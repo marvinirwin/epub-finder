@@ -16,10 +16,14 @@
     "jquery": "^3.5.1",
     "jquery-ui": "^1.12.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
+    "jszip-utils": "^0.1.0",
+    "lodash": "^4.17.15",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-reader": "^0.18.3",
     "react-scripts": "3.4.1",
+    "react-tooltip": "^4.2.6",
+    "sql.js": "^1.2.2",
     "typescript": "^3.7.5"
   },
   "scripts": {
@@ -44,6 +48,8 @@
     ]
   },
   "devDependencies": {
-    "@types/jquery": "^3.3.38"
+    "@types/jquery": "^3.3.38",
+    "@types/lodash": "^4.14.152",
+    "@types/sql.js": "^1.0.3"
   }
 }

@@ -1,11 +1,7 @@
 import hashlib
 import json
-import os
 import re
 import unicodedata
-
-import ebooklib
-from hanziconv import HanziConv
 from bs4 import BeautifulSoup
 import epub
 import sqlite3
@@ -158,7 +154,8 @@ def single_section_persisted(section):
 
 books = [
     ('老舍全集.epub', index_by_manifest_value, 'manifest_value'),
-    ('pg23962.epub', index_by_manifest_value, 'manifest_value')
+    ('pg23962.epub', index_by_manifest_value, 'manifest_value'),
+    ('test.epub', index_by_manifest_value, 'manifest_value'),
 ]
 
 
@@ -172,7 +169,7 @@ def index_books():
 
 def get_vocab():
     global f, charset, word
-    with open('./hsk.json', 'r') as f:
+    with open('./reader/src/hsk.json', 'r') as f:
         words = json.load(f)
     charset = {}
     for word in words:
@@ -211,7 +208,8 @@ WITH v AS (
               br_range_end
        FROM book_range
               LEFT JOIN range_stat AS known
-                        ON known.rs_range_id = book_range.ROWID AND known.rs_character IN (SELECT * FROM v)
+                        ON known.rs_range_id = book_range.ROWID 
+                        AND known.rs_character IN (SELECT * FROM v)
               LEFT JOIN range_stat AS unknown
                         ON
                             `unknown`.rs_range_id = book_range.ROWID AND
@@ -226,7 +224,6 @@ WITH v AS (
   WHERE 
     known_count + unknown_count > 50
   ORDER BY unknown_count * 1.0 / known_count
-  LIMIT 1;
         ''',
         (vocab_hash,)
     )

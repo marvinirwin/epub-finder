@@ -9,6 +9,9 @@ import vocab from './hsk.json';
 import Rendition from "epubjs/types/rendition";
 // @ts-ignore
 import {sify} from 'chinese-conv';
+import {FlashcardPopup, loadAnkiPackageFromFile} from "./Anki";
+import ReactTooltip from "react-tooltip";
+import {render} from 'react-dom';
 
 // export for others scripts to use
 // @ts-ignore
@@ -20,9 +23,11 @@ interface Vocab {
     pinyin: string;
     translations: string[]
 }
+
 interface VocabMap {
     [key: string]: Vocab;
 }
+
 function makeVocab(hanzi: string, pinyin: string, ...translations: string[]): Vocab {
     return {
         id: 0,
@@ -31,11 +36,12 @@ function makeVocab(hanzi: string, pinyin: string, ...translations: string[]): Vo
         translations
     }
 }
+
 // import * as ranges from './ranges.json';
 const v: Vocab[] = vocab;
 const myVocab: Vocab[] = [
-    makeVocab('却', 'qu4', 'however', 'yet'),
-    makeVocab('仙', 'xien1', 'magical')
+        makeVocab('却', 'qu4', 'however', 'yet'),
+        makeVocab('仙', 'xien1', 'magical')
     ]
 ;
 const vocabMap: VocabMap = v.concat(myVocab).reduce((acc: VocabMap, v: Vocab) => {
@@ -44,14 +50,15 @@ const vocabMap: VocabMap = v.concat(myVocab).reduce((acc: VocabMap, v: Vocab) =>
 }, {})
 
 
-
 let book = Epub("pg23962.epub", {});
 
 
 function App() {
     const [b, setB] = useState();
+    const [ankiPackage, setAnkiPackage] = useState();
     useEffect(() => {
         (async () => {
+            const apkg = await loadAnkiPackageFromFile('Game.zip');
             await book.ready;
             let elementById = document.getElementById('book');
             if (elementById) {
@@ -71,38 +78,48 @@ function App() {
                     `)
                     const words = parent.text().normalize().split('');
                     const root = $('<div/>');
+                    const wordEls: JQuery[] = [];
                     for (let i = 0; i < words.length; i++) {
                         const word = sify(words[i]);
                         const el = $('<span/>');
+
                         el.text(word);
-                        let t = vocabMap[word];
-                        if (t) {
-                            el.addClass('hoverable')
-                            // @ts-ignore
-                            el.attr('title',
-                            `
-                            ${t.pinyin} -
-                            ${t.translations.join(', ')}
-                            
-                            `
-                                );
-                            // @ts-ignore
-                            el.tooltip();
-                        }
+                        wordEls.push(el);
+
                         root.append(el);
                     }
                     parent.text('');
                     parent.append(root);
+                    setTimeout(() => {
+                        wordEls.forEach(e => {
+                            let text = e.text();
+                            let t = apkg.cardMap[text];
+                            if (t) {
+                                e.addClass('hoverable')
+                                let htmlElements = e.get(0);
+                                render(<FlashcardPopup card={t[0]} text={text}/>, htmlElements);
+                            }
+                        })
+                    })
                 });
 
             }
             setB(book)
         })()
     }, []);
+
     return (
-        <div style={{position: "relative", height: "100vh", width: '100vw'}}>
-            {" "}
+        <div>
+            <ReactTooltip
+                html
+                event="mouseenter"
+                eventOff="mouseleave click"
+            >YEEET</ReactTooltip>
+
+            <div style={{position: "relative", top: '20vh', height: "80vh", width: '80vw'}}>
+                {" "}
                 <div id="book"/>
+            </div>
         </div>
     );
 }
