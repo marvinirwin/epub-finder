@@ -58,7 +58,7 @@ function App() {
     const [ankiPackage, setAnkiPackage] = useState();
     useEffect(() => {
         (async () => {
-            const apkg = await loadAnkiPackageFromFile('Game.zip');
+            const apkg = await loadAnkiPackageFromFile('chars.zip');
             await book.ready;
             let elementById = document.getElementById('book');
             if (elementById) {
@@ -110,12 +110,6 @@ function App() {
 
     return (
         <div>
-            <ReactTooltip
-                html
-                event="mouseenter"
-                eventOff="mouseleave click"
-            >YEEET</ReactTooltip>
-
             <div style={{position: "relative", top: '20vh', height: "80vh", width: '80vw'}}>
                 {" "}
                 <div id="book"/>

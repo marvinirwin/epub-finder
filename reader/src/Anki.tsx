@@ -1,6 +1,6 @@
 import React, {ReactElement, useEffect, useState} from 'react';
 import * as _ from 'lodash';
-import {Dictionary, invert, groupBy, flatten, flattenDeep} from 'lodash';
+import {Dictionary, invert, groupBy, flatten, flattenDeep, uniq} from 'lodash';
 import './App.css';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
@@ -40,6 +40,7 @@ export class Deck {
 
 export class Card {
     interpolatdFields: string[] = [];
+
     constructor(public fields: string[]) {
         // So basically the act of displaying a card involves parsing its fields and then inlining the images
     }
@@ -51,6 +52,7 @@ export class Card {
     get back(): string {
         return this.interpolatdFields[1].normalize();
     }
+
     async interpolateImageSources(getField: (s: string) => Promise<string>): Promise<string[]> {
         let callbackfn = async (f: string) => {
             let domparser = new DOMParser();
@@ -112,31 +114,38 @@ export function prep<T>(sql: SqlJs.Database, statement: string, params: any[]): 
 export class AnkiPackage {
     allCards: Card[];
     cardMap: Dictionary<Card[]>;
+
     public constructor(public collections: Collection[], public zip: JSZip) {
         this.allCards = flattenDeep(this.collections.map(c => c.decks.map(d => d.cards)))
         this.cardMap = groupBy(this.allCards, c => {
-                return c
+                const v = uniq(c
                     .front
                     .split('')
-                    .filter(s => s.match(/[\u4E00-\uFA29]/))
+                    .filter(s => s.match(/[\u4E00-\uFA29]/)))
                     .join('')
+                if (v.length) {
+                    return v[0];
+                }
+                return v;
             }
         );
+        debugger;
+        console.log();
     }
 
-    public static async init(sql: SqlJs.Database, zip: JSZip, media: {[key: string]: string}): Promise<AnkiPackage> {
+    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }): Promise<AnkiPackage> {
         try {
             const collections = await AnkiPackage.initCollections(sql, zip, media);
             const p = new AnkiPackage(collections, zip);
             collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
             return p;
-        } catch(e) {
+        } catch (e) {
             debugger;
             throw e;
         }
     }
 
-    static async initCollections(sql: SqlJs.Database, zip: JSZip, media: {[key: string]: string}) {
+    static async initCollections(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }) {
         const tables = prep(sql, `SELECT name FROM sqlite_master WHERE type='table';
 `, []);
         const cols: col[] = prep<col>(sql,
@@ -183,7 +192,12 @@ export class AnkiPackage {
                     let noteElement: note = notes[card.nid][0];
                     const cardInstance = new Card(noteElement.flds.split("\0x1f"));
                     cardInstance.interpolatdFields = await cardInstance.interpolateImageSources(async (href) => {
-                        const imageSrc = await zip.files[media[href]].async('base64');
+                        let file = zip.files[media[href]];
+                        if (!file) {
+                            debugger;
+                            return '';
+                        }
+                        const imageSrc = await file.async('base64');
                         return `data:image/jpeg;base64,${imageSrc}`;
                     })
                     return cardInstance;
@@ -204,7 +218,7 @@ export function loadAnkiPackageFromFile(filename: string): Promise<AnkiPackage> 
             }
             const v = await JSZip.loadAsync(data);
             const ankiDatabaseBinary = await v.files['collection.anki2'].async('uint8array');
-            const mediafile: {[key: string]: string} = invert(JSON.parse(await v.files['media'].async('text')));
+            const mediafile: { [key: string]: string } = invert(JSON.parse(await v.files['media'].async('text')));
             const SQL = await initSqlJs();
             var db = new SQL.Database(ankiDatabaseBinary);
             resolve(await AnkiPackage.init(db, v, mediafile));
@@ -213,8 +227,26 @@ export function loadAnkiPackageFromFile(filename: string): Promise<AnkiPackage> 
 }
 
 
-export function FlashcardPopup({text, card}: {text: string, card: Card}) {
-    return <span data-tooltip={card.front}>
+export function FlashcardPopup({text, card}: { text: string, card: Card }) {
+    const [insideCharacter, setInsideCharacter] = useState(false)
+    const [insidePopup, setInsidePopup] = useState(false)
+    return <span
+        onMouseEnter={() => setInsideCharacter(true)}
+        onMouseLeave={() => setInsideCharacter(false)}
+    >
+        {(insideCharacter || insidePopup) && <div
+            style={{
+                position: 'absolute',
+                background: 'white',
+                border: 'solid black 1px',
+                borderRadius: '5px',
+                zIndex: 99
+            }}
+            onMouseEnter={() => setInsidePopup(true)}
+            onMouseLeave={() => setInsidePopup(false)}
+            dangerouslySetInnerHTML={{__html: card.front}}>
+
+        </div>}
         {text}
     </span>
 }
