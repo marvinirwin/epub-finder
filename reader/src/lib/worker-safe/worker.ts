@@ -30,8 +30,8 @@ export interface AnkiPackageSerialized {
     name: string
     path: string
     message: string
-    collections: Collection[];
-    cardIndex: Dictionary<Card[]>
+    collections: Collection[] | null;
+    cardIndex: Dictionary<Card[]> | null
 }
 
 class AnkiPackageLoader {
@@ -41,13 +41,16 @@ class AnkiPackageLoader {
         this.ankiPackageLoaded = from(this.loadAnkiPackageFromFile());
         combineLatest(this.ankiPackageLoaded, this.loadingCheckpoints)
             .subscribe(([ankiPackage, message]: [AnkiPackage, string | undefined]) => {
-            ctx.postMessage(JSON.stringify({
-                collections: ankiPackage ? ankiPackage.collections : null,
-                cardIndex: ankiPackage ? ankiPackage.cardMap : null,
-                message,
-                name: this.name,
-                path: this.path
-            }))
+                let value: AnkiPackageSerialized ={
+                    collections: ankiPackage ? ankiPackage.collections : null,
+                    cardIndex: ankiPackage ? ankiPackage.cardMap : null,
+                    message: message || '',
+                    name: this.name,
+                    path: this.path
+                };
+                const str = JSON.stringify(value
+                )
+            ctx.postMessage(`packageUpdate$.next(${str})`)
         })
     }
     loadAnkiPackageFromFile(): Promise<AnkiPackage> {
@@ -79,6 +82,10 @@ const loaders: AnkiPackageLoader[] = [];
 // Respond to message from parent thread
 ctx.onmessage = (ev) => {
     let {name, path}: {name: string, path: string} = JSON.parse(ev.data);
-    const l = new AnkiPackageLoader(name, path);
+    try {
+        const l = new AnkiPackageLoader(name, path);
+    } catch(e) {
+        console.error(e);
+    }
 };
 

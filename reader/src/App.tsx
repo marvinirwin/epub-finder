@@ -23,7 +23,6 @@ import CardScroller from './lib/Card-Scroller';
 import {Card} from "./lib/worker-safe/Card";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 
-// export for others scripts to use
 // @ts-ignore
 window.$ = $;
 
@@ -87,7 +86,7 @@ const m = new BookManager([
 class CurrentPackage {
     public allCards: Card[];
     constructor(p: AnkiPackageSerialized) {
-        this.allCards = flattenDeep(p.collections.map(c => c.decks.map(d => d.cards)))
+        this.allCards = flattenDeep((p.collections || []).map(c => c.decks.map(d => d.cards)))
     }
 
 }
@@ -96,22 +95,21 @@ class AnkiPackageManager {
     packages$: BehaviorSubject<Dictionary<AnkiPackageSerialized>> = new BehaviorSubject({});
     currentPackage$: BehaviorSubject<AnkiPackageSerialized | undefined> = new BehaviorSubject<AnkiPackageSerialized | undefined>(undefined);
     constructor() {
-        const packageLoader = new MyWorker();
-        const onWorkerMessage$: Subject<string> = new Subject();
-        packageLoader.onmessage = onWorkerMessage$.next.bind(onWorkerMessage$); // TODO I dont know if this will work
-        onWorkerMessage$.pipe(withLatestFrom(this.packages$))
-            .subscribe(([message, currentPackages]: [string, Dictionary<AnkiPackageSerialized>]) => {
-                let parse: AnkiPackageSerialized = JSON.parse(message);
+        const packageLoader: Worker = new MyWorker();
+        const packageUpdate$: Subject<AnkiPackageSerialized> = new Subject();
+        packageLoader.onmessage = v => eval(v.data);
+        packageUpdate$.pipe(withLatestFrom(this.packages$))
+            .subscribe(([parse, currentPackages]: [AnkiPackageSerialized, Dictionary<AnkiPackageSerialized>]) => {
                 currentPackages[parse.name] = parse;
-                if (!Object.keys(currentPackages).length) {
+                if (Object.keys(currentPackages).length === 1) {
                     this.currentPackage$.next(parse);
                 }
                 this.packages$.next(currentPackages);
             })
         const packages = [
-            {name: 'Characters', path: 'chars.zip'},
-            {name: 'Hanping', path: 'Hanping_Chinese_HSK_1-6.zip'},
-            {name: 'GRE', path: 'GRE.zip'}
+            {name: 'Characters', path: '/chars.zip'},
+            {name: 'Hanping', path: '/Hanping_Chinese_HSK_1-6.zip'},
+            {name: 'GRE', path: '/GRE.zip'}
         ].forEach(p => packageLoader.postMessage(JSON.stringify(p)))
     }
 }
@@ -125,6 +123,7 @@ function useObs<T>(obs$: Observable<T>, init?: T) {
     }, [obs$])
     return v;
 }
+
 const pm = new AnkiPackageManager();
 
 function annotateElements(target: string, p: AnkiPackageSerialized) {
@@ -156,7 +155,7 @@ function annotateElements(target: string, p: AnkiPackageSerialized) {
     setTimeout(() => {
         wordEls.forEach(e => {
             let text = e.text();
-            let t = p.cardIndex[text];
+            let t = (p.cardIndex || {})[text];
             if (t) {
                 e.addClass('hoverable')
                 let htmlElements = e.get(0);
@@ -196,10 +195,10 @@ function App() {
 
     return (
         <div>
-            <div>
+            <div className={'third-box'}>
                 {currentPackage && <
                     CardScroller
-                    cards={flatten(currentPackage.collections.map(c => c.allCards))}
+                    cards={flatten((currentPackage.collections || []).map(c => c.allCards))}
                 />
                     }
             </div>

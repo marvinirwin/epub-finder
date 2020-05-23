@@ -64,8 +64,6 @@ export class AnkiPackage {
                 return v;
             }
         );
-        debugger;
-        console.log();
     }
 
     public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }): Promise<AnkiPackage> {
@@ -129,12 +127,14 @@ export class AnkiPackage {
                     let interpolatedFields = await Card.interpolateMediaTags(fields, async (href) => {
                         let file = zip.files[media[href]];
                         if (!file) {
-                            debugger;
                             return '';
                         }
                         const imageSrc = await file.async('base64');
                         return `data:image/jpeg;base64,${imageSrc}`;
                     });
+                    if (!fields || !interpolatedFields) {
+                        debugger;console.log();
+                    }
                     const cardInstance = new Card(fields, interpolatedFields);
                     return cardInstance;
                 }));

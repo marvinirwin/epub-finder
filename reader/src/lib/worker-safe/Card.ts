@@ -1,9 +1,15 @@
+import {DOMParser, XMLSerializer} from 'xmldom';
+
+
 export class Card {
     constructor(public fields: string[], public interpolatedFields: string[]) {
         // So basically the act of displaying a card involves parsing its fields and then inlining the images
     }
 
     get front(): string {
+        if (!this.interpolatedFields[0]) {
+            debugger;console.log();
+        }
         return this.interpolatedFields[0].normalize();
     }
 
@@ -13,7 +19,14 @@ export class Card {
 
     static async interpolateMediaTags(fields: string[], getField: (s: string) => Promise<string>): Promise<string[]> {
         let callbackfn = async (f: string) => {
-            let domparser = new DOMParser();
+            let domparser = new DOMParser(
+                {
+                    errorHandler: {
+                        warning: function () {
+                        }
+                    },
+                }
+            );
             const d = domparser.parseFromString(f, 'text/html');
             const mediaTags = d.getElementsByTagName('img');
             for (let i = 0; i < mediaTags.length; i++) {
@@ -24,7 +37,11 @@ export class Card {
                 }
                 mediaTag.setAttribute('src', await getField(attribute || ''));
             }
-            return d.documentElement.innerHTML;
+            let innerHTML = new XMLSerializer().serializeToString(d.documentElement);
+            if (!innerHTML) {
+                debugger;console.log();
+            }
+            return innerHTML;
         };
         return Promise.all(fields.map(callbackfn))
     }
