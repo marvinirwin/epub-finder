@@ -1,85 +1,20 @@
-import React, {ReactElement, useEffect, useState} from 'react';
 import * as _ from 'lodash';
-import {Dictionary, invert, groupBy, flatten, flattenDeep, uniq} from 'lodash';
-import './App.css';
+import {Dictionary, flattenDeep, groupBy, uniq} from 'lodash';
 // @ts-ignore
-import {getBinaryContent} from 'jszip-utils';
 import JSZip from 'jszip';
-import initSqlJs from "sql.js";
 import {SqlJs} from "sql.js/module";
-import ReactTooltip from "react-tooltip";
-
-
-export interface col {
-    decks: string;
-    id: string;
-}
-
-export interface card {
-    nid: number;
-    did: string;
-}
-
-export interface note {
-    flds: string
-}
-
-export interface deck {
-    id: string;
-}
-
-export class Collection {
-    constructor(public decks: Deck[]) {
-    }
-}
-
-export class Deck {
-    constructor(public cards: Card[]) {
-    }
-}
-
-export class Card {
-    interpolatdFields: string[] = [];
-
-    constructor(public fields: string[]) {
-        // So basically the act of displaying a card involves parsing its fields and then inlining the images
-    }
-
-    get front(): string {
-        return this.interpolatdFields[0].normalize();
-    }
-
-    get back(): string {
-        return this.interpolatdFields[1].normalize();
-    }
-
-    async interpolateImageSources(getField: (s: string) => Promise<string>): Promise<string[]> {
-        let callbackfn = async (f: string) => {
-            let domparser = new DOMParser();
-            const d = domparser.parseFromString(f, 'text/html');
-            const mediaTags = d.getElementsByTagName('img');
-            for (let i = 0; i < mediaTags.length; i++) {
-                const mediaTag = mediaTags[i];
-                let attribute = mediaTag.getAttribute('src');
-                if (!attribute) {
-                    throw new Error('image no source');
-                }
-                mediaTag.setAttribute('src', await getField(attribute || ''));
-            }
-            return d.documentElement.innerHTML;
-        };
-        return Promise.all(this.fields.map(callbackfn))
-    }
-}
+import {Card} from "./lib/worker-safe/Card";
+import {Collection} from "./lib/worker-safe/Collection";
+import {deck} from "./lib/worker-safe/tables/deck";
+import {note} from "./lib/worker-safe/tables/note";
+import {card} from "./lib/worker-safe/tables/card";
+import {col} from "./lib/worker-safe/tables/col";
+import {Deck} from "./lib/worker-safe/Deck";
 
 export interface Model {
     deckId: string;
     name: string;
     cards: Card[];
-}
-
-export interface Card {
-    note: Note;
 }
 
 export interface Note {
@@ -190,8 +125,8 @@ export class AnkiPackage {
             let decks1 = await Promise.all(decks2.map(async d => {
                 let cards1 = await Promise.all((cards[d.id] || []).map(async card => {
                     let noteElement: note = notes[card.nid][0];
-                    const cardInstance = new Card(noteElement.flds.split("\0x1f"));
-                    cardInstance.interpolatdFields = await cardInstance.interpolateImageSources(async (href) => {
+                    let fields = noteElement.flds.split("\0x1f");
+                    let interpolatedFields = await Card.interpolateMediaTags(fields, async (href) => {
                         let file = zip.files[media[href]];
                         if (!file) {
                             debugger;
@@ -199,7 +134,8 @@ export class AnkiPackage {
                         }
                         const imageSrc = await file.async('base64');
                         return `data:image/jpeg;base64,${imageSrc}`;
-                    })
+                    });
+                    const cardInstance = new Card(fields, interpolatedFields);
                     return cardInstance;
                 }));
                 return new Deck(cards1);
@@ -208,47 +144,6 @@ export class AnkiPackage {
         }))
         return collections;
     }
-}
-
-export function loadAnkiPackageFromFile(filename: string): Promise<AnkiPackage> {
-    return new Promise((resolve, reject) => {
-        getBinaryContent(filename, async function (err: boolean | Error, data: any) {
-            if (err) {
-                reject(err);
-            }
-            const v = await JSZip.loadAsync(data);
-            const ankiDatabaseBinary = await v.files['collection.anki2'].async('uint8array');
-            const mediafile: { [key: string]: string } = invert(JSON.parse(await v.files['media'].async('text')));
-            const SQL = await initSqlJs();
-            var db = new SQL.Database(ankiDatabaseBinary);
-            resolve(await AnkiPackage.init(db, v, mediafile));
-        });
-    })
-}
-
-
-export function FlashcardPopup({text, card}: { text: string, card: Card }) {
-    const [insideCharacter, setInsideCharacter] = useState(false)
-    const [insidePopup, setInsidePopup] = useState(false)
-    return <span
-        onMouseEnter={() => setInsideCharacter(true)}
-        onMouseLeave={() => setInsideCharacter(false)}
-    >
-        {(insideCharacter || insidePopup) && <div
-            style={{
-                position: 'absolute',
-                background: 'white',
-                border: 'solid black 1px',
-                borderRadius: '5px',
-                zIndex: 99
-            }}
-            onMouseEnter={() => setInsidePopup(true)}
-            onMouseLeave={() => setInsidePopup(false)}
-            dangerouslySetInnerHTML={{__html: card.front}}>
-
-        </div>}
-        {text}
-    </span>
 }
 
 
