@@ -13,14 +13,15 @@ import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {combineLatest, Observable, Subject} from "rxjs";
+import {combineLatest, merge, Observable, Subject} from "rxjs";
 import Book from "epubjs/types/book";
 import {flattenDeep} from 'lodash';
 import {Card} from "./lib/worker-safe/Card";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 import {CardTree} from "./lib/components/Card-Tree";
 import {AnkiPackageManager} from "./AnkiPackageManager";
-import {Serializing, UnserializedAnkiPackage} from "./lib/worker-safe/Serializing";
+import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
+import {reduce, scan} from "rxjs/operators";
 
 // @ts-ignore
 window.$ = $;
@@ -83,15 +84,6 @@ const m = new BookManager([
     '老舍全集.epub'
 ]);
 
-class CurrentPackage {
-    public allCards: Card[];
-
-    constructor(p: Serializing) {
-        this.allCards = flattenDeep((p.collections || []).map(c => c.decks.map(d => d.cards)))
-    }
-
-}
-
 function useObs<T>(obs$: Observable<T>, init?: T) {
     const [v, setV] = useState(init)
     useEffect(() => {
@@ -143,6 +135,12 @@ function annotateElements(target: string, p: UnserializedAnkiPackage) {
     })
 }
 
+const messageBuffer$ = merge(pm.messages$, m.bookLoadingMessages$).pipe(scan((acc: string[], message: string) => {
+    acc.unshift(message);
+    let strings = acc.slice(0, 100);
+    return strings;
+}, []));
+
 
 function App() {
     const [b, setB] = useState();
@@ -151,6 +149,9 @@ function App() {
     const packageManager = useObs(pm.packages$, pm.packages$.getValue());
     const currentPackage = useObs(pm.currentPackage$, pm.currentPackage$.getValue());
     const packages = useObs(pm.packages$, pm.packages$.getValue());
+    const books = useObs(m.bookList$, []);
+
+    const messageList = useObs(messageBuffer$, []);
 
     useEffect(() => {
         combineLatest(
@@ -175,8 +176,21 @@ function App() {
 
     return (
         <div>
-            <ToastContainer/>
-            <div className={'third-box'}>
+            <ul style={{position: 'fixed',  top: '1em', right: '0px', width: '33vw', border: 'solid black 1px', borderRadius: '3px'}}>
+                {messageList && messageList.map(m => <li>{m}</li>)}
+            </ul>
+            <div style={{
+                left: '0px',
+                width: '77vw',
+                border: 'solid black 1px',
+                borderRadius: '3px',
+                display: 'flex',
+                justifyContent: 'space-around'
+            }}>
+                <span>Active Collection: {currentPackage?.name}</span>
+                <span>Active Book: {book?.path}</span>
+            </div>
+            <div style={{}}>
                 {packages && <CardTree ankiPackages={packages}/>}
             </div>
             {/*

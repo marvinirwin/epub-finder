@@ -4,7 +4,7 @@ import TreeItem from "@material-ui/lab/TreeItem";
 import React, {Fragment} from "react";
 import {Dictionary} from "lodash";
 import CardScroller from "./Card-Scroller";
-import {Serializing, UnserializedAnkiPackage} from "../worker-safe/Serializing";
+import {SerializedAnkiPackage, UnserializedAnkiPackage} from "../worker-safe/SerializedAnkiPackage";
 
 /**
  * This function assumes there is only one collection per package, it can trivially be made to support more

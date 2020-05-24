@@ -2,7 +2,7 @@ import {Collection, SerializedCollection} from "./Collection";
 import {Dictionary, fromPairs} from "lodash";
 import {Card, SerializedCard} from "./Card";
 
-export interface Serializing {
+export interface SerializedAnkiPackage {
     name: string
     path: string
     message: string
@@ -18,7 +18,7 @@ export interface UnserializedAnkiPackage {
     cardIndex: Dictionary<Card[]> | null
 }
 
-export function UnserializeAnkiPackage(o: Serializing): UnserializedAnkiPackage {
+export function UnserializeAnkiPackage(o: SerializedAnkiPackage): UnserializedAnkiPackage {
     let entries = o.cardIndex ? Object.entries(o.cardIndex) : null;
     let pairs = entries && entries.map(([k, v]) => [k, v.map(sc => Card.fromSerialized(sc))]);
     const cIndex = o.cardIndex ? fromPairs(pairs) : null;

@@ -1,7 +1,7 @@
 import {Card} from "./Card";
 import {Dictionary, flattenDeep, zip, fromPairs} from "lodash";
 import {Deck, SerializedDeck} from "./Deck";
-import {Serializing, UnserializedAnkiPackage} from "./Serializing";
+import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./SerializedAnkiPackage";
 
 export class Collection {
     allCards: Card[];
