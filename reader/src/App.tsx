@@ -9,19 +9,18 @@ import vocab from './hsk.json';
 // @ts-ignore
 import {sify} from 'chinese-conv';
 import {render} from 'react-dom';
-import {toast, ToastContainer} from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import MyWorker from 'worker-loader?name=dist/[name].js!./lib/worker-safe/worker';
-import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
+import {combineLatest, Observable, Subject} from "rxjs";
 import Book from "epubjs/types/book";
-import {AnkiPackageSerialized} from "./lib/worker-safe/worker";
-import {Dictionary, flattenDeep} from 'lodash';
-import {withLatestFrom} from "rxjs/operators";
+import {flattenDeep} from 'lodash';
 import {Card} from "./lib/worker-safe/Card";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
-import {CardTree} from "./lib/components/CardTree";
+import {CardTree} from "./lib/components/Card-Tree";
+import {AnkiPackageManager} from "./AnkiPackageManager";
+import {Serializing, UnserializedAnkiPackage} from "./lib/worker-safe/Serializing";
 
 // @ts-ignore
 window.$ = $;
@@ -87,37 +86,10 @@ const m = new BookManager([
 class CurrentPackage {
     public allCards: Card[];
 
-    constructor(p: AnkiPackageSerialized) {
+    constructor(p: Serializing) {
         this.allCards = flattenDeep((p.collections || []).map(c => c.decks.map(d => d.cards)))
     }
 
-}
-
-class AnkiPackageManager {
-    packages$: BehaviorSubject<Dictionary<AnkiPackageSerialized>> = new BehaviorSubject({});
-    currentPackage$: BehaviorSubject<AnkiPackageSerialized | undefined> = new BehaviorSubject<AnkiPackageSerialized | undefined>(undefined);
-
-    constructor() {
-        const packageLoader: Worker = new MyWorker();
-        const packageUpdate$: Subject<AnkiPackageSerialized> = new Subject();
-        packageLoader.onmessage = v => eval(v.data);
-        packageUpdate$.pipe(withLatestFrom(this.packages$))
-            .subscribe(([newPackageUpdate, currentPackages]: [AnkiPackageSerialized, Dictionary<AnkiPackageSerialized>]) => {
-                if (newPackageUpdate.message) {
-                    toast(newPackageUpdate.message);
-                }
-                currentPackages[newPackageUpdate.name] = newPackageUpdate;
-                if (Object.keys(currentPackages).length === 1) {
-                    this.currentPackage$.next(newPackageUpdate);
-                }
-                this.packages$.next({...currentPackages});
-            })
-        const packages = [
-            {name: 'Characters', path: '/chars.zip'},
-            {name: 'Hanping', path: '/Hanping_Chinese_HSK_1-6.zip'},
-            {name: 'GRE', path: '/GRE.zip'}
-        ].forEach(p => packageLoader.postMessage(JSON.stringify(p)))
-    }
 }
 
 function useObs<T>(obs$: Observable<T>, init?: T) {
@@ -132,7 +104,7 @@ function useObs<T>(obs$: Observable<T>, init?: T) {
 
 const pm = new AnkiPackageManager();
 
-function annotateElements(target: string, p: AnkiPackageSerialized) {
+function annotateElements(target: string, p: UnserializedAnkiPackage) {
     const parent = $('iframe').contents().find(target);
     parent.parent().append(`
                     <style>

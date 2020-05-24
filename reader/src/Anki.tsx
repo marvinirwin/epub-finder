@@ -3,7 +3,7 @@ import {Dictionary, flattenDeep, groupBy, uniq} from 'lodash';
 // @ts-ignore
 import JSZip from 'jszip';
 import {SqlJs} from "sql.js/module";
-import {Card} from "./lib/worker-safe/Card";
+import {Card, isChineseCharacter} from "./lib/worker-safe/Card";
 import {Collection} from "./lib/worker-safe/Collection";
 import {deck} from "./lib/worker-safe/tables/deck";
 import {note} from "./lib/worker-safe/tables/note";
@@ -56,7 +56,9 @@ export class AnkiPackage {
                 const v = uniq(c
                     .front
                     .split('')
-                    .filter(s => s.match(/[\u4E00-\uFA29]/)))
+                    .filter(s => {
+                        return isChineseCharacter(s);
+                    }))
                     .join('')
                 if (v.length) {
                     return v[0];

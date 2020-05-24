@@ -1,7 +1,7 @@
 import {useState} from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {Divider} from "@material-ui/core";
-import {Card} from "./worker-safe/Card";
+import {Card} from "../worker-safe/Card";
 import React from "react";
 export default function CardScroller({cards}: {cards: Card[]}) {
     const [limit, setLimit] = useState(20);
@@ -15,14 +15,7 @@ export default function CardScroller({cards}: {cards: Card[]}) {
             key={i}
             style={{border: 'thin black 1px', borderRadius: '5px'}}
         >
-            {question.fields.map(f =>
-                <div >
-                    <Divider light />
-                    <div dangerouslySetInnerHTML={{__html: f}}/>
-                    <Divider light />
-                </div>
-            )
-            }
+            {question.matchCriteria}
         </div>)
     }
     </InfiniteScroll>

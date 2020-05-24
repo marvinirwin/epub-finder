@@ -1,18 +1,16 @@
+/* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
-import {AnkiPackage, loadAnkiPackageFromFile} from "../../Anki";
-import {buffer, filter, map, last} from "rxjs/operators";
-import {Subject, BehaviorSubject, from, Observable, combineLatest} from "rxjs";
-import {invert, Dictionary} from "lodash";
+import {AnkiPackage} from "../../Anki";
+import {combineLatest, from, Observable, Subject} from "rxjs";
+import {invert} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
 import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
-import {Card} from "./Card";
-import {Collection} from "./Collection";
 
-// @ts-ignore
 // noinspection JSConstantReassignment
+// @ts-ignore
 self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
@@ -26,14 +24,6 @@ class Loader {
     }
 }
 
-export interface AnkiPackageSerialized {
-    name: string
-    path: string
-    message: string
-    collections: Collection[] | null;
-    cardIndex: Dictionary<Card[]> | null
-}
-
 class AnkiPackageLoader {
     ankiPackageLoaded: Observable<AnkiPackage>;
     loadingCheckpoints: Subject<string> = new Subject<string>();
@@ -41,16 +31,15 @@ class AnkiPackageLoader {
         this.ankiPackageLoaded = from(this.loadAnkiPackageFromFile());
         combineLatest(this.ankiPackageLoaded, this.loadingCheckpoints)
             .subscribe(([ankiPackage, message]: [AnkiPackage, string | undefined]) => {
-                let value: AnkiPackageSerialized ={
+                const str = JSON.stringify({
                     collections: ankiPackage ? ankiPackage.collections : null,
                     cardIndex: ankiPackage ? ankiPackage.cardMap : null,
                     message: message || '',
                     name: this.name,
                     path: this.path
-                };
-                const str = JSON.stringify(value
-                )
-            ctx.postMessage(`packageUpdate$.next(${str})`)
+                })
+
+            ctx.postMessage(` this.recieveSerializedPackage(${str})`)
         })
     }
     loadAnkiPackageFromFile(): Promise<AnkiPackage> {

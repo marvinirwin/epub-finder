@@ -17,6 +17,10 @@ export class Card {
         return this.interpolatedFields[1].normalize();
     }
 
+    get matchCriteria(): string {
+        return this.fields.join('').split('').filter(isChineseCharacter).join('')
+    }
+
     static async interpolateMediaTags(fields: string[], getField: (s: string) => Promise<string>): Promise<string[]> {
         let callbackfn = async (f: string) => {
             let domparser = new DOMParser(
@@ -45,4 +49,19 @@ export class Card {
         };
         return Promise.all(fields.map(callbackfn))
     }
+
+    static fromSerialized(c: SerializedCard) {
+        return new Card(c.fields, c.interpolatedFields);
+    }
+}
+
+export interface SerializedCard {
+    interpolatedFields: string[];
+    fields: string[];
+}
+
+
+// Dont know if this matches simplified or traditional
+export function isChineseCharacter(s: string) {
+    return s.match(/[\u4E00-\uFA29]/);
 }
