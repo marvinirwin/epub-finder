@@ -4,7 +4,8 @@ import {Deck} from "./Deck";
 
 export class Collection {
     allCards: Card[];
-    constructor(public decks: Deck[]) {
+    name: any;
+    constructor(public decks: Deck[], name: string) {
         this.allCards = flattenDeep(decks.map(d => d.cards))
     }
 }

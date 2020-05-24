@@ -9,19 +9,19 @@ import vocab from './hsk.json';
 // @ts-ignore
 import {sify} from 'chinese-conv';
 import {render} from 'react-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import MyWorker from 'worker-loader?name=dist/[name].js!./lib/worker-safe/worker';
-import {BehaviorSubject, from, Observable, Subject, combineLatest} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
 import Book from "epubjs/types/book";
 import {AnkiPackageSerialized} from "./lib/worker-safe/worker";
-import {Dictionary, flattenDeep, flatten} from 'lodash';
+import {Dictionary, flattenDeep} from 'lodash';
 import {withLatestFrom} from "rxjs/operators";
-import CardScroller from './lib/Card-Scroller';
 import {Card} from "./lib/worker-safe/Card";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
+import {CardTree} from "./lib/components/CardTree";
 
 // @ts-ignore
 window.$ = $;
@@ -60,9 +60,10 @@ const vocabMap: VocabMap = v.concat(myVocab).reduce((acc: VocabMap, v: Vocab) =>
 
 class BookManager {
     bookList$: Subject<string[]> = new Subject<string[]>();
-    currentBookName$: Subject<string | undefined> = new Subject<string| undefined>();
+    currentBookName$: Subject<string | undefined> = new Subject<string | undefined>();
     bookLoadingMessages$: Subject<string> = new Subject();
     currentBook$: Subject<Book | undefined> = new Subject();
+
     constructor(bookNames: string[]) {
         this.bookList$.next(bookNames);
         this.currentBookName$.subscribe(filename => {
@@ -85,6 +86,7 @@ const m = new BookManager([
 
 class CurrentPackage {
     public allCards: Card[];
+
     constructor(p: AnkiPackageSerialized) {
         this.allCards = flattenDeep((p.collections || []).map(c => c.decks.map(d => d.cards)))
     }
@@ -94,17 +96,21 @@ class CurrentPackage {
 class AnkiPackageManager {
     packages$: BehaviorSubject<Dictionary<AnkiPackageSerialized>> = new BehaviorSubject({});
     currentPackage$: BehaviorSubject<AnkiPackageSerialized | undefined> = new BehaviorSubject<AnkiPackageSerialized | undefined>(undefined);
+
     constructor() {
         const packageLoader: Worker = new MyWorker();
         const packageUpdate$: Subject<AnkiPackageSerialized> = new Subject();
         packageLoader.onmessage = v => eval(v.data);
         packageUpdate$.pipe(withLatestFrom(this.packages$))
-            .subscribe(([parse, currentPackages]: [AnkiPackageSerialized, Dictionary<AnkiPackageSerialized>]) => {
-                currentPackages[parse.name] = parse;
-                if (Object.keys(currentPackages).length === 1) {
-                    this.currentPackage$.next(parse);
+            .subscribe(([newPackageUpdate, currentPackages]: [AnkiPackageSerialized, Dictionary<AnkiPackageSerialized>]) => {
+                if (newPackageUpdate.message) {
+                    toast(newPackageUpdate.message);
                 }
-                this.packages$.next(currentPackages);
+                currentPackages[newPackageUpdate.name] = newPackageUpdate;
+                if (Object.keys(currentPackages).length === 1) {
+                    this.currentPackage$.next(newPackageUpdate);
+                }
+                this.packages$.next({...currentPackages});
             })
         const packages = [
             {name: 'Characters', path: '/chars.zip'},
@@ -165,12 +171,14 @@ function annotateElements(target: string, p: AnkiPackageSerialized) {
     })
 }
 
+
 function App() {
     const [b, setB] = useState();
     const [ankiPackage, setAnkiPackage] = useState();
-    const book = useObs<Book| undefined>(m.currentBook$)
+    const book = useObs<Book | undefined>(m.currentBook$)
     const packageManager = useObs(pm.packages$, pm.packages$.getValue());
     const currentPackage = useObs(pm.currentPackage$, pm.currentPackage$.getValue());
+    const packages = useObs(pm.packages$, pm.packages$.getValue());
 
     useEffect(() => {
         combineLatest(
@@ -195,17 +203,16 @@ function App() {
 
     return (
         <div>
+            <ToastContainer/>
             <div className={'third-box'}>
-                {currentPackage && <
-                    CardScroller
-                    cards={flatten((currentPackage.collections || []).map(c => c.allCards))}
-                />
-                    }
+                {packages && <CardTree ankiPackages={packages}/>}
             </div>
+            {/*
             <div style={{position: "relative", top: '20vh', height: "80vh", width: '80vw'}}>
                 {" "}
                 <div id="book"/>
             </div>
+*/}
         </div>
     );
 }

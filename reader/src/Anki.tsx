@@ -118,9 +118,9 @@ export class AnkiPackage {
         // Now let's assign some things
         let values = Object.values(cols);
         const collections = await Promise.all(values.map(async col => {
-            let deck = decks[col.id];
-            let decks2 = Object.values(deck);
-            let decks1 = await Promise.all(decks2.map(async d => {
+            let decksForThisCollectionDict = decks[col.id];
+            let decksForThisCollection = Object.values(decksForThisCollectionDict);
+            let processedDecks = await Promise.all(decksForThisCollection.map(async d => {
                 let cards1 = await Promise.all((cards[d.id] || []).map(async card => {
                     let noteElement: note = notes[card.nid][0];
                     let fields = noteElement.flds.split("\0x1f");
@@ -138,9 +138,9 @@ export class AnkiPackage {
                     const cardInstance = new Card(fields, interpolatedFields);
                     return cardInstance;
                 }));
-                return new Deck(cards1);
+                return new Deck(cards1, d.name);
             }));
-            return new Collection(decks1)
+            return new Collection(processedDecks, 'TODO figure out how to name collections')
         }))
         return collections;
     }
