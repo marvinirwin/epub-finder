@@ -4,7 +4,7 @@ import {useObs} from "../../UseObs";
 
 export function MessageList({messageBuffer$}: {messageBuffer$: Observable<string[]>}) {
     const messageList = useObs(messageBuffer$, []);
-    return <ul>
+    return <ul className={'message-list'}>
         {messageList && messageList.map(m => <li>{m}</li>)}
     </ul>;
 }

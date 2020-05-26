@@ -4,7 +4,6 @@ import 'jquery-ui-bundle/jquery-ui.css';
 import $ from 'jquery';
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import Epub from 'epubjs';
 // @ts-ignore
 import {sify} from 'chinese-conv';
 import {render} from 'react-dom';
@@ -12,7 +11,6 @@ import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import Book from "epubjs/types/book";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 import {CardTree} from "./lib/components/Card-Tree";
 import {AnkiPackageManager} from "./AnkiPackageManager";
@@ -20,69 +18,12 @@ import {UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
 import {map, scan} from "rxjs/operators";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
-import {Dictionary} from 'lodash';
-import Spine from "epubjs/types/spine";
+import {BookInstance, BookManager} from "./BookManager";
 import {SpineItem} from "epubjs/types/section";
-
+import {SpineItemMenu ,BookMenu} from "./lib/components/SpineItemMenu";
 
 // @ts-ignore
 window.$ = $;
-
-
-interface BookInstance {
-    message: string;
-    name: string;
-    book: Book | undefined;
-}
-
-class BookManager {
-    bookList$: BehaviorSubject<Dictionary<BookInstance>> = new BehaviorSubject<Dictionary<BookInstance>>({});
-    currentBook$: BehaviorSubject<BookInstance | undefined> = new BehaviorSubject<BookInstance | undefined>(undefined)
-    bookLoadUpdates$: Subject<BookInstance> = new Subject();
-    spine$: ReplaySubject<Spine | undefined> = new ReplaySubject(1);
-
-    constructor(bookNames: string[]) {
-        bookNames.forEach(n => this.loadBookIstance(n, n))
-        this.bookLoadUpdates$.subscribe(v => {
-            this.bookList$.next({
-                ...this.bookList$.getValue(),
-                [v.name]: v
-            })
-        });
-
-        this.currentBook$.pipe(map(function (bookInstance: BookInstance | undefined): Spine | undefined {
-            if (bookInstance) {
-                if (bookInstance.book) {
-                    return bookInstance.book.spine
-                }
-            }
-            return undefined
-        })).subscribe(this.spine$);
-
-        combineLatest(this.bookList$, this.currentBook$).subscribe(([bookList, currentBook]) => {
-            if (!currentBook) {
-                const f = Object.entries(bookList).find(([k, v]) => v.book);
-                if (f) this.currentBook$.next(f[1]);
-            }
-        })
-    }
-
-    async loadBookIstance(path: string, name: string) {
-        this.bookLoadUpdates$.next({
-            name,
-            book: undefined,
-            message: `Loading ${name} from ${path}`
-        });
-        const book: Book = Epub(path);
-        await book.ready
-        this.bookLoadUpdates$.next({
-            name,
-            book,
-            message: `Loaded ${name}`
-        });
-    }
-}
-
 
 function annotateElements(target: string, p: UnserializedAnkiPackage) {
     const parent = $('iframe').contents().find(target);
@@ -153,35 +94,29 @@ function initializeApp(): AppSingleton {
 
 function HauptMask({s}: { s: AppSingleton }) {
     const {m, pm, messageBuffer$} = s;
-    const book = useObs<BookInstance | undefined>(m.currentBook$, m.currentBook$.getValue())
+    const book = useObs<BookInstance | undefined>(m.currentBook$)
     const currentPackage = useObs(pm.currentPackage$, pm.currentPackage$.getValue());
-    const bookList = useObs(m.bookList$, m.bookList$.getValue());
+    const bookList = useObs(m.bookDict$, m.bookDict$.getValue());
     const packages = useObs(pm.packages$, pm.packages$.getValue());
-    const spine = useObs<SpineItem[] | undefined>(m.spine$.pipe(map(s => {
-        if (!s) return;
-        const a: SpineItem[] = [];
-        s.each((f: SpineItem) => {
-            debugger;
-            a.push(f);
-        })
-        return a;
-    })));
 
     useEffect(() => {
         combineLatest(
             m.currentBook$,
-            pm.currentPackage$
-        ).subscribe(async ([bookInstance, p]) => {
+            pm.currentPackage$,
+            m.currentSpineItem$
+        ).subscribe(async ([bookInstance, p, item]) => {
             // Render
-            if (bookInstance && bookInstance.book) {
+            if (bookInstance && bookInstance.book && item) {
                 let elementById = document.getElementById('book');
-
                 if (!elementById) {
                     throw new Error("Book element not found")
                 }
                 elementById.textContent = '';// clear the element
                 const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
-                const target = bookInstance.book.spine.get(0).href;
+                if (!item.href) {
+                    throw new Error("Item does not have href");
+                }
+                const target = item.href;
                 await rendition.display(target);
                 if (p) {
                     annotateElements(target, p);
@@ -191,26 +126,22 @@ function HauptMask({s}: { s: AppSingleton }) {
     }, [])
 
     return (
-        <div>
-            <div className={'message-list'}>
-                <MessageList messageBuffer$={messageBuffer$}/>
-            </div>
-            <div className={'nav-bar'}>
-                <span>Active Collection: {currentPackage?.name}</span>
-                <span>Active Book: {book?.name}</span>
-            </div>
-            <div className={'card-tree'}>
+        <div className={'root'}>
+            <div className={'card-tree-container'}>
                 {packages && <CardTree ankiPackages={packages}/>}
             </div>
-            <div className={'spine'}>
-                <ul>
-                    {spine && spine.map(s => <li>{s.href}</li>)}
-                </ul>;
-            </div>
-            <div className={'book-list'}>
-                <ul>
-                    {bookList && Object.values(bookList).map(s => <li>{s.name}</li>)}
-                </ul>;
+            <div className={'nav-bar'}>
+                <div className={'spine-menu-container'}>
+                    <SpineItemMenu spine$={m.spineItems$} selectedSpineElement$={m.currentSpineItem$} />
+                </div>
+                <div className={'book-menu-container'}>
+                    <BookMenu books$={m.bookList$} selectedBook$={m.currentBook$} />
+                </div>
+                <div>Active Collection: {currentPackage?.name}</div>
+                <div>Active Book: {book?.name}</div>
+                <div className={'message-list-container'}>
+                    <MessageList messageBuffer$={messageBuffer$}/>
+                </div>
             </div>
             <div className={'text-display'}>
                 {" "}

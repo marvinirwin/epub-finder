@@ -1,31 +1,48 @@
-.third-box {
-    border: solid black 1px;
-    border-radius: 5px;
-}
-.message-list{
-    position: fixed;
-    top: 1em;
-    right: 0;
-    width: 33vw;
-    border: solid black 1px;
-    border-radius: 3px;
-}
-.nav-bar {
-    left: 0;
-    width: 77vw;
-    border: solid black 1px;
-    border-radius: 3px;
-    display: flex;
-    justify-content: space-around;
-}
-
-.card-tree {
-
-}
 
 .text-display {
-    position: relative;
+    position: absolute;
     top: 20vh;
     height: 80vh;
     width: 80vw;
+}
+.root {
+    display: flex;
+    position: relative;
+}
+.card-tree-container {
+    position: fixed;
+    width: 20vw;
+    top: 11vh;
+    height: 89vh;
+    border: solid black 1px;
+}
+.nav-bar {
+    position: fixed;
+    max-height: 10vh;
+    display: flex;
+    left: 0;
+    width: 100vw;
+    border: solid black 1px;
+    border-radius: 3px;
+    justify-content: space-around;
+}
+.nav-bar > * {
+    position: relative;
+}
+.book-menu-container {
+    width: 10vw;
+}
+.spine-item-container {
+    width: 10vw;
+}
+.message-list-container {
+    width: 25vw;
+}
+.message-list{
+    border: solid black 1px;
+    border-radius: 3px;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    z-index: 99;
 }
