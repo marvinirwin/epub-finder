@@ -11,16 +11,18 @@ import {render} from 'react-dom';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {BehaviorSubject, combineLatest, merge, Observable, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import Book from "epubjs/types/book";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 import {CardTree} from "./lib/components/Card-Tree";
 import {AnkiPackageManager} from "./AnkiPackageManager";
-import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
+import {UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
 import {map, scan} from "rxjs/operators";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
 import {Dictionary} from 'lodash';
+import Spine from "epubjs/types/spine";
+import {SpineItem} from "epubjs/types/section";
 
 
 // @ts-ignore
@@ -37,6 +39,7 @@ class BookManager {
     bookList$: BehaviorSubject<Dictionary<BookInstance>> = new BehaviorSubject<Dictionary<BookInstance>>({});
     currentBook$: BehaviorSubject<BookInstance | undefined> = new BehaviorSubject<BookInstance | undefined>(undefined)
     bookLoadUpdates$: Subject<BookInstance> = new Subject();
+    spine$: ReplaySubject<Spine | undefined> = new ReplaySubject(1);
 
     constructor(bookNames: string[]) {
         bookNames.forEach(n => this.loadBookIstance(n, n))
@@ -46,6 +49,15 @@ class BookManager {
                 [v.name]: v
             })
         });
+
+        this.currentBook$.pipe(map(function (bookInstance: BookInstance | undefined): Spine | undefined {
+            if (bookInstance) {
+                if (bookInstance.book) {
+                    return bookInstance.book.spine
+                }
+            }
+            return undefined
+        })).subscribe(this.spine$);
 
         combineLatest(this.bookList$, this.currentBook$).subscribe(([bookList, currentBook]) => {
             if (!currentBook) {
@@ -145,23 +157,32 @@ function HauptMask({s}: { s: AppSingleton }) {
     const currentPackage = useObs(pm.currentPackage$, pm.currentPackage$.getValue());
     const bookList = useObs(m.bookList$, m.bookList$.getValue());
     const packages = useObs(pm.packages$, pm.packages$.getValue());
+    const spine = useObs<SpineItem[] | undefined>(m.spine$.pipe(map(s => {
+        if (!s) return;
+        const a: SpineItem[] = [];
+        s.each((f: SpineItem) => {
+            debugger;
+            a.push(f);
+        })
+        return a;
+    })));
 
     useEffect(() => {
         combineLatest(
             m.currentBook$,
             pm.currentPackage$
         ).subscribe(async ([bookInstance, p]) => {
+            // Render
             if (bookInstance && bookInstance.book) {
-
                 let elementById = document.getElementById('book');
+
                 if (!elementById) {
                     throw new Error("Book element not found")
                 }
-
+                elementById.textContent = '';// clear the element
                 const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
                 const target = bookInstance.book.spine.get(0).href;
                 await rendition.display(target);
-                console.log('href');
                 if (p) {
                     annotateElements(target, p);
                 }
@@ -171,28 +192,30 @@ function HauptMask({s}: { s: AppSingleton }) {
 
     return (
         <div>
-            <MessageList messageBuffer$={messageBuffer$}/>
-            <div style={{
-                left: '0px',
-                width: '77vw',
-                border: 'solid black 1px',
-                borderRadius: '3px',
-                display: 'flex',
-                justifyContent: 'space-around'
-            }}>
+            <div className={'message-list'}>
+                <MessageList messageBuffer$={messageBuffer$}/>
+            </div>
+            <div className={'nav-bar'}>
                 <span>Active Collection: {currentPackage?.name}</span>
                 <span>Active Book: {book?.name}</span>
-                <span>Book List :{bookList && Object.values(bookList).map(f => f.name).join(', ')}</span>
             </div>
-            <div style={{}}>
+            <div className={'card-tree'}>
                 {packages && <CardTree ankiPackages={packages}/>}
             </div>
-            {
-                <div style={{position: "relative", top: '20vh', height: "80vh", width: '80vw'}}>
-                    {" "}
-                    <div id="book"/>
-                </div>
-            }
+            <div className={'spine'}>
+                <ul>
+                    {spine && spine.map(s => <li>{s.href}</li>)}
+                </ul>;
+            </div>
+            <div className={'book-list'}>
+                <ul>
+                    {bookList && Object.values(bookList).map(s => <li>{s.name}</li>)}
+                </ul>;
+            </div>
+            <div className={'text-display'}>
+                {" "}
+                <div id="book"/>
+            </div>
         </div>
     );
 }

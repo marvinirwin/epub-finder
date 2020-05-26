@@ -2,3 +2,30 @@
     border: solid black 1px;
     border-radius: 5px;
 }
+.message-list{
+    position: fixed;
+    top: 1em;
+    right: 0;
+    width: 33vw;
+    border: solid black 1px;
+    border-radius: 3px;
+}
+.nav-bar {
+    left: 0;
+    width: 77vw;
+    border: solid black 1px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.card-tree {
+
+}
+
+.text-display {
+    position: relative;
+    top: 20vh;
+    height: 80vh;
+    width: 80vw;
+}
