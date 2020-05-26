@@ -6,17 +6,17 @@ import {toast} from "react-toastify";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AnkiThread from 'worker-loader?name=dist/[name].js!./lib/worker-safe/anki-thread';
-import {SerializedAnkiPackage, UnserializeAnkiPackage, UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
+import {
+    SerializedAnkiPackage,
+    UnserializeAnkiPackage,
+    UnserializedAnkiPackage
+} from "./lib/worker-safe/SerializedAnkiPackage";
 
 export class AnkiPackageManager {
     packages$: BehaviorSubject<Dictionary<UnserializedAnkiPackage>> = new BehaviorSubject({});
     currentPackage$: BehaviorSubject<UnserializedAnkiPackage | undefined> = new BehaviorSubject<UnserializedAnkiPackage | undefined>(undefined);
     private packageUpdate$: Subject<UnserializedAnkiPackage>;
     public messages$: Observable<string>;
-
-    recieveSerializedPackage(s: SerializedAnkiPackage) {
-        this.packageUpdate$.next(UnserializeAnkiPackage(s))
-    }
 
     constructor() {
         this.packageUpdate$ = new Subject<UnserializedAnkiPackage>();
@@ -25,11 +25,11 @@ export class AnkiPackageManager {
         packageLoader.onmessage = v => eval(v.data);
         this.packageUpdate$.pipe(withLatestFrom(this.packages$))
             .subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
-/*
-                if (newPackageUpdate.message) {
-                    toast(newPackageUpdate.message);
-                }
-*/
+                /*
+                                if (newPackageUpdate.message) {
+                                    toast(newPackageUpdate.message);
+                                }
+                */
                 currentPackages[newPackageUpdate.name] = newPackageUpdate;
                 if (Object.keys(currentPackages).length === 1) {
                     this.currentPackage$.next(newPackageUpdate);
@@ -41,5 +41,9 @@ export class AnkiPackageManager {
             {name: 'Hanping', path: '/Hanping_Chinese_HSK_1-6.zip'},
             {name: 'GRE', path: '/GRE.zip'}
         ].forEach(p => packageLoader.postMessage(JSON.stringify(p)))
+    }
+
+    recieveSerializedPackage(s: SerializedAnkiPackage) {
+        this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }
 }
