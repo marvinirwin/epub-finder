@@ -152,16 +152,16 @@ function HauptMask({s}: { s: AppSingleton }) {
             pm.currentPackage$
         ).subscribe(async ([bookInstance, p]) => {
             if (bookInstance && bookInstance.book) {
-                debugger;
+
                 let elementById = document.getElementById('book');
                 if (!elementById) {
                     throw new Error("Book element not found")
                 }
 
                 const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
-                debugger;
-                const target = 'TODO'
+                const target = bookInstance.book.spine.get(0).href;
                 await rendition.display(target);
+                console.log('href');
                 if (p) {
                     annotateElements(target, p);
                 }
