@@ -17,20 +17,24 @@ export class BookManager {
     currentBook$: ReplaySubject<BookInstance | undefined> = new ReplaySubject<BookInstance | undefined>(1)
     bookLoadUpdates$: Subject<BookInstance> = new Subject();
     spine$: ReplaySubject<Spine | undefined> = new ReplaySubject(1);
-    spineItems$: Observable<SpineItem[] | undefined>;
+    spineItems$: ReplaySubject<SpineItem[] | undefined> = new ReplaySubject<SpineItem[] | undefined>(1);
     currentSpineItem$: ReplaySubject<SpineItem | undefined> = new ReplaySubject(1);
     bookList$: Observable<BookInstance[]>;
 
     constructor(bookNames: string[]) {
         this.bookList$ = this.bookDict$.pipe(map(d => Object.values(d)));
-        this.spineItems$ = this.spine$.pipe(map(s => {
+        this.spine$.pipe(map(s => {
             if (!s) return;
             const a: SpineItem[] = [];
             s.each((f: SpineItem) => {
                 a.push(f);
             })
             return a;
-        }), share());
+        })).subscribe(v => {
+                this.spineItems$.next(v);
+            }
+        );
+
         this.bookLoadUpdates$.subscribe(v => {
             this.bookDict$.next({
                 ...this.bookDict$.getValue(),
@@ -65,7 +69,7 @@ export class BookManager {
         });
 
         this.currentBook$.next(undefined);
-
+        this.currentSpineItem$.next(undefined);
         bookNames.forEach(n => this.loadBookInstance(n, n))
     }
 

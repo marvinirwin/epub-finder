@@ -20,24 +20,16 @@ import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
 import {BookInstance, BookManager} from "./BookManager";
 import {SpineItem} from "epubjs/types/section";
-import {SpineItemMenu ,BookMenu} from "./lib/components/SpineItemMenu";
+import {SpineItemMenu, BookMenu} from "./lib/components/SpineItemMenu";
 
 // @ts-ignore
 window.$ = $;
 
 function annotateElements(target: string, p: UnserializedAnkiPackage) {
-    const parent = $('iframe').contents().find(target);
-    parent.parent().append(`
-                    <style>
-.hoverable {
-  background-color: lightyellow;
-}
-.hoverable:hover {
-  background-color: lightgreen;
-}
-</style>
-                    `)
-    const words = parent.text().normalize().split('');
+    let contents = $('iframe').contents();
+    debugger;
+    const body = contents.find('body');
+    const words = body.text().normalize().split('');
     const root = $('<div/>');
     const wordEls: JQuery[] = [];
     for (let i = 0; i < words.length; i++) {
@@ -49,8 +41,8 @@ function annotateElements(target: string, p: UnserializedAnkiPackage) {
 
         root.append(el);
     }
-    parent.text('');
-    parent.append(root);
+    body.text('');
+    body.append(root);
     setTimeout(() => {
         wordEls.forEach(e => {
             let text = e.text();
@@ -62,8 +54,17 @@ function annotateElements(target: string, p: UnserializedAnkiPackage) {
             }
         })
     })
+    body.append(`
+                    <style>
+.hoverable {
+  background-color: lightyellow;
 }
-
+.hoverable:hover {
+  background-color: lightgreen;
+}
+</style>
+                    `)
+}
 
 interface AppSingleton {
     m: BookManager,
@@ -90,7 +91,6 @@ function initializeApp(): AppSingleton {
         messageBuffer$
     }
 }
-
 
 function HauptMask({s}: { s: AppSingleton }) {
     const {m, pm, messageBuffer$} = s;
@@ -132,10 +132,10 @@ function HauptMask({s}: { s: AppSingleton }) {
             </div>
             <div className={'nav-bar'}>
                 <div className={'spine-menu-container'}>
-                    <SpineItemMenu spine$={m.spineItems$} selectedSpineElement$={m.currentSpineItem$} />
+                    <SpineItemMenu spine$={m.spineItems$} selectedSpineElement$={m.currentSpineItem$}/>
                 </div>
                 <div className={'book-menu-container'}>
-                    <BookMenu books$={m.bookList$} selectedBook$={m.currentBook$} />
+                    <BookMenu books$={m.bookList$} selectedBook$={m.currentBook$}/>
                 </div>
                 <div>Active Collection: {currentPackage?.name}</div>
                 <div>Active Book: {book?.name}</div>

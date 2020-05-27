@@ -1,9 +1,10 @@
-
 .text-display {
     position: absolute;
-    top: 20vh;
-    height: 80vh;
+    top: 10vh;
+    left: 20vw;
+    height: 90vh;
     width: 80vw;
+    border: 1px solid black;
 }
 .root {
     display: flex;
@@ -12,13 +13,13 @@
 .card-tree-container {
     position: fixed;
     width: 20vw;
-    top: 11vh;
+    top: 10vh;
     height: 89vh;
     border: solid black 1px;
 }
 .nav-bar {
     position: fixed;
-    max-height: 10vh;
+    height: 10vh;
     display: flex;
     left: 0;
     width: 100vw;
@@ -45,4 +46,11 @@
     width: 100%;
     background-color: white;
     z-index: 99;
+    opacity: 1;
+}
+
+
+.form-control {
+    margin: 5px;
+    min-width: 120px !important;
 }

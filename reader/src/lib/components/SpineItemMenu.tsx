@@ -16,13 +16,13 @@ export function SpineItemMenu(
         ) {
     const spine = useObs<SpineItem[] | undefined>(spine$);
     const selectedSpineElement = useObs<SpineItem | undefined>(selectedSpineElement$);
-    return <FormControl style={{minWidth: '120'}}>
+    return <FormControl className={'form-control'}>
         <InputLabel>Current Page</InputLabel>
         <Select
-            value={selectedSpineElement?.href}
+            value={(selectedSpineElement?.href) || ''}
             onChange={v => selectedSpineElement$.next(spine && spine.find(s => s.href === v.target.value))}
         >
-            {spine && spine.map(s => <MenuItem value={s.href}>{s.href}</MenuItem>)}
+            {spine && spine.map(s => <MenuItem key={s.href} value={s.href}>{s.href}</MenuItem>)}
         </Select>
     </FormControl>
 }
@@ -36,13 +36,13 @@ export function BookMenu(
 ) {
     const bookList = useObs<BookInstance[] | undefined>(books$);
     const selectedBook = useObs<BookInstance | undefined>(selectedBook$);
-    return <FormControl style={{minWidth: '120'}}>
+    return <FormControl className={'form-control'}>
         <InputLabel>Current Book</InputLabel>
         <Select
-            value={selectedBook?.name}
+            value={(selectedBook?.name) || ''}
             onChange={v => selectedBook$.next(bookList && bookList.find(s => s.name === v.target.value))}
         >
-            {bookList && bookList.map(s => <MenuItem value={s.name}>{s.name}</MenuItem>)}
+            {bookList && bookList.map(s => <MenuItem key={s.name} value={s.name}>{s.name}</MenuItem>)}
         </Select>
     </FormControl>
 }

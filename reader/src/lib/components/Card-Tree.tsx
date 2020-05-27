@@ -12,22 +12,21 @@ import {SerializedAnkiPackage, UnserializedAnkiPackage} from "../worker-safe/Ser
  * @constructor
  */
 export function CardTree({ankiPackages}: { ankiPackages: Dictionary<UnserializedAnkiPackage> }) {
-    return <TreeView style={{height: 240, flexGrow: 1, maxWidth: 400}} defaultExpanded={[]}>
-        {Object.entries(ankiPackages).map(([name, p], pi) => {
-                if (p.collections) {
-                    return <Fragment>
-                        <TreeItem key={pi} nodeId={`c${pi}`} label={name}>
+    return <div>
+        <h3>Cards</h3>
+        <TreeView style={{height: 240, flexGrow: 1, maxWidth: 400}} defaultExpanded={[]}>
+            {Object.entries(ankiPackages).map(([name, p], pi) => {
+                    if (p.collections) {
+                        return <TreeItem key={pi} nodeId={`c${pi}`} label={name}>
                             {p.collections[0].decks.filter(d => d.cards.length).map((d, di) =>
-                                <Fragment>
-                                    <TreeItem key={di} nodeId={`c${pi}d${di}`} label={d.name}>
-                                        <CardScroller cards={d.cards}/>
-                                    </TreeItem>
-                                </Fragment>)
-                            }
-                        </TreeItem>
-                    </Fragment>;
+                                <TreeItem key={di} nodeId={`c${pi}d${di}`} label={d.name}>
+                                    <CardScroller cards={d.cards}/>
+                                </TreeItem>
+                            ) }
+                        </TreeItem>;
+                    }
                 }
-            }
-        )}
-    </TreeView>
+            )}
+        </TreeView>
+    </div>
 }
