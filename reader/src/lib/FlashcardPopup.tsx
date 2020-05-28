@@ -18,7 +18,7 @@ export function FlashcardPopup({text, card}: { text: string, card: Card }) {
             }}
             onMouseEnter={() => setInsidePopup(true)}
             onMouseLeave={() => setInsidePopup(false)}
-            dangerouslySetInnerHTML={{__html: card.front}}>
+            dangerouslySetInnerHTML={{__html: card.back}}>
 
         </div>}
         {text}

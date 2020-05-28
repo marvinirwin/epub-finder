@@ -35,8 +35,6 @@ export class AnkiPackageManager {
             })
         const packages = [
             {name: 'Characters', path: '/chars.zip'},
-            {name: 'Hanping', path: '/Hanping_Chinese_HSK_1-6.zip'},
-            {name: 'GRE', path: '/GRE.zip'}
         ].forEach(p => packageLoader.postMessage(JSON.stringify(p)))
     }
 

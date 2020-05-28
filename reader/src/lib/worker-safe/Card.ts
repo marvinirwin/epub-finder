@@ -14,7 +14,7 @@ export class Card {
     }
 
     get back(): string {
-        return this.interpolatedFields[1].normalize();
+        return this.interpolatedFields.slice(6).join(' ').normalize();
     }
 
     get matchCriteria(): string {
@@ -32,7 +32,10 @@ export class Card {
                 }
             );
             const d = domparser.parseFromString(f, 'text/html');
-            const mediaTags = d.getElementsByTagName('img');
+            const mediaTags = [
+                ...Array.from(d.getElementsByTagName('img')),
+                ...Array.from(d.getElementsByTagName('audio'))
+            ];
             for (let i = 0; i < mediaTags.length; i++) {
                 const mediaTag = mediaTags[i];
                 let attribute = mediaTag.getAttribute('src');
@@ -41,13 +44,17 @@ export class Card {
                 }
                 mediaTag.setAttribute('src', await getField(attribute || ''));
             }
-            let innerHTML = new XMLSerializer().serializeToString(d.documentElement);
+            let innerHTML = new XMLSerializer().serializeToString(d);
             if (!innerHTML) {
                 debugger;console.log();
             }
+            if (innerHTML == '??') {
+                debugger;console.log('what?');
+            }
             return innerHTML;
         };
-        return Promise.all(fields.map(callbackfn))
+        const mapped = await Promise.all(fields.filter(f => f).map(callbackfn))
+        return mapped;
     }
 
     static fromSerialized(c: SerializedCard) {

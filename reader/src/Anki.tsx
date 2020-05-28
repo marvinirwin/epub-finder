@@ -10,6 +10,7 @@ import {note} from "./lib/worker-safe/tables/note";
 import {card} from "./lib/worker-safe/tables/card";
 import {col} from "./lib/worker-safe/tables/col";
 import {Deck} from "./lib/worker-safe/Deck";
+import {Subject} from "rxjs";
 
 export interface Model {
     deckId: string;
@@ -48,18 +49,18 @@ export function prep<T>(sql: SqlJs.Database, statement: string, params: any[]): 
 
 export class AnkiPackage {
     allCards: Card[];
-    cardMap: Dictionary<Card[]>;
+    cardIndex: Dictionary<Card[]>;
+    messages$: Subject<string> = new Subject<string>();
 
     public constructor(public collections: Collection[], public zip: JSZip) {
         this.allCards = flattenDeep(this.collections.map(c => c.decks.map(d => d.cards)))
-        this.cardMap = groupBy(this.allCards, c => {
-                const v = uniq(c
-                    .front
+        this.cardIndex = groupBy(this.allCards, c => {
+                const v = uniq(
+                    c.front
                     .split('')
-                    .filter(s => {
-                        return isChineseCharacter(s);
-                    }))
-                    .join('')
+                    .filter(isChineseCharacter)
+                    .join(''))
+                debugger;
                 if (v.length) {
                     return v[0];
                 }
@@ -68,9 +69,9 @@ export class AnkiPackage {
         );
     }
 
-    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }): Promise<AnkiPackage> {
+    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void): Promise<AnkiPackage> {
         try {
-            const collections = await AnkiPackage.initCollections(sql, zip, media);
+            const collections = await AnkiPackage.initCollections(sql, zip, media, mesg);
             const p = new AnkiPackage(collections, zip);
             collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
             return p;
@@ -80,9 +81,7 @@ export class AnkiPackage {
         }
     }
 
-    static async initCollections(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }) {
-        const tables = prep(sql, `SELECT name FROM sqlite_master WHERE type='table';
-`, []);
+    static async initCollections(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void) {
         const cols: col[] = prep<col>(sql,
             `SELECT decks, id
             FROM col
@@ -99,12 +98,14 @@ export class AnkiPackage {
         const deckIds: string[] = _.flattenDeep(Object.values(decks).map(d => Object.values(d))).map(d => d.id);
 
 
-        const cards: Dictionary<card[]> = _.groupBy(prep<card>(sql, `
+        let allCardsInDB = prep<card>(sql, `
                 SELECT * FROM
                 cards
                 /*WHERE did IN (${deckIds.map(d => '?').join(',')})*/
                 ORDER BY rowid DESC`,
-            [/*deckIds*/]), 'did');
+            [/*deckIds*/]);
+
+        const cards: Dictionary<card[]> = _.groupBy(allCardsInDB, 'did');
 
 
         let noteIds = _.flatten(Object.values(cards)).map(c => c.nid);
@@ -118,32 +119,58 @@ export class AnkiPackage {
 
 
         // Now let's assign some things
-        let values = Object.values(cols);
-        const collections = await Promise.all(values.map(async col => {
+        const collections = [];
+        let cardsprocessed = 0;
+        let cardsTotal = allCardsInDB.length;
+        const interval = setInterval(() => {
+            mesg(`Cards Processed ${cardsprocessed} / ${cardsTotal}`)
+        }, 500);
+        for (let i = 0; i < cols.length; i++) {
+            const col = cols[i];
             let decksForThisCollectionDict = decks[col.id];
             let decksForThisCollection = Object.values(decksForThisCollectionDict);
-            let processedDecks = await Promise.all(decksForThisCollection.map(async d => {
-                let cards1 = await Promise.all((cards[d.id] || []).map(async card => {
+            const newDecks: Deck[] = [];
+            for (let j = 0; j < decksForThisCollection.length; j++) {
+                const d = decksForThisCollection[j];
+                let cards2 = cards[d.id] || [];
+                const newCards = []
+                for (let k = 0; k < cards2.length; k++) {
+                    const card = cards2[k];
                     let noteElement: note = notes[card.nid][0];
-                    let fields = noteElement.flds.split("\0x1f");
+                    let fields = noteElement.flds.split("\x1f");
                     let interpolatedFields = await Card.interpolateMediaTags(fields, async (href) => {
+                        const ext = href.split('').reverse().join('').split('.')[0].split('').reverse().join('');
                         let file = zip.files[media[href]];
                         if (!file) {
                             return '';
                         }
                         const imageSrc = await file.async('base64');
-                        return `data:image/jpeg;base64,${imageSrc}`;
+                        switch(ext) {
+                            case 'wav':
+                                return `data:audio/wav;base64,${imageSrc}`
+                            case 'jpeg':
+                                return `data:image/jpeg;base64,${imageSrc}`;
+                            case 'gif':
+                                return `data:image/gif;base64,${imageSrc}`;
+                            default:
+                                debugger;console.log();
+                                return '';
+                        }
                     });
                     if (!fields || !interpolatedFields) {
-                        debugger;console.log();
+                        debugger;
+                        console.log();
                     }
                     const cardInstance = new Card(fields, interpolatedFields);
-                    return cardInstance;
-                }));
-                return new Deck(cards1, d.name);
-            }));
-            return new Collection(processedDecks, 'TODO figure out how to name collections')
-        }))
+                    newCards.push(cardInstance)
+                    cardsprocessed++;
+                }
+
+                newDecks.push(new Deck(newCards, d.name))
+            }
+            collections.push(new Collection(newDecks, 'TODO figure out how to name collections'))
+        }
+        clearInterval(interval);
         return collections;
     }
 }

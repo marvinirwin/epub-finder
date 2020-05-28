@@ -42,7 +42,7 @@ class AnkiPackageLoader {
         this.loadAnkiPackageFromFile().then(p => {
             this.postObject({
                 collections: p.collections,
-                cardIndex: p.cardMap,
+                cardIndex: p.cardIndex,
             })
         });
 
@@ -74,7 +74,7 @@ class AnkiPackageLoader {
                 const SQL = await initSqlJs();
                 var db = new SQL.Database(ankiDatabaseBinary);
                 this.sendMessage(`Interpolating and indexing cards`)
-                resolve(await AnkiPackage.init(db, v, mediafile));
+                resolve(await AnkiPackage.init(db, v, mediafile, s => this.sendMessage(s)));
             });
         })
     }

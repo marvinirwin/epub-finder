@@ -154,8 +154,7 @@ def single_section_persisted(section):
 
 books = [
     ('老舍全集.epub', index_by_manifest_value, 'manifest_value'),
-    ('pg23962.epub', index_by_manifest_value, 'manifest_value'),
-    ('test.epub', index_by_manifest_value, 'manifest_value'),
+    ('pg23962.epub', index_by_manifest_value, 'manifest_value')
 ]
 
 
