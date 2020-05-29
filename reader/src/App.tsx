@@ -19,7 +19,7 @@ import {map, scan} from "rxjs/operators";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
 import {BookInstance, BookManager} from "./BookManager";
-import {SpineItemMenu, BookMenu} from "./lib/components/SpineItemMenu";
+import {BookMenu, SpineItemMenu} from "./lib/components/SpineItemMenu";
 import DebugMessage from "./Debug-Message";
 import {trie} from "./lib/Trie";
 import {isChineseCharacter} from "./lib/worker-safe/Card";
@@ -88,7 +88,6 @@ function annotateElements(
             popupElements.forEach(e => {
                 let text = e.text();
                 let t = (p.cardIndex || {})[text];
-                debugger;
                 if (t) {
                     e.addClass('hoverable')
                     let htmlElements = e.get(0);
@@ -136,8 +135,7 @@ function initializeApp(): AppSingleton {
         m.bookLoadUpdates$.pipe(map(f => new DebugMessage(f.name, f.message)))
     ) .pipe(scan((acc: DebugMessage[], message: DebugMessage) => {
         acc.unshift(message);
-        let debugMessages = acc.slice(0, 100);
-        return debugMessages;
+        return acc.slice(0, 100);
     }, []));
 
     return {

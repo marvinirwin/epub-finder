@@ -101,7 +101,7 @@ export class BookManager {
                         display: async s => {
                             debugger;
                             const iframe = $(`
-                                <iframe>
+                                <iframe style="width: 100%; height: 100%; font-family: sans-serif">
                                 </iframe>`
                                 )
                             ;

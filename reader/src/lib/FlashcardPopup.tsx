@@ -14,7 +14,8 @@ export function FlashcardPopup({text, card}: { text: string, card: Card }) {
                 background: 'white',
                 border: 'solid black 1px',
                 borderRadius: '5px',
-                zIndex: 99
+                zIndex: 99,
+                font: 'font-family: Tahoma, Helvetica, Arial, "Microsoft Yahei","微软雅黑", STXihei, "华文细黑", sans-serif;'
             }}
             onMouseEnter={() => setInsidePopup(true)}
             onMouseLeave={() => setInsidePopup(false)}
