@@ -2,20 +2,19 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import React from "react";
 import Spine from "epubjs/types/spine";
-import {SpineItem} from "epubjs/types/section";
 import {useObs} from "../../UseObs";
-import {BookInstance} from "../../BookManager";
+import {aSpineItem, BookInstance} from "../../BookManager";
 
 export function SpineItemMenu(
     {
         spine$,
         selectedSpineElement$
     }: {
-        spine$: Observable<SpineItem[] | undefined>,
-        selectedSpineElement$: ReplaySubject<SpineItem | undefined> }
+        spine$: Observable<aSpineItem[] | undefined>,
+        selectedSpineElement$: ReplaySubject<aSpineItem | undefined> }
         ) {
-    const spine = useObs<SpineItem[] | undefined>(spine$);
-    const selectedSpineElement = useObs<SpineItem | undefined>(selectedSpineElement$);
+    const spine = useObs<aSpineItem[] | undefined>(spine$);
+    const selectedSpineElement = useObs<aSpineItem | undefined>(selectedSpineElement$);
     return <FormControl className={'form-control'}>
         <InputLabel>Current Page</InputLabel>
         <Select

@@ -38,11 +38,15 @@ function windDownStringIntoTrie(currentSection: string[], t: trie<number>, i: nu
     }
 }
 
-function annotateElements(target: string, p: UnserializedAnkiPackage, messageSender: (s: string) => void) {
+function annotateElements(
+    target: string,
+    p: UnserializedAnkiPackage,
+    messageSender: (s: string) => void) {
     return new Promise((resolve, reject) => {
         let $iframe = $('iframe');
         messageSender(`Starting render`)
         let contents = $iframe.contents();
+        debugger;
         let body = contents.find('body');
         const characters = body.text().normalize();
 /*
@@ -175,9 +179,11 @@ function HauptMask({s}: { s: AppSingleton }) {
                     }
                     elementById.textContent = '';// clear the element
                     const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
+/*
                     if (!item.href) {
                         throw new Error("Item does not have href");
                     }
+*/
                     const target = item.href;
                     await rendition.display(target);
                     if (p) {
