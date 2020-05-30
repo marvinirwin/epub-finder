@@ -60,7 +60,6 @@ export class AnkiPackage {
                     .split('')
                     .filter(isChineseCharacter)
                     .join(''))
-                debugger;
                 if (v.length) {
                     return v[0];
                 }

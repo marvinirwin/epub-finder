@@ -24,6 +24,35 @@ import DebugMessage from "./Debug-Message";
 import {trie} from "./lib/Trie";
 import {isChineseCharacter} from "./lib/worker-safe/Card";
 
+import * as sstk from 'shutterstock-api';
+
+sstk.setBasicAuth('JyUSD4SSh13Q09D7CXl0eQJ7asvOkPAV', '9AUN4YWTbtcxyd7X');
+
+const api = new sstk.ImagesApi();
+const queryParams = {
+    query: 'New York',
+    sort: 'popular',
+    orientation: 'horizontal'
+};
+
+interface shutterResult {
+    assets: {
+        preview: {
+            url: string;
+        }
+    }
+}
+api.searchImages(queryParams)
+    .then(({data}: {data: shutterResult[]}) => {
+        $(`<image src="${data[0].assets.preview.url}"></image>`).appendTo($(document.getElementsByTagName('body')))
+        debugger;
+        console.log(data);
+    })
+    .catch((error: any) => {
+        debugger;
+        console.error(error);
+    });
+
 // @ts-ignore
 window.$ = $;
 
@@ -46,7 +75,6 @@ function annotateElements(
         let $iframe = $('iframe');
         messageSender(`Starting render`)
         let contents = $iframe.contents();
-        debugger;
         let body = contents.find('body');
         const characters = body.text().normalize();
         /*
@@ -247,5 +275,6 @@ function App() {
     }, [])
     return appSingleton ? <HauptMask s={appSingleton}/> : <div>Initializing..</div>;
 }
+
 
 export default App;
