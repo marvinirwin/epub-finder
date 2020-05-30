@@ -28,18 +28,18 @@ export function SpineItemMenu(
 export function BookMenu(
     {
         books$,
-        selectedBook$
+        currentBook$
     }: {
         books$: Observable<BookInstance[] | undefined>,
-        selectedBook$: ReplaySubject<BookInstance | undefined> }
+        currentBook$: ReplaySubject<BookInstance | undefined> }
 ) {
     const bookList = useObs<BookInstance[] | undefined>(books$);
-    const selectedBook = useObs<BookInstance | undefined>(selectedBook$);
+    const selectedBook = useObs<BookInstance | undefined>(currentBook$);
     return <FormControl className={'form-control'}>
         <InputLabel>Current Book</InputLabel>
         <Select
             value={(selectedBook?.name) || ''}
-            onChange={v => selectedBook$.next(bookList && bookList.find(s => s.name === v.target.value))}
+            onChange={v => currentBook$.next(bookList && bookList.find(s => s.name === v.target.value))}
         >
             {bookList && bookList.map(s => <MenuItem key={s.name} value={s.name}>{s.name}</MenuItem>)}
         </Select>

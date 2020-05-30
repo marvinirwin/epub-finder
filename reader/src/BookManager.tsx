@@ -70,9 +70,7 @@ export class BookManager {
         this.currentBook$.next(undefined);
         this.currentSpineItem$.next(undefined);
         this.makeSimpleText(`a tweet`, `
-        May 26 日本农民是世界上最富有最幸福的农民，日本农村宛如仙境，生活质量要高于城市。无论是物质生活还是精神生活，农村更优于城市，这是为了让那些生活在大城市的人，有一个可以留恋和返璞归真的世外桃源。农民有独立的别墅和一大片土地，收入远高于国家公务员，而中国的广大农民却是被剥削的底层身份象征。 
-        
-        May 23 共产党的承诺能相信吗？ 当初承诺香港一国两制五十年不变，五十年后更不会变，到今年为止二十三年还不到就变了？ 当初同意一九九七年香港回归以后二十年过渡期，二〇一七年实现普选，为什么不兑现承诺
+        今年双十一，很多优惠活动的规则，真是令人匪夷所思……
         `)
     }
 
@@ -101,12 +99,12 @@ export class BookManager {
                         display: async s => {
                             debugger;
                             const iframe = $(`
-                                <iframe style="width: 100%; height: 100%; font-family: sans-serif">
-                                </iframe>`
+                                    <iframe style="width: 100%; height: 100%; font-family: sans-serif">
+                                    </iframe>`
                                 )
                             ;
                             iframe.appendTo(e);
-                            let htmlElements = $(`<p>${text}</p>`);
+                            let htmlElements = $(`<p style="white-space: pre">${text}</p>`);
                             // @ts-ignore
                             let target: JQuery<HTMLElement> = iframe.contents().find('body');
                             htmlElements.appendTo(target);

@@ -10,12 +10,12 @@ import {render} from 'react-dom';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {combineLatest, merge, Observable, ReplaySubject} from "rxjs";
+import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 import {CardTree} from "./lib/components/Card-Tree";
 import {AnkiPackageManager} from "./AnkiPackageManager";
 import {UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
-import {map, scan} from "rxjs/operators";
+import {buffer, filter, map, reduce, scan} from "rxjs/operators";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
 import {BookInstance, BookManager} from "./BookManager";
@@ -49,25 +49,25 @@ function annotateElements(
         debugger;
         let body = contents.find('body');
         const characters = body.text().normalize();
-/*
-        const t = new trie<number>();
-        let currentSection: string[] = [];
-        for (let i = 0; i < characters.length; i++) {
-            const char = characters[i];
-            if (isChineseCharacter(char)) {
-                if (currentSection.length >= CHAR_LIMIT) {
-                    // Insert into the trie all characters
-                    t.insert(currentSection.join(''), i)
-                    currentSection.splice(currentSection.length - 1, 1) // TODO this deletes the last, right?
-                } else {
-                    currentSection.push(char);
+        /*
+                const t = new trie<number>();
+                let currentSection: string[] = [];
+                for (let i = 0; i < characters.length; i++) {
+                    const char = characters[i];
+                    if (isChineseCharacter(char)) {
+                        if (currentSection.length >= CHAR_LIMIT) {
+                            // Insert into the trie all characters
+                            t.insert(currentSection.join(''), i)
+                            currentSection.splice(currentSection.length - 1, 1) // TODO this deletes the last, right?
+                        } else {
+                            currentSection.push(char);
+                        }
+                    } else {
+                        windDownStringIntoTrie(currentSection, t, i);
+                        currentSection = [];
+                    }
                 }
-            } else {
-                windDownStringIntoTrie(currentSection, t, i);
-                currentSection = [];
-            }
-        }
-*/
+        */
         const root = $('<div/>');
         const popupElements: JQuery[] = [];
         let currentEl = $('<span/>');
@@ -114,11 +114,20 @@ class RenderManager {
     messages$: ReplaySubject<string> = new ReplaySubject<string>(1)
 }
 
+class InputManager {
+    inputChar$: Subject<string> = new Subject<string>();
+    textBuffer$: Subject<string> = new Subject();
+
+    constructor(public m: BookManager) {
+    }
+}
+
 interface AppSingleton {
     m: BookManager,
     pm: AnkiPackageManager,
     messageBuffer$: Observable<DebugMessage[]>
     renderManager: RenderManager,
+    im: InputManager
 }
 
 function initializeApp(): AppSingleton {
@@ -133,27 +142,32 @@ function initializeApp(): AppSingleton {
         pm.messages$,
         renderManager.messages$.pipe(map(msg => new DebugMessage(`render`, msg))),
         m.bookLoadUpdates$.pipe(map(f => new DebugMessage(f.name, f.message)))
-    ) .pipe(scan((acc: DebugMessage[], message: DebugMessage) => {
+    ).pipe(scan((acc: DebugMessage[], message: DebugMessage) => {
         acc.unshift(message);
         return acc.slice(0, 100);
     }, []));
 
+    const im = new InputManager(m);
+
     return {
         m,
         pm,
+        im,
         messageBuffer$,
         renderManager: renderManager
     }
 }
 
 function HauptMask({s}: { s: AppSingleton }) {
-    const {m, pm, messageBuffer$, renderManager} = s;
+    const {m, pm, im, messageBuffer$, renderManager} = s;
     const book = useObs<BookInstance | undefined>(m.currentBook$)
     const currentPackage = useObs(pm.currentPackage$);
     const packages = useObs(pm.packages$, pm.packages$.getValue());
 
     const [renderInProgress, setRenderInProgress] = useState<Promise<any> | undefined>(undefined)
     const [nextRender, setNextRender] = useState<(() => Promise<any>) | undefined>(undefined)
+
+    const textBuffer = useObs(im.textBuffer$, '');
 
     useEffect(() => {
         if (!renderInProgress && nextRender) {
@@ -177,11 +191,11 @@ function HauptMask({s}: { s: AppSingleton }) {
                     }
                     elementById.textContent = '';// clear the element
                     const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
-/*
-                    if (!item.href) {
-                        throw new Error("Item does not have href");
-                    }
-*/
+                    /*
+                                        if (!item.href) {
+                                            throw new Error("Item does not have href");
+                                        }
+                    */
                     const target = item.href;
                     await rendition.display(target);
                     if (p) {
@@ -203,7 +217,14 @@ function HauptMask({s}: { s: AppSingleton }) {
                     <SpineItemMenu spine$={m.spineItems$} selectedSpineElement$={m.currentSpineItem$}/>
                 </div>
                 <div className={'book-menu-container'}>
-                    <BookMenu books$={m.bookList$} selectedBook$={m.currentBook$}/>
+                    <BookMenu books$={m.bookList$} currentBook$={m.currentBook$}/>
+                </div>
+                <div className={'input-text'}>
+                    <textarea onChange={e => im.textBuffer$.next(e.target.value)} onKeyDown={(e) => {
+                        if (e.key === "Enter" && textBuffer) {
+                            m.makeSimpleText(textBuffer.slice(10), textBuffer);
+                        }
+                    }}/>
                 </div>
                 <div>Active Collection: {currentPackage?.name}</div>
                 <div>Active Book: {book?.name}</div>
@@ -213,7 +234,7 @@ function HauptMask({s}: { s: AppSingleton }) {
             </div>
             <div className={'text-display'}>
                 {" "}
-                <div id="book"/>
+                <div id="book" style={{width: '100%', height: '100%'}}/>
             </div>
         </div>
     );

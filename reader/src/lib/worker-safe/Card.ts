@@ -14,7 +14,7 @@ export class Card {
     }
 
     get back(): string {
-        return this.interpolatedFields.slice(5).join(' ').normalize();
+        return this.interpolatedFields.slice(5).join('</br>').normalize();
     }
 
     get matchCriteria(): string {
