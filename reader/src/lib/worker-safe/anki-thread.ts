@@ -2,19 +2,24 @@
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
 import {Subject} from "rxjs";
-import {invert} from "lodash";
+import {invert, flatten} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
 import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
+import {MyAppDatabase} from "../../AppDB";
+import {groupBy} from "rxjs/operators";
+import {Card} from "./Card";
 
 // noinspection JSConstantReassignment
 // @ts-ignore
 self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
+
+const db = new MyAppDatabase();
 
 class Loader {
     packages: AnkiPackage[] = [];
@@ -30,21 +35,32 @@ class AnkiPackageLoader {
     ankiPackageLoaded$: Subject<SerializedAnkiPackage> = new Subject<SerializedAnkiPackage>();
 
     postObject(o: Partial<SerializedAnkiPackage>) {
-        this.ankiPackageLoaded$.next(Object.assign({
-            collections: null,
-            cardIndex: null,
+        this.ankiPackageLoaded$.next(Object.assign( {
             message: '',
             name: this.name,
-            path: this.path
+            path: this.path,
+            collections: undefined,
+            cardIndex: undefined,
+            cards: undefined
         }, o));
     }
     constructor(public name: string, public path: string) {
-        this.loadAnkiPackageFromFile().then(p => {
-            this.postObject({
-                collections: p.collections,
-                cardIndex: p.cardIndex,
-            })
-        });
+        db.getMemodAnkiPackage(name).then(rows => {
+            if (!rows) {
+                this.loadAnkiPackageFromFile().then(async p => {
+                    let cards = flatten(Object.values(p.cardIndex)).map(c => Card.createICardFromCard(c.ankiPackage, c.collection, c));
+                    // Now insert hese cards
+                    await db.cards.bulkAdd(cards)
+                    this.postObject({
+                        cards: cards
+                    })
+                });
+            } else {
+                this.postObject({
+                    cards: rows
+                })
+            }
+        })
 
         this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
             const str = JSON.stringify(p)

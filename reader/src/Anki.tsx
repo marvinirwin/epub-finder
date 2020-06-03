@@ -130,11 +130,11 @@ export class AnkiPackage {
             let decksForThisCollection = Object.values(decksForThisCollectionDict);
             const newDecks: Deck[] = [];
             for (let j = 0; j < decksForThisCollection.length; j++) {
-                const d = decksForThisCollection[j];
-                let cards2 = cards[d.id] || [];
+                const currentDeck = decksForThisCollection[j];
+                let cardsForThisDeck = cards[currentDeck.id] || [];
                 const newCards = []
-                for (let k = 0; k < cards2.length; k++) {
-                    const card = cards2[k];
+                for (let k = 0; k < cardsForThisDeck.length; k++) {
+                    const card = cardsForThisDeck[k];
                     let noteElement: note = notes[card.nid][0];
                     let fields = noteElement.flds.split("\x1f");
                     let interpolatedFields = await Card.interpolateMediaTags(fields, async (href) => {
@@ -160,12 +160,12 @@ export class AnkiPackage {
                         debugger;
                         console.log();
                     }
-                    const cardInstance = new Card(fields, interpolatedFields);
+                    const cardInstance = new Card(fields, interpolatedFields, currentDeck.name, 'TODO_COLLECTION_NAME', 'TODO_PACKAGE_NAME');
                     newCards.push(cardInstance)
                     cardsprocessed++;
                 }
 
-                newDecks.push(new Deck(newCards, d.name))
+                newDecks.push(new Deck(newCards, currentDeck.name))
             }
             collections.push(new Collection(newDecks, 'TODO figure out how to name collections'))
         }

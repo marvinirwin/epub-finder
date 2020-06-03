@@ -13,7 +13,7 @@ export default function CardScroller({cards}: { cards: Card[] }) {
             {cards.slice(0, limit).map((question, i) => <div
                 key={i}
                 style={{border: 'thin black 1px', borderRadius: '5px'}} >
-                <FlashcardPopup text={question.matchCriteria} card={question}/>
+                <FlashcardPopup text={question.matchCriteria} card={question} getImages={undefined}/>
             </div>)
             }
         </div>

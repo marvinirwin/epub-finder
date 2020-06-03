@@ -10,48 +10,29 @@ import {render} from 'react-dom';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest} from "rxjs";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
 import {CardTree} from "./lib/components/Card-Tree";
-import {AnkiPackageManager} from "./AnkiPackageManager";
 import {UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
-import {buffer, filter, map, reduce, scan} from "rxjs/operators";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
-import {BookInstance, BookManager} from "./BookManager";
+import {BookInstance} from "./BookManager";
 import {BookMenu, SpineItemMenu} from "./lib/components/SpineItemMenu";
-import DebugMessage from "./Debug-Message";
 import {trie} from "./lib/Trie";
 import {isChineseCharacter} from "./lib/worker-safe/Card";
 
-import * as sstk from 'shutterstock-api';
+import {AppSingleton, EditingCardInInterface, initializeApp, queryImages, EditingCard} from "./AppSingleton";
+import {GridList, GridListTile, TextField} from "@material-ui/core";
 
-sstk.setBasicAuth('JyUSD4SSh13Q09D7CXl0eQJ7asvOkPAV', '9AUN4YWTbtcxyd7X');
+const queryParams = {};
 
-const api = new sstk.ImagesApi();
-const queryParams = {
-    query: 'New York',
-    sort: 'popular',
-    orientation: 'horizontal'
-};
-
-interface shutterResult {
+export interface shutterResult {
     assets: {
         preview: {
             url: string;
         }
     }
 }
-api.searchImages(queryParams)
-    .then(({data}: {data: shutterResult[]}) => {
-        $(`<image src="${data[0].assets.preview.url}"></image>`).appendTo($(document.getElementsByTagName('body')))
-        debugger;
-        console.log(data);
-    })
-    .catch((error: any) => {
-        debugger;
-        console.error(error);
-    });
 
 // @ts-ignore
 window.$ = $;
@@ -65,6 +46,22 @@ function windDownStringIntoTrie(currentSection: string[], t: trie<number>, i: nu
             t.insert(str, i + j);
         }
     }
+}
+
+function EditingCardComponent({editingCard}: { editingCard: EditingCardInInterface }) {
+    const sources = useObs<string[] | undefined>(editingCard.imageSources)
+    return <form className={'editing-card'}>
+        <TextField label="Characters to Match" onChange={e => editingCard.matchChange$.next(e.target.value)}
+                   variant="outlined"/>
+        <TextField label="English" onChange={e => editingCard.english$.next([e.target.value])} variant="outlined"/>
+        <GridList cellHeight={160} cols={3}>
+            {sources && sources.map((src: string, i) => (
+                <GridListTile key={i} cols={1}>
+                    <img onClick={() => editingCard.photos$.next([src])} src={src} alt={''}/>
+                </GridListTile>
+            ))}
+        </GridList>
+    </form>
 }
 
 function annotateElements(
@@ -119,7 +116,11 @@ function annotateElements(
                 if (t) {
                     e.addClass('hoverable')
                     let htmlElements = e.get(0);
-                    render(<FlashcardPopup card={t[0]} text={text}/>, htmlElements);
+                    render(<FlashcardPopup card={t[0]} text={text}
+                                           getImages={async function (char: string): Promise<string[]> {
+                                               const o = await queryImages(char, 4)
+                                               return o.data.map(d => d.assets.preview.url);
+                                           }}/>, htmlElements);
                 }
             })
             messageSender(`Finished Render`)
@@ -138,59 +139,12 @@ function annotateElements(
     })
 }
 
-class RenderManager {
-    messages$: ReplaySubject<string> = new ReplaySubject<string>(1)
-}
-
-class InputManager {
-    inputChar$: Subject<string> = new Subject<string>();
-    textBuffer$: Subject<string> = new Subject();
-
-    constructor(public m: BookManager) {
-    }
-}
-
-interface AppSingleton {
-    m: BookManager,
-    pm: AnkiPackageManager,
-    messageBuffer$: Observable<DebugMessage[]>
-    renderManager: RenderManager,
-    im: InputManager
-}
-
-function initializeApp(): AppSingleton {
-    const m = new BookManager([
-        'pg23962.epub',
-        'test.epub',
-        '老舍全集.epub'
-    ]);
-    const pm = new AnkiPackageManager();
-    let renderManager = new RenderManager();
-    const messageBuffer$ = merge(
-        pm.messages$,
-        renderManager.messages$.pipe(map(msg => new DebugMessage(`render`, msg))),
-        m.bookLoadUpdates$.pipe(map(f => new DebugMessage(f.name, f.message)))
-    ).pipe(scan((acc: DebugMessage[], message: DebugMessage) => {
-        acc.unshift(message);
-        return acc.slice(0, 100);
-    }, []));
-
-    const im = new InputManager(m);
-
-    return {
-        m,
-        pm,
-        im,
-        messageBuffer$,
-        renderManager: renderManager
-    }
-}
-
 function HauptMask({s}: { s: AppSingleton }) {
-    const {m, pm, im, messageBuffer$, renderManager} = s;
+    const {m, pm, im, messageBuffer$, renderManager, customCardManager} = s;
     const book = useObs<BookInstance | undefined>(m.currentBook$)
     const currentPackage = useObs(pm.currentPackage$);
     const packages = useObs(pm.packages$, pm.packages$.getValue());
+    const editingCard = useObs<EditingCardInInterface | undefined>(customCardManager.cardInEditor$);
 
     const [renderInProgress, setRenderInProgress] = useState<Promise<any> | undefined>(undefined)
     const [nextRender, setNextRender] = useState<(() => Promise<any>) | undefined>(undefined)
@@ -257,6 +211,9 @@ function HauptMask({s}: { s: AppSingleton }) {
                 <div>Active Collection: {currentPackage?.name}</div>
                 <div>Active Book: {book?.name}</div>
                 <div className={'message-list-container'}>
+                    {editingCard && <EditingCardComponent editingCard={editingCard}/>}
+                </div>
+                <div className={'message-list-container'}>
                     <MessageList messageBuffer$={messageBuffer$}/>
                 </div>
             </div>
@@ -269,9 +226,9 @@ function HauptMask({s}: { s: AppSingleton }) {
 }
 
 function App() {
-    const [appSingleton, setAppSingleton] = useState();
+    const [appSingleton, setAppSingleton] = useState<AppSingleton | undefined>();
     useEffect(() => {
-        setAppSingleton(initializeApp())
+        initializeApp().then(s => setAppSingleton(s))
     }, [])
     return appSingleton ? <HauptMask s={appSingleton}/> : <div>Initializing..</div>;
 }

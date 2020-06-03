@@ -1,9 +1,14 @@
 import {DOMParser, XMLSerializer} from 'xmldom';
+import {ICard} from "../../AppDB";
 
 
 export class Card {
-    constructor(public fields: string[], public interpolatedFields: string[]) {
-        // So basically the act of displaying a card involves parsing its fields and then inlining the images
+    constructor(
+        public fields: string[],
+        public interpolatedFields: string[],
+        public deck: string,
+        public collection: string,
+        public ankiPackage: string) {
     }
 
     get front(): string {
@@ -58,13 +63,40 @@ export class Card {
     }
 
     static fromSerialized(c: SerializedCard) {
-        return new Card(c.fields, c.interpolatedFields);
+        return new Card(c.fields, c.interpolatedFields, c.deck, c.collection, c.ankiPackage);
+    }
+
+    static createICardFromCard(packageName: string, collectionName: string, c: Card): ICard {
+        return {
+            characters: c.front,
+            photos: c.getPhotos(),
+            sounds: c.getSounds(),
+            english: c.back.split('\n'),
+            fields: c.interpolatedFields,
+            deck: c.deck,
+            ankiPackage: packageName,
+            collection: collectionName
+        }
+    }
+
+    private getSounds() {
+        return [];
+    }
+
+    private getPhotos() {
+        return [];
     }
 }
+
+
 
 export interface SerializedCard {
     interpolatedFields: string[];
     fields: string[];
+    deck: string;
+    collection: string;
+    ankiPackage: string;
+
 }
 
 

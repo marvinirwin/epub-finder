@@ -1,13 +1,15 @@
 import {Collection, SerializedCollection} from "./Collection";
 import {Dictionary, fromPairs} from "lodash";
 import {Card, SerializedCard} from "./Card";
+import {ICard} from "../../AppDB";
 
 export interface SerializedAnkiPackage {
     name: string
     path: string
     message: string
-    collections: SerializedCollection[] | null;
-    cardIndex: Dictionary<SerializedCard[]> | null
+    collections: SerializedCollection[] | undefined;
+    cardIndex: Dictionary<SerializedCard[]> | undefined
+    cards: ICard[] | undefined
 }
 
 export interface UnserializedAnkiPackage {

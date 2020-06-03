@@ -49,9 +49,13 @@
     opacity: 1;
     list-style-type: none;
 }
-
-
 .form-control {
     margin: 5px;
     min-width: 120px !important;
+}
+.editing-card {
+    position: absolute;
+    background-color: white;
+    z-index: 100;
+
 }
