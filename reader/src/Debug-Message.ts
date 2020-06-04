@@ -1,6 +1,10 @@
 export default class DebugMessage {
     timestamp: Date;
-    constructor(public prefix: string, public message: string) {
+    public prefix: string;
+    public message: string;
+    constructor(prefix: string, message: string) {
+        this.prefix = prefix;
+        this.message = message;
         this.timestamp = new Date();
     }
 }

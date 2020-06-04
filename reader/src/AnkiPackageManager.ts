@@ -1,4 +1,4 @@
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, flatten} from "lodash";
 import {filter, map, scan, withLatestFrom} from "rxjs/operators";
 import {toast} from "react-toastify";
@@ -25,11 +25,16 @@ export class AnkiPackageManager {
     public messages$: Observable<DebugMessage>;
     currentDeck$: Observable<Deck | undefined>;
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection|undefined>();
+    workerMessages$: Subject<DebugMessage>;
 
     constructor(public appDb: MyAppDatabase, public cardManager: CardManager) {
         this.currentPackage$.next(undefined);
         this.packageUpdate$ = new Subject<UnserializedAnkiPackage>();
-        this.messages$ = this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message)))
+        this.workerMessages$ = new Subject<DebugMessage>();
+        this.messages$ = merge(
+            this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message))),
+            this.workerMessages$
+        )
         const packageLoader: Worker = new AnkiThread();
         packageLoader.onmessage = v => eval(v.data);
         this.packageUpdate$.pipe(withLatestFrom(this.packages$))
@@ -42,7 +47,9 @@ export class AnkiPackageManager {
             })
         const packages = [
             {name: 'Characters', path: '/chars.zip'},
-        ].forEach(p => packageLoader.postMessage(JSON.stringify(p)));
+        ].forEach(p => {
+            packageLoader.postMessage(JSON.stringify(p));
+        });
 
         this.currentDeck$ = this.currentPackage$.pipe(map(pkg => {
             // This probably wont work
@@ -52,10 +59,13 @@ export class AnkiPackageManager {
         }))
     }
 
-    recieveSerializedPackage(s: SerializedAnkiPackage) {
+    receiveSerializedPackage(s: SerializedAnkiPackage) {
         if (s.cards) {
             this.cardManager.addCard$.next(s.cards);
         }
         this.packageUpdate$.next(UnserializeAnkiPackage(s))
+    }
+    receiveDebugMessage(o: any) {
+        this.workerMessages$.next(new DebugMessage(o.prefix, o.message))
     }
 }

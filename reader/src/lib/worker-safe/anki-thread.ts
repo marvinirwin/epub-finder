@@ -12,6 +12,7 @@ import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
 import {MyAppDatabase} from "../../AppDB";
 import {groupBy} from "rxjs/operators";
 import {Card} from "./Card";
+import DebugMessage from "../../Debug-Message";
 
 // noinspection JSConstantReassignment
 // @ts-ignore
@@ -19,23 +20,12 @@ self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
 
-const db = new MyAppDatabase();
-
-class Loader {
-    packages: AnkiPackage[] = [];
-
-    constructor() {
-    }
-
-    async loadPackage(name: string, path: string) {
-    }
-}
-
 class AnkiPackageLoader {
+    messages$: Subject<DebugMessage> = new Subject<DebugMessage>();
     ankiPackageLoaded$: Subject<SerializedAnkiPackage> = new Subject<SerializedAnkiPackage>();
 
     postObject(o: Partial<SerializedAnkiPackage>) {
-        this.ankiPackageLoaded$.next(Object.assign( {
+        this.ankiPackageLoaded$.next(Object.assign({
             message: '',
             name: this.name,
             path: this.path,
@@ -44,13 +34,19 @@ class AnkiPackageLoader {
             cards: undefined
         }, o));
     }
-    constructor(public name: string, public path: string) {
+
+    constructor(public name: string, public path: string, public db: MyAppDatabase) {
+        db.messages$.subscribe(m => {
+            this.messages$.next(new DebugMessage('worker-database', m))
+        })
         db.getMemodAnkiPackage(name).then(rows => {
             if (!rows) {
                 this.loadAnkiPackageFromFile().then(async p => {
                     let cards = flatten(Object.values(p.cardIndex)).map(c => Card.createICardFromCard(c.ankiPackage, c.collection, c));
+                    console.log(`Cards length: ${cards.length}`)
                     // Now insert hese cards
                     await db.cards.bulkAdd(cards)
+                    console.log(`Cards inserted: ${cards.length}`)
                     this.postObject({
                         cards: cards
                     })
@@ -61,14 +57,19 @@ class AnkiPackageLoader {
                 })
             }
         })
+        this.messages$.subscribe(s => ctx.postMessage(`
+            console.log('what');
+            this.receiveDebugMessage(${JSON.stringify(s)});
+        `));
 
         this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
             const str = JSON.stringify(p)
-                ctx.postMessage(` this.recieveSerializedPackage(${str})`)
-            })
+            ctx.postMessage(` this.receiveSerializedPackage(${str})`)
+        })
     }
+
     sendMessage(m: string) {
-        this.postObject({message: m});
+        this.messages$.next(new DebugMessage('anki-package-loader', m));
     }
 
 
@@ -100,10 +101,10 @@ class AnkiPackageLoader {
 const loaders: AnkiPackageLoader[] = [];
 // Respond to message from parent thread
 ctx.onmessage = (ev) => {
+    const db = new MyAppDatabase();
     let {name, path}: { name: string, path: string } = JSON.parse(ev.data);
     try {
-        const l = new AnkiPackageLoader(name, path);
-
+        const l = new AnkiPackageLoader(name, path, db);
     } catch (e) {
         console.error(e);
     }

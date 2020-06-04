@@ -12,7 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // @ts-ignore
 import {combineLatest} from "rxjs";
 import {FlashcardPopup} from "./lib/FlashcardPopup";
-import {CardTree} from "./lib/components/Card-Tree";
+import {CardList, CardTree} from "./lib/components/Card-Tree";
 import {UnserializedAnkiPackage} from "./lib/worker-safe/SerializedAnkiPackage";
 import {MessageList} from "./lib/components/MessageLlist";
 import {useObs} from "./UseObs";
@@ -23,6 +23,8 @@ import {isChineseCharacter} from "./lib/worker-safe/Card";
 
 import {AppSingleton, EditingCardInInterface, initializeApp, queryImages, EditingCard} from "./AppSingleton";
 import {GridList, GridListTile, TextField} from "@material-ui/core";
+import {ICard} from "./AppDB";
+import { Dictionary } from 'lodash';
 
 const queryParams = {};
 
@@ -66,7 +68,7 @@ function EditingCardComponent({editingCard}: { editingCard: EditingCardInInterfa
 
 function annotateElements(
     target: string,
-    p: UnserializedAnkiPackage,
+    c: Dictionary<ICard[]>,
     messageSender: (s: string) => void) {
     return new Promise((resolve, reject) => {
         let $iframe = $('iframe');
@@ -112,7 +114,7 @@ function annotateElements(
             messageSender(`Mounting flashcards`)
             popupElements.forEach(e => {
                 let text = e.text();
-                let t = (p.cardIndex || {})[text];
+                let t = c[text];
                 if (t) {
                     e.addClass('hoverable')
                     let htmlElements = e.get(0);
@@ -140,11 +142,12 @@ function annotateElements(
 }
 
 function HauptMask({s}: { s: AppSingleton }) {
-    const {m, pm, im, messageBuffer$, renderManager, customCardManager} = s;
+    const {m, pm, im, messageBuffer$, renderManager, customCardManager, cardManager} = s;
     const book = useObs<BookInstance | undefined>(m.currentBook$)
     const currentPackage = useObs(pm.currentPackage$);
     const packages = useObs(pm.packages$, pm.packages$.getValue());
     const editingCard = useObs<EditingCardInInterface | undefined>(customCardManager.cardInEditor$);
+    const cards = useObs<ICard[] | undefined>(cardManager.currentCards$);
 
     const [renderInProgress, setRenderInProgress] = useState<Promise<any> | undefined>(undefined)
     const [nextRender, setNextRender] = useState<(() => Promise<any>) | undefined>(undefined)
@@ -161,7 +164,7 @@ function HauptMask({s}: { s: AppSingleton }) {
     useEffect(() => {
         combineLatest(
             m.currentBook$,
-            pm.currentPackage$,
+            cardManager.currentCardMap$,
             m.currentSpineItem$
         ).subscribe(([bookInstance, p, item]) => {
             const render = async () => {
@@ -192,7 +195,10 @@ function HauptMask({s}: { s: AppSingleton }) {
     return (
         <div className={'root'}>
             <div className={'card-tree-container'}>
+{/*
                 {packages && <CardTree ankiPackages={packages} selectedPackage$={pm.currentPackage$}/>}
+*/}
+                {cards && <CardList cards={cards}/>}
             </div>
             <div className={'nav-bar'}>
                 <div className={'spine-menu-container'}>
@@ -210,9 +216,11 @@ function HauptMask({s}: { s: AppSingleton }) {
                 </div>
                 <div>Active Collection: {currentPackage?.name}</div>
                 <div>Active Book: {book?.name}</div>
+{/*
                 <div className={'message-list-container'}>
                     {editingCard && <EditingCardComponent editingCard={editingCard}/>}
                 </div>
+*/}
                 <div className={'message-list-container'}>
                     <MessageList messageBuffer$={messageBuffer$}/>
                 </div>

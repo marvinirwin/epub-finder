@@ -1,5 +1,5 @@
 import Dexie from "dexie";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {AnkiPackage} from "./Anki";
 
@@ -17,6 +17,7 @@ export interface ICard {
 
 export class MyAppDatabase extends Dexie {
     cards: Dexie.Table<ICard, number>;
+    messages$: Subject<string> = new Subject<string>();
 
     constructor() {
         super("MyAppDatabase");
@@ -28,9 +29,12 @@ export class MyAppDatabase extends Dexie {
     }
 
     async getMemodAnkiPackage(packageName: string): Promise<ICard[] | undefined> {
-        const exists = await this.cards.where({package: packageName}).limit(1).first();
+        this.messages$.next(`Checking for ${packageName}`)
+        const exists = await this.cards.where('ankiPackage').equals(packageName).first();
+        this.messages$.next(`First row for ${packageName} ${JSON.stringify(exists)}`)
         if (exists) {
-            return this.cards.where({package: packageName}).toArray();
+            let promiseExtended = this.cards.where('ankiPackage').equals(packageName).toArray();
+            return promiseExtended;
         }
         return undefined;
     }

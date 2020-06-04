@@ -1,13 +1,14 @@
 import {Card} from "./worker-safe/Card";
 import React, {useEffect, useState} from "react";
+import {ICard} from "../AppDB";
 
-export function FlashcardPopup({text, card, getImages}: { text: string, card: Card, getImages: ( (s: string) => Promise<string[]>) | undefined }) {
+export function FlashcardPopup({text, card, getImages}: { text: string, card: ICard, getImages: ( (s: string) => Promise<string[]>) | undefined }) {
     const [insideCharacter, setInsideCharacter] = useState(false)
     const [insidePopup, setInsidePopup] = useState(false)
     const [srces, setSrces] = useState<string[]>([]);
     useEffect(() => {
         if (getImages) {
-            getImages(card.front).then((data) => {
+            getImages(card.characters).then((data) => {
                 setSrces(data);
             })
         }
@@ -28,7 +29,7 @@ export function FlashcardPopup({text, card, getImages}: { text: string, card: Ca
             onMouseEnter={() => setInsidePopup(true)}
             onMouseLeave={() => setInsidePopup(false)} >
             {srces.map(s => <img key={s} src={s}/>)}
-            <div dangerouslySetInnerHTML={{__html: card.back}}>
+            <div dangerouslySetInnerHTML={{__html: card.fields.join('</br>')}}>
         </div>
         </div>}
         {text}

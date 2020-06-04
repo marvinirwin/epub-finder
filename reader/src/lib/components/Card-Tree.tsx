@@ -5,6 +5,7 @@ import {Dictionary} from "lodash";
 import CardScroller from "./Card-Scroller";
 import {UnserializedAnkiPackage} from "../worker-safe/SerializedAnkiPackage";
 import {ReplaySubject} from "rxjs";
+import {ICard} from "../../AppDB";
 
 /**
  * This function assumes there is only one collection per package, it can trivially be made to support more
@@ -20,7 +21,7 @@ export function CardTree({ankiPackages, selectedPackage$}: { ankiPackages: Dicti
                         return <TreeItem key={pi} nodeId={`c${pi}`} label={name} onClick={() => selectedPackage$.next(p)}>
                             {p.collections[0].decks.filter(d => d.cards.length).map((d, di) =>
                                 <TreeItem key={di} nodeId={`c${pi}d${di}`} label={d.name}>
-                                    <CardScroller cards={d.cards}/>
+                                    {/*<CardScroller cards={d.cards}/>*/}
                                 </TreeItem>
                             ) }
                         </TreeItem>;
@@ -29,4 +30,8 @@ export function CardTree({ankiPackages, selectedPackage$}: { ankiPackages: Dicti
             )}
         </TreeView>
     </div>
+}
+
+export function CardList({cards}: {cards: ICard[]}) {
+    return <CardScroller cards={cards}/>
 }
