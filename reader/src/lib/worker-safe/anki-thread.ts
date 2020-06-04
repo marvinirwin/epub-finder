@@ -2,7 +2,7 @@
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
 import {Subject} from "rxjs";
-import {invert, flatten} from "lodash";
+import {invert, flatten, chunk} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
 import JSZip from 'jszip';
@@ -43,10 +43,14 @@ class AnkiPackageLoader {
             if (!rows) {
                 this.loadAnkiPackageFromFile().then(async p => {
                     let cards = flatten(Object.values(p.cardIndex)).map(c => Card.createICardFromCard(c.ankiPackage, c.collection, c));
-                    console.log(`Cards length: ${cards.length}`)
-                    // Now insert hese cards
-                    await db.cards.bulkAdd(cards)
-                    console.log(`Cards inserted: ${cards.length}`)
+                    this.sendMessage(`Adding ${cards.length} cards to indexDB`)
+                    const cardChunks = chunk(cards, 10);
+                    for (let i = 0; i < cardChunks.length; i++) {
+                        const cardChunk = cardChunks[i];
+                        this.sendMessage(`Added ${i * 10} so far...`)
+                        await db.cards.bulkAdd(cardChunk);
+                    }
+                    this.sendMessage(`Added all ${cards.length} to indexDB`)
                     this.postObject({
                         cards: cards
                     })
@@ -58,7 +62,6 @@ class AnkiPackageLoader {
             }
         })
         this.messages$.subscribe(s => ctx.postMessage(`
-            console.log('what');
             this.receiveDebugMessage(${JSON.stringify(s)});
         `));
 
@@ -91,7 +94,7 @@ class AnkiPackageLoader {
                 const SQL = await initSqlJs();
                 var db = new SQL.Database(ankiDatabaseBinary);
                 this.sendMessage(`Interpolating and indexing cards`)
-                resolve(await AnkiPackage.init(db, v, mediafile, s => this.sendMessage(s)));
+                resolve(await AnkiPackage.init(db, v, mediafile, s => this.sendMessage(s), this.name));
             });
         })
     }
@@ -100,8 +103,13 @@ class AnkiPackageLoader {
 
 const loaders: AnkiPackageLoader[] = [];
 // Respond to message from parent thread
-ctx.onmessage = (ev) => {
-    const db = new MyAppDatabase();
+ctx.onmessage = async (ev) => {
+    let next = (s: string) =>
+        ctx.postMessage(`
+                console.log('what');
+                this.receiveDebugMessage(${JSON.stringify(new DebugMessage('worker-database', s))});
+            `);
+    const db = new MyAppDatabase(next);
     let {name, path}: { name: string, path: string } = JSON.parse(ev.data);
     try {
         const l = new AnkiPackageLoader(name, path, db);

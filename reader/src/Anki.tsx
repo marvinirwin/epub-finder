@@ -68,9 +68,9 @@ export class AnkiPackage {
         );
     }
 
-    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void): Promise<AnkiPackage> {
+    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void, packageName: string): Promise<AnkiPackage> {
         try {
-            const collections = await AnkiPackage.initCollections(sql, zip, media, mesg);
+            const collections = await AnkiPackage.initCollections(sql, zip, media, mesg, packageName);
             const p = new AnkiPackage(collections, zip);
             collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
             return p;
@@ -80,7 +80,10 @@ export class AnkiPackage {
         }
     }
 
-    static async initCollections(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void) {
+    static async initCollections(
+        sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void,
+        packageName: string
+    ) {
         const cols: col[] = prep<col>(sql,
             `SELECT decks, id
             FROM col
@@ -160,7 +163,7 @@ export class AnkiPackage {
                         debugger;
                         console.log();
                     }
-                    const cardInstance = new Card(fields, interpolatedFields, currentDeck.name, 'TODO_COLLECTION_NAME', 'TODO_PACKAGE_NAME');
+                    const cardInstance = new Card(fields, interpolatedFields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName);
                     newCards.push(cardInstance)
                     cardsprocessed++;
                 }

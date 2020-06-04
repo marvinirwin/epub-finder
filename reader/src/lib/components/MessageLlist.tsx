@@ -71,14 +71,17 @@ const ColorArray = Object.values(AllColors)
 
 export function MessageList({messageBuffer$}: {messageBuffer$: Observable<DebugMessage[]>}) {
     const [colors, setColors] = useState<Dictionary<string>>({})
-    const [colorIndex, setColorIndex] = useState(0);
+    let [colorIndex, setColorIndex] = useState(0);
     const messageList = useObs(messageBuffer$, []);
     useEffect(() => {
         messageList?.forEach(m => {
             if (!colors[m.prefix]) {
                 colors[m.prefix] = ColorArray[colorIndex];
                 setColors({...colors});
-                setColorIndex(colorIndex + 1);
+                console.log(colors[colorIndex]);
+                console.log(colorIndex);
+                colorIndex++;
+                setColorIndex(colorIndex);
             }
         })
     }, [messageList])
