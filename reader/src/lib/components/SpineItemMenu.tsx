@@ -16,13 +16,17 @@ export function SpineItemMenu(
     const spine = useObs<aSpineItem[] | undefined>(spine$);
     const selectedSpineElement = useObs<aSpineItem | undefined>(selectedSpineElement$);
     return <FormControl className={'form-control'}>
+{/*
         <InputLabel>Current Page</InputLabel>
+*/}
+{/*
         <Select
             value={(selectedSpineElement?.href) || ''}
             onChange={v => selectedSpineElement$.next(spine && spine.find(s => s.href === v.target.value))}
         >
             {spine && spine.map(s => <MenuItem key={s.href} value={s.href}>{s.href}</MenuItem>)}
         </Select>
+*/}
     </FormControl>
 }
 export function BookMenu(

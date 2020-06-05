@@ -106,7 +106,6 @@ const loaders: AnkiPackageLoader[] = [];
 ctx.onmessage = async (ev) => {
     let next = (s: string) =>
         ctx.postMessage(`
-                console.log('what');
                 this.receiveDebugMessage(${JSON.stringify(new DebugMessage('worker-database', s))});
             `);
     const db = new MyAppDatabase(next);

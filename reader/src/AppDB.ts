@@ -1,7 +1,5 @@
 import Dexie from "dexie";
-import {ReplaySubject, Subject} from "rxjs";
-import {Dictionary} from "lodash";
-import {AnkiPackage} from "./Anki";
+import {ReplaySubject} from "rxjs";
 
 export interface ICard {
     id?: number; // Primary key. Optional (autoincremented)
@@ -37,9 +35,7 @@ export class MyAppDatabase extends Dexie {
         const exists = await this.cards.where('ankiPackage').equals(packageName).first();
         if (exists) {
             this.messages$.next(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
-            let promiseExtended = this.cards.where('ankiPackage').equals(packageName).toArray();
-            debugger;
-            return promiseExtended;
+            return this.cards.where('ankiPackage').equals(packageName).toArray();
         }
         return undefined;
     }

@@ -37,7 +37,7 @@
     width: 10vw;
 }
 .message-list-container {
-    min-width: 55vw;
+    min-width: 35vw;
 }
 .message-list{
     border: solid black 1px;

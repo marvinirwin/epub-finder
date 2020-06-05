@@ -75,7 +75,7 @@ export class AnkiPackage {
             collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
             return p;
         } catch (e) {
-            debugger;
+            debugger;console.log();
             throw e;
         }
     }
@@ -160,8 +160,7 @@ export class AnkiPackage {
                         }
                     });
                     if (!fields || !interpolatedFields) {
-                        debugger;
-                        console.log();
+                        debugger; console.log();
                     }
                     const cardInstance = new Card(fields, interpolatedFields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName);
                     newCards.push(cardInstance)

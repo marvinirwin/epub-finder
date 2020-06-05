@@ -19,10 +19,11 @@ import {ICard, MyAppDatabase} from "./AppDB";
 import {CardManager} from "./Cardmanager";
 
 export class AnkiPackageManager {
+    messages$: ReplaySubject<string> = new ReplaySubject<string>()
     packages$: BehaviorSubject<Dictionary<UnserializedAnkiPackage>> = new BehaviorSubject({});
     currentPackage$: ReplaySubject<UnserializedAnkiPackage | undefined> = new ReplaySubject<UnserializedAnkiPackage | undefined>(undefined);
     public packageUpdate$: Subject<UnserializedAnkiPackage>;
-    public messages$: Observable<DebugMessage>;
+    public allMessages: Observable<DebugMessage>;
     currentDeck$: Observable<Deck | undefined>;
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection|undefined>();
     workerMessages$: Subject<DebugMessage>;
@@ -31,7 +32,7 @@ export class AnkiPackageManager {
         this.currentPackage$.next(undefined);
         this.packageUpdate$ = new Subject<UnserializedAnkiPackage>();
         this.workerMessages$ = new Subject<DebugMessage>();
-        this.messages$ = merge(
+        this.allMessages = merge(
             this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message))),
             this.workerMessages$
         )
@@ -60,8 +61,10 @@ export class AnkiPackageManager {
     }
 
     receiveSerializedPackage(s: SerializedAnkiPackage) {
-        if (s.cards) {
-            this.cardManager.addCard$.next(s.cards);
+        let cards = s.cards;
+        if (cards?.length) {
+            this.messages$.next(`Received package with ${cards?.length} cards`)
+            this.cardManager.addCard$.next(cards);
         }
         this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }

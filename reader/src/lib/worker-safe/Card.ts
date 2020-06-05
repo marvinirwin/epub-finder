@@ -54,7 +54,7 @@ export class Card {
                 debugger;console.log();
             }
             if (innerHTML == '??') {
-                debugger;console.log('what?');
+                debugger;console.log('Inner html ??');
             }
             return innerHTML;
         };
