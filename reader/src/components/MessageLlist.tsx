@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Observable, Subject} from "rxjs";
-import {useObs} from "../../UseObs";
-import DebugMessage from "../../Debug-Message";
+import {useObs} from "../UseObs";
+import DebugMessage from "../Debug-Message";
 import { Dictionary } from "lodash";
 
 const AllColors: Dictionary<string> = {

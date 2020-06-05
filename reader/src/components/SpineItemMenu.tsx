@@ -2,8 +2,8 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import React from "react";
 import Spine from "epubjs/types/spine";
-import {useObs} from "../../UseObs";
-import {aSpineItem, BookInstance} from "../../BookManager";
+import {useObs} from "../UseObs";
+import {aSpineItem, BookInstance} from "../managers/BookManager";
 
 export function SpineItemMenu(
     {

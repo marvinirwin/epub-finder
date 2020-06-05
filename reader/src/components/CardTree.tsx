@@ -2,10 +2,12 @@ import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import React from "react";
 import {Dictionary} from "lodash";
-import CardScroller from "./Card-Scroller";
-import {UnserializedAnkiPackage} from "../worker-safe/SerializedAnkiPackage";
+import CardScroller from "./CardScroller";
+import {UnserializedAnkiPackage} from "../lib/worker-safe/SerializedAnkiPackage";
 import {ReplaySubject} from "rxjs";
-import {ICard} from "../../AppDB";
+import {ICard} from "../AppDB";
+import {useObs} from "../UseObs";
+import {Manager} from "../managers/Manager";
 
 /**
  * This function assumes there is only one collection per package, it can trivially be made to support more
@@ -32,6 +34,7 @@ export function CardTree({ankiPackages, selectedPackage$}: { ankiPackages: Dicti
     </div>
 }
 
-export function CardList({cards}: {cards: ICard[]}) {
-    return <CardScroller cards={cards}/>
+export function Cards({cardManager}: {cardManager: Manager}) {
+    const cards = useObs<ICard[] | undefined>(cardManager.currentCards$);
+    return cards ? <CardScroller cards={cards}/> : <div/>
 }

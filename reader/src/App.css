@@ -6,10 +6,12 @@
     width: 80vw;
     border: 1px solid black;
 }
+
 .root {
     display: flex;
     position: relative;
 }
+
 .card-tree-container {
     position: fixed;
     width: 20vw;
@@ -17,6 +19,7 @@
     height: 89vh;
     border: solid black 1px;
 }
+
 .nav-bar {
     position: fixed;
     height: 10vh;
@@ -27,35 +30,52 @@
     border-radius: 3px;
     justify-content: space-around;
 }
+
 .nav-bar > * {
     position: relative;
 }
+
 .book-menu-container {
     width: 10vw;
 }
+
 .spine-item-container {
     width: 10vw;
 }
+
 .message-list-container {
     min-width: 35vw;
 }
-.message-list{
-    border: solid black 1px;
-    border-radius: 3px;
-    position: absolute;
+
+.message-list {
     width: 100%;
-    background-color: black;
     z-index: 101;
     opacity: 1;
     list-style-type: none;
 }
+
 .form-control {
     margin: 5px;
     min-width: 120px !important;
 }
+
 .editing-card {
     position: absolute;
     background-color: white;
     z-index: 100;
+}
 
+.debug-display-container {
+    position: fixed;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    padding-left: 20px;
+    padding-right: 20px;
+    min-width: 100%;
+    max-width: 100%;
+}
+.debug-menu {
+    background: grey;
+    opacity: 50%;
+    text: black;
 }

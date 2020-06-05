@@ -6,12 +6,11 @@ import $ from 'jquery';
 import React, {useEffect, useState, Fragment} from 'react';
 import './App.css';
 // @ts-ignore
-import {sify} from 'chinese-conv';
 import {render} from 'react-dom';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {FlashcardPopup} from "./lib/FlashcardPopup";
+import {FlashcardPopup} from "./components/FlashcardPopup";
 import {useObs} from "./UseObs";
 import {trie} from "./lib/Trie";
 import {isChineseCharacter} from "./lib/worker-safe/Card";
@@ -33,6 +32,7 @@ const darkTheme = createMuiTheme({
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif'
     }
 });
+darkTheme.spacing(2);
 
 const queryParams = {};
 
@@ -74,82 +74,6 @@ function EditingCardComponent({editingCard}: { editingCard: EditingCardInInterfa
     </form>
 }
 
-function annotateElements(
-    target: string,
-    c: Dictionary<ICard[]>,
-    messageSender: (s: string) => void) {
-    return new Promise((resolve, reject) => {
-        let $iframe = $('iframe');
-        messageSender(`Starting render`)
-        let contents = $iframe.contents();
-        let body = contents.find('body');
-        const characters = body.text().normalize();
-        /*
-                const t = new trie<number>();
-                let currentSection: string[] = [];
-                for (let i = 0; i < characters.length; i++) {
-                    const char = characters[i];
-                    if (isChineseCharacter(char)) {
-                        if (currentSection.length >= CHAR_LIMIT) {
-                            // Insert into the trie all characters
-                            t.insert(currentSection.join(''), i)
-                            currentSection.splice(currentSection.length - 1, 1) // TODO this deletes the last, right?
-                        } else {
-                            currentSection.push(char);
-                        }
-                    } else {
-                        windDownStringIntoTrie(currentSection, t, i);
-                        currentSection = [];
-                    }
-                }
-        */
-        const root = $('<div/>');
-        const popupElements: JQuery[] = [];
-        let currentEl = $('<span/>');
-        for (let i = 0; i < characters.length; i++) {
-            const char = characters[i];
-            const word = sify(char);
-            const el = $('<span/>');
-            el.text(word);
-            if (isChineseCharacter(char)) {
-                popupElements.push(el);
-            }
-            root.append(el);
-        }
-        debugger;
-        body.children().remove();
-        body.append(root);
-        setTimeout(() => {
-            messageSender(`Mounting flashcards`)
-            popupElements.forEach(e => {
-                let text = e.text();
-                let t = c[text];
-                if (t) {
-                    e.addClass('hoverable')
-                    let htmlElements = e.get(0);
-                    render(<FlashcardPopup card={t[0]} text={text}
-                                           getImages={async function (char: string): Promise<string[]> {
-                                               const o = await queryImages(char, 4)
-                                               return o.data.map(d => d.assets.preview.url);
-                                           }}/>, htmlElements);
-                }
-            })
-            messageSender(`Finished Render`)
-            debugger;
-            resolve()
-        })
-        body.append(`
-                    <style>
-.hoverable {
-  background-color: lightyellow;
-}
-.hoverable:hover {
-  background-color: lightgreen;
-}
-</style>
-                    `)
-    })
-}
 
 function App() {
     const [appSingleton, setAppSingleton] = useState<AppSingleton | undefined>();

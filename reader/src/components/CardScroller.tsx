@@ -1,10 +1,10 @@
 import {useState} from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {Divider} from "@material-ui/core";
-import {Card} from "../worker-safe/Card";
+import {Card} from "../lib/worker-safe/Card";
 import React from "react";
-import {FlashcardPopup} from "../FlashcardPopup";
-import {ICard} from "../../AppDB";
+import {FlashcardPopup} from "./FlashcardPopup";
+import {ICard} from "../AppDB";
 
 export default function CardScroller({cards}: { cards: ICard[] }) {
     const [limit, setLimit] = useState(20);

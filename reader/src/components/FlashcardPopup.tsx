@@ -1,4 +1,4 @@
-import {Card} from "./worker-safe/Card";
+import {Card} from "../lib/worker-safe/Card";
 import React, {useEffect, useState} from "react";
 import {ICard} from "../AppDB";
 
