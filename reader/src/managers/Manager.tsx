@@ -24,12 +24,16 @@ import $ from "jquery";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
 
-export class Manager {
-    stringMessages: ReplaySubject<string> = new ReplaySubject<string>()
-    allMessages$: Subject<DebugMessage> = new Subject<DebugMessage>();
-    debugMessages: Subject<DebugMessage> = new Subject<DebugMessage>();
 
-    renderMessages$: ReplaySubject<string> = new ReplaySubject<string>();
+const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
+export class Manager {
+    cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
+    bookMessages$: ReplaySubject<string> = new ReplaySubject<string>()
+    renderMessages$: ReplaySubject<string> = new ReplaySubject<string>()
+    packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
+    ankiThreadMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>()
+
+    messageBuffer$: Subject<DebugMessage[]> = new Subject<DebugMessage[]>();
 
     packages$: BehaviorSubject<Dictionary<UnserializedAnkiPackage>> = new BehaviorSubject({});
     packageUpdate$: Subject<UnserializedAnkiPackage> = new Subject<UnserializedAnkiPackage>();
@@ -40,7 +44,7 @@ export class Manager {
 
     addCard$: Subject<ICard[]> = new Subject<ICard[]>();
 
-    cardIndex$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);
+    // cardIndex$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);
     currentCardMap$: Subject<Dictionary<ICard[]>> = new Subject<Dictionary<ICard[]>>();/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
@@ -49,6 +53,8 @@ export class Manager {
     cardInEditor$: ReplaySubject<EditingCardInInterface | undefined> = new ReplaySubject<EditingCardInInterface | undefined>(1)
 
     renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
+    renderInProgress$: ReplaySubject<any> = new ReplaySubject(1);
+    nextRender$: ReplaySubject<() => Promise<any>> = new ReplaySubject<() => Promise<any>>(1);
     textSource$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -66,6 +72,7 @@ export class Manager {
 
     displayVisible$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
     messagesVisible$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
+
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
@@ -79,6 +86,8 @@ export class Manager {
 
         this.oStringDisplay();
         this.oKeyDowns();
+
+        this.oRender();
     }
 
 
@@ -92,7 +101,7 @@ export class Manager {
             this.messagesVisible$
         )).subscribe(([ev, display, messages]) => {
             document.onkeydown = ev => {
-                switch(ev.key) {
+                switch (ev.key) {
                     case "e":
                         if (ev.ctrlKey) {
                             this.displayVisible$.next(!display)
@@ -115,10 +124,19 @@ export class Manager {
                 const obs: Observable<any> = v;
 
                 observables.push(
-                    obs.pipe(startWith(''), map(v => {
+                    obs.pipe(startWith('Has not emitted'), map(v => {
                         let str = v;
-                        if (Array.isArray(v)) {
-                            str = v.join(', ');
+                        switch (k) {
+                            case "currentCards$":
+                                str = `Length: ${v.length}`;
+                                break;
+                            case "currentBook$":
+                                str = v?.name
+                                break;
+                            default:
+                                if (Array.isArray(v)) {
+                                    str = v.join(', ');
+                                }
                         }
                         return `${k} ` + `${str}`.substr(0, 50);
                     }))
@@ -148,7 +166,10 @@ export class Manager {
             return undefined
         })).subscribe(this.spine$);
 
-        combineLatest(this.bookList$, this.currentBook$).subscribe(([bookList, currentBook]) => {
+        combineLatest([
+            this.bookList$,
+            this.currentBook$
+        ]).subscribe(([bookList, currentBook]) => {
             if (!currentBook?.book) {
                 const f = bookList.find((v) => v.book);
                 if (f) this.currentBook$.next(f);
@@ -190,13 +211,13 @@ export class Manager {
         this.cardInEditor$.next(undefined);
         this.addCard$.next([]);
         this.addCard$.pipe(scan((presentCards: ICard[], newCards: ICard[]) => {
-            this.stringMessages.next(`Cards received ${newCards.length}`)
+            this.cardMessages$.next(`Attempting to add ${newCards.length}`)
             return presentCards.concat(newCards);
         }, [])).subscribe(v => {
             this.currentCards$.next(v);
         });
         this.currentCards$.subscribe(v => {
-            this.stringMessages.next(`New current cards ${v.length}`)
+            this.cardMessages$.next(`New current cards ${v.length}`)
         })
         this.addCard$.pipe(scan((acc: Dictionary<ICard[]>, n: ICard[]) => {
             const o = {...acc};
@@ -230,17 +251,23 @@ export class Manager {
     }
 
     private oMessages() {
-        this.stringMessages.next("Initializing card manager");
         merge(
             this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message))),
-            this.debugMessages
-        ).subscribe(this.allMessages$)
+            this.packageMessages$.pipe(map(m => new DebugMessage('package', m))),
+            this.renderMessages$.pipe(map(m => new DebugMessage('render', m))),
+            this.bookMessages$.pipe(map(m => new DebugMessage('book', m))),
+            this.cardMessages$.pipe(map(m => new DebugMessage('card', m))),
+        ).pipe(scan((acc: DebugMessage[], m) => {
+            console.log(m);
+            return [m].concat(acc).slice(0, 100)
+        }, [])).subscribe(this.messageBuffer$)
     }
 
     private oPackageLoader() {
         const packageLoader: Worker = new AnkiThread();
         packageLoader.onmessage = v => eval(v.data);
         [{name: 'Characters', path: '/chars.zip'}].forEach(p => {
+            this.packageMessages$.next(`Requesting Package ${p.name} at ${p.path} `)
             packageLoader.postMessage(JSON.stringify(p));
         });
     }
@@ -249,7 +276,9 @@ export class Manager {
         this.currentPackage$.next(undefined);
         this.packageUpdate$.pipe(withLatestFrom(this.packages$)).subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
             currentPackages[newPackageUpdate.name] = newPackageUpdate;
+            this.packageMessages$.next(`Package ${newPackageUpdate.name} has been updated`)
             if (Object.keys(currentPackages).length === 1) {
+                this.packageMessages$.next(`Setting current package ${newPackageUpdate.name}`)
                 this.currentPackage$.next(newPackageUpdate);
             }
             this.packages$.next({...currentPackages});
@@ -257,49 +286,59 @@ export class Manager {
         this.currentPackage$.pipe(map(pkg => {
             // This probably wont work
             const col = pkg?.collections?.find(c => c.allCards.length)
+            this.packageMessages$.next(`Setting current collection ${col?.name}`)
             this.currentCollection$.next(col?.name);
-            return col?.decks.find(d => d.cards.length);
+            let find = col?.decks.find(d => d.cards.length);
+            this.packageMessages$.next(`Setting current deck ${find?.name}`)
+            return find;
         })).subscribe(this.currentDeck$);
     }
 
     private oRender() {
-        const renderInProgress$ = new ReplaySubject(1);
-        const nextRender$ = new ReplaySubject<() => Promise<any>>(1);
-
+        this.renderInProgress$.next(false);
+        this.renderMessages$.next('Initializing rendering')
         combineLatest([
-            renderInProgress$,
-            nextRender$
+            this.renderInProgress$,
+            this.nextRender$
         ]).subscribe(([renderInProgress, nextRender]) => {
+            this.renderMessages$.next(`deciding whether to execute another render`);
             if (!renderInProgress && nextRender) {
-                nextRender$.next(undefined);
-                renderInProgress$.next(nextRender().then(() => renderInProgress$.next(undefined)))
+                this.renderMessages$.next(`No render in progress and a next render queued`);
+                this.nextRender$.next(undefined);
+                this.renderInProgress$.next(nextRender().then(() => this.renderInProgress$.next(undefined)))
             }
         })
 
         combineLatest(
             [
                 this.currentBook$,
-                this.currentCardMap$,
-                this.currentSpineItem$
+                this.currentSpineItem$,
+                this.renderRef$,
+                this.currentCardMap$
             ]
-        ).subscribe(([bookInstance, cardLookup, spineItem]) => {
+        ).subscribe(([bookInstance, spineItem, renderRef, cardIndex]) => {
             const render = async () => {
+                this.renderMessages$.next("Render fired")
                 if (bookInstance && bookInstance.book && spineItem) {
-                    let elementById = document.getElementById('book');
-                    if (!elementById) {
-                        throw new Error("Book element not found")
-                    }
-                    debugger;
-                    elementById.textContent = '';
-                    const rendition = bookInstance.book.renderTo(elementById, {width: 600, height: 400})
+                    this.renderMessages$.next("Book and spineItem present, rendering")
+                    const iframe = this.getNewIframe(renderRef);
+                    await sleep(1000);
+                    let body = iframe.contents().find("body");
+                    // @ts-ignore
+                    const rendition = bookInstance.book.renderTo(body[0] as HTMLElement, {width: 600, height: 400})
                     const target = spineItem.href;
                     await rendition.display(target);
-                    if (cardLookup) {
-                        this.annotateElements(target, cardLookup, (s: string) => this.renderMessages$.next(s));
+                    // @ts-ignore
+                    if (cardIndex) {
+                        this.renderMessages$.next("Annotating")
+                        this.annotateInside(body, cardIndex, (s: string) => this.renderMessages$.next(s));
                     }
+                } else {
+                    this.renderMessages$.next("No book or spine item")
                 }
             }
-            nextRender$.next(render);
+            this.renderMessages$.next("Setting next render");
+            this.nextRender$.next(render);
         })
     }
 
@@ -311,8 +350,7 @@ export class Manager {
                     return {
                         display: async s => {
                             let htmlElements = $(`<p style="white-space: pre">${text}</p>`);
-                            // @ts-ignore
-                            let target: JQuery<HTMLElement> = iframe.contents().find('body');
+                            let target: JQuery<HTMLElement> = $(e);
                             htmlElements.appendTo(target);
                         }
                     }
@@ -325,16 +363,18 @@ export class Manager {
         });
     }
 
-    private annotateElements(
-        target: string,
+    private annotateInside(
+        body: JQuery<HTMLBodyElement>,
         c: Dictionary<ICard[]>,
         messageSender: (s: string) => void) {
         return new Promise((resolve, reject) => {
-            let $iframe = $('iframe');
-            messageSender(`Starting render`)
-            let contents = $iframe.contents();
-            let body = contents.find('body');
+            resolve();
+            return;
+            messageSender(`Starting annotation`)
             const characters = body.text().normalize();
+            messageSender(`Current text ${characters}`)
+            messageSender("Removing children");
+            body.children().remove();
             /*
                     const t = new trie<number>();
                     let currentSection: string[] = [];
@@ -367,29 +407,23 @@ export class Manager {
                 }
                 root.append(el);
             }
-            debugger;
-            body.children().remove();
-            body.append(root);
-            setTimeout(() => {
-                messageSender(`Mounting flashcards`)
-                popupElements.forEach(e => {
-                    let text = e.text();
-                    let t = c[text];
-                    if (t) {
-                        e.addClass('hoverable')
-                        let htmlElements = e.get(0);
-                        render(<FlashcardPopup card={t[0]} text={text}
-                                               getImages={async function (char: string): Promise<string[]> {
-                                                   const o = await queryImages(char, 4)
-                                                   return o.data.map(d => d.assets.preview.url);
-                                               }}/>, htmlElements);
-                    }
-                })
-                messageSender(`Finished Render`)
-                debugger;
-                resolve()
+            messageSender(`Mounting flashcards`)
+            popupElements.forEach(e => {
+                let text = e.text();
+                let t = c[text];
+                if (t) {
+                    e.addClass('hoverable')
+                    let htmlElements = e.get(0);
+                    render(<FlashcardPopup
+                        card={t[0]}
+                        text={text}
+                        getImages={async function (char: string): Promise<string[]> {
+                            const o = await queryImages(char, 4)
+                            return o.data.map(d => d.assets.preview.url);
+                        }}/>, htmlElements);
+                }
             })
-            body.append(`
+            let style = $(`
                     <style>
 .hoverable {
   background-color: lightyellow;
@@ -398,12 +432,16 @@ export class Manager {
   background-color: lightgreen;
 }
 </style>
-                    `)
+                    `);
+            root.appendTo(body)
+            style.appendTo(body);
+            debugger;
+            resolve()
         })
     }
 
     receiveDebugMessage(o: any) {
-        this.allMessages$.next(new DebugMessage(o.prefix, o.message))
+        this.ankiThreadMessages$.next(new DebugMessage(o.prefix, o.message))
     }
 
     async loadEbookInstance(path: string, name: string) {
@@ -424,50 +462,45 @@ export class Manager {
     receiveSerializedPackage(s: SerializedAnkiPackage) {
         let cards = s.cards;
         if (cards?.length) {
-            this.stringMessages.next(`Received package with ${cards?.length} cards`)
+            this.packageMessages$.next(`Received package with ${cards?.length} cards`)
             this.addCard$.next(cards);
         }
         this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }
 
     initIframeListeners() {
-        combineLatest([this.renderRef$, this.textSource$, this.cardIndex$]).subscribe(([ref, text, cardIndex]) => {
-            const iframe = this.getNewIframe(ref);
-            this.applySelectListener(iframe);
-            const frameBody = $(iframe).contents().find('body');
-            frameBody.append(`<p>${text}</p>`);
-        })
     }
 
-    private getNewIframe(ref: HTMLElement): HTMLIFrameElement {
-        this.stringMessages.next('Clearing children of renderRef')
+    private getNewIframe(ref: HTMLElement): JQuery<HTMLIFrameElement> {
+        this.renderMessages$.next('Clearing children of renderRef')
         for (let i = 0; i < ref.children.length; i++) {
             ref.children[i].remove();
         }
-        this.stringMessages.next('Appending new iframe')
-        const iframe = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
+        this.renderMessages$.next('Appending new iframe')
+        const iframe: JQuery<HTMLIFrameElement> = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
         iframe.appendTo(ref);
+        this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
         // @ts-ignore
-        return iframe[0];
+        return iframe;
     }
 
-
-    applySelectListener(iframe: HTMLIFrameElement) {
-        if (!iframe.contentWindow) {
+    applySelectListener(iframe: JQuery<HTMLIFrameElement>) {
+        let contentWindow = iframe[0].contentWindow;
+        if (!contentWindow) {
             throw new Error("Iframe has no content window");
         }
-        const onMouseUp$ = fromEvent(iframe.contentWindow, 'mouseup');
+        const onMouseUp$ = fromEvent(contentWindow, 'mouseup');
         onMouseUp$.pipe(withLatestFrom(
             this.currentDeck$,
             this.currentCollection$,
             this.currentPackage$
         )).subscribe(([e, d, c, p]) => {
-            if (!iframe.contentWindow) {
+            if (!contentWindow) {
                 throw new Error("Iframe has no content window");
             }
-            const activeEl = iframe.contentWindow.document.activeElement;
+            const activeEl = contentWindow.document.activeElement;
             if (activeEl) {
-                const selObj = iframe.contentWindow.document.getSelection();
+                const selObj = contentWindow.document.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
                     this.selectionText$.next(text);
