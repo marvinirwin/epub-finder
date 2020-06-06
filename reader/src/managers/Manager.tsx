@@ -17,7 +17,7 @@ import {Collection} from "../lib/worker-safe/Collection";
 import {isChineseCharacter} from "../lib/worker-safe/Card";
 import {ICard, MyAppDatabase} from "../AppDB";
 import {EditingCard, EditingCardInInterface, queryImages} from "../AppSingleton";
-import {aRendition, aSpine, aSpineItem, BookInstance} from "./BookManager";
+import {aRendition, aSpine, aSpineItem, BookInstance, RenderingBook} from "./BookManager";
 import Epub, {Book} from "epubjs";
 import React from "react";
 import $ from "jquery";
@@ -25,7 +25,17 @@ import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
 
 
-const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
+export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
+
+function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V): T {
+    let text = localStorage.getItem(key);
+    if (text) {
+        t.next(JSON.parse(text))
+    }
+    t.subscribe(v => localStorage.setItem(key, JSON.stringify(defaultVal)));
+    return t;
+}
+
 export class Manager {
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     bookMessages$: ReplaySubject<string> = new ReplaySubject<string>()
@@ -52,33 +62,31 @@ export class Manager {
     newCardRequest$: Subject<ICard> = new Subject();
     cardInEditor$: ReplaySubject<EditingCardInInterface | undefined> = new ReplaySubject<EditingCardInInterface | undefined>(1)
 
-    renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
-    renderInProgress$: ReplaySubject<any> = new ReplaySubject(1);
-    nextRender$: ReplaySubject<() => Promise<any>> = new ReplaySubject<() => Promise<any>>(1);
-    textSource$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    inputText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    currentBook$: ReplaySubject<BookInstance | undefined> = new ReplaySubject<BookInstance | undefined>(1)
+    currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook  | undefined>(1)
     bookLoadUpdates$: Subject<BookInstance> = new Subject();
-    bookDict$: BehaviorSubject<Dictionary<BookInstance>> = new BehaviorSubject<Dictionary<BookInstance>>({});
+    bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
 
     bookList$: Subject<BookInstance[]> = new Subject<BookInstance[]>();
     spine$: ReplaySubject<aSpine | undefined> = new ReplaySubject(1);
     spineItems$: ReplaySubject<aSpineItem[] | undefined> = new ReplaySubject<aSpineItem[] | undefined>(1);
-    currentSpineItem$: ReplaySubject<aSpineItem | undefined> = new ReplaySubject(1);
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
-    displayVisible$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
-    messagesVisible$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
+    displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
+    messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
         this.oCurrent();
         this.oCards();
+/*
         this.oSpine();
+*/
         this.oBook();
         this.makeSimpleText(`a tweet`, `
         今年双十一，很多优惠活动的规则，真是令人匪夷所思……
@@ -119,26 +127,31 @@ export class Manager {
 
     private oStringDisplay() {
         const observables: Observable<string>[] = [];
-        Object.entries(this).forEach(([k, v]) => {
-            if (k.endsWith('$')) {
-                const obs: Observable<any> = v;
-
+        Object.entries(this).forEach(([key, value]) => {
+            if (key.endsWith('$')) {
+                const obs: Observable<any> = value;
+                if (!key.toLowerCase().includes('message') && !key.toLowerCase().includes('display')) {
+                    obs.subscribe(() => this.bookMessages$.next(`${key} fired`))
+                }
                 observables.push(
                     obs.pipe(startWith('Has not emitted'), map(v => {
                         let str = v;
-                        switch (k) {
+                        switch (key) {
                             case "currentCards$":
                                 str = `Length: ${v.length}`;
                                 break;
                             case "currentBook$":
                                 str = v?.name
                                 break;
+                            case "bookDict$":
+                                // @ts-ignore
+                                str = Object.values(v).map((v: RenderingBook) => v.name).join(', ')
                             default:
                                 if (Array.isArray(v)) {
                                     str = v.join(', ');
                                 }
                         }
-                        return `${k} ` + `${str}`.substr(0, 50);
+                        return `${key} ` + `${str}`.substr(0, 50);
                     }))
                 );
             }
@@ -149,35 +162,39 @@ export class Manager {
     }
 
     private oBook() {
-        this.bookList$.next([]);
-        this.bookDict$.pipe(map(d => Object.values(d))).subscribe(this.bookList$);
-        this.bookLoadUpdates$.subscribe(v => {
-            this.bookDict$.next({
-                ...this.bookDict$.getValue(),
-                [v.name]: v
-            })
-        });
-        this.currentBook$.pipe(map(function (bookInstance: BookInstance | undefined): aSpine | undefined {
-            if (bookInstance) {
-                if (bookInstance.book) {
-                    return bookInstance.book.spine
-                }
+        this.bookLoadUpdates$.pipe(withLatestFrom(this.bookDict$)).subscribe(([instance, dict]) => {
+            const currentRender: RenderingBook = dict[instance.name];
+            if (currentRender) {
+                currentRender.bookInstance$.next(instance);
+            } else {
+                this.bookDict$.next({
+                    ...this.bookDict$.getValue(),
+                    [instance.name]: new RenderingBook(instance, this, instance.name)
+                })
             }
-            return undefined
-        })).subscribe(this.spine$);
+        });
 
         combineLatest([
-            this.bookList$,
+            this.bookDict$,
             this.currentBook$
-        ]).subscribe(([bookList, currentBook]) => {
-            if (!currentBook?.book) {
-                const f = bookList.find((v) => v.book);
-                if (f) this.currentBook$.next(f);
+        ]).subscribe(([bookDict, currentBook]) => {
+            if (currentBook) {
+                // If the bookDict has been updated with a new book,
+                // check to see if it was the currentBook which was updated
+                if (bookDict[currentBook.name] !== currentBook) {
+                    this.currentBook$.next(bookDict[currentBook.name])
+                }
+            } else {
+                if (Object.values(bookDict).length) {
+                    this.currentBook$.next(Object.values(bookDict)[0]);
+                }
             }
+
         });
         this.currentBook$.next(undefined);
     }
 
+/*
     private oSpine() {
         this.currentSpineItem$.next(undefined);
         this.spineItems$.next([]);
@@ -206,6 +223,7 @@ export class Manager {
             }
         })
     }
+*/
 
     private oCards() {
         this.cardInEditor$.next(undefined);
@@ -258,7 +276,6 @@ export class Manager {
             this.bookMessages$.pipe(map(m => new DebugMessage('book', m))),
             this.cardMessages$.pipe(map(m => new DebugMessage('card', m))),
         ).pipe(scan((acc: DebugMessage[], m) => {
-            console.log(m);
             return [m].concat(acc).slice(0, 100)
         }, [])).subscribe(this.messageBuffer$)
     }
@@ -295,51 +312,7 @@ export class Manager {
     }
 
     private oRender() {
-        this.renderInProgress$.next(false);
         this.renderMessages$.next('Initializing rendering')
-        combineLatest([
-            this.renderInProgress$,
-            this.nextRender$
-        ]).subscribe(([renderInProgress, nextRender]) => {
-            this.renderMessages$.next(`deciding whether to execute another render`);
-            if (!renderInProgress && nextRender) {
-                this.renderMessages$.next(`No render in progress and a next render queued`);
-                this.nextRender$.next(undefined);
-                this.renderInProgress$.next(nextRender().then(() => this.renderInProgress$.next(undefined)))
-            }
-        })
-
-        combineLatest(
-            [
-                this.currentBook$,
-                this.currentSpineItem$,
-                this.renderRef$,
-                this.currentCardMap$
-            ]
-        ).subscribe(([bookInstance, spineItem, renderRef, cardIndex]) => {
-            const render = async () => {
-                this.renderMessages$.next("Render fired")
-                if (bookInstance && bookInstance.book && spineItem) {
-                    this.renderMessages$.next("Book and spineItem present, rendering")
-                    const iframe = this.getNewIframe(renderRef);
-                    await sleep(1000);
-                    let body = iframe.contents().find("body");
-                    // @ts-ignore
-                    const rendition = bookInstance.book.renderTo(body[0] as HTMLElement, {width: 600, height: 400})
-                    const target = spineItem.href;
-                    await rendition.display(target);
-                    // @ts-ignore
-                    if (cardIndex) {
-                        this.renderMessages$.next("Annotating")
-                        this.annotateInside(body, cardIndex, (s: string) => this.renderMessages$.next(s));
-                    }
-                } else {
-                    this.renderMessages$.next("No book or spine item")
-                }
-            }
-            this.renderMessages$.next("Setting next render");
-            this.nextRender$.next(render);
-        })
     }
 
     makeSimpleText(name: string, text: string) {
@@ -361,80 +334,6 @@ export class Manager {
             },
             message: `Created simple text source ${name}`
         });
-    }
-
-    private annotateInside(
-        body: JQuery<HTMLBodyElement>,
-        c: Dictionary<ICard[]>,
-        messageSender: (s: string) => void) {
-        return new Promise((resolve, reject) => {
-            messageSender(`Starting annotation`);
-            const characters = body.text().normalize();
-            messageSender(`Current text ${characters}`)
-            messageSender("Removing children");
-            body.children().remove();
-            /*
-                    const t = new trie<number>();
-                    let currentSection: string[] = [];
-                    for (let i = 0; i < characters.length; i++) {
-                        const char = characters[i];
-                        if (isChineseCharacter(char)) {
-                            if (currentSection.length >= CHAR_LIMIT) {
-                                // Insert into the trie all characters
-                                t.insert(currentSection.join(''), i)
-                                currentSection.splice(currentSection.length - 1, 1) // TODO this deletes the last, right?
-                            } else {
-                                currentSection.push(char);
-                            }
-                        } else {
-                            windDownStringIntoTrie(currentSection, t, i);
-                            currentSection = [];
-                        }
-                    }
-            */
-            const root = $('<div/>');
-            const popupElements: JQuery[] = [];
-            let currentEl = $('<span/>');
-            for (let i = 0; i < characters.length; i++) {
-                const char = characters[i];
-                const word = sify(char);
-                const el = $('<span/>');
-                el.text(word);
-                if (isChineseCharacter(char)) {
-                    popupElements.push(el);
-                }
-                root.append(el);
-            }
-            messageSender(`Mounting flashcards`)
-            popupElements.forEach(e => {
-                let text = e.text();
-                let t = c[text];
-                if (t) {
-                    e.addClass('hoverable')
-                    let htmlElements = e.get(0);
-                    render(<FlashcardPopup
-                        card={t[0]}
-                        text={text}
-                        getImages={async function (char: string): Promise<string[]> {
-                            const o = await queryImages(char, 4)
-                            return o.data.map(d => d.assets.preview.url);
-                        }}/>, htmlElements);
-                }
-            })
-            let style = $(`
-                    <style>
-.hoverable {
-  background-color: lightyellow;
-}
-.hoverable:hover {
-  background-color: lightgreen;
-}
-</style>
-                    `);
-            root.appendTo(body)
-            style.appendTo(body);
-            resolve()
-        })
     }
 
     receiveDebugMessage(o: any) {
@@ -467,52 +366,6 @@ export class Manager {
 
     initIframeListeners() {
     }
-
-    private getNewIframe(ref: HTMLElement): JQuery<HTMLIFrameElement> {
-        this.renderMessages$.next('Clearing children of renderRef')
-        for (let i = 0; i < ref.children.length; i++) {
-            ref.children[i].remove();
-        }
-        this.renderMessages$.next('Appending new iframe')
-        const iframe: JQuery<HTMLIFrameElement> = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
-        iframe.appendTo(ref);
-        this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
-        // @ts-ignore
-        return iframe;
-    }
-
-    applySelectListener(iframe: JQuery<HTMLIFrameElement>) {
-        let contentWindow = iframe[0].contentWindow;
-        if (!contentWindow) {
-            throw new Error("Iframe has no content window");
-        }
-        const onMouseUp$ = fromEvent(contentWindow, 'mouseup');
-        onMouseUp$.pipe(withLatestFrom(
-            this.currentDeck$,
-            this.currentCollection$,
-            this.currentPackage$
-        )).subscribe(([e, d, c, p]) => {
-            if (!contentWindow) {
-                throw new Error("Iframe has no content window");
-            }
-            const activeEl = contentWindow.document.activeElement;
-            if (activeEl) {
-                const selObj = contentWindow.document.getSelection();
-                if (selObj) {
-                    const text = selObj.toString();
-                    this.selectionText$.next(text);
-                    this.newCardRequest$.next({
-                        deck: d?.name || "NO_DECK",
-                        characters: text,
-                        fields: [],
-                        photos: [],
-                        sounds: [],
-                        english: [],
-                        collection: c?.name || "NO_COLLECTION",
-                        ankiPackage: p?.name || "NO_PACKAGE"
-                    })
-                }
-            }
-        })
-    }
 }
+
+

@@ -3,12 +3,15 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import {Manager} from "../managers/Manager";
+import {TextareaAutosize} from "@material-ui/core";
+import MyModal from './MyModal';
+import {useObs} from "../UseObs";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,27 +31,33 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ProminentAppBar({m}: {m: Manager}) {
+export default function ProminentAppBar({m}: { m: Manager }) {
     const classes = useStyles();
-    const []
+    const [open, setOpen] = React.useState(false);
 
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const inputText = useObs(m.inputText$, '');
     return (
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
-                    <IconButton
-                        edge="start"
-                        className={classes.menuButton}
-                        color="inherit"
-                        aria-label="Open Add Note"
-                    >
-                        <NoteAddIcon />
-                    </IconButton>
-                    <Typography className={classes.title} variant="h6" noWrap>
-                        Flash Cards
-                    </Typography>
-                    <IconButton aria-label="search" color="inherit" onClick={}>
-                        <PostAddIcon />
+                    <MyModal icon={<NoteAddIcon/>} submit={() => m.makeSimpleText('a tweet', inputText || '')}>
+                        <TextareaAutosize
+                            aria-label=""
+                            placeholder=""
+                            defaultValue=""
+                            value={inputText}
+                            onChange={v => m.inputText$.next(v.target.value)}
+                        />
+                    </MyModal>
+                    <IconButton aria-label="search" color="inherit">
+                        <PostAddIcon/>
                     </IconButton>
                 </Toolbar>
             </AppBar>

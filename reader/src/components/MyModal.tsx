@@ -1,8 +1,11 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {cloneElement, FunctionComponent, PropsWithChildren, ReactComponentElement, useState} from 'react';
+import {makeStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import IconButton from "@material-ui/core/IconButton";
+import NoteAddIcon from "@material-ui/icons/NoteAdd";
+import Toolbar from "@material-ui/core/Toolbar";
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -18,9 +21,18 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function TransitionsModal() {
+interface TextModalBody {
+    close: () => void
+}
+
+interface Created1 {
+    icon: ReactComponentElement<any>;
+    submit: (...args: any[]) => any;
+}
+
+const MyModal: FunctionComponent<Created1> = function TransitionsModal({icon, submit, children}) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleOpen = () => {
         setOpen(true);
@@ -30,13 +42,12 @@ export default function TransitionsModal() {
         setOpen(false);
     };
 
-
-
     return (
         <div>
-            <button type="button" onClick={handleOpen}>
-                react-transition-group
-            </button>
+            <IconButton
+                edge="start"
+                color="inherit"
+                onClick={handleOpen} > {icon} </IconButton>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -47,15 +58,15 @@ export default function TransitionsModal() {
                 BackdropComponent={Backdrop}
                 BackdropProps={{
                     timeout: 500,
-                }}
-            >
+                }} >
                 <Fade in={open}>
                     <div className={classes.paper}>
-                        <h2 id="transition-modal-title">Transition modal</h2>
-                        <p id="transition-modal-description">react-transition-group animates me.</p>
+                        {children}
+                        <button onClick={() => {handleClose(); submit()}}>Submit</button>
                     </div>
                 </Fade>
             </Modal>
         </div>
     );
 }
+export default MyModal;

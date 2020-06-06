@@ -1,6 +1,6 @@
 import {AppSingleton, EditingCardInInterface} from "../AppSingleton";
 import {useObs} from "../UseObs";
-import {BookInstance} from "../managers/BookManager";
+import {BookInstance, RenderingBook} from "../managers/BookManager";
 import {ICard} from "../AppDB";
 import React, {useEffect, useRef, useState} from "react";
 import {combineLatest, Observable} from "rxjs";
@@ -11,29 +11,31 @@ import {AppBar, Drawer, IconButton, List, Toolbar, Typography} from "@material-u
 import DebugMessage from "../Debug-Message";
 import DebugDisplay from "./DebugDisplay";
 import TopBar from "./TopBar";
+import {map} from "rxjs/operators";
 
 
-function getDiv(messageBuffer$: Observable<DebugMessage[]>) {
-    return <div className={'message-list-container'}>
-        <MessageList messageBuffer$={messageBuffer$}/>
-    </div>;
+function BookContainer({rb}: {rb: RenderingBook}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const instance = useObs(rb.bookInstance$)
+    useEffect(() => {
+        ref && ref.current && rb.renderRef$.next(ref.current);
+    }, [ref])
+    return <div id={`render_parent_${instance?.name}`} style={{width: '100%'}} ref={ref}/>
 }
 
 export function Main({s}: { s: AppSingleton }) {
     const {m} = s;
-    const book = useObs<BookInstance | undefined>(m.currentBook$)
+    const book = useObs<RenderingBook | undefined>(m.currentBook$)
     const currentPackage = useObs(m.currentPackage$);
     const packages = useObs(m.packages$, m.packages$.getValue());
     const editingCard = useObs<EditingCardInInterface | undefined>(m.cardInEditor$);
-    const ref = useRef<HTMLDivElement>(null);
 /*
     const textBuffer = useObs(m.textBuffer$, '');
 */
-
-    useEffect(() => {
-        ref && ref.current && m.renderRef$.next(ref.current);
-    }, [ref])
-
+/*
+TODO why does this cause inifinite re-render
+    const books = useObs<RenderingBook[]>(m.bookDict$.pipe(map(d => Object.values(d))))
+*/
 
     return (
         <div className={'root'}>
@@ -49,7 +51,9 @@ export function Main({s}: { s: AppSingleton }) {
 */}
             <div className={'text-display'}>
                 {" "}
-                <div id="book" style={{width: '100%', height: '100%'}} ref={ref}/>
+{/*
+                {books?.map(b => <BookContainer key={b.name} rb={b}/>)}
+*/}
             </div>
         </div>
     );
