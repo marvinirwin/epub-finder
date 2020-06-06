@@ -368,9 +368,7 @@ export class Manager {
         c: Dictionary<ICard[]>,
         messageSender: (s: string) => void) {
         return new Promise((resolve, reject) => {
-            resolve();
-            return;
-            messageSender(`Starting annotation`)
+            messageSender(`Starting annotation`);
             const characters = body.text().normalize();
             messageSender(`Current text ${characters}`)
             messageSender("Removing children");
@@ -435,7 +433,6 @@ export class Manager {
                     `);
             root.appendTo(body)
             style.appendTo(body);
-            debugger;
             resolve()
         })
     }

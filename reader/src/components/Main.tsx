@@ -10,13 +10,8 @@ import {MessageList} from "./MessageLlist";
 import {AppBar, Drawer, IconButton, List, Toolbar, Typography} from "@material-ui/core";
 import DebugMessage from "../Debug-Message";
 import DebugDisplay from "./DebugDisplay";
+import TopBar from "./TopBar";
 
-function TopBar() {
-    return <AppBar position="static">
-        <Toolbar>
-        </Toolbar>
-    </AppBar>;
-}
 
 function getDiv(messageBuffer$: Observable<DebugMessage[]>) {
     return <div className={'message-list-container'}>
@@ -48,12 +43,13 @@ export function Main({s}: { s: AppSingleton }) {
                     <MessageList messageBuffer$={m.messageBuffer$}/>
                 </DebugDisplay>
             </div>
+            <TopBar m={m}/>
 {/*
             <MessageList messageBuffer$={messageBuffer$}/>
 */}
             <div className={'text-display'}>
                 {" "}
-                <div id="book" style={{width: '100%', height: '100%'}} ref={ref}>x</div>
+                <div id="book" style={{width: '100%', height: '100%'}} ref={ref}/>
             </div>
         </div>
     );
