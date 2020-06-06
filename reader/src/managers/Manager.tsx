@@ -17,7 +17,7 @@ import {Collection} from "../lib/worker-safe/Collection";
 import {isChineseCharacter} from "../lib/worker-safe/Card";
 import {ICard, MyAppDatabase} from "../AppDB";
 import {EditingCard, EditingCardInInterface, queryImages} from "../AppSingleton";
-import {aRendition, aSpine, aSpineItem, BookInstance, RenderingBook} from "./BookManager";
+import {aRendition, aSpine, aSpineItem, BookInstance, RenderingBook} from "./RenderingBook";
 import Epub, {Book} from "epubjs";
 import React from "react";
 import $ from "jquery";
@@ -54,8 +54,7 @@ export class Manager {
 
     addCard$: Subject<ICard[]> = new Subject<ICard[]>();
 
-    // cardIndex$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);
-    currentCardMap$: Subject<Dictionary<ICard[]>> = new Subject<Dictionary<ICard[]>>();/* = new Subject<Dictionary<ICard>>()*/
+    currentCardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
 
@@ -63,30 +62,28 @@ export class Manager {
     cardInEditor$: ReplaySubject<EditingCardInInterface | undefined> = new ReplaySubject<EditingCardInInterface | undefined>(1)
 
     inputText$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    titleText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook  | undefined>(1)
+    currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
     bookLoadUpdates$: Subject<BookInstance> = new Subject();
     bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
-
-    bookList$: Subject<BookInstance[]> = new Subject<BookInstance[]>();
-    spine$: ReplaySubject<aSpine | undefined> = new ReplaySubject(1);
-    spineItems$: ReplaySubject<aSpineItem[] | undefined> = new ReplaySubject<aSpineItem[] | undefined>(1);
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
     displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
     messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
+    allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
         this.oCurrent();
         this.oCards();
-/*
-        this.oSpine();
-*/
+        /*
+                this.oSpine();
+        */
         this.oBook();
         this.makeSimpleText(`a tweet`, `
         今年双十一，很多优惠活动的规则，真是令人匪夷所思……
@@ -146,6 +143,7 @@ export class Manager {
                             case "bookDict$":
                                 // @ts-ignore
                                 str = Object.values(v).map((v: RenderingBook) => v.name).join(', ')
+                                break;
                             default:
                                 if (Array.isArray(v)) {
                                     str = v.join(', ');
@@ -167,9 +165,12 @@ export class Manager {
             if (currentRender) {
                 currentRender.bookInstance$.next(instance);
             } else {
+                let renderingBook = new RenderingBook(instance, this, instance.name);
+                renderingBook.renderMessages$.pipe(map(m => new DebugMessage(`render-${renderingBook.name}`, m)))
+                    .subscribe(this.allDebugMessages$)
                 this.bookDict$.next({
                     ...this.bookDict$.getValue(),
-                    [instance.name]: new RenderingBook(instance, this, instance.name)
+                    [instance.name]: renderingBook
                 })
             }
         });
@@ -194,36 +195,36 @@ export class Manager {
         this.currentBook$.next(undefined);
     }
 
-/*
-    private oSpine() {
-        this.currentSpineItem$.next(undefined);
-        this.spineItems$.next([]);
-        this.spine$.next(undefined);
+    /*
+        private oSpine() {
+            this.currentSpineItem$.next(undefined);
+            this.spineItems$.next([]);
+            this.spine$.next(undefined);
 
-        this.spine$.pipe(map(s => {
-            if (!s) return;
-            const a: aSpineItem[] = [];
-            s.each((f: aSpineItem) => {
-                a.push(f);
-            })
-            return a;
-        }))
-            .subscribe(v => {
-                    this.spineItems$.next(v);
+            this.spine$.pipe(map(s => {
+                if (!s) return;
+                const a: aSpineItem[] = [];
+                s.each((f: aSpineItem) => {
+                    a.push(f);
+                })
+                return a;
+            }))
+                .subscribe(v => {
+                        this.spineItems$.next(v);
+                    }
+                );
+            this.spineItems$.pipe(withLatestFrom(this.currentSpineItem$)).subscribe(([spineItems, currentItem]) => {
+                if (!spineItems) {
+                    this.currentSpineItem$.next(undefined);
+                    return;
                 }
-            );
-        this.spineItems$.pipe(withLatestFrom(this.currentSpineItem$)).subscribe(([spineItems, currentItem]) => {
-            if (!spineItems) {
-                this.currentSpineItem$.next(undefined);
-                return;
-            }
-            if (!currentItem || !spineItems.find(i => i.href === currentItem.href)) {
-                this.currentSpineItem$.next(spineItems[0])
-                return;
-            }
-        })
-    }
-*/
+                if (!currentItem || !spineItems.find(i => i.href === currentItem.href)) {
+                    this.currentSpineItem$.next(spineItems[0])
+                    return;
+                }
+            })
+        }
+    */
 
     private oCards() {
         this.cardInEditor$.next(undefined);
@@ -269,15 +270,18 @@ export class Manager {
     }
 
     private oMessages() {
+        this.allDebugMessages$ = new ReplaySubject<DebugMessage>();
+        this.allDebugMessages$.pipe(scan((acc: DebugMessage[], m) => {
+            return [m].concat(acc).slice(0, 100)
+        }, [])).subscribe(this.messageBuffer$);
+
         merge(
             this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message))),
             this.packageMessages$.pipe(map(m => new DebugMessage('package', m))),
             this.renderMessages$.pipe(map(m => new DebugMessage('render', m))),
             this.bookMessages$.pipe(map(m => new DebugMessage('book', m))),
             this.cardMessages$.pipe(map(m => new DebugMessage('card', m))),
-        ).pipe(scan((acc: DebugMessage[], m) => {
-            return [m].concat(acc).slice(0, 100)
-        }, [])).subscribe(this.messageBuffer$)
+        ).subscribe(this.allDebugMessages$)
     }
 
     private oPackageLoader() {

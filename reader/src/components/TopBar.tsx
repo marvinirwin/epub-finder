@@ -9,7 +9,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import {Manager} from "../managers/Manager";
-import {TextareaAutosize} from "@material-ui/core";
+import {TextareaAutosize, TextField} from "@material-ui/core";
 import MyModal from './MyModal';
 import {useObs} from "../UseObs";
 
@@ -43,18 +43,21 @@ export default function ProminentAppBar({m}: { m: Manager }) {
         setOpen(false);
     };
     const inputText = useObs(m.inputText$, '');
+    const titleText = useObs(m.titleText$, '');
     return (
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
-                    <MyModal icon={<NoteAddIcon/>} submit={() => m.makeSimpleText('a tweet', inputText || '')}>
-                        <TextareaAutosize
-                            aria-label=""
-                            placeholder=""
-                            defaultValue=""
-                            value={inputText}
-                            onChange={v => m.inputText$.next(v.target.value)}
-                        />
+                    <MyModal icon={<NoteAddIcon/>} submit={() => m.makeSimpleText(titleText || '', inputText || '')}>
+                        <form className={classes.root} noValidate autoComplete="off">
+                            <TextField value={titleText} onChange={v => m.titleText$.next(v.target.value)} />
+                            <TextareaAutosize
+                                aria-label=""
+                                placeholder=""
+                                value={inputText}
+                                onChange={v => m.inputText$.next(v.target.value)}
+                            />
+                        </form>
                     </MyModal>
                     <IconButton aria-label="search" color="inherit">
                         <PostAddIcon/>

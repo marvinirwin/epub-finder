@@ -34,10 +34,22 @@ export class RenderingBook {
         public m: Manager,
         public name: string
     ) {
+        Object.entries(this).forEach(([key, value]) => {
+            if (value !== this.renderMessages$) {
+                if (value.subscribe) {
+                    // @ts-ignore
+                    value.subscribe(newValue => { this.renderMessages$.next(`${key} updated to ${newValue}`) })
+                }
+            }
+        })
+
         combineLatest([
             this.renderInProgress$,
             this.nextRender$
         ]).subscribe(([renderInProgress, nextRender]) => {
+            if (this.name === 'title') {
+                debugger;console.log();
+            }
             this.renderMessages$.next(`deciding whether to execute another render`);
             if (!renderInProgress && nextRender) {
                 this.renderMessages$.next(`No render in progress and a next render queued`);
@@ -54,18 +66,21 @@ export class RenderingBook {
                 this.m.currentCardMap$
             ]
         ).subscribe(([bookInstance, spineItem, renderRef, cardIndex]) => {
-            debugger;
+            if (this.name === 'title') {
+                debugger;console.log();
+            }
             const render = async () => {
                 this.renderMessages$.next("Render fired")
-                if (bookInstance && bookInstance.book && spineItem) {
-                    this.renderMessages$.next("Book and spineItem present, rendering")
-                    const iframe = this.getNewIframe(renderRef);
+                if (bookInstance && bookInstance.book) {
+                    this.renderMessages$.next("Book present, rendering")
+                    const iframe = this.resolveIFrame(renderRef);
+                    this.renderMessages$.next("Waiting for iframe 250ms")
                     await sleep(1000);
                     let body = iframe.contents().find("body");
                     // @ts-ignore
                     const rendition = bookInstance.book.renderTo(body[0] as HTMLElement, {width: 600, height: 400})
-                    const target = spineItem.href;
-                    await rendition.display(target);
+                    const target = spineItem?.href;
+                    await rendition.display(target || '');
                     // @ts-ignore
                     if (cardIndex) {
                         this.renderMessages$.next("Annotating")
@@ -78,22 +93,29 @@ export class RenderingBook {
             this.renderMessages$.next("Setting next render");
             this.nextRender$.next(render);
         })
-
         this.bookInstance$.next(bookInstance);
         this.renderInProgress$.next(false);
         this.currentSpineItem$.next(undefined);
     }
 
-    getNewIframe(ref: HTMLElement): JQuery<HTMLIFrameElement> {
+    getId() {
+        return `render_parent_${this.name}`
+    }
+
+    resolveIFrame(ref: HTMLElement): JQuery<HTMLIFrameElement> {
         this.renderMessages$.next('Clearing children of renderRef')
         for (let i = 0; i < ref.children.length; i++) {
             ref.children[i].remove();
         }
         this.renderMessages$.next('Appending new iframe')
-        const iframe: JQuery<HTMLIFrameElement> = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
-        iframe.appendTo(ref);
-        this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
-        // @ts-ignore
+        let iframe: JQuery<HTMLIFrameElement> = $(`#${this.getId()}`).find('iframe');
+        if (iframe.length) {
+            iframe.contents().find('body').children().remove();
+        } else {
+            iframe = $(` <iframe style="width: 100%; font-family: sans-serif"> </iframe>`);
+            iframe.appendTo(ref);
+            this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
+        }
         return iframe;
     }
 
