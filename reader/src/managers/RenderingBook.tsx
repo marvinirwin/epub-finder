@@ -19,6 +19,7 @@ export interface BookInstance {
     message: string;
     name: string;
     book: aBook | undefined;
+    serialize: (() => void) | undefined
 }
 
 export class RenderingBook {
@@ -34,6 +35,11 @@ export class RenderingBook {
         public m: Manager,
         public name: string
     ) {
+        this.bookInstance$.subscribe(instance => {
+            debugger;
+            instance.serialize && instance.serialize()
+        });
+
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
                 if (value.subscribe) {
@@ -112,7 +118,7 @@ export class RenderingBook {
         if (iframe.length) {
             iframe.contents().find('body').children().remove();
         } else {
-            iframe = $(` <iframe style="width: 100%; font-family: sans-serif"> </iframe>`);
+            iframe = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
             iframe.appendTo(ref);
             this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
         }

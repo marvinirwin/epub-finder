@@ -24,6 +24,12 @@ import $ from "jquery";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
 
+let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
+
+export interface ISimpleText {
+    title: string;
+    text: string;
+}
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -85,9 +91,21 @@ export class Manager {
                 this.oSpine();
         */
         this.oBook();
-        this.makeSimpleText(`a tweet`, `
+        // We take this simpleText from locaStorage if we can
+        const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY);
+        if (obj) {
+            let unserialized: Dictionary<ISimpleText> = JSON.parse(obj);
+            Object.values(unserialized).forEach(({title, text}) => this.makeSimpleText(title, text))
+        } else {
+            this.makeSimpleText(`a tweet`, `
         今年双十一，很多优惠活动的规则，真是令人匪夷所思……
         `)
+        }
+
+        this.bookDict$.subscribe(v => {
+
+        })
+
 
         this.oStringDisplay();
         this.oKeyDowns();
@@ -336,7 +354,16 @@ export class Manager {
                     each: cb => cb({href: ''})
                 }
             },
-            message: `Created simple text source ${name}`
+            message: `Created simple text source ${name}`,
+            serialize: function() {
+                const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY) || "{}";
+                let unserialized: Dictionary<ISimpleText> = JSON.parse(obj) || {};
+                unserialized[this.name] = {
+                    title: name,
+                    text: text
+                }
+                localStorage.setItem(SIMPLE_TEXT_LOCALSTORAGE_KEY, JSON.stringify(unserialized));
+            }
         });
     }
 
@@ -348,14 +375,16 @@ export class Manager {
         this.bookLoadUpdates$.next({
             name,
             book: undefined,
-            message: `Loading ${name} from ${path}`
+            message: `Loading ${name} from ${path}`,
+            serialize: undefined
         });
         const book: Book = Epub(path);
         await book.ready
         this.bookLoadUpdates$.next({
             name,
             book,
-            message: `Loaded ${name}`
+            message: `Loaded ${name}`,
+            serialize: undefined
         });
     }
 

@@ -20,7 +20,7 @@ function BookContainer({rb}: {rb: RenderingBook}) {
     useEffect(() => {
         ref && ref.current && rb.renderRef$.next(ref.current);
     }, [ref])
-    return <div id={rb.getId()} style={{width: '100%'}} ref={ref}/>
+    return <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
 }
 
 export function Main({s}: { s: AppSingleton }) {
