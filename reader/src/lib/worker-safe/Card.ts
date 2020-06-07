@@ -15,8 +15,7 @@ export class Card {
 
     get front(): string {
         if (!this.interpolatedFields[0]) {
-            debugger;
-            console.log();
+            debugger; console.log();
         }
         return this.interpolatedFields[0].normalize();
     }

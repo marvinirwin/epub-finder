@@ -1,25 +1,16 @@
-import {AppSingleton, EditingCard, EditingCardClass} from "../AppSingleton";
+import {AppSingleton, EditingCard} from "../AppSingleton";
 import {useObs} from "../UseObs";
-import { RenderingBook} from "../managers/RenderingBook";
-import React, {useEffect, useRef, useState, Fragment} from "react";
+import {RenderingBook} from "../managers/RenderingBook";
+import React, {Fragment} from "react";
 import {MessageList} from "./MessageLlist";
-import {Grid, Paper} from "@material-ui/core";
+import {Grid} from "@material-ui/core";
 import DebugDisplay from "./DebugDisplay";
 import TopBar from "./TopBar";
 import {Dictionary} from "lodash";
 import LeftBar from "./LeftBar";
 import {makeStyles} from "@material-ui/core/styles";
+import {BookContainer} from "./BookContainer";
 
-
-function BookContainer({rb}: { rb: RenderingBook }) {
-    const ref = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        ref && ref.current && rb.renderRef$.next(ref.current);
-    }, [ref])
-    return <Paper variant="outlined" elevation={3}>
-        <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
-    </Paper>;
-}
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         flexFlow: 'column nowrap',
         '& > *': {
-            margin: theme.spacing(1),
+            borderRadius: 0
         },
     },
 }));

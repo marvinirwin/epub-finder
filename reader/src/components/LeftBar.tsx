@@ -17,6 +17,9 @@ import EditingCard from "./EditingCard";
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
+        '& > .MuiExpansionPanel-root.Mui-expanded': {
+            borderRadius: 0
+        },
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),

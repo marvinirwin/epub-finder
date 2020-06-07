@@ -1,7 +1,6 @@
-import {Card} from "../lib/worker-safe/Card";
 import React, {useEffect, useState} from "react";
 import {Manager} from "../managers/Manager";
-import {EditingCard, EditingCardClass} from "../AppSingleton";
+import {EditingCard} from "../AppSingleton";
 import {ICard} from "../lib/worker-safe/icard";
 
 export function FlashcardPopup({text, card, getImages, m}: { text: string, card: ICard, getImages: ((s: string) => Promise<string[]>) | undefined, m: Manager }) {
@@ -32,7 +31,7 @@ export function FlashcardPopup({text, card, getImages, m}: { text: string, card:
             }}
             onMouseEnter={() => setInsidePopup(true)}
             onMouseLeave={() => setInsidePopup(false)}>
-            {srces.map(s => <img key={s} src={s} style={{width: '100px', height: '100px'}}/>)}
+            {srces.map(s => <img alt={'image'} key={s} src={s} style={{width: '100px', height: '100px'}}/>)}
             <div dangerouslySetInnerHTML={{__html: card.fields.join('</br>')}}>
             </div>
         </div>}

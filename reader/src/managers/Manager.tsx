@@ -14,15 +14,12 @@ import {
 import DebugMessage from "../Debug-Message";
 import {Deck} from "../lib/worker-safe/Deck";
 import {Collection} from "../lib/worker-safe/Collection";
-import {isChineseCharacter} from "../lib/worker-safe/Card";
 import {MyAppDatabase} from "../AppDB";
-import {EditingCard, EditingCardClass, queryImages} from "../AppSingleton";
-import {aRendition, aSpine, aSpineItem, BookInstance, RenderingBook} from "./RenderingBook";
+import {EditingCard} from "../AppSingleton";
+import {aRendition, cBookInstance, RenderingBook, SimpleText, Tweet} from "./RenderingBook";
 import Epub, {Book} from "epubjs";
 import React from "react";
 import $ from "jquery";
-import {render} from "react-dom";
-import {FlashcardPopup} from "../components/FlashcardPopup";
 import {ICard} from "../lib/worker-safe/icard";
 
 let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
@@ -73,7 +70,7 @@ export class Manager {
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
-    bookLoadUpdates$: Subject<BookInstance> = new Subject();
+    bookLoadUpdates$: ReplaySubject<cBookInstance> = new ReplaySubject<cBookInstance>();
     bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
@@ -91,21 +88,25 @@ export class Manager {
                 this.oSpine();
         */
         this.oBook();
+
         // We take this simpleText from locaStorage if we can
-        const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY);
-        if (obj) {
-            let unserialized: Dictionary<ISimpleText> = JSON.parse(obj);
-            Object.values(unserialized).forEach(({title, text}) => this.makeSimpleText(title, text))
-        } else {
-            this.makeSimpleText(`a tweet`, `
-        今年双十一，很多优惠活动的规则，真是令人匪夷所思……
-        `)
-        }
-
-        this.bookDict$.subscribe(v => {
-
-        })
-
+        /*
+                const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY);
+                if (obj) {
+                    let unserialized: Dictionary<ISimpleText> = JSON.parse(obj);
+                    Object.values(unserialized).forEach(({title, text}) => this.makeSimpleText(title, text))
+                } else {
+                    this.makeSimpleText(`a tweet`, `
+                今年双十一，很多优惠活动的规则，真是令人匪夷所思……
+                `)
+                }
+        */
+        let simpleText = new SimpleText('', '');
+        let tweet = new Tweet('', '');
+        [
+            ...simpleText.createFromSerilizedForm(localStorage.getItem(simpleText.localStorageKey) || '{}'),
+            ...tweet.createFromSerilizedForm(localStorage.getItem(tweet.localStorageKey) || '{}'),
+        ].forEach(b => this.bookLoadUpdates$.next(b))
 
         this.oStringDisplay();
         this.oKeyDowns();
@@ -340,64 +341,36 @@ export class Manager {
         this.renderMessages$.next('Initializing rendering')
     }
 
-    makeSimpleText(name: string, text: string) {
-        this.bookLoadUpdates$.next({
-            name,
-            book: {
-                renderTo(e: HTMLElement, options: { [p: string]: any }): aRendition {
-                    return {
-                        display: async s => {
-                            let htmlElements = $(`<p style="white-space: pre">${text}</p>`);
-                            let target: JQuery<HTMLElement> = $(e);
-                            htmlElements.appendTo(target);
-                        }
-                    }
-                },
-                spine: {
-                    each: cb => cb({href: ''})
-                }
-            },
-            message: `Created simple text source ${name}`,
-            serialize: function() {
-                const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY) || "{}";
-                let unserialized: Dictionary<ISimpleText> = JSON.parse(obj) || {};
-                unserialized[this.name] = {
-                    title: name,
-                    text: text
-                }
-                localStorage.setItem(SIMPLE_TEXT_LOCALSTORAGE_KEY, JSON.stringify(unserialized));
-            }
-        });
-    }
-
     receiveDebugMessage(o: any) {
         this.allDebugMessages$.next(new DebugMessage(o.prefix, o.message))
     }
 
-    async loadEbookInstance(path: string, name: string) {
-        this.bookLoadUpdates$.next({
-            name,
-            book: undefined,
-            message: `Loading ${name} from ${path}`,
-            serialize: undefined
-        });
-        const book: Book = Epub(path);
-        await book.ready
-        this.bookLoadUpdates$.next({
-            name,
-            book,
-            message: `Loaded ${name}`,
-            serialize: undefined
-        });
-    }
+    /*
+        async loadEbookInstance(path: string, name: string) {
+            this.bookLoadUpdates$.next({
+                name,
+                book: undefined,
+                message: `Loading ${name} from ${path}`,
+                serialize: undefined
+            });
+            const book: Book = Epub(path);
+            await book.ready
+            this.bookLoadUpdates$.next({
+                name,
+                book,
+                message: `Loaded ${name}`,
+                serialize: undefined
+            });
+        }
+    */
 
     receiveSerializedPackage(s: SerializedAnkiPackage) {
         let cards = s.cards;
         if (cards?.length) {
             this.packageMessages$.next(`Received package with ${cards?.length} cards`)
-/*
-            this.addCards$.next(cards);
-*/
+            /*
+                        this.addCards$.next(cards);
+            */
         }
         this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }

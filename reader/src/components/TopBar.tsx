@@ -12,6 +12,7 @@ import {Manager} from "../managers/Manager";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import MyModal from './MyModal';
 import {useObs} from "../UseObs";
+import {SimpleText} from "../managers/RenderingBook";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,7 +49,7 @@ export default function ProminentAppBar({m}: { m: Manager }) {
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
-                    <MyModal icon={<NoteAddIcon/>} submit={() => m.makeSimpleText(titleText || '', inputText || '')}>
+                    <MyModal icon={<NoteAddIcon/>} submit={() => m.bookLoadUpdates$.next(new SimpleText(titleText || '', inputText || ''))}>
                         <form className={classes.root} noValidate autoComplete="off">
                             <TextField value={titleText} onChange={v => m.titleText$.next(v.target.value)} />
                             <TextareaAutosize
