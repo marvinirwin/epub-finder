@@ -16,11 +16,13 @@ import {Deck} from "../lib/worker-safe/Deck";
 import {Collection} from "../lib/worker-safe/Collection";
 import {MyAppDatabase} from "../AppDB";
 import {EditingCard} from "../AppSingleton";
-import {aRendition, cBookInstance, RenderingBook, SimpleText, Tweet} from "./RenderingBook";
+import {aRendition, cBookInstance, RenderingBook} from "./RenderingBook";
 import Epub, {Book} from "epubjs";
 import React from "react";
 import $ from "jquery";
 import {ICard} from "../lib/worker-safe/icard";
+import {Tweet} from "../Tweet";
+import {SimpleText} from "../SimpleText";
 
 let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
 
@@ -64,8 +66,11 @@ export class Manager {
     newCardRequest$: Subject<ICard> = new Subject();
     cardInEditor$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
 
-    inputText$: ReplaySubject<string> = new ReplaySubject<string>(1);
-    titleText$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    simpleTextTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
+
+    twitterUrl$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    twitterTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 

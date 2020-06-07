@@ -12,7 +12,8 @@ import {Manager} from "../managers/Manager";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import MyModal from './MyModal';
 import {useObs} from "../UseObs";
-import {SimpleText} from "../managers/RenderingBook";
+import {Tweet} from "../Tweet";
+import {SimpleText} from "../SimpleText";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,26 +44,40 @@ export default function ProminentAppBar({m}: { m: Manager }) {
     const handleClose = () => {
         setOpen(false);
     };
-    const inputText = useObs(m.inputText$, '');
-    const titleText = useObs(m.titleText$, '');
+    const simpleTextInput = useObs(m.simpleTextInput$, '');
+    const simpleTextTitle = useObs(m.simpleTextTitle$, '');
+
+    const twitterUrlInput = useObs(m.twitterUrl$, '');
+    const twitterTitleInput = useObs(m.twitterTitle$, '');
     return (
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
-                    <MyModal icon={<NoteAddIcon/>} submit={() => m.bookLoadUpdates$.next(new SimpleText(titleText || '', inputText || ''))}>
+
+                    <MyModal icon={<NoteAddIcon/>} submit={() => m.bookLoadUpdates$.next(new SimpleText(simpleTextTitle || '', simpleTextInput || ''))}>
                         <form className={classes.root} noValidate autoComplete="off">
-                            <TextField value={titleText} onChange={v => m.titleText$.next(v.target.value)} />
+                            <TextField value={simpleTextTitle} onChange={v => m.simpleTextTitle$.next(v.target.value)} />
                             <TextareaAutosize
                                 aria-label=""
                                 placeholder=""
-                                value={inputText}
-                                onChange={v => m.inputText$.next(v.target.value)}
+                                value={simpleTextInput}
+                                onChange={v => m.simpleTextInput$.next(v.target.value)}
                             />
                         </form>
                     </MyModal>
-                    <IconButton aria-label="search" color="inherit">
-                        <PostAddIcon/>
-                    </IconButton>
+
+                    <MyModal icon={<PostAddIcon/>} submit={() => m.bookLoadUpdates$.next(new Tweet(twitterTitleInput || '', twitterUrlInput || ''))}>
+                        <form className={classes.root} noValidate autoComplete="off">
+                            <TextField value={twitterTitleInput} onChange={v => m.twitterTitle$.next(v.target.value)} />
+                            <TextareaAutosize
+                                aria-label=""
+                                placeholder=""
+                                value={twitterUrlInput}
+                                onChange={v => m.twitterUrl$.next(v.target.value)}
+                            />
+                        </form>
+                    </MyModal>
+
                 </Toolbar>
             </AppBar>
         </div>

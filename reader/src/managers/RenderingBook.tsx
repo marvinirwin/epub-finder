@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {startWith, withLatestFrom} from "rxjs/operators";
-import {ISimpleText, Manager, sleep} from "./Manager";
+import {Manager, sleep} from "./Manager";
 import $ from "jquery";
 import {isChineseCharacter} from "../lib/worker-safe/Card";
 import {render} from "react-dom";
@@ -27,85 +27,6 @@ export abstract class cBookInstance {
 }
 
 
-
-export class Tweet extends cBookInstance {
-    localStorageKey = "TWEET"
-    constructor(name: string, public url: string) {
-        super(name);
-        this.book = {
-            renderTo(iframe: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
-                return {
-                    display: async spineItem => {
-                        // e is an iframe
-                        iframe.attr('src', url);
-                        // Now wait a bit for the tweet to render
-                        await sleep(1000);
-                    }
-                }
-            },
-            spine: {
-                each: cb => cb({href: ''})
-            }
-        };
-    }
-
-    getSerializedForm() {
-        return {
-            [this.name]: {
-                name: this.name,
-                url: this.url
-            }
-        }
-    }
-
-    createFromSerilizedForm(o: string): Tweet[] {
-        const v = JSON.parse(o || '') || {};
-        if (!Array.isArray(v)) {
-            // @ts-ignore
-            return Object.values(v).filter(({name, url}) => name && url).map(({name, url}: {name: string, url: string}) => new Tweet(name, url))
-        }
-        return []
-    }
-}
-
-export class SimpleText extends cBookInstance {
-    localStorageKey = "SIMPLE_TEXT"
-    constructor(name: string, public text: string) {
-        super(name);
-        this.book = {
-            renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
-                return {
-                    display: async spineItem => {
-                        let htmlElements = $(`<p style="white-space: pre">${text}</p>`);
-                        let target: JQuery<HTMLElement> = e.contents().find('body');
-                        htmlElements.appendTo(target);
-                    }
-                }
-            },
-            spine: {
-                each: cb => cb({href: ''})
-            }
-        };
-    }
-
-    getSerializedForm() {
-        return {
-            [this.name]: {
-                name: this.name,
-                text: this.text
-            }
-        }
-    }
-
-    createFromSerilizedForm(o: string): SimpleText[] {
-        const v = JSON.parse(o || '') || {};
-        if (!Array.isArray(v)) {
-            // @ts-ignore
-            return Object.values(v).filter(({name, text}) => name && text).map(({name, text}: {name: string, text: string}) => new SimpleText(name, text))
-        }
-        return []
-    }
-}
 
 export class RenderingBook {
     bookInstance$: Subject<cBookInstance> = new Subject<cBookInstance>()
@@ -196,8 +117,11 @@ export class RenderingBook {
             // Go into the iframe, remove all the marks with my class
             // Go through each element of the iframe body and get the text inside
             // The element I'm getting text from
-            debugger;
             const body: HTMLBodyElement = $(ref).find('iframe').contents().find('body')[0];
+            if (!body) {
+                debugger;console.log();
+            }
+
             const allEls = body.getElementsByTagName('*');
             const textEls = [];
             for (let i = 0; i < allEls.length; i++) {
