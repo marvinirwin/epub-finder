@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {Dictionary} from "lodash";
-import {debounceTime, filter, map, scan, startWith, withLatestFrom} from "rxjs/operators";
+import {Dictionary, flatten} from "lodash";
+import {buffer, bufferWhen, debounce, debounceTime, filter, map, scan, startWith, withLatestFrom} from "rxjs/operators";
 // @ts-ignore
 import {sify} from 'chinese-conv';
 /* eslint import/no-webpack-loader-syntax:0 */
@@ -15,14 +15,15 @@ import DebugMessage from "../Debug-Message";
 import {Deck} from "../lib/worker-safe/Deck";
 import {Collection} from "../lib/worker-safe/Collection";
 import {isChineseCharacter} from "../lib/worker-safe/Card";
-import {ICard, MyAppDatabase} from "../AppDB";
-import {EditingCard, EditingCardInInterface, queryImages} from "../AppSingleton";
+import {MyAppDatabase} from "../AppDB";
+import {EditingCard, EditingCardClass, queryImages} from "../AppSingleton";
 import {aRendition, aSpine, aSpineItem, BookInstance, RenderingBook} from "./RenderingBook";
 import Epub, {Book} from "epubjs";
 import React from "react";
 import $ from "jquery";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
+import {ICard} from "../lib/worker-safe/icard";
 
 let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
 
@@ -47,7 +48,6 @@ export class Manager {
     bookMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     renderMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
-    ankiThreadMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>()
 
     messageBuffer$: Subject<DebugMessage[]> = new Subject<DebugMessage[]>();
 
@@ -58,14 +58,14 @@ export class Manager {
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
 
-    addCard$: Subject<ICard[]> = new Subject<ICard[]>();
+    addCards$: Subject<ICard[]> = new Subject<ICard[]>();
 
     currentCardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
 
     newCardRequest$: Subject<ICard> = new Subject();
-    cardInEditor$: ReplaySubject<EditingCardInInterface | undefined> = new ReplaySubject<EditingCardInInterface | undefined>(1)
+    cardInEditor$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
 
     inputText$: ReplaySubject<string> = new ReplaySubject<string>(1);
     titleText$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -246,8 +246,9 @@ export class Manager {
 
     private oCards() {
         this.cardInEditor$.next(undefined);
-        this.addCard$.next([]);
-        this.addCard$.pipe(scan((presentCards: ICard[], newCards: ICard[]) => {
+        this.addCards$.next([]);
+        const o = this.addCards$.pipe(debounceTime(1000))
+        this.addCards$.pipe(buffer(o), map(flatten), scan((presentCards: ICard[], newCards: ICard[]) => {
             this.cardMessages$.next(`Attempting to add ${newCards.length}`)
             return presentCards.concat(newCards);
         }, [])).subscribe(v => {
@@ -256,7 +257,8 @@ export class Manager {
         this.currentCards$.subscribe(v => {
             this.cardMessages$.next(`New current cards ${v.length}`)
         })
-        this.addCard$.pipe(scan((acc: Dictionary<ICard[]>, n: ICard[]) => {
+
+        this.addCards$.pipe(buffer(o), map(flatten), scan((acc: Dictionary<ICard[]>, n: ICard[]) => {
             const o = {...acc};
             n.forEach(v => {
                 if (o[v.characters]) {
@@ -267,6 +269,7 @@ export class Manager {
             });
             return o;
         }, {})).subscribe(this.currentCardMap$);
+
         this.allCustomCards$.next({})
         this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
             let key = `${c.characters}_${c.deck}`;
@@ -368,7 +371,7 @@ export class Manager {
     }
 
     receiveDebugMessage(o: any) {
-        this.ankiThreadMessages$.next(new DebugMessage(o.prefix, o.message))
+        this.allDebugMessages$.next(new DebugMessage(o.prefix, o.message))
     }
 
     async loadEbookInstance(path: string, name: string) {
@@ -392,7 +395,9 @@ export class Manager {
         let cards = s.cards;
         if (cards?.length) {
             this.packageMessages$.next(`Received package with ${cards?.length} cards`)
-            this.addCard$.next(cards);
+/*
+            this.addCards$.next(cards);
+*/
         }
         this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }

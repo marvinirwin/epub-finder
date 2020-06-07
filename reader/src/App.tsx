@@ -15,14 +15,14 @@ import {useObs} from "./UseObs";
 import {trie} from "./lib/Trie";
 import {isChineseCharacter} from "./lib/worker-safe/Card";
 
-import {AppSingleton, EditingCardInInterface, initializeApp, queryImages} from "./AppSingleton";
+import {AppSingleton, EditingCardClass, initializeApp, queryImages} from "./AppSingleton";
 import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";
-import {ICard} from "./AppDB";
 import {Dictionary} from 'lodash';
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
 import {dark} from "@material-ui/core/styles/createPalette";
+import {ICard} from "./lib/worker-safe/icard";
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -58,7 +58,7 @@ function windDownStringIntoTrie(currentSection: string[], t: trie<number>, i: nu
     }
 }
 
-function EditingCardComponent({editingCard}: { editingCard: EditingCardInInterface }) {
+function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) {
     const sources = useObs<string[] | undefined>(editingCard.imageSources)
     return <form className={'editing-card'}>
         <TextField label="Characters to Match" onChange={e => editingCard.matchChange$.next(e.target.value)}

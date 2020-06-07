@@ -1,17 +1,6 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
-
-export interface ICard {
-    id?: number; // Primary key. Optional (autoincremented)
-    characters: string;
-    photos: string[];
-    sounds: string[];
-    english: string[];
-    ankiPackage: string | undefined;
-    collection: string | undefined;
-    deck: string | undefined;
-    fields: string[];
-}
+import {ICard} from "./lib/worker-safe/icard";
 
 export class MyAppDatabase extends Dexie {
     cards: Dexie.Table<ICard, number>;
@@ -22,7 +11,7 @@ export class MyAppDatabase extends Dexie {
         this.messages$.subscribe(v => cb)
         this.messages$.next("Starting database, creating stories")
         this.version(1).stores({
-            cards: 'id++, characters, photos, sounds, english, ankiPackage, collection, deck, fields',
+            cards: 'id++, characters, english, ankiPackage, collection, deck',
         });
         this.messages$.next("Stores created, initializing cards")
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
@@ -35,7 +24,16 @@ export class MyAppDatabase extends Dexie {
         const exists = await this.cards.where('ankiPackage').equals(packageName).first();
         if (exists) {
             this.messages$.next(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
-            return this.cards.where('ankiPackage').equals(packageName).toArray();
+            const cards = [];
+            let offset = 0;
+            let chunkSize = 100;
+            while (await this.cards.where('ankiPackage').equals(packageName).offset(offset).first()) {
+                this.messages$.next(`Querying cards in chunks ${offset}`)
+                const chunkedCards = await this.cards.where('ankiPackage').equals(packageName).offset(offset).limit(chunkSize).toArray();
+                offset += chunkSize;
+                cards.push(...chunkedCards)
+            }
+            return cards;
         }
         return undefined;
     }

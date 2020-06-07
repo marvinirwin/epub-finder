@@ -5,9 +5,9 @@ import {Dictionary} from "lodash";
 import CardScroller from "./CardScroller";
 import {UnserializedAnkiPackage} from "../lib/worker-safe/SerializedAnkiPackage";
 import {ReplaySubject} from "rxjs";
-import {ICard} from "../AppDB";
 import {useObs} from "../UseObs";
 import {Manager} from "../managers/Manager";
+import {ICard} from "../lib/worker-safe/icard";
 
 /**
  * This function assumes there is only one collection per package, it can trivially be made to support more
@@ -36,5 +36,5 @@ export function CardTree({ankiPackages, selectedPackage$}: { ankiPackages: Dicti
 
 export function Cards({cardManager}: {cardManager: Manager}) {
     const cards = useObs<ICard[] | undefined>(cardManager.currentCards$);
-    return cards ? <CardScroller cards={cards}/> : <div/>
+    return cards ? <CardScroller m={cardManager} cards={cards}/> : <div/>
 }

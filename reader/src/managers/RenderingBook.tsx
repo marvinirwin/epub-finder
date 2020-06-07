@@ -1,12 +1,8 @@
-import {BehaviorSubject, combineLatest, fromEvent, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, share, withLatestFrom} from "rxjs/operators";
-import Epub from 'epubjs';
-import Spine from "epubjs/types/spine";
-import Book from "epubjs/types/book";
+import {withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "./Manager";
 import $ from "jquery";
-import {ICard} from "../AppDB";
 import {isChineseCharacter} from "../lib/worker-safe/Card";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
@@ -14,6 +10,7 @@ import {queryImages} from "../AppSingleton";
 import React from "react";
 // @ts-ignore
 import {sify} from 'chinese-conv';
+import {ICard} from "../lib/worker-safe/icard";
 
 export interface BookInstance {
     message: string;
@@ -36,7 +33,6 @@ export class RenderingBook {
         public name: string
     ) {
         this.bookInstance$.subscribe(instance => {
-            debugger;
             instance.serialize && instance.serialize()
         });
 
@@ -53,9 +49,6 @@ export class RenderingBook {
             this.renderInProgress$,
             this.nextRender$
         ]).subscribe(([renderInProgress, nextRender]) => {
-            if (this.name === 'title') {
-                debugger;console.log();
-            }
             this.renderMessages$.next(`deciding whether to execute another render`);
             if (!renderInProgress && nextRender) {
                 this.renderMessages$.next(`No render in progress and a next render queued`);
@@ -72,9 +65,6 @@ export class RenderingBook {
                 this.m.currentCardMap$
             ]
         ).subscribe(([bookInstance, spineItem, renderRef, cardIndex]) => {
-            if (this.name === 'title') {
-                debugger;console.log();
-            }
             const render = async () => {
                 this.renderMessages$.next("Render fired")
                 if (bookInstance && bookInstance.book) {
@@ -118,7 +108,7 @@ export class RenderingBook {
         if (iframe.length) {
             iframe.contents().find('body').children().remove();
         } else {
-            iframe = $(` <iframe style="width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
+            iframe = $(` <iframe style="border: none; width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
             iframe.appendTo(ref);
             this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
         }
@@ -175,6 +165,7 @@ export class RenderingBook {
                     e.addClass('hoverable')
                     let htmlElements = e.get(0);
                     render(<FlashcardPopup
+                        m={this.m}
                         card={t[0]}
                         text={text}
                         getImages={async function (char: string): Promise<string[]> {
@@ -185,11 +176,8 @@ export class RenderingBook {
             })
             let style = $(`
                     <style>
-.hoverable {
-  background-color: lightyellow;
-}
 .hoverable:hover {
-  background-color: lightgreen;
+  cursor: pointer;
 }
 </style>
                     `);

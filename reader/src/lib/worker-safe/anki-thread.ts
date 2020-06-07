@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
-import {Subject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {invert, flatten, chunk} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
@@ -13,6 +13,7 @@ import {MyAppDatabase} from "../../AppDB";
 import {groupBy} from "rxjs/operators";
 import {Card} from "./Card";
 import DebugMessage from "../../Debug-Message";
+import {ICard} from "./icard";
 
 // noinspection JSConstantReassignment
 // @ts-ignore
@@ -21,8 +22,14 @@ self.window = self;
 const ctx: Worker = self as any;
 
 class AnkiPackageLoader {
-    messages$: Subject<DebugMessage> = new Subject<DebugMessage>();
+    messages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
     ankiPackageLoaded$: Subject<SerializedAnkiPackage> = new Subject<SerializedAnkiPackage>();
+
+    sendCards(c: ICard[]) {
+        ctx.postMessage(
+            `this.addCards$.next(${JSON.stringify(c)})`
+        )
+    }
 
     postObject(o: Partial<SerializedAnkiPackage>) {
         this.ankiPackageLoaded$.next(Object.assign({
@@ -37,33 +44,16 @@ class AnkiPackageLoader {
 
     constructor(public name: string, public path: string, public db: MyAppDatabase) {
         db.messages$.subscribe(m => {
-            this.messages$.next(new DebugMessage('worker-database', m))
-        })
-        db.getMemodAnkiPackage(name).then(rows => {
-            if (!rows) {
-                this.loadAnkiPackageFromFile().then(async p => {
-                    let cards = flatten(Object.values(p.cardIndex)).map(c => Card.createICardFromCard(c.ankiPackage, c.collection, c));
-                    this.sendMessage(`Adding ${cards.length} cards to indexDB`)
-                    const cardChunks = chunk(cards, 10);
-                    for (let i = 0; i < cardChunks.length; i++) {
-                        const cardChunk = cardChunks[i];
-                        this.sendMessage(`Added ${i * 10} so far...`)
-                        await db.cards.bulkAdd(cardChunk);
-                    }
-                    this.sendMessage(`Added all ${cards.length} to indexDB`)
-                    this.postObject({
-                        cards: cards
-                    })
-                });
-            } else {
-                this.postObject({
-                    cards: rows
-                })
-            }
-        })
+            this.messages$.next(new DebugMessage('worker-database', m));
+        });
         this.messages$.subscribe(s => ctx.postMessage(`
             this.receiveDebugMessage(${JSON.stringify(s)});
         `));
+        (async () => {
+            let cards = await this.getCards(name);
+            this.sendMessage(`Adding ${cards.length} cards to indexDB`)
+            await this.sendCardsToMainThread(cards, 100);
+        })()
 
         this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
             const str = JSON.stringify(p)
@@ -71,10 +61,40 @@ class AnkiPackageLoader {
         })
     }
 
+    private async persistCards(cards: ICard[], chunkSize: number) {
+        const cardChunks = chunk(cards, chunkSize);
+        for (let i = 0; i < cardChunks.length; i++) {
+            const cardChunk = cardChunks[i];
+            this.sendMessage(`Persisted ${i * chunkSize} so far...`)
+            await this.db.cards.bulkAdd(cardChunk);
+        }
+        this.sendMessage(`Persisted ${cards.length} to indexDB `)
+    }
+
+    private async sendCardsToMainThread(cards: ICard[], chunkSize: number) {
+        const cardChunks = chunk(cards, chunkSize);
+        for (let i = 0; i < cardChunks.length; i++) {
+            const cardChunk = cardChunks[i];
+            this.sendMessage(`Sent ${i * chunkSize} so far...`)
+            this.sendCards(cardChunk);
+        }
+        this.sendMessage(`Sent ${cards.length} over`)
+    }
+
+    private async getCards(name: string) {
+        const chunkSize = 100;
+        let cards = await this.db.getMemodAnkiPackage(name);
+        if (!cards) {
+            const p = await this.loadAnkiPackageFromFile();
+            cards = p.allCards.map(c => c.iCard);
+            await this.persistCards(cards, 100);
+        }
+        return cards;
+    }
+
     sendMessage(m: string) {
         this.messages$.next(new DebugMessage('anki-package-loader', m));
     }
-
 
     loadAnkiPackageFromFile(): Promise<AnkiPackage> {
         return new Promise((resolve, reject) => {
@@ -98,7 +118,6 @@ class AnkiPackageLoader {
             });
         })
     }
-
 }
 
 const loaders: AnkiPackageLoader[] = [];

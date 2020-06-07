@@ -11,6 +11,7 @@ import {card} from "./lib/worker-safe/tables/card";
 import {col} from "./lib/worker-safe/tables/col";
 import {Deck} from "./lib/worker-safe/Deck";
 import {Subject} from "rxjs";
+import {ICard} from "./lib/worker-safe/icard";
 
 export interface Model {
     deckId: string;
@@ -71,9 +72,8 @@ export class AnkiPackage {
     public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void, packageName: string): Promise<AnkiPackage> {
         try {
             const collections = await AnkiPackage.initCollections(sql, zip, media, mesg, packageName);
-            const p = new AnkiPackage(collections, zip);
-            collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
-            return p;
+            // collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
+            return new AnkiPackage(collections, zip);
         } catch (e) {
             debugger;console.log();
             throw e;
@@ -140,7 +140,9 @@ export class AnkiPackage {
                     const card = cardsForThisDeck[k];
                     let noteElement: note = notes[card.nid][0];
                     let fields = noteElement.flds.split("\x1f");
-                    let interpolatedFields = await Card.interpolateMediaTags(fields, async (href) => {
+                    let iCard: ICard = await Card.getIcard(
+                        fields,
+                        async (href) => {
                         const ext = href.split('').reverse().join('').split('.')[0].split('').reverse().join('');
                         let file = zip.files[media[href]];
                         if (!file) {
@@ -150,6 +152,8 @@ export class AnkiPackage {
                         switch(ext) {
                             case 'wav':
                                 return `data:audio/wav;base64,${imageSrc}`
+                            case 'mp3':
+                                return `data:audio/mp3;base64,${imageSrc}`
                             case 'jpeg':
                                 return `data:image/jpeg;base64,${imageSrc}`;
                             case 'gif':
@@ -158,11 +162,11 @@ export class AnkiPackage {
                                 debugger;console.log();
                                 return '';
                         }
-                    });
-                    if (!fields || !interpolatedFields) {
+                    }, currentDeck.name, packageName, 'TODO_COLLECTION_NAME');
+                    if (!fields || !iCard) {
                         debugger; console.log();
                     }
-                    const cardInstance = new Card(fields, interpolatedFields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName);
+                    const cardInstance = new Card(fields, iCard.fields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName, iCard);
                     newCards.push(cardInstance)
                     cardsprocessed++;
                 }

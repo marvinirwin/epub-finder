@@ -78,8 +78,6 @@ export function MessageList({messageBuffer$}: {messageBuffer$: Observable<DebugM
             if (!colors[m.prefix]) {
                 colors[m.prefix] = ColorArray[colorIndex];
                 setColors({...colors});
-                console.log(colors[colorIndex]);
-                console.log(colorIndex);
                 colorIndex++;
                 setColorIndex(colorIndex);
             }
