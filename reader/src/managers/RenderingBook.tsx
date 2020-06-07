@@ -27,6 +27,18 @@ export abstract class cBookInstance {
 }
 
 
+function waitFor(f: () => any, n: number) {
+    return new Promise(resolve => {
+        const interval = setInterval(() => {
+            let f1 = f();
+            if (f1){
+                resolve();
+                clearInterval(interval);
+            }
+        }, n);
+    })
+
+}
 
 export class RenderingBook {
     bookInstance$: Subject<cBookInstance> = new Subject<cBookInstance>()
@@ -87,9 +99,10 @@ export class RenderingBook {
             [
                 this.bookInstance$,
                 this.currentSpineItem$,
-                this.renderRef$
+                this.renderRef$,
+                this.m.currentCardMap$.pipe(startWith({}))
             ]
-        ).subscribe(([bookInstance, spineItem, renderRef]) => {
+        ).subscribe(([bookInstance, spineItem, renderRef, map]) => {
             const render = async () => {
                 this.renderMessages$.next("Render fired")
                 if (bookInstance && bookInstance.book) {
@@ -101,7 +114,8 @@ export class RenderingBook {
                     const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
                     const target = spineItem?.href;
                     await rendition.display(target || '');
-                    this.applySelectListener(iframe);
+                    await this.annotate(renderRef, map);
+                    await this.applySelectListener(iframe);
                     // @ts-ignore
                 } else {
                     this.renderMessages$.next("No book or spine item")
@@ -113,44 +127,66 @@ export class RenderingBook {
         this.bookInstance$.next(bookInstance);
         this.renderInProgress$.next(false);
         this.currentSpineItem$.next(undefined);
-        this.m.currentCardMap$.pipe(withLatestFrom(this.renderRef$.pipe(startWith({})))).subscribe(([map, ref]) => {
-            // Go into the iframe, remove all the marks with my class
-            // Go through each element of the iframe body and get the text inside
-            // The element I'm getting text from
-            const body: HTMLBodyElement = $(ref).find('iframe').contents().find('body')[0];
-            if (!body) {
-                debugger;console.log();
-            }
+        // This will definitely be out of sync with the render, it has to fire right after the render method
+    }
 
-            const allEls = body.getElementsByTagName('*');
-            const textEls = [];
-            for (let i = 0; i < allEls.length; i++) {
-                const el = allEls[i];
-                if(el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
-                    // Apply flashcards to it
-                    const newText: string[] = [];
-                    const text = (el.textContent || '').split('') // maybe innerHTML?;
-                    text.forEach((c, i) => {
-                        const flashCard = map[c];
-                        if (!flashCard) {
-                            newText.push(c)
-                        } else {
-                            // Now make a mark on top
-                            newText.push(`<mark class="flashcard">${c}</mark>`)
-                        }
-                    })
-                    el.innerHTML = newText.join('')// weird how I get textContent but set innerHTML
-                    // Maybe I'm not allowed to add things to text nodes?  Maybe I have to use el.parent.append?
-                }
-            }
-            const flashCards = body.getElementsByClassName('flashcard');
-            for (let i = 0; i < flashCards.length; i++) {
-                $(flashCards[i]).on('click', t => {
-                    this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
+    private async annotate(ref: HTMLElement, map: Dictionary<ICard[]>) {
+        let iframeFromOtherSource = $(ref).find('iframe');
+        await waitFor(() => {
+            let contents = iframeFromOtherSource.contents();
+            let htmlBodyElements = contents.find('body');
+            debugger;
+            return htmlBodyElements.text().trim();
+        }, 1000)
+        const iframeHTML = iframeFromOtherSource[0].innerHTML;
+        // Now delete that iframe
+        iframeFromOtherSource.remove();
+        // Now create a new IFrame
+        const newIFrameWithNoSource = $(`<iframe></iframe>`);
+        newIFrameWithNoSource.appendTo(ref);
+        await sleep(500);
+        const dstFrame: HTMLIFrameElement = newIFrameWithNoSource[0] as HTMLIFrameElement;
+        var dstDoc = dstFrame.contentDocument;
+        if (!dstDoc) {
+            throw new Error("No destination document");
+        }
+        dstDoc.write(iframeHTML);
+
+
+        const body: HTMLBodyElement = newIFrameWithNoSource.contents().find('body')[0];
+        if (!body) {
+            debugger;
+            console.log();
+        }
+
+        const allEls = body.getElementsByTagName('*');
+        const textEls = [];
+        for (let i = 0; i < allEls.length; i++) {
+            const el = allEls[i];
+            if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
+                // Apply flashcards to it
+                const newText: string[] = [];
+                const text = (el.textContent || '').split('') // maybe innerHTML?;
+                text.forEach((c, i) => {
+                    const flashCard = map[c];
+                    if (!flashCard) {
+                        newText.push(c)
+                    } else {
+                        // Now make a mark on top
+                        newText.push(`<mark class="flashcard">${c}</mark>`)
+                    }
                 })
+                el.innerHTML = newText.join('')// weird how I get textContent but set innerHTML
+                // Maybe I'm not allowed to add things to text nodes?  Maybe I have to use el.parent.append?
             }
-            this.appendStyoeToBody($(body));
-        })
+        }
+        const flashCards = body.getElementsByClassName('flashcard');
+        for (let i = 0; i < flashCards.length; i++) {
+            $(flashCards[i]).on('click', t => {
+                this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
+            })
+        }
+        this.appendStyoeToBody($(body));
     }
 
     getId() {
