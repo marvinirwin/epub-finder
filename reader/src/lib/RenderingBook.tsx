@@ -182,7 +182,10 @@ export class RenderingBook {
         const flashCards = body.getElementsByClassName('flashcard');
         for (let i = 0; i < flashCards.length; i++) {
             $(flashCards[i]).on('click', t => {
-                this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
+                if (t.target.textContent) {
+                    this.m.requestEditWord$.next(t.target.textContent)
+                }
+                // this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
             })
         }
         this.appendStyoeToBody($(body));

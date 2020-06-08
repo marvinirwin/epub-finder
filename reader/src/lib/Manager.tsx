@@ -65,6 +65,7 @@ export class Manager {
 
     newCardRequest$: Subject<ICard> = new Subject();
     cardInEditor$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
+    requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
     simpleTextTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -123,6 +124,32 @@ export class Manager {
 
         this.oRender();
         this.oScoreAndCount()
+
+        this.requestEditWord$.pipe(withLatestFrom(
+            this.currentCardMap$,
+            this.currentPackage$.pipe(startWith(undefined)),
+            this.currentDeck$.pipe(startWith(undefined)),
+            this.currentCollection$.pipe(startWith(undefined)))
+        )
+            .subscribe(([word, map, ankiPackage, deck, collection]) => {
+                const currentICard = map[word];
+                let iCard;
+                if (currentICard?.length) {
+                    iCard = currentICard[0];
+                } else {
+                    iCard = {
+                        characters: word,
+                        photos: [],
+                        sounds: [],
+                        english: [],
+                        ankiPackage: ankiPackage?.name,
+                        deck: deck?.name,
+                        collection: collection?.name,
+                        fields: []
+                    };
+                }
+                this.cardInEditor$.next(EditingCard.fromICard(iCard))
+            })
     }
 
     private oKeyDowns() {

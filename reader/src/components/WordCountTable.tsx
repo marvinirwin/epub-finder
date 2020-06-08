@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import {iWordCountRow, Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import {WordCountTableRow} from "../lib/WordCountTableRow";
+import {EditingCard} from "../lib/EditingCard";
 
 const useStyles = makeStyles({
     table: {
@@ -18,13 +19,15 @@ const useStyles = makeStyles({
 });
 
 
-function WordCountRow({row}: {row: WordCountTableRow}) {
+function WordCountRow({row, m}: {row: WordCountTableRow, m: Manager}) {
     const score = useObs(row.currentRecognitionScore$);
     const count = useObs(row.currentCount$);
     return (
         <TableRow key={row.word}>
-            <TableCell component="th" scope="row">
-                {row.word}
+            <TableCell component="th" scope="row" >
+                <div onClick={() => m.requestEditWord$.next(row.word)}>
+                    {row.word}
+                </div>
             </TableCell>
             <TableCell align="right">{count}</TableCell>
             <TableCell align="right">{score}</TableCell>
@@ -46,7 +49,7 @@ export default function WordCountTable({m}: {m: Manager}) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows && rows.map(r => <WordCountRow row={r}/>)}
+                    {rows && rows.map(r => <WordCountRow row={r} m={m}/>)}
                 </TableBody>
             </Table>
         </TableContainer>
