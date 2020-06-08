@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
-import {ICard} from "./lib/worker-safe/icard";
+import {ICard} from "./worker-safe/icard";
 
 export class MyAppDatabase extends Dexie {
     cards: Dexie.Table<ICard, number>;

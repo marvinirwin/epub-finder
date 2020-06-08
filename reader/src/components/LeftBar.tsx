@@ -10,9 +10,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import {Manager} from "../managers/Manager";
+import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import EditingCard from "./EditingCard";
+import WordCountTable from "./WordCountTable";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,6 +77,7 @@ export default function LeftBar({m}: {m: Manager}) {
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanel>
+            <WordCountTable m={m}/>
         </div>
     );
 }

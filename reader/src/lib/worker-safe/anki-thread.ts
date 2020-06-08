@@ -9,7 +9,7 @@ import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
-import {MyAppDatabase} from "../../AppDB";
+import {MyAppDatabase} from "../AppDB";
 import {groupBy} from "rxjs/operators";
 import {Card} from "./Card";
 import DebugMessage from "../../Debug-Message";

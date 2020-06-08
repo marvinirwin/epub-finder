@@ -1,6 +1,6 @@
-import {AppSingleton, EditingCard} from "../AppSingleton";
+import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../UseObs";
-import {RenderingBook} from "../managers/RenderingBook";
+import {RenderingBook} from "../lib/RenderingBook";
 import React, {Fragment} from "react";
 import {MessageList} from "./MessageLlist";
 import {Grid} from "@material-ui/core";
@@ -10,6 +10,7 @@ import {Dictionary} from "lodash";
 import LeftBar from "./LeftBar";
 import {makeStyles} from "@material-ui/core/styles";
 import {BookContainer} from "./BookContainer";
+import {EditingCard} from "../lib/EditingCard";
 
 
 const useStyles = makeStyles((theme) => ({

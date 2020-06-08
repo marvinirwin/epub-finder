@@ -1,28 +1,28 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, flatten} from "lodash";
-import {buffer, bufferWhen, debounce, debounceTime, filter, map, scan, startWith, withLatestFrom} from "rxjs/operators";
+import {Dictionary, flatten, groupBy, sortBy} from "lodash";
+import {buffer, debounceTime, filter, map, scan, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 // @ts-ignore
-import {sify} from 'chinese-conv';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import AnkiThread from 'worker-loader?name=dist/[name].js!../lib/worker-safe/anki-thread';
+import AnkiThread from 'worker-loader?name=dist/[name].js!./worker-safe/anki-thread';
 import {
     SerializedAnkiPackage,
     UnserializeAnkiPackage,
     UnserializedAnkiPackage
-} from "../lib/worker-safe/SerializedAnkiPackage";
+} from "./worker-safe/SerializedAnkiPackage";
 import DebugMessage from "../Debug-Message";
-import {Deck} from "../lib/worker-safe/Deck";
-import {Collection} from "../lib/worker-safe/Collection";
-import {MyAppDatabase} from "../AppDB";
-import {EditingCard} from "../AppSingleton";
-import {aRendition, cBookInstance, RenderingBook} from "./RenderingBook";
-import Epub, {Book} from "epubjs";
+import {Deck} from "./worker-safe/Deck";
+import {Collection} from "./worker-safe/Collection";
+import {MyAppDatabase} from "./AppDB";
+import {RenderingBook} from "./RenderingBook";
 import React from "react";
 import $ from "jquery";
-import {ICard} from "../lib/worker-safe/icard";
-import {Tweet} from "../Tweet";
-import {SimpleText} from "../SimpleText";
+import {ICard} from "./worker-safe/icard";
+import {Tweet} from "./Tweet";
+import {SimpleText} from "./SimpleText";
+import {WordCountTableRow} from "./WordCountTableRow";
+import {cBookInstance} from "./cBookInstance";
+import {EditingCard} from "./EditingCard";
 
 let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
 
@@ -84,6 +84,11 @@ export class Manager {
     messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
+    wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
+    sortedWordRows$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
+    addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
+    addWordRecognitionRows$: ReplaySubject<iWordRecognitionRow[]> = new ReplaySubject<iWordRecognitionRow[]>();
+
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
@@ -117,8 +122,8 @@ export class Manager {
         this.oKeyDowns();
 
         this.oRender();
+        this.oScoreAndCount()
     }
-
 
     private oKeyDowns() {
         this.displayVisible$.next(true);
@@ -346,6 +351,48 @@ export class Manager {
         this.renderMessages$.next('Initializing rendering')
     }
 
+    private oScoreAndCount() {
+        this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
+            const wordCountsGrouped: Dictionary<iWordCountRow[]> = groupBy(newRows, 'word');
+            const newObject = {...acc};
+            Object.entries(wordCountsGrouped).forEach(([word, wordCountRecords]) => {
+                const currentEntry = newObject[word];
+                if (!currentEntry) {
+                    const newRow = new WordCountTableRow(word);
+                    newRow.addCountRecords$.next(wordCountRecords)
+                    newObject[word] = newRow;
+                } else {
+                    currentEntry.addCountRecords$.next(wordCountRecords);
+                }
+            })
+            return newObject;
+        }, {})).subscribe(this.wordRowDict);
+        this.addWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
+            const group = groupBy(newRecognitionRows, v => v);
+            // These will always be present in the table records for now
+            // If I starting to cache loading this wont be true anymore
+            Object.entries(group).forEach(([word, recognitionRows]) => {
+                rowDict[word].addNewRecognitionRecords$.next(recognitionRows)
+            })
+        })
+        this.wordRowDict.pipe(
+            map(d => Object.values(d)),
+            switchMap(wordRows =>
+                combineLatest(wordRows.map(r => r.currentCount$.pipe(map(count => ({count, row: r})))))
+            ),
+            map((recs: iCountRowEmitted[]) => recs.sort((a, b) => {
+                if (a.count < b.count) {
+                    return 1;
+                }
+                if (a.count > b.count) {
+                    return -1;
+                }
+                return 0;
+            }).map(r => r.row))
+        ).subscribe(this.sortedWordRows$)
+        this.wordRowDict.pipe(map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue())))
+    }
+
     receiveDebugMessage(o: any) {
         this.allDebugMessages$.next(new DebugMessage(o.prefix, o.message))
     }
@@ -382,6 +429,24 @@ export class Manager {
 
     initIframeListeners() {
     }
+}
+
+
+export interface iWordCountRow {
+    book: string;
+    word: string;
+    count: number;
+}
+
+export interface iWordRecognitionRow {
+    word: string;
+    timestamp: Date;
+    recognitionScore: number;
+}
+
+export interface iCountRowEmitted {
+    count: number;
+    row: WordCountTableRow
 }
 
 

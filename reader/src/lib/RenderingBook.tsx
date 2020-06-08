@@ -3,29 +3,22 @@ import {Dictionary} from "lodash";
 import {startWith, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "./Manager";
 import $ from "jquery";
-import {isChineseCharacter} from "../lib/worker-safe/Card";
+import {isChineseCharacter} from "./worker-safe/Card";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
-import {EditingCard, queryImages} from "../AppSingleton";
+import {queryImages} from "../AppSingleton";
 import React from "react";
 // @ts-ignore
 import {sify} from 'chinese-conv';
-import {ICard} from "../lib/worker-safe/icard";
+import {ICard} from "./worker-safe/icard";
+import {cBookInstance} from "./cBookInstance";
+import {EditingCard} from "./EditingCard";
 
 export interface BookInstance {
     message: string;
     name: string;
     serialize: (() => void) | undefined
 }
-
-export abstract class cBookInstance {
-    localStorageKey!: string;
-    book: aBook | undefined;
-    constructor(public name: string) {}
-    abstract getSerializedForm(): {[key: string]: any}
-    abstract createFromSerilizedForm(o: string): cBookInstance[]
-}
-
 
 function waitFor(f: () => any, n: number) {
     return new Promise(resolve => {
@@ -49,7 +42,6 @@ export class RenderingBook {
     nextRender$: ReplaySubject<() => Promise<any>> = new ReplaySubject<() => Promise<any>>(1);
     type: any;
 
-
     constructor(
         bookInstance: cBookInstance,
         public m: Manager,
@@ -70,6 +62,9 @@ export class RenderingBook {
             }
             const o = Object.assign(currentObject, instance.getSerializedForm());
             localStorage.setItem(instance.localStorageKey, JSON.stringify(o))
+
+            // TODO Allow removing records when the instance changes
+            instance.wordCountRecords$.subscribe(r => this.m.addWordCountRows$.next(r))
         });
 
         Object.entries(this).forEach(([key, value]) => {
@@ -128,6 +123,7 @@ export class RenderingBook {
         this.renderInProgress$.next(false);
         this.currentSpineItem$.next(undefined);
         // This will definitely be out of sync with the render, it has to fire right after the render method
+
     }
 
     private async annotate(ref: HTMLElement, map: Dictionary<ICard[]>) {
@@ -138,6 +134,7 @@ export class RenderingBook {
             debugger;
             return htmlBodyElements.text().trim();
         }, 1000)
+/*
         const iframeHTML = iframeFromOtherSource[0].innerHTML;
         // Now delete that iframe
         iframeFromOtherSource.remove();
@@ -154,6 +151,8 @@ export class RenderingBook {
 
 
         const body: HTMLBodyElement = newIFrameWithNoSource.contents().find('body')[0];
+*/
+        const body: HTMLBodyElement = iframeFromOtherSource.contents().find('body')[0];
         if (!body) {
             debugger;
             console.log();

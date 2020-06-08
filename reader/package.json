@@ -31,6 +31,7 @@
     "react-scripts": "3.4.1",
     "react-toastify": "^6.0.5",
     "react-tooltip": "^4.2.6",
+    "react-virtualized": "^9.21.2",
     "rxjs": "^6.5.5",
     "shutterstock-api": "^1.0.22",
     "sql.js": "^1.2.2",

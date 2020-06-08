@@ -6,7 +6,7 @@ import CardScroller from "./CardScroller";
 import {UnserializedAnkiPackage} from "../lib/worker-safe/SerializedAnkiPackage";
 import {ReplaySubject} from "rxjs";
 import {useObs} from "../UseObs";
-import {Manager} from "../managers/Manager";
+import {Manager} from "../lib/Manager";
 import {ICard} from "../lib/worker-safe/icard";
 
 /**

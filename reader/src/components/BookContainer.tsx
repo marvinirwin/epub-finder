@@ -1,4 +1,4 @@
-import {RenderingBook} from "../managers/RenderingBook";
+import {RenderingBook} from "../lib/RenderingBook";
 import React, {useEffect, useRef} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';

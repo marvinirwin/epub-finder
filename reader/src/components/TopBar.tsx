@@ -8,12 +8,12 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import PostAddIcon from '@material-ui/icons/PostAdd';
-import {Manager} from "../managers/Manager";
+import {Manager} from "../lib/Manager";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import MyModal from './MyModal';
 import {useObs} from "../UseObs";
-import {Tweet} from "../Tweet";
-import {SimpleText} from "../SimpleText";
+import {Tweet} from "../lib/Tweet";
+import {SimpleText} from "../lib/SimpleText";
 
 const useStyles = makeStyles((theme) => ({
     root: {

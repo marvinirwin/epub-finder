@@ -4,7 +4,7 @@ import {Divider} from "@material-ui/core";
 import {Card} from "../lib/worker-safe/Card";
 import React from "react";
 import {FlashcardPopup} from "./FlashcardPopup";
-import {Manager} from "../managers/Manager";
+import {Manager} from "../lib/Manager";
 import {ICard} from "../lib/worker-safe/icard";
 
 export default function CardScroller({cards, m}: { cards: ICard[] , m: Manager}) {

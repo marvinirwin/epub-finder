@@ -1,5 +1,6 @@
-import {sleep} from "./managers/Manager";
-import {aRendition, cBookInstance} from "./managers/RenderingBook";
+import {sleep} from "./Manager";
+import {aRendition} from "./RenderingBook";
+import {cBookInstance} from "./cBookInstance";
 
 export class Tweet extends cBookInstance {
     localStorageKey = "TWEET"
