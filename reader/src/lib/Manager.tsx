@@ -23,8 +23,8 @@ import {SimpleText} from "./SimpleText";
 import {WordCountTableRow} from "./WordCountTableRow";
 import {cBookInstance} from "./cBookInstance";
 import {EditingCard} from "./EditingCard";
+import Dexie from "dexie";
 
-let SIMPLE_TEXT_LOCALSTORAGE_KEY = "SIMPLE_TEXT";
 
 export interface ISimpleText {
     title: string;
@@ -89,6 +89,7 @@ export class Manager {
     sortedWordRows$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
     addWordRecognitionRows$: ReplaySubject<iWordRecognitionRow[]> = new ReplaySubject<iWordRecognitionRow[]>();
+    cardLocalStorage = new LocalStorageManager('CARDS');
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -112,11 +113,11 @@ export class Manager {
                 `)
                 }
         */
-        let simpleText = new SimpleText('', '');
-        let tweet = new Tweet('', '');
+        const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
+        const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
         [
-            ...simpleText.createFromSerilizedForm(localStorage.getItem(simpleText.localStorageKey) || '{}'),
-            ...tweet.createFromSerilizedForm(localStorage.getItem(tweet.localStorageKey) || '{}'),
+        ...tweetLoader.load<Tweet>(Tweet.fromSerialized),
+        ... simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
         ].forEach(b => this.bookLoadUpdates$.next(b))
 
         this.oStringDisplay();
@@ -133,7 +134,7 @@ export class Manager {
         )
             .subscribe(([word, map, ankiPackage, deck, collection]) => {
                 const currentICard = map[word];
-                let iCard;
+                let iCard: ICard;
                 if (currentICard?.length) {
                     iCard = currentICard[0];
                 } else {
@@ -145,10 +146,11 @@ export class Manager {
                         ankiPackage: ankiPackage?.name,
                         deck: deck?.name,
                         collection: collection?.name,
-                        fields: []
+                        fields: [],
+                        frontPhotos: []
                     };
                 }
-                this.cardInEditor$.next(EditingCard.fromICard(iCard))
+                this.cardInEditor$.next(EditingCard.fromICard(iCard, this.cardLocalStorage))
             })
     }
 
@@ -312,7 +314,7 @@ export class Manager {
         this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
             let key = `${c.characters}_${c.deck}`;
             const presentCard = cDict[key];
-            const ec: EditingCard = presentCard || new EditingCard();
+            const ec: EditingCard = presentCard || new EditingCard(this.cardLocalStorage);
             ec.english$.next(c.english);
             ec.characters$.next(c.characters);
             ec.deck$.next(c.deck || 'NO_DECK_FOR_CARD');
@@ -475,5 +477,83 @@ export interface iCountRowEmitted {
     count: number;
     row: WordCountTableRow
 }
+
+
+export interface HasId {
+
+}
+export class IndexDBManager {
+    constructor(public db: MyAppDatabase) {}
+
+    async load<FinalType, StoredInDBType>(f: (db: MyAppDatabase) => Promise<StoredInDBType[]>, create: (a: any) => FinalType) {
+        return (await f(this.db)).map(create);
+    }
+
+    async upsert<StoredInDBType extends HasId>(t: StoredInDBType, table: Dexie.Table<StoredInDBType, number>, getId: (db: MyAppDatabase) => Promise<number | undefined>): Promise<number> {
+        let id = await getId(this.db);
+        if (id !== undefined) {
+            await table.update(id, t)
+        } else {
+            id = await table.add(t);
+        }
+        return id;
+    }
+
+    async delete<StoredInDBType>(id: number, table: Dexie.Table<StoredInDBType, number>): Promise<undefined> {
+        await table.delete(id)
+        return;
+    }
+}
+
+export class LocalStorageManager {
+    constructor(public localStorageKey: string) {}
+
+    getLocalStorageArray(): Array<any> {
+
+        const a = this.tryParseLocalstorage();
+        if (!Array.isArray(a)) {
+            return [];
+        }
+        return a;
+    }
+
+    private tryParseLocalstorage(): any {
+        try  {
+            return JSON.parse(localStorage.getItem(this.localStorageKey) || '');
+        } catch(e) {
+            return undefined;
+        }
+    }
+
+    load<T>(create: (a: any) => T) {
+        const stored = this.getLocalStorageArray();
+        return stored.map(create);
+    }
+
+    upsert(isMe: (a: any) => boolean, meSerialized: any) {
+        debugger;
+        const serializedInstances = this.getLocalStorageArray();
+        const currentMe = serializedInstances.find(serializedObject => isMe(serializedObject))
+        if (currentMe) {
+            const i = serializedInstances.indexOf(currentMe);
+            serializedInstances[i] = meSerialized;
+        }
+        serializedInstances.push(meSerialized);
+        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
+    }
+
+    delete(isMe: (a: any) => boolean) {
+        const serializedInstances = this.getLocalStorageArray();
+        const currentMe = serializedInstances.filter(serializedObject => isMe(serializedObject))
+        if (currentMe) {
+            const i = serializedInstances.indexOf(currentMe);
+            serializedInstances.splice(i, 1);
+        } else {
+            throw new Error("Not found in array, cannot delete")
+        }
+        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
+    }
+}
+
 
 

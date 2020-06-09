@@ -1,14 +1,18 @@
 import $ from "jquery";
 import {aRendition, RenderingBook} from "./RenderingBook";
-import { Dictionary } from "lodash";
+import {Dictionary} from "lodash";
 import {cBookInstance} from "./cBookInstance";
+import {isChineseCharacter} from "./worker-safe/Card";
 
 export class SimpleText extends cBookInstance {
-    localStorageKey = "SIMPLE_TEXT"
+    static localStorageKey = "SIMPLE_TEXT"
+    get localStorageKey(): string {
+        return SimpleText.localStorageKey
+    }
 
     constructor(name: string, public text: string) {
         super(name);
-        const countedCharacters: Dictionary<number> =  text.split('').reduce((acc: Dictionary<number>, letter) => {
+        const countedCharacters: Dictionary<number> = text.split('').filter(isChineseCharacter).reduce((acc: Dictionary<number>, letter) => {
             if (!acc[letter]) {
                 acc[letter] = 1;
             } else {
@@ -40,21 +44,15 @@ export class SimpleText extends cBookInstance {
         };
     }
 
-    getSerializedForm() {
+    toSerialized() {
         return {
-            [this.name]: {
-                name: this.name,
-                text: this.text
-            }
+            name: this.name,
+            text: this.text
         }
     }
 
-    createFromSerilizedForm(o: string): SimpleText[] {
-        const v = JSON.parse(o || '') || {};
-        if (!Array.isArray(v)) {
-            // @ts-ignore
-            return Object.values(v).filter(({name, text}) => name && text).map(({name, text}: { name: string, text: string }) => new SimpleText(name, text))
-        }
-        return []
+
+    static fromSerialized(o: any): SimpleText {
+        return new SimpleText(o.name, o.text)
     }
 }

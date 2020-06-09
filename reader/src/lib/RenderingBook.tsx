@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {startWith, withLatestFrom} from "rxjs/operators";
-import {Manager, sleep} from "./Manager";
+import {LocalStorageManager, Manager, sleep} from "./Manager";
 import $ from "jquery";
 import {isChineseCharacter} from "./worker-safe/Card";
 import {render} from "react-dom";
@@ -40,7 +40,13 @@ export class RenderingBook {
     renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
     renderInProgress$: ReplaySubject<any> = new ReplaySubject(1);
     nextRender$: ReplaySubject<() => Promise<any>> = new ReplaySubject<() => Promise<any>>(1);
-    type: any;
+    localStorageKey: any;
+    persistor: LocalStorageManager;
+
+
+    removeSerialized() {
+        this.persistor.delete((serialized: any) => serialized.name === this.name);
+    }
 
     constructor(
         bookInstance: cBookInstance,
@@ -48,24 +54,14 @@ export class RenderingBook {
         public name: string
 
     ) {
-        this.type = bookInstance.localStorageKey;
+        this.localStorageKey = bookInstance.localStorageKey;
+        this.persistor =  new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
-            const str = localStorage.getItem(instance.localStorageKey);
-            let currentObject;
-            if (str) {
-                currentObject = JSON.parse(str);
-                if (typeof str !== 'object'  ||Array.isArray(currentObject)) {
-                    currentObject = {};
-                }
-            } else {
-                currentObject = {};
-            }
-            const o = Object.assign(currentObject, instance.getSerializedForm());
-            localStorage.setItem(instance.localStorageKey, JSON.stringify(o))
-
+            this.persistor.upsert((serialized: any) => serialized.name === this.name, instance.toSerialized());
             // TODO Allow removing records when the instance changes
             instance.wordCountRecords$.subscribe(r => this.m.addWordCountRows$.next(r))
-        });
+        })
+
 
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
@@ -131,7 +127,6 @@ export class RenderingBook {
         await waitFor(() => {
             let contents = iframeFromOtherSource.contents();
             let htmlBodyElements = contents.find('body');
-            debugger;
             return htmlBodyElements.text().trim();
         }, 1000)
 /*
@@ -320,7 +315,8 @@ export class RenderingBook {
                         sounds: [],
                         english: [],
                         collection: c?.name || "NO_COLLECTION",
-                        ankiPackage: p?.name || "NO_PACKAGE"
+                        ankiPackage: p?.name || "NO_PACKAGE",
+                        frontPhotos: []
                     })
                 }
             }

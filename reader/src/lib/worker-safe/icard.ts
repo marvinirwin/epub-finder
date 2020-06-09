@@ -8,4 +8,5 @@ export interface ICard {
     collection: string | undefined;
     deck: string | undefined;
     fields: string[];
+    frontPhotos: string[];
 }

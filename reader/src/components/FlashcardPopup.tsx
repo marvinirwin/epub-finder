@@ -21,7 +21,7 @@ export function FlashcardPopup({text, card, getImages, m}: { text: string, card:
     }}
                  onClick={() => {
                      setClicked(true);
-                     m.cardInEditor$.next(EditingCard.fromICard(card))
+                     m.cardInEditor$.next(EditingCard.fromICard(card, m.cardLocalStorage))
                  }}
                  onMouseLeave={() => setClicked(false)}
     >

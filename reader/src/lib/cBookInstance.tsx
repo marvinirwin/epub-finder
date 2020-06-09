@@ -3,14 +3,12 @@ import {iWordCountRow} from "./Manager";
 import {aBook} from "./RenderingBook";
 
 export abstract class cBookInstance {
-    localStorageKey!: string;
+    abstract get localStorageKey(): string;
     book: aBook | undefined;
     wordCountRecords$: ReplaySubject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>(1)
 
     constructor(public name: string) {
     }
 
-    abstract getSerializedForm(): { [key: string]: any }
-
-    abstract createFromSerilizedForm(o: string): cBookInstance[]
+    abstract toSerialized(): any;
 }

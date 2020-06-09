@@ -49,7 +49,7 @@ export default function WordCountTable({m}: {m: Manager}) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows && rows.map(r => <WordCountRow row={r} m={m}/>)}
+                    {rows && rows.map(r => <WordCountRow key={r.word} row={r} m={m}/>)}
                 </TableBody>
             </Table>
         </TableContainer>

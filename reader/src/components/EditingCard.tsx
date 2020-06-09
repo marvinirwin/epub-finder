@@ -1,16 +1,16 @@
 import React, {useEffect} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
+import {red} from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {useObs} from "../UseObs";
 import {EditingCard} from "../lib/EditingCard";
+import {EditingImage} from "./EditingImage";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function EditingCardComponent({card}: {card: EditingCard}) {
+export default function EditingCardComponent({card}: { card: EditingCard }) {
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
     const handleExpandClick = () => {
@@ -54,6 +54,7 @@ export default function EditingCardComponent({card}: {card: EditingCard}) {
         }
     }, [sounds])
 
+
     return (
         <Card className={classes.root}>
             <CardHeader avatar={<Avatar aria-label="card-type" className={classes.avatar}>{characters}</Avatar>}
@@ -65,9 +66,13 @@ export default function EditingCardComponent({card}: {card: EditingCard}) {
                         title={characters}
                         subheader={deck}
             />
-            {photos?.map(src => <CardMedia className={classes.media} image={src} style={{width: '170px', height: '100px'}} title={characters}/>)}
+            {photos?.map((src, index) => {
+                return <EditingImage key={index} index={index} card={card} src={src} classes={classes}
+    photos={photos} characters={characters}/>
+            })}
             <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p" dangerouslySetInnerHTML={{__html: english?.join('</br>') || ''}}>
+                <Typography variant="body2" color="textSecondary" component="p"
+                            dangerouslySetInnerHTML={{__html: english?.join('</br>') || ''}}>
                 </Typography>
                 {sounds?.map(s => <audio className={'new-audio'} controls={true} src={s}>This is audio</audio>)}
             </CardContent>

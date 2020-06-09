@@ -53,7 +53,7 @@ export function BookContainer({rb}: { rb: RenderingBook }) {
             <CardHeader
                 avatar={
                     <Avatar aria-label="Book Name" className={classes.avatar}>
-                        {rb.type}
+                        {rb.localStorageKey}
                     </Avatar>
                 }
                 action={
@@ -61,7 +61,7 @@ export function BookContainer({rb}: { rb: RenderingBook }) {
                         <DeleteIcon />
                     </IconButton>
                 }
-                title={rb.type}
+                title={rb.localStorageKey}
             />
             <CardActions disableSpacing>
 {/*

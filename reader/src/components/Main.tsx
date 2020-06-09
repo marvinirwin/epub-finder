@@ -12,6 +12,12 @@ import {makeStyles} from "@material-ui/core/styles";
 import {BookContainer} from "./BookContainer";
 import {EditingCard} from "../lib/EditingCard";
 
+window.addEventListener("dragover",function(e){
+    e.preventDefault();
+},false);
+window.addEventListener("drop",function(e){
+    e.preventDefault();
+},false);
 
 const useStyles = makeStyles((theme) => ({
     root: {

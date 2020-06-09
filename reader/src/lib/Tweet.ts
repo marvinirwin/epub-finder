@@ -3,9 +3,11 @@ import {aRendition} from "./RenderingBook";
 import {cBookInstance} from "./cBookInstance";
 
 export class Tweet extends cBookInstance {
-    localStorageKey = "TWEET"
-
-    constructor(name: string, public url: string) {
+    static localStorageKey = "TWEET"
+    get localStorageKey(): string {
+        return Tweet.localStorageKey
+    }
+    constructor(public name: string, public url: string) {
         super(name);
         this.book = {
             renderTo(iframe: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
@@ -24,21 +26,14 @@ export class Tweet extends cBookInstance {
         };
     }
 
-    getSerializedForm() {
+    toSerialized() {
         return {
-            [this.name]: {
-                name: this.name,
-                url: this.url
-            }
+            name: this.name,
+            url: this.url
         }
     }
 
-    createFromSerilizedForm(o: string): Tweet[] {
-        const v = JSON.parse(o || '') || {};
-        if (!Array.isArray(v)) {
-            // @ts-ignore
-            return Object.values(v).filter(({name, url}) => name && url).map(({name, url}: { name: string, url: string }) => new Tweet(name, url))
-        }
-        return []
+    static fromSerialized(o: any): Tweet {
+        return new Tweet(o.name, o.url)
     }
 }

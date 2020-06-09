@@ -3,6 +3,7 @@ import {ICard} from "./icard";
 
 
 export class Card {
+    frontPhotos: string[];
     constructor(
         public fields: string[],
         public interpolatedFields: string[],
@@ -11,6 +12,7 @@ export class Card {
         public ankiPackage: string,
         public iCard: ICard
     ) {
+        this.frontPhotos = [];
     }
 
     get front(): string {
@@ -44,7 +46,8 @@ export class Card {
             ankiPackage: ankiPackage,
             collection: collection,
             deck: deck,
-            fields: []
+            fields: [],
+            frontPhotos: []
         }
         const soundMatchRegexp = new RegExp(`\\[sound:(.*?)\\]`);
         for (let i = 0; i < fields.length; i++) {
