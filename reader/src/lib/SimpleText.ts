@@ -32,7 +32,7 @@ export class SimpleText extends cBookInstance {
             renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
                 return {
                     display: async spineItem => {
-                        let htmlElements = $(`<p style="white-space: pre">${text}</p>`);
+                        let htmlElements = $(`<p style="white-space: pre; font-size: 200%;">${text}</p>`);
                         let target: JQuery<HTMLElement> = e.contents().find('body');
                         htmlElements.appendTo(target);
                     }

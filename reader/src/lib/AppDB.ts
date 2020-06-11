@@ -26,7 +26,7 @@ export class MyAppDatabase extends Dexie {
             this.messages$.next(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
             const cards = [];
             let offset = 0;
-            let chunkSize = 100;
+            let chunkSize = 500;
             while (await this.cards.where('ankiPackage').equals(packageName).offset(offset).first()) {
                 this.messages$.next(`Querying cards in chunks ${offset}`)
                 const chunkedCards = await this.cards.where('ankiPackage').equals(packageName).offset(offset).limit(chunkSize).toArray();

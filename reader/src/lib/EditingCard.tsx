@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, merge, ReplaySubject} from "rxjs";
-import {ICard} from "./worker-safe/icard";
+import {getIsMeFunction, ICard} from "./worker-safe/icard";
 import {LocalStorageManager} from "./Manager";
 import {debounceTime, skip, withLatestFrom} from "rxjs/operators";
 
@@ -14,30 +14,31 @@ export class EditingCard {
     ankiPackage$ = new ReplaySubject<string>(1);
     collection$ = new ReplaySubject<string>(1);
 
-    constructor(public persistor: LocalStorageManager) {
-        this.photos$.pipe(skip(1)).subscribe(p => {
-            debugger;console.log(p)
-        })
-        combineLatest(
+    constructor(public persistor: LocalStorageManager, public timestamp?: Date | number | undefined) {
+        let firstGroup$ = combineLatest(
             [
-                combineLatest(
-                    [
-                        this.photos$,
-                        this.sounds$,
-                        this.english$,
-                        this.frontPhotos$
-                    ]
-                ),
-                this.characters$.pipe(skip(1)),
-                combineLatest([
-                        this.deck$,
-                        this.collection$,
-                        this.ankiPackage$
-                    ]
-                )
+                this.photos$,
+                this.sounds$,
+                this.english$,
+                this.frontPhotos$
+            ]
+        );
+        let secondGroup$ = combineLatest([
+                this.deck$,
+                this.collection$,
+                this.ankiPackage$
+            ]
+        );
+
+        let saveSignal$ = combineLatest(
+            [
+                firstGroup$,
+                this.characters$,
+                secondGroup$
             ]
             // This debounce Time and then skip means skip the first emit when we create the EditingCard
-        ).pipe(debounceTime(100), skip(1))
+        );
+        saveSignal$.pipe(debounceTime(100), skip(1))
             .subscribe((
                 [[photos, sounds, english, frontPhotos], characters, [deck, collection, ankiPackage]]
             ) => {
@@ -51,15 +52,11 @@ export class EditingCard {
                     characters,
                     ankiPackage,
                     frontPhotos,
-                    fields: []
+                    fields: [],
+                    timestamp: this.timestamp || new Date()
                 };
-                debugger;
                 persistor.upsert(
-                    v => v.id === this.id ||
-                        (v.deck === deck &&
-                            v.ankiPackage === ankiPackage &&
-                            v.collection === collection &&
-                            v.characters === characters),
+                    getIsMeFunction(iCard),
                     iCard
                 )
             })
@@ -93,14 +90,24 @@ export class EditingCard {
 
     static fromICard(iCard: ICard, persistor: LocalStorageManager): EditingCard {
         const e = new EditingCard(persistor);
+/*
+        deck$ = new ReplaySubject<string>(1);
+        photos$ = new ReplaySubject<string[]>(1);
+        frontPhotos$ = new ReplaySubject<string[]>(1);
+        sounds$ = new ReplaySubject<string[]>(1);
+        english$ = new ReplaySubject<string[]>(1);
+        characters$ = new ReplaySubject<string>(1);
+        ankiPackage$ = new ReplaySubject<string>(1);
+        collection$ = new ReplaySubject<string>(1);
+*/
         e.deck$.next(iCard.deck || "NO_DECK");
-        e.collection$.next(iCard.collection || "NO_COLLECTION");
-        e.ankiPackage$.next(iCard.ankiPackage || "NO_PACKAGE");
         e.photos$.next(iCard.photos);
+        e.frontPhotos$.next(iCard.frontPhotos);
         e.sounds$.next(iCard.sounds);
         e.english$.next(iCard.english);
         e.characters$.next(iCard.characters);
-        e.frontPhotos$.next(iCard.frontPhotos);
+        e.ankiPackage$.next(iCard.ankiPackage || "NO_PACKAGE");
+        e.collection$.next(iCard.collection || "NO_COLLECTION");
         return e;
     }
 }

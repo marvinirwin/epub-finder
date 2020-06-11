@@ -15,6 +15,7 @@ import {Card} from "./Card";
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "./icard";
 
+export const CHUNK_SIZE = 500;
 // noinspection JSConstantReassignment
 // @ts-ignore
 self.window = self;
@@ -52,7 +53,7 @@ class AnkiPackageLoader {
         (async () => {
             let cards = await this.getCards(name);
             this.sendMessage(`Adding ${cards.length} cards to indexDB`)
-            await this.sendCardsToMainThread(cards, 100);
+            await this.sendCardsToMainThread(cards, CHUNK_SIZE);
         })()
 
         this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
@@ -82,12 +83,12 @@ class AnkiPackageLoader {
     }
 
     private async getCards(name: string) {
-        const chunkSize = 100;
+        const chunkSize = 500;
         let cards = await this.db.getMemodAnkiPackage(name);
         if (!cards) {
             const p = await this.loadAnkiPackageFromFile();
             cards = p.allCards.map(c => c.iCard);
-            await this.persistCards(cards, 100);
+            await this.persistCards(cards, 500);
         }
         return cards;
     }

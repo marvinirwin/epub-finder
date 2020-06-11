@@ -17,7 +17,7 @@ import {MyAppDatabase} from "./AppDB";
 import {RenderingBook} from "./RenderingBook";
 import React from "react";
 import $ from "jquery";
-import {ICard} from "./worker-safe/icard";
+import {getIsMeFunction, ICard} from "./worker-safe/icard";
 import {Tweet} from "./Tweet";
 import {SimpleText} from "./SimpleText";
 import {WordCountTableRow} from "./WordCountTableRow";
@@ -41,6 +41,8 @@ function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V):
     t.subscribe(v => localStorage.setItem(key, JSON.stringify(defaultVal)));
     return t;
 }
+
+export const CARD_LOCAL_STORAGE_KEY = 'CARDS';
 
 export class Manager {
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
@@ -78,6 +80,7 @@ export class Manager {
     currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
     bookLoadUpdates$: ReplaySubject<cBookInstance> = new ReplaySubject<cBookInstance>();
     bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
+    requestBookRemove$: Subject<RenderingBook> = new Subject<RenderingBook>()
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
@@ -89,7 +92,10 @@ export class Manager {
     sortedWordRows$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
     addWordRecognitionRows$: ReplaySubject<iWordRecognitionRow[]> = new ReplaySubject<iWordRecognitionRow[]>();
-    cardLocalStorage = new LocalStorageManager('CARDS');
+
+
+
+    cardLocalStorage = new LocalStorageManager(CARD_LOCAL_STORAGE_KEY);
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -101,31 +107,37 @@ export class Manager {
         */
         this.oBook();
 
-        // We take this simpleText from locaStorage if we can
-        /*
-                const obj = localStorage.getItem(SIMPLE_TEXT_LOCALSTORAGE_KEY);
-                if (obj) {
-                    let unserialized: Dictionary<ISimpleText> = JSON.parse(obj);
-                    Object.values(unserialized).forEach(({title, text}) => this.makeSimpleText(title, text))
-                } else {
-                    this.makeSimpleText(`a tweet`, `
-                今年双十一，很多优惠活动的规则，真是令人匪夷所思……
-                `)
-                }
-        */
-        const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
-        const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
-        [
-        ...tweetLoader.load<Tweet>(Tweet.fromSerialized),
-        ... simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
-        ].forEach(b => this.bookLoadUpdates$.next(b))
 
+        this.requestBookRemove$.pipe(withLatestFrom(this.bookDict$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
+            delete bookDict[bookToRemove.name];
+            if (bookToRemove === currentBook) {
+                this.currentBook$.next(Object.values(bookDict)[0])
+            }
+            bookToRemove.removeSerialized();
+            this.bookDict$.next(bookDict);
+        })
         this.oStringDisplay();
         this.oKeyDowns();
 
         this.oRender();
         this.oScoreAndCount()
+        this.oEditWord();
+        this.oLoad();
+    }
 
+    private oLoad() {
+        const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
+        const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
+        let thingsToLoad = [
+            ...tweetLoader.load<Tweet>(Tweet.fromSerialized),
+            ...simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
+        ];
+        thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
+        const cardLoader = new LocalStorageManager(CARD_LOCAL_STORAGE_KEY)
+        this.addCards$.next(cardLoader.load<ICard>(v => v));
+    }
+
+    private oEditWord() {
         this.requestEditWord$.pipe(withLatestFrom(
             this.currentCardMap$,
             this.currentPackage$.pipe(startWith(undefined)),
@@ -147,7 +159,8 @@ export class Manager {
                         deck: deck?.name,
                         collection: collection?.name,
                         fields: [],
-                        frontPhotos: []
+                        frontPhotos: [],
+                        timestamp: new Date()
                     };
                 }
                 this.cardInEditor$.next(EditingCard.fromICard(iCard, this.cardLocalStorage))
@@ -287,28 +300,19 @@ export class Manager {
     private oCards() {
         this.cardInEditor$.next(undefined);
         this.addCards$.next([]);
-        const o = this.addCards$.pipe(debounceTime(1000))
-        this.addCards$.pipe(buffer(o), map(flatten), scan((presentCards: ICard[], newCards: ICard[]) => {
-            this.cardMessages$.next(`Attempting to add ${newCards.length}`)
-            return presentCards.concat(newCards);
-        }, [])).subscribe(v => {
-            this.currentCards$.next(v);
-        });
+        const debouncedAddCards$ = this.addCards$.pipe(debounceTime(1000))
         this.currentCards$.subscribe(v => {
             this.cardMessages$.next(`New current cards ${v.length}`)
         })
 
-        this.addCards$.pipe(buffer(o), map(flatten), scan((acc: Dictionary<ICard[]>, n: ICard[]) => {
+        this.addCards$.pipe(buffer(debouncedAddCards$), map(flatten), scan((acc: Dictionary<ICard[]>, newCards: ICard[]) => {
             const o = {...acc};
-            n.forEach(v => {
-                if (o[v.characters]) {
-                    o[v.characters].push(v)
-                } else {
-                    o[v.characters] = [v]
-                }
+            newCards.forEach(newICard => {
+                Manager.mergeCardIntoCardDict(newICard, o);
             });
             return o;
         }, {})).subscribe(this.currentCardMap$);
+        this.currentCardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
 
         this.allCustomCards$.next({})
         this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
@@ -328,6 +332,27 @@ export class Manager {
                 this.allCustomCards$.next(value)
             }
         })
+    }
+
+    private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
+        const detectDuplicateCard = getIsMeFunction(newICard);
+        let presentCards = o[newICard.characters];
+        if (presentCards) {
+            debugger;
+            const indexOfDuplicateCard = presentCards.findIndex(detectDuplicateCard);
+            if (indexOfDuplicateCard >= 0) {
+                const presentCard = presentCards[indexOfDuplicateCard];
+                if (newICard.timestamp > presentCard.timestamp) {
+                    // TODO will I have to update this?
+                    // Probably not, if there is an editingCard it will definitely take precendence over this
+                    presentCards[indexOfDuplicateCard] = newICard;
+                }
+            } else {
+                presentCards.push(newICard)
+            }
+        } else {
+            o[newICard.characters] = [newICard]
+        }
     }
 
     private oMessages() {
@@ -531,14 +556,15 @@ export class LocalStorageManager {
     }
 
     upsert(isMe: (a: any) => boolean, meSerialized: any) {
-        debugger;
         const serializedInstances = this.getLocalStorageArray();
         const currentMe = serializedInstances.find(serializedObject => isMe(serializedObject))
         if (currentMe) {
+
             const i = serializedInstances.indexOf(currentMe);
             serializedInstances[i] = meSerialized;
+        } else {
+            serializedInstances.push(meSerialized);
         }
-        serializedInstances.push(meSerialized);
         localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
     }
 

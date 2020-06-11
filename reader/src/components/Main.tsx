@@ -32,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
 
 export function Main({s}: { s: AppSingleton }) {
     const {m} = s;
-    const book = useObs<RenderingBook | undefined>(m.currentBook$)
-    const currentPackage = useObs(m.currentPackage$);
-    const packages = useObs(m.packages$, m.packages$.getValue());
-    const editingCard = useObs<EditingCard | undefined>(m.cardInEditor$);
     const classes = useStyles();
     const books = useObs<Dictionary<RenderingBook>>(m.bookDict$)
 
@@ -50,12 +46,12 @@ export function Main({s}: { s: AppSingleton }) {
             <Grid container item xs={12}>
                 <TopBar m={m}/>
             </Grid>
-            <Grid container item xs={4}>
+            <Grid container item xs={6}>
                 <LeftBar m={m}/>
             </Grid>
-            <Grid container item xs={8}>
+            <Grid container item xs={6}>
                 <div className={classes.root}>
-                    {Object.values(books || {}).map(b => <BookContainer key={b.name} rb={b}/>)}
+                    {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
                 </div>
             </Grid>
         </Grid>

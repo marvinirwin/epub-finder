@@ -1,5 +1,5 @@
 import {Card} from "./Card";
-import {Dictionary, flattenDeep, zip, fromPairs} from "lodash";
+import {flattenDeep} from "lodash";
 import {Deck, SerializedDeck} from "./Deck";
 import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./SerializedAnkiPackage";
 

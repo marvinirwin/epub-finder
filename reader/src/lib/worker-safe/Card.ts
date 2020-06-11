@@ -47,7 +47,8 @@ export class Card {
             collection: collection,
             deck: deck,
             fields: [],
-            frontPhotos: []
+            frontPhotos: [],
+            timestamp: Number.MIN_SAFE_INTEGER // Notes imported have the lowest timestamp because they're meant to be over-written
         }
         const soundMatchRegexp = new RegExp(`\\[sound:(.*?)\\]`);
         for (let i = 0; i < fields.length; i++) {
@@ -80,7 +81,7 @@ export class Card {
                 debugger;
                 console.log();
             }
-            if (innerHTML == '??') {
+            if (innerHTML === '??') {
                 debugger;
                 console.log('Inner html ??');
             }

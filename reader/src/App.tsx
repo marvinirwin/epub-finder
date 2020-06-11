@@ -3,26 +3,19 @@ import "fontsource-noto-sans"
 import 'jquery-ui-bundle';
 import 'jquery-ui-bundle/jquery-ui.css';
 import $ from 'jquery';
-import React, {useEffect, useState, Fragment} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 // @ts-ignore
-import {render} from 'react-dom';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {FlashcardPopup} from "./components/FlashcardPopup";
 import {useObs} from "./UseObs";
 import {trie} from "./lib/Trie";
-import {isChineseCharacter} from "./lib/worker-safe/Card";
 
-import {AppSingleton, EditingCardClass, initializeApp, queryImages} from "./AppSingleton";
+import {AppSingleton, EditingCardClass, initializeApp} from "./AppSingleton";
 import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";
-import {Dictionary} from 'lodash';
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-import blue from '@material-ui/core/colors/blue';
-import {dark} from "@material-ui/core/styles/createPalette";
-import {ICard} from "./lib/worker-safe/icard";
 
 const darkTheme = createMuiTheme({
     palette: {

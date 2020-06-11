@@ -4,13 +4,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import Collapse from '@material-ui/core/Collapse';
-import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import { red } from '@material-ui/core/colors';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {CardActions, CardContent} from "@material-ui/core";
+import {Manager} from "../lib/Manager";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,14 +35,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export function BookContainer({rb}: { rb: RenderingBook }) {
+export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
     const ref = useRef<HTMLDivElement>(null);
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(true);
 
+/*
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+*/
     useEffect(() => {
         ref && ref.current && rb.renderRef$.next(ref.current);
     }, [ref])
@@ -57,7 +58,7 @@ export function BookContainer({rb}: { rb: RenderingBook }) {
                     </Avatar>
                 }
                 action={
-                    <IconButton aria-label="settings">
+                    <IconButton aria-label="settings" onClick={() => m.requestBookRemove$.next(rb)}>
                         <DeleteIcon />
                     </IconButton>
                 }

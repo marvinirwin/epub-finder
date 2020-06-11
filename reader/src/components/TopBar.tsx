@@ -1,11 +1,7 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import {Manager} from "../lib/Manager";
@@ -35,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ProminentAppBar({m}: { m: Manager }) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const [, setOpen] = React.useState(false);
 
     const handleOpen = () => {
         setOpen(true);

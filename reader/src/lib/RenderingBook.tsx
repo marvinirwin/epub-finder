@@ -1,6 +1,6 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {startWith, withLatestFrom} from "rxjs/operators";
+import {startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {LocalStorageManager, Manager, sleep} from "./Manager";
 import $ from "jquery";
 import {isChineseCharacter} from "./worker-safe/Card";
@@ -12,7 +12,6 @@ import React from "react";
 import {sify} from 'chinese-conv';
 import {ICard} from "./worker-safe/icard";
 import {cBookInstance} from "./cBookInstance";
-import {EditingCard} from "./EditingCard";
 
 export interface BookInstance {
     message: string;
@@ -58,10 +57,8 @@ export class RenderingBook {
         this.persistor =  new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
             this.persistor.upsert((serialized: any) => serialized.name === this.name, instance.toSerialized());
-            // TODO Allow removing records when the instance changes
-            instance.wordCountRecords$.subscribe(r => this.m.addWordCountRows$.next(r))
         })
-
+        this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
 
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
@@ -154,7 +151,6 @@ export class RenderingBook {
         }
 
         const allEls = body.getElementsByTagName('*');
-        const textEls = [];
         for (let i = 0; i < allEls.length; i++) {
             const el = allEls[i];
             if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
@@ -183,7 +179,7 @@ export class RenderingBook {
                 // this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
             })
         }
-        this.appendStyoeToBody($(body));
+        RenderingBook.appendStyleToBody($(body));
     }
 
     getId() {
@@ -270,13 +266,13 @@ export class RenderingBook {
                         }}/>, htmlElements);
                 }
             })
-            this.appendStyoeToBody(body);
+            RenderingBook.appendStyleToBody(body);
             root.appendTo(body)
             resolve()
         })
     }
 
-    private appendStyoeToBody(body: JQuery<HTMLBodyElement>) {
+    private static appendStyleToBody(body: JQuery<HTMLBodyElement>) {
         let style = $(`
                     <style>
 .flashcard:hover {
@@ -296,8 +292,9 @@ export class RenderingBook {
         onMouseUp$.pipe(withLatestFrom(
             this.m.currentDeck$,
             this.m.currentCollection$,
-            this.m.currentPackage$
-        )).subscribe(([e, d, c, p]) => {
+            this.m.currentPackage$,
+            this.m.currentCardMap$
+        )).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
                 throw new Error("Iframe has no content window");
             }
@@ -307,20 +304,26 @@ export class RenderingBook {
                 if (selObj) {
                     const text = selObj.toString();
                     this.m.selectionText$.next(text);
+                    const c = RenderingBook.getExistingCard(cardMap, text);
                     this.m.newCardRequest$.next({
-                        deck: d?.name || "NO_DECK",
+                        deck: currentDeck?.name || "NO_DECK",
                         characters: text,
                         fields: [],
                         photos: [],
                         sounds: [],
                         english: [],
-                        collection: c?.name || "NO_COLLECTION",
-                        ankiPackage: p?.name || "NO_PACKAGE",
-                        frontPhotos: []
+                        collection: currentCollection?.name || "NO_COLLECTION",
+                        ankiPackage: currentPackage?.name || "NO_PACKAGE",
+                        frontPhotos: [],
+                        timestamp: c?.timestamp || new Date()
                     })
                 }
             }
         })
+    }
+
+    private static getExistingCard(cardMap: Dictionary<ICard[]>, text: string): ICard | undefined {
+        return cardMap[text] ? cardMap[text][0] : undefined;
     }
 }
 
