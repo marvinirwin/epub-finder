@@ -49,15 +49,15 @@ export function prep<T>(sql: SqlJs.Database, statement: string, params: any[]): 
 }
 
 export class AnkiPackage {
-    allCards: Card[];
-    cardIndex: Dictionary<Card[]>;
+    allCards: ICard[];
+    cardIndex: Dictionary<ICard[]>;
     messages$: Subject<string> = new Subject<string>();
 
     public constructor(public collections: Collection[], public zip: JSZip) {
         this.allCards = flattenDeep(this.collections.map(c => c.decks.map(d => d.cards)))
         this.cardIndex = groupBy(this.allCards, c => {
                 const v = uniq(
-                    c.front
+                    c.fields[0]
                     .split('')
                     .filter(isChineseCharacter)
                     .join(''))
@@ -69,7 +69,12 @@ export class AnkiPackage {
         );
     }
 
-    public static async init(sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void, packageName: string): Promise<AnkiPackage> {
+    public static async init(
+        sql: SqlJs.Database,
+        zip: JSZip,
+        media: { [key: string]: string },
+        mesg: (s: string) => void,
+        packageName: string): Promise<AnkiPackage> {
         try {
             const collections = await AnkiPackage.initCollections(sql, zip, media, mesg, packageName);
             // collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
@@ -166,8 +171,8 @@ export class AnkiPackage {
                     if (!fields || !iCard) {
                         debugger; console.log();
                     }
-                    const cardInstance = new Card(fields, iCard.fields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName, iCard);
-                    newCards.push(cardInstance)
+                    // const cardInstance = new Card(fields, iCard.fields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName, iCard);
+                    newCards.push(iCard)
                     cardsprocessed++;
                 }
 

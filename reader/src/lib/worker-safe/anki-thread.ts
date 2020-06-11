@@ -82,13 +82,13 @@ class AnkiPackageLoader {
         this.sendMessage(`Sent ${cards.length} over`)
     }
 
-    private async getCards(name: string) {
+    private async getCards(name: string): Promise<ICard[]> {
         const chunkSize = 500;
         let cards = await this.db.getMemodAnkiPackage(name);
         if (!cards) {
             const p = await this.loadAnkiPackageFromFile();
-            cards = p.allCards.map(c => c.iCard);
-            await this.persistCards(cards, 500);
+            await this.persistCards(p.allCards, 500);
+            cards = p.allCards;
         }
         return cards;
     }

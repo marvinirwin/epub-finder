@@ -151,15 +151,15 @@ export class Manager {
                     iCard = currentICard[0];
                 } else {
                     iCard = {
-                        characters: word,
+                        learningLanguage: word,
                         photos: [],
                         sounds: [],
-                        english: [],
+                        knownLanguage: [],
                         ankiPackage: ankiPackage?.name,
                         deck: deck?.name,
                         collection: collection?.name,
                         fields: [],
-                        frontPhotos: [],
+                        illustrationPhotos: [],
                         timestamp: new Date()
                     };
                 }
@@ -316,11 +316,11 @@ export class Manager {
 
         this.allCustomCards$.next({})
         this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
-            let key = `${c.characters}_${c.deck}`;
+            let key = `${c.learningLanguage}_${c.deck}`;
             const presentCard = cDict[key];
             const ec: EditingCard = presentCard || new EditingCard(this.cardLocalStorage);
-            ec.english$.next(c.english);
-            ec.characters$.next(c.characters);
+            ec.knownLanguage$.next(c.knownLanguage);
+            ec.characters$.next(c.learningLanguage);
             ec.deck$.next(c.deck || 'NO_DECK_FOR_CARD');
             ec.photos$.next(c.photos);
             ec.sounds$.next(c.sounds);
@@ -336,9 +336,8 @@ export class Manager {
 
     private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
-        let presentCards = o[newICard.characters];
+        let presentCards = o[newICard.learningLanguage];
         if (presentCards) {
-            debugger;
             const indexOfDuplicateCard = presentCards.findIndex(detectDuplicateCard);
             if (indexOfDuplicateCard >= 0) {
                 const presentCard = presentCards[indexOfDuplicateCard];
@@ -351,7 +350,7 @@ export class Manager {
                 presentCards.push(newICard)
             }
         } else {
-            o[newICard.characters] = [newICard]
+            o[newICard.learningLanguage] = [newICard]
         }
     }
 

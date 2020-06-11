@@ -9,7 +9,7 @@ export function FlashcardPopup({text, card, getImages, m}: { text: string, card:
     const [srces, setSrces] = useState<string[]>([]);
     useEffect(() => {
         if (getImages) {
-            getImages(card.characters).then((data) => {
+            getImages(card.learningLanguage).then((data) => {
                 setSrces(data);
             })
         }

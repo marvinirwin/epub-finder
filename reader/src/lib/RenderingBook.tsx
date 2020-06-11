@@ -307,14 +307,14 @@ export class RenderingBook {
                     const c = RenderingBook.getExistingCard(cardMap, text);
                     this.m.newCardRequest$.next({
                         deck: currentDeck?.name || "NO_DECK",
-                        characters: text,
+                        learningLanguage: text,
                         fields: [],
                         photos: [],
                         sounds: [],
-                        english: [],
+                        knownLanguage: [],
                         collection: currentCollection?.name || "NO_COLLECTION",
                         ankiPackage: currentPackage?.name || "NO_PACKAGE",
-                        frontPhotos: [],
+                        illustrationPhotos: [],
                         timestamp: c?.timestamp || new Date()
                     })
                 }

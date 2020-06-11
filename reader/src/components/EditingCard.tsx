@@ -10,11 +10,12 @@ import {red} from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {useObs} from "../UseObs";
 import {EditingCard} from "../lib/EditingCard";
-import {EditingImage} from "./EditingImage";
+import ImageList from "./ImageList";
+import EditCardEnglish from "./EditCardEnglish";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: '100%',
+        width: '100%',
     },
     media: {
         height: 0,
@@ -43,9 +44,10 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
     };
     const characters = useObs(card.characters$);
     const deck = useObs(card.deck$);
-    const photos = useObs(card.photos$);
-    const english = useObs(card.english$);
+    const english = useObs(card.knownLanguage$);
     const sounds = useObs(card.sounds$);
+    const photos = useObs(card.photos$);
+    const frontPhotos = useObs(card.illustrationPhotos$);
     useEffect(() => {
         const els = document.getElementsByClassName('new-audio');
         for (let i = 0; i < els.length; i++) {
@@ -66,15 +68,18 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
                         title={characters}
                         subheader={deck}
             />
-            {photos?.map((src, index) => {
-                return <EditingImage key={index} index={index} card={card} src={src} classes={classes}
-    photos={photos} characters={characters}/>
-            })}
+
             <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p"
-                            dangerouslySetInnerHTML={{__html: english?.join('</br>') || ''}}>
-                </Typography>
-                {sounds?.map(s => <audio className={'new-audio'} controls={true} src={s}>This is audio</audio>)}
+                <div className={classes.root}>
+                    <Typography variant="h6" gutterBottom> Question Pictures </Typography>
+                    <ImageList photos$={card.photos$} card={card} characters={characters || ""} />
+                    <Typography variant="h6" gutterBottom> Illustration Pictures </Typography>
+                    <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} />
+                    <Typography variant="h6" gutterBottom> English </Typography>
+                    <EditCardEnglish e={card}/>
+                </div>
+
+                {sounds?.map(s => <audio className={'new-audio'} key={s} controls={true} src={s}>This is audio</audio>)}
             </CardContent>
             {/*
 

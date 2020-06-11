@@ -39,15 +39,15 @@ export class Card {
     ): Promise<ICard> {
         fields = fields.filter(f => f);
         const c: ICard = {
-            characters: fields[0], // assuming the first field contains the character
+            learningLanguage: fields[0], // assuming the first field contains the character
             photos:  [],
             sounds:  [],
-            english: [],
+            knownLanguage: [],
             ankiPackage: ankiPackage,
             collection: collection,
             deck: deck,
             fields: [],
-            frontPhotos: [],
+            illustrationPhotos: [],
             timestamp: Number.MIN_SAFE_INTEGER // Notes imported have the lowest timestamp because they're meant to be over-written
         }
         const soundMatchRegexp = new RegExp(`\\[sound:(.*?)\\]`);
@@ -75,7 +75,8 @@ export class Card {
             const audioSources = await this.resolveMediaSources(audio, resolveMediaSrc);
             const imageSources = await this.resolveMediaSources(images, resolveMediaSrc);
             c.sounds.push(...audioSources);
-            c.photos.push(...imageSources);
+            // For this current package, the photos will always be illustrationPhotos
+            c.illustrationPhotos.push(...imageSources);
             let innerHTML = new XMLSerializer().serializeToString(document);
             if (!innerHTML) {
                 debugger;

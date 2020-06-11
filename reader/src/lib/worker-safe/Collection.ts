@@ -1,10 +1,10 @@
 import {Card} from "./Card";
 import {flattenDeep} from "lodash";
 import {Deck, SerializedDeck} from "./Deck";
-import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./SerializedAnkiPackage";
+import {ICard} from "./icard";
 
 export class Collection {
-    allCards: Card[];
+    allCards: ICard[];
     name: any;
 
     constructor(public decks: Deck[], name: string) {
@@ -18,7 +18,7 @@ export class Collection {
 
 export class SerializedCollection {
     name: any;
-    allCards: Card[]
+    allCards: ICard[]
 
     constructor(public decks: SerializedDeck[], name: string) {
         this.allCards = [];

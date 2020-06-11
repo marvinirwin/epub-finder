@@ -7,9 +7,9 @@ export class EditingCard {
     id?: number;
     deck$ = new ReplaySubject<string>(1);
     photos$ = new ReplaySubject<string[]>(1);
-    frontPhotos$ = new ReplaySubject<string[]>(1);
+    illustrationPhotos$ = new ReplaySubject<string[]>(1);
     sounds$ = new ReplaySubject<string[]>(1);
-    english$ = new ReplaySubject<string[]>(1);
+    knownLanguage$ = new ReplaySubject<string[]>(1);
     characters$ = new ReplaySubject<string>(1);
     ankiPackage$ = new ReplaySubject<string>(1);
     collection$ = new ReplaySubject<string>(1);
@@ -19,8 +19,8 @@ export class EditingCard {
             [
                 this.photos$,
                 this.sounds$,
-                this.english$,
-                this.frontPhotos$
+                this.knownLanguage$,
+                this.illustrationPhotos$
             ]
         );
         let secondGroup$ = combineLatest([
@@ -48,10 +48,10 @@ export class EditingCard {
                     deck,
                     photos,
                     sounds,
-                    english,
-                    characters,
+                    knownLanguage: english,
+                    learningLanguage: characters,
                     ankiPackage,
-                    frontPhotos,
+                    illustrationPhotos: frontPhotos,
                     fields: [],
                     timestamp: this.timestamp || new Date()
                 };
@@ -102,10 +102,10 @@ export class EditingCard {
 */
         e.deck$.next(iCard.deck || "NO_DECK");
         e.photos$.next(iCard.photos);
-        e.frontPhotos$.next(iCard.frontPhotos);
+        e.illustrationPhotos$.next(iCard.illustrationPhotos);
         e.sounds$.next(iCard.sounds);
-        e.english$.next(iCard.english);
-        e.characters$.next(iCard.characters);
+        e.knownLanguage$.next(iCard.knownLanguage);
+        e.characters$.next(iCard.learningLanguage);
         e.ankiPackage$.next(iCard.ankiPackage || "NO_PACKAGE");
         e.collection$.next(iCard.collection || "NO_COLLECTION");
         return e;

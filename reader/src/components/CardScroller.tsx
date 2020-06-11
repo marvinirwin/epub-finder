@@ -13,7 +13,7 @@ export default function CardScroller({cards, m}: { cards: ICard[] , m: Manager})
     return <div>
         <div>
             {cards.slice(0, limit).map((question, i) => <div key={i} style={{border: 'thin black 1px', borderRadius: '5px'}} >
-                <FlashcardPopup m={m} text={question.characters} card={question} getImages={undefined}/>
+                <FlashcardPopup m={m} text={question.learningLanguage} card={question} getImages={undefined}/>
             </div>)
             }
         </div>

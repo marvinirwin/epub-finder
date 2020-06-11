@@ -56,7 +56,7 @@ function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) 
     return <form className={'editing-card'}>
         <TextField label="Characters to Match" onChange={e => editingCard.matchChange$.next(e.target.value)}
                    variant="outlined"/>
-        <TextField label="English" onChange={e => editingCard.english$.next([e.target.value])} variant="outlined"/>
+        <TextField label="English" onChange={e => editingCard.knownLanguage$.next([e.target.value])} variant="outlined"/>
         <GridList cellHeight={160} cols={3}>
             {sources && sources.map((src: string, i) => (
                 <GridListTile key={i} cols={1}>
