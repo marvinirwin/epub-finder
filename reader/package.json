@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "@types/google-translate-api": "^2.3.1",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.38",
     "@types/react": "^16.9.34",
@@ -45,6 +46,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "proxy": "http://localhost:3001",
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -64,6 +66,7 @@
     "@types/jquery": "^3.3.38",
     "@types/lodash": "^4.14.152",
     "@types/sql.js": "^1.0.3",
-    "@types/xmldom": "^0.1.29"
+    "@types/xmldom": "^0.1.29",
+    "nodemon": "^2.0.4"
   }
 }
