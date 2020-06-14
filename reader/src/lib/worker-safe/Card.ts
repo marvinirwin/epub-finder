@@ -83,8 +83,7 @@ export class Card {
                 console.log();
             }
             if (innerHTML === '??') {
-                debugger;
-                console.log('Inner html ??');
+                debugger; console.log('Inner html ??');
             }
             c.fields.push(innerHTML);
         }

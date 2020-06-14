@@ -8,8 +8,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
-import EditingCard from "./EditingCard";
+import EditingCardComponent from "./EditingCardComponent";
 import WordCountTable from "./WordCountTable";
+import {FlashcardPopup} from "./FlashcardPopup";
+import QuickDIalogContainer from "./QuizPopup";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     },
     helper: {
         borderLeft: `2px solid ${theme.palette.divider}`,
-        padding: theme.spacing(1, 2),
+        padding: theme.spacing(1),
     },
     link: {
         color: theme.palette.primary.main,
@@ -59,6 +61,7 @@ export default function LeftBar({m}: {m: Manager}) {
     const editingCard = useObs(m.cardInEditor$);
     return (
         <div className={classes.root}>
+            <QuickDIalogContainer m={m}/>
             <ExpansionPanel defaultExpanded>
                 <ExpansionPanelSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -73,7 +76,7 @@ export default function LeftBar({m}: {m: Manager}) {
                     </div>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
-                    {editingCard ? (<EditingCard card={editingCard}/>) : (<div>No card found</div>)}
+                    {editingCard ? (<EditingCardComponent card={editingCard}/>) : (<div>No card found</div>)}
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanel>

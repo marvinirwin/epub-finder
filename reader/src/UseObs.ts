@@ -5,7 +5,8 @@ export function useObs<T>(obs$: Observable<T>, init?: T) {
     const [v, setV] = useState(init)
     useEffect(() => {
         obs$.subscribe(newV => {
-            setV(newV);
+            // Cheap hack, should do this because its incompatible with init
+            setV(typeof newV === 'function' ? () => newV : newV);
         })
     }, [obs$])
     return v;

@@ -24,6 +24,8 @@ import {WordCountTableRow} from "./WordCountTableRow";
 import {cBookInstance} from "./cBookInstance";
 import {EditingCard} from "./EditingCard";
 import Dexie from "dexie";
+import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
+import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 
 
 export interface ISimpleText {
@@ -61,7 +63,7 @@ export class Manager {
 
     addCards$: Subject<ICard[]> = new Subject<ICard[]>();
 
-    currentCardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
+    cardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
 
@@ -93,9 +95,17 @@ export class Manager {
     addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
     addWordRecognitionRows$: ReplaySubject<iWordRecognitionRow[]> = new ReplaySubject<iWordRecognitionRow[]>();
 
+    cardDBManager = new IndexDBManager<ICard>(
+        this.db,
+        this.db.cards,
+        (c: ICard) => c.id,
+        (i: number, c: ICard) => ({...c, id: i})
+    );
 
 
-    cardLocalStorage = new LocalStorageManager(CARD_LOCAL_STORAGE_KEY);
+    requestQuizCharacter$: Subject<string> = new Subject<string>();
+    quizzingCard$: ReplaySubject<ICard | undefined>= new ReplaySubject<ICard | undefined>(1);
+    quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -123,6 +133,20 @@ export class Manager {
         this.oScoreAndCount()
         this.oEditWord();
         this.oLoad();
+
+        this.oQuiz();
+    }
+
+    private oQuiz() {
+        this.requestQuizCharacter$.pipe(withLatestFrom(this.cardMap$)).subscribe(([char, map]) => {
+            if (!map[char]) {
+                throw new Error(`Cannot quiz char ${char} because no ICard found`)
+            }
+
+            const iCard = map[char][0];
+            this.quizzingCard$.next(iCard);
+            this.quizDialogComponent$.next(ShowCharacter);
+        })
     }
 
     private oLoad() {
@@ -133,13 +157,13 @@ export class Manager {
             ...simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
         ];
         thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
-        const cardLoader = new LocalStorageManager(CARD_LOCAL_STORAGE_KEY)
-        this.addCards$.next(cardLoader.load<ICard>(v => v));
+        // Maybe we dont want to load, because the cards we want will be pulled from the anki-thread anyways
+        // this.addCards$.next(this.cardDBManager.load((t: Dexie.Table<ICard, number>) => t.toArray()));
     }
 
     private oEditWord() {
         this.requestEditWord$.pipe(withLatestFrom(
-            this.currentCardMap$,
+            this.cardMap$,
             this.currentPackage$.pipe(startWith(undefined)),
             this.currentDeck$.pipe(startWith(undefined)),
             this.currentCollection$.pipe(startWith(undefined)))
@@ -148,6 +172,7 @@ export class Manager {
                 const currentICard = map[word];
                 let iCard: ICard;
                 if (currentICard?.length) {
+                    debugger;
                     iCard = currentICard[0];
                 } else {
                     iCard = {
@@ -163,7 +188,7 @@ export class Manager {
                         timestamp: new Date()
                     };
                 }
-                this.cardInEditor$.next(EditingCard.fromICard(iCard, this.cardLocalStorage))
+                this.cardInEditor$.next(EditingCard.fromICard(iCard, this.cardDBManager, this))
             })
     }
 
@@ -311,14 +336,14 @@ export class Manager {
                 Manager.mergeCardIntoCardDict(newICard, o);
             });
             return o;
-        }, {})).subscribe(this.currentCardMap$);
-        this.currentCardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
+        }, {})).subscribe(this.cardMap$);
+        this.cardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
 
         this.allCustomCards$.next({})
         this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
             let key = `${c.learningLanguage}_${c.deck}`;
             const presentCard = cDict[key];
-            const ec: EditingCard = presentCard || new EditingCard(this.cardLocalStorage);
+            const ec: EditingCard = presentCard || new EditingCard(this.cardDBManager, this);
             ec.knownLanguage$.next(c.knownLanguage);
             ec.characters$.next(c.learningLanguage);
             ec.deck$.next(c.deck || 'NO_DECK_FOR_CARD');
@@ -421,11 +446,15 @@ export class Manager {
             return newObject;
         }, {})).subscribe(this.wordRowDict);
         this.addWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
-            const group = groupBy(newRecognitionRows, v => v);
+            const group = groupBy(newRecognitionRows, v => v.word);
             // These will always be present in the table records for now
             // If I starting to cache loading this wont be true anymore
             Object.entries(group).forEach(([word, recognitionRows]) => {
-                rowDict[word].addNewRecognitionRecords$.next(recognitionRows)
+                let rowDictElement = rowDict[word];
+                if (!rowDictElement) {
+                    debugger;console.log();
+                }
+                rowDictElement.addNewRecognitionRecords$.next(recognitionRows)
             })
         })
         this.wordRowDict.pipe(
@@ -484,7 +513,6 @@ export class Manager {
     }
 }
 
-
 export interface iWordCountRow {
     book: string;
     word: string;
@@ -502,12 +530,14 @@ export interface iCountRowEmitted {
     row: WordCountTableRow
 }
 
-
 export interface HasId {
 
 }
+
+/*
 export class IndexDBManager {
-    constructor(public db: MyAppDatabase) {}
+    constructor(public db: MyAppDatabase) {
+    }
 
     async load<FinalType, StoredInDBType>(f: (db: MyAppDatabase) => Promise<StoredInDBType[]>, create: (a: any) => FinalType) {
         return (await f(this.db)).map(create);
@@ -528,57 +558,7 @@ export class IndexDBManager {
         return;
     }
 }
-
-export class LocalStorageManager {
-    constructor(public localStorageKey: string) {}
-
-    getLocalStorageArray(): Array<any> {
-
-        const a = this.tryParseLocalstorage();
-        if (!Array.isArray(a)) {
-            return [];
-        }
-        return a;
-    }
-
-    private tryParseLocalstorage(): any {
-        try  {
-            return JSON.parse(localStorage.getItem(this.localStorageKey) || '');
-        } catch(e) {
-            return undefined;
-        }
-    }
-
-    load<T>(create: (a: any) => T) {
-        const stored = this.getLocalStorageArray();
-        return stored.map(create);
-    }
-
-    upsert(isMe: (a: any) => boolean, meSerialized: any) {
-        const serializedInstances = this.getLocalStorageArray();
-        const currentMe = serializedInstances.find(serializedObject => isMe(serializedObject))
-        if (currentMe) {
-
-            const i = serializedInstances.indexOf(currentMe);
-            serializedInstances[i] = meSerialized;
-        } else {
-            serializedInstances.push(meSerialized);
-        }
-        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
-    }
-
-    delete(isMe: (a: any) => boolean) {
-        const serializedInstances = this.getLocalStorageArray();
-        const currentMe = serializedInstances.filter(serializedObject => isMe(serializedObject))
-        if (currentMe) {
-            const i = serializedInstances.indexOf(currentMe);
-            serializedInstances.splice(i, 1);
-        } else {
-            throw new Error("Not found in array, cannot delete")
-        }
-        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
-    }
-}
+*/
 
 
 

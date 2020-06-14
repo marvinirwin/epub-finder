@@ -2,6 +2,8 @@ import $ from "jquery";
 import {aRendition, RenderingBook} from "./RenderingBook";
 import {Dictionary} from "lodash";
 import {cBookInstance} from "./cBookInstance";
+// @ts-ignore
+import {sify} from 'chinese-conv';
 import {isChineseCharacter} from "./worker-safe/Card";
 
 export class SimpleText extends cBookInstance {
@@ -12,22 +14,9 @@ export class SimpleText extends cBookInstance {
 
     constructor(name: string, public text: string) {
         super(name);
-        const countedCharacters: Dictionary<number> = text.split('').filter(isChineseCharacter).reduce((acc: Dictionary<number>, letter) => {
-            if (!acc[letter]) {
-                acc[letter] = 1;
-            } else {
-                acc[letter]++;
-            }
-            return acc;
-        }, {});
-
-        this.wordCountRecords$.next(
-            Object.entries(countedCharacters).map(([letter, count]) => ({
-                book: this.name,
-                word: letter,
-                count
-            }))
-        )
+        // @ts-ignore
+        text = text.split('').map(sify).join('')
+        this.rawText$.next(text);
         this.book = {
             renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
                 return {

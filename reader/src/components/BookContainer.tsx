@@ -10,6 +10,7 @@ import { red } from '@material-ui/core/colors';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {CardActions, CardContent} from "@material-ui/core";
 import {Manager} from "../lib/Manager";
+import {useObs} from "../UseObs";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,6 +50,8 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
         ref && ref.current && rb.renderRef$.next(ref.current);
     }, [ref])
 
+    const translationText = useObs(rb.translationText$)
+
     return (
         <Card className={classes.root}>
             <CardHeader
@@ -81,6 +84,7 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
+                    <p>{translationText}</p>
                 </CardContent>
             </Collapse>
         </Card>

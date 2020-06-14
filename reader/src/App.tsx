@@ -17,12 +17,7 @@ import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core"
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
-fetch(`/translate`)
-    .then(r => {
-        console.log(r);
-    }).catch(e => {
-        console.error(e);
-})
+import axios from 'axios';
 
 const darkTheme = createMuiTheme({
     palette: {

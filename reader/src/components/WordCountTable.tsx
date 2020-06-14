@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import {WordCountTableRow} from "../lib/WordCountTableRow";
+import {ShowCharacter} from "./QuizPopup";
 
 const useStyles = makeStyles({
     table: {
@@ -24,7 +25,9 @@ function WordCountRow({row, m}: {row: WordCountTableRow, m: Manager}) {
     return (
         <TableRow key={row.word}>
             <TableCell component="th" scope="row" >
-                <div onClick={() => m.requestEditWord$.next(row.word)}>
+                <div onClick={() => {
+                    m.requestQuizCharacter$.next(row.word)
+                }}>
                     {row.word}
                 </div>
             </TableCell>

@@ -14,6 +14,7 @@
     "@types/node": "^12.12.38",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
+    "axios": "^0.19.2",
     "chinese-conv": "^1.0.1",
     "dexie": "^3.0.1",
     "epubjs-rn": "^0.1.5",

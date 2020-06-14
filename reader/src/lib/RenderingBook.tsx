@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {LocalStorageManager, Manager, sleep} from "./Manager";
+import {Manager, sleep} from "./Manager";
 import $ from "jquery";
 import {isChineseCharacter} from "./worker-safe/Card";
 import {render} from "react-dom";
@@ -12,6 +12,8 @@ import React from "react";
 import {sify} from 'chinese-conv';
 import {ICard} from "./worker-safe/icard";
 import {cBookInstance} from "./cBookInstance";
+import axios from 'axios';
+import {LocalStorageManager} from "./StorageManagers";
 
 export interface BookInstance {
     message: string;
@@ -39,6 +41,7 @@ export class RenderingBook {
     renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
     renderInProgress$: ReplaySubject<any> = new ReplaySubject(1);
     nextRender$: ReplaySubject<() => Promise<any>> = new ReplaySubject<() => Promise<any>>(1);
+    translationText$: ReplaySubject<string> = new ReplaySubject<string>(1)
     localStorageKey: any;
     persistor: LocalStorageManager;
 
@@ -50,15 +53,24 @@ export class RenderingBook {
     constructor(
         bookInstance: cBookInstance,
         public m: Manager,
-        public name: string
-
+        public name: string,
     ) {
         this.localStorageKey = bookInstance.localStorageKey;
         this.persistor =  new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
             this.persistor.upsert((serialized: any) => serialized.name === this.name, instance.toSerialized());
-        })
+        });
+
         this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
+        this.bookInstance$.pipe(switchMap(i => i.rawText$)).subscribe(r => {
+            axios.post('/translate', {
+                from: 'zh-CN',
+                to: 'en',
+                text: r
+            }).then(r => {
+                this.translationText$.next(r.data.translation);
+            })
+        })
 
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
@@ -88,7 +100,7 @@ export class RenderingBook {
                 this.bookInstance$,
                 this.currentSpineItem$,
                 this.renderRef$,
-                this.m.currentCardMap$.pipe(startWith({}))
+                this.m.cardMap$.pipe(startWith({}))
             ]
         ).subscribe(([bookInstance, spineItem, renderRef, map]) => {
             const render = async () => {
@@ -293,7 +305,7 @@ export class RenderingBook {
             this.m.currentDeck$,
             this.m.currentCollection$,
             this.m.currentPackage$,
-            this.m.currentCardMap$
+            this.m.cardMap$
         )).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
                 throw new Error("Iframe has no content window");

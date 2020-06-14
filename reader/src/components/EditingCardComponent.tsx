@@ -12,6 +12,7 @@ import {useObs} from "../UseObs";
 import {EditingCard} from "../lib/EditingCard";
 import ImageList from "./ImageList";
 import EditCardEnglish from "./EditCardEnglish";
+import {CircularProgressWithLabel} from './CircularProgressWithLabel'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +43,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+    const progress = useObs(card.saveProgress$);
     const characters = useObs(card.characters$);
     const deck = useObs(card.deck$);
     const english = useObs(card.knownLanguage$);
@@ -61,6 +63,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
         <Card className={classes.root}>
             <CardHeader avatar={<Avatar aria-label="card-type" className={classes.avatar}>{characters}</Avatar>}
                         action={
+
                             <IconButton aria-label="settings">
                                 <MoreVertIcon/>
                             </IconButton>
@@ -70,16 +73,17 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
             />
 
             <CardContent>
+                <CircularProgressWithLabel value={progress || 0} />
                 <div className={classes.root}>
+                    <Typography variant="h6" gutterBottom> English </Typography>
+                    <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Question Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} />
                     <Typography variant="h6" gutterBottom> Illustration Pictures </Typography>
                     <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} />
-                    <Typography variant="h6" gutterBottom> English </Typography>
-                    <EditCardEnglish e={card}/>
                 </div>
 
-                {sounds?.map(s => <audio className={'new-audio'} key={s} controls={true} src={s}>This is audio</audio>)}
+                {(sounds || []).map((s: string) => <audio className={'new-audio'} key={s} controls={true} src={s}>This is audio</audio>)}
             </CardContent>
             {/*
 
