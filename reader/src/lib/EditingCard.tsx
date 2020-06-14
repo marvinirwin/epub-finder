@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, interval, merge, race, ReplaySubject, Subject, timer} from "rxjs";
 import {getIsMeFunction, ICard} from "./worker-safe/icard";
-import {debounceTime, map, skip, startWith, switchMap, take, takeUntil, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, mapTo, skip, startWith, switchMap, take, takeUntil, withLatestFrom} from "rxjs/operators";
 import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
 import {Manager} from "./Manager";
 import {debounce} from "@material-ui/core";
@@ -48,29 +48,19 @@ export class EditingCard {
             // This debounce Time and then skip means skip the first emit when we create the EditingCard
         ).pipe(skip(1));
 
+        let debouncedSaveData = saveData$.pipe(debounceTime(1000));
+
 
         saveData$.subscribe(() => {
             this.saveInProgress$.next(true);
         })
 
         saveData$.pipe(
-            map(v => {
-                console.log("savedData fird");
-                return v
-            }),
-            switchMap(() =>
+            switchMap((d) =>
                 race(
-                    saveData$.pipe(
-                        map(v => {
-                            console.log("fired")
-                            return v;
-                        }),
-                        debounceTime(1000)),
-                    this.cardClosed$.pipe(withLatestFrom(saveData$), map(a => a[1]), map(v => {
-                        console.log("fired2");
-                        return v;
-                    }))
-                )
+                    timer(1000),
+                    this.cardClosed$
+                ).pipe(mapTo(d))
             )
         ).subscribe(async (
             [[photos, sounds, english, frontPhotos], characters, [deck, collection, ankiPackage]]

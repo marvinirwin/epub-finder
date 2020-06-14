@@ -69,7 +69,7 @@ export class Manager {
 
     newCardRequest$: Subject<ICard> = new Subject();
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
-    currentEditingCardIsSaving$: ReplaySubject<boolean | undefined> = new ReplaySubject<boolean | undefined>();
+    currentEditingCardIsSaving$: ReplaySubject<boolean | undefined> = new ReplaySubject<boolean | undefined>(1);
     currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
@@ -369,18 +369,18 @@ export class Manager {
                 if (!currentCard) {
                     return of(queCard)
                 }
-
                 return this.currentEditingCardIsSaving$.pipe(
                     withLatestFrom(this.queEditingCard$),
-                    filter(([saving]) => {
-                        console.log(`Filter called ${saving}`)
-                        return !saving;
-                    }),
+                    filter(([saving]) => !saving),
                     map(e => e[1]),
                     take(1)
                 )
-            })
-        ).subscribe(this.currentEditingCard$)
+            }),
+            withLatestFrom(this.currentEditingCard$)
+        ).subscribe(([newCard, currentCard]) => {
+            currentCard?.cardClosed$.next();
+            this.currentEditingCard$.next(newCard);
+        })
     }
 
     private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
