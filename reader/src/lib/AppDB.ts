@@ -8,7 +8,7 @@ export class MyAppDatabase extends Dexie {
 
     constructor(cb: (s: string) => void) {
         super("MyAppDatabase");
-        this.messages$.subscribe(v => cb)
+        this.messages$.subscribe(v => cb(v))
         this.messages$.next("Starting database, creating stories")
         this.version(1).stores({
             cards: 'id++, characters, english, ankiPackage, collection, deck',
@@ -19,22 +19,22 @@ export class MyAppDatabase extends Dexie {
         this.messages$.next("Cards initialized")
     }
 
-    async getMemodAnkiPackage(packageName: string): Promise<ICard[] | undefined> {
-        this.messages$.next(`Checking for ${packageName}`)
-        const exists = await this.cards.where('ankiPackage').equals(packageName).first();
-        if (exists) {
-            this.messages$.next(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
-            const cards = [];
-            let offset = 0;
-            let chunkSize = 500;
-            while (await this.cards.where('ankiPackage').equals(packageName).offset(offset).first()) {
-                this.messages$.next(`Querying cards in chunks ${offset}`)
-                const chunkedCards = await this.cards.where('ankiPackage').equals(packageName).offset(offset).limit(chunkSize).toArray();
-                offset += chunkSize;
-                cards.push(...chunkedCards)
+    async getCachedCardsExists(packageName: string): Promise<boolean> {
+        return !!this.cards.where('ankiPackage').equals(packageName).first();
+    }
+
+    async* getCardsFromDB(packageName: string): AsyncGenerator<ICard> {
+        console.log("Got here?");
+        let offset = 0;
+        let chunkSize = 500;
+        while (await this.cards.where('ankiPackage').equals(packageName).offset(offset).first()) {
+            this.messages$.next(`Querying cards in chunks ${offset}`)
+            const chunkedCards = await this.cards.where('ankiPackage').equals(packageName).offset(offset).limit(chunkSize).toArray();
+            for (let i = 0; i < chunkedCards.length; i++) {
+                const chunkedCard = chunkedCards[i];
+                yield chunkedCard;
             }
-            return cards;
+            offset += chunkSize;
         }
-        return undefined;
     }
 }

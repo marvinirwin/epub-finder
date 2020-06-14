@@ -44,7 +44,7 @@ export class RenderingBook {
     translationText$: ReplaySubject<string> = new ReplaySubject<string>(1)
     localStorageKey: any;
     persistor: LocalStorageManager;
-
+    renderedContentRoot$: Subject<JQuery<HTMLElement>> = new Subject<JQuery<HTMLElement>>();
 
     removeSerialized() {
         this.persistor.delete((serialized: any) => serialized.name === this.name);
@@ -94,15 +94,32 @@ export class RenderingBook {
                 this.renderInProgress$.next(nextRender().then(() => this.renderInProgress$.next(undefined)))
             }
         })
+        this.oRender();
+        this.oAnnotate();
+        this.bookInstance$.next(bookInstance);
+        this.renderInProgress$.next(false);
+        this.currentSpineItem$.next(undefined);
+        // This will definitely be out of sync with the render, it has to fire right after the render method
 
+    }
+
+    private oAnnotate() {
+        combineLatest([
+            this.m.cardMap$.pipe(startWith({})),
+            this.renderedContentRoot$
+        ]).subscribe(async ([cardMap, rootElement]) => {
+            await this.annotate(rootElement, cardMap);
+        })
+    }
+
+    private oRender() {
         combineLatest(
             [
                 this.bookInstance$,
                 this.currentSpineItem$,
-                this.renderRef$,
-                this.m.cardMap$.pipe(startWith({}))
+                this.renderRef$
             ]
-        ).subscribe(([bookInstance, spineItem, renderRef, map]) => {
+        ).subscribe(([bookInstance, spineItem, renderRef]) => {
             const render = async () => {
                 this.renderMessages$.next("Render fired")
                 if (bookInstance && bookInstance.book) {
@@ -114,8 +131,13 @@ export class RenderingBook {
                     const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
                     const target = spineItem?.href;
                     await rendition.display(target || '');
-                    await this.annotate(renderRef, map);
                     await this.applySelectListener(iframe);
+                    await waitFor(() => {
+                        let contents = iframe.contents();
+                        let htmlBodyElements = contents.find('body');
+                        return htmlBodyElements.text().trim();
+                    }, 1000)
+                    this.renderedContentRoot$.next(iframe.contents().find('body'))
                     // @ts-ignore
                 } else {
                     this.renderMessages$.next("No book or spine item")
@@ -123,21 +145,10 @@ export class RenderingBook {
             }
             this.renderMessages$.next("Setting next render");
             this.nextRender$.next(render);
-        })
-        this.bookInstance$.next(bookInstance);
-        this.renderInProgress$.next(false);
-        this.currentSpineItem$.next(undefined);
-        // This will definitely be out of sync with the render, it has to fire right after the render method
-
+        });
     }
 
-    private async annotate(ref: HTMLElement, map: Dictionary<ICard[]>) {
-        let iframeFromOtherSource = $(ref).find('iframe');
-        await waitFor(() => {
-            let contents = iframeFromOtherSource.contents();
-            let htmlBodyElements = contents.find('body');
-            return htmlBodyElements.text().trim();
-        }, 1000)
+    private async annotate(body: JQuery<HTMLElement>, map: Dictionary<ICard[]>) {
 /*
         const iframeHTML = iframeFromOtherSource[0].innerHTML;
         // Now delete that iframe
@@ -156,13 +167,13 @@ export class RenderingBook {
 
         const body: HTMLBodyElement = newIFrameWithNoSource.contents().find('body')[0];
 */
-        const body: HTMLBodyElement = iframeFromOtherSource.contents().find('body')[0];
+
         if (!body) {
             debugger;
             console.log();
         }
 
-        const allEls = body.getElementsByTagName('*');
+        const allEls = body[0].getElementsByTagName('*');
         for (let i = 0; i < allEls.length; i++) {
             const el = allEls[i];
             if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
@@ -182,7 +193,7 @@ export class RenderingBook {
                 // Maybe I'm not allowed to add things to text nodes?  Maybe I have to use el.parent.append?
             }
         }
-        const flashCards = body.getElementsByClassName('flashcard');
+        const flashCards = body[0].getElementsByClassName('flashcard');
         for (let i = 0; i < flashCards.length; i++) {
             $(flashCards[i]).on('click', t => {
                 if (t.target.textContent) {
@@ -191,7 +202,7 @@ export class RenderingBook {
                 // this.m.cardInEditor$.next(EditingCard.fromICard(map[t.target.textContent || ''][0]));
             })
         }
-        RenderingBook.appendStyleToBody($(body));
+        RenderingBook.appendStyleToBody(body);
     }
 
     getId() {
@@ -284,7 +295,7 @@ export class RenderingBook {
         })
     }
 
-    private static appendStyleToBody(body: JQuery<HTMLBodyElement>) {
+    private static appendStyleToBody(body: JQuery<HTMLElement>) {
         let style = $(`
                     <style>
 .flashcard:hover {

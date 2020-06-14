@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         '& .MuiTextField-root': {
             margin: theme.spacing(1),
-            width: '25ch',
+            width: '100%',
         },
     },
 }));
@@ -18,7 +18,6 @@ export default function EditCardEnglish({e}: {e: EditingCard}) {
     const english = useObs(e.knownLanguage$);
     return (
         <form className={classes.root} noValidate autoComplete="off">
-            <div>
                 <TextField
                     id="outlined-multiline-static"
                     label="Multiline"
@@ -29,7 +28,6 @@ export default function EditCardEnglish({e}: {e: EditingCard}) {
                     value={english}
                     onChange={t => e.knownLanguage$.next(t.target.value.split('\n'))}
                 />
-            </div>
         </form>
     );
 }

@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
-import {ReplaySubject, Subject} from "rxjs";
+import {ReplaySubject, Subject, of, from} from "rxjs";
 import {invert, flatten, chunk} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
@@ -10,7 +10,7 @@ import JSZip from 'jszip';
 import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
 import {MyAppDatabase} from "../AppDB";
-import {groupBy} from "rxjs/operators";
+import {bufferCount, groupBy} from "rxjs/operators";
 import {Card} from "./Card";
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "./icard";
@@ -27,6 +27,7 @@ class AnkiPackageLoader {
     ankiPackageLoaded$: Subject<SerializedAnkiPackage> = new Subject<SerializedAnkiPackage>();
 
     sendCards(c: ICard[]) {
+        this.sendMessage(`Sending ${c.length} cards`)
         ctx.postMessage(
             `this.addCards$.next(${JSON.stringify(c)})`
         )
@@ -51,9 +52,18 @@ class AnkiPackageLoader {
             this.receiveDebugMessage(${JSON.stringify(s)});
         `));
         (async () => {
-            let cards = await this.getCards(name);
-            this.sendMessage(`Adding ${cards.length} cards to indexDB`)
-            await this.sendCardsToMainThread(cards, CHUNK_SIZE);
+            const cards$ = new Subject<ICard>();
+            cards$.pipe(
+                bufferCount(1000)
+            ).subscribe(cards => this.sendCards(cards));
+            this.sendMessage("Getting generator")
+            const generator: AsyncGenerator<ICard> = await this.getCardGenerator(name);
+            this.sendMessage("Got generator")
+            for await (let c of generator) {
+                cards$.next(c);
+            }
+            this.sendMessage("Finished sending cards")
+            cards$.complete();
         })()
 
         this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
@@ -82,40 +92,39 @@ class AnkiPackageLoader {
         this.sendMessage(`Sent ${cards.length} over`)
     }
 
-    private async getCards(name: string): Promise<ICard[]> {
-        const chunkSize = 500;
-        let cards = await this.db.getMemodAnkiPackage(name);
-        if (!cards) {
-            const p = await this.loadAnkiPackageFromFile();
-            await this.persistCards(p.allCards, 500);
-            cards = p.allCards;
+    private async getCardGenerator(packageName: string): Promise<AsyncGenerator<ICard>> {
+        this.sendMessage(`Checking for ${packageName}`)
+        if (await this.db.getCachedCardsExists(packageName)) {
+            this.sendMessage(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
+            return this.db.getCardsFromDB(packageName)
         }
-        return cards;
+        this.sendMessage(`Cards not found in indexDB, loading from AnkiPackage`)
+        return this.loadAnkiPackageFromFile();
     }
 
     sendMessage(m: string) {
         this.messages$.next(new DebugMessage('anki-package-loader', m));
     }
 
-    loadAnkiPackageFromFile(): Promise<AnkiPackage> {
-        return new Promise((resolve, reject) => {
+    loadAnkiPackageFromFile(): Promise<AsyncGenerator<ICard>> {
+        return new Promise(resolve => {
             this.sendMessage(`Loading ${this.name}`);
             getBinaryContent(this.path, async (err: boolean | Error, data: any) => {
                 if (err) {
                     this.sendMessage(`Error loading anki package binary file ${err}`);
-                    reject(err);
+                    throw new Error("Error getting binary content");
                 }
                 this.sendMessage('Unzipping Anki Archive')
-                const v = await JSZip.loadAsync(data);
+                const zipFile = await JSZip.loadAsync(data);
                 this.sendMessage(`Loading SQLite file`)
-                const ankiDatabaseBinary = await v.files['collection.anki2'].async('uint8array');
+                const ankiDatabaseBinary = await zipFile.files['collection.anki2'].async('uint8array');
                 this.sendMessage(`Loading media file`)
-                const mediafile: { [key: string]: string } = invert(JSON.parse(await v.files['media'].async('text')));
+                const mediafile: { [key: string]: string } = invert(JSON.parse(await zipFile.files['media'].async('text')));
                 this.sendMessage(`Initializing SQLite database`)
                 const SQL = await initSqlJs();
                 var db = new SQL.Database(ankiDatabaseBinary);
                 this.sendMessage(`Interpolating and indexing cards`)
-                resolve(await AnkiPackage.init(db, v, mediafile, s => this.sendMessage(s), this.name));
+                resolve(AnkiPackage.initCollections(db, zipFile, mediafile, (s: string) => this.sendMessage(s), this.name));
             });
         })
     }

@@ -12,11 +12,14 @@ import {useObs} from "../UseObs";
 import {EditingCard} from "../lib/EditingCard";
 import ImageList from "./ImageList";
 import EditCardEnglish from "./EditCardEnglish";
-import {CircularProgressWithLabel} from './CircularProgressWithLabel'
+import CircularIntegration, {SpinnerState} from './SpinningCircle'
 
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
+        '& > *': {
+            width: '100%'
+        }
     },
     media: {
         height: 0,
@@ -33,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
         transform: 'rotate(180deg)',
     },
     avatar: {
-        backgroundColor: red[500],
+        backgroundColor: theme.palette.primary.dark,
+        color: theme.palette.primary.contrastText
     },
 }));
 
@@ -43,7 +47,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-    const progress = useObs(card.saveProgress$);
+    const progress = useObs(card.saveInProgress$);
     const characters = useObs(card.characters$);
     const deck = useObs(card.deck$);
     const english = useObs(card.knownLanguage$);
@@ -61,7 +65,10 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
 
     return (
         <Card className={classes.root}>
-            <CardHeader avatar={<Avatar aria-label="card-type" className={classes.avatar}>{characters}</Avatar>}
+            <CardHeader avatar={<CircularIntegration
+                state={progress ? SpinnerState.InProgress : SpinnerState.Success}
+                icon={<Avatar aria-label="card-type" className={classes.avatar}>{characters}</Avatar>}
+            />}
                         action={
 
                             <IconButton aria-label="settings">
@@ -73,7 +80,6 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
             />
 
             <CardContent>
-                <CircularProgressWithLabel value={progress || 0} />
                 <div className={classes.root}>
                     <Typography variant="h6" gutterBottom> English </Typography>
                     <EditCardEnglish e={card}/>

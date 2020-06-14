@@ -57,7 +57,7 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
             <CardHeader
                 avatar={
                     <Avatar aria-label="Book Name" className={classes.avatar}>
-                        {rb.localStorageKey}
+                        {rb.name}
                     </Avatar>
                 }
                 action={
@@ -65,7 +65,7 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
                         <DeleteIcon />
                     </IconButton>
                 }
-                title={rb.localStorageKey}
+                title={rb.name}
             />
             <CardActions disableSpacing>
 {/*
@@ -84,7 +84,7 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
-                    <p>{translationText}</p>
+                    <p style={{whiteSpace: 'pre'}}>{translationText}</p>
                 </CardContent>
             </Collapse>
         </Card>

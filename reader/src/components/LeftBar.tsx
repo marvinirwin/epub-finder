@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 export default function LeftBar({m}: {m: Manager}) {
     const classes = useStyles();
 
-    const editingCard = useObs(m.cardInEditor$);
+    const editingCard = useObs(m.currentEditingCard$);
     return (
         <div className={classes.root}>
             <QuickDIalogContainer m={m}/>

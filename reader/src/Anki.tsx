@@ -58,9 +58,9 @@ export class AnkiPackage {
         this.cardIndex = groupBy(this.allCards, c => {
                 const v = uniq(
                     c.fields[0]
-                    .split('')
-                    .filter(isChineseCharacter)
-                    .join(''))
+                        .split('')
+                        .filter(isChineseCharacter)
+                        .join(''))
                 if (v.length) {
                     return v[0];
                 }
@@ -69,26 +69,10 @@ export class AnkiPackage {
         );
     }
 
-    public static async init(
-        sql: SqlJs.Database,
-        zip: JSZip,
-        media: { [key: string]: string },
-        mesg: (s: string) => void,
-        packageName: string): Promise<AnkiPackage> {
-        try {
-            const collections = await AnkiPackage.initCollections(sql, zip, media, mesg, packageName);
-            // collections.map(c => c.decks.map(d => d.cards.map(c => c.fields)))
-            return new AnkiPackage(collections, zip);
-        } catch (e) {
-            debugger;console.log();
-            throw e;
-        }
-    }
-
-    static async initCollections(
+    static async* initCollections(
         sql: SqlJs.Database, zip: JSZip, media: { [key: string]: string }, mesg: (s: string) => void,
         packageName: string
-    ) {
+    ): AsyncGenerator<ICard> {
         const cols: col[] = prep<col>(sql,
             `SELECT decks, id
             FROM col
@@ -148,40 +132,38 @@ export class AnkiPackage {
                     let iCard: ICard = await Card.getIcard(
                         fields,
                         async (href) => {
-                        const ext = href.split('').reverse().join('').split('.')[0].split('').reverse().join('');
-                        let file = zip.files[media[href]];
-                        if (!file) {
-                            return '';
-                        }
-                        const imageSrc = await file.async('base64');
-                        switch(ext) {
-                            case 'wav':
-                                return `data:audio/wav;base64,${imageSrc}`
-                            case 'mp3':
-                                return `data:audio/mp3;base64,${imageSrc}`
-                            case 'jpeg':
-                                return `data:image/jpeg;base64,${imageSrc}`;
-                            case 'gif':
-                                return `data:image/gif;base64,${imageSrc}`;
-                            default:
-                                debugger;console.log();
+                            const ext = href.split('').reverse().join('').split('.')[0].split('').reverse().join('');
+                            let file = zip.files[media[href]];
+                            if (!file) {
                                 return '';
-                        }
-                    }, currentDeck.name, packageName, 'TODO_COLLECTION_NAME');
+                            }
+                            const imageSrc = await file.async('base64');
+                            switch (ext) {
+                                case 'wav':
+                                    return `data:audio/wav;base64,${imageSrc}`
+                                case 'mp3':
+                                    return `data:audio/mp3;base64,${imageSrc}`
+                                case 'jpeg':
+                                    return `data:image/jpeg;base64,${imageSrc}`;
+                                case 'gif':
+                                    return `data:image/gif;base64,${imageSrc}`;
+                                default:
+                                    debugger;
+                                    console.log();
+                                    return '';
+                            }
+                        }, currentDeck.name, packageName, 'TODO_COLLECTION_NAME');
                     if (!fields || !iCard) {
-                        debugger; console.log();
+                        debugger;
+                        console.log();
                     }
                     // const cardInstance = new Card(fields, iCard.fields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName, iCard);
-                    newCards.push(iCard)
-                    cardsprocessed++;
+                    yield iCard;
                 }
 
-                newDecks.push(new Deck(newCards, currentDeck.name))
             }
-            collections.push(new Collection(newDecks, 'TODO figure out how to name collections'))
         }
         clearInterval(interval);
-        return collections;
     }
 }
 

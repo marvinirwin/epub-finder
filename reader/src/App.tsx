@@ -17,11 +17,21 @@ import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core"
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
-import axios from 'axios';
 
 const darkTheme = createMuiTheme({
     palette: {
-        type: 'dark',
+        primary: {
+            light:'#e6ffff',
+            main: '#b3e5fc',
+            dark: '#82b3c9',
+            contrastText: '#000000',
+        },
+        secondary: {
+            light: '#ffffff',
+            main: '#fafafa',
+            dark: '#c7c7c7',
+            contrastText: '#000000',
+        },
     },
     typography: {
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif'

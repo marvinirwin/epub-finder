@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject, of} from "rxjs";
 import {Dictionary, flatten, groupBy, sortBy} from "lodash";
 import {buffer, debounceTime, filter, map, scan, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 // @ts-ignore
@@ -68,7 +68,9 @@ export class Manager {
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
 
     newCardRequest$: Subject<ICard> = new Subject();
-    cardInEditor$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
+    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
+    currentEditingCardIsSaving$: Subject<boolean | undefined> = new Subject<boolean | undefined>();
+    currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -104,7 +106,7 @@ export class Manager {
 
 
     requestQuizCharacter$: Subject<string> = new Subject<string>();
-    quizzingCard$: ReplaySubject<ICard | undefined>= new ReplaySubject<ICard | undefined>(1);
+    quizzingCard$: ReplaySubject<ICard | undefined> = new ReplaySubject<ICard | undefined>(1);
     quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
 
     constructor(public db: MyAppDatabase) {
@@ -112,9 +114,6 @@ export class Manager {
         this.oMessages();
         this.oCurrent();
         this.oCards();
-        /*
-                this.oSpine();
-        */
         this.oBook();
 
 
@@ -125,7 +124,8 @@ export class Manager {
             }
             bookToRemove.removeSerialized();
             this.bookDict$.next(bookDict);
-        })
+        });
+
         this.oStringDisplay();
         this.oKeyDowns();
 
@@ -188,7 +188,7 @@ export class Manager {
                         timestamp: new Date()
                     };
                 }
-                this.cardInEditor$.next(EditingCard.fromICard(iCard, this.cardDBManager, this))
+                this.queEditingCard$.next(EditingCard.fromICard(iCard, this.cardDBManager, this))
             })
     }
 
@@ -323,9 +323,9 @@ export class Manager {
     */
 
     private oCards() {
-        this.cardInEditor$.next(undefined);
+        this.currentEditingCard$.next(undefined);
         this.addCards$.next([]);
-        const debouncedAddCards$ = this.addCards$.pipe(debounceTime(1000))
+        const debouncedAddCards$ = this.addCards$.pipe(debounceTime(500))
         this.currentCards$.subscribe(v => {
             this.cardMessages$.next(`New current cards ${v.length}`)
         })
@@ -357,6 +357,26 @@ export class Manager {
                 this.allCustomCards$.next(value)
             }
         })
+
+        this.currentEditingCard$.pipe(
+            switchMap(c =>
+                c ? c.saveInProgress$ : of(undefined)
+            )
+        ).subscribe(this.currentEditingCardIsSaving$);
+
+        this.queEditingCard$.pipe(
+            withLatestFrom(this.currentEditingCard$.pipe(startWith(undefined))), // Do I need to use startWith Here?
+            switchMap(([queCard, currentCard]) => {
+                if (!currentCard) {
+                    return of(queCard)
+                }
+                return this.currentEditingCardIsSaving$.pipe(
+                    filter(saving => !saving),
+                    withLatestFrom(this.queEditingCard$),
+                    map(e => e[1])
+                )
+            })
+        ).subscribe(this.currentEditingCard$)
     }
 
     private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
@@ -452,7 +472,8 @@ export class Manager {
             Object.entries(group).forEach(([word, recognitionRows]) => {
                 let rowDictElement = rowDict[word];
                 if (!rowDictElement) {
-                    debugger;console.log();
+                    debugger;
+                    console.log();
                 }
                 rowDictElement.addNewRecognitionRecords$.next(recognitionRows)
             })
