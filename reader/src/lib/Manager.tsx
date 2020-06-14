@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject, of} from "rxjs";
 import {Dictionary, flatten, groupBy, sortBy} from "lodash";
-import {buffer, debounceTime, filter, map, scan, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {buffer, debounceTime, filter, map, scan, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 // @ts-ignore
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
@@ -69,7 +69,7 @@ export class Manager {
 
     newCardRequest$: Subject<ICard> = new Subject();
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
-    currentEditingCardIsSaving$: Subject<boolean | undefined> = new Subject<boolean | undefined>();
+    currentEditingCardIsSaving$: ReplaySubject<boolean | undefined> = new ReplaySubject<boolean | undefined>();
     currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
@@ -172,7 +172,6 @@ export class Manager {
                 const currentICard = map[word];
                 let iCard: ICard;
                 if (currentICard?.length) {
-                    debugger;
                     iCard = currentICard[0];
                 } else {
                     iCard = {
@@ -370,10 +369,15 @@ export class Manager {
                 if (!currentCard) {
                     return of(queCard)
                 }
+
                 return this.currentEditingCardIsSaving$.pipe(
-                    filter(saving => !saving),
                     withLatestFrom(this.queEditingCard$),
-                    map(e => e[1])
+                    filter(([saving]) => {
+                        console.log(`Filter called ${saving}`)
+                        return !saving;
+                    }),
+                    map(e => e[1]),
+                    take(1)
                 )
             })
         ).subscribe(this.currentEditingCard$)

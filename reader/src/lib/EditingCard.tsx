@@ -23,6 +23,7 @@ export class EditingCard {
         public m: Manager,
         public timestamp?: Date | number | undefined,
     ) {
+        this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(
             [
                 this.photos$,
@@ -74,7 +75,6 @@ export class EditingCard {
         ).subscribe(async (
             [[photos, sounds, english, frontPhotos], characters, [deck, collection, ankiPackage]]
         ) => {
-            debugger;
             const iCard: ICard = {
                 id: this.id,
                 collection,

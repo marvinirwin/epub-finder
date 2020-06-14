@@ -24,7 +24,6 @@ export class MyAppDatabase extends Dexie {
     }
 
     async* getCardsFromDB(packageName: string): AsyncGenerator<ICard> {
-        console.log("Got here?");
         let offset = 0;
         let chunkSize = 500;
         while (await this.cards.where('ankiPackage').equals(packageName).offset(offset).first()) {

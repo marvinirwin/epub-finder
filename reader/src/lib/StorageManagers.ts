@@ -68,7 +68,6 @@ export class IndexDBManager<T> {
         return this.db.transaction('rw', this.table, async () => {
             try {
                 const presentRecords = await isMeWhere(this.table);
-                debugger;
                 // If I am already here, delete
                 const keys: number[] = [];
                 presentRecords.map(this.getId).forEach(n => n !== undefined && keys.push(n));

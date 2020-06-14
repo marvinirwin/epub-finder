@@ -54,7 +54,7 @@ class AnkiPackageLoader {
         (async () => {
             const cards$ = new Subject<ICard>();
             cards$.pipe(
-                bufferCount(1000)
+                bufferCount(500)
             ).subscribe(cards => this.sendCards(cards));
             this.sendMessage("Getting generator")
             const generator: AsyncGenerator<ICard> = await this.getCardGenerator(name);

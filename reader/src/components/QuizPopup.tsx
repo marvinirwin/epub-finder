@@ -18,7 +18,6 @@ import {EditingCard} from "../lib/EditingCard";
 export type QuizCardProps = {c: ICard, m: Manager}
 
 export function ShowCharacter({c, m}: QuizCardProps) {
-    debugger;
     return <Card>
         <CardContent>
             <Typography variant="h1" component="h1">
