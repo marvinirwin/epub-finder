@@ -8,7 +8,10 @@ import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
 import StarBorderIcon from "@material-ui/icons/StarBorder";
+import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,8 +41,9 @@ export function EditingImage(
         index,
         card,
         src,
-        characters
-    }: { photos: string[], index: number, card: EditingCard, src: string, characters: string | undefined }
+        characters,
+        addCb
+    }: { photos: string[], index: number, card: EditingCard, src: string, characters: string | undefined, addCb: undefined | (() => void) }
 ) {
     const updatePhotoSource = debounce((newSource: string) => {
         const newPhotos: string[] = [...photos];
@@ -49,7 +53,21 @@ export function EditingImage(
     const classes = useStyles();
     const [currentSource, setCurrentSource] = useState(src);
     return <GridListTile key={index}>
-        <img src={src} style={{height: "100px", width: '170px'}} alt={characters} />
+        <img src={src} style={{height: "100px", width: '170px'}} alt={characters}/>
+        <GridListTileBar
+            title={<IconButton onClick={() => console.log('TODO')}>
+                <DeleteIcon/>
+            </IconButton>}
+            titlePosition="top"
+            actionIcon={
+                addCb ?
+                    <IconButton onClick={addCb}>
+                        <LibraryAddIcon/>
+                    </IconButton> : ''
+            }
+            actionPosition="left"
+            className={classes.titleBar}
+        />
         <ListSubheader component="div">
             <form noValidate autoComplete="off">
                 <TextField value={currentSource} id="standard-basic" label="Standard" onChange={e => {
@@ -58,20 +76,6 @@ export function EditingImage(
                 }}/>
             </form>
         </ListSubheader>
-{/*
-        <GridListTileBar
-            title={characters}
-            classes={{
-                root: classes.titleBar,
-                title: classes.title,
-            }}
-            actionIcon={
-                <IconButton aria-label={`star ${characters}`}>
-                    <StarBorderIcon className={classes.title} />
-                </IconButton>
-            }
-        />
-*/}
     </GridListTile>
-    ;
+        ;
 }

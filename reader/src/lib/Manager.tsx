@@ -27,7 +27,6 @@ import Dexie from "dexie";
 import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 
-
 export interface ISimpleText {
     title: string;
     text: string;
@@ -45,6 +44,11 @@ function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V):
 }
 
 export const CARD_LOCAL_STORAGE_KEY = 'CARDS';
+
+export interface SelectImageRequest {
+    term: string;
+    cb: (s: string) =>void
+}
 
 export class Manager {
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
@@ -95,7 +99,8 @@ export class Manager {
     wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
     sortedWordRows$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
-    addWordRecognitionRows$: ReplaySubject<iWordRecognitionRow[]> = new ReplaySubject<iWordRecognitionRow[]>();
+    addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
+    addUnpersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
 
     cardDBManager = new IndexDBManager<ICard>(
         this.db,
@@ -108,6 +113,7 @@ export class Manager {
     requestQuizCharacter$: Subject<string> = new Subject<string>();
     quizzingCard$: ReplaySubject<ICard | undefined> = new ReplaySubject<ICard | undefined>(1);
     quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
+    queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest|undefined>(1);
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -469,7 +475,14 @@ export class Manager {
             })
             return newObject;
         }, {})).subscribe(this.wordRowDict);
-        this.addWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
+        this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                row.id = await this.db.recognitionRecords.add(row);
+            }
+            this.addPersistedWordRecognitionRows$.next(rows);
+        }))
+        this.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
             const group = groupBy(newRecognitionRows, v => v.word);
             // These will always be present in the table records for now
             // If I starting to cache loading this wont be true anymore
@@ -497,7 +510,16 @@ export class Manager {
                 return 0;
             }).map(r => r.row))
         ).subscribe(this.sortedWordRows$)
-        this.wordRowDict.pipe(map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue())))
+        this.wordRowDict.pipe(
+            map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))
+        );
+        (async () => {
+            const generator = this.db.getRecognitionRowsFromDB();
+            for await (let rowChunk of generator) {
+                this.addPersistedWordRecognitionRows$.next(rowChunk);
+            }
+        })()
+
     }
 
     receiveDebugMessage(o: any) {
@@ -544,7 +566,8 @@ export interface iWordCountRow {
     count: number;
 }
 
-export interface iWordRecognitionRow {
+export interface IWordRecognitionRow {
+    id?: number;
     word: string;
     timestamp: Date;
     recognitionScore: number;

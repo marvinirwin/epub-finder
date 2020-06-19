@@ -10,7 +10,7 @@ import {red} from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {useObs} from "../UseObs";
 import {EditingCard} from "../lib/EditingCard";
-import ImageList from "./ImageList";
+import ImageList from "./CardImageList";
 import EditCardEnglish from "./EditCardEnglish";
 import CircularIntegration, {SpinnerState} from './SpinningCircle'
 
@@ -83,10 +83,12 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
                 <div className={classes.root}>
                     <Typography variant="h6" gutterBottom> English </Typography>
                     <EditCardEnglish e={card}/>
-                    <Typography variant="h6" gutterBottom> Question Pictures </Typography>
-                    <ImageList photos$={card.photos$} card={card} characters={characters || ""} />
+                    <Typography variant="h6" gutterBottom> Pictures </Typography>
+                    <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m} />
+{/*
                     <Typography variant="h6" gutterBottom> Illustration Pictures </Typography>
-                    <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} />
+                    <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} m={card.m} />
+*/}
                 </div>
 
                 {(sounds || []).map((s: string) => <audio className={'new-audio'} key={s} controls={true} src={s}>This is audio</audio>)}

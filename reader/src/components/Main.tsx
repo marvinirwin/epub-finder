@@ -10,6 +10,7 @@ import {Dictionary} from "lodash";
 import LeftBar from "./LeftBar";
 import {makeStyles} from "@material-ui/core/styles";
 import {BookContainer} from "./BookContainer";
+import {getImages, ImageSelectPopup} from "./ImageSelectPopup";
 
 window.addEventListener("dragover",function(e){
     e.preventDefault();
@@ -17,6 +18,8 @@ window.addEventListener("dragover",function(e){
 window.addEventListener("drop",function(e){
     e.preventDefault();
 },false);
+
+getImages('人').then(d => console.log(d))
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -53,6 +56,7 @@ export function Main({s}: { s: AppSingleton }) {
                     {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
                 </div>
             </Grid>
+            <ImageSelectPopup m={m}/>
         </Grid>
     </Fragment>;
 }

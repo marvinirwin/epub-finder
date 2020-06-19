@@ -33,7 +33,7 @@ export function ShowCharacter({c, m}: QuizCardProps) {
 
 function EditCardScreen({c, m}: QuizCardProps) {
     function sendWordRec(recognitionScore: number) {
-        m.addWordRecognitionRows$.next([
+        m.addUnpersistedWordRecognitionRows$.next([
             {
                 word: c.learningLanguage,
                 timestamp: new Date(),
@@ -60,8 +60,6 @@ function EditCardScreen({c, m}: QuizCardProps) {
     </Card> : <div/>;
 }
 
-
-
 export default function QuickDIalogContainer({m}: {m: Manager}) {
     const open = useObs(m.quizDialogComponent$)
     const quizzingCard = useObs(m.quizzingCard$);
@@ -71,8 +69,7 @@ export default function QuickDIalogContainer({m}: {m: Manager}) {
     const Component = useObs(m.quizDialogComponent$);
 
 
-    return <div>
-        <Dialog onClose={close} aria-labelledby="customized-dialog-title" open={!!open}>
+    return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!open}>
 {/*
             <DialogTitle id="customized-dialog-title" onClose={() => m.quizDialogOpen$.next(false)}>
 
@@ -87,5 +84,4 @@ export default function QuickDIalogContainer({m}: {m: Manager}) {
                 </Button>
             </DialogActions>
         </Dialog>
-    </div>;
 }
