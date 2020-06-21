@@ -1,5 +1,5 @@
 import {Card, SerializedCard} from "./Card";
-import {ICard} from "./icard";
+import {ICard} from "../ICard";
 
 export class Deck {
     constructor(public cards: ICard[], public name: string) {

@@ -1,6 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
-import {AnkiPackage} from "../../../Anki";
+import {AnkiPackage} from "../../Anki";
 import {ReplaySubject, Subject, of, from} from "rxjs";
 import {invert, flatten, chunk} from "lodash";
 import initSqlJs from "sql.js";
@@ -8,12 +8,12 @@ import initSqlJs from "sql.js";
 import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
-import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
-import {MyAppDatabase} from "../../AppDB";
+import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnkiPackage";
+import {MyAppDatabase} from "../Storage/AppDB";
 import {bufferCount, groupBy} from "rxjs/operators";
-import {Card} from "./Card";
-import DebugMessage from "../../../Debug-Message";
-import {ICard} from "./icard";
+import {Card} from "../Interfaces/OldAnkiClasses/Card";
+import DebugMessage from "../../Debug-Message";
+import {ICard} from "../Interfaces/ICard";
 
 export const CHUNK_SIZE = 500;
 // noinspection JSConstantReassignment
@@ -46,7 +46,7 @@ class AnkiPackageLoader {
 
     constructor(public name: string, public path: string, public db: MyAppDatabase) {
         db.messages$.subscribe(m => {
-            this.messages$.next(new DebugMessage('worker-database', m));
+            this.messages$.next(new DebugMessage('Worker-database', m));
         });
         this.messages$.subscribe(s => ctx.postMessage(`
             this.receiveDebugMessage(${JSON.stringify(s)});
@@ -135,7 +135,7 @@ const loaders: AnkiPackageLoader[] = [];
 ctx.onmessage = async (ev) => {
     let next = (s: string) =>
         ctx.postMessage(`
-                this.receiveDebugMessage(${JSON.stringify(new DebugMessage('worker-database', s))});
+                this.receiveDebugMessage(${JSON.stringify(new DebugMessage('Worker-database', s))});
             `);
     const db = new MyAppDatabase(next);
     let {name, path}: { name: string, path: string } = JSON.parse(ev.data);

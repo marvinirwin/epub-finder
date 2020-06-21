@@ -1,8 +1,8 @@
-import {sleep} from "./Manager";
-import {aRendition} from "./RenderingBook";
-import {cBookInstance} from "./cBookInstance";
+import {sleep} from "../Manager";
+import {BookInstance} from "./BookInstance";
+import {IRendition} from "../Interfaces/Book/IRendition";
 
-export class Tweet extends cBookInstance {
+export class Tweet extends BookInstance {
     static localStorageKey = "TWEET"
     get localStorageKey(): string {
         return Tweet.localStorageKey
@@ -10,7 +10,7 @@ export class Tweet extends cBookInstance {
     constructor(public name: string, public url: string) {
         super(name);
         this.book = {
-            renderTo(iframe: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
+            renderTo(iframe: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): IRendition {
                 return {
                     display: async spineItem => {
                         // e is an iframe

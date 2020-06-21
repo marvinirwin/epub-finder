@@ -1,7 +1,7 @@
 import {Card} from "./Card";
 import {flattenDeep} from "lodash";
 import {Deck, SerializedDeck} from "./Deck";
-import {ICard} from "./icard";
+import {ICard} from "../ICard";
 
 export class Collection {
     allCards: ICard[];

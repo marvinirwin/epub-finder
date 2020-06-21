@@ -19,4 +19,5 @@ const DebugDisplay: React.FunctionComponent<Props> = ({visible$, text$, children
         : <div/>;
 
 }
+
 export default DebugDisplay;

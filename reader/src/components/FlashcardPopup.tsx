@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Manager} from "../lib/Manager";
-import {ICard} from "../lib/serializeable/worker-safe/icard";
-import {EditingCard} from "../lib/EditingCard";
+import {ICard} from "../lib/Interfaces/ICard";
+import {EditingCard} from "../lib/DisplayClasses/EditingCard";
 
 export function FlashcardPopup({text, card, getImages, m}: { text: string, card: ICard, getImages: ((s: string) => Promise<string[]>) | undefined, m: Manager }) {
     const [clicked, setClicked] = useState(false)

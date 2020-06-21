@@ -1,7 +1,7 @@
 import {Collection, SerializedCollection} from "./Collection";
 import {Dictionary, fromPairs} from "lodash";
 import {Card, SerializedCard} from "./Card";
-import {ICard} from "./icard";
+import {ICard} from "../ICard";
 
 export interface SerializedAnkiPackage {
     name: string

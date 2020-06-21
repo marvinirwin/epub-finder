@@ -8,7 +8,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
-import EditingCardComponent from "./EditingCardComponent";
+import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
 import {FlashcardPopup} from "./FlashcardPopup";
 import QuickDIalogContainer from "./QuizPopup";

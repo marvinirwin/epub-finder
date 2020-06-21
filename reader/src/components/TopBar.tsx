@@ -8,8 +8,8 @@ import {Manager} from "../lib/Manager";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import MyModal from './MyModal';
 import {useObs} from "../UseObs";
-import {Tweet} from "../lib/Tweet";
-import {SimpleText} from "../lib/SimpleText";
+import {Tweet} from "../lib/Books/Tweet";
+import {SimpleText} from "../lib/Books/SimpleText";
 
 const useStyles = makeStyles((theme) => ({
     topBar: {

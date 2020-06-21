@@ -3,15 +3,15 @@ import {Dictionary, flattenDeep, groupBy, uniq} from 'lodash';
 // @ts-ignore
 import JSZip from 'jszip';
 import {SqlJs} from "sql.js/module";
-import {Card, isChineseCharacter} from "./lib/serializeable/worker-safe/Card";
-import {Collection} from "./lib/serializeable/worker-safe/Collection";
-import {deck} from "./lib/serializeable/worker-safe/tables/deck";
-import {note} from "./lib/serializeable/worker-safe/tables/note";
-import {card} from "./lib/serializeable/worker-safe/tables/card";
-import {col} from "./lib/serializeable/worker-safe/tables/col";
-import {Deck} from "./lib/serializeable/worker-safe/Deck";
+import {Card, isChineseCharacter} from "./lib/Interfaces/OldAnkiClasses/Card";
+import {Collection} from "./lib/Interfaces/OldAnkiClasses/Collection";
+import {deck} from "./lib/Interfaces/AnkiPackageSQLiteTables/deck";
+import {note} from "./lib/Interfaces/AnkiPackageSQLiteTables/note";
+import {card} from "./lib/Interfaces/AnkiPackageSQLiteTables/card";
+import {col} from "./lib/Interfaces/AnkiPackageSQLiteTables/col";
+import {Deck} from "./lib/Interfaces/OldAnkiClasses/Deck";
 import {Subject} from "rxjs";
-import {ICard} from "./lib/serializeable/worker-safe/icard";
+import {GetICard, ICard} from "./lib/Interfaces/ICard";
 
 export interface Model {
     deckId: string;
@@ -129,7 +129,7 @@ export class AnkiPackage {
                     const card = cardsForThisDeck[k];
                     let noteElement: note = notes[card.nid][0];
                     let fields = noteElement.flds.split("\x1f");
-                    let iCard: ICard = await Card.getIcard(
+                    let iCard: ICard = await GetICard(
                         fields,
                         async (href) => {
                             const ext = href.split('').reverse().join('').split('.')[0].split('').reverse().join('');

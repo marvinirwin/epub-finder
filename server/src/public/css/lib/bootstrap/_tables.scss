@@ -98,7 +98,7 @@
 // Table backgrounds
 //
 // Exact selectors below required to override `.table-striped` and prevent
-// inheritance to nested tables.
+// inheritance to nested AnkiPackageSQLiteTables.
 
 @each $color, $value in $theme-colors {
   @include table-row-variant($color, theme-color-level($color, -9));
@@ -160,7 +160,7 @@
 }
 
 
-// Responsive tables
+// Responsive AnkiPackageSQLiteTables
 //
 // Generate series of `.table-responsive-*` classes for configuring the screen
 // size of where your table will overflow.

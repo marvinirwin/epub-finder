@@ -1,7 +1,7 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
-import {ICard} from "./serializeable/worker-safe/icard";
-import {IWordRecognitionRow} from "./Manager";
+import {ICard} from "../Interfaces/ICard";
+import {IWordRecognitionRow} from "../Manager";
 
 export class MyAppDatabase extends Dexie {
     cards: Dexie.Table<ICard, number>;
@@ -16,7 +16,7 @@ export class MyAppDatabase extends Dexie {
             cards: 'id++, characters, english, ankiPackage, collection, deck',
             recognitionRecords: 'id++, word, timestamp'
         });
-        this.messages$.next("Stores created, initializing tables")
+        this.messages$.next("Stores created, initializing AnkiPackageSQLiteTables")
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table("cards");
         this.recognitionRecords = this.table("recognitionRecords");

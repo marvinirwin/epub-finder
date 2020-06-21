@@ -10,7 +10,6 @@ import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import {useObs} from "./UseObs";
-import {trie} from "./lib/Trie";
 
 import {AppSingleton, EditingCardClass, initializeApp} from "./AppSingleton";
 import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";
@@ -52,16 +51,6 @@ export interface shutterResult {
 // @ts-ignore
 window.$ = $;
 
-const CHAR_LIMIT = 5;
-
-function windDownStringIntoTrie(currentSection: string[], t: trie<number>, i: number) {
-    if (currentSection.length) {
-        for (let j = 0; j < currentSection.length; j++) {
-            const str = currentSection.slice(j).join('');
-            t.insert(str, i + j);
-        }
-    }
-}
 
 function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) {
     const sources = useObs<string[] | undefined>(editingCard.imageSources)

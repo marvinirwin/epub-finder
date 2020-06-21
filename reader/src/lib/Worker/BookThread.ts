@@ -1,6 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
-import {AnkiPackage} from "../../../Anki";
+import {AnkiPackage} from "../../Anki";
 import {Subject} from "rxjs";
 import {invert} from "lodash";
 import initSqlJs from "sql.js";
@@ -8,7 +8,7 @@ import initSqlJs from "sql.js";
 import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
-import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
+import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 
 // noinspection JSConstantReassignment
 // @ts-ignore

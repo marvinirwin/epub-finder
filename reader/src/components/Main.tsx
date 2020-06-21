@@ -1,6 +1,6 @@
 import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../UseObs";
-import {RenderingBook} from "../lib/RenderingBook";
+import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 import React, {Fragment} from "react";
 import {Dictionary} from "lodash";
 import LeftBar from "./LeftBar";

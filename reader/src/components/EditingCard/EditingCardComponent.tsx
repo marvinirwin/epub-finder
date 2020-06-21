@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -6,13 +6,13 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import {red} from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {useObs} from "../UseObs";
-import {EditingCard} from "../lib/EditingCard";
-import ImageList from "./CardImageList";
-import EditCardEnglish from "./EditCardEnglish";
-import CircularIntegration, {SpinnerState} from './SpinningCircle'
+import {useObs} from "../../UseObs";
+import {EditingCard} from "../../lib/DisplayClasses/EditingCard";
+import ImageList from "../CardImageList";
+import EditCardEnglish from "../EditCardEnglish";
+import CircularIntegration, {SpinnerState} from '../SpinningCircle'
+import {SoundEl} from "../SoundElement";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,16 +41,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
-function SoundEl({src, playOnMount}: {src: string, playOnMount: boolean}) {
-    const ref = useRef<HTMLAudioElement>(null);
-    useEffect(() => {
-        if (ref?.current) {
-            ref.current.play();
-        }
-    }, [ref])
-    return <audio ref={ref} className={'new-audio'} key={src} controls={true} src={src}>This is audio</audio>;
-}
 
 export default function EditingCardComponent({card}: { card: EditingCard }) {
     const classes = useStyles();

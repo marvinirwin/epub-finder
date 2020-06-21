@@ -1,4 +1,4 @@
-import {RenderingBook} from "../lib/RenderingBook";
+import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 import React, {useEffect, useRef} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -16,7 +16,7 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import EditingCardComponent from "./EditingCardComponent";
+import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme) => ({

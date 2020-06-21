@@ -1,12 +1,13 @@
 import $ from "jquery";
-import {aRendition, RenderingBook} from "./RenderingBook";
+import {RenderingBook} from "./Rendering/RenderingBook";
 import {Dictionary} from "lodash";
-import {cBookInstance} from "./cBookInstance";
+import {BookInstance} from "./BookInstance";
 // @ts-ignore
 import {sify} from 'chinese-conv';
-import {isChineseCharacter} from "./serializeable/worker-safe/Card";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {IRendition} from "../Interfaces/Book/IRendition";
 
-export class SimpleText extends cBookInstance {
+export class SimpleText extends BookInstance {
     static localStorageKey = "SIMPLE_TEXT"
     get localStorageKey(): string {
         return SimpleText.localStorageKey
@@ -18,7 +19,7 @@ export class SimpleText extends cBookInstance {
         text = text.split('').map(sify).join('')
         this.rawText$.next(text);
         this.book = {
-            renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): aRendition {
+            renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): IRendition {
                 return {
                     display: async spineItem => {
                         let htmlElements = $(`<p style="white-space: pre; font-size: 200%;">${text}</p>`);

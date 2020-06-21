@@ -1,8 +1,8 @@
 import {BehaviorSubject, combineLatest, interval, merge, race, ReplaySubject, Subject, timer} from "rxjs";
-import {getIsMeFunction, ICard} from "./serializeable/worker-safe/icard";
+import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {debounceTime, map, mapTo, skip, startWith, switchMap, take, takeUntil, withLatestFrom} from "rxjs/operators";
-import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
-import {Manager} from "./Manager";
+import {IndexDBManager, LocalStorageManager} from "../Storage/StorageManagers";
+import {Manager} from "../Manager";
 import {debounce} from "@material-ui/core";
 
 export class EditingCard {
@@ -45,7 +45,7 @@ export class EditingCard {
                 this.characters$,
                 secondGroup$
             ]
-            // This debounce Time and then skip means skip the first emit when we create the EditingCard
+            // This debounce Time and then skip means skip the first emit when we create the DisplayClasses
         ).pipe(skip(1));
 
         let debouncedSaveData = saveData$.pipe(debounceTime(1000));

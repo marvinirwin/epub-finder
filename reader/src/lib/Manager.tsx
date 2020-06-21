@@ -15,34 +15,35 @@ import {
 // @ts-ignore
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import AnkiThread from 'worker-loader?name=dist/[name].js!./serializeable/worker-safe/anki-thread';
+import AnkiThread from 'Worker-loader?name=dist/[name].js!./Worker/AnkiThread';
 import {
     SerializedAnkiPackage,
     UnserializeAnkiPackage,
     UnserializedAnkiPackage
-} from "./serializeable/worker-safe/SerializedAnkiPackage";
+} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import DebugMessage from "../Debug-Message";
-import {Deck} from "./serializeable/worker-safe/Deck";
-import {Collection} from "./serializeable/worker-safe/Collection";
-import {MyAppDatabase} from "./AppDB";
-import {RenderingBook, Trie} from "./RenderingBook";
+import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
+import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
+import {MyAppDatabase} from "./Storage/AppDB";
+import {RenderingBook} from "./Books/Rendering/RenderingBook";
 import React from "react";
 import $ from "jquery";
-import {getIsMeFunction, ICard} from "./serializeable/worker-safe/icard";
-import {Tweet} from "./Tweet";
-import {SimpleText} from "./SimpleText";
-import {WordCountTableRow} from "./WordCountTableRow";
-import {cBookInstance} from "./cBookInstance";
-import {EditingCard} from "./EditingCard";
+import {getIsMeFunction, ICard} from "./Interfaces/ICard";
+import {Tweet} from "./Books/Tweet";
+import {SimpleText} from "./Books/SimpleText";
+import {WordCountTableRow} from "./DisplayClasses/WordCountTableRow";
+import {BookInstance} from "./Books/BookInstance";
+import {EditingCard} from "./DisplayClasses/EditingCard";
 import Dexie from "dexie";
-import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
+import {IndexDBManager, LocalStorageManager} from "./Storage/StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 import axios from 'axios';
 import trie from 'trie-prefix-tree';
+import {ITrie} from "./Interfaces/Trie";
 
 class TrieWrapper {
     public changeSignal$: Subject<void>;
-    constructor(public t: Trie) {
+    constructor(public t: ITrie) {
         this.changeSignal$ = new ReplaySubject<void>(1);
         this.changeSignal$.next();
     }
@@ -172,7 +173,7 @@ export class Manager {
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
-    bookLoadUpdates$: ReplaySubject<cBookInstance> = new ReplaySubject<cBookInstance>();
+    bookLoadUpdates$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>();
     bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
     requestBookRemove$: Subject<RenderingBook> = new Subject<RenderingBook>()
 

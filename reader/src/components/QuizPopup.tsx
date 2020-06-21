@@ -8,7 +8,7 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import {ICard} from "../lib/serializeable/worker-safe/icard";
+import {ICard} from "../lib/Interfaces/ICard";
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import {
@@ -21,8 +21,8 @@ import {
     GridList,
     ListSubheader, TextField
 } from "@material-ui/core";
-import EditingCardComponent from "./EditingCardComponent";
-import {EditingCard} from "../lib/EditingCard";
+import EditingCardComponent from "./EditingCard/EditingCardComponent";
+import {EditingCard} from "../lib/DisplayClasses/EditingCard";
 import CardImageList from "./CardImageList";
 import {EditingImage} from "./EditingImage";
 import GridListTileBar from "@material-ui/core/GridListTileBar";

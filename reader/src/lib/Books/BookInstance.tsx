@@ -1,12 +1,12 @@
 import {ReplaySubject} from "rxjs";
-import {iWordCountRow} from "./Manager";
-import {aBook} from "./RenderingBook";
+import {iWordCountRow} from "../Manager";
 import {Dictionary} from "lodash";
-import {isChineseCharacter} from "./serializeable/worker-safe/Card";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {IBook} from "../Interfaces/Book/IBook";
 
-export abstract class cBookInstance {
+export abstract class BookInstance {
     abstract get localStorageKey(): string;
-    book: aBook | undefined;
+    book: IBook | undefined;
     wordCountRecords$: ReplaySubject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>(1)
     rawText$: ReplaySubject<string> = new ReplaySubject<string>(1)
 

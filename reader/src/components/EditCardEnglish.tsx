@@ -1,6 +1,6 @@
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import {EditingCard} from "../lib/EditingCard";
+import {EditingCard} from "../lib/DisplayClasses/EditingCard";
 import {useObs} from "../UseObs";
 import React from 'react';
 
@@ -13,21 +13,21 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function EditCardEnglish({e}: {e: EditingCard}) {
+export default function EditCardEnglish({e}: { e: EditingCard }) {
     const classes = useStyles();
     const english = useObs(e.knownLanguage$);
     return (
         <form className={classes.root} noValidate autoComplete="off">
-                <TextField
-                    id="outlined-multiline-static"
-                    label="Multiline"
-                    multiline
-                    rows={4}
-                    defaultValue="Default Value"
-                    variant="outlined"
-                    value={english}
-                    onChange={t => e.knownLanguage$.next(t.target.value.split('\n'))}
-                />
+            <TextField
+                id="outlined-multiline-static"
+                label="Multiline"
+                multiline
+                rows={4}
+                defaultValue="Default Value"
+                variant="outlined"
+                value={english}
+                onChange={t => e.knownLanguage$.next(t.target.value.split('\n'))}
+            />
         </form>
     );
 }
