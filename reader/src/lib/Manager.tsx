@@ -1,6 +1,17 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject, of} from "rxjs";
-import {Dictionary, flatten, groupBy, sortBy} from "lodash";
-import {buffer, debounceTime, filter, map, scan, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {Dictionary, flatten, groupBy, sortBy, orderBy} from "lodash";
+import {
+    buffer,
+    debounceTime,
+    filter,
+    last,
+    map,
+    scan,
+    startWith,
+    switchMap,
+    take,
+    withLatestFrom
+} from "rxjs/operators";
 // @ts-ignore
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
@@ -26,6 +37,7 @@ import {EditingCard} from "./EditingCard";
 import Dexie from "dexie";
 import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
+import axios from 'axios';
 
 export interface ISimpleText {
     title: string;
@@ -39,16 +51,69 @@ function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V):
     if (text) {
         t.next(JSON.parse(text))
     }
-    t.subscribe(v => localStorage.setItem(key, JSON.stringify(defaultVal)));
+    t.subscribe(v => localStorage.setItem(key, JSON.stringify(v)));
     return t;
 }
 
 export const CARD_LOCAL_STORAGE_KEY = 'CARDS';
 
+export interface TwitterTrend {
+    name: string,
+    url: string,
+    promoted_content: null,
+    query: string,
+    tweet_volume: number | null
+}
+
+export enum NavigationPages {
+    READING_PAGE = "READING_PAGE",
+    QUIZ_PAGE = "QUIZ_PAGE",
+    TRENDS_PAGE = "TRENDS_PAGE"
+}
+
 export interface SelectImageRequest {
     term: string;
-    cb: (s: string) =>void
+    cb: (s: string) => void
 }
+
+interface ITweet {
+
+}
+
+interface ITrend {
+    name: string,
+    url: string,
+    promoted_content: string,
+    query: string,
+    tweet_volume: number
+}
+
+interface ITrendLocation {
+    country: string,
+    countryCode: string,
+    name: string,
+    parentid: number,
+    placeType: {
+        code: number,
+        name: string
+    },
+    url: string,
+    woeid: number
+}
+
+async function getAllLocations(): Promise<ITrendLocation[]> {
+    const result = await axios.post('/trend-locations')
+    debugger;
+    return result.data;
+}
+
+async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
+    const result = await axios.post('/trends', {id: woeid})
+    debugger;
+    return result.data;
+}
+getAllLocations()
+getAllTrendsForLocation(1);
 
 export class Manager {
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
@@ -113,7 +178,19 @@ export class Manager {
     requestQuizCharacter$: Subject<string> = new Subject<string>();
     quizzingCard$: ReplaySubject<ICard | undefined> = new ReplaySubject<ICard | undefined>(1);
     quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
-    queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest|undefined>(1);
+    queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
+
+    bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
+        new ReplaySubject<NavigationPages>(1), 'debug_observables_visible', NavigationPages.READING_PAGE
+    );
+
+    nextQuizItem$ = new ReplaySubject<ICard | undefined>(1);
+
+
+
+    allTrends$ = new ReplaySubject<ITrendLocation[]>(1);
+    tweetTrendMap$ = new ReplaySubject<Dictionary<ITweet>>();
+    selectedTrend$ = new ReplaySubject<ITrendLocation | undefined>();
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -122,6 +199,38 @@ export class Manager {
         this.oCards();
         this.oBook();
 
+/*
+        axios.get('/twitter-trends').then(response => {
+            debugger;
+            const data: ITrendLocation[] = response.data;
+            this.allTrends$.next(data);
+        })
+*/
+
+        this.sortedWordRows$.pipe(
+            switchMap(rows => combineLatest(rows.map(r =>
+                r.lastWordRecognitionRecord$
+                    .pipe(
+                        map(lastRecord => ({
+                                lastRecord,
+                                row: r
+                            })
+                        )
+                    )
+            )).pipe(debounceTime(100)))
+        ).pipe(map(sortedRows => {
+            let oneMinute = 60 * 1000;
+            const oneMinuteAgo = (new Date()).getTime() - oneMinute;
+            // r will be in descending order, so just find the one which has no record, or a record before 1 minute ago
+            return sortedRows.find(({lastRecord, row}) => !lastRecord || lastRecord.timestamp.getTime() < oneMinuteAgo)?.lastRecord?.word
+        }),
+            withLatestFrom(this.cardMap$),
+            map(([char, cardMap]) => {
+                if (!char) return undefined;
+                const cards = cardMap[char] || []
+                return cards[0];
+            })
+        ).subscribe(this.nextQuizItem$)
 
         this.requestBookRemove$.pipe(withLatestFrom(this.bookDict$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
             delete bookDict[bookToRemove.name];
@@ -500,15 +609,8 @@ export class Manager {
             switchMap(wordRows =>
                 combineLatest(wordRows.map(r => r.currentCount$.pipe(map(count => ({count, row: r})))))
             ),
-            map((recs: iCountRowEmitted[]) => recs.sort((a, b) => {
-                if (a.count < b.count) {
-                    return 1;
-                }
-                if (a.count > b.count) {
-                    return -1;
-                }
-                return 0;
-            }).map(r => r.row))
+            map((recs: iCountRowEmitted[]) => orderBy(
+                orderBy(recs, 'recognitionScore', 'desc'), ['count'], 'desc').map(r => r.row))
         ).subscribe(this.sortedWordRows$)
         this.wordRowDict.pipe(
             map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))

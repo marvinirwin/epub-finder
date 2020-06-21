@@ -12,8 +12,9 @@ import {Tweet} from "../lib/Tweet";
 import {SimpleText} from "../lib/SimpleText";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
+    topBar: {
+        maxHeight: '10vh',
+        minHeight: '10vh'
     },
     menuButton: {
         marginRight: theme.spacing(1),
@@ -46,12 +47,12 @@ export default function ProminentAppBar({m}: { m: Manager }) {
     const twitterUrlInput = useObs(m.twitterUrl$, '');
     const twitterTitleInput = useObs(m.twitterTitle$, '');
     return (
-        <div className={classes.root}>
+        <div className={classes.topBar}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
 
                     <MyModal icon={<NoteAddIcon/>} submit={() => m.bookLoadUpdates$.next(new SimpleText(simpleTextTitle || '', simpleTextInput || ''))}>
-                        <form className={classes.root} noValidate autoComplete="off">
+                        <form noValidate autoComplete="off">
                             <TextField value={simpleTextTitle} onChange={v => m.simpleTextTitle$.next(v.target.value)} />
                             <TextareaAutosize
                                 aria-label=""
@@ -63,7 +64,7 @@ export default function ProminentAppBar({m}: { m: Manager }) {
                     </MyModal>
 
                     <MyModal icon={<PostAddIcon/>} submit={() => m.bookLoadUpdates$.next(new Tweet(twitterTitleInput || '', twitterUrlInput || ''))}>
-                        <form className={classes.root} noValidate autoComplete="off">
+                        <form noValidate autoComplete="off">
                             <TextField value={twitterTitleInput} onChange={v => m.twitterTitle$.next(v.target.value)} />
                             <TextareaAutosize
                                 aria-label=""

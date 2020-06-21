@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -40,6 +40,17 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.contrastText
     },
 }));
+
+
+function SoundEl({src, playOnMount}: {src: string, playOnMount: boolean}) {
+    const ref = useRef<HTMLAudioElement>(null);
+    useEffect(() => {
+        if (ref?.current) {
+            ref.current.play();
+        }
+    }, [ref])
+    return <audio ref={ref} className={'new-audio'} key={src} controls={true} src={src}>This is audio</audio>;
+}
 
 export default function EditingCardComponent({card}: { card: EditingCard }) {
     const classes = useStyles();
@@ -91,7 +102,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
 */}
                 </div>
 
-                {(sounds || []).map((s: string) => <audio className={'new-audio'} key={s} controls={true} src={s}>This is audio</audio>)}
+                {(sounds || []).map((s: string) => <SoundEl src={s} playOnMount={true}/>)}
             </CardContent>
             {/*
 

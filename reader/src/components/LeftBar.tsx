@@ -12,16 +12,22 @@ import EditingCardComponent from "./EditingCardComponent";
 import WordCountTable from "./WordCountTable";
 import {FlashcardPopup} from "./FlashcardPopup";
 import QuickDIalogContainer from "./QuizPopup";
+import TableContainer from "@material-ui/core/TableContainer";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
+    leftBarRoot: {
+        maxHeight: '90vh',
+        minHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+
         '& > .MuiExpansionPanel-root.Mui-expanded': {
             borderRadius: 0
         },
         '& > *': {
-            width: '100%'
-        }
+            width: '100%',
+            flexGrow: 1
+        },
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),
@@ -60,7 +66,7 @@ export default function LeftBar({m}: {m: Manager}) {
 
     const editingCard = useObs(m.currentEditingCard$);
     return (
-        <div className={classes.root}>
+        <div className={classes.leftBarRoot}>
             <QuickDIalogContainer m={m}/>
             <ExpansionPanel defaultExpanded>
                 <ExpansionPanelSummary

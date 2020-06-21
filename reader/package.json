@@ -37,6 +37,7 @@
     "rxjs": "^6.5.5",
     "shutterstock-api": "^1.0.22",
     "sql.js": "^1.2.2",
+    "twitter-lite": "^0.14.0",
     "typescript": "^3.7.5",
     "worker-loader": "^2.0.0",
     "xmldom": "^0.3.0"

@@ -11,6 +11,13 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import {CardActions, CardContent} from "@material-ui/core";
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Typography from "@material-ui/core/Typography";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import EditingCardComponent from "./EditingCardComponent";
+import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -53,40 +60,45 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager}) {
     const translationText = useObs(rb.translationText$)
 
     return (
-        <Card className={classes.root}>
-            <CardHeader
-                avatar={
-                    <Avatar aria-label="Book Name" className={classes.avatar}>
-                        {rb.name}
-                    </Avatar>
-                }
-                action={
-                    <IconButton aria-label="settings" onClick={() => m.requestBookRemove$.next(rb)}>
-                        <DeleteIcon />
-                    </IconButton>
-                }
-                title={rb.name}
-            />
-            <CardActions disableSpacing>
-{/*
-                <IconButton
-                    className={clsx(classes.expand, {
-                        [classes.expandOpen]: expanded,
-                    })}
-                    onClick={handleExpandClick}
-                    aria-expanded={expanded}
-                    aria-label="show more"
-                >
-                    <ExpandMoreIcon />
-                </IconButton>
-*/}
-            </CardActions>
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
-                    <p style={{whiteSpace: 'pre'}}>{translationText}</p>
-                </CardContent>
-            </Collapse>
-        </Card>
+        <ExpansionPanel defaultExpanded>
+            <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1c-content"
+                id="panel1c-header"
+            >
+                <div>
+                    <Typography>Current Card</Typography>
+                </div>
+                <div>
+                    <Typography>Current Card</Typography>
+                </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Card className={classes.root}>
+                    <CardHeader
+                        avatar={
+                            <Avatar aria-label="Book Name" className={classes.avatar}>
+                                {rb.name}
+                            </Avatar>
+                        }
+                        action={
+                            <IconButton aria-label="settings" onClick={() => m.requestBookRemove$.next(rb)}>
+                                <DeleteIcon />
+                            </IconButton>
+                        }
+                        title={rb.name}
+                    />
+                    <CardActions disableSpacing>
+                    </CardActions>
+                    <Collapse in={expanded} timeout="auto" unmountOnExit>
+                        <CardContent>
+                            <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
+                            <p style={{whiteSpace: 'pre'}}>{translationText}</p>
+                        </CardContent>
+                    </Collapse>
+                </Card>
+            </ExpansionPanelDetails>
+            <Divider />
+        </ExpansionPanel>
     );
 }

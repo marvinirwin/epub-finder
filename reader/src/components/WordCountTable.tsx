@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -18,13 +18,28 @@ const useStyles = makeStyles({
     }
 });
 
+function perc2color(perc: number) {
+    if (perc > 100) perc = 100;
+    var r, g, b = 0;
+    if(perc < 50) {
+        r = 255;
+        g = Math.round(5.1 * perc);
+    }
+    else {
+        g = 255;
+        r = Math.round(510 - 5.10 * perc);
+    }
+    var h = r * 0x10000 + g * 0x100 + b * 0x1;
+    return '#' + ('000000' + h.toString(16)).slice(-6);
+}
 
-function WordCountRow({row, m}: {row: WordCountTableRow, m: Manager}) {
+
+function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
     const score = useObs(row.currentRecognitionScore$);
     const count = useObs(row.currentCount$);
     return (
         <TableRow key={row.word}>
-            <TableCell component="th" scope="row" >
+            <TableCell component="th" scope="row">
                 <div onClick={() => {
                     m.requestQuizCharacter$.next(row.word)
                 }}>
@@ -32,16 +47,16 @@ function WordCountRow({row, m}: {row: WordCountTableRow, m: Manager}) {
                 </div>
             </TableCell>
             <TableCell align="right">{count}</TableCell>
-            <TableCell align="right">{score}</TableCell>
+            <TableCell align="right" style={{backgroundColor: perc2color(score || 0)}}>{score}</TableCell>
         </TableRow>
     );
 }
 
-export default function WordCountTable({m}: {m: Manager}) {
+export default function WordCountTable({m}: { m: Manager }) {
     const classes = useStyles();
     const rows = useObs(m.sortedWordRows$)
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} style={{flexGrow: 1, overflow: 'auto'}}>
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                     <TableRow>

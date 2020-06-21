@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -11,11 +11,26 @@ import Typography from '@material-ui/core/Typography';
 import {ICard} from "../lib/worker-safe/icard";
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
-import {Card, CardActions, CardContent, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
+import {
+    Card,
+    CardActions,
+    CardContent,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    GridList,
+    ListSubheader, TextField
+} from "@material-ui/core";
 import EditingCardComponent from "./EditingCardComponent";
 import {EditingCard} from "../lib/EditingCard";
+import CardImageList from "./CardImageList";
+import {EditingImage} from "./EditingImage";
+import GridListTileBar from "@material-ui/core/GridListTileBar";
+import DeleteIcon from "@material-ui/icons/Delete";
+import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import GridListTile from "@material-ui/core/GridListTile";
 
-export type QuizCardProps = {c: ICard, m: Manager}
+export type QuizCardProps = { c: ICard, m: Manager }
 
 export function ShowCharacter({c, m}: QuizCardProps) {
     return <Card>
@@ -25,10 +40,28 @@ export function ShowCharacter({c, m}: QuizCardProps) {
             </Typography>
         </CardContent>
         <CardActions>
-            <Button onClick={() => m.quizDialogComponent$.next(EditCardScreen)}>Next</Button>
+            <Button onClick={() => m.quizDialogComponent$.next(CardPictureScreen)}>Next</Button>
 
         </CardActions>
     </Card>
+}
+
+
+function CardPictureScreen({c, m}: QuizCardProps) {
+    return <Card>
+        <CardContent>
+            <GridList>
+                {c.photos.map((src: string, index: number) =>
+                    <GridListTile key={src}>
+                        <img src={src}/>
+                    </GridListTile>
+                )}
+            </GridList>
+        </CardContent>
+        <CardActions>
+            <Button onClick={() => m.quizDialogComponent$.next(EditCardScreen)}>Next</Button>
+        </CardActions>
+    </Card>;
 }
 
 function EditCardScreen({c, m}: QuizCardProps) {
@@ -60,28 +93,30 @@ function EditCardScreen({c, m}: QuizCardProps) {
     </Card> : <div/>;
 }
 
-export default function QuickDIalogContainer({m}: {m: Manager}) {
+export default function QuickDIalogContainer({m}: { m: Manager }) {
     const open = useObs(m.quizDialogComponent$)
     const quizzingCard = useObs(m.quizzingCard$);
+
     function close() {
         m.quizDialogComponent$.next();
     }
+
     const Component = useObs(m.quizDialogComponent$);
 
 
     return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!open}>
-{/*
+        {/*
             <DialogTitle id="customized-dialog-title" onClose={() => m.quizDialogOpen$.next(false)}>
 
             </DialogTitle>
 */}
-            <DialogContent dividers>
-                {Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : ''}
-            </DialogContent>
-            <DialogActions>
-                <Button autoFocus onClick={close} color="primary">
-                    Save changes
-                </Button>
-            </DialogActions>
-        </Dialog>
+        <DialogContent dividers>
+            {Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : ''}
+        </DialogContent>
+        <DialogActions>
+            <Button autoFocus onClick={close} color="primary">
+                Save changes
+            </Button>
+        </DialogActions>
+    </Dialog>
 }
