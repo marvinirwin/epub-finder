@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
-import {ICard} from "./worker-safe/icard";
+import {ICard} from "./serializeable/worker-safe/icard";
 import {IWordRecognitionRow} from "./Manager";
 
 export class MyAppDatabase extends Dexie {

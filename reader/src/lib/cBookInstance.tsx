@@ -2,7 +2,7 @@ import {ReplaySubject} from "rxjs";
 import {iWordCountRow} from "./Manager";
 import {aBook} from "./RenderingBook";
 import {Dictionary} from "lodash";
-import {isChineseCharacter} from "./worker-safe/Card";
+import {isChineseCharacter} from "./serializeable/worker-safe/Card";
 
 export abstract class cBookInstance {
     abstract get localStorageKey(): string;

@@ -1,6 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
-import {AnkiPackage} from "../../Anki";
+import {AnkiPackage} from "../../../Anki";
 import {ReplaySubject, Subject, of, from} from "rxjs";
 import {invert, flatten, chunk} from "lodash";
 import initSqlJs from "sql.js";
@@ -9,10 +9,10 @@ import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "./SerializedAnkiPackage";
-import {MyAppDatabase} from "../AppDB";
+import {MyAppDatabase} from "../../AppDB";
 import {bufferCount, groupBy} from "rxjs/operators";
 import {Card} from "./Card";
-import DebugMessage from "../../Debug-Message";
+import DebugMessage from "../../../Debug-Message";
 import {ICard} from "./icard";
 
 export const CHUNK_SIZE = 500;

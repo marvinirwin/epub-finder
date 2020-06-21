@@ -3,11 +3,11 @@ import TreeItem from "@material-ui/lab/TreeItem";
 import React from "react";
 import {Dictionary} from "lodash";
 import CardScroller from "./CardScroller";
-import {UnserializedAnkiPackage} from "../lib/worker-safe/SerializedAnkiPackage";
+import {UnserializedAnkiPackage} from "../lib/serializeable/worker-safe/SerializedAnkiPackage";
 import {ReplaySubject} from "rxjs";
 import {useObs} from "../UseObs";
 import {Manager} from "../lib/Manager";
-import {ICard} from "../lib/worker-safe/icard";
+import {ICard} from "../lib/serializeable/worker-safe/icard";
 
 /**
  * This function assumes there is only one collection per package, it can trivially be made to support more

@@ -37,6 +37,7 @@
     "rxjs": "^6.5.5",
     "shutterstock-api": "^1.0.22",
     "sql.js": "^1.2.2",
+    "trie-prefix-tree": "^1.5.1",
     "twitter-lite": "^0.14.0",
     "typescript": "^3.7.5",
     "worker-loader": "^2.0.0",
@@ -68,6 +69,7 @@
     "@types/jquery": "^3.3.38",
     "@types/lodash": "^4.14.152",
     "@types/sql.js": "^1.0.3",
+    "@types/trie-prefix-tree": "^1.5.0",
     "@types/xmldom": "^0.1.29",
     "nodemon": "^2.0.4"
   }

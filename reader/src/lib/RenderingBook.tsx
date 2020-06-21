@@ -1,19 +1,21 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
-import {Dictionary} from "lodash";
-import {startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {Dictionary, uniq, maxBy, uniqBy} from "lodash";
+import {debounceTime, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "./Manager";
 import $ from "jquery";
-import {isChineseCharacter} from "./worker-safe/Card";
+import {isChineseCharacter} from "./serializeable/worker-safe/Card";
 import {render} from "react-dom";
 import {FlashcardPopup} from "../components/FlashcardPopup";
 import {queryImages} from "../AppSingleton";
 import React from "react";
 // @ts-ignore
 import {sify} from 'chinese-conv';
-import {ICard} from "./worker-safe/icard";
+import {ICard} from "./serializeable/worker-safe/icard";
 import {cBookInstance} from "./cBookInstance";
 import axios from 'axios';
 import {LocalStorageManager} from "./StorageManagers";
+
+import Trie from "trie-prefix-tree";
 
 export interface BookInstance {
     message: string;
@@ -21,11 +23,81 @@ export interface BookInstance {
     serialize: (() => void) | undefined
 }
 
+export interface Trie {
+    /**
+     * Get a string representation of the trie
+     */
+    dump(spacer?: number): string;
+
+    /**
+     * Get the generated raw trie object
+     */
+    tree(): any;
+
+    /**
+     * Add a new word to the trie
+     */
+    addWord(word: string): ReturnType<typeof Trie>;
+
+    /**
+     * Remove an existing word from the trie
+     */
+    removeWord(word: string): ReturnType<typeof Trie>;
+
+    /**
+     * Check a prefix is valid
+     * @returns Boolean
+     */
+    isPrefix(word: string): boolean;
+
+    /**
+     * Count the number of words with the given prefixSearch
+     * @returns Number
+     */
+    countPrefix(word: string): number;
+
+    /**
+     * Get a list of all words in the trie with the given prefix
+     * @returns Array
+     */
+    getPrefix(word: string, sort?: boolean): string[];
+
+    /**
+     * Get a random word in the trie with the given prefix
+     * @returns Array
+     */
+    getRandomWordWithPrefix(prefix: string): string;
+
+    /**
+     * Get all words in the trie
+     * @returns Array
+     */
+    getWords(sorted?: boolean): string[];
+
+    /**
+     * Check the existence of a word in the trie
+     * @returns Boolean
+     */
+    hasWord(word: string): boolean;
+
+    /**
+     * Get a list of valid anagrams that can be made from the given letters
+     * @returns Array
+     */
+    getAnagrams(word: string): string[];
+
+    /**
+     * Get a list of all sub-anagrams that can be made from the given letters
+     * @returns Array
+     */
+    getSubAnagrams(word: string): string[];
+}
+
 function waitFor(f: () => any, n: number) {
     return new Promise(resolve => {
         const interval = setInterval(() => {
             let f1 = f();
-            if (f1){
+            if (f1) {
                 resolve();
                 clearInterval(interval);
             }
@@ -33,6 +105,29 @@ function waitFor(f: () => any, n: number) {
     })
 
 }
+
+// Now let's start a window function over a string
+
+interface IWordPos {
+    word: string;
+    position: number;
+}
+
+interface ITryChar {
+    words: IWordPos[];
+    char: string;
+    el: JQuery<HTMLElement>
+}
+
+interface IWordInProgress {
+    word: string;
+    lengthRemaining: number;
+}
+
+
+// WHat is the shape of characters?
+// Should be empty until
+// The firstw ordInProgress should start at 23
 
 export class RenderingBook {
     bookInstance$: Subject<cBookInstance> = new Subject<cBookInstance>()
@@ -56,7 +151,7 @@ export class RenderingBook {
         public name: string,
     ) {
         this.localStorageKey = bookInstance.localStorageKey;
-        this.persistor =  new LocalStorageManager(bookInstance.localStorageKey);
+        this.persistor = new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
             this.persistor.upsert((serialized: any) => serialized.name === this.name, instance.toSerialized());
         });
@@ -68,7 +163,6 @@ export class RenderingBook {
                 to: 'en',
                 text: r
             }).then(r => {
-                debugger;
                 this.translationText$.next(r.data.translation);
             })
         })
@@ -107,9 +201,10 @@ export class RenderingBook {
     private oAnnotate() {
         combineLatest([
             this.m.cardMap$.pipe(startWith({})),
-            this.renderedContentRoot$
+            this.renderedContentRoot$,
+            this.m.trieWrapper.changeSignal$.pipe(debounceTime(500))
         ]).subscribe(async ([cardMap, rootElement]) => {
-            await this.annotate(rootElement, cardMap);
+            await this.annotate(rootElement, cardMap, this.m.trieWrapper.t);
         })
     }
 
@@ -149,37 +244,40 @@ export class RenderingBook {
         });
     }
 
-    private async annotate(body: JQuery<HTMLElement>, map: Dictionary<ICard[]>) {
-/*
-        const iframeHTML = iframeFromOtherSource[0].innerHTML;
-        // Now delete that iframe
-        iframeFromOtherSource.remove();
-        // Now create a new IFrame
-        const newIFrameWithNoSource = $(`<iframe></iframe>`);
-        newIFrameWithNoSource.appendTo(ref);
-        await sleep(500);
-        const dstFrame: HTMLIFrameElement = newIFrameWithNoSource[0] as HTMLIFrameElement;
-        var dstDoc = dstFrame.contentDocument;
-        if (!dstDoc) {
-            throw new Error("No destination document");
-        }
-        dstDoc.write(iframeHTML);
+    private async annotate(body: JQuery<HTMLElement>, map: Dictionary<ICard[]>, trie: Trie) {
+        /*
+                const iframeHTML = iframeFromOtherSource[0].innerHTML;
+                // Now delete that iframe
+                iframeFromOtherSource.remove();
+                // Now create a new IFrame
+                const newIFrameWithNoSource = $(`<iframe></iframe>`);
+                newIFrameWithNoSource.appendTo(ref);
+                await sleep(500);
+                const dstFrame: HTMLIFrameElement = newIFrameWithNoSource[0] as HTMLIFrameElement;
+                var dstDoc = dstFrame.contentDocument;
+                if (!dstDoc) {
+                    throw new Error("No destination document");
+                }
+                dstDoc.write(iframeHTML);
 
 
-        const body: HTMLBodyElement = newIFrameWithNoSource.contents().find('body')[0];
-*/
+                const body: HTMLBodyElement = newIFrameWithNoSource.contents().find('body')[0];
+        */
 
         if (!body) {
             debugger;
             console.log();
         }
 
+        if (!trie.getWords().length) return;
         const allEls = body[0].getElementsByTagName('*');
         for (let i = 0; i < allEls.length; i++) {
             const el = allEls[i];
             if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
+                await this.annotateWithStuff($(el) as JQuery<HTMLElement>, trie, uniq(trie.getWords().map(w => w.length)));
+
                 // Apply flashcards to it
-                const newText: string[] = [];
+/*                const newText: string[] = [];
                 const text = (el.textContent || '').split('') // maybe innerHTML?;
                 text.forEach((c, i) => {
                     const flashCard = map[c];
@@ -191,7 +289,7 @@ export class RenderingBook {
                     }
                 })
                 el.innerHTML = newText.join('')// weird how I get textContent but set innerHTML
-                // Maybe I'm not allowed to add things to text nodes?  Maybe I have to use el.parent.append?
+                // Maybe I'm not allowed to add things to text nodes?  Maybe I have to use el.parent.append?*/
             }
         }
         const flashCards = body[0].getElementsByClassName('flashcard');
@@ -227,6 +325,51 @@ export class RenderingBook {
             this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
         }
         return iframe;
+    }
+
+
+    async annotateWithStuff(e: JQuery<HTMLElement>, t: Trie, uniqueLengths: number[]) {
+        const text = e.text();
+        e.empty();
+        const characters: ITryChar[] = Array(text.length);
+        let wordsInProgress: IWordInProgress[] = [];
+// So now we have a trie lets compate the index of things in a string
+        for (let i = 0; i < text.length; i++) {
+            wordsInProgress = wordsInProgress.map(w => {
+                w.lengthRemaining--;
+                return w;
+            }).filter(w => w.lengthRemaining > 0);
+            const strings = uniqueLengths.map(size => text.substr(i, size));
+            // @ts-ignore
+            const wordsWhichStartHere: string[] = strings.map(str => t.hasWord(str) ? str : undefined).filter(s => s);
+            wordsInProgress.push(...wordsWhichStartHere.map(word => ({word, lengthRemaining: word.length})))
+            let words = wordsInProgress.map(({word, lengthRemaining}) => ({
+                word,
+                position: word.length - lengthRemaining
+            }));
+            let maxWord = maxBy(words, 'length');
+            let el = $(`<mark >${text[i]}</mark>`);
+            el.appendTo(e)
+            let iTryChar = {
+                char: text[i],
+                words: words,
+                word: maxWord,
+                el: el
+            };
+            iTryChar.el.on("click", (ev) => {
+                if (maxWord) {
+                    e.children('.highlighted').removeClass('highlighted')
+                    const elementsToHighlight = [];
+                    const startIndex = i - maxWord.position;
+                    for (let i = startIndex; i < startIndex + maxWord.word.length; i++) {
+                        elementsToHighlight.push(characters[i].el);
+                    }
+                    elementsToHighlight.forEach(e => e.addClass('highlighted'))
+                    this.m.requestEditWord$.next(maxWord.word);
+                }
+            })
+            characters[i] = iTryChar;
+        }
     }
 
     private annotateInside(

@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, interval, merge, race, ReplaySubject, Subject, timer} from "rxjs";
-import {getIsMeFunction, ICard} from "./worker-safe/icard";
+import {getIsMeFunction, ICard} from "./serializeable/worker-safe/icard";
 import {debounceTime, map, mapTo, skip, startWith, switchMap, take, takeUntil, withLatestFrom} from "rxjs/operators";
 import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
 import {Manager} from "./Manager";

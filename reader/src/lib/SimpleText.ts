@@ -4,7 +4,7 @@ import {Dictionary} from "lodash";
 import {cBookInstance} from "./cBookInstance";
 // @ts-ignore
 import {sify} from 'chinese-conv';
-import {isChineseCharacter} from "./worker-safe/Card";
+import {isChineseCharacter} from "./serializeable/worker-safe/Card";
 
 export class SimpleText extends cBookInstance {
     static localStorageKey = "SIMPLE_TEXT"

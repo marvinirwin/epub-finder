@@ -1,6 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
-import {AnkiPackage} from "../../Anki";
+import {AnkiPackage} from "../../../Anki";
 import {Subject} from "rxjs";
 import {invert} from "lodash";
 import initSqlJs from "sql.js";

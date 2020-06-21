@@ -15,20 +15,20 @@ import {
 // @ts-ignore
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import AnkiThread from 'worker-loader?name=dist/[name].js!./worker-safe/anki-thread';
+import AnkiThread from 'worker-loader?name=dist/[name].js!./serializeable/worker-safe/anki-thread';
 import {
     SerializedAnkiPackage,
     UnserializeAnkiPackage,
     UnserializedAnkiPackage
-} from "./worker-safe/SerializedAnkiPackage";
+} from "./serializeable/worker-safe/SerializedAnkiPackage";
 import DebugMessage from "../Debug-Message";
-import {Deck} from "./worker-safe/Deck";
-import {Collection} from "./worker-safe/Collection";
+import {Deck} from "./serializeable/worker-safe/Deck";
+import {Collection} from "./serializeable/worker-safe/Collection";
 import {MyAppDatabase} from "./AppDB";
-import {RenderingBook} from "./RenderingBook";
+import {RenderingBook, Trie} from "./RenderingBook";
 import React from "react";
 import $ from "jquery";
-import {getIsMeFunction, ICard} from "./worker-safe/icard";
+import {getIsMeFunction, ICard} from "./serializeable/worker-safe/icard";
 import {Tweet} from "./Tweet";
 import {SimpleText} from "./SimpleText";
 import {WordCountTableRow} from "./WordCountTableRow";
@@ -38,6 +38,24 @@ import Dexie from "dexie";
 import {IndexDBManager, LocalStorageManager} from "./StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 import axios from 'axios';
+import trie from 'trie-prefix-tree';
+
+class TrieWrapper {
+    public changeSignal$: Subject<void>;
+    constructor(public t: Trie) {
+        this.changeSignal$ = new ReplaySubject<void>(1);
+        this.changeSignal$.next();
+    }
+    addWords(...words: string[]) {
+        words.forEach(w => this.t.addWord(w))
+        if(words.length) this.changeSignal$.next()
+
+    }
+    removeWords(...words: string[]) {
+        words.forEach(w => this.t.removeWord(w))
+        if(words.length) this.changeSignal$.next()
+    }
+}
 
 export interface ISimpleText {
     title: string;
@@ -54,8 +72,6 @@ function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V):
     t.subscribe(v => localStorage.setItem(key, JSON.stringify(v)));
     return t;
 }
-
-export const CARD_LOCAL_STORAGE_KEY = 'CARDS';
 
 export interface TwitterTrend {
     name: string,
@@ -139,6 +155,7 @@ export class Manager {
     cardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
     allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
+    trieWrapper = new TrieWrapper(trie([]));
 
     newCardRequest$: Subject<ICard> = new Subject();
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
@@ -190,11 +207,11 @@ export class Manager {
 
     nextQuizItem$ = new ReplaySubject<ICard | undefined>(1);
 
-
-
     allTrends$ = new ReplaySubject<ITrendLocation[]>(1);
     tweetTrendMap$ = new ReplaySubject<Dictionary<ITweet>>();
     selectedTrend$ = new ReplaySubject<ITrendLocation | undefined>();
+
+
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -448,10 +465,14 @@ export class Manager {
             this.cardMessages$.next(`New current cards ${v.length}`)
         })
 
-        this.addCards$.pipe(buffer(debouncedAddCards$), map(flatten), scan((acc: Dictionary<ICard[]>, newCards: ICard[]) => {
+        this.addCards$.pipe(
+            buffer(debouncedAddCards$),
+            map(flatten),
+            scan((acc: Dictionary<ICard[]>, newCards) => {
             const o = {...acc};
             newCards.forEach(newICard => {
                 Manager.mergeCardIntoCardDict(newICard, o);
+                this.trieWrapper.addWords(newICard.learningLanguage);
             });
             return o;
         }, {})).subscribe(this.cardMap$);
@@ -684,9 +705,14 @@ export interface iCountRowEmitted {
     row: WordCountTableRow
 }
 
-export interface HasId {
-
+function ProcessDocumentForFlashcards(d: XMLDocument) {
+    // Get the elements with text
+    const elementsWithText = [];
+    // Actually this problem might not actually be solvable?
+    // One section of text will map to multiple flashcards
+    // Can html marks overlap?
 }
+
 
 /*
 export class IndexDBManager {

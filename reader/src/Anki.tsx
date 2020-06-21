@@ -3,15 +3,15 @@ import {Dictionary, flattenDeep, groupBy, uniq} from 'lodash';
 // @ts-ignore
 import JSZip from 'jszip';
 import {SqlJs} from "sql.js/module";
-import {Card, isChineseCharacter} from "./lib/worker-safe/Card";
-import {Collection} from "./lib/worker-safe/Collection";
-import {deck} from "./lib/worker-safe/tables/deck";
-import {note} from "./lib/worker-safe/tables/note";
-import {card} from "./lib/worker-safe/tables/card";
-import {col} from "./lib/worker-safe/tables/col";
-import {Deck} from "./lib/worker-safe/Deck";
+import {Card, isChineseCharacter} from "./lib/serializeable/worker-safe/Card";
+import {Collection} from "./lib/serializeable/worker-safe/Collection";
+import {deck} from "./lib/serializeable/worker-safe/tables/deck";
+import {note} from "./lib/serializeable/worker-safe/tables/note";
+import {card} from "./lib/serializeable/worker-safe/tables/card";
+import {col} from "./lib/serializeable/worker-safe/tables/col";
+import {Deck} from "./lib/serializeable/worker-safe/Deck";
 import {Subject} from "rxjs";
-import {ICard} from "./lib/worker-safe/icard";
+import {ICard} from "./lib/serializeable/worker-safe/icard";
 
 export interface Model {
     deckId: string;
