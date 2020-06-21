@@ -243,7 +243,6 @@ export class RenderingBook {
 
 }
 
-
 function waitFor(f: () => any, n: number) {
     return new Promise(resolve => {
         const interval = setInterval(() => {
