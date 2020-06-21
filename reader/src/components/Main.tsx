@@ -9,7 +9,8 @@ import {BookContainer} from "./BookContainer";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
 import {Manager, NavigationPages} from "../lib/Manager";
-
+import {Fab} from "@material-ui/core";
+import AddIcon from '@material-ui/icons/Add';
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -59,6 +60,9 @@ function ReadingPage({m}: { m: Manager }) {
     return <div style={{display: 'grid', gridTemplateColumns: '50% 50%'}}>
         <LeftBar m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
+            <Fab style={{position: 'absolute'}} color="secondary" aria-label="add">
+                <AddIcon />
+            </Fab>
             {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
         </div>
     </div>

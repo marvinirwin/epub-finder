@@ -37,9 +37,7 @@ export interface ImageResult {
 }
 
 export interface ImageSearchResponse {
-    translation: {
-        value: ImageResult[]
-    }
+    images: ImageResult[]
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -117,7 +115,7 @@ export function ImageSelectPopup({m}: { m: Manager }) {
     const debounceSearch = debounce((term: string) => {
         getImages(term).then((response) => {
             const results: ImageSearchResponse = response.data;
-            setSrces(results.translation.value);
+            setSrces(results.images);
         })
     }, 1000);
     useEffect(() => {

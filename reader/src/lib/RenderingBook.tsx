@@ -68,6 +68,7 @@ export class RenderingBook {
                 to: 'en',
                 text: r
             }).then(r => {
+                debugger;
                 this.translationText$.next(r.data.translation);
             })
         })

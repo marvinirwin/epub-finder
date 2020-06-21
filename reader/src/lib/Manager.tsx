@@ -103,6 +103,8 @@ interface ITrendLocation {
 
 async function getAllLocations(): Promise<ITrendLocation[]> {
     const result = await axios.post('/trend-locations')
+    const d: ITrendLocation[] = result.data;
+    const filtered = d.filter(r => r.country === 'Singapore')
     debugger;
     return result.data;
 }
@@ -112,8 +114,10 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
     debugger;
     return result.data;
 }
+/*
 getAllLocations()
-getAllTrendsForLocation(1);
+getAllTrendsForLocation(23424948);
+*/
 
 export class Manager {
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
