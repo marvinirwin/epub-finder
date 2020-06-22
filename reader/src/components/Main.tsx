@@ -1,16 +1,13 @@
 import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../UseObs";
-import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
-import React, {Fragment} from "react";
-import {Dictionary} from "lodash";
-import LeftBar from "./LeftBar";
+import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {BookContainer} from "./BookContainer";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
 import {Manager, NavigationPages} from "../lib/Manager";
-import {Fab} from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import {ReadingPage} from "./Pages/ReadingPage";
+import {TrendsPage} from "./Pages/TrendsPage";
+import {QuizPage} from "./Pages/QuizPage";
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -33,40 +30,6 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1
     }
 }));
-
-function QuizPage({m}: { m: Manager }) {
-    const nextItem = useObs(m.nextQuizItem$);
-    return <div >
-        TODO IMPLEMENT
-    </div>
-}
-
-function TrendsPage({m}: { m: Manager }) {
-    const trends = useObs(m.allTrends$);
-    // Put all the trends in a select?
-    // One half will be trends the other half will be tweets from that trend
-    return <div style={{display: 'grid', gridTemplateColumns: '50% 50%'}}>
-        <div>
-
-        </div>
-        <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
-
-        </div>
-    </div>
-}
-
-function ReadingPage({m}: { m: Manager }) {
-    const books = useObs<Dictionary<RenderingBook>>(m.bookDict$);
-    return <div style={{display: 'grid', gridTemplateColumns: '50% 50%'}}>
-        <LeftBar m={m}/>
-        <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
-            <Fab style={{position: 'absolute'}} color="secondary" aria-label="add">
-                <AddIcon />
-            </Fab>
-            {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
-        </div>
-    </div>
-}
 
 function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) {
     switch (item) {

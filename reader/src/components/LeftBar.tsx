@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
@@ -10,9 +9,8 @@ import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
-import {FlashcardPopup} from "./FlashcardPopup";
 import QuickDIalogContainer from "./QuizPopup";
-import TableContainer from "@material-ui/core/TableContainer";
+import {ExpansionPanelNoMargin} from "./ExpansionPanelNoMargin";
 
 const useStyles = makeStyles((theme) => ({
     leftBarRoot: {
@@ -68,7 +66,7 @@ export default function LeftBar({m}: {m: Manager}) {
     return (
         <div className={classes.leftBarRoot}>
             <QuickDIalogContainer m={m}/>
-            <ExpansionPanel defaultExpanded>
+            <ExpansionPanelNoMargin defaultExpanded>
                 <ExpansionPanelSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1c-content"
@@ -85,7 +83,7 @@ export default function LeftBar({m}: {m: Manager}) {
                     {editingCard ? (<EditingCardComponent card={editingCard}/>) : (<div>No card found</div>)}
                 </ExpansionPanelDetails>
                 <Divider />
-            </ExpansionPanel>
+            </ExpansionPanelNoMargin>
             <WordCountTable m={m}/>
         </div>
     );

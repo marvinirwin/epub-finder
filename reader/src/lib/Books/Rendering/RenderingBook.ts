@@ -12,6 +12,7 @@ import {BookInstance} from "../BookInstance";
 import {AnnotatedElement} from "./AnnotatedElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 
+
 export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[]>, acc: Dictionary<IAnnotatedCharacter[]>) {
     Object.entries(cDict).forEach(([word, annotatedCharacters]) => {
         if (acc[word]) {
@@ -21,6 +22,7 @@ export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[
         }
     })
 }
+
 
 export class RenderingBook {
     bookInstance$: Subject<BookInstance> = new Subject<BookInstance>()
@@ -44,6 +46,7 @@ mark:hover {
   cursor: pointer;
 }
 mark {
+    transition-duration: 0.5s;
     background-color: transparent;
 }
 .highlighted {

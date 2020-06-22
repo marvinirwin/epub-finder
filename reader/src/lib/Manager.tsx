@@ -40,7 +40,6 @@ export enum NavigationPages {
 }
 
 interface ITweet {
-
 }
 
 interface ITrend {
@@ -221,7 +220,11 @@ export class Manager {
         this.oLoad();
 
         this.oQuiz();
+        this.oAnnotations();
+    }
 
+    private oAnnotations() {
+        let previousHighlightedElements: JQuery<HTMLElement>[] | undefined;
         this.bookDict$.pipe(
             switchMap(d =>
                 combineLatest(Object.values(d).map(d => d.annotatedCharMap$))
@@ -234,15 +237,20 @@ export class Manager {
                 return map;
             })
         ).subscribe(this.wordElementMap$);
-        this.highlightedWord$.pipe(debounceTime(0),
+        this.highlightedWord$.pipe(debounceTime(10),
             withLatestFrom(this.wordElementMap$))
             .subscribe(([word, dict]) => {
-                const allEls = flatten(Object.values(dict).map(elList => elList.map(e => e.el)));
-                allEls.forEach(e => e.removeClass('highlighted'));
-                if (word) {
-                    const wordsToHighlight = dict[word]?.forEach(annotatedEl => annotatedEl.el.addClass('highlighted'));
+                    if (previousHighlightedElements) {
+                        previousHighlightedElements.map(e => e.removeClass('highlighted'))
+                    }
+                    if (word) {
+                        previousHighlightedElements = dict[word]?.map(annotatedEl => {
+                            annotatedEl.el.addClass('highlighted')
+                            return annotatedEl.el;
+                        });
+                    }
                 }
-            })
+            );
     }
 
     private oQuiz() {
@@ -495,7 +503,9 @@ export class Manager {
         })
     }
 
-    private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
+    private static
+
+    mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
         let presentCards = o[newICard.learningLanguage];
         if (presentCards) {
