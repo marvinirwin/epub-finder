@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {useObs} from "../../UseObs";
-import {EditingCard} from "../../lib/DisplayClasses/EditingCard";
+import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
 import CircularIntegration, {SpinnerState} from '../SpinningCircle'

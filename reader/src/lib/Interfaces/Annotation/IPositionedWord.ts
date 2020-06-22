@@ -1,4 +1,4 @@
-export interface IWordPos {
+export interface IPositionedWord {
     word: string;
     position: number;
 }

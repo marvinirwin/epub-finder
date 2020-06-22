@@ -1,23 +1,26 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, maxBy, uniq} from "lodash";
-import {debounceTime, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {Dictionary, uniq} from "lodash";
+import {debounceTime, map, switchMap, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
 import $ from "jquery";
-import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
-import {render} from "react-dom";
-import {FlashcardPopup} from "../../../components/FlashcardPopup";
-import {queryImages} from "../../../AppSingleton";
 // @ts-ignore
-import {sify} from 'chinese-conv';
 import {ICard} from "../../Interfaces/ICard";
 import axios from 'axios';
 import {LocalStorageManager} from "../../Storage/StorageManagers";
-import Trie from "trie-prefix-tree";
-import {IBookInstance} from "../../Interfaces/Book/IBookInstance";
 import {aSpineItem} from "../../Interfaces/Book/aSpineItem";
 import {BookInstance} from "../BookInstance";
-import {ITrie} from "../../Interfaces/Trie";
 import {AnnotatedElement} from "./AnnotatedElement";
+import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
+
+export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[]>, acc: Dictionary<IAnnotatedCharacter[]>) {
+    Object.entries(cDict).forEach(([word, annotatedCharacters]) => {
+        if (acc[word]) {
+            acc[word].push(...annotatedCharacters);
+        } else {
+            acc[word] = annotatedCharacters;
+        }
+    })
+}
 
 export class RenderingBook {
     bookInstance$: Subject<BookInstance> = new Subject<BookInstance>()
@@ -32,12 +35,21 @@ export class RenderingBook {
     renderedContentBody$: Subject<JQuery<HTMLElement>> = new Subject<JQuery<HTMLElement>>();
     leaves$: Subject<AnnotatedElement[]> = new Subject<AnnotatedElement[]>();
 
+    annotatedCharMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
+
     private static appendStyleToBody(body: JQuery<HTMLElement>) {
         let style = $(`
                     <style>
-.flashcard:hover {
+mark:hover {
   cursor: pointer;
 }
+mark {
+    background-color: transparent;
+}
+.highlighted {
+    background-color: grey;
+}
+
 </style>
                     `);
         style.appendTo(body);
@@ -117,10 +129,18 @@ export class RenderingBook {
             this.leaves$,
             this.m.trieWrapper.changeSignal$.pipe(debounceTime(500))
         ]).subscribe(async ([leaves]) => {
-            leaves.forEach(l => l.annotate(
+
+            const chars: Dictionary<IAnnotatedCharacter[]>[] = leaves.map(l => l.annotate(
                 this.m.trieWrapper.t,
                 uniq(this.m.trieWrapper.t.getWords().map(w => w.length))
-            ))
+            ));
+            const reducedChars = chars.reduce((
+                acc: Dictionary<IAnnotatedCharacter[]>,
+                cDict: Dictionary<IAnnotatedCharacter[]>) => {
+                mergeAnnotationDictionary(cDict, acc);
+                return acc;
+            }, {})
+            this.annotatedCharMap$.next(reducedChars);
         })
     }
 
@@ -138,18 +158,18 @@ export class RenderingBook {
                     this.renderMessages$.next("Book present, rendering")
                     const iframe = await this.resolveIFrame(renderRef);
                     this.renderMessages$.next("Waiting for iframe 250ms")
-                    await sleep(1000);
+                    await waitFor(() => {
+                        let contents = iframe.contents();
+                        return contents.find('body');
+                    }, 250)
                     // @ts-ignore
                     const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
                     const target = spineItem?.href;
                     await rendition.display(target || '');
                     await this.applySelectListener(iframe);
-                    await waitFor(() => {
-                        let contents = iframe.contents();
-                        let htmlBodyElements = contents.find('body');
-                        return htmlBodyElements.text().trim();
-                    }, 1000)
-                    this.renderedContentBody$.next(iframe.contents().find('body'))
+                    let body = iframe.contents().find('body');
+                    RenderingBook.appendStyleToBody(body)
+                    this.renderedContentBody$.next(body)
                     // @ts-ignore
                 } else {
                     this.renderMessages$.next("No book or spine item")
@@ -216,7 +236,7 @@ export class RenderingBook {
                         if (t.target.textContent) {
                             this.m.requestEditWord$.next(t.target.textContent)
                         }
-                        // this.m.cardInEditor$.next(DisplayClasses.fromICard(map[t.target.textContent || ''][0]));
+                        // this.m.cardInEditor$.next(ReactiveClasses.fromICard(map[t.target.textContent || ''][0]));
                     })
                 }
         */

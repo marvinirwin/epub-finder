@@ -1,6 +1,6 @@
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import {EditingCard} from "../lib/DisplayClasses/EditingCard";
+import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {useObs} from "../UseObs";
 import React from 'react';
 

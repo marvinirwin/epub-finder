@@ -1,18 +1,6 @@
-import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject, of} from "rxjs";
-import {Dictionary, flatten, groupBy, sortBy, orderBy} from "lodash";
-import {
-    buffer,
-    debounceTime,
-    filter,
-    last,
-    map,
-    scan,
-    startWith,
-    switchMap,
-    take,
-    withLatestFrom
-} from "rxjs/operators";
-// @ts-ignore
+import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {Dictionary, flatten, groupBy, orderBy, sortBy} from "lodash";
+import {buffer, debounceTime, filter, map, scan, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AnkiThread from 'Worker-loader?name=dist/[name].js!./Worker/AnkiThread';
@@ -25,72 +13,30 @@ import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
-import {RenderingBook} from "./Books/Rendering/RenderingBook";
+import {mergeAnnotationDictionary, RenderingBook} from "./Books/Rendering/RenderingBook";
 import React from "react";
 import $ from "jquery";
 import {getIsMeFunction, ICard} from "./Interfaces/ICard";
 import {Tweet} from "./Books/Tweet";
 import {SimpleText} from "./Books/SimpleText";
-import {WordCountTableRow} from "./DisplayClasses/WordCountTableRow";
+import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
 import {BookInstance} from "./Books/BookInstance";
-import {EditingCard} from "./DisplayClasses/EditingCard";
-import Dexie from "dexie";
+import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager, LocalStorageManager} from "./Storage/StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 import axios from 'axios';
 import trie from 'trie-prefix-tree';
-import {ITrie} from "./Interfaces/Trie";
-
-class TrieWrapper {
-    public changeSignal$: Subject<void>;
-    constructor(public t: ITrie) {
-        this.changeSignal$ = new ReplaySubject<void>(1);
-        this.changeSignal$.next();
-    }
-    addWords(...words: string[]) {
-        words.forEach(w => this.t.addWord(w))
-        if(words.length) this.changeSignal$.next()
-
-    }
-    removeWords(...words: string[]) {
-        words.forEach(w => this.t.removeWord(w))
-        if(words.length) this.changeSignal$.next()
-    }
-}
-
-export interface ISimpleText {
-    title: string;
-    text: string;
-}
+import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
+import {TrieWrapper} from "./TrieWrapper";
+import {LocalStored} from "./Storage/LocalStored";
+import {SelectImageRequest} from "./Interfaces/IImageRequest";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
-
-function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultVal: V): T {
-    let text = localStorage.getItem(key);
-    if (text) {
-        t.next(JSON.parse(text))
-    }
-    t.subscribe(v => localStorage.setItem(key, JSON.stringify(v)));
-    return t;
-}
-
-export interface TwitterTrend {
-    name: string,
-    url: string,
-    promoted_content: null,
-    query: string,
-    tweet_volume: number | null
-}
 
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
     QUIZ_PAGE = "QUIZ_PAGE",
     TRENDS_PAGE = "TRENDS_PAGE"
-}
-
-export interface SelectImageRequest {
-    term: string;
-    cb: (s: string) => void
 }
 
 interface ITweet {
@@ -131,6 +77,7 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
     debugger;
     return result.data;
 }
+
 /*
 getAllLocations()
 getAllTrendsForLocation(23424948);
@@ -212,7 +159,8 @@ export class Manager {
     tweetTrendMap$ = new ReplaySubject<Dictionary<ITweet>>();
     selectedTrend$ = new ReplaySubject<ITrendLocation | undefined>();
 
-
+    highlightedWord$ = new ReplaySubject<string | undefined>(1);
+    wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -221,13 +169,14 @@ export class Manager {
         this.oCards();
         this.oBook();
 
-/*
-        axios.get('/twitter-trends').then(response => {
-            debugger;
-            const data: ITrendLocation[] = response.data;
-            this.allTrends$.next(data);
-        })
-*/
+
+        /*
+                axios.get('/twitter-trends').then(response => {
+                    debugger;
+                    const data: ITrendLocation[] = response.data;
+                    this.allTrends$.next(data);
+                })
+        */
 
         this.sortedWordRows$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
@@ -241,11 +190,11 @@ export class Manager {
                     )
             )).pipe(debounceTime(100)))
         ).pipe(map(sortedRows => {
-            let oneMinute = 60 * 1000;
-            const oneMinuteAgo = (new Date()).getTime() - oneMinute;
-            // r will be in descending order, so just find the one which has no record, or a record before 1 minute ago
-            return sortedRows.find(({lastRecord, row}) => !lastRecord || lastRecord.timestamp.getTime() < oneMinuteAgo)?.lastRecord?.word
-        }),
+                let oneMinute = 60 * 1000;
+                const oneMinuteAgo = (new Date()).getTime() - oneMinute;
+                // r will be in descending order, so just find the one which has no record, or a record before 1 minute ago
+                return sortedRows.find(({lastRecord, row}) => !lastRecord || lastRecord.timestamp.getTime() < oneMinuteAgo)?.lastRecord?.word
+            }),
             withLatestFrom(this.cardMap$),
             map(([char, cardMap]) => {
                 if (!char) return undefined;
@@ -272,6 +221,28 @@ export class Manager {
         this.oLoad();
 
         this.oQuiz();
+
+        this.bookDict$.pipe(
+            switchMap(d =>
+                combineLatest(Object.values(d).map(d => d.annotatedCharMap$))
+            ),
+            map((elCharMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
+                const map: Dictionary<IAnnotatedCharacter[]> = {};
+                elCharMaps.forEach(c => {
+                    mergeAnnotationDictionary(c, map)
+                })
+                return map;
+            })
+        ).subscribe(this.wordElementMap$);
+        this.highlightedWord$.pipe(debounceTime(0),
+            withLatestFrom(this.wordElementMap$))
+            .subscribe(([word, dict]) => {
+                const allEls = flatten(Object.values(dict).map(elList => elList.map(e => e.el)));
+                allEls.forEach(e => e.removeClass('highlighted'));
+                if (word) {
+                    const wordsToHighlight = dict[word]?.forEach(annotatedEl => annotatedEl.el.addClass('highlighted'));
+                }
+            })
     }
 
     private oQuiz() {
@@ -470,13 +441,13 @@ export class Manager {
             buffer(debouncedAddCards$),
             map(flatten),
             scan((acc: Dictionary<ICard[]>, newCards) => {
-            const o = {...acc};
-            newCards.forEach(newICard => {
-                Manager.mergeCardIntoCardDict(newICard, o);
-                this.trieWrapper.addWords(newICard.learningLanguage);
-            });
-            return o;
-        }, {})).subscribe(this.cardMap$);
+                const o = {...acc};
+                newCards.forEach(newICard => {
+                    Manager.mergeCardIntoCardDict(newICard, o);
+                    this.trieWrapper.addWords(newICard.learningLanguage);
+                });
+                return o;
+            }, {})).subscribe(this.cardMap$);
         this.cardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
 
         this.allCustomCards$.next({})

@@ -1,9 +1,10 @@
 import {ITrie} from "../../Interfaces/Trie";
-import {ITryChar} from "../../Interfaces/Annotation/ITryChar";
+import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
-import {maxBy} from "lodash";
+import {maxBy, Dictionary} from "lodash";
 import $ from "jquery";
 import {RenderingBook} from "./RenderingBook";
+import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 
 export class AnnotatedElement {
     private $originalContent: JQuery<HTMLElement>;
@@ -13,15 +14,17 @@ export class AnnotatedElement {
         public $leafParent: JQuery<HTMLElement>
     ) {
         this.$originalContent = $leafParent.children();
+
     }
 
-    annotate(t: ITrie, uniqueLengths: number[]) {
+    annotate(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         if (!uniqueLengths.length) {
-            return;
+            return {};
         }
         const text = this.$originalContent.text();
         this.$leafParent.empty();
-        const characters: ITryChar[] = Array(text.length);
+        const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
+        const characters: IAnnotatedCharacter[] = Array(text.length);
         let wordsInProgress: IWordInProgress[] = [];
         // So now we have a trie lets compate the index of things in a string
         for (let i = 0; i < text.length; i++) {
@@ -36,36 +39,56 @@ export class AnnotatedElement {
                 }
                 return acc;
             }, []);
-            if (wordsWhichStartHere.length) {
-                debugger;console.log();
-            }
             wordsInProgress.push(...wordsWhichStartHere.map(word => ({word, lengthRemaining: word.length})))
-            let words = wordsInProgress.map(({word, lengthRemaining}) => ({
-                word,
-                position: word.length - lengthRemaining
-            }));
-            let maxWord = maxBy(words, w => w.word.length);
+            let words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
+                let newWord: IPositionedWord = {
+                    word,
+                    position: word.length - lengthRemaining
+                };
+                return newWord;
+            });
+            let maxWord:IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let el = $(`<mark >${text[i]}</mark>`);
             el.appendTo(this.$leafParent)
-            let iTryChar = {
+            let annotationElement: IAnnotatedCharacter = {
                 char: text[i],
                 words: words,
-                word: maxWord,
                 el: el
             };
-            iTryChar.el.on("click", (ev) => {
-                if (maxWord) {
-                    this.$leafParent.children('.highlighted').removeClass('highlighted')
-                    const elementsToHighlight = [];
-                    const startIndex = i - maxWord.position;
-                    for (let i = startIndex; i < startIndex + maxWord.word.length; i++) {
-                        elementsToHighlight.push(characters[i].el);
-                    }
-                    elementsToHighlight.forEach(e => e.addClass('highlighted'))
-                    this.r.m.requestEditWord$.next(maxWord.word);
+            annotationElement.words.forEach(w => {
+                if (elsMappedToWords[w.word]) {
+                    elsMappedToWords[w.word].push(annotationElement);
+                } else {
+                    elsMappedToWords[w.word] = [annotationElement]
                 }
             })
-            characters[i] = iTryChar;
+
+            if (maxWord) {
+                this.applyMouseEvents(annotationElement, maxWord, i);
+            }
         }
+        return elsMappedToWords;
+    }
+
+    private applyMouseEvents(annotationElement: IAnnotatedCharacter, maxWord: IPositionedWord, i: number) {
+        annotationElement.el.on("mouseenter", (ev) => {
+            this.r.m.highlightedWord$.next(maxWord.word);
+        });
+        annotationElement.el.on('mouseleave', (ev) => {
+            this.r.m.highlightedWord$.next();
+        })
+        annotationElement.el.on("click", (ev) => {
+            this.$leafParent.children('.highlighted').removeClass('highlighted')
+/*
+            const elementsToHighlight = [];
+            const startIndex = i - maxWord.position;
+            for (let i = startIndex; i < startIndex + maxWord.word.length; i++) {
+                elementsToHighlight.push(characters[i].el);
+            }
+            elementsToHighlight.forEach(e => e.addClass('highlighted'))
+*/
+            this.r.m.requestEditWord$.next(maxWord.word);
+        })
+        return i;
     }
 }

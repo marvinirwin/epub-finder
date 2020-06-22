@@ -45,7 +45,7 @@ export class EditingCard {
                 this.characters$,
                 secondGroup$
             ]
-            // This debounce Time and then skip means skip the first emit when we create the DisplayClasses
+            // This debounce Time and then skip means skip the first emit when we create the ReactiveClasses
         ).pipe(skip(1));
 
         let debouncedSaveData = saveData$.pipe(debounceTime(1000));

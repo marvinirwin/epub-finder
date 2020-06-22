@@ -3,7 +3,7 @@ import {EditingImage} from "./EditingImage";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import {makeStyles} from "@material-ui/core/styles";
-import {EditingCard} from "../lib/DisplayClasses/EditingCard";
+import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {Subject} from "rxjs";
 import {useObs} from "../UseObs";
 import React from "react";

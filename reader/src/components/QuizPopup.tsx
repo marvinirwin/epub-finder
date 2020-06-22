@@ -22,7 +22,7 @@ import {
     ListSubheader, TextField
 } from "@material-ui/core";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
-import {EditingCard} from "../lib/DisplayClasses/EditingCard";
+import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import CardImageList from "./CardImageList";
 import {EditingImage} from "./EditingImage";
 import GridListTileBar from "@material-ui/core/GridListTileBar";

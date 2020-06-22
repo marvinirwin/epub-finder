@@ -5,7 +5,7 @@ import DebugMessage from "./Debug-Message";
 import * as sstk from 'shutterstock-api';
 import {shutterResult} from "./App";
 import {MyAppDatabase} from "./lib/Storage/AppDB";
-import {EditingCard} from "./lib/DisplayClasses/EditingCard";
+import {EditingCard} from "./lib/ReactiveClasses/EditingCard";
 import {IndexDBManager, LocalStorageManager} from "./lib/Storage/StorageManagers";
 import {ICard} from "./lib/Interfaces/ICard";
 

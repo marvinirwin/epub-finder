@@ -1,4 +1,4 @@
-import {EditingCard} from "../lib/DisplayClasses/EditingCard";
+import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {ClassNameMap} from "@material-ui/core/styles/withStyles";
 import {debounce} from "lodash";
 import React, {Fragment, useState} from "react";

@@ -22,7 +22,7 @@ export class SimpleText extends BookInstance {
             renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): IRendition {
                 return {
                     display: async spineItem => {
-                        let htmlElements = $(`<p style="white-space: pre; font-size: 200%;">${text}</p>`);
+                        let htmlElements = $(`<p style="max-width: 100%; font-size: 200%;">${text}</p>`);
                         let target: JQuery<HTMLElement> = e.contents().find('body');
                         htmlElements.appendTo(target);
                     }

@@ -52,6 +52,7 @@ export interface shutterResult {
 window.$ = $;
 
 
+/*
 function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) {
     const sources = useObs<string[] | undefined>(editingCard.imageSources)
     return <form className={'editing-card'}>
@@ -67,6 +68,7 @@ function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) 
         </GridList>
     </form>
 }
+*/
 
 
 function App() {

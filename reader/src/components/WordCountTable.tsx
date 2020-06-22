@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
-import {WordCountTableRow} from "../lib/DisplayClasses/WordCountTableRow";
+import {WordCountTableRow} from "../lib/ReactiveClasses/WordCountTableRow";
 import {ShowCharacter} from "./QuizPopup";
 
 const useStyles = makeStyles({
