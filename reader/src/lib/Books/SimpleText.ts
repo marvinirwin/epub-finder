@@ -15,8 +15,9 @@ export class SimpleText extends BookInstance {
 
     constructor(name: string, public text: string) {
         super(name);
-        // @ts-ignore
+/*
         text = text.split('').map(sify).join('')
+*/
         this.rawText$.next(text);
         this.book = {
             renderTo(e: JQuery<HTMLIFrameElement>, options: { [p: string]: any }): IRendition {

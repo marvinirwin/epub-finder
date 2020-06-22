@@ -7,13 +7,13 @@ import {RenderingBook} from "./RenderingBook";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 
 export class AnnotatedElement {
-    private $originalContent: JQuery<HTMLElement>;
+    private $originalContent: string;
 
     constructor(
         public r: RenderingBook,
         public $leafParent: JQuery<HTMLElement>
     ) {
-        this.$originalContent = $leafParent.children();
+        this.$originalContent = $leafParent.text();
 
     }
 
@@ -21,10 +21,9 @@ export class AnnotatedElement {
         if (!uniqueLengths.length) {
             return {};
         }
-        const text = this.$originalContent.text();
+        const text = this.$originalContent;
         this.$leafParent.empty();
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
-        const characters: IAnnotatedCharacter[] = Array(text.length);
         let wordsInProgress: IWordInProgress[] = [];
         // So now we have a trie lets compate the index of things in a string
         for (let i = 0; i < text.length; i++) {

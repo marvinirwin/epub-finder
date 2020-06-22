@@ -160,11 +160,8 @@ mark {
                 if (bookInstance && bookInstance.book) {
                     this.renderMessages$.next("Book present, rendering")
                     const iframe = await this.resolveIFrame(renderRef);
-                    this.renderMessages$.next("Waiting for iframe 250ms")
-                    await waitFor(() => {
-                        let contents = iframe.contents();
-                        return contents.find('body');
-                    }, 250)
+                    this.renderMessages$.next("Waiting for iframe 500ms")
+                    await sleep(500);
                     // @ts-ignore
                     const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
                     const target = spineItem?.href;
@@ -172,6 +169,7 @@ mark {
                     await this.applySelectListener(iframe);
                     let body = iframe.contents().find('body');
                     RenderingBook.appendStyleToBody(body)
+                    await sleep(500);
                     this.renderedContentBody$.next(body)
                     // @ts-ignore
                 } else {

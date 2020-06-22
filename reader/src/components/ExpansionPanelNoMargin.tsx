@@ -40,5 +40,11 @@ export const ExpansionPanelNoMargin = withStyles({
             margin: '0',
         },
     },
-    expanded: {},
+    expanded: {
+        height: '100%' // Easy way to make it take up all available room when expanded
+    },
+    '& > div.MuiCollapse-container': {
+        height: '100%',
+        color: 'red'
+    }
 })(MuiExpansionPanel);

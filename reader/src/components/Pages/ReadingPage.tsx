@@ -14,9 +14,8 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1
     },
     bookList: {
-        maxHeight: '90vh',
-        minHeight: '90vh',
-        overflow: 'auto'
+        display: 'flex',
+        flexFlow: 'column nowrap'
     }
 }));
 
@@ -28,7 +27,13 @@ export function ReadingPage({m}: { m: Manager }) {
         <Grid item xs={6}>
             <LeftBar m={m}/>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} className={classes.bookList}>
+            <Fab onClick={() => m.simpleTextDialogOpen$.next(true)}
+                aria-label="save"
+                style={{position: 'absolute', right: 0}}
+            >
+                <AddIcon/>
+            </Fab>
             {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
         </Grid>
     </Grid>

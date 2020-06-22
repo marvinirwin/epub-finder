@@ -1,7 +1,7 @@
-export interface TwitterTrend {
+export interface ITrend {
     name: string,
     url: string,
-    promoted_content: null,
+    promoted_content: string,
     query: string,
-    tweet_volume: number | null
+    tweet_volume: number
 }

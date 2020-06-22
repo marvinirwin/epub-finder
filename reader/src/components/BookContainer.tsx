@@ -9,17 +9,45 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Divider from "@material-ui/core/Divider";
 import {ExpansionPanelNoMargin} from "./ExpansionPanelNoMargin";
+import {IconButton, withStyles} from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+    collapse: {
+        display: 'flex',
+        flexFlow: 'row nowrap',
+        height: '100%',
+        '& > *': {
+            flexGrow: 1
+        }
+    },
+}));
+
+
+const StyledCollapse = withStyles({
+    container: {
+        height: '100%'
+    },
+    wrapper: {
+        height: '100%'
+    },
+    wrapperInner: {
+        height: '100%'
+    }
+})(Collapse);
+
+
+const StyledExpansionPanelDetails = withStyles({
+    root: {
+        height: '100%'
+    }
+})(ExpansionPanelDetails);
 
 export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
+    const classes = useStyles();
     const ref = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = React.useState(true);
-
-    /*
-        const handleExpandClick = () => {
-            setExpanded(!expanded);
-        };
-    */
     useEffect(() => {
         ref && ref.current && rb.renderRef$.next(ref.current);
     }, [ref])
@@ -27,21 +55,25 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
     const translationText = useObs(rb.translationText$)
 
     return (
-        <ExpansionPanelNoMargin defaultExpanded>
+        <ExpansionPanelNoMargin defaultExpanded className={"book-expansion-panel"}>
             <ExpansionPanelSummary
                 expandIcon={<ExpandMoreIcon/>}
                 aria-controls="panel1c-content"
                 id="panel1c-header"
             >
-                <Typography>{rb.name}</Typography>
+                <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', width: '100%', }}>
+                    <Typography variant={'h6'}>{rb.name}</Typography>
+                    <IconButton onClick={() => m.requestBookRemove$.next(rb)}>
+                        <DeleteIcon/>
+                    </IconButton>
+                </div>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <div id={rb.getId()} style={{width: '100%', height: '50%'}} ref={ref}/>
+            <StyledExpansionPanelDetails>
+                <StyledCollapse in={expanded} timeout="auto" unmountOnExit>
+                    <div id={rb.getId()} ref={ref}/>
                     <p style={{whiteSpace: 'pre'}}>{translationText}</p>
-                </Collapse>
-            </ExpansionPanelDetails>
-            <Divider/>
+                </StyledCollapse>
+            </StyledExpansionPanelDetails>
         </ExpansionPanelNoMargin>
     );
 }

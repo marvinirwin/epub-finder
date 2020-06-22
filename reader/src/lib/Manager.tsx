@@ -30,6 +30,9 @@ import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {TrieWrapper} from "./TrieWrapper";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
+import {ITweet} from "./Interfaces/ITweet";
+import {ITrend} from "./Interfaces/ITwitterTrend";
+import {ITrendLocation} from "./Interfaces/ITrendLocation";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -37,30 +40,6 @@ export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
     QUIZ_PAGE = "QUIZ_PAGE",
     TRENDS_PAGE = "TRENDS_PAGE"
-}
-
-interface ITweet {
-}
-
-interface ITrend {
-    name: string,
-    url: string,
-    promoted_content: string,
-    query: string,
-    tweet_volume: number
-}
-
-interface ITrendLocation {
-    country: string,
-    countryCode: string,
-    name: string,
-    parentid: number,
-    placeType: {
-        code: number,
-        name: string
-    },
-    url: string,
-    woeid: number
 }
 
 async function getAllLocations(): Promise<ITrendLocation[]> {
@@ -83,6 +62,9 @@ getAllTrendsForLocation(23424948);
 */
 
 export class Manager {
+    displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
+    messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
+
     cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     bookMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     renderMessages$: ReplaySubject<string> = new ReplaySubject<string>()
@@ -110,9 +92,11 @@ export class Manager {
     currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
+    simpleTextDialogOpen$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1)
     simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
     simpleTextTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
+    // These two aren't used currently
     twitterUrl$: ReplaySubject<string> = new ReplaySubject<string>(1);
     twitterTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
@@ -125,8 +109,6 @@ export class Manager {
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
-    displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
-    messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
     wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
@@ -208,7 +190,7 @@ export class Manager {
                 this.currentBook$.next(Object.values(bookDict)[0])
             }
             bookToRemove.removeSerialized();
-            this.bookDict$.next(bookDict);
+            this.bookDict$.next({...bookDict});
         });
 
         this.oStringDisplay();
@@ -308,8 +290,6 @@ export class Manager {
     }
 
     private oKeyDowns() {
-        this.displayVisible$.next(true);
-        this.messagesVisible$.next(true);
         this.stringDisplay$.next('');
 
         fromEvent(document, 'keydown').pipe(withLatestFrom(
@@ -600,13 +580,11 @@ export class Manager {
         }))
         this.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
             const group = groupBy(newRecognitionRows, v => v.word);
-            // These will always be present in the table records for now
-            // If I starting to cache loading this wont be true anymore
             Object.entries(group).forEach(([word, recognitionRows]) => {
                 let rowDictElement = rowDict[word];
                 if (!rowDictElement) {
-                    debugger;
-                    console.log();
+                    // TODO handle the case when recognition records are loaded for words which aren't in the dict
+                    return;
                 }
                 rowDictElement.addNewRecognitionRecords$.next(recognitionRows)
             })
