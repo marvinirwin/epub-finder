@@ -70,8 +70,10 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
             </ExpansionPanelSummary>
             <StyledExpansionPanelDetails>
                 <StyledCollapse in={expanded} timeout="auto" unmountOnExit>
-                    <div id={rb.getId()} ref={ref}/>
-                    <p style={{whiteSpace: 'pre'}}>{translationText}</p>
+                    <div style={{display: 'flex', flexFlow: 'column nowrap'}}>
+                        <div style={{flexGrow: 1}} id={rb.getId()} ref={ref}/>
+                        <p style={{flexGrow: 1}}>{translationText}</p>
+                    </div>
                 </StyledCollapse>
             </StyledExpansionPanelDetails>
         </ExpansionPanelNoMargin>
