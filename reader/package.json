@@ -72,5 +72,6 @@
     "@types/trie-prefix-tree": "^1.5.0",
     "@types/xmldom": "^0.1.29",
     "nodemon": "^2.0.4"
-  }
+  },
+  "homepage": "reader"
 }
