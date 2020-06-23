@@ -3,11 +3,29 @@ import fs from "fs";
 import {ImageSearchClient, ImageSearchModels} from "@azure/cognitiveservices-imagesearch";
 import {CognitiveServicesCredentials} from "@azure/ms-rest-azure-js";
 import Twitter from "twitter-lite";
+import {
+    AudioConfig,
+    SpeechConfig,
+    SpeechSynthesizer
+} from "microsoft-cognitiveservices-speech-sdk";
+import crypto from 'crypto';
+import {encode} from 'base64-arraybuffer';
 
 const projectId = "mandarin-trainer";
 
 
 const {Translate} = require("@google-cloud/translate").v2;
+
+const speechConfig = SpeechConfig.fromSubscription(process.env.AZURE_SPEECH_KEY1, process.env.AZURE_SPEECH_LOCATION);
+
+speechConfig.speechRecognitionLanguage = 'zh-CN'
+speechConfig.speechSynthesisLanguage = 'zh-CN'
+speechConfig.speechSynthesisVoiceName = ''
+
+interface ISpeechParams {
+    text: string;
+}
+
 
 const getTwitter = async () => {
     const twitterKey = process.env["TWITTER_API_KEY"];
@@ -57,33 +75,21 @@ interface ITranslationRequest {
     text: string;
 }
 
-const getTranslation = async (req: Request, res: Response, next: NextFunction) => {
-    const args = req.body as ITranslationRequest;
-    res.send(JSON.stringify({translation: await translateFuncF(args)}));
-
-};
-/*
-const getImageSearch = async (req: Request, res: Response, next: NextFunction) => {
-    const args = req.body as IImageSearchRequest;
-    const value = {translation: await imageSearchFunc(args)};
-    res.send(JSON.stringify(value));
-};
-*/
-
-
 function memoInFile(filename: string, f: (...a: any[]) => any) {
-    const memo: { [key: string]: any } = {};
+    let memoFilePath = `${filename}.json`;
+    const filedata = fs.existsSync(memoFilePath) && fs.readFileSync(memoFilePath).toString();
+    const memo: { [key: string]: any } = JSON.parse(filedata || '{}');
     return async function (...args: any[]) {
         const key = JSON.stringify(args);
         if (!memo[key]) {
             memo[key] = await f(...args);
-            await new Promise(resolve => fs.writeFile(`${filename}.json`, JSON.stringify(memo), resolve));
+            await new Promise(resolve => fs.writeFile(memoFilePath, JSON.stringify(memo), resolve));
         }
         return memo[key];
     };
 }
 
-export const translateFuncF = memoInFile("../TRANSLATIONS", async function (args: ITranslationRequest) {
+const translateFuncF = memoInFile("../TRANSLATIONS", async function (args: ITranslationRequest) {
     const [translation] = await translate.translate(args.text, args.to);
     return {translation};
 });
@@ -98,7 +104,7 @@ interface IImageSearchRequest {
     cb: (str: string) => void;
 }
 
-export const imageSearchFuncF = memoInFile("../IMAGE_SEARCHES", async function (args: IImageSearchRequest) {
+const imageSearchFuncF = memoInFile("../IMAGE_SEARCHES", async function (args: IImageSearchRequest) {
     return sendQuery(args.term);
 });
 export const imageSearchFunc = async (req: Request, res: Response) => {
@@ -122,9 +128,51 @@ interface ITrendRequest {
     id: number;
 }
 
-export const getTrendForLocationF = memoInFile("../TWITTER_TRENDS", async function (args: ITrendRequest) {
+const getTrendForLocationF = memoInFile("../TWITTER_TRENDS", async function (args: ITrendRequest) {
     return await (await twitterInstance).get("trends/place", {id: args.id});
 });
 export const getTrendForLocation = async (req: Request, res: Response) => {
     return res.send(JSON.stringify(await getTrendForLocationF(req.body)));
+};
+
+function loadAudioEndpoint(params: ISpeechParams): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        let hash = crypto.createHash('md5').update(JSON.stringify(params)).digest("hex")
+        let filename = `${hash}.wav`;
+        const audioConfig = AudioConfig.fromAudioFileOutput(filename);
+        const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
+
+
+        synthesizer.speakSsmlAsync(
+            `
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="string">
+<voice name="zh-CN-YunyangNeural">
+    <prosody rate="0.75">
+        ${params.text} 
+    </prosody>
+</voice>
+</speak>`,
+            async result => {
+                console.log(result);
+                synthesizer.close();
+                // Interact with the audio ArrayBuffer data
+                const bytes = await new Promise<Buffer>((resolve, reject) =>
+                    fs.readFile(filename, (err, data) => err ? reject(err) : resolve(data))
+                )
+                resolve(encode(bytes))
+            },
+            error => {
+                console.log(error);
+                synthesizer.close();
+                reject(error)
+            });
+    }
+)
+}
+
+const getSpeechSoundf = memoInFile("../SPEECH", async function (args: ISpeechParams) {
+    return await loadAudioEndpoint(args)
+});
+export const getSpeechSound = async (req: Request, res: Response) => {
+    return res.send(await getSpeechSoundf(req.body));
 };

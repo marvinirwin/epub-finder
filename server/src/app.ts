@@ -107,6 +107,7 @@ app.post("/translate", translateController.translateFunc);
 app.post("/image-search", translateController.imageSearchFunc);
 app.post("/trend-locations", translateController.getLocations);
 app.post("/trends", translateController.getTrendForLocation);
+app.post("/get-speech", translateController.getSpeechSound);
 
 /**
  * API examples routes.

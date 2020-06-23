@@ -5,5 +5,7 @@ import { Request, Response } from "express";
  * Home page.
  */
 export const index = (req: Request, res: Response) => {
-    express.static(root, [options])
+    res.render("home", {
+        title: "Home"
+    });
 };

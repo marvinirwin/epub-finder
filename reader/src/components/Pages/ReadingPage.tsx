@@ -30,7 +30,7 @@ export function ReadingPage({m}: { m: Manager }) {
         <Grid item xs={6} className={classes.bookList}>
             <Fab onClick={() => m.simpleTextDialogOpen$.next(true)}
                 aria-label="save"
-                style={{position: 'absolute', right: 0}}
+                style={{position: 'absolute', right: 0, zIndex: 10000}}
             >
                 <AddIcon/>
             </Fab>

@@ -436,7 +436,6 @@ export class Manager {
             scan((acc: Dictionary<ICard[]>, newCards) => {
                 const o = {...acc};
                 newCards.forEach(newICard => {
-                    debugger;
                     Manager.mergeCardIntoCardDict(newICard, o);
                     this.trieWrapper.addWords(newICard.learningLanguage);
                 });

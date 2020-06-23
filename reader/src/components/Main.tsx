@@ -4,10 +4,11 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
-import {Manager, NavigationPages} from "../lib/Manager";
+import {Manager, NavigationPages, sleep} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
+import axios from 'axios';
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -15,6 +16,16 @@ window.addEventListener("dragover", function (e) {
 window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
+
+
+axios.post('/get-speech', {text: '直播 动画 番剧'}).then(async result => {
+    var snd = new Audio("data:audio/wav;base64," + result.data);
+    snd.controls = true;
+    snd.style.position = 'absolute';
+    snd.style.zIndex = '10000';
+
+    document.body.appendChild(snd);
+})
 
 const useStyles = makeStyles((theme) => ({
     root: {
