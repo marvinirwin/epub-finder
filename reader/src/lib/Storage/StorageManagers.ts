@@ -77,8 +77,17 @@ export class IndexDBManager<T> {
                 for (let i = 0; i < recordsToPut.length; i++) {
                     // WHat's the difference between put and add
                     let recordToInsert = recordsToPut[i];
-                    const id = await this.table.put(recordToInsert, this.getId(recordToInsert));
-                    recordsWithAssignedIds.push(this.assignId(id, recordToInsert));
+                    let id = this.getId(recordToInsert);
+                    let newId;
+                    if (id) {
+                        newId = await this.table.put(recordToInsert, id);
+                    } else {
+                        // @ts-ignore If the id property is present, but undefined it will error when inserted
+                        if (recordToInsert.hasOwnProperty('id')) delete recordToInsert.id;
+                        newId = await this.table.add(recordToInsert);
+
+                    }
+                    recordsWithAssignedIds.push(this.assignId(newId, recordToInsert));
                 }
                 return recordsWithAssignedIds;
             } catch(e) {

@@ -80,6 +80,7 @@ export class Manager {
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
 
     addCards$: Subject<ICard[]> = new Subject<ICard[]>();
+    addUnpersistedCards$ = new Subject<ICard[]>();
 
     cardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
     currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
@@ -203,6 +204,11 @@ export class Manager {
 
         this.oQuiz();
         this.oAnnotations();
+
+        (async () => {
+            // No blank cards allowed
+            this.addCards$.next((await this.db.cards.where('deck').equals("NO_DECK").toArray()).filter(c => c.learningLanguage))
+        })()
     }
 
     private oAnnotations() {
@@ -420,17 +426,17 @@ export class Manager {
     private oCards() {
         this.currentEditingCard$.next(undefined);
         this.addCards$.next([]);
-        const debouncedAddCards$ = this.addCards$.pipe(debounceTime(500))
         this.currentCards$.subscribe(v => {
             this.cardMessages$.next(`New current cards ${v.length}`)
         })
 
         this.addCards$.pipe(
-            buffer(debouncedAddCards$),
+            buffer(this.addCards$.pipe(debounceTime(500))),
             map(flatten),
             scan((acc: Dictionary<ICard[]>, newCards) => {
                 const o = {...acc};
                 newCards.forEach(newICard => {
+                    debugger;
                     Manager.mergeCardIntoCardDict(newICard, o);
                     this.trieWrapper.addWords(newICard.learningLanguage);
                 });
@@ -438,24 +444,6 @@ export class Manager {
             }, {})).subscribe(this.cardMap$);
         this.cardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
 
-        this.allCustomCards$.next({})
-        this.newCardRequest$.pipe(withLatestFrom(this.allCustomCards$)).subscribe(([c, cDict]) => {
-            let key = `${c.learningLanguage}_${c.deck}`;
-            const presentCard = cDict[key];
-            const ec: EditingCard = presentCard || new EditingCard(this.cardDBManager, this);
-            ec.knownLanguage$.next(c.knownLanguage);
-            ec.characters$.next(c.learningLanguage);
-            ec.deck$.next(c.deck || 'NO_DECK_FOR_CARD');
-            ec.photos$.next(c.photos);
-            ec.sounds$.next(c.sounds);
-            if (!presentCard) {
-                let value: Dictionary<EditingCard> = {
-                    ...cDict,
-                    [key]: ec
-                };
-                this.allCustomCards$.next(value)
-            }
-        })
 
         this.currentEditingCard$.pipe(
             switchMap(c =>
@@ -481,11 +469,21 @@ export class Manager {
             currentCard?.cardClosed$.next();
             this.currentEditingCard$.next(newCard);
         })
+        this.addUnpersistedCards$.pipe(
+            map(async cards => {
+                for (let i = 0; i < cards.length; i++) {
+                    const card = cards[i];
+                    card.id = await this.db.cards.add(card);
+                }
+                return cards;
+            })).subscribe((cardsPromise: Promise<ICard[]>) => {
+            cardsPromise.then(cardsWithIds => {
+                this.addCards$.next(cardsWithIds);
+            })
+        })
     }
 
-    private static
-
-    mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
+    private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
         let presentCards = o[newICard.learningLanguage];
         if (presentCards) {
@@ -664,41 +662,5 @@ export interface iCountRowEmitted {
     count: number;
     row: WordCountTableRow
 }
-
-function ProcessDocumentForFlashcards(d: XMLDocument) {
-    // Get the elements with text
-    const elementsWithText = [];
-    // Actually this problem might not actually be solvable?
-    // One section of text will map to multiple flashcards
-    // Can html marks overlap?
-}
-
-
-/*
-export class IndexDBManager {
-    constructor(public db: MyAppDatabase) {
-    }
-
-    async load<FinalType, StoredInDBType>(f: (db: MyAppDatabase) => Promise<StoredInDBType[]>, create: (a: any) => FinalType) {
-        return (await f(this.db)).map(create);
-    }
-
-    async upsert<StoredInDBType extends HasId>(t: StoredInDBType, table: Dexie.Table<StoredInDBType, number>, getId: (db: MyAppDatabase) => Promise<number | undefined>): Promise<number> {
-        let id = await getId(this.db);
-        if (id !== undefined) {
-            await table.update(id, t)
-        } else {
-            id = await table.add(t);
-        }
-        return id;
-    }
-
-    async delete<StoredInDBType>(id: number, table: Dexie.Table<StoredInDBType, number>): Promise<undefined> {
-        await table.delete(id)
-        return;
-    }
-}
-*/
-
 
 

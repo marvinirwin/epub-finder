@@ -1,6 +1,6 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, map, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
 import $ from "jquery";
 // @ts-ignore
@@ -188,11 +188,12 @@ mark {
         }
         const onMouseUp$ = fromEvent(contentWindow, 'mouseup');
         onMouseUp$.pipe(withLatestFrom(
-            this.m.currentDeck$,
-            this.m.currentCollection$,
-            this.m.currentPackage$,
+            this.m.currentDeck$.pipe(startWith(undefined)),
+            this.m.currentCollection$.pipe(startWith(undefined)),
+            this.m.currentPackage$.pipe(startWith(undefined)),
             this.m.cardMap$
-        )).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
+        ),// For some reason this fires twice always?
+            debounceTime(100)).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
                 throw new Error("Iframe has no content window");
             }
@@ -201,20 +202,11 @@ mark {
                 const selObj = contentWindow.document.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
-                    this.m.selectionText$.next(text);
-                    const c = RenderingBook.getExistingCard(cardMap, text);
-                    this.m.newCardRequest$.next({
-                        deck: currentDeck?.name || "NO_DECK",
-                        learningLanguage: text,
-                        fields: [],
-                        photos: [],
-                        sounds: [],
-                        knownLanguage: [],
-                        collection: currentCollection?.name || "NO_COLLECTION",
-                        ankiPackage: currentPackage?.name || "NO_PACKAGE",
-                        illustrationPhotos: [],
-                        timestamp: c?.timestamp || new Date()
-                    })
+                    if (text) {
+                        this.m.selectionText$.next(text);
+                        this.m.requestEditWord$.next(text);
+                    }
+                    return;
                 }
             }
         })
