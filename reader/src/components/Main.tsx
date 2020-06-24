@@ -4,11 +4,11 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
-import {Manager, NavigationPages, sleep} from "../lib/Manager";
+import {Manager, NavigationPages} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
-import axios, {AxiosResponse} from 'axios';
+import axios from 'axios';
 import {decode, encode} from 'base64-arraybuffer';
 import Plotly from 'plotly.js'
 
@@ -21,29 +21,9 @@ window.addEventListener("drop", function (e) {
 
 const recordAudio = () => {
     return new Promise<Blob>(resolve => {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(async stream => {
-                const mediaRecorder = new MediaRecorder(stream);
-                const audioChunks: Blob[] = [];
-
-                mediaRecorder.addEventListener("dataavailable", event => {
-                    audioChunks.push(event.data);
-                });
-
-                mediaRecorder.start();
-
-                await sleep(5000);
-                mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    resolve(audioBlob);
-                });
-
-                mediaRecorder.stop();
-            });
     });
 };
 
-const audioContext = new AudioContext();
 
 function plotData(normalizedData: number[]) {
     const plotEl = $('<div></div>');
@@ -77,27 +57,9 @@ async function graphAudioData(
     document.body.appendChild(snd);
 }
 
-axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result => {
-    const filterData = (audioBuffer: AudioBuffer) => {
-        const rawData = audioBuffer.getChannelData(0); // We only need to work with one channel of data
-        const samples = 400; // Number of samples we want to have in our final data set
-        const blockSize = Math.floor(rawData.length / samples); // the number of samples in each subdivision
-        const filteredData = [];
-        for (let i = 0; i < samples; i++) {
-            let blockStart = blockSize * i; // the location of the first sample in the block
-            let sum = 0;
-            for (let j = 0; j < blockSize; j++) {
-                sum = sum + Math.abs(rawData[blockStart + j]) // find the sum of all the samples in the block
-            }
-            filteredData.push(sum / blockSize); // divide the sum by the block size to get the average
-        }
-        return filteredData;
-    }
-    const normalizeData = (filteredData: number[]) => {
-        const multiplier = Math.pow(Math.max(...filteredData), -1);
-        return filteredData.map(n => n * multiplier);
-    }
 
+axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result => {
+    const SynthesizedDecodedWavFile = decode(result.data);
     const firstDerivative = (points: number[]) => {
         if (points.length <= 1) {
             throw new Error("Cannot compute derivative of 0 or 1 length array");
@@ -112,8 +74,8 @@ axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result =>
         return newPoints;
     }
 
+    const audioData = await audioContext.decodeAudioData(SynthesizedDecodedWavFile)
 
-    const SynthesizedDecodedWavFile = decode(result.data);
     let recordedAudio = localStorage.getItem("DECODED_WAV");
     if (!recordedAudio) {
         const audioBlob: Blob = await recordAudio();
@@ -123,7 +85,7 @@ axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result =>
     }
     const audioData = await audioContext.decodeAudioData(decode(recordedAudio));
     await graphAudioData(audioData, filterData, normalizeData, firstDerivative, result.data);
-    await graphAudioData(await audioContext.decodeAudioData(SynthesizedDecodedWavFile), filterData, normalizeData, firstDerivative, recordedAudio);
+    await graphAudioData(, filterData, normalizeData, firstDerivative, recordedAudio);
 })
 
 const useStyles = makeStyles((theme) => ({

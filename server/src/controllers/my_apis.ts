@@ -147,13 +147,12 @@ function loadAudioEndpoint(params: ISpeechParams): Promise<string> {
             `
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="string">
 <voice name="zh-CN-YunyangNeural">
-    <prosody rate="0.75">
+    <prosody rate="0.65">
         ${params.text} 
     </prosody>
 </voice>
 </speak>`,
             async result => {
-                console.log(result);
                 synthesizer.close();
                 // Interact with the audio ArrayBuffer data
                 const bytes = await new Promise<Buffer>((resolve, reject) =>
