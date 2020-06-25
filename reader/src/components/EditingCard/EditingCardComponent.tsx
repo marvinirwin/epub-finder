@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -13,6 +13,7 @@ import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
 import CircularIntegration, {SpinnerState} from '../SpinningCircle'
 import {SoundEl} from "../SoundElement";
+import {AudioRecorder, AudioRecording, AudioTest} from "../../lib/AudioRecorder";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,7 +62,16 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
             // @ts-ignore
             els[i].play();
         }
-    }, [sounds])
+    }, [sounds]);
+
+    const [test, setTest] = useState<AudioTest | undefined>();
+    useEffect(() => {
+        if (characters) { // TODO shouldn't knownLanguage be entirely replaced with characters?
+            let audioTest = new AudioTest();
+            audioTest.text$.next(characters)
+            setTest(audioTest)
+        }
+    }, [characters])
 
 
     return (
@@ -86,13 +96,16 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m}/>
+                    {test ? <AudioRecording t={test}/> : '<div>There should be a recording element here</div>'}
                     {/*
                     <Typography variant="h6" gutterBottom> Illustration Pictures </Typography>
                     <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} m={card.m} />
 */}
                 </div>
 
+{/*
                 {(sounds || []).map((s: string) => <SoundEl src={s} playOnMount={true}/>)}
+*/}
             </CardContent>
             {/*
 

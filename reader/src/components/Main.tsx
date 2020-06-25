@@ -58,6 +58,7 @@ async function graphAudioData(
 }
 
 
+/*
 axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result => {
     const SynthesizedDecodedWavFile = decode(result.data);
     const firstDerivative = (points: number[]) => {
@@ -87,6 +88,7 @@ axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result =>
     await graphAudioData(audioData, filterData, normalizeData, firstDerivative, result.data);
     await graphAudioData(, filterData, normalizeData, firstDerivative, recordedAudio);
 })
+*/
 
 const useStyles = makeStyles((theme) => ({
     root: {
