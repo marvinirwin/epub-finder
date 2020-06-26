@@ -1,11 +1,14 @@
 import {from, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {concatMap, delay, filter, flatMap, map, scan, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {concatMap, delay, filter, flatMap, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import React, {useEffect, useState} from "react";
 import Plot from 'react-plotly.js';
 import {chunk} from "lodash";
-import axios, {AxiosResponse} from "axios";
-import {decode} from "base64-arraybuffer";
+import axios from "axios";
+import {encode} from "base64-arraybuffer";
 import {useObs} from "../UseObs";
+
+
+
 
 class WavAudio {
     blob: Blob;
@@ -37,12 +40,10 @@ class WavAudio {
     }
 }
 
-
-async function workingAudioData(data: string): Promise<AudioBuffer> {
-    const SynthesizedDecodedWavFile = decode(data);
+async function workingAudioData(b: ArrayBuffer): Promise<AudioBuffer> {
     try {
-        return await audioContext.decodeAudioData(SynthesizedDecodedWavFile)
-    } catch(e) {
+        return await audioContext.decodeAudioData(b)
+    } catch (e) {
         console.log("Error decoding synthesized sound")
         console.error(e);
         throw e;
@@ -71,15 +72,26 @@ const normalizeData = (filteredData: number[]) => {
     return filteredData.map(n => n * multiplier);
 }
 
+export interface RecordRequest {
+    length: number;
+    cb: (c: WavAudio) => void;
+}
+
 export class AudioRecorder {
-    recordingData$ = new Subject<Blob>()
+    finishedRecordingData = new Subject<Blob>()
     /*
         audioChunks$: Observable<AudioBuffer>;
         graphDataChunks$: Observable<number[]>;
     */
-    allGraphData$: Observable<number[]>
+    recordRequest$ = new Subject<RecordRequest>();
+    graphData$: Observable<number[]>;
+    mediaSource$: Observable <MediaStream>;
+    stream$: Observable<MediaStreamAudioSourceNode>;
+    canvas$ = new Subject<HTMLCanvasElement>();
 
     constructor() {
+        this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
+
         /*
                 this.audioChunks$ = this.blobs$.pipe(
                     flatMap(blob => new Response(blob).arrayBuffer()),
@@ -90,44 +102,96 @@ export class AudioRecorder {
                     map(chunk => normalizeData(chunk)),
                 )
         */
-        this.allGraphData$ = this.recordingData$.pipe(
-            scan((acc: Blob[], audioDataChunk) => {
-                acc.push(audioDataChunk);
-                return acc;
-            }, []),
-            flatMap(async (recordingData: Blob[]) => {
-                console.log(recordingData);
-                const blob = new Blob(recordingData, {type: 'audio/wav'})
+        // @ts-ignore
+        this.recordRequest$.pipe(
+            withLatestFrom(this.mediaSource$, this.canvas$),
+            flatMap(([req, source, canvas]: [RecordRequest, MediaStream, HTMLCanvasElement]) => {
+                const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
+                const recorder = new MediaRecorder(source);
+                const stream = audioContext.createMediaStreamSource(recorder.stream);
+                return new Promise(async resolve => {
+                    recorder.ondataavailable = (event) => {
+                        resolve(event.data);
+                    }
+                    const analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 2048;
+                    const bufferLength = analyser.frequencyBinCount;
+                    const dataArray = new Uint8Array(bufferLength);
+                    stream.connect(analyser).connect(audioContext.destination);
+
+                    const draw = () => {
+                        const WIDTH = canvas.width
+                        const HEIGHT = canvas.height;
+
+                        requestAnimationFrame(draw);
+
+                        analyser.getByteTimeDomainData(dataArray);
+
+                        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+                        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+                        canvasCtx.lineWidth = 2;
+                        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+
+                        canvasCtx.beginPath();
+
+                        let sliceWidth = WIDTH * 1.0 / bufferLength;
+                        let x = 0;
+
+
+                        for (let i = 0; i < bufferLength; i++) {
+
+                            let v = dataArray[i] / 128.0;
+                            let y = v * HEIGHT / 2;
+
+                            if (i === 0) {
+                                canvasCtx.moveTo(x, y);
+                            } else {
+                                canvasCtx.lineTo(x, y);
+                            }
+
+                            x += sliceWidth;
+                        }
+
+                        canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                        canvasCtx.stroke();
+
+                    }
+
+                    draw();
+                    recorder.start();
+
+                    setTimeout(() => recorder.stop(), length)
+                })
+            })
+        )
+        this.graphData$ = this.finishedRecordingData.pipe(
+            flatMap(async (recordingData: Blob) => {
+                const blob = new Blob([recordingData], {type: 'audio/wav'})
                 const buffer = await (new Response(blob)).arrayBuffer();
+                const wav = new WavAudio(buffer, await audioContext.decodeAudioData(buffer), encode(buffer))
                 try {
                     return await audioContext.decodeAudioData(buffer)
-                } catch(e) {
+                } catch (e) {
                     console.log("Error decoding user audio")
                     console.error(e);
                 }
                 return;
             }),
-                filter(v => !!v),
-                map(d => {
-                    // @ts-ignore
-                    return normalizeData(filterData(d, AUDIO_GRAPH_SAMPLE_SIZE));
-                })
-            )
+            filter(v => !!v),
+            map(d => {
+                // @ts-ignore
+                return normalizeData(filterData(d, AUDIO_GRAPH_SAMPLE_SIZE));
+            })
+        )
+        this.recordRequest$.subscribe(r => {
+            this.rec(r.length).then()
+        })
     }
 
-    async rec(length: number) {
-        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.addEventListener("dataavailable", event => {
-            console.log(event.data);
-            console.log(event);
-            if (event.data.size) {
-                this.recordingData$.next(event.data)
-            }
-        });
-        mediaRecorder.start();
-
-        setTimeout(() => mediaRecorder.stop(), length)
+    rec(length: number) {
+        return new Promise(async (resolve) => {
+        })
     }
 }
 
@@ -157,8 +221,10 @@ export class AudioTest {
     constructor() {
         this.synthesizedAudio$ = this.text$.pipe(
             flatMap(async text => {
-                const result = await axios.post('/get-speech', {text: '你们好'});
-                return new WavAudio(decode(result.data), await workingAudioData(result.data), result.data);
+                const response = await axios.post('/get-speech', {text: '你们好'}, {responseType: 'blob'});
+                const b = new Blob(response.data, {type: 'audio/wav'})
+                const buffer = await (new Response(b).arrayBuffer())
+                return new WavAudio(buffer, await workingAudioData(buffer), encode(buffer));
             }),
             shareReplay(1)
         );
@@ -168,7 +234,7 @@ export class AudioTest {
                 (wav: WavAudio) => {
                     const rec = new AudioRecorder();
                     rec.rec(wav.duration * 1000 * 2)
-                    return rec.allGraphData$
+                    return rec.graphData$
                 }
             ),
             shareReplay(1)
