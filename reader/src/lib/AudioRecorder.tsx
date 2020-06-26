@@ -45,12 +45,12 @@ export class AudioRecorder {
         audioChunks$: Observable<AudioBuffer>;
         graphDataChunks$: Observable<number[]>;
     */
-    recordRequest$ = new Subject<IRecordRequest>();
+    recordRequest$ = new ReplaySubject<IRecordRequest>(1);
     // graphData$: Observable<number[]>;
     mediaSource$: Observable<MediaStream>;
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
 
-    isRecording$ = new Subject<boolean>();
+    isRecording$ = new ReplaySubject<boolean>(1);
 
     constructor() {
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
@@ -65,15 +65,9 @@ export class AudioRecorder {
                     map(chunk => normalizeData(chunk)),
                 )
         */
-        this.mediaSource$.subscribe(v => {
-            console.log(v);
-        })
-        this.canvas$.subscribe(v => console.log(v))
-        this.recordRequest$.subscribe(v => console.log(v))
         this.recordRequest$.pipe(
             withLatestFrom(this.mediaSource$, this.canvas$),
-            mergeMap(async ([req, source, canvas]: [IRecordRequest, MediaStream, HTMLCanvasElement]) => {
-                debugger;
+            flatMap(async ([req, source, canvas]: [IRecordRequest, MediaStream, HTMLCanvasElement]) => {
                 this.isRecording$.next(true);
                 try {
                     const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -136,8 +130,8 @@ export class AudioRecorder {
                 } finally {
                     this.isRecording$.next(false);
                 }
-            }, 1)
-        )
+            })
+        ).subscribe(() => {})
         /*
                 this.graphData$ = this.finishedRecordingData.pipe(
                     flatMap(async (recordingData: Blob) => {

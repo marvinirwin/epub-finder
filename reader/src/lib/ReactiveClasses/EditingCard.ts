@@ -49,7 +49,6 @@ export class EditingCard {
                 return this.m.recorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
             })
         )
-        this.recordedAudio$.subscribe(v => console.log(v))
 
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(

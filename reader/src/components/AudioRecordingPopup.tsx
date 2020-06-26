@@ -21,20 +21,20 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexFlow: 'column nowrap'
     },
-    waves: {
-
+    canvas: {
+        width: '100%',
+        height: '200px'
     },
-    graph: {
-
-    }
 }));
 
 export function AudioRecordingPopup({r}: {r: AudioRecorder}) {
     const classes = useStyles();
+
     const mediaSource = useObs(r.mediaSource$);
-    const isRecording = useObs(r.isRecording$);
     const req = useObs(r.recordRequest$);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const isRecording = useObs(r.isRecording$);
     const graphRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (canvasRef.current) r.canvas$.next(canvasRef.current)
@@ -46,8 +46,10 @@ export function AudioRecordingPopup({r}: {r: AudioRecorder}) {
         <div>label: {req?.label}</div>
         <div>mediaSource active: {mediaSource?.active}</div>
         <div>mediaSource id: {mediaSource?.id}</div>
+{/*
         <div ref={graphRef}/>
-        <canvas ref={canvasRef} className={classes.waves}/>
+*/}
+        <canvas ref={canvasRef} className={classes.canvas}/>
     </Card>
     ;
 }
