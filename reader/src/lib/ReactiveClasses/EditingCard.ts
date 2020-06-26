@@ -1,9 +1,22 @@
-import {BehaviorSubject, combineLatest, interval, merge, race, ReplaySubject, Subject, timer} from "rxjs";
+import {combineLatest, interval, merge, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
-import {debounceTime, map, mapTo, skip, startWith, switchMap, take, takeUntil, withLatestFrom} from "rxjs/operators";
+import {
+    debounceTime, first,
+    flatMap,
+    map,
+    mapTo,
+    skip,
+    startWith,
+    switchMap,
+    take,
+    takeUntil,
+    withLatestFrom
+} from "rxjs/operators";
 import {IndexDBManager, LocalStorageManager} from "../Storage/StorageManagers";
 import {Manager} from "../Manager";
 import {debounce} from "@material-ui/core";
+import {WavAudio} from "../WavAudio";
+import {getSynthesizedAudio} from "../AudioRecorder";
 
 export class EditingCard {
     id?: number;
@@ -12,17 +25,32 @@ export class EditingCard {
     illustrationPhotos$ = new ReplaySubject<string[]>(1);
     sounds$ = new ReplaySubject<string[]>(1);
     knownLanguage$ = new ReplaySubject<string[]>(1);
-    characters$ = new ReplaySubject<string>(1);
+    learningLanguage$ = new ReplaySubject<string>(1);
     ankiPackage$ = new ReplaySubject<string>(1);
     collection$ = new ReplaySubject<string>(1);
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
-
+    synthesizedSpeech$: Observable<WavAudio>;
+    recordedAudio$: Observable<WavAudio>;
     constructor(
         public persistor: IndexDBManager<ICard>,
         public m: Manager,
         public timestamp?: Date | number | undefined,
     ) {
+        // TODO should this be a replaySubject with share?
+        this.synthesizedSpeech$ = this.learningLanguage$.pipe(
+            flatMap(getSynthesizedAudio)
+        )
+        this.recordedAudio$ = this.synthesizedSpeech$.pipe(
+            withLatestFrom(
+                this.learningLanguage$
+            ),
+            flatMap(async ([synthesizedWav, characters]) => {
+                return this.m.recorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
+            })
+        )
+        this.recordedAudio$.subscribe(v => console.log(v))
+
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(
             [
@@ -42,14 +70,11 @@ export class EditingCard {
         let saveData$ = combineLatest(
             [
                 firstGroup$,
-                this.characters$,
+                this.learningLanguage$,
                 secondGroup$
             ]
             // This debounce Time and then skip means skip the first emit when we create the ReactiveClasses
         ).pipe(skip(1));
-
-        let debouncedSaveData = saveData$.pipe(debounceTime(1000));
-
 
         saveData$.subscribe(() => {
             this.saveInProgress$.next(true);
@@ -109,10 +134,11 @@ export class EditingCard {
         e.illustrationPhotos$.next(iCard.illustrationPhotos);
         e.sounds$.next(iCard.sounds);
         e.knownLanguage$.next(iCard.knownLanguage);
-        e.characters$.next(iCard.learningLanguage);
+        e.learningLanguage$.next(iCard.learningLanguage);
         e.ankiPackage$.next(iCard.ankiPackage || "NO_PACKAGE");
         e.collection$.next(iCard.collection || "NO_COLLECTION");
         e.id = iCard.id;
         return e;
     }
+
 }

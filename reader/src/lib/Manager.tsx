@@ -33,6 +33,7 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {ITweet} from "./Interfaces/ITweet";
 import {ITrend} from "./Interfaces/ITwitterTrend";
 import {ITrendLocation} from "./Interfaces/ITrendLocation";
+import {AudioRecorder} from "./AudioRecorder";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -143,6 +144,7 @@ export class Manager {
 
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
+    recorder = new AudioRecorder();
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();

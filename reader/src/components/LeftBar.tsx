@@ -11,6 +11,7 @@ import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
 import QuickDIalogContainer from "./QuizPopup";
 import {ExpansionPanelNoMargin} from "./ExpansionPanelNoMargin";
+import {AudioRecordingPopup} from "./AudioRecordingPopup";
 
 const useStyles = makeStyles((theme) => ({
     leftBarRoot: {
@@ -84,7 +85,10 @@ export default function LeftBar({m}: {m: Manager}) {
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanelNoMargin>
+            <AudioRecordingPopup r={m.recorder}/>
+{/*
             <WordCountTable m={m}/>
+*/}
         </div>
     );
 }

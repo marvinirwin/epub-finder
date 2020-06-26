@@ -13,7 +13,7 @@ import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
 import CircularIntegration, {SpinnerState} from '../SpinningCircle'
 import {SoundEl} from "../SoundElement";
-import {AudioRecorder, AudioRecording, AudioTest} from "../../lib/AudioRecorder";
+import {AudioRecorder, AudioTest} from "../../lib/AudioRecorder";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,7 +50,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
         setExpanded(!expanded);
     };
     const progress = useObs(card.saveInProgress$);
-    const characters = useObs(card.characters$);
+    const characters = useObs(card.learningLanguage$);
     const deck = useObs(card.deck$);
     const english = useObs(card.knownLanguage$);
     const sounds = useObs(card.sounds$);
@@ -67,6 +67,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
     const [test, setTest] = useState<AudioTest | undefined>();
     useEffect(() => {
         if (characters) { // TODO shouldn't knownLanguage be entirely replaced with characters?
+
             let audioTest = new AudioTest();
             audioTest.text$.next(characters)
             setTest(audioTest)
@@ -96,7 +97,9 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m}/>
+{/*
                     {test ? <AudioRecording t={test}/> : '<div>There should be a recording element here</div>'}
+*/}
                     {/*
                     <Typography variant="h6" gutterBottom> Illustration Pictures </Typography>
                     <ImageList photos$={card.illustrationPhotos$} card={card} characters={characters || ""} m={card.m} />

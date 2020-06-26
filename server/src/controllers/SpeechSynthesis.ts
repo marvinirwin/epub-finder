@@ -25,24 +25,20 @@ function downloadSynthesizedSpeech(filename: string, text: string) {
     return new Promise<string>((resolve, reject) => {
             const audioConfig = AudioConfig.fromAudioFileOutput(filename);
             const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
-
-
             synthesizer.speakSsmlAsync(
                 `
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="string">
-<voice name="zh-CN-YaoyaoNeural">
+<voice name="zh-CN-Yaoyao-Apollo">
     <prosody rate="0.65">
         ${text} 
     </prosody>
 </voice>
 </speak>`,
                 async result => {
+                    // TODO Put something here which checks if result is an error
+                    console.log(result);
+                    resolve()
                     synthesizer.close();
-                    // Interact with the audio ArrayBuffer data
-                    const bytes = await new Promise<Buffer>((resolve, reject) =>
-                        fs.readFile(filename, (err, data) => err ? reject(err) : resolve(data))
-                    )
-                    resolve(encode(bytes))
                 },
                 error => {
                     console.log(error);
@@ -64,6 +60,7 @@ export async function SynthesizeSpeech(req: Request, res: Response) {
     }
     res.setHeader("content-type", "audio/wav");
     fs.createReadStream(filename).pipe(res);
+
 }
 
 

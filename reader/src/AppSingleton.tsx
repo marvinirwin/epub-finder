@@ -35,7 +35,7 @@ export class EditingCardClass extends EditingCard {
     matchChange$: Subject<string> = new Subject<string>()
     constructor(persistor: IndexDBManager<ICard>, public m: Manager) {
         super(persistor, m);
-        this.characters$.subscribe(async v => {
+        this.learningLanguage$.subscribe(async v => {
             const o = await queryImages(v, 2)
             const data: shutterResult[] = o.data;
             this.imageSources.next(data.map(d => d.assets.preview.url))
