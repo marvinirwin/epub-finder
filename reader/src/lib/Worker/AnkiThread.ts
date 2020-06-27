@@ -11,7 +11,7 @@ import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "../Interfaces/ICard";
-import {CardMessage, ThreadMessage, ThreadMessageKey} from "../Manager/Manager";
+import {CardMessage} from "../Interfaces/Message";
 
 export const CHUNK_SIZE = 500;
 // noinspection JSConstantReassignment
@@ -120,6 +120,7 @@ class AnkiPackageLoader {
 }
 
 const loaders: AnkiPackageLoader[] = [];
+
 // Respond to message from parent thread
 ctx.onmessage = async (ev) => {
 /*

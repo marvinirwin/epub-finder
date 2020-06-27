@@ -1,7 +1,5 @@
 import './declaration.d';
 import "fontsource-noto-sans"
-import 'jquery-ui-bundle';
-import 'jquery-ui-bundle/jquery-ui.css';
 import $ from 'jquery';
 import React, {useEffect, useState} from 'react';
 import './App.css';
@@ -11,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // @ts-ignore
 import {useObs} from "./UseObs";
 
-import {AppSingleton, EditingCardClass, initializeApp} from "./AppSingleton";
+import {AppSingleton, initializeApp} from "./AppSingleton";
 import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';

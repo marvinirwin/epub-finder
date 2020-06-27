@@ -4,13 +4,10 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
-import {Manager, NavigationPages} from "../lib/Manager/Manager";
+import {Manager, NavigationPages} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
-import axios from 'axios';
-import {decode, encode} from 'base64-arraybuffer';
-import Plotly from 'plotly.js'
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -25,6 +22,7 @@ const recordAudio = () => {
 };
 
 
+/*
 function plotData(normalizedData: number[]) {
     const plotEl = $('<div></div>');
     plotEl.appendTo(document.body);
@@ -35,7 +33,9 @@ function plotData(normalizedData: number[]) {
         margin: {t: 0}
     });
 }
+*/
 
+/*
 async function graphAudioData(
     audioData: AudioBuffer,
     filterData: (audioBuffer: AudioBuffer) => any[],
@@ -46,9 +46,7 @@ async function graphAudioData(
     const normalizedData = normalizeData(filteredData);
     const derivedData = firstDerivative(normalizedData);
     plotData(normalizedData);
-/*
     plotData(derivedData);
-*/
 
     var snd = new Audio("data:audio/wav;base64," + base64);
     snd.controls = true;
@@ -56,6 +54,7 @@ async function graphAudioData(
     snd.style.zIndex = '10000';
     document.body.appendChild(snd);
 }
+*/
 
 
 /*

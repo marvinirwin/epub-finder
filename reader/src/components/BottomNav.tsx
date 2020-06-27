@@ -1,6 +1,6 @@
 import {BottomNavigation, BottomNavigationAction} from "@material-ui/core";
 import React from "react";
-import {Manager, NavigationPages} from "../lib/Manager/Manager";
+import {Manager, NavigationPages} from "../lib/Manager";
 import {useObs} from "../UseObs";
 
 import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
