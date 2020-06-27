@@ -1,16 +1,7 @@
-import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 import React, {useEffect, useRef} from "react";
-import Collapse from '@material-ui/core/Collapse';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Typography from "@material-ui/core/Typography";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import Divider from "@material-ui/core/Divider";
-import {ExpansionPanelNoMargin} from "./ExpansionPanelNoMargin";
-import {Card, IconButton, withStyles} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
+import {Card} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {AudioRecorder} from "../lib/AudioRecorder";
 import MultiGraph from "./MultiGraph";
@@ -47,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
 export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
     const classes = useStyles();
 
@@ -60,7 +52,8 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
     }, [canvasRef])
 
     const userAudio = useObs(r.userAudio$);
-    // const synthAudio = useObs(m.currentEditingSynthesizedWavFile$)
+    const synthAudio = useObs(m.currentEditingSynthesizedWavFile$);
+    const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
 
     return <Card className={classes.root}>
         <div>active: {isRecording ? "True" : "False"}</div>
@@ -69,9 +62,7 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
         <div>mediaSource id: {mediaSource?.id}</div>
         <canvas ref={canvasRef} className={classes.canvas}/>
         <audio src={userAudio?.url} controls/>
-{/*
         <audio src={synthAudio?.url} controls/>
-*/}
-    </Card>
-    ;
+        {graphData && <MultiGraph plots={graphData}/>}
+    </Card>;
 }

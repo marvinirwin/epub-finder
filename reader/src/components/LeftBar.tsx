@@ -63,9 +63,7 @@ const useStyles = makeStyles((theme) => ({
 export default function LeftBar({m}: {m: Manager}) {
     const classes = useStyles();
 
-/*
     const editingCard = useObs(m.currentEditingCard$);
-*/
     return (
         <div className={classes.leftBarRoot}>
             <QuickDIalogContainer m={m}/>
@@ -89,7 +87,7 @@ export default function LeftBar({m}: {m: Manager}) {
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanelNoMargin>
-            <AudioRecordingPopup r={m.recorder} m={m}/>
+            <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>
 {/*
             <WordCountTable m={m}/>
 */}

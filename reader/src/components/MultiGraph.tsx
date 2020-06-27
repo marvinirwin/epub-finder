@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Plot from 'react-plotly.js';
+import {WavAudio} from "../lib/WavAudio";
+
 
 export default function MultiGraph({plots}: {plots: number[][]}) {
     const [ rev, setRev ] = useState(0)
@@ -17,7 +19,7 @@ export default function MultiGraph({plots}: {plots: number[][]}) {
                     marker: {color: ['red', 'green']},
                 }
             })
-        } layout={{width: 320, height: 240, title: 'Sound recording'}}
+        } layout={{title: 'Sound recording'}}
               revision={rev}
         />
     </div>

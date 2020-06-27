@@ -10,8 +10,6 @@ export function useObs<T>(obs$: Observable<T>, init?: T) {
                 setV(typeof newV === 'function' ? () => newV : newV);
             })
         }catch(e) {
-            debugger;
-            console.error(e);
             throw e;
         }
     }, [obs$])

@@ -47,7 +47,7 @@ export class EditingCard {
                 this.learningLanguage$
             ),
             flatMap(async ([synthesizedWav, characters]) => {
-                return this.m.recorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
+                return this.m.audioManager.audioRecorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
             })
         )
         // TODO Figure out who cares about the result of recordedAudio so we dont have to put a dummy subscribe here

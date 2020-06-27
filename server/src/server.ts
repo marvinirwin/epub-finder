@@ -10,10 +10,11 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
-const server = app.listen(app.get("port"), () => {
+let port = 3001;
+const server = app.listen("3001", () => {
     console.log(
         "  App is running at http://localhost:%d in %s mode",
-        app.get("port"),
+        port,
         app.get("env")
     );
     console.log("  Press CTRL-C to stop\n");

@@ -5,8 +5,6 @@ import axios from "axios";
 import {WavAudio} from "./WavAudio";
 import {IRecordRequest} from "./Interfaces/IRecordRequest";
 
-
-
 export const audioContext = new Promise<AudioContext>(resolve => {
     setTimeout(() => {
         resolve(new AudioContext())
@@ -42,6 +40,7 @@ export class AudioRecorder {
     isRecording$ = new ReplaySubject<boolean>(1);
     userAudio$: Observable<WavAudio>;
 
+
     constructor() {
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
 
@@ -67,7 +66,6 @@ export class AudioRecorder {
                         recorder.ondataavailable = async (event) => {
                             this.isRecording$.next(false);
                             let wavAudio = new WavAudio(await new Response(new Blob([event.data])).arrayBuffer());
-                            debugger;
                             req.cb(wavAudio)
                             resolve(wavAudio);
                         }

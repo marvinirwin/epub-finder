@@ -11,6 +11,7 @@ export class WavAudio {
     duration$: Observable<number>;
     audioBuffer$: Observable<AudioBuffer>;
     graphData$: Observable<number[]>;
+
     private graphObservable$: Observable<Observable<number[]>>;
 
     constructor(public buffer: ArrayBuffer) {

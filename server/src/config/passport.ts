@@ -1,3 +1,4 @@
+/*
 import passport from "passport";
 import passportLocal from "passport-local";
 import passportFacebook from "passport-facebook";
@@ -21,9 +22,9 @@ passport.deserializeUser((id, done) => {
 });
 
 
-/**
+/!**
  * Sign in using Email and Password.
- */
+ *!/
 passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
     User.findOne({ email: email.toLowerCase() }, (err, user: any) => {
         if (err) { return done(err); }
@@ -41,7 +42,7 @@ passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, don
 }));
 
 
-/**
+/!**
  * OAuth Strategy Overview
  *
  * - User is already logged in.
@@ -54,12 +55,12 @@ passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, don
  *     - Else check if there is an existing account with user's email.
  *       - If there is, return an error message.
  *       - Else create a new account.
- */
+ *!/
 
 
-/**
+/!**
  * Sign in with Facebook.
- */
+ *!/
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_ID,
     clientSecret: process.env.FACEBOOK_SECRET,
@@ -117,9 +118,9 @@ passport.use(new FacebookStrategy({
     }
 }));
 
-/**
+/!**
  * Login Required middleware.
- */
+ *!/
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     if (req.isAuthenticated()) {
         return next();
@@ -127,9 +128,9 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     res.redirect("/login");
 };
 
-/**
+/!**
  * Authorization Required middleware.
- */
+ *!/
 export const isAuthorized = (req: Request, res: Response, next: NextFunction) => {
     const provider = req.path.split("/").slice(-1)[0];
 
@@ -140,3 +141,4 @@ export const isAuthorized = (req: Request, res: Response, next: NextFunction) =>
         res.redirect(`/auth/${provider}`);
     }
 };
+*/

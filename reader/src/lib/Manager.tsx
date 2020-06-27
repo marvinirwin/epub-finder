@@ -4,7 +4,8 @@ import {
     buffer,
     debounceTime,
     filter,
-    map, pairwise,
+    map,
+    pairwise,
     scan,
     shareReplay,
     startWith,
@@ -26,7 +27,6 @@ import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
 import {mergeAnnotationDictionary, RenderingBook} from "./Books/Rendering/RenderingBook";
 import React from "react";
-import $ from "jquery";
 import {getIsMeFunction, ICard} from "./Interfaces/ICard";
 import {Tweet} from "./Books/Tweet";
 import {SimpleText} from "./Books/SimpleText";
@@ -47,6 +47,8 @@ import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {AudioRecorder} from "./AudioRecorder";
 import {WavAudio} from "./WavAudio";
 import {Settings} from "./Interfaces/Message";
+import {iWordCountRow} from "./Interfaces/IWordCountRow";
+import {AudioManager} from "./AudioManager";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -99,7 +101,7 @@ export class Manager {
     cardMap$!: Observable<Dictionary<ICard[]>>;
     trieWrapper = new TrieWrapper(trie([]));
 
-    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
+    queEditingCard$: ReplaySubject<EditingCard> = new ReplaySubject<EditingCard>(1);
     currentEditingCardIsSaving$!: Observable<boolean | undefined>;
     currentEditingCard$!: Observable<EditingCard | undefined>;
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -164,9 +166,8 @@ export class Manager {
 
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
-    recorder = new AudioRecorder();
+    audioManager: AudioManager;
 
-    packageLoader: Worker = new AnkiThread();
 
 
     constructor(public db: MyAppDatabase) {
@@ -223,15 +224,20 @@ export class Manager {
 
         this.oScoreAndCount()
         this.oEditWord();
-        this.oLoad();
 
         this.oQuiz();
         this.oAnnotations();
 
+        this.audioManager = new AudioManager(this)
+
+        this.oLoad();
+
+/*
         (async () => {
             // No blank cards allowed
             this.addPersistedCards$.next((await this.db.cards.where('deck').equals("NO_DECK").toArray()).filter(c => c.learningLanguage))
         })()
+*/
     }
 
     private oAnnotations() {
@@ -465,8 +471,6 @@ export class Manager {
     */
 
     private oCards() {
-        this.addPersistedCards$.next([]);
-
         this.cardMap$ = this.addPersistedCards$.pipe(
             buffer(this.addPersistedCards$.pipe(debounceTime(500))),
             map(flatten),
@@ -484,24 +488,21 @@ export class Manager {
 
 
         this.currentEditingCard$ = this.queEditingCard$.pipe(
-            startWith(null),
+            startWith(undefined),
             pairwise(),
-            switchMap(([previousCard, currentCard]) => {
+            switchMap(([previousCard, newCard]) => {
                 if (!previousCard) {
-                    return of(currentCard)
+                    return of(newCard)
                 }
                 return this.currentEditingCardIsSaving$.pipe(
-                    withLatestFrom(this.queEditingCard$),
-                    filter(([saving]) => !saving),
-                    map(e => e[1]),
+                    filter((saving) => !saving),
+                    map(() => {
+                        previousCard.cardClosed$.next();
+                        return newCard;
+                    }),
                     take(1)
                 )
             }),
-            withLatestFrom(this.currentEditingCard$),
-            map(([newCard, currentCard]) => {
-                currentCard?.cardClosed$.next();
-                return newCard || undefined;
-            })
         )
 
         this.currentEditingCardIsSaving$ = this.currentEditingCard$.pipe(
@@ -568,12 +569,14 @@ export class Manager {
     }
 
     private oPackageLoader() {
+/*
         const packageLoader: Worker = new AnkiThread();
         packageLoader.onmessage = v => eval(v.data);
-        [{name: 'Characters', path: '/chars.zip'}].forEach(p => {
+        [{name: 'Characters', path: '/files/chars.zip'}].forEach(p => {
             this.packageMessages$.next(`Requesting Package ${p.name} at ${p.path} `)
             packageLoader.postMessage(JSON.stringify(p));
         });
+*/
     }
 
     private oCurrent() {
@@ -688,12 +691,6 @@ export class Manager {
 
     initIframeListeners() {
     }
-}
-
-export interface iWordCountRow {
-    book: string;
-    word: string;
-    count: number;
 }
 
 export interface IWordRecognitionRow {

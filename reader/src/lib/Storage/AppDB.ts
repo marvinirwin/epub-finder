@@ -40,9 +40,12 @@ export class MyAppDatabase extends Dexie {
         chunkSize: number = 500
     ): AsyncGenerator<ICard[]> {
         let offset = 0;
-        while (await this.cards.where(whereStmts).offset(offset).first()) {
+        const f = Object.values(whereStmts).length ?
+            () => this.cards.where(whereStmts).offset(offset) :
+            () => this.cards.where('learningLanguage').notEqual('').offset(offset)
+        while (await f().first()) {
             this.messages$.next(`Querying cards in chunks ${offset}`)
-            const chunkedCards = await this.cards.offset(offset).limit(chunkSize).toArray();
+            const chunkedCards = await f().limit(chunkSize).toArray();
             yield chunkedCards;
             offset += chunkSize;
         }
