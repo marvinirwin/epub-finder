@@ -26,8 +26,6 @@ export class EditingCard {
     sounds$ = new ReplaySubject<string[]>(1);
     knownLanguage$ = new ReplaySubject<string[]>(1);
     learningLanguage$ = new ReplaySubject<string>(1);
-    ankiPackage$ = new ReplaySubject<string>(1);
-    collection$ = new ReplaySubject<string>(1);
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
     synthesizedSpeech$: Observable<WavAudio>;
@@ -65,9 +63,7 @@ export class EditingCard {
             ]
         );
         let secondGroup$ = combineLatest([
-                this.deck$,
-                this.collection$,
-                this.ankiPackage$
+                this.deck$
             ]
         );
 
@@ -92,17 +88,15 @@ export class EditingCard {
                 ).pipe(mapTo(d))
             )
         ).subscribe(async (
-            [[photos, sounds, english, frontPhotos], characters, [deck, collection, ankiPackage]]
+            [[photos, sounds, english, frontPhotos], characters, [deck]]
         ) => {
             const iCard: ICard = {
                 id: this.id,
-                collection,
                 deck,
                 photos,
                 sounds,
                 knownLanguage: english,
                 learningLanguage: characters,
-                ankiPackage,
                 illustrationPhotos: frontPhotos,
                 fields: [],
                 timestamp: this.timestamp || new Date()
@@ -115,8 +109,6 @@ export class EditingCard {
                 (t: Dexie.Table<ICard>) =>
                     t.where({
                         deck: iCard.deck,
-                        ankiPackage: iCard.ankiPackage,
-                        collection: iCard.collection,
                         learningLanguage: iCard.learningLanguage
                     })
                         .or("id").equals(iCard.id || 0)
@@ -139,8 +131,6 @@ export class EditingCard {
         e.sounds$.next(iCard.sounds);
         e.knownLanguage$.next(iCard.knownLanguage);
         e.learningLanguage$.next(iCard.learningLanguage);
-        e.ankiPackage$.next(iCard.ankiPackage || "NO_PACKAGE");
-        e.collection$.next(iCard.collection || "NO_COLLECTION");
         e.id = iCard.id;
         return e;
     }

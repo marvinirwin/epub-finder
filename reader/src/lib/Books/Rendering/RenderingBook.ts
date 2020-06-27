@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
 import {debounceTime, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {Manager, sleep} from "../../Manager";
+import {Manager, sleep, getNewICardForWord} from "../../Manager";
 import $ from "jquery";
 // @ts-ignore
 import {ICard} from "../../Interfaces/ICard";
@@ -45,12 +45,20 @@ export class RenderingBook {
 mark:hover {
   cursor: pointer;
 }
+
+.annotated_and_translated {
+    transition-duration: 0.5s;
+}
+.annotated_and_translated:hover {
+    background-color: #eaeaea;
+}
+
 mark {
     transition-duration: 0.5s;
     background-color: transparent;
 }
 .highlighted {
-    background-color: grey;
+    background-color: lightgrey;
 }
 
 </style>
@@ -74,11 +82,21 @@ mark {
         });
 
         this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
-        this.bookInstance$.pipe(switchMap(i => i.rawText$)).subscribe(r => {
+        this.bookInstance$.pipe(
+            switchMap(i => i.rawText$),
+            withLatestFrom(this.m.cardMap$)
+        ).subscribe(([text, map]) => {
+            const newCards: ICard[] = [];
+            text.split('').forEach(c => {
+                if (!map[c] || !map[c].length) {
+                    newCards.push(getNewICardForWord(c, ''))
+                }
+            });
+            this.m.addUnpersistedCards$.next(newCards);
             axios.post('/translate', {
                 from: 'zh-CN',
                 to: 'en',
-                text: r
+                text: text
             }).then(r => {
                 this.translationText$.next(r.data.translation);
             })

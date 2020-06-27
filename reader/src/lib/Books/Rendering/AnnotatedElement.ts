@@ -14,7 +14,7 @@ export class AnnotatedElement {
         public $leafParent: JQuery<HTMLElement>
     ) {
         this.$originalContent = $leafParent.text();
-
+        this.$leafParent.addClass('annotated_and_translated');
     }
 
     annotate(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {

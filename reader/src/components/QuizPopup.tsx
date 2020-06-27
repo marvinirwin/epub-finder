@@ -93,7 +93,7 @@ function EditCardScreen({c, m}: QuizCardProps) {
     </Card> : <div/>;
 }
 
-export default function QuickDIalogContainer({m}: { m: Manager }) {
+export default function QuizDialogContainer({m}: { m: Manager }) {
     const open = useObs(m.quizDialogComponent$)
     const quizzingCard = useObs(m.quizzingCard$);
 

@@ -25,7 +25,6 @@ export class Website extends BookInstance {
                         }, 2000);
                         const leaves = RenderingBook.getTextElements(e.contents().find('body'));
                         const text = leaves.map(l => l.textContent || '').join('');
-                        debugger;
                         self.rawText$.next(text)
 
 /*

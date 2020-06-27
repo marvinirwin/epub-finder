@@ -15,7 +15,6 @@ import {
 } from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import AnkiThread from 'Worker-loader?name=dist/[name].js!./Worker/AnkiThread';
 import {
     SerializedAnkiPackage,
     UnserializeAnkiPackage,
@@ -44,12 +43,12 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {ITweet} from "./Interfaces/ITweet";
 import {ITrend} from "./Interfaces/ITwitterTrend";
 import {ITrendLocation} from "./Interfaces/ITrendLocation";
-import {AudioRecorder} from "./AudioRecorder";
 import {WavAudio} from "./WavAudio";
 import {Settings} from "./Interfaces/Message";
 import {iWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./AudioManager";
 import {Website} from "./Books/Website";
+
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -77,6 +76,19 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
 getAllLocations()
 getAllTrendsForLocation(23424948);
 */
+
+export function getNewICardForWord(word: string, deck: string) {
+    return {
+        learningLanguage: word,
+        photos: [],
+        sounds: [],
+        knownLanguage: [],
+        deck: deck,
+        fields: [],
+        illustrationPhotos: [],
+        timestamp: new Date()
+    };
+}
 
 export class Manager {
     displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
@@ -168,8 +180,6 @@ export class Manager {
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
-
-
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -327,18 +337,7 @@ export class Manager {
                 if (currentICard?.length) {
                     iCard = currentICard[0];
                 } else {
-                    iCard = {
-                        learningLanguage: word,
-                        photos: [],
-                        sounds: [],
-                        knownLanguage: [],
-                        ankiPackage: ankiPackage?.name,
-                        deck: deck?.name,
-                        collection: collection?.name,
-                        fields: [],
-                        illustrationPhotos: [],
-                        timestamp: new Date()
-                    };
+                    iCard = getNewICardForWord(word, deck?.name || '');
                 }
                 this.queEditingCard$.next(EditingCard.fromICard(iCard, this.cardDBManager, this))
             })

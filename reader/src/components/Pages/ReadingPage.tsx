@@ -11,11 +11,12 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     gridRoot: {
-        flexGrow: 1
+        height: '90vh'
     },
     bookList: {
         display: 'flex',
-        flexFlow: 'column nowrap'
+        flexFlow: 'column nowrap',
+
     }
 }));
 
@@ -24,10 +25,8 @@ export function ReadingPage({m}: { m: Manager }) {
     const books = useObs<Dictionary<RenderingBook>>(m.bookDict$);
     const classes = useStyles();
     return <Grid container className={classes.gridRoot} /*style={{display: 'grid', gridTemplateColumns: '50% 50%'}}*/>
-        <Grid item xs={6}>
-            <LeftBar m={m}/>
-        </Grid>
-        <Grid item xs={6} className={classes.bookList}>
+        <LeftBar m={m}/>
+        <Grid item xs={12} className={classes.bookList}>
             <Fab onClick={() => m.simpleTextDialogOpen$.next(true)}
                 aria-label="save"
                 style={{position: 'absolute', right: 0, zIndex: 10000}}

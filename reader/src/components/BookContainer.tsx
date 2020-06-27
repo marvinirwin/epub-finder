@@ -52,7 +52,9 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
         ref && ref.current && rb.renderRef$.next(ref.current);
     }, [ref])
 
+/*
     const translationText = useObs(rb.translationText$)
+*/
 
     return (
         <ExpansionPanelNoMargin defaultExpanded className={"book-expansion-panel"}>
@@ -72,7 +74,9 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
                 <StyledCollapse in={expanded} timeout="auto" unmountOnExit>
                     <div style={{display: 'flex', flexFlow: 'column nowrap'}}>
                         <div style={{flexGrow: 1}} id={rb.getId()} ref={ref}/>
+{/*
                         <p style={{flexGrow: 1}}>{translationText}</p>
+*/}
                     </div>
                 </StyledCollapse>
             </StyledExpansionPanelDetails>

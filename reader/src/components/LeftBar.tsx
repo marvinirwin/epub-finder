@@ -9,16 +9,18 @@ import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
-import QuickDIalogContainer from "./QuizPopup";
+import QuizDialogContainer from "./QuizPopup";
 import {ExpansionPanelNoMargin} from "./ExpansionPanelNoMargin";
 import {AudioRecordingPopup} from "./AudioRecordingPopup";
 
 const useStyles = makeStyles((theme) => ({
     leftBarRoot: {
+        position: 'absolute',
         maxHeight: '90vh',
         minHeight: '90vh',
         display: 'flex',
         flexDirection: 'column',
+        zIndex: 10,
 
         '& > .MuiExpansionPanel-root.Mui-expanded': {
             borderRadius: 0
@@ -66,7 +68,8 @@ export default function LeftBar({m}: {m: Manager}) {
     const editingCard = useObs(m.currentEditingCard$);
     return (
         <div className={classes.leftBarRoot}>
-            <QuickDIalogContainer m={m}/>
+            <QuizDialogContainer m={m}/>
+            {editingCard &&
             <ExpansionPanelNoMargin defaultExpanded>
                 <ExpansionPanelSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -81,13 +84,12 @@ export default function LeftBar({m}: {m: Manager}) {
                     </div>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
-{/*
-                    {editingCard ? (<EditingCardComponent card={editingCard}/>) : (<div>No card found</div>)}
-*/}
+                {editingCard ? (<EditingCardComponent card={editingCard}/>) : (<div>No card found</div>)}
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanelNoMargin>
-            <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>
+            }
+            {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>}
 {/*
             <WordCountTable m={m}/>
 */}

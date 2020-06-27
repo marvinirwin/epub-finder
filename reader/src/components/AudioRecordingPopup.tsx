@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
     canvas: {
         width: '100%',
-        height: '200px'
+        height: '25px'
     },
 }));
 
