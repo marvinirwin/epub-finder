@@ -4,10 +4,16 @@ import {useEffect, useState} from "react";
 export function useObs<T>(obs$: Observable<T>, init?: T) {
     const [v, setV] = useState(init)
     useEffect(() => {
-        obs$.subscribe(newV => {
-            // Cheap hack, should do this because its incompatible with init
-            setV(typeof newV === 'function' ? () => newV : newV);
-        })
+        try {
+            obs$.subscribe(newV => {
+                // Cheap hack, should do this because its incompatible with init
+                setV(typeof newV === 'function' ? () => newV : newV);
+            })
+        }catch(e) {
+            debugger;
+            console.error(e);
+            throw e;
+        }
     }, [obs$])
     return v;
 }

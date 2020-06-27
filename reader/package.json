@@ -33,7 +33,6 @@
     "plotly.js-dist": "^1.54.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-infinite-scroll-component": "^5.0.4",
     "react-plotly.js": "^2.4.0",
     "react-reader": "^0.18.3",
     "react-scripts": "3.4.1",

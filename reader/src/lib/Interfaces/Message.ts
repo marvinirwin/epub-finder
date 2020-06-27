@@ -1,13 +1,17 @@
 import {ICard} from "./ICard";
 
-export enum MessageKey {
-    CARDS = "CARDS"
+export enum ThreadMessageKey {
+    Cards = "CARDS",
+    DEBUG = "DEBUG"
+}
+export interface ThreadMessage {
+    key: ThreadMessageKey,
+}
+export interface CardMessage extends ThreadMessage {
+    cards: ICard[];
 }
 
-export interface Message {
-    key: MessageKey.CARDS
+export enum Settings {
+    MOST_POPULAR_WORDS = "MOST_POPULAR_WORDS"
 }
 
-export interface CardMessage extends Message {
-    cards: ICard[]
-}

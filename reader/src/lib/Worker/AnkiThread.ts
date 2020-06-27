@@ -11,7 +11,7 @@ import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "../Interfaces/ICard";
-import {CardMessage} from "../Interfaces/Message";
+import {CardMessage, ThreadMessageKey} from "../Interfaces/Message";
 
 export const CHUNK_SIZE = 500;
 // noinspection JSConstantReassignment

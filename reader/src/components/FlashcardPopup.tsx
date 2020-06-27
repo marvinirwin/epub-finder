@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import {ICard} from "../lib/Interfaces/ICard";
 import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 

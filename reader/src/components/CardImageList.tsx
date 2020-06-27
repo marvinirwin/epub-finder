@@ -7,7 +7,7 @@ import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {Subject} from "rxjs";
 import {useObs} from "../UseObs";
 import React from "react";
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 
 const useStylesGridListImages = makeStyles((theme) => ({

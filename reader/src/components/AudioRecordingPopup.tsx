@@ -1,7 +1,7 @@
 import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 import React, {useEffect, useRef} from "react";
 import Collapse from '@material-ui/core/Collapse';
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -60,7 +60,7 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
     }, [canvasRef])
 
     const userAudio = useObs(r.userAudio$);
-    const synthAudio = useObs(m.currentEditingSynthesizedWavFile$)
+    // const synthAudio = useObs(m.currentEditingSynthesizedWavFile$)
 
     return <Card className={classes.root}>
         <div>active: {isRecording ? "True" : "False"}</div>
@@ -69,7 +69,9 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
         <div>mediaSource id: {mediaSource?.id}</div>
         <canvas ref={canvasRef} className={classes.canvas}/>
         <audio src={userAudio?.url} controls/>
+{/*
         <audio src={synthAudio?.url} controls/>
+*/}
     </Card>
     ;
 }

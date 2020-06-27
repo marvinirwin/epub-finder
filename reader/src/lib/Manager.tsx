@@ -1,6 +1,17 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, flatten, groupBy, orderBy, sortBy} from "lodash";
-import {buffer, debounceTime, filter, map, scan, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {
+    buffer,
+    debounceTime,
+    filter,
+    map, pairwise,
+    scan,
+    shareReplay,
+    startWith,
+    switchMap,
+    take,
+    withLatestFrom
+} from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AnkiThread from 'Worker-loader?name=dist/[name].js!./Worker/AnkiThread';
@@ -34,6 +45,8 @@ import {ITweet} from "./Interfaces/ITweet";
 import {ITrend} from "./Interfaces/ITwitterTrend";
 import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {AudioRecorder} from "./AudioRecorder";
+import {WavAudio} from "./WavAudio";
+import {Settings} from "./Interfaces/Message";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -80,19 +93,26 @@ export class Manager {
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
 
-    addCards$: Subject<ICard[]> = new Subject<ICard[]>();
+    addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
 
-    cardMap$: ReplaySubject<Dictionary<ICard[]>> = new ReplaySubject<Dictionary<ICard[]>>(1);/* = new Subject<Dictionary<ICard>>()*/
-    currentCards$: ReplaySubject<ICard[]> = new ReplaySubject<ICard[]>(1);
-    allCustomCards$: ReplaySubject<Dictionary<EditingCard>> = new ReplaySubject<Dictionary<EditingCard>>(1)
+    cardMap$!: Observable<Dictionary<ICard[]>>;
     trieWrapper = new TrieWrapper(trie([]));
 
+    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
+    currentEditingCardIsSaving$!: Observable<boolean | undefined>;
+    currentEditingCard$!: Observable<EditingCard | undefined>;
+    requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
+
+    currentEditingSynthesizedWavFile$!: Observable<WavAudio>;
+
     newCardRequest$: Subject<ICard> = new Subject();
+/*
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
     currentEditingCardIsSaving$: ReplaySubject<boolean | undefined> = new ReplaySubject<boolean | undefined>(1);
     currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
+*/
 
     simpleTextDialogOpen$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1)
     simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -114,7 +134,7 @@ export class Manager {
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
     wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
-    sortedWordRows$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
+    wordsSortedByPopularityDesc$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
@@ -136,7 +156,7 @@ export class Manager {
         new ReplaySubject<NavigationPages>(1), 'debug_observables_visible', NavigationPages.READING_PAGE
     );
 
-    nextQuizItem$ = new ReplaySubject<ICard | undefined>(1);
+    nextQuizItem$:Observable<ICard | undefined>;
 
     allTrends$ = new ReplaySubject<ITrendLocation[]>(1);
     tweetTrendMap$ = new ReplaySubject<Dictionary<ITweet>>();
@@ -146,13 +166,15 @@ export class Manager {
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     recorder = new AudioRecorder();
 
+    packageLoader: Worker = new AnkiThread();
+
+
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
         this.oCurrent();
         this.oCards();
         this.oBook();
-
 
         /*
                 axios.get('/twitter-trends').then(response => {
@@ -162,7 +184,7 @@ export class Manager {
                 })
         */
 
-        this.sortedWordRows$.pipe(
+        this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
                 r.lastWordRecognitionRecord$
                     .pipe(
@@ -185,7 +207,7 @@ export class Manager {
                 const cards = cardMap[char] || []
                 return cards[0];
             })
-        ).subscribe(this.nextQuizItem$)
+        )
 
         this.requestBookRemove$.pipe(withLatestFrom(this.bookDict$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
             delete bookDict[bookToRemove.name];
@@ -199,7 +221,6 @@ export class Manager {
         this.oStringDisplay();
         this.oKeyDowns();
 
-        this.oRender();
         this.oScoreAndCount()
         this.oEditWord();
         this.oLoad();
@@ -209,7 +230,7 @@ export class Manager {
 
         (async () => {
             // No blank cards allowed
-            this.addCards$.next((await this.db.cards.where('deck').equals("NO_DECK").toArray()).filter(c => c.learningLanguage))
+            this.addPersistedCards$.next((await this.db.cards.where('deck').equals("NO_DECK").toArray()).filter(c => c.learningLanguage))
         })()
     }
 
@@ -255,7 +276,7 @@ export class Manager {
         })
     }
 
-    private oLoad() {
+    private async oLoad() {
         const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
         const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
         let thingsToLoad = [
@@ -263,6 +284,22 @@ export class Manager {
             ...simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
         ];
         thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
+
+        if (await this.db.getCachedCardsExists()) {
+            const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
+            const priorityWords = priorityCards?.value || [];
+            for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
+                this.addPersistedCards$.next(cards);
+            }
+            for await (let cards of this.db.getCardsFromDB({}, 500)) {
+                this.addPersistedCards$.next(cards);
+            }
+
+        } else {
+
+        }
+
+
         // Maybe we dont want to load, because the cards we want will be pulled from the anki-thread anyways
         // this.addCards$.next(this.cardDBManager.load((t: Dexie.Table<ICard, number>) => t.toArray()));
     }
@@ -323,6 +360,7 @@ export class Manager {
 
     private oStringDisplay() {
         const observables: Observable<string>[] = [];
+/*
         Object.entries(this).forEach(([key, value]) => {
             if (key.endsWith('$')) {
                 const obs: Observable<any> = value;
@@ -353,6 +391,7 @@ export class Manager {
                 );
             }
         })
+*/
         combineLatest(observables).pipe(debounceTime(500), map(a => {
             return a.join("</br>")
         })).subscribe(this.stringDisplay$);
@@ -426,14 +465,10 @@ export class Manager {
     */
 
     private oCards() {
-        this.currentEditingCard$.next(undefined);
-        this.addCards$.next([]);
-        this.currentCards$.subscribe(v => {
-            this.cardMessages$.next(`New current cards ${v.length}`)
-        })
+        this.addPersistedCards$.next([]);
 
-        this.addCards$.pipe(
-            buffer(this.addCards$.pipe(debounceTime(500))),
+        this.cardMap$ = this.addPersistedCards$.pipe(
+            buffer(this.addPersistedCards$.pipe(debounceTime(500))),
             map(flatten),
             scan((acc: Dictionary<ICard[]>, newCards) => {
                 const o = {...acc};
@@ -442,21 +477,18 @@ export class Manager {
                     this.trieWrapper.addWords(newICard.learningLanguage);
                 });
                 return o;
-            }, {})).subscribe(this.cardMap$);
-        this.cardMap$.pipe(map(c => flatten(Object.values(c)))).subscribe(this.currentCards$)
+            }, {}),
+            shareReplay(1)
+            );
 
 
-        this.currentEditingCard$.pipe(
-            switchMap(c =>
-                c ? c.saveInProgress$ : of(undefined)
-            )
-        ).subscribe(this.currentEditingCardIsSaving$);
 
-        this.queEditingCard$.pipe(
-            withLatestFrom(this.currentEditingCard$.pipe(startWith(undefined))), // Do I need to use startWith Here?
-            switchMap(([queCard, currentCard]) => {
-                if (!currentCard) {
-                    return of(queCard)
+        this.currentEditingCard$ = this.queEditingCard$.pipe(
+            startWith(null),
+            pairwise(),
+            switchMap(([previousCard, currentCard]) => {
+                if (!previousCard) {
+                    return of(currentCard)
                 }
                 return this.currentEditingCardIsSaving$.pipe(
                     withLatestFrom(this.queEditingCard$),
@@ -465,11 +497,20 @@ export class Manager {
                     take(1)
                 )
             }),
-            withLatestFrom(this.currentEditingCard$)
-        ).subscribe(([newCard, currentCard]) => {
-            currentCard?.cardClosed$.next();
-            this.currentEditingCard$.next(newCard);
-        })
+            withLatestFrom(this.currentEditingCard$),
+            map(([newCard, currentCard]) => {
+                currentCard?.cardClosed$.next();
+                return newCard || undefined;
+            })
+        )
+
+        this.currentEditingCardIsSaving$ = this.currentEditingCard$.pipe(
+            switchMap(c =>
+                c ? c.saveInProgress$ : of(undefined)
+            ),
+            shareReplay(1)
+        );
+
         this.addUnpersistedCards$.pipe(
             map(async cards => {
                 for (let i = 0; i < cards.length; i++) {
@@ -479,9 +520,16 @@ export class Manager {
                 return cards;
             })).subscribe((cardsPromise: Promise<ICard[]>) => {
             cardsPromise.then(cardsWithIds => {
-                this.addCards$.next(cardsWithIds);
+                this.addPersistedCards$.next(cardsWithIds);
             })
         })
+
+        this.currentEditingSynthesizedWavFile$ = this.currentEditingCard$.pipe(
+            filter(c => !!c),
+            switchMap(c => {
+                return (c as EditingCard).synthesizedSpeech$;
+            })
+        )
     }
 
     private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
@@ -550,10 +598,6 @@ export class Manager {
         })).subscribe(this.currentDeck$);
     }
 
-    private oRender() {
-        this.renderMessages$.next('Initializing rendering')
-    }
-
     private oScoreAndCount() {
         this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
             const wordCountsGrouped: Dictionary<iWordCountRow[]> = groupBy(newRows, 'word');
@@ -595,7 +639,7 @@ export class Manager {
             ),
             map((recs: iCountRowEmitted[]) => orderBy(
                 orderBy(recs, 'recognitionScore', 'desc'), ['count'], 'desc').map(r => r.row))
-        ).subscribe(this.sortedWordRows$)
+        ).subscribe(this.wordsSortedByPopularityDesc$)
         this.wordRowDict.pipe(
             map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))
         );

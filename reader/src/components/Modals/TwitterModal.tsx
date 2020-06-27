@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager/Manager";
+import {Manager} from "../../lib/Manager";
 import {useObs} from "../../UseObs";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 import {Tweet} from "../../lib/Books/Tweet";

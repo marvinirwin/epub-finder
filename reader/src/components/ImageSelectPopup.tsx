@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import axios from 'axios';
 import Dialog from "@material-ui/core/Dialog";
@@ -14,8 +14,6 @@ import {
     ListSubheader,
     Slide, Theme, Toolbar, Typography
 } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import ImageScroller, {useStylesGridListImages} from './ImageScroller';
 import {TransitionProps} from "@material-ui/core/transitions";
 import {makeStyles} from "@material-ui/core/styles";
 import SearchIcon from '@material-ui/icons/Search';

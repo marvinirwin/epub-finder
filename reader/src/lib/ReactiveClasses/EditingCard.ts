@@ -13,7 +13,7 @@ import {
     withLatestFrom
 } from "rxjs/operators";
 import {IndexDBManager, LocalStorageManager} from "../Storage/StorageManagers";
-import {Manager} from "../Manager/Manager";
+import {Manager} from "../Manager";
 import {debounce} from "@material-ui/core";
 import {WavAudio} from "../WavAudio";
 import {getSynthesizedAudio} from "../AudioRecorder";

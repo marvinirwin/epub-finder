@@ -18,8 +18,8 @@ export class MyAppDatabase extends Dexie {
     constructor() {
         super("MyAppDatabase");
         this.messages$.next("Starting database, creating stories")
-        this.version(3).stores({
-            cards: 'id++, characters, english, ankiPackage, collection, deck',
+        this.version(4).stores({
+            cards: 'id++, learningLanguage, knownLanguage, deck',
             recognitionRecords: 'id++, word, timestamp',
             settings: 'key, value'
         });

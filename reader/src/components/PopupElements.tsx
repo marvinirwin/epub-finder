@@ -1,4 +1,4 @@
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import {ImageSelectPopup} from "./ImageSelectPopup";
 import DebugDisplay from "./DebugDisplay";
 import {MessageList} from "./MessageLlist";

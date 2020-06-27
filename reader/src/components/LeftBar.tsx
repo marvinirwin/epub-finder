@@ -5,7 +5,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
-import {Manager} from "../lib/Manager/Manager";
+import {Manager} from "../lib/Manager";
 import {useObs} from "../UseObs";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
@@ -63,7 +63,9 @@ const useStyles = makeStyles((theme) => ({
 export default function LeftBar({m}: {m: Manager}) {
     const classes = useStyles();
 
+/*
     const editingCard = useObs(m.currentEditingCard$);
+*/
     return (
         <div className={classes.leftBarRoot}>
             <QuickDIalogContainer m={m}/>
@@ -81,7 +83,9 @@ export default function LeftBar({m}: {m: Manager}) {
                     </div>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
+{/*
                     {editingCard ? (<EditingCardComponent card={editingCard}/>) : (<div>No card found</div>)}
+*/}
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanelNoMargin>
