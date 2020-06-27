@@ -1,8 +1,8 @@
 import {ReplaySubject} from "rxjs";
-import {iWordCountRow} from "../Manager";
 import {Dictionary} from "lodash";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IBook} from "../Interfaces/Book/IBook";
+import {iWordCountRow} from "../Interfaces/IWordCountRow";
 
 export abstract class BookInstance {
     abstract get localStorageKey(): string;

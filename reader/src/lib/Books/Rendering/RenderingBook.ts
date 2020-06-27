@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
 import {debounceTime, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {Manager, sleep} from "../../Manager";
+import {Manager, sleep} from "../../Manager/Manager";
 import $ from "jquery";
 // @ts-ignore
 import {ICard} from "../../Interfaces/ICard";

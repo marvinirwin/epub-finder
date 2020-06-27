@@ -86,7 +86,9 @@ export async function GetICard(
             debugger;
             console.log('Inner html ??');
         }
+/*
         c.fields.push(innerHTML);
+*/
     }
     return c;
 }

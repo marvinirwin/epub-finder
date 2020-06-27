@@ -1,6 +1,7 @@
 import {BehaviorSubject, ReplaySubject} from "rxjs";
 import {scan} from "rxjs/operators";
-import {iWordCountRow, IWordRecognitionRow} from "../Manager";
+import {iWordCountRow} from "../Interfaces/IWordCountRow";
+import {IWordRecognitionRow} from "../Interfaces/IWordRecognitionRow";
 
 export class WordCountTableRow {
     addCountRecords$: ReplaySubject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>(1)

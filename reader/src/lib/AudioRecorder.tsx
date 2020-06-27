@@ -6,17 +6,13 @@ import {WavAudio} from "./WavAudio";
 import {IRecordRequest} from "./Interfaces/IRecordRequest";
 
 
-async function workingAudioData(b: ArrayBuffer): Promise<AudioBuffer> {
-    try {
-        return await audioContext.decodeAudioData(b)
-    } catch (e) {
-        console.log("Error decoding synthesized sound")
-        console.error(e);
-        throw e;
-    }
-}
 
-export const audioContext = new AudioContext();
+export const audioContext = new Promise<AudioContext>(resolve => {
+    setTimeout(() => {
+        resolve(new AudioContext())
+    }, 100)
+})
+
 export const AUDIO_GRAPH_SAMPLE_SIZE = 50;
 
 export const filterData = (audioBuffer: AudioBuffer, samples: number) => {
@@ -40,17 +36,11 @@ export const normalizeData = (filteredData: number[]) => {
 }
 
 export class AudioRecorder {
-    finishedRecordingData = new Subject<Blob>()
-    /*
-        audioChunks$: Observable<AudioBuffer>;
-        graphDataChunks$: Observable<number[]>;
-    */
     recordRequest$ = new ReplaySubject<IRecordRequest>(1);
-    // graphData$: Observable<number[]>;
     mediaSource$: Observable<MediaStream>;
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
-
     isRecording$ = new ReplaySubject<boolean>(1);
+    userAudio$: Observable<WavAudio>;
 
     constructor() {
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
@@ -65,24 +55,27 @@ export class AudioRecorder {
                     map(chunk => normalizeData(chunk)),
                 )
         */
-        this.recordRequest$.pipe(
+        this.userAudio$ = this.recordRequest$.pipe(
             withLatestFrom(this.mediaSource$, this.canvas$),
             flatMap(async ([req, source, canvas]: [IRecordRequest, MediaStream, HTMLCanvasElement]) => {
                 this.isRecording$.next(true);
                 try {
                     const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
                     const recorder = new MediaRecorder(source);
-                    const stream = audioContext.createMediaStreamSource(recorder.stream);
-                    return new Promise(async resolve => {
+                    const stream = (await audioContext).createMediaStreamSource(recorder.stream);
+                    return new Promise<WavAudio>(async resolve => {
                         recorder.ondataavailable = async (event) => {
-                            req.cb(new WavAudio(await new Response(new Blob([event.data])).arrayBuffer()))
-                            resolve();
+                            this.isRecording$.next(false);
+                            let wavAudio = new WavAudio(await new Response(new Blob([event.data])).arrayBuffer());
+                            debugger;
+                            req.cb(wavAudio)
+                            resolve(wavAudio);
                         }
-                        const analyser = audioContext.createAnalyser();
+                        const analyser = (await audioContext).createAnalyser();
                         analyser.fftSize = 2048;
                         const bufferLength = analyser.frequencyBinCount;
                         const dataArray = new Uint8Array(bufferLength);
-                        stream.connect(analyser).connect(audioContext.destination);
+                        stream.connect(analyser).connect((await audioContext).destination);
                         const draw = () => {
                             const WIDTH = canvas.width
                             const HEIGHT = canvas.height;
@@ -127,11 +120,11 @@ export class AudioRecorder {
                     })
                 } catch (e) {
                     console.error(e);
-                } finally {
                     this.isRecording$.next(false);
+                    throw e;
                 }
             })
-        ).subscribe(() => {})
+        )
         /*
                 this.graphData$ = this.finishedRecordingData.pipe(
                     flatMap(async (recordingData: Blob) => {

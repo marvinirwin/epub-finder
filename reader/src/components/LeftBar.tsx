@@ -5,7 +5,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
-import {Manager} from "../lib/Manager";
+import {Manager} from "../lib/Manager/Manager";
 import {useObs} from "../UseObs";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
@@ -85,7 +85,7 @@ export default function LeftBar({m}: {m: Manager}) {
                 </ExpansionPanelDetails>
                 <Divider />
             </ExpansionPanelNoMargin>
-            <AudioRecordingPopup r={m.recorder}/>
+            <AudioRecordingPopup r={m.recorder} m={m}/>
 {/*
             <WordCountTable m={m}/>
 */}

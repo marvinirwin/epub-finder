@@ -1,7 +1,7 @@
 import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 import React, {useEffect, useRef} from "react";
 import Collapse from '@material-ui/core/Collapse';
-import {Manager} from "../lib/Manager";
+import {Manager} from "../lib/Manager/Manager";
 import {useObs} from "../UseObs";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";

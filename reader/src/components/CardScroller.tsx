@@ -4,7 +4,7 @@ import {Divider} from "@material-ui/core";
 import {Card} from "../lib/Interfaces/OldAnkiClasses/Card";
 import React from "react";
 import {FlashcardPopup} from "./FlashcardPopup";
-import {Manager} from "../lib/Manager";
+import {Manager} from "../lib/Manager/Manager";
 import {ICard} from "../lib/Interfaces/ICard";
 
 export default function CardScroller({cards, m}: { cards: ICard[] , m: Manager}) {

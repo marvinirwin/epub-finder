@@ -1,19 +1,17 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
-import {ReplaySubject, Subject, of, from} from "rxjs";
-import {invert, flatten, chunk} from "lodash";
+import {ReplaySubject, Subject} from "rxjs";
+import {chunk, invert} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
 import JSZip from 'jszip';
 // @ts-ignore
 import {getBinaryContent} from 'jszip-utils';
 import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnkiPackage";
-import {MyAppDatabase} from "../Storage/AppDB";
-import {bufferCount, groupBy} from "rxjs/operators";
-import {Card} from "../Interfaces/OldAnkiClasses/Card";
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "../Interfaces/ICard";
+import {CardMessage, ThreadMessage, ThreadMessageKey} from "../Manager/Manager";
 
 export const CHUNK_SIZE = 500;
 // noinspection JSConstantReassignment
@@ -28,9 +26,11 @@ class AnkiPackageLoader {
 
     sendCards(c: ICard[]) {
         this.sendMessage(`Sending ${c.length} cards`)
+/*
         ctx.postMessage(
             `this.addCards$.next(${JSON.stringify(c)})`
         )
+*/
     }
 
     postObject(o: Partial<SerializedAnkiPackage>) {
@@ -44,19 +44,20 @@ class AnkiPackageLoader {
         }, o));
     }
 
-    constructor(public name: string, public path: string, public db: MyAppDatabase) {
-        db.messages$.subscribe(m => {
-            this.messages$.next(new DebugMessage('Worker-database', m));
-        });
+    constructor(public name: string, public path: string) {
+/*
         this.messages$.subscribe(s => ctx.postMessage(`
             this.receiveDebugMessage(${JSON.stringify(s)});
         `));
+*/
+/*
         (async () => {
             const cards$ = new Subject<ICard>();
             cards$.pipe(
                 bufferCount(500)
             ).subscribe(cards => this.sendCards(cards));
             this.sendMessage("Getting generator")
+
             const generator: AsyncGenerator<ICard> = await this.getCardGenerator(name);
             this.sendMessage("Got generator")
             for await (let c of generator) {
@@ -65,21 +66,8 @@ class AnkiPackageLoader {
             this.sendMessage("Finished sending cards")
             cards$.complete();
         })()
+*/
 
-        this.ankiPackageLoaded$.subscribe((p: SerializedAnkiPackage) => {
-            const str = JSON.stringify(p)
-            ctx.postMessage(` this.receiveSerializedPackage(${str})`)
-        })
-    }
-
-    private async persistCards(cards: ICard[], chunkSize: number) {
-        const cardChunks = chunk(cards, chunkSize);
-        for (let i = 0; i < cardChunks.length; i++) {
-            const cardChunk = cardChunks[i];
-            this.sendMessage(`Persisted ${i * chunkSize} so far...`)
-            await this.db.cards.bulkAdd(cardChunk);
-        }
-        this.sendMessage(`Persisted ${cards.length} to indexDB `)
     }
 
     private async sendCardsToMainThread(cards: ICard[], chunkSize: number) {
@@ -92,15 +80,16 @@ class AnkiPackageLoader {
         this.sendMessage(`Sent ${cards.length} over`)
     }
 
+/*
     private async getCardGenerator(packageName: string): Promise<AsyncGenerator<ICard>> {
-        this.sendMessage(`Checking for ${packageName}`)
-        if (await this.db.getCachedCardsExists(packageName)) {
+        if (await this.db.getCachedCardsExists()) {
             this.sendMessage(`Found cached cards for ${packageName}, not loading from AnkiPackage`)
             return this.db.getCardsFromDB(packageName)
         }
         this.sendMessage(`Cards not found in indexDB, loading from AnkiPackage`)
         return this.loadAnkiPackageFromFile();
     }
+*/
 
     sendMessage(m: string) {
         this.messages$.next(new DebugMessage('anki-package-loader', m));
@@ -133,14 +122,27 @@ class AnkiPackageLoader {
 const loaders: AnkiPackageLoader[] = [];
 // Respond to message from parent thread
 ctx.onmessage = async (ev) => {
+/*
     let next = (s: string) =>
         ctx.postMessage(`
                 this.receiveDebugMessage(${JSON.stringify(new DebugMessage('Worker-database', s))});
             `);
-    const db = new MyAppDatabase(next);
+*/
+
+    const packagePath = ev.data;
+
     let {name, path}: { name: string, path: string } = JSON.parse(ev.data);
     try {
-        const l = new AnkiPackageLoader(name, path, db);
+        const cards: ICard[] = []
+        let gen: AsyncGenerator<ICard> = await new AnkiPackageLoader(name, path).loadAnkiPackageFromFile()
+        for await (let icard of gen) {
+            cards.push(icard);
+        }
+        const m: CardMessage = {
+            key: ThreadMessageKey.Cards,
+            cards
+        }
+        ctx.postMessage({})
     } catch (e) {
         console.error(e);
     }

@@ -4,7 +4,7 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
-import {Manager, NavigationPages} from "../lib/Manager";
+import {Manager, NavigationPages} from "../lib/Manager/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";

@@ -1,5 +1,5 @@
 import React, {FunctionComponent} from "react";
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/Manager/Manager";
 import {useObs} from "../../UseObs";
 import {SimpleText} from "../../lib/Books/SimpleText";
 import {TextareaAutosize, TextField} from "@material-ui/core";

@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/Manager/Manager";
 import {useObs} from "../../UseObs";
 import {Dictionary} from "lodash";
 import {RenderingBook} from "../../lib/Books/Rendering/RenderingBook";

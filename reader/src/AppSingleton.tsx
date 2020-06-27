@@ -1,4 +1,4 @@
-import {Manager} from "./lib/Manager";
+import {Manager} from "./lib/Manager/Manager";
 import {ReplaySubject, Subject} from "rxjs";
 import DebugMessage from "./Debug-Message";
 

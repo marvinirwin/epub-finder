@@ -1,4 +1,4 @@
-import {sleep} from "../Manager";
+import {sleep} from "../Manager/Manager";
 import {BookInstance} from "./BookInstance";
 import {IRendition} from "../Interfaces/Book/IRendition";
 

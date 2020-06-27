@@ -4,7 +4,7 @@ import {
     debounceTime, first,
     flatMap,
     map,
-    mapTo,
+    mapTo, share, shareReplay,
     skip,
     startWith,
     switchMap,
@@ -13,7 +13,7 @@ import {
     withLatestFrom
 } from "rxjs/operators";
 import {IndexDBManager, LocalStorageManager} from "../Storage/StorageManagers";
-import {Manager} from "../Manager";
+import {Manager} from "../Manager/Manager";
 import {debounce} from "@material-ui/core";
 import {WavAudio} from "../WavAudio";
 import {getSynthesizedAudio} from "../AudioRecorder";
@@ -39,7 +39,8 @@ export class EditingCard {
     ) {
         // TODO should this be a replaySubject with share?
         this.synthesizedSpeech$ = this.learningLanguage$.pipe(
-            flatMap(getSynthesizedAudio)
+            flatMap(getSynthesizedAudio),
+            // shareReplay(1)// TODO this makes it a replaySubject(1), right?
         )
         this.recordedAudio$ = this.synthesizedSpeech$.pipe(
             withLatestFrom(
@@ -49,6 +50,10 @@ export class EditingCard {
                 return this.m.recorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
             })
         )
+        // TODO Figure out who cares about the result of recordedAudio so we dont have to put a dummy subscribe here
+        this.recordedAudio$.subscribe(v => {
+
+        })
 
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(
@@ -121,7 +126,7 @@ export class EditingCard {
                 throw new Error("Upserting returned a weird array")
             }
             const rec = records[0];
-            this.m.addCards$.next([rec])
+            this.m.addPersistedCards$.next([rec])
             this.saveInProgress$.next(false);
         })
     }

@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/Manager/Manager";
 import {useObs} from "../../UseObs";
 import {ICard} from "../../lib/Interfaces/ICard";
 import CardScroller from "../CardScroller";
