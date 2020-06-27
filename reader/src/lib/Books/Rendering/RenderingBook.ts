@@ -213,15 +213,10 @@ mark {
     }
 
     private async getLeaves(body: JQuery<HTMLElement>): Promise<AnnotatedElement[]> {
-        const leaves = [];
-        const allEls = body[0].getElementsByTagName('*');
-        for (let i = 0; i < allEls.length; i++) {
-            const el = allEls[i];
-            if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
-                leaves.push(new AnnotatedElement(this, $(el) as JQuery<HTMLElement>))
-            }
-        }
-        return leaves;
+        const leaves = RenderingBook.getTextElements(body);
+        return leaves.map( (el: Element) => {
+            return new AnnotatedElement(this, $(el) as JQuery<HTMLElement>);
+        });
         /*
                 const flashCards = body[0].getElementsByClassName('flashcard');
                 for (let i = 0; i < flashCards.length; i++) {
@@ -233,6 +228,20 @@ mark {
                     })
                 }
         */
+    }
+
+    public static getTextElements(body: JQuery<HTMLElement>) {
+        const leaves: Element[] = [];
+        const allEls = body[0].getElementsByTagName('*');
+
+
+        for (let i = 0; i < allEls.length; i++) {
+            const el = allEls[i];
+            if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
+                leaves.push(el)
+            }
+        }
+        return leaves;
     }
 
     private async resolveIFrame(ref: HTMLElement): Promise<JQuery<HTMLIFrameElement>> {
@@ -256,7 +265,7 @@ mark {
 
 }
 
-function waitFor(f: () => any, n: number) {
+export function waitFor(f: () => any, n: number) {
     return new Promise(resolve => {
         const interval = setInterval(() => {
             let f1 = f();

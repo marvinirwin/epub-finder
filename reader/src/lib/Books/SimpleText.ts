@@ -46,4 +46,5 @@ export class SimpleText extends BookInstance {
     static fromSerialized(o: any): SimpleText {
         return new SimpleText(o.name, o.text)
     }
+
 }

@@ -49,6 +49,7 @@ import {WavAudio} from "./WavAudio";
 import {Settings} from "./Interfaces/Message";
 import {iWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./AudioManager";
+import {Website} from "./Books/Website";
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
@@ -285,11 +286,14 @@ export class Manager {
     private async oLoad() {
         const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
         const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
+/*
         let thingsToLoad = [
             ...tweetLoader.load<Tweet>(Tweet.fromSerialized),
             ...simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
         ];
-        thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
+*/
+        this.bookLoadUpdates$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
+        // thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
 
         if (await this.db.getCachedCardsExists()) {
             const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
