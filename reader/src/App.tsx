@@ -7,7 +7,7 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import {useObs} from "./UseObs";
+import {useObs} from "./lib/Worker/UseObs";
 
 import {AppSingleton, initializeApp} from "./AppSingleton";
 import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";

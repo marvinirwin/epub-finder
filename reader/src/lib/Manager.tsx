@@ -3,7 +3,7 @@ import {Dictionary, flatten, groupBy, orderBy, sortBy} from "lodash";
 import {
     buffer,
     debounceTime,
-    filter,
+    filter, flatMap,
     map,
     pairwise,
     scan,
@@ -180,11 +180,15 @@ export class Manager {
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
+    currentTextToBeTranslated$!: Observable<string>;
+    translatedText$!: Observable<void>;
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
         this.oMessages();
+/*
         this.oCurrent();
+*/
         this.oCards();
         this.oBook();
 
@@ -440,6 +444,20 @@ export class Manager {
 
         });
         this.currentBook$.next(undefined);
+
+        this.currentTextToBeTranslated$ = this.bookDict$.pipe(
+            switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)))
+        )
+        this.translatedText$ = this.currentTextToBeTranslated$.pipe(
+            debounceTime(100),
+            flatMap(async learningText => {
+                const result = await axios.post('/translate', {
+                    from: 'zh-CN',
+                    to: 'en',
+                    text: learningText
+                })
+            })
+        )
     }
 
     /*
@@ -582,6 +600,7 @@ export class Manager {
 */
     }
 
+/*
     private oCurrent() {
         this.currentPackage$.next(undefined);
         this.packageUpdate$.pipe(withLatestFrom(this.packages$)).subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
@@ -603,6 +622,7 @@ export class Manager {
             return find;
         })).subscribe(this.currentDeck$);
     }
+*/
 
     private oScoreAndCount() {
         this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {

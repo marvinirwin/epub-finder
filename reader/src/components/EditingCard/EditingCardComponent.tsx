@@ -7,7 +7,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {useObs} from "../../UseObs";
+import {useObs} from "../../lib/Worker/UseObs";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
@@ -35,10 +35,6 @@ const useStyles = makeStyles((theme) => ({
     },
     expandOpen: {
         transform: 'rotate(180deg)',
-    },
-    avatar: {
-        backgroundColor: theme.palette.primary.dark,
-        color: theme.palette.primary.contrastText
     },
 }));
 
@@ -77,19 +73,6 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
 
     return (
         <Card className={classes.root}>
-            <CardHeader avatar={<CircularIntegration
-                state={progress ? SpinnerState.InProgress : SpinnerState.Success}
-                icon={<Avatar aria-label="card-type" className={classes.avatar}>{characters}</Avatar>}
-            />}
-                        action={
-
-                            <IconButton aria-label="settings">
-                                <MoreVertIcon/>
-                            </IconButton>
-                        }
-                        title={characters}
-                        subheader={deck}
-            />
 
             <CardContent>
                 <div className={classes.root}>

@@ -1,5 +1,5 @@
 import {AppSingleton} from "../AppSingleton";
-import {useObs} from "../UseObs";
+import {useObs} from "../lib/Worker/UseObs";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";

@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../UseObs";
+import {useObs} from "../../lib/Worker/UseObs";
 import React from "react";
 
 export function QuizPage({m}: { m: Manager }) {

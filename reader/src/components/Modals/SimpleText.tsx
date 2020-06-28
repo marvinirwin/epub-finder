@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from "react";
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../UseObs";
+import {useObs} from "../../lib/Worker/UseObs";
 import {SimpleText} from "../../lib/Books/SimpleText";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import Button from '@material-ui/core/Button';

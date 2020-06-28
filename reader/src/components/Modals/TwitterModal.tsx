@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../UseObs";
+import {useObs} from "../../lib/Worker/UseObs";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 import {Tweet} from "../../lib/Books/Tweet";
 import {TextareaAutosize, TextField} from "@material-ui/core";

@@ -38,10 +38,14 @@ export class RenderingBook {
     leaves$: Subject<AnnotatedElement[]> = new Subject<AnnotatedElement[]>();
 
     annotatedCharMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
+    currentTranslateText$ = new Subject<string>();
 
     private static appendStyleToBody(body: JQuery<HTMLElement>) {
         let style = $(`
                     <style>
+body {
+zoom: 200%;
+}
 mark:hover {
   cursor: pointer;
 }
@@ -59,6 +63,7 @@ mark {
 }
 .highlighted {
     background-color: lightgrey;
+    font-weight: bold;
 }
 
 </style>
@@ -93,13 +98,6 @@ mark {
                 }
             });
             this.m.addUnpersistedCards$.next(newCards);
-            axios.post('/translate', {
-                from: 'zh-CN',
-                to: 'en',
-                text: text
-            }).then(r => {
-                this.translationText$.next(r.data.translation);
-            })
         })
 
         Object.entries(this).forEach(([key, value]) => {

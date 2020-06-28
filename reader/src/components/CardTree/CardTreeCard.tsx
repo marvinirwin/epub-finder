@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../UseObs";
+import {useObs} from "../../lib/Worker/UseObs";
 import {ICard} from "../../lib/Interfaces/ICard";
 import CardScroller from "../CardScroller";
 import React from "react";

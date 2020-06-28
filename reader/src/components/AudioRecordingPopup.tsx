@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from "react";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../UseObs";
-import {Card} from "@material-ui/core";
+import {useObs} from "../lib/Worker/UseObs";
+import {Card, CardContent} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {AudioRecorder} from "../lib/AudioRecorder";
 import MultiGraph from "./MultiGraph";
@@ -56,6 +56,9 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
 
     return <Card className={classes.root}>
+        <CardContent>
+
+        </CardContent>
         <div>active: {isRecording ? "True" : "False"}</div>
         <div>label: {req?.label}</div>
         <div>mediaSource active: {mediaSource?.active}</div>

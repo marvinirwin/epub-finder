@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../UseObs";
+import {useObs} from "../lib/Worker/UseObs";
 import axios from 'axios';
 import Dialog from "@material-ui/core/Dialog";
 import CloseIcon from '@material-ui/icons/Close';
