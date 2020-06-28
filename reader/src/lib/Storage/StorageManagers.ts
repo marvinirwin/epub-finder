@@ -67,6 +67,7 @@ export class IndexDBManager<T> {
     async upsert(m: T | T[], isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>) {
         return this.db.transaction('rw', this.table, async () => {
             try {
+                debugger;
                 const presentRecords = await isMeWhere(this.table);
                 // If I am already here, delete
                 const keys: number[] = [];

@@ -55,7 +55,8 @@ export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
     QUIZ_PAGE = "QUIZ_PAGE",
-    TRENDS_PAGE = "TRENDS_PAGE"
+    TRENDS_PAGE = "TRENDS_PAGE",
+    SETTINGS_PAGE = "SETTINGS_PAGE"
 }
 
 async function getAllLocations(): Promise<ITrendLocation[]> {
@@ -497,7 +498,8 @@ export class Manager {
 
     private oCards() {
         this.cardMap$ = this.addPersistedCards$.pipe(
-            buffer(this.addPersistedCards$.pipe(debounceTime(500))),
+            startWith([]),
+            buffer(this.addPersistedCards$.pipe(startWith([]), debounceTime(500))),
             map(flatten),
             scan((acc: Dictionary<ICard[]>, newCards) => {
                 const o = {...acc};
@@ -541,6 +543,7 @@ export class Manager {
             map(async cards => {
                 for (let i = 0; i < cards.length; i++) {
                     const card = cards[i];
+                    debugger;
                     card.id = await this.db.cards.add(card);
                 }
                 return cards;
@@ -717,6 +720,14 @@ export class Manager {
     }
 
     initIframeListeners() {
+    }
+
+    applyGlobalListener(el: HTMLElement) {
+        el.onkeydown = (e) => {
+            if (e.key === "Escape") {
+                this.queEditingCard$.next(undefined);
+            }
+        }
     }
 }
 

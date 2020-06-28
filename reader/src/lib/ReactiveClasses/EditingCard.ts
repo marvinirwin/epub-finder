@@ -104,6 +104,7 @@ export class EditingCard {
             // I need to handle the case where there is a card cached which is newer than the one getting persisted
             // Whatever, I'll do that later
             // Also I have no idea if isMeWhere is going to work
+            debugger;
             const records = await persistor.upsert(
                 iCard,
                 (t: Dexie.Table<ICard>) =>

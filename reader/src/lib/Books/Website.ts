@@ -20,7 +20,6 @@ export class Website extends BookInstance {
                         e.prop('src', self.url)
                         await waitFor(() => {
                             let length = e.contents().find('body').children().length;
-                            console.log(`Children length ${length}`);
                             return length > 6;
                         }, 2000);
                         const leaves = RenderingBook.getTextElements(e.contents().find('body'));

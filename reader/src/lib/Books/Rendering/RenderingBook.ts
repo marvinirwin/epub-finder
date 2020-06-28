@@ -21,6 +21,7 @@ import {aSpineItem} from "../../Interfaces/Book/aSpineItem";
 import {BookInstance} from "../BookInstance";
 import {AnnotatedElement} from "./AnnotatedElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
+import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 
 
 export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[]>, acc: Dictionary<IAnnotatedCharacter[]>) {
@@ -33,6 +34,11 @@ export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[
     })
 }
 
+
+function getIndexOfEl(textNode: Element): number {
+    for (var indexOfMe = 0; (textNode = <Element>textNode.previousSibling); indexOfMe++) ;
+    return indexOfMe;
+}
 
 export class RenderingBook {
     bookInstance$: Subject<BookInstance> = new Subject<BookInstance>()
@@ -100,17 +106,22 @@ mark {
         this.bookInstance$.pipe(
             switchMap(i => i.rawText$),
             withLatestFrom(this.m.cardMap$),
-            concatMap(m =>
-                this.m.cardsLeftToLoad$.pipe(
-                    filter(count => count <= 0),
-                    mapTo(m)
-                )
+            concatMap(m => {
+                    return this.m.cardsLeftToLoad$.pipe(
+                        filter(count => {
+                            return count <= 0;
+                        }),
+                        mapTo(m)
+                    );
+                }
             )
         ).subscribe(([text, map]) => {
             const newCards: ICard[] = [];
             text.split('').forEach(c => {
-                if (!map[c] || !map[c].length) {
-                    newCards.push(getNewICardForWord(c, ''))
+                if (isChineseCharacter(c)) {
+                    if (!map[c] || !map[c].length) {
+                        newCards.push(getNewICardForWord(c, ''))
+                    }
                 }
             });
             this.m.addUnpersistedCards$.next(newCards);
@@ -201,6 +212,7 @@ mark {
                     await this.applySelectListener(iframe);
                     let body = iframe.contents().find('body');
                     RenderingBook.appendStyleToBody(body)
+                    this.m.applyGlobalListener(body as unknown as HTMLElement);
                     await sleep(500);
                     this.renderedContentBody$.next(body)
                     // @ts-ignore
@@ -216,7 +228,9 @@ mark {
     private applySelectListener(iframe: JQuery<HTMLIFrameElement>) {
         let contentWindow = iframe[0].contentWindow;
         if (!contentWindow) {
-            throw new Error("Iframe has no content window");
+            return;
+            // throw new Error("Iframe has no content window");
+
         }
         const onMouseUp$ = fromEvent(contentWindow, 'mouseup');
         onMouseUp$.pipe(withLatestFrom(
@@ -224,10 +238,13 @@ mark {
             this.m.currentCollection$.pipe(startWith(undefined)),
             this.m.currentPackage$.pipe(startWith(undefined)),
             this.m.cardMap$
-        ),// For some reason this fires twice always?
+            ),// For some reason this fires twice always?
             debounceTime(100)).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
+                return;
+/*
                 throw new Error("Iframe has no content window");
+*/
             }
             const activeEl = contentWindow.document.activeElement;
             if (activeEl) {
@@ -246,8 +263,21 @@ mark {
 
     private async getLeaves(body: JQuery<HTMLElement>): Promise<AnnotatedElement[]> {
         const leaves = RenderingBook.getTextElements(body);
-        return leaves.map( (el: Element) => {
-            return new AnnotatedElement(this, $(el) as JQuery<HTMLElement>);
+        return leaves.map((textNode: Element) => {
+            textNode.remove();
+
+            const div = $(`<div></div>`);
+            return new AnnotatedElement(this, $(div) as JQuery<HTMLElement>);
+/*
+            debugger;
+            const parent: HTMLElement = <HTMLElement>textNode.parentElement;
+            const myText: string = <string>textNode.textContent;
+            const indexOfMe = getIndexOfEl(textNode);
+            const div = $(`<div></div>`);
+*/
+/*
+            parent.insertBefore(div[0], parent.children[indexOfMe]);
+*/
         });
         /*
                 const flashCards = body[0].getElementsByClassName('flashcard');
@@ -264,15 +294,40 @@ mark {
 
     public static getTextElements(body: JQuery<HTMLElement>) {
         const leaves: Element[] = [];
+        var walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+
+        var node;
+        var textNodes = [];
+
+        while(node = walker.nextNode()) {
+            // @ts-ignore
+            console.log(node.remove());
+            continue;
+            debugger;
+            let trim = node.textContent?.trim();
+            if (trim) {
+                leaves.push(node as Element);
+            }
+        }
+/*
         const allEls = body[0].getElementsByTagName('*');
 
 
         for (let i = 0; i < allEls.length; i++) {
             const el = allEls[i];
-            if (el.nodeType === Node.TEXT_NODE || (el.tagName === 'P'/* && el.children.length === 0*/)) {
-                leaves.push(el)
+            for (let j = 0; j < el.children.length; j++) {
+                const child = el.children[j];
+                if (child.nodeType === Node.TEXT_NODE /!*|| el.tagName === 'P'*!//!* || el.tagName === "SPAN" || el.tagName === "DIV"*!/) {
+                    leaves.push(child)
+                }
             }
         }
+*/
         return leaves;
     }
 

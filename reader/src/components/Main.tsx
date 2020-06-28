@@ -1,6 +1,6 @@
 import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../lib/Worker/UseObs";
-import React from "react";
+import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
@@ -8,6 +8,7 @@ import {Manager, NavigationPages} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
+import {SettingsPage} from "./Pages/SettingsPage";
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -15,6 +16,7 @@ window.addEventListener("dragover", function (e) {
 window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
+
 
 const recordAudio = () => {
     return new Promise<Blob>(resolve => {
@@ -104,6 +106,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+
 function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) {
     switch (item) {
         case NavigationPages.QUIZ_PAGE:
@@ -112,6 +115,8 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
             return <TrendsPage m={m}/>
         case NavigationPages.READING_PAGE:
             return <ReadingPage m={m}/>
+        case NavigationPages.SETTINGS_PAGE:
+            return <SettingsPage m={m}/>
         default:
             return <ReadingPage m={m}/>
     }
@@ -122,6 +127,9 @@ export function Main({s}: { s: AppSingleton }) {
     const classes = useStyles();
     const item = useObs(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
+    useEffect(() => {
+        m.applyGlobalListener(document.body);
+    }, [m])
 
     return <div>
         <PopupElements m={m}/>

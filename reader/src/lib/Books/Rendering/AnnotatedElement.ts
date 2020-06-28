@@ -47,7 +47,7 @@ export class AnnotatedElement {
                 };
                 return newWord;
             });
-            let maxWord:IPositionedWord | undefined = maxBy(words, w => w.word.length);
+            let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let el = $(`<mark >${text[i]}</mark>`);
             el.appendTo(this.$leafParent)
             let annotationElement: IAnnotatedCharacter = {
@@ -69,6 +69,7 @@ export class AnnotatedElement {
         }
         return elsMappedToWords;
     }
+
     private applyParentMouseEvents() {
         this.$leafParent.on("mouseenter", (ev) => {
             this.r.currentTranslateText$.next(this.leafText);

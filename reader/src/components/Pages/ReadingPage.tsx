@@ -115,9 +115,9 @@ export function ReadingPage({m}: { m: Manager }) {
                 }
             </span>
             <span>
-                {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>} <QuizDialogContainer m={m}/>
+                {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>}
             </span>
-            <span>
+            <span style={{maxHeight: '50vh', overflow: 'scroll'}}>
                 <Paper>
                     <div> <Typography variant="h6">{textToBeTranslated || ''}</Typography> </div>
                     <div> <Typography variant="subtitle1">{translatedText || ''}</Typography> </div>
