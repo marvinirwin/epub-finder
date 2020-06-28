@@ -63,7 +63,6 @@ async function getAllLocations(): Promise<ITrendLocation[]> {
     const result = await axios.post('/trend-locations')
     const d: ITrendLocation[] = result.data;
     const filtered = d.filter(r => r.country === 'Singapore')
-    debugger;
     return result.data;
 }
 
@@ -450,8 +449,11 @@ export class Manager {
         this.currentBook$.next(undefined);
 
         this.textToBeTranslated$ = this.bookDict$.pipe(
-            switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)))
-        )
+            switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)).pipe(debounceTime(100))),
+            shareReplay(1)
+        );
+
+        this.textToBeTranslated$.subscribe(v => console.log(v))
         this.translatedText$ = this.textToBeTranslated$.pipe(
             debounceTime(100),
             flatMap(async learningText => {
@@ -461,8 +463,10 @@ export class Manager {
                     text: learningText
                 })
                 return result.data.translation;
-            })
-        )
+            }),
+            shareReplay(1)
+        );
+        this.translatedText$.subscribe(v => console.log(v));
     }
 
     /*
@@ -650,6 +654,7 @@ export class Manager {
         this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
+                debugger;
                 row.id = await this.db.recognitionRecords.add(row);
             }
             this.addPersistedWordRecognitionRows$.next(rows);

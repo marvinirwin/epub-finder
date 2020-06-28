@@ -24,7 +24,7 @@ export class Website extends BookInstance {
                         }, 2000);
                         const leaves = RenderingBook.getTextElements(e.contents().find('body'));
                         const text = leaves.map(l => l.textContent || '').join('');
-                        self.rawText$.next(text)
+                        self.rawText$.next(text.normalize())
 
 /*
                         let htmlElements = $(`<p style="max-width: 100%; font-size: 200%;">${text}</p>`);

@@ -9,6 +9,10 @@ import {ReadingPage} from "./Pages/ReadingPage";
 import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
+import {Grid} from "@material-ui/core";
+import {BookContainer} from "./BookContainer";
+import {Dictionary} from "lodash";
+import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -103,7 +107,12 @@ const useStyles = makeStyles((theme) => ({
     },
     middle: {
         flexGrow: 1
-    }
+    },
+    bookList: {
+        display: 'flex',
+        flexFlow: 'column nowrap',
+
+    },
 }));
 
 
@@ -129,9 +138,21 @@ export function Main({s}: { s: AppSingleton }) {
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
         m.applyGlobalListener(document.body);
-    }, [m])
+    }, [m]);
+    const books = useObs<Dictionary<RenderingBook>>(m.bookDict$);
+    const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
+        <div style={{
+            position: 'absolute',
+            maxHeight: '90vh',
+            minHeight: '90vh',
+            maxWidth: '100vw',
+            minWidth: '100vw',
+            top: iframeVisible ? 0 : '9000px'
+        }}>
+            {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
+        </div>
         <PopupElements m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
             {SelectedPage}

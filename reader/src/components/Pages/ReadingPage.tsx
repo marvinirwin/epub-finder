@@ -29,11 +29,6 @@ const useStyles = makeStyles((theme) => ({
     gridRoot: {
         height: '90vh'
     },
-    bookList: {
-        display: 'flex',
-        flexFlow: 'column nowrap',
-
-    },
     column: {
         flexBasis: '33.33%',
     },
@@ -64,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
 
 
 export function ReadingPage({m}: { m: Manager }) {
-    const books = useObs<Dictionary<RenderingBook>>(m.bookDict$);
     const classes = useStyles();
     const editingCard = useObs(m.currentEditingCard$);
     const characters = usePipe(m.currentEditingCard$,
@@ -124,8 +118,5 @@ export function ReadingPage({m}: { m: Manager }) {
                 </Paper>
             </span>
         </div>
-        <Grid item xs={12} className={classes.bookList}>
-            {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
-        </Grid>
     </Grid>
 }

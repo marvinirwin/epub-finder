@@ -8,7 +8,7 @@ import {IRecordRequest} from "./Interfaces/IRecordRequest";
 export const audioContext = new Promise<AudioContext>(resolve => {
     setTimeout(() => {
         resolve(new AudioContext())
-    }, 100)
+    }, 1000)
 })
 
 export const AUDIO_GRAPH_SAMPLE_SIZE = 50;

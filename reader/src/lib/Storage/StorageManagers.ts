@@ -81,10 +81,12 @@ export class IndexDBManager<T> {
                     let id = this.getId(recordToInsert);
                     let newId;
                     if (id) {
+                        debugger;
                         newId = await this.table.put(recordToInsert, id);
                     } else {
                         // @ts-ignore If the id property is present, but undefined it will error when inserted
                         if (recordToInsert.hasOwnProperty('id')) delete recordToInsert.id;
+                        debugger;
                         newId = await this.table.add(recordToInsert);
 
                     }

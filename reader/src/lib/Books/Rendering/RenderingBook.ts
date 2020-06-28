@@ -1,21 +1,10 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
-import {
-    concatMap,
-    debounce,
-    debounceTime,
-    filter,
-    map, mapTo,
-    skipUntil,
-    startWith,
-    switchMap,
-    withLatestFrom
-} from "rxjs/operators";
-import {Manager, sleep, getNewICardForWord} from "../../Manager";
+import {concatMap, debounceTime, filter, map, mapTo, skip, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {getNewICardForWord, Manager, sleep} from "../../Manager";
 import $ from "jquery";
 // @ts-ignore
 import {ICard} from "../../Interfaces/ICard";
-import axios from 'axios';
 import {LocalStorageManager} from "../../Storage/StorageManagers";
 import {aSpineItem} from "../../Interfaces/Book/aSpineItem";
 import {BookInstance} from "../BookInstance";
@@ -96,6 +85,7 @@ mark {
         public m: Manager,
         public name: string,
     ) {
+
         this.localStorageKey = bookInstance.localStorageKey;
         this.persistor = new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
@@ -111,20 +101,24 @@ mark {
                         filter(count => {
                             return count <= 0;
                         }),
+                        concatMap(() => this.m.cardMap$.pipe(skip(1), debounceTime(1000))),
                         mapTo(m)
                     );
                 }
             )
-        ).subscribe(([text, map]) => {
-            const newCards: ICard[] = [];
-            text.split('').forEach(c => {
+        ).subscribe(async ([text, map]) => {
+            const newCards  = new Set<string>();
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
                 if (isChineseCharacter(c)) {
                     if (!map[c] || !map[c].length) {
-                        newCards.push(getNewICardForWord(c, ''))
+                        if (!newCards.has(c)) {
+                            newCards.add(c);
+                        }
                     }
                 }
-            });
-            this.m.addUnpersistedCards$.next(newCards);
+            }
+            this.m.addUnpersistedCards$.next(Array.from(newCards.keys()).map(c => getNewICardForWord(c, '')))
         })
 
         Object.entries(this).forEach(([key, value]) => {
@@ -211,7 +205,6 @@ mark {
                     await rendition.display(target || '');
                     await this.applySelectListener(iframe);
                     let body = iframe.contents().find('body');
-                    RenderingBook.appendStyleToBody(body)
                     this.m.applyGlobalListener(body as unknown as HTMLElement);
                     await sleep(500);
                     this.renderedContentBody$.next(body)
@@ -229,7 +222,7 @@ mark {
         let contentWindow = iframe[0].contentWindow;
         if (!contentWindow) {
             return;
-            // throw new Error("Iframe has no content window");
+            throw new Error("Iframe has no content window");
 
         }
         const onMouseUp$ = fromEvent(contentWindow, 'mouseup');
@@ -242,9 +235,7 @@ mark {
             debounceTime(100)).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
                 return;
-/*
                 throw new Error("Iframe has no content window");
-*/
             }
             const activeEl = contentWindow.document.activeElement;
             if (activeEl) {
@@ -263,22 +254,17 @@ mark {
 
     private async getLeaves(body: JQuery<HTMLElement>): Promise<AnnotatedElement[]> {
         const leaves = RenderingBook.getTextElements(body);
-        return leaves.map((textNode: Element) => {
-            textNode.remove();
-
-            const div = $(`<div></div>`);
-            return new AnnotatedElement(this, $(div) as JQuery<HTMLElement>);
-/*
-            debugger;
+        const ret = leaves.map((textNode: Element) => {
             const parent: HTMLElement = <HTMLElement>textNode.parentElement;
             const myText: string = <string>textNode.textContent;
             const indexOfMe = getIndexOfEl(textNode);
-            const div = $(`<div></div>`);
-*/
-/*
+            textNode.remove();
+            const div = $(`<span>${myText}</span>`);
             parent.insertBefore(div[0], parent.children[indexOfMe]);
-*/
+            return new AnnotatedElement(this, $(div) as JQuery<HTMLElement>);
         });
+        RenderingBook.appendStyleToBody(body)
+        return ret;
         /*
                 const flashCards = body[0].getElementsByClassName('flashcard');
                 for (let i = 0; i < flashCards.length; i++) {
@@ -291,11 +277,14 @@ mark {
                 }
         */
     }
+    public static removeElementEffects(body: JQuery<HTMLElement>) {
+        // body.find('*').off('click mouseenter mouseleave')
+    }
 
     public static getTextElements(body: JQuery<HTMLElement>) {
         const leaves: Element[] = [];
         var walker = document.createTreeWalker(
-            document.body,
+            body[0],
             NodeFilter.SHOW_TEXT,
             null,
             false
@@ -305,10 +294,6 @@ mark {
         var textNodes = [];
 
         while(node = walker.nextNode()) {
-            // @ts-ignore
-            console.log(node.remove());
-            continue;
-            debugger;
             let trim = node.textContent?.trim();
             if (trim) {
                 leaves.push(node as Element);
