@@ -7,21 +7,22 @@ import {RenderingBook} from "./RenderingBook";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 
 export class AnnotatedElement {
-    private $originalContent: string;
+    private leafText: string;
 
     constructor(
         public r: RenderingBook,
         public $leafParent: JQuery<HTMLElement>
     ) {
-        this.$originalContent = $leafParent.text();
+        this.leafText = $leafParent.text();
         this.$leafParent.addClass('annotated_and_translated');
+        this.applyParentMouseEvents();
     }
 
     annotate(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         if (!uniqueLengths.length) {
             return {};
         }
-        const text = this.$originalContent;
+        const text = this.leafText;
         this.$leafParent.empty();
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
@@ -63,13 +64,18 @@ export class AnnotatedElement {
             })
 
             if (maxWord) {
-                this.applyMouseEvents(annotationElement, maxWord, i);
+                this.applySingleElementMouseEvents(annotationElement, maxWord, i);
             }
         }
         return elsMappedToWords;
     }
+    private applyParentMouseEvents() {
+        this.$leafParent.on("mouseenter", (ev) => {
+            this.r.currentTranslateText$.next(this.leafText);
+        });
+    }
 
-    private applyMouseEvents(annotationElement: IAnnotatedCharacter, maxWord: IPositionedWord, i: number) {
+    private applySingleElementMouseEvents(annotationElement: IAnnotatedCharacter, maxWord: IPositionedWord, i: number) {
         annotationElement.el.on("mouseenter", (ev) => {
             this.r.m.highlightedWord$.next(maxWord.word);
         });
@@ -78,14 +84,6 @@ export class AnnotatedElement {
         })
         annotationElement.el.on("click", (ev) => {
             this.$leafParent.children('.highlighted').removeClass('highlighted')
-/*
-            const elementsToHighlight = [];
-            const startIndex = i - maxWord.position;
-            for (let i = startIndex; i < startIndex + maxWord.word.length; i++) {
-                elementsToHighlight.push(characters[i].el);
-            }
-            elementsToHighlight.forEach(e => e.addClass('highlighted'))
-*/
             this.r.m.requestEditWord$.next(maxWord.word);
         })
         return i;

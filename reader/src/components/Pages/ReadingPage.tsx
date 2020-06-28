@@ -3,7 +3,7 @@ import {useObs, usePipe} from "../../lib/Worker/UseObs";
 import {Dictionary} from "lodash";
 import {RenderingBook} from "../../lib/Books/Rendering/RenderingBook";
 import Popups from "../Popups";
-import {Fab, Grid} from "@material-ui/core";
+import {Fab, Grid, Paper} from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import {BookContainer} from "../BookContainer";
 import React from "react";
@@ -53,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
         right: 0,
         zIndex: 10000,
         width: '100vw',
-        display: 'flex'
+        display: 'flex',
+        maxHeight: '1px'
     },
     avatar: {
         backgroundColor: theme.palette.primary.dark,
@@ -87,7 +88,8 @@ export function ReadingPage({m}: { m: Manager }) {
             )
         )
     )
-    const currentTranslateText = useObs(m.currentTextToBeTranslated$);
+    const textToBeTranslated = useObs(m.textToBeTranslated$);
+    const translatedText = useObs(m.translatedText$);
     return <Grid container className={classes.gridRoot} /*style={{display: 'grid', gridTemplateColumns: '50% 50%'}}*/>
         <div className={classes.popup}>
             <span>
@@ -116,15 +118,11 @@ export function ReadingPage({m}: { m: Manager }) {
                 {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>} <QuizDialogContainer m={m}/>
             </span>
             <span>
-                {currentTranslateText}
+                <Paper>
+                    <div> <Typography variant="h6">{textToBeTranslated || ''}</Typography> </div>
+                    <div> <Typography variant="subtitle1">{translatedText || ''}</Typography> </div>
+                </Paper>
             </span>
-{/*
-            <Fab onClick={() => m.simpleTextDialogOpen$.next(true)} style={{right: 0}}
-                 aria-label="save"
-            >
-                <AddIcon/>
-            </Fab>
-*/}
         </div>
         <Grid item xs={12} className={classes.bookList}>
             {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}

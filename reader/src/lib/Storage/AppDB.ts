@@ -31,8 +31,8 @@ export class MyAppDatabase extends Dexie {
         this.messages$.next("Tables initialized")
     }
 
-    async getCachedCardsExists(): Promise<boolean> {
-        return !!this.cards.offset(0).first();
+    async getCardsInDatabaseCount(): Promise<number> {
+        return this.cards.offset(0).count();
     }
 
     async* getCardsFromDB(

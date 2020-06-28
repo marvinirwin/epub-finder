@@ -1,6 +1,16 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+    concatMap,
+    debounce,
+    debounceTime,
+    filter,
+    map, mapTo,
+    skipUntil,
+    startWith,
+    switchMap,
+    withLatestFrom
+} from "rxjs/operators";
 import {Manager, sleep, getNewICardForWord} from "../../Manager";
 import $ from "jquery";
 // @ts-ignore
@@ -89,7 +99,13 @@ mark {
         this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
         this.bookInstance$.pipe(
             switchMap(i => i.rawText$),
-            withLatestFrom(this.m.cardMap$)
+            withLatestFrom(this.m.cardMap$),
+            concatMap(m =>
+                this.m.cardsLeftToLoad$.pipe(
+                    filter(count => count <= 0),
+                    mapTo(m)
+                )
+            )
         ).subscribe(([text, map]) => {
             const newCards: ICard[] = [];
             text.split('').forEach(c => {

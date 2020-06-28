@@ -180,8 +180,10 @@ export class Manager {
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
-    currentTextToBeTranslated$!: Observable<string>;
-    translatedText$!: Observable<void>;
+    textToBeTranslated$!: Observable<string>;
+    translatedText$!: Observable<string>;
+
+    cardsLeftToLoad$: ReplaySubject<number> = new ReplaySubject<number>(1);
 
     constructor(public db: MyAppDatabase) {
         this.oPackageLoader();
@@ -308,21 +310,22 @@ export class Manager {
 */
         this.bookLoadUpdates$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
         // thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
-
-        if (await this.db.getCachedCardsExists()) {
+        let unloadedCardCount = await this.db.getCardsInDatabaseCount()
+        this.cardsLeftToLoad$.next(unloadedCardCount);
+        if (unloadedCardCount) {
             const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
             const priorityWords = priorityCards?.value || [];
             for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
                 this.addPersistedCards$.next(cards);
+                this.cardsLeftToLoad$.next(unloadedCardCount);
             }
             for await (let cards of this.db.getCardsFromDB({}, 500)) {
+                unloadedCardCount -= cards.length;
                 this.addPersistedCards$.next(cards);
+                this.cardsLeftToLoad$.next(unloadedCardCount);
             }
 
-        } else {
-
         }
-
 
         // Maybe we dont want to load, because the cards we want will be pulled from the anki-thread anyways
         // this.addCards$.next(this.cardDBManager.load((t: Dexie.Table<ICard, number>) => t.toArray()));
@@ -445,10 +448,10 @@ export class Manager {
         });
         this.currentBook$.next(undefined);
 
-        this.currentTextToBeTranslated$ = this.bookDict$.pipe(
+        this.textToBeTranslated$ = this.bookDict$.pipe(
             switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)))
         )
-        this.translatedText$ = this.currentTextToBeTranslated$.pipe(
+        this.translatedText$ = this.textToBeTranslated$.pipe(
             debounceTime(100),
             flatMap(async learningText => {
                 const result = await axios.post('/translate', {
@@ -456,6 +459,7 @@ export class Manager {
                     to: 'en',
                     text: learningText
                 })
+                return result.data.translation;
             })
         )
     }
