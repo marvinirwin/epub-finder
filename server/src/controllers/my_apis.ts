@@ -12,7 +12,7 @@ const {Translate} = require("@google-cloud/translate").v2;
 
 
 
-export interface ISpeechParams {
+export interface SpeechParams {
     text: string;
 }
 
@@ -21,13 +21,18 @@ const getTwitter = async () => {
     const twitterKey = process.env["TWITTER_API_KEY"];
     const twitterSecret = process.env["TWITTER_API_KEY_SECRET"];
     const user = new Twitter({
+        // @ts-ignore
         consumer_key: twitterKey,
+        // @ts-ignore
         consumer_secret: twitterSecret,
     });
     const response = await user.getBearerToken();
     return new Twitter({
+        // @ts-ignore
         bearer_token: response.access_token,
+        // @ts-ignore
         consumer_key: twitterKey,
+        // @ts-ignore
         consumer_secret: twitterSecret,
     });
 };
@@ -59,16 +64,16 @@ const sendQuery = async (searchTerm: string) => {
 // Instantiates a client
 const translate = new Translate({projectId});
 
-interface ITranslationRequest {
+interface TranslationRequest {
     from: string;
     to: string;
     text: string;
 }
 
 function memInJSON(filename: string, f: (...a: any[]) => any) {
-    let memoFilePath = `${filename}.json`;
+    const memoFilePath = `${filename}.json`;
     const filedata = fs.existsSync(memoFilePath) && fs.readFileSync(memoFilePath).toString();
-    const memo: { [key: string]: any } = JSON.parse(filedata || '{}');
+    const memo: { [key: string]: any } = JSON.parse(filedata || "{}");
     return async function (...args: any[]) {
         const key = JSON.stringify(args);
         if (!memo[key]) {
@@ -80,7 +85,7 @@ function memInJSON(filename: string, f: (...a: any[]) => any) {
 }
 
 
-const translateFuncF = memInJSON("../TRANSLATIONS", async function (args: ITranslationRequest) {
+const translateFuncF = memInJSON("../TRANSLATIONS", async function (args: TranslationRequest) {
     const [translation] = await translate.translate(args.text, args.to);
     return {translation};
 });
@@ -90,36 +95,36 @@ export const translateFunc = async (req: Request, res: Response) => {
 };
 
 
-interface IImageSearchRequest {
+interface ImageSearchRequest {
     term: string;
     cb: (str: string) => void;
 }
 
-const imageSearchFuncF = memInJSON("../IMAGE_SEARCHES", async function (args: IImageSearchRequest) {
+const imageSearchFuncF = memInJSON("../IMAGE_SEARCHES", async function (args: ImageSearchRequest) {
     return sendQuery(args.term);
 });
 export const imageSearchFunc = async (req: Request, res: Response) => {
     return res.send(JSON.stringify({images: await imageSearchFuncF(req.body)}));
 };
 
-interface ILocationsRequest {
+interface LocationsRequest {
     term: string;
     cb: (str: string) => void;
 }
 
-const getLocationsF = memInJSON("../TREND_LOCATIONS", async function (args: ILocationsRequest) {
+const getLocationsF = memInJSON("../TREND_LOCATIONS", async function (args: LocationsRequest) {
     return await (await twitterInstance).get("trends/available");
 });
 export const getLocations = async (req: Request, res: Response) => {
-    let body = JSON.stringify(await getLocationsF(req.body));
+    const body = JSON.stringify(await getLocationsF(req.body));
     return res.send(body);
 };
 
-interface ITrendRequest {
+interface TrendRequest {
     id: number;
 }
 
-const getTrendForLocationF = memInJSON("../TWITTER_TRENDS", async function (args: ITrendRequest) {
+const getTrendForLocationF = memInJSON("../TWITTER_TRENDS", async function (args: TrendRequest) {
     return await (await twitterInstance).get("trends/place", {id: args.id});
 });
 export const getTrendForLocation = async (req: Request, res: Response) => {

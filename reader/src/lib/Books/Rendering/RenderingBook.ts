@@ -152,11 +152,15 @@ mark {
             this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500))
         ]).subscribe(async ([leaves]) => {
 
+            let uniqueLengths = uniq(this.m.cardManager.trie.t.getWords().map(w => w.length));
             this.renderInProgress$.next(true);
-            const chars: Dictionary<IAnnotatedCharacter[]>[] = leaves.map(l => l.annotate(
-                this.m.cardManager.trie.t,
-                uniq(this.m.cardManager.trie.t.getWords().map(w => w.length))
-            ));
+            const chars: Dictionary<IAnnotatedCharacter[]>[] = [];
+            for (let i = 0; i < leaves.length; i++) {
+                const leaf = leaves[i];
+                chars.push(leaf.annotate(this.m.cardManager.trie.t, uniqueLengths))
+                await sleep(1);
+            }
+
             const reducedChars = chars.reduce((
                 acc: Dictionary<IAnnotatedCharacter[]>,
                 cDict: Dictionary<IAnnotatedCharacter[]>) => {
@@ -239,7 +243,9 @@ mark {
 
     private async getLeaves(body: JQuery<HTMLElement>): Promise<AnnotatedElement[]> {
         const leaves = RenderingBook.getTextElements(body);
-        const ret = leaves.map((textNode: Element) => {
+        const ret = [];
+        for (let i = 0; i < leaves.length; i++) {
+            const textNode = leaves[i];
             const parent: HTMLElement = <HTMLElement>textNode.parentElement;
             const myText: string = <string>textNode.textContent;
             const indexOfMe = getIndexOfEl(textNode);
@@ -247,8 +253,9 @@ mark {
             const div = document.createElement('SPAN');
             div.textContent = myText;
             parent.insertBefore(div, parent.children[indexOfMe]);
-            return new AnnotatedElement(this, $(div) as JQuery<HTMLElement>);
-        });
+            await sleep(1);
+            ret.push(new AnnotatedElement(this, $(div) as JQuery<HTMLElement>));
+        }
         RenderingBook.appendStyleToBody(body);
 
 

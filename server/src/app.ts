@@ -1,4 +1,4 @@
-import morgan from 'morgan';
+import morgan from "morgan";
 
 import express from "express";
 import compression from "compression";  // compresses requests
@@ -80,7 +80,7 @@ app.use(passport.session());
 /*
 app.use(flash());
 */
-app.use(morgan('combined'))
+app.use(morgan("combined"));
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
 app.use((req, res, next) => {
@@ -113,7 +113,9 @@ app.use(
 /**
  * Primary app routes.
  */
-app.get("/files", express.static('/Users/frodo/PycharmProjects/vocabfinder/reader/public'));
+/*
+app.get("/files", express.static(""));
+*/
 /*
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
@@ -144,7 +146,9 @@ app.post("/get-speech", synthesisController.SynthesizeSpeech);
 /**
  * API examples routes.
  */
+/*
 app.get("/api", apiController.getApi);
+*/
 /*
 app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 */

@@ -17,6 +17,18 @@ import {Manager} from "../Manager";
 import {debounce} from "@material-ui/core";
 import {WavAudio} from "../WavAudio";
 import {getSynthesizedAudio} from "../AudioRecorder";
+import { memoize } from "lodash";
+
+interface IDefinition {
+    traditional: string;
+    simplified: string;
+    pinyin: string;
+}
+
+const hanzi = require("hanzi");
+hanzi.start();
+const lookup: (s: string) => IDefinition[] = memoize((chars: string) => hanzi.definitionLookup(chars))
+
 
 export class EditingCard {
     id?: number;
@@ -30,6 +42,7 @@ export class EditingCard {
     cardClosed$ = new Subject<void>();
     synthesizedSpeech$: Observable<WavAudio>;
     recordedAudio$: Observable<WavAudio>;
+    pinyin$: Observable<string>;
     constructor(
         public persistor: IndexDBManager<ICard>,
         public m: Manager,
@@ -38,7 +51,6 @@ export class EditingCard {
         // TODO should this be a replaySubject with share?
         this.synthesizedSpeech$ = this.learningLanguage$.pipe(
             flatMap(getSynthesizedAudio),
-            // shareReplay(1)// TODO this makes it a replaySubject(1), right?
         )
         this.recordedAudio$ = this.synthesizedSpeech$.pipe(
             withLatestFrom(
@@ -120,7 +132,21 @@ export class EditingCard {
             const rec = records[0];
             this.m.cardManager.addPersistedCards$.next([rec])
             this.saveInProgress$.next(false);
+        });
+
+        this.pinyin$ = this.learningLanguage$.pipe(map(s => {
+            const ret = lookup(s);
+            return ret.map(r => r.pinyin).join('/')
+        }));
+
+/*
+        this.pinyin$.pipe(withLatestFrom(this.knownLanguage$)).subscribe(([pinyin, definition]) => {
+            const defString = definition.join('');
+            if (!defString || !defString.trim()) {
+                this.knownLanguage$.next([pinyin]);
+            }
         })
+*/
     }
 
     static fromICard(iCard: ICard, persistor: IndexDBManager<ICard>, m: Manager): EditingCard {

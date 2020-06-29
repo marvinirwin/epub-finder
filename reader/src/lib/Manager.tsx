@@ -165,7 +165,7 @@ export class Manager {
     queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
-        new ReplaySubject<NavigationPages>(1), 'debug_observables_visible', NavigationPages.READING_PAGE
+        new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
     );
 
     nextQuizItem$:Observable<ICard | undefined>;

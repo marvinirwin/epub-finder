@@ -2,23 +2,23 @@ import crypto from "crypto";
 import {AudioConfig, SpeechConfig, SpeechSynthesizer} from "microsoft-cognitiveservices-speech-sdk";
 import fs from "fs-extra";
 import {encode} from "base64-arraybuffer";
-import {ISpeechParams} from "./my_apis";
+import {SpeechParams} from "./my_apis";
 import express, { Request, Response } from "express";
 
 const speechConfig = SpeechConfig.fromSubscription(process.env.AZURE_SPEECH_KEY1, process.env.AZURE_SPEECH_LOCATION);
-speechConfig.speechRecognitionLanguage = 'zh-CN'
-speechConfig.speechSynthesisLanguage = 'zh-CN'
-const SpeechSynthesisMemoFilePath = "../SPEECH_SYNTHESIS_MEMO.json"
+speechConfig.speechRecognitionLanguage = "zh-CN";
+speechConfig.speechSynthesisLanguage = "zh-CN";
+const SpeechSynthesisMemoFilePath = "../SPEECH_SYNTHESIS_MEMO.json";
 
 function loadSpeechSynthesisMemo(): {[key: string]: string} {
     const fileData = fs.existsSync(SpeechSynthesisMemoFilePath) && fs.readFileSync(SpeechSynthesisMemoFilePath).toString();
-    return JSON.parse(fileData || '{}');
+    return JSON.parse(fileData || "{}");
 }
 
 const speechSynthesisMemo = loadSpeechSynthesisMemo();
 
 function getMd5(text: any) {
-    return crypto.createHash('md5').update(text).digest("hex");
+    return crypto.createHash("md5").update(text).digest("hex");
 }
 
 function downloadSynthesizedSpeech(filename: string, text: string) {
@@ -37,22 +37,22 @@ function downloadSynthesizedSpeech(filename: string, text: string) {
                 async result => {
                     // TODO Put something here which checks if result is an error
                     console.log(result);
-                    resolve()
+                    resolve();
                     synthesizer.close();
                 },
                 error => {
                     console.log(error);
                     synthesizer.close();
-                    reject(error)
+                    reject(error);
                 });
         }
-    )
+    );
 }
 
 export async function SynthesizeSpeech(req: Request, res: Response) {
     const {text} = req.body;
-    let hash = getMd5(text)
-    let filename = `${hash}.wav`;
+    const hash = getMd5(text);
+    const filename = `${hash}.wav`;
     if (!speechSynthesisMemo[text]) {
         await downloadSynthesizedSpeech(filename, text);
         speechSynthesisMemo[text] = filename;

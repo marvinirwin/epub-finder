@@ -69,7 +69,9 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
             audioTest.text$.next(characters)
             setTest(audioTest)
         }
-    }, [characters])
+    }, [characters]);
+    const pinyin = useObs(card.pinyin$);
+
 
 
     return (
@@ -77,7 +79,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
 
             <CardContent>
                 <div className={classes.root}>
-                    <Typography variant="h6" gutterBottom> English </Typography>
+                    <Typography variant="h6" gutterBottom> English ({pinyin}) </Typography>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m}/>
