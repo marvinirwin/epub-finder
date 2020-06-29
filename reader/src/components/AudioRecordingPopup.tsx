@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from "react";
 import {Manager} from "../lib/Manager";
 import {useObs} from "../lib/Worker/UseObs";
-import {Card, CardContent} from "@material-ui/core";
+import {Card, CardContent, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {AudioRecorder} from "../lib/AudioRecorder";
 import MultiGraph from "./MultiGraph";
@@ -33,8 +33,7 @@ const useStyles = makeStyles((theme) => ({
         flexFlow: 'column nowrap'
     },
     canvas: {
-        width: '100%',
-        height: '25px'
+        flexGrow: 1
     },
 }));
 
@@ -57,15 +56,18 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
 
     return <Card className={classes.root}>
         <CardContent>
-
+            <div style={{display: 'flex'}}>
+                <div className="led-box">
+                    <div className={isRecording ? 'led-red' : 'led-off'}/>
+                </div>
+                <Typography variant="h6">{req?.label}</Typography>
+                <canvas ref={canvasRef} className={classes.canvas}/>
+            </div>
+            <div>
+                <audio src={userAudio?.url} controls autoPlay />
+                <audio src={synthAudio?.url} controls autoPlay />
+            </div>
+            {graphData && <MultiGraph plots={graphData}/>}
         </CardContent>
-        <div>active: {isRecording ? "True" : "False"}</div>
-        <div>label: {req?.label}</div>
-        <div>mediaSource active: {mediaSource?.active}</div>
-        <div>mediaSource id: {mediaSource?.id}</div>
-        <canvas ref={canvasRef} className={classes.canvas}/>
-        <audio src={userAudio?.url} controls/>
-        <audio src={synthAudio?.url} controls/>
-        {graphData && <MultiGraph plots={graphData}/>}
     </Card>;
 }

@@ -1,15 +1,15 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, flatten, groupBy, orderBy, sortBy} from "lodash";
 import {
-    buffer,
-    debounceTime,
+    buffer, concatMap,
+    debounceTime, delay,
     filter, flatMap,
     map,
     pairwise,
     scan,
     shareReplay,
     startWith,
-    switchMap,
+    switchMap, switchMapTo,
     take,
     withLatestFrom
 } from "rxjs/operators";
@@ -46,8 +46,10 @@ import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {WavAudio} from "./WavAudio";
 import {Settings} from "./Interfaces/Message";
 import {iWordCountRow} from "./Interfaces/IWordCountRow";
-import {AudioManager} from "./AudioManager";
+import {AudioManager} from "./Manager/AudioManager";
 import {Website} from "./Books/Website";
+import CardManager from "./Manager/CardManager";
+import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
@@ -108,11 +110,6 @@ export class Manager {
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
 
-    addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
-    addUnpersistedCards$ = new Subject<ICard[]>();
-
-    cardMap$!: Observable<Dictionary<ICard[]>>;
-    trieWrapper = new TrieWrapper(trie([]));
 
     queEditingCard$: ReplaySubject<EditingCard> = new ReplaySubject<EditingCard>(1);
     currentEditingCardIsSaving$!: Observable<boolean | undefined>;
@@ -141,7 +138,7 @@ export class Manager {
 
     currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
     bookLoadUpdates$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>();
-    bookDict$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
+    bookIndex$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
     requestBookRemove$: Subject<RenderingBook> = new Subject<RenderingBook>()
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
@@ -180,18 +177,22 @@ export class Manager {
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
+    cardManager: CardManager;
     textToBeTranslated$!: Observable<string>;
     translatedText$!: Observable<string>;
 
-    cardsLeftToLoad$: ReplaySubject<number> = new ReplaySubject<number>(1);
+    renderingInProgress$: Observable<boolean>;
 
     constructor(public db: MyAppDatabase) {
+        this.cardManager = new CardManager(this);
+        this.cardManager.load();
+
         this.oPackageLoader();
         this.oMessages();
 /*
         this.oCurrent();
 */
-        this.oCards();
+        this.oEditingCard();
         this.oBook();
 
         /*
@@ -219,7 +220,7 @@ export class Manager {
                 // r will be in descending order, so just find the one which has no record, or a record before 1 minute ago
                 return sortedRows.find(({lastRecord, row}) => !lastRecord || lastRecord.timestamp.getTime() < oneMinuteAgo)?.lastRecord?.word
             }),
-            withLatestFrom(this.cardMap$),
+            withLatestFrom(this.cardManager.cardIndex$),
             map(([char, cardMap]) => {
                 if (!char) return undefined;
                 const cards = cardMap[char] || []
@@ -227,13 +228,13 @@ export class Manager {
             })
         )
 
-        this.requestBookRemove$.pipe(withLatestFrom(this.bookDict$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
+        this.requestBookRemove$.pipe(withLatestFrom(this.bookIndex$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
             delete bookDict[bookToRemove.name];
             if (bookToRemove === currentBook) {
                 this.currentBook$.next(Object.values(bookDict)[0])
             }
             bookToRemove.removeSerialized();
-            this.bookDict$.next({...bookDict});
+            this.bookIndex$.next({...bookDict});
         });
 
         this.oStringDisplay();
@@ -247,6 +248,36 @@ export class Manager {
 
         this.audioManager = new AudioManager(this)
 
+        this.cardManager.cardLoadingSignal$.pipe(
+            filter(b => !b),
+            delay(100),
+            switchMapTo(this.bookIndex$),
+            switchMap(bookIndex => merge(
+                ...Object.values(bookIndex).map(v => v.bookInstance$.pipe(switchMap(i => i.rawText$))))
+            ),
+            withLatestFrom(this.cardManager.cardIndex$)
+        ).subscribe(([text, cardIndex]) => {
+            const newCharacterSet = new Set<string>();
+            for (let i = 0; i < text.length; i++) {
+                const textElement = text[i];
+                if (isChineseCharacter(textElement)) {
+                    if (!cardIndex[textElement]) {
+                        newCharacterSet.add(textElement);
+                    }
+                }
+            }
+            const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
+            if (newCards.length) {
+                debugger;console.log();
+            }
+            this.cardManager.addUnpersistedCards$.next(newCards);
+        });
+
+        this.renderingInProgress$ = this.bookIndex$.pipe(
+            switchMap(bookIndex => combineLatest(Object.values(bookIndex).map(book => book.isRendering$))),
+            map((rendersInProgress: boolean[]) => !!rendersInProgress.find(v => v)),
+        )
+
         this.oLoad();
 
 /*
@@ -259,7 +290,7 @@ export class Manager {
 
     private oAnnotations() {
         let previousHighlightedElements: JQuery<HTMLElement>[] | undefined;
-        this.bookDict$.pipe(
+        this.bookIndex$.pipe(
             switchMap(d =>
                 combineLatest(Object.values(d).map(d => d.annotatedCharMap$))
             ),
@@ -288,7 +319,7 @@ export class Manager {
     }
 
     private oQuiz() {
-        this.requestQuizCharacter$.pipe(withLatestFrom(this.cardMap$)).subscribe(([char, map]) => {
+        this.requestQuizCharacter$.pipe(withLatestFrom(this.cardManager.cardIndex$)).subscribe(([char, map]) => {
             if (!map[char]) {
                 throw new Error(`Cannot quiz char ${char} because no ICard found`)
             }
@@ -310,22 +341,6 @@ export class Manager {
 */
         this.bookLoadUpdates$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
         // thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
-        let unloadedCardCount = await this.db.getCardsInDatabaseCount()
-        this.cardsLeftToLoad$.next(unloadedCardCount);
-        if (unloadedCardCount) {
-            const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
-            const priorityWords = priorityCards?.value || [];
-            for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
-                this.addPersistedCards$.next(cards);
-                this.cardsLeftToLoad$.next(unloadedCardCount);
-            }
-            for await (let cards of this.db.getCardsFromDB({}, 500)) {
-                unloadedCardCount -= cards.length;
-                this.addPersistedCards$.next(cards);
-                this.cardsLeftToLoad$.next(unloadedCardCount);
-            }
-
-        }
 
         // Maybe we dont want to load, because the cards we want will be pulled from the anki-thread anyways
         // this.addCards$.next(this.cardDBManager.load((t: Dexie.Table<ICard, number>) => t.toArray()));
@@ -333,7 +348,7 @@ export class Manager {
 
     private oEditWord() {
         this.requestEditWord$.pipe(withLatestFrom(
-            this.cardMap$,
+            this.cardManager.cardIndex$,
             this.currentPackage$.pipe(startWith(undefined)),
             this.currentDeck$.pipe(startWith(undefined)),
             this.currentCollection$.pipe(startWith(undefined)))
@@ -414,7 +429,7 @@ export class Manager {
     }
 
     private oBook() {
-        this.bookLoadUpdates$.pipe(withLatestFrom(this.bookDict$)).subscribe(([instance, dict]) => {
+        this.bookLoadUpdates$.pipe(withLatestFrom(this.bookIndex$)).subscribe(([instance, dict]) => {
             const currentRender: RenderingBook = dict[instance.name];
             if (currentRender) {
                 currentRender.bookInstance$.next(instance);
@@ -422,15 +437,15 @@ export class Manager {
                 let renderingBook = new RenderingBook(instance, this, instance.name);
                 renderingBook.renderMessages$.pipe(map(m => new DebugMessage(`render-${renderingBook.name}`, m)))
                     .subscribe(this.allDebugMessages$)
-                this.bookDict$.next({
-                    ...this.bookDict$.getValue(),
+                this.bookIndex$.next({
+                    ...this.bookIndex$.getValue(),
                     [instance.name]: renderingBook
                 })
             }
         });
 
         combineLatest([
-            this.bookDict$,
+            this.bookIndex$,
             this.currentBook$
         ]).subscribe(([bookDict, currentBook]) => {
             if (currentBook) {
@@ -448,7 +463,7 @@ export class Manager {
         });
         this.currentBook$.next(undefined);
 
-        this.textToBeTranslated$ = this.bookDict$.pipe(
+        this.textToBeTranslated$ = this.bookIndex$.pipe(
             switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)).pipe(debounceTime(100))),
             shareReplay(1)
         );
@@ -500,21 +515,7 @@ export class Manager {
         }
     */
 
-    private oCards() {
-        this.cardMap$ = this.addPersistedCards$.pipe(
-            startWith([]),
-            buffer(this.addPersistedCards$.pipe(startWith([]), debounceTime(500))),
-            map(flatten),
-            scan((acc: Dictionary<ICard[]>, newCards) => {
-                const o = {...acc};
-                newCards.forEach(newICard => {
-                    Manager.mergeCardIntoCardDict(newICard, o);
-                    this.trieWrapper.addWords(newICard.learningLanguage);
-                });
-                return o;
-            }, {}),
-            shareReplay(1)
-            );
+    private oEditingCard() {
 
 
 
@@ -543,19 +544,6 @@ export class Manager {
             shareReplay(1)
         );
 
-        this.addUnpersistedCards$.pipe(
-            map(async cards => {
-                for (let i = 0; i < cards.length; i++) {
-                    const card = cards[i];
-                    debugger;
-                    card.id = await this.db.cards.add(card);
-                }
-                return cards;
-            })).subscribe((cardsPromise: Promise<ICard[]>) => {
-            cardsPromise.then(cardsWithIds => {
-                this.addPersistedCards$.next(cardsWithIds);
-            })
-        })
 
         this.currentEditingSynthesizedWavFile$ = this.currentEditingCard$.pipe(
             filter(c => !!c),
@@ -564,27 +552,6 @@ export class Manager {
             })
         )
     }
-
-    private static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
-        const detectDuplicateCard = getIsMeFunction(newICard);
-        let presentCards = o[newICard.learningLanguage];
-        if (presentCards) {
-            const indexOfDuplicateCard = presentCards.findIndex(detectDuplicateCard);
-            if (indexOfDuplicateCard >= 0) {
-                const presentCard = presentCards[indexOfDuplicateCard];
-                if (newICard.timestamp > presentCard.timestamp) {
-                    // TODO will I have to update this?
-                    // Probably not, if there is an editingCard it will definitely take precendence over this
-                    presentCards[indexOfDuplicateCard] = newICard;
-                }
-            } else {
-                presentCards.push(newICard)
-            }
-        } else {
-            o[newICard.learningLanguage] = [newICard]
-        }
-    }
-
     private oMessages() {
         this.allDebugMessages$ = new ReplaySubject<DebugMessage>();
         this.allDebugMessages$.pipe(scan((acc: DebugMessage[], m) => {

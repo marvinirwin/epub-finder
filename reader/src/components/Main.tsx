@@ -139,16 +139,14 @@ export function Main({s}: { s: AppSingleton }) {
     useEffect(() => {
         m.applyGlobalListener(document.body);
     }, [m]);
-    const books = useObs<Dictionary<RenderingBook>>(m.bookDict$);
+    const books = useObs<Dictionary<RenderingBook>>(m.bookIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
         <div style={{
             position: 'absolute',
-            maxHeight: '90vh',
-            minHeight: '90vh',
-            maxWidth: '100vw',
-            minWidth: '100vw',
+            height: '90vh',
+            width: '100vw',
             top: iframeVisible ? 0 : '9000px'
         }}>
             {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}

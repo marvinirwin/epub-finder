@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const ExpansionPanelNoMargin = withStyles({
     root: {
+        backgroundColor: 'white',
         border: '1px solid rgba(0, 0, 0, .125)',
         boxShadow: 'none',
         '&:not(:last-child)': {
@@ -41,6 +42,7 @@ export const ExpansionPanelNoMargin = withStyles({
         },
     },
     expanded: {
+        backgroundColor: 'white',
         height: '100%' // Easy way to make it take up all available room when expanded
     },
 })(MuiExpansionPanel);

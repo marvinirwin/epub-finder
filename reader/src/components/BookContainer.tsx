@@ -57,29 +57,6 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
 */
 
     return (
-        <ExpansionPanelNoMargin defaultExpanded className={"book-expansion-panel"}>
-            <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon/>}
-                aria-controls="panel1c-content"
-                id="panel1c-header"
-            >
-                <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', width: '100%', }}>
-                    <Typography variant={'h6'}>{rb.name}</Typography>
-                    <IconButton onClick={() => m.requestBookRemove$.next(rb)}>
-                        <DeleteIcon/>
-                    </IconButton>
-                </div>
-            </ExpansionPanelSummary>
-            <StyledExpansionPanelDetails>
-                <StyledCollapse in={expanded} timeout="auto" unmountOnExit>
-                    <div style={{display: 'flex', flexFlow: 'column nowrap'}}>
-                        <div style={{flexGrow: 1}} id={rb.getId()} ref={ref}/>
-{/*
-                        <p style={{flexGrow: 1}}>{translationText}</p>
-*/}
-                    </div>
-                </StyledCollapse>
-            </StyledExpansionPanelDetails>
-        </ExpansionPanelNoMargin>
+        <div style={{width: '100%', height: '100%'}} id={rb.getId()} ref={ref}/>
     );
 }

@@ -4,8 +4,7 @@ import React from "react";
 import {debounceTime, map, scan} from "rxjs/operators";
 
 export function SettingsPage({m}: { m: Manager }) {
-    const cardsLeftToLoad = useObs(m.cardsLeftToLoad$)
-    const cardMap = useObs(m.cardMap$);
+    const cardMap = useObs(m.cardManager.cardIndex$);
     const textToBeTranslated = usePipe(m.textToBeTranslated$, c => c.pipe(
         debounceTime(500),
         scan((acc: string[], v) => {acc.push(v); return acc;}, []),
@@ -13,7 +12,6 @@ export function SettingsPage({m}: { m: Manager }) {
     ));
     const translatedText = useObs(m.translatedText$);
     return <div>
-        <div>Cards left to load: {cardsLeftToLoad}</div>
         <div>Card Map key count: {cardMap ? Object.values(cardMap).length : 'undefined'}</div>
         <div>Text to translate: {textToBeTranslated}</div>
         <div>Translated text: {translatedText}</div>

@@ -48,12 +48,19 @@ export class AnnotatedElement {
                 return newWord;
             });
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
+            const el = document.createElement('MARK');
+            el.textContent = text[i];
+/*
             let el = $(`<mark >${text[i]}</mark>`);
+*/
+            this.$leafParent.append(el);
+/*
             el.appendTo(this.$leafParent)
+*/
             let annotationElement: IAnnotatedCharacter = {
                 char: text[i],
                 words: words,
-                el: el
+                el: $(el)
             };
             annotationElement.words.forEach(w => {
                 if (elsMappedToWords[w.word]) {

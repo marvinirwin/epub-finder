@@ -17,6 +17,7 @@ import {AudioRecorder, AudioTest} from "../../lib/AudioRecorder";
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        backgroundColor: theme.palette.background.default,
         width: '100%',
         '& > *': {
             width: '100%'

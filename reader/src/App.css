@@ -86,6 +86,7 @@
 }
 
 
+/*
 .book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered,
 .book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper,
 .book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner,
@@ -96,13 +97,45 @@
 .book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div > div > div,
 .book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div > div > div > div
 {
-    max-height: 90vh !important;
-    min-height: 90vh !important;
+    height: 90vh !important;
     width: 100vw;
     z-index: 0;
 }
 .book-expansion-panel {
     height: 90vh;
+}
+*/
+
+/* HACK to make */
+.makeStyles-popup-18 > span > div > div {
+    background-color: white;
+}
+
+.led-off {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    background-color: #9e9e9e;
+    border-radius: 50%;
+}
+.led-red {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    background-color: #F00;
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+    -webkit-animation: blinkRed 0.5s infinite;
+    -moz-animation: blinkRed 0.5s infinite;
+    -ms-animation: blinkRed 0.5s infinite;
+    -o-animation: blinkRed 0.5s infinite;
+    animation: blinkRed 0.5s infinite;
+}
+.led-box {
+    height: 30px;
+    width: 25%;
+    margin: 10px 0;
+    float: left;
 }
 
 

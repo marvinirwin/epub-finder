@@ -30,7 +30,7 @@ function getIndexOfEl(textNode: Element): number {
 }
 
 export class RenderingBook {
-    bookInstance$: Subject<BookInstance> = new Subject<BookInstance>()
+    bookInstance$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>(1)
     renderMessages$: ReplaySubject<string> = new ReplaySubject<string>();
     currentSpineItem$: ReplaySubject<aSpineItem | undefined> = new ReplaySubject(1);
     renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
@@ -44,6 +44,8 @@ export class RenderingBook {
 
     annotatedCharMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     currentTranslateText$ = new Subject<string>();
+
+    isRendering$ = new ReplaySubject<boolean>(1);
 
     private static appendStyleToBody(body: JQuery<HTMLElement>) {
         let style = $(`
@@ -86,6 +88,8 @@ mark {
         public name: string,
     ) {
 
+        this.isRendering$.next(true);
+
         this.localStorageKey = bookInstance.localStorageKey;
         this.persistor = new LocalStorageManager(bookInstance.localStorageKey);
         this.bookInstance$.subscribe(instance => {
@@ -93,33 +97,6 @@ mark {
         });
 
         this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
-        this.bookInstance$.pipe(
-            switchMap(i => i.rawText$),
-            withLatestFrom(this.m.cardMap$),
-            concatMap(m => {
-                    return this.m.cardsLeftToLoad$.pipe(
-                        filter(count => {
-                            return count <= 0;
-                        }),
-                        concatMap(() => this.m.cardMap$.pipe(skip(1), debounceTime(1000))),
-                        mapTo(m)
-                    );
-                }
-            )
-        ).subscribe(async ([text, map]) => {
-            const newCards  = new Set<string>();
-            for (let i = 0; i < text.length; i++) {
-                const c = text[i];
-                if (isChineseCharacter(c)) {
-                    if (!map[c] || !map[c].length) {
-                        if (!newCards.has(c)) {
-                            newCards.add(c);
-                        }
-                    }
-                }
-            }
-            this.m.addUnpersistedCards$.next(Array.from(newCards.keys()).map(c => getNewICardForWord(c, '')))
-        })
 
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
@@ -160,19 +137,25 @@ mark {
     }
 
     private oAnnotate() {
-        this.renderedContentBody$.pipe(map($r => this.getLeaves($r)))
+        this.renderedContentBody$.pipe(map($r => {
+            return this.getLeaves($r);
+
+        }))
             .subscribe(async (leafPromise: Promise<AnnotatedElement[]>) => {
+                this.isRendering$.next(true)
                 this.leaves$.next(await leafPromise);
+
             })
 
         combineLatest([
             this.leaves$,
-            this.m.trieWrapper.changeSignal$.pipe(debounceTime(500))
+            this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500))
         ]).subscribe(async ([leaves]) => {
 
+            this.renderInProgress$.next(true);
             const chars: Dictionary<IAnnotatedCharacter[]>[] = leaves.map(l => l.annotate(
-                this.m.trieWrapper.t,
-                uniq(this.m.trieWrapper.t.getWords().map(w => w.length))
+                this.m.cardManager.trie.t,
+                uniq(this.m.cardManager.trie.t.getWords().map(w => w.length))
             ));
             const reducedChars = chars.reduce((
                 acc: Dictionary<IAnnotatedCharacter[]>,
@@ -181,6 +164,8 @@ mark {
                 return acc;
             }, {})
             this.annotatedCharMap$.next(reducedChars);
+
+            this.renderInProgress$.next(false);
         })
     }
 
@@ -205,8 +190,8 @@ mark {
                     await rendition.display(target || '');
                     await this.applySelectListener(iframe);
                     let body = iframe.contents().find('body');
-                    this.m.applyGlobalListener(body as unknown as HTMLElement);
                     await sleep(500);
+                    this.m.applyGlobalListener(body as unknown as HTMLElement);
                     this.renderedContentBody$.next(body)
                     // @ts-ignore
                 } else {
@@ -230,7 +215,7 @@ mark {
             this.m.currentDeck$.pipe(startWith(undefined)),
             this.m.currentCollection$.pipe(startWith(undefined)),
             this.m.currentPackage$.pipe(startWith(undefined)),
-            this.m.cardMap$
+            this.m.cardManager.cardIndex$
             ),// For some reason this fires twice always?
             debounceTime(100)).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
@@ -259,11 +244,14 @@ mark {
             const myText: string = <string>textNode.textContent;
             const indexOfMe = getIndexOfEl(textNode);
             textNode.remove();
-            const div = $(`<span>${myText}</span>`);
-            parent.insertBefore(div[0], parent.children[indexOfMe]);
+            const div = document.createElement('SPAN');
+            div.textContent = myText;
+            parent.insertBefore(div, parent.children[indexOfMe]);
             return new AnnotatedElement(this, $(div) as JQuery<HTMLElement>);
         });
-        RenderingBook.appendStyleToBody(body)
+        RenderingBook.appendStyleToBody(body);
+
+
         return ret;
         /*
                 const flashCards = body[0].getElementsByClassName('flashcard');

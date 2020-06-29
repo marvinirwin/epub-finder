@@ -1,14 +1,9 @@
 import {Manager} from "../../lib/Manager";
 import {useObs, usePipe} from "../../lib/Worker/UseObs";
-import {Dictionary} from "lodash";
-import {RenderingBook} from "../../lib/Books/Rendering/RenderingBook";
-import Popups from "../Popups";
 import {Fab, Grid, Paper} from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import {BookContainer} from "../BookContainer";
+import CancelIcon from "@material-ui/icons/Cancel";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import QuizDialogContainer from "../QuizPopup";
 import {ExpansionPanelNoMargin} from "../ExpansionPanelNoMargin";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -20,7 +15,6 @@ import {AudioRecordingPopup} from "../AudioRecordingPopup";
 import CardHeader from "@material-ui/core/CardHeader";
 import CircularIntegration, {SpinnerState} from "../SpinningCircle";
 import Avatar from "@material-ui/core/Avatar";
-import Card from "@material-ui/core/Card";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import {Observable, of} from "rxjs";
 import {filter, switchMap} from "rxjs/operators";
@@ -46,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     popup: {
         position: 'absolute',
         right: 0,
-        zIndex: 10000,
+        zIndex: 2,
         width: '100vw',
         display: 'flex',
         maxHeight: '1px'
@@ -86,6 +80,7 @@ export function ReadingPage({m}: { m: Manager }) {
     const translatedText = useObs(m.translatedText$);
     return <Grid container className={classes.gridRoot} /*style={{display: 'grid', gridTemplateColumns: '50% 50%'}}*/>
         <div className={classes.popup}>
+            {editingCard && <Fab><CancelIcon/></Fab>}
             <span>
                 {editingCard && <ExpansionPanelNoMargin defaultExpanded>
                     <ExpansionPanelSummary
@@ -111,11 +106,9 @@ export function ReadingPage({m}: { m: Manager }) {
             <span>
                 {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>}
             </span>
-            <span style={{maxHeight: '50vh', overflow: 'scroll'}}>
-                <Paper>
-                    <div> <Typography variant="h6">{textToBeTranslated || ''}</Typography> </div>
-                    <div> <Typography variant="subtitle1">{translatedText || ''}</Typography> </div>
-                </Paper>
+            <span >
+                <div style={{backgroundColor: 'white'}}> <Typography variant="h6">{textToBeTranslated || ''}</Typography> </div>
+                <div style={{backgroundColor: 'white'}}> <Typography variant="subtitle1">{translatedText || ''}</Typography> </div>
             </span>
         </div>
     </Grid>

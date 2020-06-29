@@ -1,7 +1,7 @@
-import {AudioRecorder} from "./AudioRecorder";
+import {AudioRecorder} from "../AudioRecorder";
 import {combineLatest, Observable, of, zip} from "rxjs";
-import {WavAudio} from "./WavAudio";
-import {Manager} from "./Manager";
+import {WavAudio} from "../WavAudio";
+import {Manager} from "../Manager";
 import {debounceTime, filter, map, shareReplay, switchMap} from "rxjs/operators";
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
