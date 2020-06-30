@@ -1,6 +1,6 @@
 import {WordCountTableRow} from "../ReactiveClasses/WordCountTableRow";
 
-export interface iCountRowEmitted {
+export interface ICountRowEmitted {
     count: number;
     row: WordCountTableRow
 }

@@ -1,9 +1,18 @@
 import {from, Observable, ReplaySubject, Subject} from "rxjs";
-import {flatMap, mergeMap, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {concatMap, flatMap, map, mergeMap, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import React from "react";
 import axios from "axios";
 import {WavAudio} from "./WavAudio";
 import {IRecordRequest} from "./Interfaces/IRecordRequest";
+import {sleep} from "./Manager";
+import {AudioConfig, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
+import assert from "assert";
+
+// TODO does this work?
+let AZURE_SPEECH_REGION = 'westus2' as string;
+
+assert(AZURE_SPEECH_REGION);
+
 
 export const audioContext = new Promise<AudioContext>(resolve => {
     setTimeout(() => {
@@ -39,25 +48,53 @@ export class AudioRecorder {
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
     isRecording$ = new ReplaySubject<boolean>(1);
     userAudio$: Observable<WavAudio>;
+    countdown$ = new ReplaySubject<number>(1);
+    speechRecognitionToken$ = new ReplaySubject<string>(1);
+    speechConfig$: Observable<SpeechConfig>;
+    speechRecongitionText$ = new ReplaySubject<string>(1);
 
 
     constructor() {
+        axios.post(`/speech-recognition-token`).then(result => {
+            const token = result.data as string;
+            this.speechRecognitionToken$.next(token);
+        })
+
+        this.speechConfig$ = this.speechRecognitionToken$.pipe(
+            map(t => {
+                    const speechConfig = SpeechConfig.fromAuthorizationToken(t, AZURE_SPEECH_REGION);
+                    speechConfig.speechRecognitionLanguage = "zh-CN";
+                    return speechConfig;
+                }
+            )
+        )
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
 
-        /*
-                this.audioChunks$ = this.blobs$.pipe(
-                    flatMap(blob => new Response(blob).arrayBuffer()),
-                    flatMap(buffer => audioContext.decodeAudioData(buffer))
-                )
-                this.graphDataChunks$ = this.audioChunks$.pipe(
-                    map(chunk => filterData(chunk, 50)),
-                    map(chunk => normalizeData(chunk)),
-                )
-        */
         this.userAudio$ = this.recordRequest$.pipe(
-            withLatestFrom(this.mediaSource$, this.canvas$),
-            flatMap(async ([req, source, canvas]: [IRecordRequest, MediaStream, HTMLCanvasElement]) => {
+            withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
+            flatMap(async args => {
+                for (let i = 0; i <= 3; i++) {
+                    this.countdown$.next(3 - i);
+                    await sleep(1000)
+                }
+                return args;
+            }, 1),
+            flatMap(async ([req, source, canvas, speechConfig]: [IRecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
                 this.isRecording$.next(true);
+                const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
+                const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+                recognizer.recognizeOnceAsync(
+                    (result) => {
+                        this.speechRecongitionText$.next(result.text)
+                        debugger;
+                        window.console.log(result);
+                        recognizer.close();
+                    },
+                    function (err) {
+                        console.error(err);
+                        recognizer.close();
+                    });
+
                 try {
                     const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
                     const recorder = new MediaRecorder(source);
@@ -73,7 +110,8 @@ export class AudioRecorder {
                         analyser.fftSize = 2048;
                         const bufferLength = analyser.frequencyBinCount;
                         const dataArray = new Uint8Array(bufferLength);
-                        stream.connect(analyser).connect((await audioContext).destination);
+                        // Dont connect back to speakers
+                        stream.connect(analyser)/*.connect((await audioContext).destination)*/;
                         const draw = () => {
                             const WIDTH = canvas.width
                             const HEIGHT = canvas.height;
@@ -123,27 +161,6 @@ export class AudioRecorder {
                 }
             })
         )
-        /*
-                this.graphData$ = this.finishedRecordingData.pipe(
-                    flatMap(async (recordingData: Blob) => {
-                        const blob = new Blob([recordingData], {type: 'audio/wav'})
-                        const buffer = await (new Response(blob)).arrayBuffer();
-                        const wav = new WavAudio(buffer, ))
-                        try {
-                            return await audioContext.decodeAudioData(buffer)
-                        } catch (e) {
-                            console.log("Error decoding user audio")
-                            console.error(e);
-                        }
-                        return;
-                    }),
-                    filter(v => !!v),
-                    map(d => {
-                        // @ts-ignore
-                        return normalizeData(filterData(d, AUDIO_GRAPH_SAMPLE_SIZE));
-                    })
-                )
-        */
     }
 
     getRecording(text: string, duration: number): Promise<WavAudio> {
@@ -164,10 +181,10 @@ export function spaceOutRecording() {
 export async function getSynthesizedAudio(text: string): Promise<WavAudio> {
     const response = await axios.post('/get-speech', {text}, {responseType: 'blob'});
     const buffer = await new Response(response.data as Blob).arrayBuffer()
-/*
-    const b = new Blob([response.data as Blob], {type: 'audio/wav'})
-    const buffer =
-*/
+    /*
+        const b = new Blob([response.data as Blob], {type: 'audio/wav'})
+        const buffer =
+    */
     return new WavAudio(buffer);
 }
 

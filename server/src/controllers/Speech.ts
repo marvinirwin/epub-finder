@@ -1,16 +1,20 @@
 import crypto from "crypto";
-import {AudioConfig, SpeechConfig, SpeechSynthesizer} from "microsoft-cognitiveservices-speech-sdk";
+import {AudioConfig, SpeechConfig, SpeechSynthesizer, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
 import fs from "fs-extra";
-import {encode} from "base64-arraybuffer";
-import {SpeechParams} from "./my_apis";
-import express, { Request, Response } from "express";
+import {Request, Response} from "express";
+import axios from "axios";
 
-const speechConfig = SpeechConfig.fromSubscription(process.env.AZURE_SPEECH_KEY1, process.env.AZURE_SPEECH_LOCATION);
+// TODO is AZURE_SPEECH_LOCATION the region?  They're both location oriented words
+const region = process.env.AZURE_SPEECH_LOCATION;
+const subscriptionKey = process.env.AZURE_SPEECH_KEY1;
+const speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region);
+
 speechConfig.speechRecognitionLanguage = "zh-CN";
 speechConfig.speechSynthesisLanguage = "zh-CN";
+
 const SpeechSynthesisMemoFilePath = "../SPEECH_SYNTHESIS_MEMO.json";
 
-function loadSpeechSynthesisMemo(): {[key: string]: string} {
+function loadSpeechSynthesisMemo(): { [key: string]: string } {
     const fileData = fs.existsSync(SpeechSynthesisMemoFilePath) && fs.readFileSync(SpeechSynthesisMemoFilePath).toString();
     return JSON.parse(fileData || "{}");
 }
@@ -49,7 +53,7 @@ function downloadSynthesizedSpeech(filename: string, text: string) {
     );
 }
 
-export async function SynthesizeSpeech(req: Request, res: Response) {
+export async function TextToSpeech(req: Request, res: Response) {
     const {text} = req.body;
     const hash = getMd5(text);
     const filename = `${hash}.wav`;
@@ -63,4 +67,21 @@ export async function SynthesizeSpeech(req: Request, res: Response) {
 
 }
 
+export async function GetSpeechRecognitionToken(req: Request, res: Response) {
+    const result = await axios.post(
+        `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
+        {},
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "Ocp-Apim-Subscription-Key": subscriptionKey
+            }
+        }
+    );
+    debugger;
+    res.send(result.data);
+}
 
+export interface SpeechSynthesisParams {
+    text: string;
+}

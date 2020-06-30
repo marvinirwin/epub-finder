@@ -1,7 +1,7 @@
 import morgan from "morgan";
 
 import express from "express";
-import compression from "compression";  // compresses requests
+import compression from "compression"; // compresses requests
 /*
 import session from "express-session";
 */
@@ -10,24 +10,16 @@ import lusca from "lusca";
 /*
 import mongo from "connect-mongo";
 */
-import flash from "express-flash";
 import path from "path";
-import mongoose from "mongoose";
-import passport from "passport";
-import bluebird from "bluebird";
-import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
+// Controllers (route handlers)
+import * as synthesisController from "./controllers/Speech";
+import {getLocations, getTrendForLocation} from "./controllers/Twitter";
+import {imageSearchFunc} from "./controllers/ImageSearch";
+import {translateFunc} from "./controllers/Translate";
 
 /*
 const MongoStore = mongo(session);
 */
-
-// Controllers (route handlers)
-import * as homeController from "./controllers/home";
-import * as userController from "./controllers/user";
-import * as apiController from "./controllers/api";
-import * as contactController from "./controllers/contact";
-import * as translateController from "./controllers/my_apis";
-import * as synthesisController from "./controllers/SpeechSynthesis";
 
 
 // API keys and Passport configuration
@@ -137,11 +129,12 @@ app.post("/account/delete", passportConfig.isAuthenticated, userController.postD
 app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
 */
 
-app.post("/translate", translateController.translateFunc);
-app.post("/image-search", translateController.imageSearchFunc);
-app.post("/trend-locations", translateController.getLocations);
-app.post("/trends", translateController.getTrendForLocation);
-app.post("/get-speech", synthesisController.SynthesizeSpeech);
+app.post("/translate", translateFunc);
+app.post("/image-search", imageSearchFunc);
+app.post("/trend-locations", getLocations);
+app.post("/trends", getTrendForLocation);
+app.post("/get-speech", synthesisController.TextToSpeech);
+app.post("/speech-recognition-token", synthesisController.GetSpeechRecognitionToken);
 
 /**
  * API examples routes.

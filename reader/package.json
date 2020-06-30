@@ -29,6 +29,7 @@
     "jquery-ui-bundle": "^1.12.1-migrate",
     "jszip-utils": "^0.1.0",
     "lodash": "^4.17.15",
+    "microsoft-cognitiveservices-speech-sdk": "^1.12.1",
     "ml5": "^0.5.0",
     "pinyin-converter": "^2.8.1",
     "plotly.js": "^1.54.5",

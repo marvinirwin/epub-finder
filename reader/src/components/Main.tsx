@@ -13,6 +13,7 @@ import {Grid} from "@material-ui/core";
 import {BookContainer} from "./BookContainer";
 import {Dictionary} from "lodash";
 import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
+/*
 
 window.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -21,12 +22,11 @@ window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
 
-
+*/
 const recordAudio = () => {
     return new Promise<Blob>(resolve => {
     });
 };
-
 
 /*
 function plotData(normalizedData: number[]) {
@@ -115,7 +115,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) {
     switch (item) {
         case NavigationPages.QUIZ_PAGE:
@@ -138,6 +137,7 @@ export function Main({s}: { s: AppSingleton }) {
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
         m.applyGlobalListener(document.body);
+        m.applyShiftListener(document.body);
     }, [m]);
     const books = useObs<Dictionary<RenderingBook>>(m.bookIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;

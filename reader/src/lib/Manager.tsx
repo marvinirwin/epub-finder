@@ -24,7 +24,7 @@ import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
-import {mergeAnnotationDictionary, RenderingBook} from "./Books/Rendering/RenderingBook";
+import {RenderingBook} from "./Books/Rendering/RenderingBook";
 import React from "react";
 import {getIsMeFunction, ICard} from "./Interfaces/ICard";
 import {Tweet} from "./Books/Tweet";
@@ -50,6 +50,9 @@ import {AudioManager} from "./Manager/AudioManager";
 import {Website} from "./Books/Website";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
+import {IWordRecognitionRow} from "./Interfaces/IWordRecognitionRow";
+import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
+import {mergeAnnotationDictionary} from "./Util/mergeAnnotationDictionary";
 
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
@@ -183,6 +186,9 @@ export class Manager {
 
     renderingInProgress$: Observable<boolean>;
 
+
+    shiftPressed = false;
+
     constructor(public db: MyAppDatabase) {
         this.cardManager = new CardManager(this);
         this.cardManager.load();
@@ -289,7 +295,7 @@ export class Manager {
     }
 
     private oAnnotations() {
-        let previousHighlightedElements: JQuery<HTMLElement>[] | undefined;
+        let previousHighlightedElements: HTMLElement[] | undefined;
         this.bookIndex$.pipe(
             switchMap(d =>
                 combineLatest(Object.values(d).map(d => d.annotatedCharMap$))
@@ -306,11 +312,11 @@ export class Manager {
             withLatestFrom(this.wordElementMap$))
             .subscribe(([word, dict]) => {
                     if (previousHighlightedElements) {
-                        previousHighlightedElements.map(e => e.removeClass('highlighted'))
+                        previousHighlightedElements.map(e => e.classList.remove('highlighted'));
                     }
                     if (word) {
                         previousHighlightedElements = dict[word]?.map(annotatedEl => {
-                            annotatedEl.el.addClass('highlighted')
+                            annotatedEl.el.classList.add('highlighted');
                             return annotatedEl.el;
                         });
                     }
@@ -642,7 +648,7 @@ export class Manager {
             switchMap(wordRows =>
                 combineLatest(wordRows.map(r => r.currentCount$.pipe(map(count => ({count, row: r})))))
             ),
-            map((recs: iCountRowEmitted[]) => orderBy(
+            map((recs: ICountRowEmitted[]) => orderBy(
                 orderBy(recs, 'recognitionScore', 'desc'), ['count'], 'desc').map(r => r.row))
         ).subscribe(this.wordsSortedByPopularityDesc$)
         this.wordRowDict.pipe(
@@ -701,18 +707,20 @@ export class Manager {
             }
         }
     }
+
+    applyShiftListener(el: HTMLElement) {
+        el.onkeydown = e => {
+            if (e.key === "Shift") {
+                this.shiftPressed = true;
+            }
+        }
+        el.onkeyup = e => {
+            if (e.key === "Shift") {
+                this.shiftPressed = false;
+            }
+        }
+    }
 }
 
-export interface IWordRecognitionRow {
-    id?: number;
-    word: string;
-    timestamp: Date;
-    recognitionScore: number;
-}
-
-export interface iCountRowEmitted {
-    count: number;
-    row: WordCountTableRow
-}
 
 

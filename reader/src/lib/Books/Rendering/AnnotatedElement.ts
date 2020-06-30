@@ -11,10 +11,10 @@ export class AnnotatedElement {
 
     constructor(
         public r: RenderingBook,
-        public $leafParent: JQuery<HTMLElement>
+        public leafParent: HTMLElement
     ) {
-        this.leafText = $leafParent.text();
-        this.$leafParent.addClass('annotated_and_translated');
+        this.leafText = leafParent.textContent as string;
+        this.leafParent.classList.add('annotated_and_translated');
         this.applyParentMouseEvents();
     }
 
@@ -23,7 +23,10 @@ export class AnnotatedElement {
             return {};
         }
         const text = this.leafText;
-        this.$leafParent.empty();
+        for (let i = 0; i < this.leafParent.children.length; i++) {
+            const child = this.leafParent.children[i];
+            child.remove();
+        }
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
         // So now we have a trie lets compate the index of things in a string
@@ -50,17 +53,17 @@ export class AnnotatedElement {
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             const el = document.createElement('MARK');
             el.textContent = text[i];
-/*
-            let el = $(`<mark >${text[i]}</mark>`);
-*/
-            this.$leafParent.append(el);
-/*
-            el.appendTo(this.$leafParent)
-*/
+            /*
+                        let el = $(`<mark >${text[i]}</mark>`);
+            */
+            this.leafParent.append(el);
+            /*
+                        el.appendTo(this.$leafParent)
+            */
             let annotationElement: IAnnotatedCharacter = {
                 char: text[i],
                 words: words,
-                el: $(el)
+                el: el
             };
             annotationElement.words.forEach(w => {
                 if (elsMappedToWords[w.word]) {
@@ -78,22 +81,26 @@ export class AnnotatedElement {
     }
 
     private applyParentMouseEvents() {
-        this.$leafParent.on("mouseenter", (ev) => {
+        this.leafParent.onmouseenter = (ev) => {
             this.r.currentTranslateText$.next(this.leafText);
-        });
+        };
     }
 
     private applySingleElementMouseEvents(annotationElement: IAnnotatedCharacter, maxWord: IPositionedWord, i: number) {
-        annotationElement.el.on("mouseenter", (ev) => {
+        annotationElement.el.onmouseenter = (ev) => {
             this.r.m.highlightedWord$.next(maxWord.word);
-        });
-        annotationElement.el.on('mouseleave', (ev) => {
+        };
+        annotationElement.el.onmouseleave = (ev) => {
             this.r.m.highlightedWord$.next();
-        })
-        annotationElement.el.on("click", (ev) => {
-            this.$leafParent.children('.highlighted').removeClass('highlighted')
+        }
+        annotationElement.el.onclick = (ev) => {
+            const children = this.leafParent.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                child.classList.remove('highlighted')
+            }
             this.r.m.requestEditWord$.next(maxWord.word);
-        })
+        };
         return i;
     }
 }

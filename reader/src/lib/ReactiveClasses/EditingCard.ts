@@ -135,7 +135,7 @@ export class EditingCard {
         });
 
         this.pinyin$ = this.learningLanguage$.pipe(map(s => {
-            const ret = lookup(s);
+            const ret = lookup(s) || [];
             return ret.map(r => r.pinyin).join('/')
         }));
 

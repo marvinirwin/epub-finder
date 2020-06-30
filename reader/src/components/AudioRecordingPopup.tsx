@@ -50,17 +50,21 @@ export function AudioRecordingPopup({r, m}: {r: AudioRecorder, m: Manager}) {
         if (canvasRef.current) r.canvas$.next(canvasRef.current)
     }, [canvasRef])
 
+    const countdown = useObs(r.countdown$);
     const userAudio = useObs(r.userAudio$);
     const synthAudio = useObs(m.currentEditingSynthesizedWavFile$);
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
+    const translateText = useObs(r.speechRecongitionText$);
 
     return <Card className={classes.root}>
         <CardContent>
             <div style={{display: 'flex'}}>
+                {countdown && <Typography variant="h6">{countdown}</Typography>}
                 <div className="led-box">
                     <div className={isRecording ? 'led-red' : 'led-off'}/>
                 </div>
                 <Typography variant="h6">{req?.label}</Typography>
+                <Typography variant="h6">{translateText}</Typography>
                 <canvas ref={canvasRef} className={classes.canvas}/>
             </div>
             <div>

@@ -1,6 +1,7 @@
 import {BookInstance} from "./BookInstance";
 import {IRendition} from "../Interfaces/Book/IRendition";
-import {RenderingBook, waitFor} from "./Rendering/RenderingBook";
+import {RenderingBook} from "./Rendering/RenderingBook";
+import {waitFor} from "../Util/waitFor";
 
 export class Website extends BookInstance {
     get localStorageKey(): string {

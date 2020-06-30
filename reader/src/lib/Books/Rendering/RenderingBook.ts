@@ -1,8 +1,7 @@
 import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
-import {concatMap, debounceTime, filter, map, mapTo, skip, startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {getNewICardForWord, Manager, sleep} from "../../Manager";
-import $ from "jquery";
+import {debounceTime, flatMap, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {Manager, sleep} from "../../Manager";
 // @ts-ignore
 import {ICard} from "../../Interfaces/ICard";
 import {LocalStorageManager} from "../../Storage/StorageManagers";
@@ -10,24 +9,9 @@ import {aSpineItem} from "../../Interfaces/Book/aSpineItem";
 import {BookInstance} from "../BookInstance";
 import {AnnotatedElement} from "./AnnotatedElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
-import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
+import {mergeAnnotationDictionary} from "../../Util/mergeAnnotationDictionary";
+import {getIndexOfEl} from "../../Util/getIndexOfEl";
 
-
-export function mergeAnnotationDictionary(cDict: Dictionary<IAnnotatedCharacter[]>, acc: Dictionary<IAnnotatedCharacter[]>) {
-    Object.entries(cDict).forEach(([word, annotatedCharacters]) => {
-        if (acc[word]) {
-            acc[word].push(...annotatedCharacters);
-        } else {
-            acc[word] = annotatedCharacters;
-        }
-    })
-}
-
-
-function getIndexOfEl(textNode: Element): number {
-    for (var indexOfMe = 0; (textNode = <Element>textNode.previousSibling); indexOfMe++) ;
-    return indexOfMe;
-}
 
 export class RenderingBook {
     bookInstance$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>(1)
@@ -137,14 +121,14 @@ mark {
     }
 
     private oAnnotate() {
-        this.renderedContentBody$.pipe(map($r => {
-            return this.getLeaves($r);
-
+        this.renderedContentBody$.pipe(flatMap($r => {
+            this.isRendering$.next(true)
+            const leaves = this.getLeaves($r);
+            this.m.applyGlobalListener($r[0]);
+            return leaves;
         }))
-            .subscribe(async (leafPromise: Promise<AnnotatedElement[]>) => {
-                this.isRendering$.next(true)
-                this.leaves$.next(await leafPromise);
-
+            .subscribe(async (leaves: AnnotatedElement[]) => {
+                this.leaves$.next(leaves);
             })
 
         combineLatest([
@@ -192,10 +176,9 @@ mark {
                     const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
                     const target = spineItem?.href;
                     await rendition.display(target || '');
-                    await this.applySelectListener(iframe);
+                    await this.applySelectionListener(iframe);
                     let body = iframe.contents().find('body');
                     await sleep(500);
-                    this.m.applyGlobalListener(body as unknown as HTMLElement);
                     this.renderedContentBody$.next(body)
                     // @ts-ignore
                 } else {
@@ -207,7 +190,7 @@ mark {
         });
     }
 
-    private applySelectListener(iframe: JQuery<HTMLIFrameElement>) {
+    private applySelectionListener(iframe: JQuery<HTMLIFrameElement>) {
         let contentWindow = iframe[0].contentWindow;
         if (!contentWindow) {
             return;
@@ -220,8 +203,9 @@ mark {
             this.m.currentCollection$.pipe(startWith(undefined)),
             this.m.currentPackage$.pipe(startWith(undefined)),
             this.m.cardManager.cardIndex$
-            ),// For some reason this fires twice always?
-            debounceTime(100)).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
+            ),
+            debounceTime(100)
+        ).subscribe(([e, currentDeck, currentCollection, currentPackage, cardMap]) => {
             if (!contentWindow) {
                 return;
                 throw new Error("Iframe has no content window");
@@ -254,7 +238,7 @@ mark {
             div.textContent = myText;
             parent.insertBefore(div, parent.children[indexOfMe]);
             await sleep(1);
-            ret.push(new AnnotatedElement(this, $(div) as JQuery<HTMLElement>));
+            ret.push(new AnnotatedElement(this, div));
         }
         RenderingBook.appendStyleToBody(body);
 
@@ -271,9 +255,6 @@ mark {
                     })
                 }
         */
-    }
-    public static removeElementEffects(body: JQuery<HTMLElement>) {
-        // body.find('*').off('click mouseenter mouseleave')
     }
 
     public static getTextElements(body: JQuery<HTMLElement>) {
@@ -325,23 +306,12 @@ mark {
             iframe.appendTo(ref);
             await sleep(500);
             // Maybe do this after?
-            this.applySelectListener(iframe as JQuery<HTMLIFrameElement>);
+            this.applySelectionListener(iframe as JQuery<HTMLIFrameElement>);
+            this.m.applyGlobalListener(iframe[0])
+            this.m.applyShiftListener(iframe[0])
         }
         return iframe;
     }
-
-}
-
-export function waitFor(f: () => any, n: number) {
-    return new Promise(resolve => {
-        const interval = setInterval(() => {
-            let f1 = f();
-            if (f1) {
-                resolve();
-                clearInterval(interval);
-            }
-        }, n);
-    })
 
 }
 

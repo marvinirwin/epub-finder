@@ -1,8 +1,12 @@
 import {AudioRecorder} from "../AudioRecorder";
-import {combineLatest, Observable, of, zip} from "rxjs";
+import {combineLatest, Observable, of, ReplaySubject, zip} from "rxjs";
 import {WavAudio} from "../WavAudio";
 import {Manager} from "../Manager";
 import {debounceTime, filter, map, shareReplay, switchMap} from "rxjs/operators";
+import {AudioConfig, SpeechConfig, SpeechSynthesizer, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
+import axios from 'axios';
+import assert from "assert";
+
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
 
