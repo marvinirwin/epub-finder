@@ -1,7 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
 import PostAddIcon from "@material-ui/icons/PostAdd";
-import {Tweet} from "../../lib/Books/Tweet";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import React from "react";
 

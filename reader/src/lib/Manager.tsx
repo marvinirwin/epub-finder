@@ -30,7 +30,6 @@ import {PageRenderer} from "./Books/Rendering/PageRenderer";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
 import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
-import {BookInstance} from "./Books/BookInstance";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
@@ -147,7 +146,6 @@ export class Manager {
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     currentBook$: ReplaySubject<PageRenderer | undefined> = new ReplaySubject<PageRenderer | undefined>(1)
-    bookLoadUpdates$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>();
     bookIndex$: BehaviorSubject<Dictionary<PageRenderer>> = new BehaviorSubject<Dictionary<PageRenderer>>({});
     requestBookRemove$: Subject<PageRenderer> = new Subject<PageRenderer>()
 
@@ -189,8 +187,6 @@ export class Manager {
     audioManager: AudioManager;
     cardManager: CardManager;
     pageManager: PageManager;
-    textToBeTranslated$!: Observable<string>;
-    translatedText$!: Observable<string>;
 
     renderingInProgress$ = new Subject();
 
@@ -433,15 +429,6 @@ export class Manager {
         this.currentBook$.next(undefined);
 
 
-        this.textToBeTranslated$.subscribe(v => console.log(v))
-        this.translatedText$ = this.textToBeTranslated$.pipe(
-            debounceTime(100),
-            flatMap(async learningText => {
-                return await getTranslation(learningText);
-            }),
-            shareReplay(1)
-        );
-        this.translatedText$.subscribe(v => console.log(v));
     }
 
     /*

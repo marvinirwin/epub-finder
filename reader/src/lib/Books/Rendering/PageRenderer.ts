@@ -26,14 +26,14 @@ export class PageRenderer {
     text$ = new Subject<string>();
     wordCountRecords$ = new Subject<IWordCountRow[]>();
 
-    private static appendAnnotationStyleToPageBody(body: JQuery<HTMLElement>) {
+    private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         let style = $(`
                     <style>
-body {
-zoom: 200%;
-}
 mark:hover {
   cursor: pointer;
+}
+
+body {
 }
 
 .annotated_and_translated {
@@ -42,7 +42,6 @@ mark:hover {
 .annotated_and_translated:hover {
     background-color: #eaeaea;
 }
-
 mark {
     transition-duration: 0.5s;
     background-color: transparent;
@@ -83,21 +82,20 @@ mark {
                 }))
             )
         })
-        this.iframeBody$ = this.ref$.pipe(
-            flatMap(async ref => {
-                const iframe = await this.getEmptyIFrame(ref);
-                return iframe.contents().find('body')[0];
-            })
-        )
 
-        this.textNodes$ = this.iframeBody$.pipe(map(body => {
-            const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
-            this.applySelectionListener(body);
-            this.m.applyGlobalLIstenersToPage(body)
-            this.m.applyShiftListener(body)
-            this.m.applyGlobalLIstenersToPage(body);
-            return leaves;
-        }))
+        this.textNodes$ = this.ref$.pipe(
+            flatMap(async ref => {
+                const iframe = await this.getIFrame(ref);
+                return iframe.contents().find('body')[0];
+            }),
+            map(body => {
+                const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
+                this.applySelectionListener(body);
+                PageRenderer.appendAnnotationStyleToPageBody(body)
+                this.m.applyGlobalLIstenersToPage(body)
+                this.m.applyShiftListener(body)
+                return leaves;
+            }));
 
         combineLatest([
             this.textNodes$,
@@ -133,7 +131,7 @@ mark {
         return annotatedElements;
     }
 
-    async getEmptyIFrame(ref: HTMLElement): Promise<JQuery<HTMLIFrameElement>> {
+    async getIFrame(ref: HTMLElement): Promise<JQuery<HTMLIFrameElement>> {
         for (let i = 0; i < ref.children.length; i++) {
             ref.children[i].remove();
         }
@@ -142,10 +140,13 @@ mark {
             iframe.contents().find('body').children().remove();
         } else {
             iframe = $(` <iframe style="border: none; width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
+            iframe[0].srcdoc = this.src;
             iframe.appendTo(ref);
+
             // Maybe do this after?
         }
-        await waitFor(() => iframe.contents().find('body').children().length > 0, 100)
+        await waitFor(() => iframe.contents().find('body').find('script').length > 0, 100)
+        const v = iframe.contents().find('body').children().length;
         return iframe;
     }
 

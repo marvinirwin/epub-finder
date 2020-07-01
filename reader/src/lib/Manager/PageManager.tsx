@@ -8,7 +8,7 @@ import {Manager} from "../Manager";
 import {Website} from "../Books/Website";
 import {flatMap, scan} from "rxjs/operators";
 import { strict as assert } from 'assert';
-import {printExecTime} from "../Util/Timer";
+import {printExecTime, printExecTimeAsync} from "../Util/Timer";
 
 export class PageManager {
     pageIndex$: Observable<Dictionary<PageRenderer>>
@@ -16,21 +16,19 @@ export class PageManager {
     constructor(public m: Manager) {
         this.pageIndex$ = this.requestRenderPage$.pipe(
             flatMap(async page => {
-                return printExecTime("Preprocessing xml DOM", async () => {
+                return printExecTimeAsync("Preprocessing xml DOM", async () => {
                     const documentProcessingWorker = new DocumentProcessor();
                     documentProcessingWorker.postMessage(page.url)
-                    const processedXML = new Promise<string>(resolve => documentProcessingWorker.onmessage = resolve);
-                    return new PageRenderer(
+                    const processedXML = new Promise<string>(resolve => documentProcessingWorker.onmessage = (ev: MessageEvent) => resolve(ev.data));
+                    let pageRenderer = new PageRenderer(
                         await processedXML,
                         this.m,
                         page.name
-                    )
+                    );
+                    return pageRenderer
                 })
             }),
             scan((acc: Dictionary<PageRenderer>, page: PageRenderer) => {
-                // Screw it let's just assume nothing is in the acc
-                assert(!acc[page.name]);
-
                 acc[page.name] = page;
                 return acc;
             }, {})

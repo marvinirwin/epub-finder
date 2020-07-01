@@ -75,8 +75,6 @@ export function ReadingPage({m}: { m: Manager }) {
             )
         )
     )
-    const textToBeTranslated = useObs(m.textToBeTranslated$);
-    const translatedText = useObs(m.translatedText$);
     return <Grid container className={classes.gridRoot} /*style={{display: 'grid', gridTemplateColumns: '50% 50%'}}*/>
         <div className={classes.popup}>
             {editingCard && <Fab><CancelIcon/></Fab>}
@@ -104,10 +102,6 @@ export function ReadingPage({m}: { m: Manager }) {
             </span>
             <span>
                 {editingCard && <AudioRecordingPopup r={m.audioManager.audioRecorder} m={m}/>}
-            </span>
-            <span >
-                <div style={{backgroundColor: 'white'}}> <Typography variant="h6">{textToBeTranslated || ''}</Typography> </div>
-                <div style={{backgroundColor: 'white'}}> <Typography variant="subtitle1">{translatedText || ''}</Typography> </div>
             </span>
         </div>
     </Grid>

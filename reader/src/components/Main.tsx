@@ -10,7 +10,7 @@ import {TrendsPage} from "./Pages/TrendsPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
 import {Grid} from "@material-ui/core";
-import {BookContainer} from "./BookContainer";
+import {PageContainer} from "./PageContainer";
 import {Dictionary} from "lodash";
 import {PageRenderer} from "../lib/Books/Rendering/PageRenderer";
 /*
@@ -141,7 +141,7 @@ export function Main({s}: { s: AppSingleton }) {
         m.applyGlobalLIstenersToPage(document.body);
         m.applyShiftListener(document.body);
     }, [m]);
-    const books = useObs<Dictionary<PageRenderer>>(m.bookIndex$);
+    const pages = useObs<Dictionary<PageRenderer>>(m.pageManager.pageIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
@@ -151,7 +151,7 @@ export function Main({s}: { s: AppSingleton }) {
             width: '100vw',
             top: iframeVisible ? 0 : '9000px'
         }}>
-            {Object.values(books || {}).map(b => <BookContainer m={m} key={b.name} rb={b}/>)}
+            {Object.values(pages || {}).map(page => <PageContainer m={m} key={page.name} rb={page}/>)}
         </div>
         <PopupElements m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>

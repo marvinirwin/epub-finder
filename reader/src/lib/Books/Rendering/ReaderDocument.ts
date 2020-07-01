@@ -1,6 +1,6 @@
 import {getIndexOfEl} from "../../Util/getIndexOfEl";
-import {AnnotatedElement} from "./AnnotatedElement";
 import {uniqueId} from 'lodash';
+import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -8,46 +8,88 @@ export class ReaderDocument {
 
     constructor(public document: XMLDocument) {}
 
-    getTextElements(body: Element) {
-        const leaves: Element[] = [];
-        var walker = this.document.createTreeWalker(
-            body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        let node;
-        while (node = walker.nextNode()) {
-            let trim = node.textContent?.trim();
-            if (trim) {
-                leaves.push(node as Element);
+
+    setSources(doc: Document) {
+        function walk(node: Node) {
+            var child, next;
+            const el = node as Element;
+            if (el.getAttribute) {
+                let currentSource = el.getAttribute("src");
+
+                if (currentSource && !currentSource.startsWith("data")) {
+                    el.setAttribute("src", `${process.env.PUBLIC_URL}/${currentSource}`);
+                }
+            }
+            switch (node.nodeType) {
+                case 1: // Element node
+                case 9: // Document node
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        walk(child);
+                        child = next;
+                    }
+                    break;
             }
         }
+        walk(doc);
+    }
+    getTextElements(doc: Document) {
+        const leaves: Element[] = [];
+        function walk(node: Node, cb: (n: Node) => any) {
+            var child, next;
+            switch (node.nodeType) {
+                case 3: // Text node
+                    cb(node);
+                    break;
+                case 1: // Element node
+                    // @ts-ignore
+                    if (node.localName === 'script') break;
+                    // @ts-ignore
+                    if (node.localName === 'style') break;
+                case 9: // Document node
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        walk(child, cb);
+                        child = next;
+                    }
+                    break;
+            }
+        }
+        walk(doc, (node: Node) => {
+            let text = (node.textContent as string).trim();
+            if (text)  {
+                leaves.push(node as Element);
+            }
+        })
         return leaves;
     }
 
     createMarksUnderLeaves(textNodes: Element[]) {
+        const body = (this.document.getElementsByTagName("body"))[0];
         for (let i = 0; i < textNodes.length; i++) {
             const textNode = textNodes[i];
-            const parent: Element = <Element>textNode.parentElement;
-            parent.classList.add(ANNOTATE_AND_TRANSLATE);
-            const myText: string = <string>textNode.textContent;
+            const oldParent: Element = <Element>textNode.parentNode;
+            const myText: string = <string>textNode.nodeValue;
             const indexOfMe = getIndexOfEl(textNode);
-            textNode.remove();
-            const span = this.document.createElement('SPAN');
-            myText.split('').forEach(s => {
+            oldParent.removeChild(textNode);
+            const newParent = this.document.createElement('span');
+            newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
+            myText.split('').forEach(char => {
                 // I'll probably need to do labelling later so the data can be rehydrated
                 // Perhaps this is inefficient, but for character based stuff its probably fine
-                const mark = this.document.createElement("MARK");
-                mark.textContent = s;
-                parent.insertBefore(mark, null)
+                const mark = this.document.createElement("mark");
+                const textNode = this.document.createTextNode(char);
+                mark.insertBefore(textNode, null);
+                newParent.insertBefore(mark, null)
             })
-            parent.insertBefore(span, parent.children[indexOfMe]);
+            oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
             const popperId = uniqueId();
-            const popperEl = this.document.createElement('DIV');
-            popperEl.classList.add("translation-popover")
+            const popperEl = this.document.createElement('div');
+            popperEl.setAttribute("class", "translation-popover");
             popperEl.id = ReaderDocument.getPopperId(popperId);
-            this.document.body.appendChild(popperEl);
+            body.appendChild(popperEl);
         }
     }
 

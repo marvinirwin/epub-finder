@@ -17,8 +17,9 @@ ctx.onmessage = (ev) => {
     const oReq = new XMLHttpRequest();
     oReq.addEventListener("load", response => {
         const doc = new ReaderDocument(new DOMParser().parseFromString(oReq.responseText,'text/html'));
-        doc.createMarksUnderLeaves(doc.getTextElements(doc.document.body));
-        let innerHTML = new XMLSerializer().serializeToString(doc.document);
+        doc.setSources(doc.document);
+        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
+        let innerHTML: string = new XMLSerializer().serializeToString(doc.document);
         ctx.postMessage(innerHTML);
     });
     oReq.open("GET", url);

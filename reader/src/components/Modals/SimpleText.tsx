@@ -1,7 +1,6 @@
 import React, {FunctionComponent} from "react";
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
-import {SimpleText} from "../../lib/Books/SimpleText";
 import {TextareaAutosize, TextField} from "@material-ui/core";
 import Button from '@material-ui/core/Button';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -21,7 +20,9 @@ export function SimpleTextModal({m}: { m: Manager }) {
                 onChange={v => m.simpleTextInput$.next(v.target.value)}
             />
             <Button onClick={() => {
+/*
                 m.bookLoadUpdates$.next(new SimpleText(simpleTextTitle || '', simpleTextInput || ''));
+*/
                 m.simpleTextDialogOpen$.next(false);
             }}>Add Resource</Button>
         </form>

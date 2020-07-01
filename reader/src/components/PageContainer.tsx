@@ -44,12 +44,12 @@ const StyledExpansionPanelDetails = withStyles({
     }
 })(ExpansionPanelDetails);
 
-export function BookContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
+export function PageContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
     const classes = useStyles();
     const ref = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = React.useState(true);
     useEffect(() => {
-        ref && ref.current && rb.renderRef$.next(ref.current);
+        ref && ref.current && rb.ref$.next(ref.current);
     }, [ref])
 
 /*
