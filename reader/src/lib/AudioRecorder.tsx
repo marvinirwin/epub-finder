@@ -86,7 +86,6 @@ export class AudioRecorder {
                 recognizer.recognizeOnceAsync(
                     (result) => {
                         this.speechRecongitionText$.next(result.text)
-                        debugger;
                         window.console.log(result);
                         recognizer.close();
                     },

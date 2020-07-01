@@ -2,11 +2,12 @@ import {ITrie} from "../../Interfaces/Trie";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
 import {maxBy, Dictionary} from "lodash";
-import $ from "jquery";
 import {PageRenderer} from "./PageRenderer";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 import {ReaderDocument} from "./ReaderDocument";
 import {getTranslation} from "../../Manager";
+import { createPopper } from '@popperjs/core';
+
 
 export class AnnotatedElement {
     private translatableText: string;
@@ -15,23 +16,26 @@ export class AnnotatedElement {
 
     constructor(
         public r: PageRenderer,
-        public leafParent: HTMLElement
+        public annotatedElement: HTMLElement
     ) {
 
         this.applyParentMouseEvents();
-        this.translatableText = leafParent.getAttribute('translatable-text') as string;
-        this.popperElement = (leafParent.ownerDocument as XMLDocument)
-            .getElementById(ReaderDocument.getPopperId(
-                this.leafParent.getAttribute('popper-id') as string
-                )
-            ) as HTMLElement;
+        this.translatableText = annotatedElement.getAttribute('translatable-text') as string;
+        let attribute = this.annotatedElement.getAttribute('popper-id') as string;
+        let popperId = ReaderDocument.getPopperId( attribute );
+        this.popperElement = (annotatedElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
+        const allPopperEls = (annotatedElement.ownerDocument as XMLDocument).getElementsByClassName('POPPER_ELEMENT');
+        debugger;
+        createPopper(this.annotatedElement, this.popperElement, {
+            placement: 'top',
+        });
     }
 
     updateWords(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
-        let children = this.leafParent.children;
-        const text = this.leafParent.textContent as string;
+        let children = this.annotatedElement.children;
+        const text = this.annotatedElement.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as HTMLElement;
             wordsInProgress = wordsInProgress.map(w => {
@@ -75,9 +79,9 @@ export class AnnotatedElement {
     }
 
     private applyParentMouseEvents() {
-        this.leafParent.onmouseenter = (ev) => {
+        this.annotatedElement.onmouseenter = (ev) => {
             if (!this.translated) {
-                getTranslation(this.leafParent).then(t => {
+                getTranslation(this.annotatedElement).then(t => {
                     this.translated = true;
                     return this.popperElement.textContent = t;
                 })
@@ -93,7 +97,7 @@ export class AnnotatedElement {
             this.r.m.highlightedWord$.next();
         }
         annotationElement.el.onclick = (ev) => {
-            const children = this.leafParent.children;
+            const children = this.annotatedElement.children;
             for (let i = 0; i < children.length; i++) {
                 const child = children[i];
                 child.classList.remove('highlighted')

@@ -1,14 +1,20 @@
 import React, {useEffect, useState} from "react";
 import Plot from 'react-plotly.js';
 import {WavAudio} from "../lib/WavAudio";
+import {makeStyles} from "@material-ui/core/styles";
 
-
+const useStyles = makeStyles((theme) => ({
+    graphParent: {
+        width: '100%',
+    }
+}));
 export default function MultiGraph({plots}: {plots: number[][]}) {
+    const classes = useStyles();
     const [ rev, setRev ] = useState(0)
     useEffect(() => {
         setRev(rev + 1);
     }, [])
-    return <div>
+    return <div className={classes.graphParent}>
         <Plot data={
             plots.map((stream, i) => {
                 return {

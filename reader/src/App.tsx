@@ -3,14 +3,9 @@ import "fontsource-noto-sans"
 import $ from 'jquery';
 import React, {useEffect, useState} from 'react';
 import './App.css';
-// @ts-ignore
 import 'react-toastify/dist/ReactToastify.css';
-/* eslint import/no-webpack-loader-syntax:0 */
-// @ts-ignore
-import {useObs} from "./lib/UseObs";
-
 import {AppSingleton, initializeApp} from "./AppSingleton";
-import {CssBaseline, GridList, GridListTile, TextField} from "@material-ui/core";
+import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
@@ -18,7 +13,7 @@ import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 const darkTheme = createMuiTheme({
     palette: {
         primary: {
-            light:'#e6ffff',
+            light: '#e6ffff',
             main: '#b3e5fc',
             dark: '#82b3c9',
             contrastText: '#000000',
@@ -36,8 +31,6 @@ const darkTheme = createMuiTheme({
 });
 darkTheme.spacing(2);
 
-const queryParams = {};
-
 export interface shutterResult {
     assets: {
         preview: {
@@ -45,29 +38,6 @@ export interface shutterResult {
         }
     }
 }
-
-// @ts-ignore
-window.$ = $;
-
-
-/*
-function EditingCardComponent({editingCard}: { editingCard: EditingCardClass }) {
-    const sources = useObs<string[] | undefined>(editingCard.imageSources)
-    return <form className={'editing-card'}>
-        <TextField label="Characters to Match" onChange={e => editingCard.matchChange$.next(e.target.value)}
-                   variant="outlined"/>
-        <TextField label="English" onChange={e => editingCard.knownLanguage$.next([e.target.value])} variant="outlined"/>
-        <GridList cellHeight={160} cols={3}>
-            {sources && sources.map((src: string, i) => (
-                <GridListTile key={i} cols={1}>
-                    <img onClick={() => editingCard.photos$.next([src])} src={src} alt={''}/>
-                </GridListTile>
-            ))}
-        </GridList>
-    </form>
-}
-*/
-
 
 function App() {
     const [appSingleton, setAppSingleton] = useState<AppSingleton | undefined>();
@@ -80,6 +50,5 @@ function App() {
         {c}
     </ThemeProvider>;
 }
-
 
 export default App;

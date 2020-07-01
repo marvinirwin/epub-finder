@@ -1,9 +1,8 @@
 import {combineLatest, fromEvent, Observable, ReplaySubject, Subject} from "rxjs";
+import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
 import {debounceTime, flatMap, map, startWith, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
-// @ts-ignore
-import {BookInstance} from "../BookInstance";
 import {AnnotatedElement} from "./AnnotatedElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeWordTextNodeMap} from "../../Util/mergeAnnotationDictionary";
@@ -11,16 +10,12 @@ import {ANNOTATE_AND_TRANSLATE} from "./ReaderDocument";
 import {printExecTime} from "../../Util/Timer";
 import {waitFor} from "../../Util/waitFor";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
-import {ICountRowEmitted} from "../../Interfaces/ICountRowEmitted";
-import {WordCountTableRow} from "../../ReactiveClasses/WordCountTableRow";
 import {IWordCountRow} from "../../Interfaces/IWordCountRow";
 
 
 // TODO divorce the renderer from the counter/analyzer
 export class PageRenderer {
     ref$ = new ReplaySubject<HTMLElement>();
-    iframeBody$!: Observable<HTMLBodyElement>;
-
     textNodes$!: Observable<AnnotatedElement[]>;
     wordTextNodeMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1);
     text$ = new Subject<string>();
@@ -89,11 +84,17 @@ mark {
                 return iframe.contents().find('body')[0];
             }),
             map(body => {
+                debugger;
                 const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
                 this.applySelectionListener(body);
                 PageRenderer.appendAnnotationStyleToPageBody(body)
                 this.m.applyGlobalLIstenersToPage(body)
                 this.m.applyShiftListener(body)
+/*
+                leaves.forEach(v => {
+                    v.popperElement
+                })
+*/
                 return leaves;
             }));
 

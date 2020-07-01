@@ -7,7 +7,6 @@ export class ReaderDocument {
 
     constructor(public document: XMLDocument) {}
 
-
     setSources(doc: Document) {
         const walk = (node: Node) => {
             var child, next;
@@ -73,28 +72,33 @@ export class ReaderDocument {
     createMarksUnderLeaves(textNodes: Element[]) {
         const body = (this.document.getElementsByTagName("body"))[0];
         for (let i = 0; i < textNodes.length; i++) {
-            const textNode = textNodes[i];
-            const oldParent: Element = <Element>textNode.parentNode;
-            const myText: string = <string>textNode.nodeValue;
-            const indexOfMe = getIndexOfEl(textNode);
-            oldParent.removeChild(textNode);
-            const newParent = this.document.createElement('span');
-            newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
-            myText.split('').forEach(char => {
-                // I'll probably need to do labelling later so the data can be rehydrated
-                // Perhaps this is inefficient, but for character based stuff its probably fine
-                const mark = this.document.createElement("mark");
-                const textNode = this.document.createTextNode(char);
-                mark.insertBefore(textNode, null);
-                newParent.insertBefore(mark, null)
-            })
-            oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
-            const popperId = uniqueId();
-            const popperEl = this.document.createElement('div');
-            popperEl.setAttribute("class", "translation-popover");
-            popperEl.id = ReaderDocument.getPopperId(popperId);
-            body.appendChild(popperEl);
+            this.annotateTextNode(textNodes[i], i, body);
         }
+    }
+
+    private annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
+        const oldParent: Element = <Element>textNode.parentNode;
+        const popperId = uniqueId();
+        const myText: string = <string>textNode.nodeValue;
+        const indexOfMe = getIndexOfEl(textNode);
+        oldParent.removeChild(textNode);
+        const newParent = this.document.createElement('span');
+        newParent.setAttribute('popper-id', popperId);
+        newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
+        myText.split('').forEach(char => {
+            // I'll probably need to do labelling later so the data can be rehydrated
+            // Perhaps this is inefficient, but for character based stuff its probably fine
+            const mark = this.document.createElement("mark");
+            const textNode = this.document.createTextNode(char);
+            mark.insertBefore(textNode, null);
+            newParent.insertBefore(mark, null)
+        })
+        oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
+        const popperEl = this.document.createElement('div');
+        popperEl.setAttribute("class", "translation-popover");
+        popperEl.setAttribute('id', ReaderDocument.getPopperId(popperId));
+        popperEl.setAttribute("class", "POPPER_ELEMENT")
+        body.appendChild(popperEl);
     }
 
     static getPopperId(popperId: string) {

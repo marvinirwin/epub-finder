@@ -112,36 +112,17 @@ export class Manager {
 
     messageBuffer$: Subject<DebugMessage[]> = new Subject<DebugMessage[]>();
 
-    packages$: BehaviorSubject<Dictionary<UnserializedAnkiPackage>> = new BehaviorSubject({});
-    packageUpdate$: Subject<UnserializedAnkiPackage> = new Subject<UnserializedAnkiPackage>();
-
     currentPackage$: ReplaySubject<UnserializedAnkiPackage | undefined> = new ReplaySubject<UnserializedAnkiPackage | undefined>(undefined);
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
 
 
-    queEditingCard$: ReplaySubject<EditingCard> = new ReplaySubject<EditingCard>(1);
+    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
     currentEditingCardIsSaving$!: Observable<boolean | undefined>;
     currentEditingCard$!: Observable<EditingCard | undefined>;
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     currentEditingSynthesizedWavFile$!: Observable<WavAudio>;
-
-    newCardRequest$: Subject<ICard> = new Subject();
-/*
-    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
-    currentEditingCardIsSaving$: ReplaySubject<boolean | undefined> = new ReplaySubject<boolean | undefined>(1);
-    currentEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1)
-    requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
-*/
-
-    simpleTextDialogOpen$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1)
-    simpleTextInput$: ReplaySubject<string> = new ReplaySubject<string>(1);
-    simpleTextTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
-
-    // These two aren't used currently
-    twitterUrl$: ReplaySubject<string> = new ReplaySubject<string>(1);
-    twitterTitle$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
@@ -178,10 +159,6 @@ export class Manager {
 
     nextQuizItem$:Observable<ICard | undefined>;
 
-    allTrends$ = new ReplaySubject<ITrendLocation[]>(1);
-    tweetTrendMap$ = new ReplaySubject<Dictionary<ITweet>>();
-    selectedTrend$ = new ReplaySubject<ITrendLocation | undefined>();
-
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
@@ -189,7 +166,6 @@ export class Manager {
     pageManager: PageManager;
 
     renderingInProgress$ = new Subject();
-
 
     shiftPressed = false;
 
@@ -505,13 +481,6 @@ export class Manager {
             return [m].concat(acc).slice(0, 100)
         }, [])).subscribe(this.messageBuffer$);
 
-        merge(
-            this.packageUpdate$.pipe(filter(m => !!m.message), map(m => new DebugMessage(m.name, m.message))),
-            this.packageMessages$.pipe(map(m => new DebugMessage('package', m))),
-            this.renderMessages$.pipe(map(m => new DebugMessage('render', m))),
-            this.bookMessages$.pipe(map(m => new DebugMessage('book', m))),
-            this.cardMessages$.pipe(map(m => new DebugMessage('card', m))),
-        ).subscribe(this.allDebugMessages$)
     }
 
     private oPackageLoader() {
@@ -635,7 +604,6 @@ export class Manager {
                         this.addCards$.next(cards);
             */
         }
-        this.packageUpdate$.next(UnserializeAnkiPackage(s))
     }
 
     initIframeListeners() {
