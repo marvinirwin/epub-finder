@@ -1,6 +1,6 @@
-import {combineLatest, fromEvent, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, fromEvent, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, flatMap, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, flatMap, startWith, withLatestFrom, map} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
 // @ts-ignore
 import {ICard} from "../../Interfaces/ICard";
@@ -10,11 +10,12 @@ import {BookInstance} from "../BookInstance";
 import {AnnotatedElement} from "./AnnotatedElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeAnnotationDictionary} from "../../Util/mergeAnnotationDictionary";
-import {getIndexOfEl} from "../../Util/getIndexOfEl";
+import getTextElements from "./DocumentPreprocessing";
+import {ANNOTATE_AND_TRANSLATE} from "./ReaderDocument";
+import {printExecTime} from "../../Util/Timer";
 
 
 export class RenderingBook {
-    bookInstance$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>(1)
     renderMessages$: ReplaySubject<string> = new ReplaySubject<string>();
     currentSpineItem$: ReplaySubject<aSpineItem | undefined> = new ReplaySubject(1);
     renderRef$: ReplaySubject<HTMLElement> = new ReplaySubject<HTMLElement>(1)
@@ -24,7 +25,7 @@ export class RenderingBook {
     localStorageKey: any;
     persistor: LocalStorageManager;
     renderedContentBody$: Subject<JQuery<HTMLElement>> = new Subject<JQuery<HTMLElement>>();
-    leaves$: Subject<AnnotatedElement[]> = new Subject<AnnotatedElement[]>();
+    leaves$!: Observable<AnnotatedElement[]>;
 
     annotatedCharMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     currentTranslateText$ = new Subject<string>();
@@ -67,7 +68,7 @@ mark {
     }
 
     constructor(
-        bookInstance: BookInstance,
+        public bookInstance: BookInstance,
         public m: Manager,
         public name: string,
     ) {
@@ -76,11 +77,8 @@ mark {
 
         this.localStorageKey = bookInstance.localStorageKey;
         this.persistor = new LocalStorageManager(bookInstance.localStorageKey);
-        this.bookInstance$.subscribe(instance => {
-            this.persistor.upsert((serialized: any) => serialized.name === this.name, instance.toSerialized());
-        });
 
-        this.bookInstance$.pipe(switchMap(i => i.wordCountRecords$)).subscribe(r => this.m.addWordCountRows$.next(r))
+        this.bookInstance.wordCountRecords$.subscribe(r => this.m.addWordCountRows$.next(r))
 
         Object.entries(this).forEach(([key, value]) => {
             if (value !== this.renderMessages$) {
@@ -106,7 +104,6 @@ mark {
         })
         this.oRender();
         this.oAnnotate();
-        this.bookInstance$.next(bookInstance);
         this.renderInProgress$.next(false);
         this.currentSpineItem$.next(undefined);
         // This will definitely be out of sync with the render, it has to fire right after the render method
@@ -121,69 +118,65 @@ mark {
     }
 
     private oAnnotate() {
-        this.renderedContentBody$.pipe(flatMap($r => {
+        // This might take long, I should time this
+        this.leaves$ = this.renderedContentBody$.pipe(map($r => {
             this.isRendering$.next(true)
-            const leaves = this.getLeaves($r);
+            const t1 = performance.now();
+            const leaves = this.rehydrate($r[0].ownerDocument as HTMLDocument);
+            const t2 = performance.now();
+            console.log(`It took ${t2 - t1} to rehydrate`)
             this.m.applyGlobalListener($r[0]);
             return leaves;
         }))
-            .subscribe(async (leaves: AnnotatedElement[]) => {
-                this.leaves$.next(leaves);
-            })
 
         combineLatest([
             this.leaves$,
             this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500))
         ]).subscribe(async ([leaves]) => {
+            printExecTime("Update words in annotated elements", () => {
+                let uniqueLengths = uniq(this.m.cardManager.trie.t.getWords().map(w => w.length));
+                this.renderInProgress$.next(true);
+                const chars: Dictionary<IAnnotatedCharacter[]>[] = [];
+                for (let i = 0; i < leaves.length; i++) {
+                    const leaf = leaves[i];
+                    chars.push(leaf.updateWords(this.m.cardManager.trie.t, uniqueLengths))
+                }
 
-            let uniqueLengths = uniq(this.m.cardManager.trie.t.getWords().map(w => w.length));
-            this.renderInProgress$.next(true);
-            const chars: Dictionary<IAnnotatedCharacter[]>[] = [];
-            for (let i = 0; i < leaves.length; i++) {
-                const leaf = leaves[i];
-                chars.push(leaf.annotate(this.m.cardManager.trie.t, uniqueLengths))
-                await sleep(1);
-            }
+                const reducedChars = chars.reduce((
+                    acc: Dictionary<IAnnotatedCharacter[]>,
+                    cDict: Dictionary<IAnnotatedCharacter[]>) => {
+                    mergeAnnotationDictionary(cDict, acc);
+                    return acc;
+                }, {})
+                this.annotatedCharMap$.next(reducedChars);
 
-            const reducedChars = chars.reduce((
-                acc: Dictionary<IAnnotatedCharacter[]>,
-                cDict: Dictionary<IAnnotatedCharacter[]>) => {
-                mergeAnnotationDictionary(cDict, acc);
-                return acc;
-            }, {})
-            this.annotatedCharMap$.next(reducedChars);
-
-            this.renderInProgress$.next(false);
+                this.renderInProgress$.next(false);
+            })
         })
     }
 
     private oRender() {
         combineLatest(
             [
-                this.bookInstance$,
                 this.currentSpineItem$,
                 this.renderRef$
             ]
-        ).subscribe(([bookInstance, spineItem, renderRef]) => {
+        ).subscribe(([spineItem, renderRef]) => {
             const render = async () => {
                 this.renderMessages$.next("Render fired")
-                if (bookInstance && bookInstance.book) {
-                    this.renderMessages$.next("Book present, rendering")
-                    const iframe = await this.resolveIFrame(renderRef);
-                    this.renderMessages$.next("Waiting for iframe 500ms")
-                    await sleep(500);
-                    // @ts-ignore
-                    const rendition = bookInstance.book.renderTo(iframe, {width: 600, height: 400})
-                    const target = spineItem?.href;
-                    await rendition.display(target || '');
-                    await this.applySelectionListener(iframe);
-                    let body = iframe.contents().find('body');
-                    await sleep(500);
-                    this.renderedContentBody$.next(body)
-                    // @ts-ignore
-                } else {
-                    this.renderMessages$.next("No book or spine item")
-                }
+                this.renderMessages$.next("Book present, rendering")
+                const iframe = await this.resolveIFrame(renderRef);
+                this.renderMessages$.next("Waiting for iframe 500ms")
+                await sleep(500);
+                // @ts-ignore
+                const rendition = bookInstance..book.renderTo(iframe, {width: 600, height: 400})
+                const target = spineItem?.href;
+                await rendition.display(target || '');
+                await this.applySelectionListener(iframe);
+                let body = iframe.contents().find('body');
+                await sleep(500);
+                this.renderedContentBody$.next(body)
+                // @ts-ignore
             }
             this.renderMessages$.next("Setting next render");
             this.nextRender$.next(render);
@@ -226,24 +219,10 @@ mark {
     }
 
     private async getLeaves(body: JQuery<HTMLElement>): Promise<AnnotatedElement[]> {
-        const leaves = RenderingBook.getTextElements(body);
-        const ret = [];
-        for (let i = 0; i < leaves.length; i++) {
-            const textNode = leaves[i];
-            const parent: HTMLElement = <HTMLElement>textNode.parentElement;
-            const myText: string = <string>textNode.textContent;
-            const indexOfMe = getIndexOfEl(textNode);
-            textNode.remove();
-            const div = document.createElement('SPAN');
-            div.textContent = myText;
-            parent.insertBefore(div, parent.children[indexOfMe]);
-            await sleep(1);
-            ret.push(new AnnotatedElement(this, div));
-        }
+        const leaves = getTextElements(body);
         RenderingBook.appendStyleToBody(body);
 
 
-        return ret;
         /*
                 const flashCards = body[0].getElementsByClassName('flashcard');
                 for (let i = 0; i < flashCards.length; i++) {
@@ -257,40 +236,6 @@ mark {
         */
     }
 
-    public static getTextElements(body: JQuery<HTMLElement>) {
-        const leaves: Element[] = [];
-        var walker = document.createTreeWalker(
-            body[0],
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-
-        var node;
-        var textNodes = [];
-
-        while(node = walker.nextNode()) {
-            let trim = node.textContent?.trim();
-            if (trim) {
-                leaves.push(node as Element);
-            }
-        }
-/*
-        const allEls = body[0].getElementsByTagName('*');
-
-
-        for (let i = 0; i < allEls.length; i++) {
-            const el = allEls[i];
-            for (let j = 0; j < el.children.length; j++) {
-                const child = el.children[j];
-                if (child.nodeType === Node.TEXT_NODE /!*|| el.tagName === 'P'*!//!* || el.tagName === "SPAN" || el.tagName === "DIV"*!/) {
-                    leaves.push(child)
-                }
-            }
-        }
-*/
-        return leaves;
-    }
 
     private async resolveIFrame(ref: HTMLElement): Promise<JQuery<HTMLIFrameElement>> {
         this.renderMessages$.next('Clearing children of renderRef')
@@ -313,5 +258,14 @@ mark {
         return iframe;
     }
 
+    public rehydrate(htmlDocument: HTMLDocument): AnnotatedElement[] {
+        const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
+        const annotatedElements = new Array(elements.length);
+        for (let i = 0; i < elements.length; i++) {
+            const annotatedElement = elements[i];
+            annotatedElements[i] = new AnnotatedElement(this, annotatedElement as HTMLElement);
+        }
+        return annotatedElements;
+    }
 }
 

@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../lib/Worker/UseObs";
+import {useObs} from "../../lib/UseObs";
 import React, { Fragment } from "react";
 import WordCountTable from "../WordCountTable";
 import QuizDialogContainer from "../QuizPopup";

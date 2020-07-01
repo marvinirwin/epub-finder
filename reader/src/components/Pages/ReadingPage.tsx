@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs, usePipe} from "../../lib/Worker/UseObs";
+import {useObs, usePipe} from "../../lib/UseObs";
 import {Fab, Grid, Paper} from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import React from "react";
@@ -50,7 +50,6 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.contrastText
     },
 }));
-
 
 export function ReadingPage({m}: { m: Manager }) {
     const classes = useStyles();

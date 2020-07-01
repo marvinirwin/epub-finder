@@ -26,7 +26,7 @@ import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
 import {RenderingBook} from "./Books/Rendering/RenderingBook";
 import React from "react";
-import {getIsMeFunction, ICard} from "./Interfaces/ICard";
+import {ICard} from "./Interfaces/ICard";
 import {Tweet} from "./Books/Tweet";
 import {SimpleText} from "./Books/SimpleText";
 import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
@@ -35,9 +35,7 @@ import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager, LocalStorageManager} from "./Storage/StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 import axios from 'axios';
-import trie from 'trie-prefix-tree';
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
-import {TrieWrapper} from "./TrieWrapper";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {ITweet} from "./Interfaces/ITweet";
@@ -93,6 +91,15 @@ export function getNewICardForWord(word: string, deck: string) {
         illustrationPhotos: [],
         timestamp: new Date()
     };
+}
+
+export async function getTranslation<A>(learningText: A) {
+    const result = await axios.post('/translate', {
+        from: 'zh-CN',
+        to: 'en',
+        text: learningText
+    })
+    return result.data.translation;
 }
 
 export class Manager {
@@ -478,12 +485,7 @@ export class Manager {
         this.translatedText$ = this.textToBeTranslated$.pipe(
             debounceTime(100),
             flatMap(async learningText => {
-                const result = await axios.post('/translate', {
-                    from: 'zh-CN',
-                    to: 'en',
-                    text: learningText
-                })
-                return result.data.translation;
+                return await getTranslation(learningText);
             }),
             shareReplay(1)
         );

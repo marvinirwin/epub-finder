@@ -5,32 +5,35 @@ import {maxBy, Dictionary} from "lodash";
 import $ from "jquery";
 import {RenderingBook} from "./RenderingBook";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
+import {ReaderDocument} from "./ReaderDocument";
+import {getTranslation} from "../../Manager";
 
 export class AnnotatedElement {
-    private leafText: string;
+    private translatableText: string;
+    popperElement: HTMLElement;
+    private translated = false;
 
     constructor(
         public r: RenderingBook,
         public leafParent: HTMLElement
     ) {
-        this.leafText = leafParent.textContent as string;
-        this.leafParent.classList.add('annotated_and_translated');
+
         this.applyParentMouseEvents();
+        this.translatableText = leafParent.getAttribute('translatable-text') as string;
+        this.popperElement = (leafParent.ownerDocument as XMLDocument)
+            .getElementById(ReaderDocument.getPopperId(
+                this.leafParent.getAttribute('popper-id') as string
+                )
+            ) as HTMLElement;
     }
 
-    annotate(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
-        if (!uniqueLengths.length) {
-            return {};
-        }
-        const text = this.leafText;
-        for (let i = 0; i < this.leafParent.children.length; i++) {
-            const child = this.leafParent.children[i];
-            child.remove();
-        }
+    updateWords(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
-        // So now we have a trie lets compate the index of things in a string
-        for (let i = 0; i < text.length; i++) {
+        let children = this.leafParent.children;
+        const text = this.leafParent.textContent as string;
+        for (let i = 0; i < children.length; i++) {
+            const currentMark = children[i] as HTMLElement;
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
@@ -51,19 +54,10 @@ export class AnnotatedElement {
                 return newWord;
             });
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
-            const el = document.createElement('MARK');
-            el.textContent = text[i];
-            /*
-                        let el = $(`<mark >${text[i]}</mark>`);
-            */
-            this.leafParent.append(el);
-            /*
-                        el.appendTo(this.$leafParent)
-            */
             let annotationElement: IAnnotatedCharacter = {
                 char: text[i],
                 words: words,
-                el: el
+                el: currentMark
             };
             annotationElement.words.forEach(w => {
                 if (elsMappedToWords[w.word]) {
@@ -82,7 +76,12 @@ export class AnnotatedElement {
 
     private applyParentMouseEvents() {
         this.leafParent.onmouseenter = (ev) => {
-            this.r.currentTranslateText$.next(this.leafText);
+            if (!this.translated) {
+                getTranslation(this.leafParent).then(t => {
+                    this.translated = true;
+                    return this.popperElement.textContent = t;
+                })
+            }
         };
     }
 

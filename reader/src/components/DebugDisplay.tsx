@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import React from "react";
 
 interface Props {

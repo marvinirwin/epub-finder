@@ -19,13 +19,17 @@ export class Website extends BookInstance {
                 return {
                     display: async spineItem => {
                         e.prop('src', self.url)
+/*
                         await waitFor(() => {
                             let length = e.contents().find('body').children().length;
                             return length > 6;
                         }, 2000);
                         const leaves = RenderingBook.getTextElements(e.contents().find('body'));
                         const text = leaves.map(l => l.textContent || '').join('');
+*/
+/*
                         self.rawText$.next(text.normalize())
+*/
 
 /*
                         let htmlElements = $(`<p style="max-width: 100%; font-size: 200%;">${text}</p>`);

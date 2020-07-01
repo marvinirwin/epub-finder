@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {useObs, usePipe} from "../../lib/Worker/UseObs";
+import {useObs, usePipe} from "../../lib/UseObs";
 import React from "react";
 import {debounceTime, map, scan} from "rxjs/operators";
 

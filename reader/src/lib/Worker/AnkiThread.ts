@@ -2,7 +2,6 @@
 // @ts-ignore Workers don't have the window object
 import {AnkiPackage} from "../../Anki";
 import {ReplaySubject, Subject} from "rxjs";
-import {chunk, invert} from "lodash";
 import initSqlJs from "sql.js";
 // @ts-ignore
 import JSZip from 'jszip';
@@ -12,12 +11,10 @@ import {SerializedAnkiPackage} from "../Interfaces/OldAnkiClasses/SerializedAnki
 import DebugMessage from "../../Debug-Message";
 import {ICard} from "../Interfaces/ICard";
 import {CardMessage, ThreadMessageKey} from "../Interfaces/Message";
+import { chunk, invert } from "lodash";
 
-export const CHUNK_SIZE = 500;
-// noinspection JSConstantReassignment
 // @ts-ignore
-self.window = self;
-// @ts-ignore
+self["window"] = self;
 const ctx: Worker = self as any;
 
 class AnkiPackageLoader {

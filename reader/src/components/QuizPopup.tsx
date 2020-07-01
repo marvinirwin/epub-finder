@@ -10,7 +10,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import {ICard} from "../lib/Interfaces/ICard";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import {
     Card,
     CardActions,

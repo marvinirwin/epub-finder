@@ -7,7 +7,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {useObs} from "../../lib/Worker/UseObs";
+import {useObs} from "../../lib/UseObs";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";

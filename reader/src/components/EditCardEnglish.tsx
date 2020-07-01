@@ -1,7 +1,7 @@
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import React from 'react';
 
 const useStyles = makeStyles((theme) => ({

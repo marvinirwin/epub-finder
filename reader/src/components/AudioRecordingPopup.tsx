@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import {Card, CardContent, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {AudioRecorder} from "../lib/AudioRecorder";

@@ -1,5 +1,6 @@
+/* eslint import/no-webpack-loader-syntax:0 */
 import {AppSingleton} from "../AppSingleton";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
@@ -13,6 +14,8 @@ import {Grid} from "@material-ui/core";
 import {BookContainer} from "./BookContainer";
 import {Dictionary} from "lodash";
 import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
+// @ts-ignore
+import DocumentProcessor from 'Worker-loader?name=dist/[name].js!../lib/Worker/DocumentProcessor';
 /*
 
 window.addEventListener("dragover", function (e) {
@@ -94,6 +97,10 @@ axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result =>
     await graphAudioData(, filterData, normalizeData, firstDerivative, recordedAudio);
 })
 */
+
+
+const documentProcessor = new DocumentProcessor();
+documentProcessor.postMessage(`${process.env.PUBLIC_URL}/alphago_bilibili.htm`)
 
 const useStyles = makeStyles((theme) => ({
     root: {

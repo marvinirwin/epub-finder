@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/Worker/UseObs";
+import {useObs} from "../lib/UseObs";
 import EditingCardComponent from "./EditingCard/EditingCardComponent";
 import WordCountTable from "./WordCountTable";
 import QuizDialogContainer from "./QuizPopup";
