@@ -3,7 +3,7 @@ import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharact
 import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
 import {maxBy, Dictionary} from "lodash";
 import $ from "jquery";
-import {RenderingBook} from "./RenderingBook";
+import {PageRenderer} from "./PageRenderer";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 import {ReaderDocument} from "./ReaderDocument";
 import {getTranslation} from "../../Manager";
@@ -14,7 +14,7 @@ export class AnnotatedElement {
     private translated = false;
 
     constructor(
-        public r: RenderingBook,
+        public r: PageRenderer,
         public leafParent: HTMLElement
     ) {
 

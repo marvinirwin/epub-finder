@@ -1,6 +1,6 @@
 import {BookInstance} from "./BookInstance";
 import {IRendition} from "../Interfaces/Book/IRendition";
-import {RenderingBook} from "./Rendering/RenderingBook";
+import {PageRenderer} from "./Rendering/PageRenderer";
 import {waitFor} from "../Util/waitFor";
 
 export class Website extends BookInstance {

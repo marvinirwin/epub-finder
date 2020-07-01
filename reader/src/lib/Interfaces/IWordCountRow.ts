@@ -1,4 +1,4 @@
-export interface iWordCountRow {
+export interface IWordCountRow {
     book: string;
     word: string;
     count: number;

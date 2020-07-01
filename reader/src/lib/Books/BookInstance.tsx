@@ -2,36 +2,15 @@ import {ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IBook} from "../Interfaces/Book/IBook";
-import {iWordCountRow} from "../Interfaces/IWordCountRow";
+import {IWordCountRow} from "../Interfaces/IWordCountRow";
 
 export abstract class BookInstance {
     abstract get localStorageKey(): string;
     book: IBook | undefined;
-    wordCountRecords$: ReplaySubject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>(1)
-    rawText$: ReplaySubject<string> = new ReplaySubject<string>(1)
+    wordCountRecords$: ReplaySubject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>(1)
+    rawText$: Observable<string>;
 
     constructor(public name: string) {
-        this.rawText$.subscribe(text => {
-            const countedCharacters: Dictionary<number> = text
-                .split('')
-                .filter(isChineseCharacter)
-                .reduce((acc: Dictionary<number>, letter) => {
-                if (!acc[letter]) {
-                    acc[letter] = 1;
-                } else {
-                    acc[letter]++;
-                }
-                return acc;
-            }, {});
-
-            this.wordCountRecords$.next(
-                Object.entries(countedCharacters).map(([letter, count]) => ({
-                    book: this.name,
-                    word: letter,
-                    count
-                }))
-            )
-        })
     }
 
     abstract toSerialized(): any;

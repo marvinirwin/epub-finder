@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {RenderingBook} from "./Rendering/RenderingBook";
+import {PageRenderer} from "./Rendering/PageRenderer";
 import {Dictionary} from "lodash";
 import {BookInstance} from "./BookInstance";
 // @ts-ignore

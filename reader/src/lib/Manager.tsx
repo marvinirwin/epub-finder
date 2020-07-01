@@ -1,15 +1,17 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, flatten, groupBy, orderBy, sortBy} from "lodash";
+import {Dictionary, groupBy, orderBy, sortBy} from "lodash";
 import {
-    buffer, concatMap,
-    debounceTime, delay,
-    filter, flatMap,
+    debounceTime,
+    delay,
+    filter,
+    flatMap,
     map,
     pairwise,
     scan,
     shareReplay,
     startWith,
-    switchMap, switchMapTo,
+    switchMap,
+    switchMapTo,
     take,
     withLatestFrom
 } from "rxjs/operators";
@@ -24,15 +26,13 @@ import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
-import {RenderingBook} from "./Books/Rendering/RenderingBook";
+import {PageRenderer} from "./Books/Rendering/PageRenderer";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
-import {Tweet} from "./Books/Tweet";
-import {SimpleText} from "./Books/SimpleText";
 import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
 import {BookInstance} from "./Books/BookInstance";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
-import {IndexDBManager, LocalStorageManager} from "./Storage/StorageManagers";
+import {IndexDBManager} from "./Storage/StorageManagers";
 import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
 import axios from 'axios';
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
@@ -42,15 +42,15 @@ import {ITweet} from "./Interfaces/ITweet";
 import {ITrend} from "./Interfaces/ITwitterTrend";
 import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {WavAudio} from "./WavAudio";
-import {Settings} from "./Interfaces/Message";
-import {iWordCountRow} from "./Interfaces/IWordCountRow";
+import {IWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./Manager/AudioManager";
 import {Website} from "./Books/Website";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 import {IWordRecognitionRow} from "./Interfaces/IWordRecognitionRow";
 import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
-import {mergeAnnotationDictionary} from "./Util/mergeAnnotationDictionary";
+import {mergeWordTextNodeMap} from "./Util/mergeAnnotationDictionary";
+import {PageManager} from "./Manager/PageManager";
 
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
@@ -146,10 +146,10 @@ export class Manager {
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    currentBook$: ReplaySubject<RenderingBook | undefined> = new ReplaySubject<RenderingBook | undefined>(1)
+    currentBook$: ReplaySubject<PageRenderer | undefined> = new ReplaySubject<PageRenderer | undefined>(1)
     bookLoadUpdates$: ReplaySubject<BookInstance> = new ReplaySubject<BookInstance>();
-    bookIndex$: BehaviorSubject<Dictionary<RenderingBook>> = new BehaviorSubject<Dictionary<RenderingBook>>({});
-    requestBookRemove$: Subject<RenderingBook> = new Subject<RenderingBook>()
+    bookIndex$: BehaviorSubject<Dictionary<PageRenderer>> = new BehaviorSubject<Dictionary<PageRenderer>>({});
+    requestBookRemove$: Subject<PageRenderer> = new Subject<PageRenderer>()
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
@@ -157,7 +157,7 @@ export class Manager {
 
     wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
     wordsSortedByPopularityDesc$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
-    addWordCountRows$: Subject<iWordCountRow[]> = new ReplaySubject<iWordCountRow[]>();
+    addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
 
@@ -188,15 +188,17 @@ export class Manager {
     wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
     audioManager: AudioManager;
     cardManager: CardManager;
+    pageManager: PageManager;
     textToBeTranslated$!: Observable<string>;
     translatedText$!: Observable<string>;
 
-    renderingInProgress$: Observable<boolean>;
+    renderingInProgress$ = new Subject();
 
 
     shiftPressed = false;
 
     constructor(public db: MyAppDatabase) {
+        this.pageManager = new PageManager(this);
         this.cardManager = new CardManager(this);
         this.cardManager.load();
 
@@ -246,7 +248,6 @@ export class Manager {
             if (bookToRemove === currentBook) {
                 this.currentBook$.next(Object.values(bookDict)[0])
             }
-            bookToRemove.removeSerialized();
             this.bookIndex$.next({...bookDict});
         });
 
@@ -264,10 +265,8 @@ export class Manager {
         this.cardManager.cardLoadingSignal$.pipe(
             filter(b => !b),
             delay(100),
-            switchMapTo(this.bookIndex$),
-            switchMap(bookIndex => merge(
-                ...Object.values(bookIndex).map(v => v.bookInstance$.pipe(switchMap(i => i.rawText$))))
-            ),
+            switchMapTo(this.pageManager.pageIndex$),
+            switchMap(pageIndex => merge(...Object.values(pageIndex).map(pageRenderer => pageRenderer.text$))),
             withLatestFrom(this.cardManager.cardIndex$)
         ).subscribe(([text, cardIndex]) => {
             const newCharacterSet = new Set<string>();
@@ -286,31 +285,20 @@ export class Manager {
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
 
-        this.renderingInProgress$ = this.bookIndex$.pipe(
-            switchMap(bookIndex => combineLatest(Object.values(bookIndex).map(book => book.isRendering$))),
-            map((rendersInProgress: boolean[]) => !!rendersInProgress.find(v => v)),
-        )
+        this.pageManager.requestRenderPage$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
 
-        this.oLoad();
-
-/*
-        (async () => {
-            // No blank cards allowed
-            this.addPersistedCards$.next((await this.db.cards.where('deck').equals("NO_DECK").toArray()).filter(c => c.learningLanguage))
-        })()
-*/
     }
 
     private oAnnotations() {
         let previousHighlightedElements: HTMLElement[] | undefined;
         this.bookIndex$.pipe(
             switchMap(d =>
-                combineLatest(Object.values(d).map(d => d.annotatedCharMap$))
+                combineLatest(Object.values(d).map(d => d.wordTextNodeMap$))
             ),
             map((elCharMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
                 const map: Dictionary<IAnnotatedCharacter[]> = {};
                 elCharMaps.forEach(c => {
-                    mergeAnnotationDictionary(c, map)
+                    mergeWordTextNodeMap(c, map)
                 })
                 return map;
             })
@@ -342,23 +330,6 @@ export class Manager {
             this.quizDialogComponent$.next(ShowCharacter);
         })
     }
-
-    private async oLoad() {
-        const tweetLoader = new LocalStorageManager(Tweet.localStorageKey);
-        const simpleTextLoader = new LocalStorageManager(SimpleText.localStorageKey);
-/*
-        let thingsToLoad = [
-            ...tweetLoader.load<Tweet>(Tweet.fromSerialized),
-            ...simpleTextLoader.load<SimpleText>(SimpleText.fromSerialized)
-        ];
-*/
-        this.bookLoadUpdates$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
-        // thingsToLoad.forEach(b => this.bookLoadUpdates$.next(b))
-
-        // Maybe we dont want to load, because the cards we want will be pulled from the anki-thread anyways
-        // this.addCards$.next(this.cardDBManager.load((t: Dexie.Table<ICard, number>) => t.toArray()));
-    }
-
     private oEditWord() {
         this.requestEditWord$.pipe(withLatestFrom(
             this.cardManager.cardIndex$,
@@ -442,21 +413,6 @@ export class Manager {
     }
 
     private oBook() {
-        this.bookLoadUpdates$.pipe(withLatestFrom(this.bookIndex$)).subscribe(([instance, dict]) => {
-            const currentRender: RenderingBook = dict[instance.name];
-            if (currentRender) {
-                currentRender.bookInstance$.next(instance);
-            } else {
-                let renderingBook = new RenderingBook(instance, this, instance.name);
-                renderingBook.renderMessages$.pipe(map(m => new DebugMessage(`render-${renderingBook.name}`, m)))
-                    .subscribe(this.allDebugMessages$)
-                this.bookIndex$.next({
-                    ...this.bookIndex$.getValue(),
-                    [instance.name]: renderingBook
-                })
-            }
-        });
-
         combineLatest([
             this.bookIndex$,
             this.currentBook$
@@ -476,10 +432,6 @@ export class Manager {
         });
         this.currentBook$.next(undefined);
 
-        this.textToBeTranslated$ = this.bookIndex$.pipe(
-            switchMap(d => merge(...Object.values(d).map(d => d.currentTranslateText$)).pipe(debounceTime(100))),
-            shareReplay(1)
-        );
 
         this.textToBeTranslated$.subscribe(v => console.log(v))
         this.translatedText$ = this.textToBeTranslated$.pipe(
@@ -612,7 +564,7 @@ export class Manager {
 
     private oScoreAndCount() {
         this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
-            const wordCountsGrouped: Dictionary<iWordCountRow[]> = groupBy(newRows, 'word');
+            const wordCountsGrouped: Dictionary<IWordCountRow[]> = groupBy(newRows, 'word');
             const newObject = {...acc};
             Object.entries(wordCountsGrouped).forEach(([word, wordCountRecords]) => {
                 const currentEntry = newObject[word];
@@ -702,7 +654,7 @@ export class Manager {
     initIframeListeners() {
     }
 
-    applyGlobalListener(el: HTMLElement) {
+    applyGlobalLIstenersToPage(el: HTMLElement) {
         el.onkeydown = (e) => {
             if (e.key === "Escape") {
                 this.queEditingCard$.next(undefined);

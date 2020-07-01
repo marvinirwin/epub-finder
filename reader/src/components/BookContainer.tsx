@@ -1,4 +1,4 @@
-import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
+import {PageRenderer} from "../lib/Books/Rendering/PageRenderer";
 import React, {useEffect, useRef} from "react";
 import Collapse from '@material-ui/core/Collapse';
 import {Manager} from "../lib/Manager";
@@ -44,7 +44,7 @@ const StyledExpansionPanelDetails = withStyles({
     }
 })(ExpansionPanelDetails);
 
-export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
+export function BookContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
     const classes = useStyles();
     const ref = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = React.useState(true);
@@ -57,6 +57,6 @@ export function BookContainer({rb, m}: { rb: RenderingBook, m: Manager }) {
 */
 
     return (
-        <div style={{width: '100%', height: '100%'}} id={rb.getId()} ref={ref}/>
+        <div style={{width: '100%', height: '100%'}} id={rb.getRenderParentElementId()} ref={ref}/>
     );
 }

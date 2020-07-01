@@ -1,4 +1,3 @@
-/* eslint import/no-webpack-loader-syntax:0 */
 import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../lib/UseObs";
 import React, {useEffect} from "react";
@@ -13,9 +12,7 @@ import {SettingsPage} from "./Pages/SettingsPage";
 import {Grid} from "@material-ui/core";
 import {BookContainer} from "./BookContainer";
 import {Dictionary} from "lodash";
-import {RenderingBook} from "../lib/Books/Rendering/RenderingBook";
-// @ts-ignore
-import DocumentProcessor from 'Worker-loader?name=dist/[name].js!../lib/Worker/DocumentProcessor';
+import {PageRenderer} from "../lib/Books/Rendering/PageRenderer";
 /*
 
 window.addEventListener("dragover", function (e) {
@@ -99,8 +96,6 @@ axios.post('/get-speech', {text: '大家好 加拿大人'}).then(async result =>
 */
 
 
-const documentProcessor = new DocumentProcessor();
-documentProcessor.postMessage(`${process.env.PUBLIC_URL}/alphago_bilibili.htm`)
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -143,10 +138,10 @@ export function Main({s}: { s: AppSingleton }) {
     const item = useObs(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
-        m.applyGlobalListener(document.body);
+        m.applyGlobalLIstenersToPage(document.body);
         m.applyShiftListener(document.body);
     }, [m]);
-    const books = useObs<Dictionary<RenderingBook>>(m.bookIndex$);
+    const books = useObs<Dictionary<PageRenderer>>(m.bookIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
