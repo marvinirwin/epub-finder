@@ -1,6 +1,6 @@
 import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../lib/UseObs";
-import React, {useEffect} from "react";
+import React, {Fragment, useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
@@ -13,6 +13,7 @@ import {Grid} from "@material-ui/core";
 import {PageContainer} from "./PageContainer";
 import {Dictionary} from "lodash";
 import {PageRenderer} from "../lib/Books/Rendering/PageRenderer";
+import {ImageSelectPopup} from "./ImageSelectPopup";
 /*
 
 window.addEventListener("dragover", function (e) {
@@ -153,6 +154,7 @@ export function Main({s}: { s: AppSingleton }) {
         }}>
             {Object.values(pages || {}).map(page => <PageContainer m={m} key={page.name} rb={page}/>)}
         </div>
+        <ImageSelectPopup m={m}/>
         <PopupElements m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
             {SelectedPage}

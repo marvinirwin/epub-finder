@@ -24,8 +24,6 @@ export class AnnotatedElement {
         let attribute = this.annotatedElement.getAttribute('popper-id') as string;
         let popperId = ReaderDocument.getPopperId( attribute );
         this.popperElement = (annotatedElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
-        const allPopperEls = (annotatedElement.ownerDocument as XMLDocument).getElementsByClassName('POPPER_ELEMENT');
-        debugger;
         createPopper(this.annotatedElement, this.popperElement, {
             placement: 'top',
         });

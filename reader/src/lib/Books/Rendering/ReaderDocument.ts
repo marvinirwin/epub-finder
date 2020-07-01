@@ -98,7 +98,7 @@ export class ReaderDocument {
         popperEl.setAttribute("class", "translation-popover");
         popperEl.setAttribute('id', ReaderDocument.getPopperId(popperId));
         popperEl.setAttribute("class", "POPPER_ELEMENT")
-        body.appendChild(popperEl);
+        newParent.insertBefore(popperEl, null);
     }
 
     static getPopperId(popperId: string) {

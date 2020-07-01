@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     titleRow: {
         display: 'flex',
         justifyContent: "center",
+        height: 'fit-content'
     },
     learningLanguage: {
         flexGrow: 1

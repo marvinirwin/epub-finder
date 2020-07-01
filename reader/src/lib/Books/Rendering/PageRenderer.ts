@@ -30,6 +30,19 @@ mark:hover {
 
 body {
 }
+.POPPER_ELEMENT {
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    display: none;
+}
+
+.POPPER_ELEMENT[data-show] {
+    display: block;
+}
+
 
 .annotated_and_translated {
     transition-duration: 0.5s;
@@ -84,7 +97,6 @@ mark {
                 return iframe.contents().find('body')[0];
             }),
             map(body => {
-                debugger;
                 const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
                 this.applySelectionListener(body);
                 PageRenderer.appendAnnotationStyleToPageBody(body)
@@ -142,6 +154,7 @@ mark {
         } else {
             iframe = $(` <iframe style="border: none; width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
             iframe[0].srcdoc = this.src;
+
             iframe.appendTo(ref);
 
             // Maybe do this after?
