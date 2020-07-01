@@ -1,6 +1,5 @@
 import {getIndexOfEl} from "../../Util/getIndexOfEl";
 import {uniqueId} from 'lodash';
-import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -10,18 +9,15 @@ export class ReaderDocument {
 
 
     setSources(doc: Document) {
-        function walk(node: Node) {
+        const walk = (node: Node) => {
             var child, next;
-            const el = node as Element;
-            if (el.getAttribute) {
-                let currentSource = el.getAttribute("src");
-
-                if (currentSource && !currentSource.startsWith("data")) {
-                    el.setAttribute("src", `${process.env.PUBLIC_URL}/${currentSource}`);
-                }
-            }
             switch (node.nodeType) {
                 case 1: // Element node
+                    const el = node as Element;
+                    this.replaceHrefOrSource(el, "src");
+                    if (el.localName === "link") {
+                        this.replaceHrefOrSource(el, "href");
+                    }
                 case 9: // Document node
                     child = node.firstChild;
                     while (child) {
@@ -34,6 +30,14 @@ export class ReaderDocument {
         }
         walk(doc);
     }
+
+    private replaceHrefOrSource(el: Element, qualifiedName: string) {
+        let currentSource = el.getAttribute(qualifiedName);
+        if (currentSource && !currentSource.startsWith("data")) {
+            el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
+        }
+    }
+
     getTextElements(doc: Document) {
         const leaves: Element[] = [];
         function walk(node: Node, cb: (n: Node) => any) {

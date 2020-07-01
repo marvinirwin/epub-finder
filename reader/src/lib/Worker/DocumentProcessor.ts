@@ -9,8 +9,6 @@ self["window"] = self;
 // @ts-ignore
 const ctx: Worker = self as any;
 
-
-
 // Respond to message from parent thread
 ctx.onmessage = (ev) => {
     const url = ev.data as string;
