@@ -33,10 +33,13 @@ body {
 .POPPER_ELEMENT {
     background-color: #333;
     color: white;
-    padding: 5px 10px;
+    padding: 15px 15px;
     border-radius: 4px;
     font-size: 13px;
+    height: fit-content;
+    z-index: 9999;
     display: none;
+    
 }
 
 .POPPER_ELEMENT[data-show] {

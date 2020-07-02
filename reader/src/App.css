@@ -85,27 +85,6 @@
     flex-direction: column;
 }
 
-
-/*
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div > div,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div > div > div,
-.book-expansion-panel > .MuiCollapse-container.MuiCollapse-entered > .MuiCollapse-wrapper > .MuiCollapse-wrapperInner > div > div > div > div > div > div
-{
-    height: 90vh !important;
-    width: 100vw;
-    z-index: 0;
-}
-.book-expansion-panel {
-    height: 90vh;
-}
-*/
-
 /* HACK to make */
 .makeStyles-popup-18 > span > div > div {
     background-color: white;

@@ -99,59 +99,37 @@ export class AudioRecorder {
                     const recorder = new MediaRecorder(source);
                     const stream = (await audioContext).createMediaStreamSource(recorder.stream);
                     return new Promise<WavAudio>(async resolve => {
-                        recorder.ondataavailable = async (event) => {
-                            this.isRecording$.next(false);
-                            let wavAudio = new WavAudio(await new Response(new Blob([event.data])).arrayBuffer());
-                            req.cb(wavAudio)
-                            resolve(wavAudio);
-                        }
-                        const analyser = (await audioContext).createAnalyser();
-                        analyser.fftSize = 2048;
-                        const bufferLength = analyser.frequencyBinCount;
-                        const dataArray = new Uint8Array(bufferLength);
-                        // Dont connect back to speakers
-                        stream.connect(analyser)/*.connect((await audioContext).destination)*/;
-                        const draw = () => {
-                            const WIDTH = canvas.width
-                            const HEIGHT = canvas.height;
-
-                            requestAnimationFrame(draw);
-
-                            analyser.getByteTimeDomainData(dataArray);
-
-                            canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-                            canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-                            canvasCtx.lineWidth = 2;
-                            canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
-
-                            canvasCtx.beginPath();
-
-                            let sliceWidth = WIDTH * 1.0 / bufferLength;
-                            let x = 0;
-
-
-                            for (let i = 0; i < bufferLength; i++) {
-
-                                let v = dataArray[i] / 128.0;
-                                let y = v * HEIGHT / 2;
-
-                                if (i === 0) {
-                                    canvasCtx.moveTo(x, y);
-                                } else {
-                                    canvasCtx.lineTo(x, y);
-                                }
-
-                                x += sliceWidth;
+                        try {
+                            recorder.ondataavailable = async (event) => {
+                                this.isRecording$.next(false);
+                                let wavAudio = new WavAudio(await new Response(new Blob([event.data])).arrayBuffer());
+                                req.cb(wavAudio)
+                                resolve(wavAudio);
                             }
+                            const analyser = (await audioContext).createAnalyser();
+                            analyser.fftSize = 2048;
+                            const bufferLength = analyser.frequencyBinCount;
+                            const dataArray = new Uint8Array(bufferLength);
+                            // Dont connect back to speakers
+                            stream.connect(analyser)/*.connect((await audioContext).destination)*/;
+                            const draw = () => {
+                                this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
 
-                            canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                            canvasCtx.stroke();
-
+                            }
+                            draw();
+                            recorder.start();
+                            setTimeout(() => {
+                                if(recorder.state === "recording") {
+                                    recorder.stop();
+                                }
+                            }, req.duration * 1000 * 2)
+                        } catch (e) {
+                            console.error(e);
+                        } finally {
+                            if(recorder.state === "recording") {
+                                recorder.stop();
+                            }
                         }
-                        draw();
-                        recorder.start();
-                        setTimeout(() => recorder.stop(), req.duration * 1000 * 2)
                     })
                 } catch (e) {
                     console.error(e);
@@ -160,6 +138,44 @@ export class AudioRecorder {
                 }
             })
         )
+    }
+
+    private drawSineWave(canvas: HTMLCanvasElement, draw: () => void, analyser: AnalyserNode, dataArray: Uint8Array, canvasCtx: CanvasRenderingContext2D, bufferLength: number) {
+        const WIDTH = canvas.width
+        const HEIGHT = canvas.height;
+
+        requestAnimationFrame(draw);
+
+        analyser.getByteTimeDomainData(dataArray);
+
+        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+
+        canvasCtx.beginPath();
+
+        let sliceWidth = WIDTH * 1.0 / bufferLength;
+        let x = 0;
+
+
+        for (let i = 0; i < bufferLength; i++) {
+
+            let v = dataArray[i] / 128.0;
+            let y = v * HEIGHT / 2;
+
+            if (i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+
+            x += sliceWidth;
+        }
+
+        canvasCtx.lineTo(canvas.width, canvas.height / 2);
+        canvasCtx.stroke();
     }
 
     getRecording(text: string, duration: number): Promise<WavAudio> {

@@ -135,8 +135,11 @@ export class EditingCard {
         });
 
         this.pinyin$ = this.learningLanguage$.pipe(map(s => {
-            const ret = lookup(s) || [];
-            return ret.map(r => r.pinyin).join('/')
+            return s.split('').map(char => {
+                let definitions = lookup(char);
+                if (definitions) return definitions.map(r => r.pinyin).join('/')
+                return char;
+            }).join(' ')
         }));
 
 /*

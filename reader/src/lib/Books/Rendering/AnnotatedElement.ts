@@ -18,6 +18,8 @@ export class AnnotatedElement {
         public r: PageRenderer,
         public annotatedElement: HTMLElement
     ) {
+        const showEvents = ['mouseenter', 'focus'];
+        const hideEvents = ['mouseleave', 'blur'];
 
         this.applyParentMouseEvents();
         this.translatableText = annotatedElement.getAttribute('translatable-text') as string;
@@ -27,6 +29,23 @@ export class AnnotatedElement {
         createPopper(this.annotatedElement, this.popperElement, {
             placement: 'top',
         });
+
+        const show = () => {
+            this.popperElement.setAttribute('data-show', '');
+        }
+        const hide = () => {
+            this.popperElement.removeAttribute('data-show');
+        }
+
+        showEvents.forEach(event => {
+            annotatedElement.addEventListener(event, show);
+        });
+
+        hideEvents.forEach(event => {
+            annotatedElement.addEventListener(event, hide);
+        });
+
+
     }
 
     updateWords(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
@@ -79,7 +98,7 @@ export class AnnotatedElement {
     private applyParentMouseEvents() {
         this.annotatedElement.onmouseenter = (ev) => {
             if (!this.translated) {
-                getTranslation(this.annotatedElement).then(t => {
+                getTranslation(this.annotatedElement.textContent).then(t => {
                     this.translated = true;
                     return this.popperElement.textContent = t;
                 })

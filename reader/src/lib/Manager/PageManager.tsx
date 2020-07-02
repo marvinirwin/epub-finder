@@ -1,6 +1,6 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import DocumentProcessor from 'Worker-loader?name=dist/[name].js!../Worker/DocumentProcessor';
+import HTMLProcessor from 'Worker-loader?name=dist/[name].js!../Worker/HTMLProcessorThread';
 import {PageRenderer} from "../Books/Rendering/PageRenderer";
 import {Observable, ReplaySubject} from "rxjs";
 import { Dictionary } from "lodash";
@@ -17,7 +17,7 @@ export class PageManager {
         this.pageIndex$ = this.requestRenderPage$.pipe(
             flatMap(async page => {
                 return printExecTimeAsync("Preprocessing xml DOM", async () => {
-                    const documentProcessingWorker = new DocumentProcessor();
+                    const documentProcessingWorker = new HTMLProcessor();
                     documentProcessingWorker.postMessage(page.url)
                     const processedXML = new Promise<string>(resolve => documentProcessingWorker.onmessage = (ev: MessageEvent) => resolve(ev.data));
                     let pageRenderer = new PageRenderer(

@@ -60,22 +60,25 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
         }
     }, [sounds]);
 
+/*
     const [test, setTest] = useState<AudioTest | undefined>();
+*/
+/*
     useEffect(() => {
         if (characters) { // TODO shouldn't knownLanguage be entirely replaced with characters?
-
             let audioTest = new AudioTest();
             audioTest.text$.next(characters)
             setTest(audioTest)
         }
     }, [characters]);
+*/
     const pinyin = useObs(card.pinyin$);
 
     return (
         <Card className={classes.root}>
             <CardContent>
                 <div className={classes.root}>
-                    <Typography variant="h6" gutterBottom> English ({pinyin}) </Typography>
+                    <Typography variant="h6" gutterBottom> {characters} ({pinyin}) </Typography>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m}/>
