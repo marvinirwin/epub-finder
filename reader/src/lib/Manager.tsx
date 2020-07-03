@@ -257,7 +257,7 @@ export class Manager {
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
 
-        this.pageManager.requestRenderPage$.next(new Website('AlphaGo Bilibili', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
+        this.pageManager.requestRenderPage$.next(new Website('Obama', `${process.env.PUBLIC_URL}/obama.htm`));
 
     }
 

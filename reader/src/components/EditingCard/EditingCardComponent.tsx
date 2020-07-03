@@ -11,9 +11,6 @@ import {useObs} from "../../lib/UseObs";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
-import CircularIntegration, {SpinnerState} from '../SpinningCircle'
-import {SoundEl} from "../SoundElement";
-import {AudioRecorder, AudioTest} from "../../lib/AudioRecorder";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,17 +38,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EditingCardComponent({card}: { card: EditingCard }) {
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
-    const progress = useObs(card.saveInProgress$);
     const characters = useObs(card.learningLanguage$);
-    const deck = useObs(card.deck$);
-    const english = useObs(card.knownLanguage$);
     const sounds = useObs(card.sounds$);
-    const photos = useObs(card.photos$);
-    const frontPhotos = useObs(card.illustrationPhotos$);
     useEffect(() => {
         const els = document.getElementsByClassName('new-audio');
         for (let i = 0; i < els.length; i++) {
@@ -60,18 +48,6 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
         }
     }, [sounds]);
 
-/*
-    const [test, setTest] = useState<AudioTest | undefined>();
-*/
-/*
-    useEffect(() => {
-        if (characters) { // TODO shouldn't knownLanguage be entirely replaced with characters?
-            let audioTest = new AudioTest();
-            audioTest.text$.next(characters)
-            setTest(audioTest)
-        }
-    }, [characters]);
-*/
     const pinyin = useObs(card.pinyin$);
 
     return (

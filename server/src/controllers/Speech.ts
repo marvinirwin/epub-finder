@@ -3,6 +3,7 @@ import {AudioConfig, SpeechConfig, SpeechSynthesizer, SpeechRecognizer} from "mi
 import fs from "fs-extra";
 import {Request, Response} from "express";
 import axios from "axios";
+import { join } from "path";
 
 // TODO is AZURE_SPEECH_LOCATION the region?  They're both location oriented words
 const region = process.env.AZURE_SPEECH_LOCATION;
@@ -52,11 +53,12 @@ function downloadSynthesizedSpeech(filename: string, text: string) {
         }
     );
 }
+const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR;
 
 export async function TextToSpeech(req: Request, res: Response) {
     const {text} = req.body;
     const hash = getMd5(text);
-    const filename = `${hash}.wav`;
+    const filename = join(wavRoot, `${hash}.wav`);
     if (!speechSynthesisMemo[text]) {
         await downloadSynthesizedSpeech(filename, text);
         speechSynthesisMemo[text] = filename;
@@ -78,7 +80,6 @@ export async function GetSpeechRecognitionToken(req: Request, res: Response) {
             }
         }
     );
-    debugger;
     res.send(result.data);
 }
 

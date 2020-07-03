@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {memoInJson} from "./my_apis";
+import {memoWithMySQL} from "./cache";
 
 const projectId = "mandarin-trainer";
 
@@ -13,7 +13,7 @@ export interface TranslationRequest {
     text: string;
 }
 
-export const translateFuncF = memoInJson("../TRANSLATIONS", async function (args: TranslationRequest) {
+export const translateFuncF = memoWithMySQL("GOOGLE_TRANSLATIONS", async function (args: TranslationRequest) {
     const [translation] = await translate.translate(args.text, args.to);
     return {translation};
 });

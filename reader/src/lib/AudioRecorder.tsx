@@ -111,7 +111,7 @@ export class AudioRecorder {
                             const bufferLength = analyser.frequencyBinCount;
                             const dataArray = new Uint8Array(bufferLength);
                             // Dont connect back to speakers
-                            stream.connect(analyser)/*.connect((await audioContext).destination)*/;
+                            stream.connect(analyser)
                             const draw = () => {
                                 this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
 
@@ -189,10 +189,6 @@ export class AudioRecorder {
     }
 }
 
-export function spaceOutRecording() {
-
-}
-
 export async function getSynthesizedAudio(text: string): Promise<WavAudio> {
     const response = await axios.post('/get-speech', {text}, {responseType: 'blob'});
     const buffer = await new Response(response.data as Blob).arrayBuffer()
@@ -206,9 +202,6 @@ export async function getSynthesizedAudio(text: string): Promise<WavAudio> {
 export class AudioTest {
     text$ = new ReplaySubject<string>(1);
     synthesizedAudio$: Observable<WavAudio>;
-    /*
-        userAudioNumbers$: Observable<number[]>;
-    */
     synthesizedGraphData$: Observable<number[]>
 
     constructor() {
@@ -238,28 +231,3 @@ export class AudioTest {
 
 }
 
-/*
-export function AudioRecording({t}: { t: AudioTest }) {
-    const userNumbers = useObs(t.userAudioNumbers$);
-    const synthesizeNumbers = useObs(t.synthesizedGraphData$);
-    const [rev, setRev] = useState(0);
-    useEffect(() => {
-            setRev(rev + 1)
-        },
-        [userNumbers, synthesizeNumbers])
-    return <div>
-        <Plot data={
-            [userNumbers || [], synthesizeNumbers || []].map((stream, i) => {
-                return {
-                    x: stream.map((_, i) => i + 1),
-                    y: stream,
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    marker: {color: ['red', 'green']},
-                }
-            })
-        } layout={{width: 320, height: 240, title: 'Sound recording'}}
-              revision={rev}
-        />
-    </div>
-}*/

@@ -1,14 +1,30 @@
 sudo: false
 language: node_js
 node_js:
-    - "8"
-    - "9"
-    - "10"
+  - "8"
+  - "9"
+  - "10"
 services:
-    - mongodb
+  - mysql
 cache:
-    directories:
-        - node_modules
+  directories:
+    - node_modules
 script:
-    - npm run build
-    - npm run test
+  - npm run build
+  - npm run test
+env:
+  global:
+    - PORT=3001
+    - AZURE_IMAGE_SEARCH_KEY_ENDPOINT=abc123
+    - AZURE_IMAGE_SEARCH_KEY=abc123
+    - AZURE_SPEECH_LOCATION=abc123
+    - AZURE_SPEECH_KEY1=abc123
+    - TWITTER_API_KEY=abc123
+    - TWITTER_API_KEY_SECRET=abc123
+    - SYTHTHESIZED_WAV_CACHE_DIR=./wav_cache
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=password
+    - MYSQL_PORT=3000
+  jobs:
+    - USE_NETWORK=false
+

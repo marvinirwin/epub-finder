@@ -5,7 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
     canvas: {
         flexGrow: 1,
-        height: '25px',
+        height: '50px',
         width: '100%'
     },
 }));
