@@ -17,7 +17,9 @@ import {Manager} from "../Manager";
 import {debounce} from "@material-ui/core";
 import {WavAudio} from "../WavAudio";
 import {getSynthesizedAudio} from "../AudioRecorder";
-import { memoize } from "lodash";
+import { memoize, flatten } from "lodash";
+import pinyin from 'pinyin';
+
 
 interface IDefinition {
     traditional: string;
@@ -25,9 +27,7 @@ interface IDefinition {
     pinyin: string;
 }
 
-const hanzi = require("hanzi");
-hanzi.start();
-const lookup: (s: string) => IDefinition[] = memoize((chars: string) => hanzi.definitionLookup(chars))
+export const lookup: (s: string) => string[] = memoize(s => flatten(pinyin(s)))
 
 
 export class EditingCard {
@@ -137,7 +137,7 @@ export class EditingCard {
         this.pinyin$ = this.learningLanguage$.pipe(map(s => {
             return s.split('').map(char => {
                 let definitions = lookup(char);
-                if (definitions) return definitions.map(r => r.pinyin).join('/')
+                if (definitions) return definitions.join('/')
                 return char;
             }).join(' ')
         }));

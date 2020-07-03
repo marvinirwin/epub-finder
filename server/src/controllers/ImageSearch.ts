@@ -4,7 +4,7 @@ import {CognitiveServicesCredentials} from "@azure/ms-rest-azure-js";
 import {memoWithMySQL} from "./cache";
 
 export const imageSearchEndPoint = process.env["AZURE_IMAGE_SEARCH_ENDPOINT"];
-export const imageSearchKey = process.env["AZURE_IMAGE_SEARCH_KEY"];
+export const imageSearchKey = process.env["AZURE_IMAGE_SEARCH_KEY"] as string;
 
 const cognitiveServiceCredentials = new CognitiveServicesCredentials(
     imageSearchKey
@@ -26,7 +26,6 @@ const sendQuery = async (searchTerm: string) => {
 
 export interface ImageSearchRequest {
     term: string;
-    cb: (str: string) => void;
 }
 
 export const imageSearchFuncF = memoWithMySQL("AZURE_IMAGE_SEARCH", async function (args: ImageSearchRequest) {

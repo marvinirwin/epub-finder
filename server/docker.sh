@@ -19,7 +19,7 @@ then
     --name "$IMAGE_NAME" \
     -e MYSQL_USER=$MYSQL_USER \
     -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-    -d mysql;
+    -d mysql:5;
 # If somebody else is listening 3306   Will this filter out off instances?  I only want this block to appear
 elif [ -n "$(sudo docker ps -f publish=3306)" ]
 then

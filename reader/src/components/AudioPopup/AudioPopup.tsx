@@ -6,6 +6,7 @@ import CountdownCircle from "./CountdownCircle";
 import SineWave from "./SineWave";
 import MultiGraph from "../MultiGraph";
 import {useObs} from "../../lib/UseObs";
+import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -49,7 +50,7 @@ export default function AudioPopup({m}:{m: Manager}) {
                     <Typography variant="h3" className={classes.learningLanguage} align="center">{currentAudioRequest?.label}</Typography>
                 </div>
                 <SineWave r={r}/>
-                <Typography variant="h3" className={classes.recognizedSpeech}>{recognizedText}</Typography>
+                <Typography variant="h3" className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
                 <Grid container>
                     <Grid item xs={6}>
                         <audio src={userAudio?.url} controls autoPlay />

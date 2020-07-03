@@ -1,41 +1,37 @@
-const mysql = require('mysql2/promise');
-var crypto = require('crypto')
+import {getSha1} from "../util/sha1";
+import {getConnection, query} from "../util/mysql";
 
-// create the connection to database
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD
-});
+const connection = getConnection();
 
+interface JsonCacheRow {
+    service: string;
+    value: any;
+    key: string;
+    key_hash: string;
+}
 
-
-
-
-export function memoWithMySQL(serviceKey: string, f: (...a: any[]) => any) {
+export function memoWithMySQL<T>(serviceKey: string, f: (...a: any[]) => T) {
     return async function (...args: any[]) {
-        const key = JSON.stringify(args);
-        const sha = crypto.createHash('sha1')
-        sha.update(key)
-        let sha1Hex = sha.digest('hex');
-        const [rows, fields] = await (await connection).execute(
-            "SELECT `value` FROM `json_cache` WHERE `service` = ? AND `key_hash` = ?",
+        const stringifiedArgs = JSON.stringify(args);
+        let sha1Hex = getSha1(stringifiedArgs);
+        const rows = await query<JsonCacheRow>(connection,
+            'SELECT `value` FROM `json_cache` WHERE `service` = ? AND `key_hash` = ?',
             [
                 serviceKey,
                 sha1Hex
-            ]
-        );
+            ])
 
         if (!rows.length) {
-            const result  = await f(...args);
-            const [rows, fields] = await (await connection).execute(
-                "INSERT INTO `json_cache` (`service`, `key`, `key_hash`, `value`) VALUES (?, ?, ?, ?)",
+            const result = await f(...args);
+            await query<JsonCacheRow>(connection,
+                'INSERT INTO `json_cache` (`service`, `key`, `key_hash`, `value`) VALUES (?, ?, ?, ?)',
                 [
                     serviceKey,
-                    key,
+                    stringifiedArgs,
                     sha1Hex,
+                    JSON.stringify(result)
                 ]
-            );
+            )
             return result;
         }
         return rows[0].value;

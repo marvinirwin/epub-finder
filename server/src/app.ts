@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
+console.log(process.env);
 import morgan from "morgan";
 import express from "express";
 import compression from "compression"; // compresses requests
