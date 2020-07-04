@@ -50,6 +50,8 @@ import {IWordRecognitionRow} from "./Interfaces/IWordRecognitionRow";
 import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
 import {mergeWordTextNodeMap} from "./Util/mergeAnnotationDictionary";
 import {PageManager} from "./Manager/PageManager";
+import {SentenceElement} from "./Books/Rendering/SentenceElement";
+import {IPositionedWord} from "./Interfaces/Annotation/IPositionedWord";
 
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
@@ -157,10 +159,10 @@ export class Manager {
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
     );
 
-    nextQuizItem$:Observable<ICard | undefined>;
+    nextQuizItem$: Observable<ICard | undefined>;
 
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
-    wordElementMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1)
+    wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
     audioManager: AudioManager;
     cardManager: CardManager;
     pageManager: PageManager;
@@ -176,9 +178,9 @@ export class Manager {
 
         this.oPackageLoader();
         this.oMessages();
-/*
-        this.oCurrent();
-*/
+        /*
+                this.oCurrent();
+        */
         this.oEditingCard();
         this.oBook();
 
@@ -252,7 +254,8 @@ export class Manager {
             }
             const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
             if (newCards.length) {
-                debugger;console.log();
+                debugger;
+                console.log();
             }
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
@@ -263,6 +266,17 @@ export class Manager {
 
     private oAnnotations() {
         let previousHighlightedElements: HTMLElement[] | undefined;
+        this.wordElementMap$ = this.bookIndex$.pipe(
+            switchMap(bookIndex => combineLatest(Object.values(bookIndex).map(book => book.wordTextNodeMap$))),
+            map((wordTextNodeMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
+                const newMap = {};
+                wordTextNodeMaps.map(v => {
+                    mergeWordTextNodeMap(v, newMap)
+                })
+                return newMap;
+            })
+        );
+/*
         this.bookIndex$.pipe(
             switchMap(d =>
                 combineLatest(Object.values(d).map(d => d.wordTextNodeMap$))
@@ -274,9 +288,12 @@ export class Manager {
                 })
                 return map;
             })
-        ).subscribe(this.wordElementMap$);
+        );
+*/
+
+
         this.highlightedWord$.pipe(debounceTime(10),
-            withLatestFrom(this.wordElementMap$))
+            withLatestFrom(this.wordElementMap$.pipe(startWith({} as Dictionary<IAnnotatedCharacter[]>))))
             .subscribe(([word, dict]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
@@ -302,6 +319,7 @@ export class Manager {
             this.quizDialogComponent$.next(ShowCharacter);
         })
     }
+
     private oEditWord() {
         this.requestEditWord$.pipe(withLatestFrom(
             this.cardManager.cardIndex$,
@@ -347,38 +365,38 @@ export class Manager {
 
     private oStringDisplay() {
         const observables: Observable<string>[] = [];
-/*
-        Object.entries(this).forEach(([key, value]) => {
-            if (key.endsWith('$')) {
-                const obs: Observable<any> = value;
-                if (!key.toLowerCase().includes('message') && !key.toLowerCase().includes('display')) {
-                    obs.subscribe(() => this.bookMessages$.next(`${key} fired`))
-                }
-                observables.push(
-                    obs.pipe(startWith('Has not emitted'), map(v => {
-                        let str = v;
-                        switch (key) {
-                            case "currentCards$":
-                                str = `Length: ${v.length}`;
-                                break;
-                            case "currentBook$":
-                                str = v?.name
-                                break;
-                            case "bookDict$":
-                                // @ts-ignore
-                                str = Object.values(v).map((v: RenderingBook) => v.name).join(', ')
-                                break;
-                            default:
-                                if (Array.isArray(v)) {
-                                    str = v.join(', ');
-                                }
+        /*
+                Object.entries(this).forEach(([key, value]) => {
+                    if (key.endsWith('$')) {
+                        const obs: Observable<any> = value;
+                        if (!key.toLowerCase().includes('message') && !key.toLowerCase().includes('display')) {
+                            obs.subscribe(() => this.bookMessages$.next(`${key} fired`))
                         }
-                        return `${key} ` + `${str}`.substr(0, 50);
-                    }))
-                );
-            }
-        })
-*/
+                        observables.push(
+                            obs.pipe(startWith('Has not emitted'), map(v => {
+                                let str = v;
+                                switch (key) {
+                                    case "currentCards$":
+                                        str = `Length: ${v.length}`;
+                                        break;
+                                    case "currentBook$":
+                                        str = v?.name
+                                        break;
+                                    case "bookDict$":
+                                        // @ts-ignore
+                                        str = Object.values(v).map((v: RenderingBook) => v.name).join(', ')
+                                        break;
+                                    default:
+                                        if (Array.isArray(v)) {
+                                            str = v.join(', ');
+                                        }
+                                }
+                                return `${key} ` + `${str}`.substr(0, 50);
+                            }))
+                        );
+                    }
+                })
+        */
         combineLatest(observables).pipe(debounceTime(500), map(a => {
             return a.join("</br>")
         })).subscribe(this.stringDisplay$);
@@ -441,7 +459,6 @@ export class Manager {
     private oEditingCard() {
 
 
-
         this.currentEditingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
             pairwise(),
@@ -475,6 +492,7 @@ export class Manager {
             })
         )
     }
+
     private oMessages() {
         this.allDebugMessages$ = new ReplaySubject<DebugMessage>();
         this.allDebugMessages$.pipe(scan((acc: DebugMessage[], m) => {
@@ -484,39 +502,39 @@ export class Manager {
     }
 
     private oPackageLoader() {
-/*
-        const packageLoader: Worker = new AnkiThread();
-        packageLoader.onmessage = v => eval(v.data);
-        [{name: 'Characters', path: '/files/chars.zip'}].forEach(p => {
-            this.packageMessages$.next(`Requesting Package ${p.name} at ${p.path} `)
-            packageLoader.postMessage(JSON.stringify(p));
-        });
-*/
+        /*
+                const packageLoader: Worker = new AnkiThread();
+                packageLoader.onmessage = v => eval(v.data);
+                [{name: 'Characters', path: '/files/chars.zip'}].forEach(p => {
+                    this.packageMessages$.next(`Requesting Package ${p.name} at ${p.path} `)
+                    packageLoader.postMessage(JSON.stringify(p));
+                });
+        */
     }
 
-/*
-    private oCurrent() {
-        this.currentPackage$.next(undefined);
-        this.packageUpdate$.pipe(withLatestFrom(this.packages$)).subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
-            currentPackages[newPackageUpdate.name] = newPackageUpdate;
-            this.packageMessages$.next(`Package ${newPackageUpdate.name} has been updated`)
-            if (Object.keys(currentPackages).length === 1) {
-                this.packageMessages$.next(`Setting current package ${newPackageUpdate.name}`)
-                this.currentPackage$.next(newPackageUpdate);
-            }
-            this.packages$.next({...currentPackages});
-        })
-        this.currentPackage$.pipe(map(pkg => {
-            // This probably wont work
-            const col = pkg?.collections?.find(c => c.allCards.length)
-            this.packageMessages$.next(`Setting current collection ${col?.name}`)
-            this.currentCollection$.next(col?.name);
-            let find = col?.decks.find(d => d.cards.length);
-            this.packageMessages$.next(`Setting current deck ${find?.name}`)
-            return find;
-        })).subscribe(this.currentDeck$);
-    }
-*/
+    /*
+        private oCurrent() {
+            this.currentPackage$.next(undefined);
+            this.packageUpdate$.pipe(withLatestFrom(this.packages$)).subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
+                currentPackages[newPackageUpdate.name] = newPackageUpdate;
+                this.packageMessages$.next(`Package ${newPackageUpdate.name} has been updated`)
+                if (Object.keys(currentPackages).length === 1) {
+                    this.packageMessages$.next(`Setting current package ${newPackageUpdate.name}`)
+                    this.currentPackage$.next(newPackageUpdate);
+                }
+                this.packages$.next({...currentPackages});
+            })
+            this.currentPackage$.pipe(map(pkg => {
+                // This probably wont work
+                const col = pkg?.collections?.find(c => c.allCards.length)
+                this.packageMessages$.next(`Setting current collection ${col?.name}`)
+                this.currentCollection$.next(col?.name);
+                let find = col?.decks.find(d => d.cards.length);
+                this.packageMessages$.next(`Setting current deck ${find?.name}`)
+                return find;
+            })).subscribe(this.currentDeck$);
+        }
+    */
 
     private oScoreAndCount() {
         this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
@@ -577,25 +595,6 @@ export class Manager {
         this.allDebugMessages$.next(new DebugMessage(o.prefix, o.message))
     }
 
-    /*
-        async loadEbookInstance(path: string, name: string) {
-            this.bookLoadUpdates$.next({
-                name,
-                book: undefined,
-                message: `Loading ${name} from ${path}`,
-                serialize: undefined
-            });
-            const book: Book = Epub(path);
-            await book.ready
-            this.bookLoadUpdates$.next({
-                name,
-                book,
-                message: `Loaded ${name}`,
-                serialize: undefined
-            });
-        }
-    */
-
     receiveSerializedPackage(s: SerializedAnkiPackage) {
         let cards = s.cards;
         if (cards?.length) {
@@ -606,28 +605,96 @@ export class Manager {
         }
     }
 
-    initIframeListeners() {
+    applyGlobalListeners(document: Document) {
+        document.onkeydown = (e) => {
+            debugger;
+            switch (e.key) {
+                case "Escape":
+                    this.queEditingCard$.next(undefined);
+                    break;
+                case "Shift":
+                    this.shiftPressed = true;
+                    break;
+            }
+        };
+
+        document.onkeyup = (e) => {
+            debugger;
+            switch (e.key) {
+                case "Escape":
+                    this.shiftPressed = false;
+            }
+        }
+
+        const onMouseUp$ = fromEvent(document, 'mouseup');
+        onMouseUp$.pipe(withLatestFrom(
+            this.cardManager.cardIndex$
+            ),
+            debounceTime(100)
+        ).subscribe(([event, currentDeck]) => {
+            debugger;
+            const activeEl = document.activeElement;
+            if (activeEl) {
+                const selObj = document.getSelection();
+                if (selObj) {
+                    const text = selObj.toString();
+                    if (text) {
+                        this.selectionText$.next(text);
+                        this.requestEditWord$.next(text);
+                    }
+                    return;
+                }
+            }
+        })
     }
 
-    applyGlobalLIstenersToPage(el: HTMLElement) {
-        el.onkeydown = (e) => {
-            if (e.key === "Escape") {
-                this.queEditingCard$.next(undefined);
+    applySentenceElementSelectListener(annotatedElements: SentenceElement) {
+        annotatedElements.sentenceElement.onmouseenter = (ev) => {
+            if (!annotatedElements.translated) {
+                getTranslation(annotatedElements.sentenceElement.textContent).then(t => {
+                    annotatedElements.translated = true;
+                    return annotatedElements.popperElement.textContent = t;
+                })
             }
-        }
+        };
     }
 
-    applyShiftListener(el: HTMLElement) {
-        el.onkeydown = e => {
-            if (e.key === "Shift") {
-                this.shiftPressed = true;
+    applyWordElementListener(
+        annotationElement: IAnnotatedCharacter,
+        maxWord: IPositionedWord,
+        i: number,
+        sentence: SentenceElement) {
+        const child: HTMLElement = annotationElement.el;
+        child.onmouseenter = (ev) => {
+            if (ev.shiftKey) {
+                const r = document.createRange();
+                r.selectNode(child);
+                const selObj = (annotationElement.el.ownerDocument as Document).getSelection();
+                /**
+                 * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
+                 * whereas other browsers will return a Selection object with Selection.type set to None.
+                 */
+                if (selObj) {
+                    selObj.addRange(r);
+                }
             }
+
         }
-        el.onkeyup = e => {
-            if (e.key === "Shift") {
-                this.shiftPressed = false;
+        annotationElement.el.onmouseenter = (ev) => {
+            this.highlightedWord$.next(maxWord.word);
+        };
+        annotationElement.el.onmouseleave = (ev) => {
+            this.highlightedWord$.next();
+        }
+        annotationElement.el.onclick = (ev) => {
+            const children = sentence.sentenceElement.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                child.classList.remove('highlighted')
             }
-        }
+            this.requestEditWord$.next(maxWord.word);
+        };
+        return i;
     }
 }
 

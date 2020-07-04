@@ -61,8 +61,7 @@ export function Main({s}: { s: AppSingleton }) {
     const item = useObs(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
-        m.applyGlobalLIstenersToPage(document.body);
-        m.applyShiftListener(document.body);
+        m.applyGlobalListeners(document);
     }, [m]);
     const pages = useObs<Dictionary<PageRenderer>>(m.pageManager.pageIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;

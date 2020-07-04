@@ -3,7 +3,7 @@ import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
 import {debounceTime, flatMap, map, startWith, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
-import {AnnotatedElement} from "./AnnotatedElement";
+import {SentenceElement} from "./SentenceElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeWordTextNodeMap} from "../../Util/mergeAnnotationDictionary";
 import {ANNOTATE_AND_TRANSLATE} from "./ReaderDocument";
@@ -16,7 +16,7 @@ import {IWordCountRow} from "../../Interfaces/IWordCountRow";
 // TODO divorce the renderer from the counter/analyzer
 export class PageRenderer {
     ref$ = new ReplaySubject<HTMLElement>();
-    textNodes$!: Observable<AnnotatedElement[]>;
+    textNodes$!: Observable<SentenceElement[]>;
     wordTextNodeMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1);
     text$ = new Subject<string>();
     wordCountRecords$ = new Subject<IWordCountRow[]>();
@@ -99,17 +99,10 @@ mark {
                 const iframe = await this.getIFrame(ref);
                 return iframe.contents().find('body')[0];
             }),
-            map(body => {
+            map((body: HTMLBodyElement) => {
                 const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
-                this.applySelectionListener(body);
+                this.m.applyGlobalListeners(body.ownerDocument as Document);
                 PageRenderer.appendAnnotationStyleToPageBody(body)
-                this.m.applyGlobalLIstenersToPage(body)
-                this.m.applyShiftListener(body)
-/*
-                leaves.forEach(v => {
-                    v.popperElement
-                })
-*/
                 return leaves;
             }));
 
@@ -136,13 +129,12 @@ mark {
         })
     }
 
-
-    rehydratePage(htmlDocument: HTMLDocument): AnnotatedElement[] {
+    rehydratePage(htmlDocument: HTMLDocument): SentenceElement[] {
         const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
         const annotatedElements = new Array(elements.length);
         for (let i = 0; i < elements.length; i++) {
             const annotatedElement = elements[i];
-            annotatedElements[i] = new AnnotatedElement(this, annotatedElement as HTMLElement);
+            annotatedElements[i] = new SentenceElement(this, annotatedElement as HTMLElement);
         }
         return annotatedElements;
     }
@@ -165,28 +157,6 @@ mark {
         await waitFor(() => iframe.contents().find('body').find('script').length > 0, 100)
         const v = iframe.contents().find('body').children().length;
         return iframe;
-    }
-
-    applySelectionListener(body: HTMLBodyElement) {
-        const onMouseUp$ = fromEvent(body, 'mouseup');
-        onMouseUp$.pipe(withLatestFrom(
-            this.m.cardManager.cardIndex$
-            ),
-            debounceTime(100)
-        ).subscribe(([e, currentDeck]) => {
-            const activeEl = (body.ownerDocument as Document).activeElement;
-            if (activeEl) {
-                const selObj = (body.ownerDocument as Document).getSelection();
-                if (selObj) {
-                    const text = selObj.toString();
-                    if (text) {
-                        this.m.selectionText$.next(text);
-                        this.m.requestEditWord$.next(text);
-                    }
-                    return;
-                }
-            }
-        })
     }
 
     getRenderParentElementId() {

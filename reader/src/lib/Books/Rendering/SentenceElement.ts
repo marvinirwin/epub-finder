@@ -9,24 +9,24 @@ import {getTranslation} from "../../Manager";
 import { createPopper } from '@popperjs/core';
 
 
-export class AnnotatedElement {
-    private translatableText: string;
+export class SentenceElement {
+    translatableText: string;
     popperElement: HTMLElement;
-    private translated = false;
+    translated = false;
 
     constructor(
         public r: PageRenderer,
-        public annotatedElement: HTMLElement
+        public sentenceElement: HTMLElement
     ) {
         const showEvents = ['mouseenter', 'focus'];
         const hideEvents = ['mouseleave', 'blur'];
 
-        this.applyParentMouseEvents();
-        this.translatableText = annotatedElement.getAttribute('translatable-text') as string;
-        let attribute = this.annotatedElement.getAttribute('popper-id') as string;
+        this.r.m.applySentenceElementSelectListener(this);
+        this.translatableText = sentenceElement.getAttribute('translatable-text') as string;
+        let attribute = this.sentenceElement.getAttribute('popper-id') as string;
         let popperId = ReaderDocument.getPopperId( attribute );
-        this.popperElement = (annotatedElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
-        createPopper(this.annotatedElement, this.popperElement, {
+        this.popperElement = (sentenceElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
+        createPopper(this.sentenceElement, this.popperElement, {
             placement: 'top',
         });
 
@@ -38,21 +38,19 @@ export class AnnotatedElement {
         }
 
         showEvents.forEach(event => {
-            annotatedElement.addEventListener(event, show);
+            sentenceElement.addEventListener(event, show);
         });
 
         hideEvents.forEach(event => {
-            annotatedElement.addEventListener(event, hide);
+            sentenceElement.addEventListener(event, hide);
         });
-
-
     }
 
     updateWords(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
-        let children = this.annotatedElement.children;
-        const text = this.annotatedElement.textContent as string;
+        let children = this.sentenceElement.children;
+        const text = this.sentenceElement.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as HTMLElement;
             wordsInProgress = wordsInProgress.map(w => {
@@ -89,38 +87,11 @@ export class AnnotatedElement {
             })
 
             if (maxWord) {
-                this.applySingleElementMouseEvents(annotationElement, maxWord, i);
+                this.r.m.applyWordElementListener(annotationElement, maxWord, i, this);
             }
         }
         return elsMappedToWords;
     }
 
-    private applyParentMouseEvents() {
-        this.annotatedElement.onmouseenter = (ev) => {
-            if (!this.translated) {
-                getTranslation(this.annotatedElement.textContent).then(t => {
-                    this.translated = true;
-                    return this.popperElement.textContent = t;
-                })
-            }
-        };
-    }
 
-    private applySingleElementMouseEvents(annotationElement: IAnnotatedCharacter, maxWord: IPositionedWord, i: number) {
-        annotationElement.el.onmouseenter = (ev) => {
-            this.r.m.highlightedWord$.next(maxWord.word);
-        };
-        annotationElement.el.onmouseleave = (ev) => {
-            this.r.m.highlightedWord$.next();
-        }
-        annotationElement.el.onclick = (ev) => {
-            const children = this.annotatedElement.children;
-            for (let i = 0; i < children.length; i++) {
-                const child = children[i];
-                child.classList.remove('highlighted')
-            }
-            this.r.m.requestEditWord$.next(maxWord.word);
-        };
-        return i;
-    }
 }

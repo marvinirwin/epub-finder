@@ -31,9 +31,6 @@ export function ReadingPage({m}: { m: Manager }) {
     return <Grid container>
         <div className={classes.popup}>
             {editingCard && <Fragment>
-                <div>
-                    <Fab onClick={e => m.queEditingCard$.next(undefined)}><CancelIcon/></Fab>
-                </div>
                 <EditingCardComponent card={editingCard}/>
                 <AudioPopup m={m}/>
             </Fragment>}
