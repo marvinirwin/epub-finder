@@ -63,8 +63,7 @@ export async function GetICard(
         );
         const document = parser.parseFromString(field, 'text/html');
         if (!document) {
-            debugger;
-            console.log();
+            throw new Error("No document")
         }
         const audio = Array.from(document.getElementsByTagName('audio'));
         const images = Array.from(document.getElementsByTagName('img'));
@@ -74,13 +73,8 @@ export async function GetICard(
         // For this current package, the photos will always be illustrationPhotos
         c.illustrationPhotos.push(...imageSources);
         let innerHTML = new XMLSerializer().serializeToString(document);
-        if (!innerHTML) {
-            debugger;
-            console.log();
-        }
-        if (innerHTML === '??') {
-            debugger;
-            console.log('Inner html ??');
+        if (!innerHTML || innerHTML === '??') {
+            throw new Error("No innerHTML")
         }
 /*
         c.fields.push(innerHTML);

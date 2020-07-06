@@ -6,7 +6,7 @@ import {Observable, ReplaySubject} from "rxjs";
 import { Dictionary } from "lodash";
 import {Manager} from "../Manager";
 import {Website} from "../Books/Website";
-import {flatMap, scan} from "rxjs/operators";
+import {flatMap, scan, shareReplay} from "rxjs/operators";
 import { strict as assert } from 'assert';
 import {printExecTime, printExecTimeAsync} from "../Util/Timer";
 
@@ -31,7 +31,8 @@ export class PageManager {
             scan((acc: Dictionary<PageRenderer>, page: PageRenderer) => {
                 acc[page.name] = page;
                 return acc;
-            }, {})
+            }, {}),
+            shareReplay(1)
         )
     }
 }

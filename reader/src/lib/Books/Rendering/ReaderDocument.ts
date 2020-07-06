@@ -97,7 +97,7 @@ export class ReaderDocument {
         const popperEl = this.document.createElement('div');
         popperEl.setAttribute("class", "translation-popover");
         popperEl.setAttribute('id', ReaderDocument.getPopperId(popperId));
-        popperEl.setAttribute("class", "POPPER_ELEMENT")
+        popperEl.setAttribute("class", "POPPER_ELEMENT");
         newParent.insertBefore(popperEl, null);
     }
 

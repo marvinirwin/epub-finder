@@ -148,15 +148,9 @@ export class AnkiPackage {
                                 case 'gif':
                                     return `data:image/gif;base64,${imageSrc}`;
                                 default:
-                                    debugger;
-                                    console.log();
-                                    return '';
+                                    throw new Error("Unknown Media")
                             }
                         }, currentDeck.name, packageName, 'TODO_COLLECTION_NAME');
-                    if (!fields || !iCard) {
-                        debugger;
-                        console.log();
-                    }
                     // const cardInstance = new Card(fields, iCard.fields, currentDeck.name, 'TODO_COLLECTION_NAME', packageName, iCard);
                     yield iCard;
                 }

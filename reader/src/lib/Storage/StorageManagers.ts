@@ -67,7 +67,6 @@ export class IndexDBManager<T> {
     async upsert(m: T | T[], isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>) {
         return this.db.transaction('rw', this.table, async () => {
             try {
-                debugger;
                 const presentRecords = await isMeWhere(this.table);
                 // If I am already here, delete
                 const keys: number[] = [];
@@ -81,12 +80,10 @@ export class IndexDBManager<T> {
                     let id = this.getId(recordToInsert);
                     let newId;
                     if (id) {
-                        debugger;
                         newId = await this.table.put(recordToInsert, id);
                     } else {
                         // @ts-ignore If the id property is present, but undefined it will error when inserted
                         if (recordToInsert.hasOwnProperty('id')) delete recordToInsert.id;
-                        debugger;
                         newId = await this.table.add(recordToInsert);
 
                     }
@@ -94,7 +91,6 @@ export class IndexDBManager<T> {
                 }
                 return recordsWithAssignedIds;
             } catch(e) {
-                debugger;
                 console.error(e);
                 throw e;
             }
@@ -103,7 +99,6 @@ export class IndexDBManager<T> {
 
     delete(isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>) {
         return this.db.transaction('rw', this.table, async () => {
-            debugger;
             const presentRecords = await isMeWhere(this.table);
             let keys: number[] = [];
             presentRecords.map(this.getId).forEach(n => (n !== undefined) && keys.push(n));

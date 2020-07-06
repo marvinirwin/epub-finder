@@ -1,7 +1,7 @@
 import {combineLatest, fromEvent, Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, flatMap, map, startWith, withLatestFrom} from "rxjs/operators";
+import {debounceTime, filter, flatMap, map, startWith, withLatestFrom} from "rxjs/operators";
 import {Manager, sleep} from "../../Manager";
 import {SentenceElement} from "./SentenceElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
@@ -18,7 +18,7 @@ export class PageRenderer {
     ref$ = new ReplaySubject<HTMLElement>();
     textNodes$!: Observable<SentenceElement[]>;
     wordTextNodeMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1);
-    text$ = new Subject<string>();
+    text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
 
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
@@ -108,14 +108,19 @@ mark {
 
         combineLatest([
             this.textNodes$,
-            this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500))
-        ]).subscribe(async ([leaves]) => {
+            this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500)),
+        ]).pipe(filter(([leaves]) => !!leaves.length)).subscribe(async ([leaves]) => {
             printExecTime("Update words in annotated elements", () => {
-                let uniqueLengths = uniq(this.m.cardManager.trie.t.getWords().map(w => w.length));
+                let words = this.m.cardManager.trie.t.getWords();
+                if (!words.length) {
+                    return;
+                }
+                let uniqueLengths: number[] = uniq(words.map(w => w.length));
                 const chars: Dictionary<IAnnotatedCharacter[]>[] = [];
                 for (let i = 0; i < leaves.length; i++) {
                     const leaf = leaves[i];
-                    chars.push(leaf.updateWords(this.m.cardManager.trie.t, uniqueLengths))
+                    let wordElementMemberships = leaf.getWordElementMemberships(this.m.cardManager.trie.t, uniqueLengths);
+                    chars.push(wordElementMemberships)
                 }
 
                 const wordTextNodeMap = chars.reduce((
@@ -123,7 +128,7 @@ mark {
                     cDict: Dictionary<IAnnotatedCharacter[]>) => {
                     mergeWordTextNodeMap(cDict, acc);
                     return acc;
-                }, {})
+                }, {});
                 this.wordTextNodeMap$.next(wordTextNodeMap);
             })
         })
@@ -132,10 +137,14 @@ mark {
     rehydratePage(htmlDocument: HTMLDocument): SentenceElement[] {
         const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
         const annotatedElements = new Array(elements.length);
+        const text = [];
         for (let i = 0; i < elements.length; i++) {
             const annotatedElement = elements[i];
-            annotatedElements[i] = new SentenceElement(this, annotatedElement as HTMLElement);
+            let sentenceElement = new SentenceElement(this, annotatedElement as HTMLElement);
+            annotatedElements[i] = sentenceElement;
+            text.push(sentenceElement.translatableText);
         }
+        this.text$.next(text.join(''))
         return annotatedElements;
     }
 

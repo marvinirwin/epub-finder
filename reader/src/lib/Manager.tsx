@@ -72,7 +72,6 @@ async function getAllLocations(): Promise<ITrendLocation[]> {
 
 async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
     const result = await axios.post('/trends', {id: woeid})
-    debugger;
     return result.data;
 }
 
@@ -107,9 +106,6 @@ export class Manager {
     displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
     messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
 
-    cardMessages$: ReplaySubject<string> = new ReplaySubject<string>()
-    bookMessages$: ReplaySubject<string> = new ReplaySubject<string>()
-    renderMessages$: ReplaySubject<string> = new ReplaySubject<string>()
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
 
     messageBuffer$: Subject<DebugMessage[]> = new Subject<DebugMessage[]>();
@@ -117,7 +113,6 @@ export class Manager {
     currentPackage$: ReplaySubject<UnserializedAnkiPackage | undefined> = new ReplaySubject<UnserializedAnkiPackage | undefined>(undefined);
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
     currentCollection$: Subject<Collection | undefined> = new Subject<Collection | undefined>();
-
 
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
     currentEditingCardIsSaving$!: Observable<boolean | undefined>;
@@ -128,8 +123,7 @@ export class Manager {
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    currentBook$: ReplaySubject<PageRenderer | undefined> = new ReplaySubject<PageRenderer | undefined>(1)
-    bookIndex$: BehaviorSubject<Dictionary<PageRenderer>> = new BehaviorSubject<Dictionary<PageRenderer>>({});
+    bookIndex$: ReplaySubject<Dictionary<PageRenderer>> = new ReplaySubject<Dictionary<PageRenderer>>(1);
     requestBookRemove$: Subject<PageRenderer> = new Subject<PageRenderer>()
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
@@ -178,19 +172,8 @@ export class Manager {
 
         this.oPackageLoader();
         this.oMessages();
-        /*
-                this.oCurrent();
-        */
         this.oEditingCard();
-        this.oBook();
 
-        /*
-                axios.get('/twitter-trends').then(response => {
-                    debugger;
-                    const data: ITrendLocation[] = response.data;
-                    this.allTrends$.next(data);
-                })
-        */
 
         this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
@@ -216,14 +199,6 @@ export class Manager {
                 return cards[0];
             })
         )
-
-        this.requestBookRemove$.pipe(withLatestFrom(this.bookIndex$, this.currentBook$)).subscribe(([bookToRemove, bookDict, currentBook]) => {
-            delete bookDict[bookToRemove.name];
-            if (bookToRemove === currentBook) {
-                this.currentBook$.next(Object.values(bookDict)[0])
-            }
-            this.bookIndex$.next({...bookDict});
-        });
 
         this.oStringDisplay();
         this.oKeyDowns();
@@ -253,10 +228,6 @@ export class Manager {
                 }
             }
             const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
-            if (newCards.length) {
-                debugger;
-                console.log();
-            }
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
 
@@ -266,8 +237,12 @@ export class Manager {
 
     private oAnnotations() {
         let previousHighlightedElements: HTMLElement[] | undefined;
-        this.wordElementMap$ = this.bookIndex$.pipe(
-            switchMap(bookIndex => combineLatest(Object.values(bookIndex).map(book => book.wordTextNodeMap$))),
+        this.wordElementMap$ = this.pageManager.pageIndex$.pipe(
+            switchMap(pageIndex => {
+                let pageRenderers = Object.values(pageIndex);
+                let sources = pageRenderers.map(book => book.wordTextNodeMap$);
+                return combineLatest(sources);
+            }),
             map((wordTextNodeMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
                 const newMap = {};
                 wordTextNodeMaps.map(v => {
@@ -276,20 +251,20 @@ export class Manager {
                 return newMap;
             })
         );
-/*
-        this.bookIndex$.pipe(
-            switchMap(d =>
-                combineLatest(Object.values(d).map(d => d.wordTextNodeMap$))
-            ),
-            map((elCharMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
-                const map: Dictionary<IAnnotatedCharacter[]> = {};
-                elCharMaps.forEach(c => {
-                    mergeWordTextNodeMap(c, map)
-                })
-                return map;
-            })
-        );
-*/
+        /*
+                this.bookIndex$.pipe(
+                    switchMap(d =>
+                        combineLatest(Object.values(d).map(d => d.wordTextNodeMap$))
+                    ),
+                    map((elCharMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
+                        const map: Dictionary<IAnnotatedCharacter[]> = {};
+                        elCharMaps.forEach(c => {
+                            mergeWordTextNodeMap(c, map)
+                        })
+                        return map;
+                    })
+                );
+        */
 
 
         this.highlightedWord$.pipe(debounceTime(10),
@@ -402,28 +377,6 @@ export class Manager {
         })).subscribe(this.stringDisplay$);
     }
 
-    private oBook() {
-        combineLatest([
-            this.bookIndex$,
-            this.currentBook$
-        ]).subscribe(([bookDict, currentBook]) => {
-            if (currentBook) {
-                // If the bookDict has been updated with a new book,
-                // check to see if it was the currentBook which was updated
-                if (bookDict[currentBook.name] !== currentBook) {
-                    this.currentBook$.next(bookDict[currentBook.name])
-                }
-            } else {
-                if (Object.values(bookDict).length) {
-                    this.currentBook$.next(Object.values(bookDict)[0]);
-                }
-            }
-
-        });
-        this.currentBook$.next(undefined);
-
-
-    }
 
     /*
         private oSpine() {
@@ -555,7 +508,6 @@ export class Manager {
         this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                debugger;
                 row.id = await this.db.recognitionRecords.add(row);
             }
             this.addPersistedWordRecognitionRows$.next(rows);
@@ -607,7 +559,6 @@ export class Manager {
 
     applyGlobalListeners(document: Document) {
         document.onkeydown = (e) => {
-            debugger;
             switch (e.key) {
                 case "Escape":
                     this.queEditingCard$.next(undefined);
@@ -619,7 +570,6 @@ export class Manager {
         };
 
         document.onkeyup = (e) => {
-            debugger;
             switch (e.key) {
                 case "Escape":
                     this.shiftPressed = false;
@@ -632,7 +582,6 @@ export class Manager {
             ),
             debounceTime(100)
         ).subscribe(([event, currentDeck]) => {
-            debugger;
             const activeEl = document.activeElement;
             if (activeEl) {
                 const selObj = document.getSelection();
@@ -680,13 +629,13 @@ export class Manager {
             }
 
         }
-        annotationElement.el.onmouseenter = (ev) => {
+        child.onmouseenter = (ev) => {
             this.highlightedWord$.next(maxWord.word);
         };
-        annotationElement.el.onmouseleave = (ev) => {
+        child.onmouseleave = (ev) => {
             this.highlightedWord$.next();
         }
-        annotationElement.el.onclick = (ev) => {
+        child.onclick = (ev) => {
             const children = sentence.sentenceElement.children;
             for (let i = 0; i < children.length; i++) {
                 const child = children[i];

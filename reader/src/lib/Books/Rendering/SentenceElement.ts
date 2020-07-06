@@ -1,12 +1,11 @@
 import {ITrie} from "../../Interfaces/Trie";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
-import {maxBy, Dictionary} from "lodash";
+import {Dictionary, maxBy} from "lodash";
 import {PageRenderer} from "./PageRenderer";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
 import {ReaderDocument} from "./ReaderDocument";
-import {getTranslation} from "../../Manager";
-import { createPopper } from '@popperjs/core';
+import {createPopper} from '@popperjs/core';
 
 
 export class SentenceElement {
@@ -22,7 +21,7 @@ export class SentenceElement {
         const hideEvents = ['mouseleave', 'blur'];
 
         this.r.m.applySentenceElementSelectListener(this);
-        this.translatableText = sentenceElement.getAttribute('translatable-text') as string;
+        this.translatableText = sentenceElement.textContent as string;
         let attribute = this.sentenceElement.getAttribute('popper-id') as string;
         let popperId = ReaderDocument.getPopperId( attribute );
         this.popperElement = (sentenceElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
@@ -46,19 +45,18 @@ export class SentenceElement {
         });
     }
 
-    updateWords(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
-        const elsMappedToWords: Dictionary<IAnnotatedCharacter[]> = {};
+    getWordElementMemberships(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
+        const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
         let children = this.sentenceElement.children;
-        const text = this.sentenceElement.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as HTMLElement;
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
             }).filter(w => w.lengthRemaining > 0);
-            const strings = uniqueLengths.map(size => text.substr(i, size));
-            const wordsWhichStartHere: string[] = strings.reduce((acc: string[], str) => {
+            const stringChunks = uniqueLengths.map(size => (this.sentenceElement.textContent as string).substr(i, size));
+            const wordsWhichStartHere: string[] = stringChunks.reduce((acc: string[], str) => {
                 if (t.hasWord(str)) {
                     acc.push(str);
                 }
@@ -74,15 +72,15 @@ export class SentenceElement {
             });
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let annotationElement: IAnnotatedCharacter = {
-                char: text[i],
+                char: (this.sentenceElement.textContent as string)[i],
                 words: words,
                 el: currentMark
             };
             annotationElement.words.forEach(w => {
-                if (elsMappedToWords[w.word]) {
-                    elsMappedToWords[w.word].push(annotationElement);
+                if (wordElementsMap[w.word]) {
+                    wordElementsMap[w.word].push(annotationElement);
                 } else {
-                    elsMappedToWords[w.word] = [annotationElement]
+                    wordElementsMap[w.word] = [annotationElement]
                 }
             })
 
@@ -90,8 +88,6 @@ export class SentenceElement {
                 this.r.m.applyWordElementListener(annotationElement, maxWord, i, this);
             }
         }
-        return elsMappedToWords;
+        return wordElementsMap;
     }
-
-
 }
