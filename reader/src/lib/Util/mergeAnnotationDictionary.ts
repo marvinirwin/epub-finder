@@ -9,4 +9,5 @@ export function mergeWordTextNodeMap(cDict: Dictionary<IAnnotatedCharacter[]>, a
             acc[word] = annotatedCharacters;
         }
     })
+    return acc;
 }

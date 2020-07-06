@@ -1,6 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // noinspection JSConstantReassignment
-import {AtomizeDocument} from "../Pages/Rendering/AtomizeDocument";
+import {AtomizedDocument} from "../Atomize/AtomizedDocument";
 
 // @ts-ignore
 self["window"] = self;
@@ -12,7 +12,7 @@ ctx.onmessage = (ev) => {
     const url = ev.data as string;
     const oReq = new XMLHttpRequest();
     oReq.addEventListener("load", response => {
-        ctx.postMessage(AtomizeDocument.atomize(oReq.responseText));
+        ctx.postMessage(AtomizedDocument.atomizeDocument(oReq.responseText));
     });
     oReq.open("GET", url);
     oReq.send();

@@ -1,16 +1,14 @@
-import {getIndexOfEl} from "../../Util/getIndexOfEl";
+import {getIndexOfEl} from "../Util/getIndexOfEl";
 import {uniqueId} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
+import {AtomizedSentence} from "./AtomizedSentence";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
-export class AtomizeDocument {
+export class AtomizedDocument {
+    constructor(public document: XMLDocument) {}
 
-    constructor(public document: XMLDocument) {
-
-    }
-
-    setSources(doc: Document) {
+    replaceDocumentSources(doc: Document) {
         const walk = (node: Node) => {
             var child, next;
             switch (node.nodeType) {
@@ -31,9 +29,10 @@ export class AtomizeDocument {
             }
         }
         walk(doc);
+        return doc;
     }
 
-    private replaceHrefOrSource(el: Element, qualifiedName: string) {
+    replaceHrefOrSource(el: Element, qualifiedName: string) {
         let currentSource = el.getAttribute(qualifiedName);
         if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
@@ -79,7 +78,7 @@ export class AtomizeDocument {
         }
     }
 
-    private annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
+    annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
         const oldParent: Element = <Element>textNode.parentNode;
         const popperId = uniqueId();
         const myText: string = <string>textNode.nodeValue;
@@ -99,21 +98,30 @@ export class AtomizeDocument {
         oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
         const popperEl = this.document.createElement('div');
         popperEl.setAttribute("class", "translation-popover");
-        popperEl.setAttribute('id', AtomizeDocument.getPopperId(popperId));
+        popperEl.setAttribute('id', AtomizedDocument.getPopperId(popperId));
         popperEl.setAttribute("class", "POPPER_ELEMENT");
         newParent.insertBefore(popperEl, null);
     }
 
-    static getPopperId(popperId: string) {
+    public static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
 
-    public static atomize(xmlsource: string) {
-        const doc = new AtomizeDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
-        doc.setSources(doc.document);
+    public static atomizeDocument(xmlsource: string): AtomizedDocument {
+        const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
+        doc.replaceDocumentSources(doc.document);
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
-        let innerHTML: string = new XMLSerializer().serializeToString(doc.document);
-        return innerHTML;
+        return doc;
+    }
+
+    public getAtomizedSentences(): AtomizedSentence[]  {
+        const sentenceElements =  this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
+        const atomized = new Array(sentenceElements.length);
+        for (let i = 0; i < sentenceElements.length; i++) {
+            const sentenceElement = sentenceElements[i];
+            atomized[i] = new AtomizedSentence(sentenceElement);
+        }
+        return atomized;
     }
 }
 

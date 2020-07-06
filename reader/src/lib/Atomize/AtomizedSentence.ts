@@ -1,56 +1,34 @@
-import {ITrie} from "../../Interfaces/Trie";
-import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
-import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
+import {ITrie} from "../Interfaces/Trie";
 import {Dictionary, maxBy} from "lodash";
-import {PageRenderer} from "./PageRenderer";
-import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
-import {createPopper} from '@popperjs/core';
+import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
+import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
+import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
+import {AtomizedDocument} from "./AtomizedDocument";
+import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 
-
-
-export class SentenceElement {
+export class AtomizedSentence {
     translatableText: string;
-    popperElement: HTMLElement;
+    popperElement: XMLDocumentNode;
     translated = false;
 
     constructor(
-        public r: PageRenderer,
-        public sentenceElement: HTMLElement
+        public sentenceElement: XMLDocumentNode
     ) {
-        const showEvents = ['mouseenter', 'focus'];
-        const hideEvents = ['mouseleave', 'blur'];
-
-        this.r.m.applySentenceElementSelectListener(this);
-        this.translatableText = sentenceElement.textContent as string;
-        let attribute = this.sentenceElement.getAttribute('popper-id') as string;
-        let popperId = AtomizeDocument.getPopperId(attribute);
-        this.popperElement = (sentenceElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
-        createPopper(this.sentenceElement, this.popperElement, {
-            placement: 'top',
-        });
-
-        const show = () => {
-            this.popperElement.setAttribute('data-show', '');
-        }
-        const hide = () => {
-            this.popperElement.removeAttribute('data-show');
-        }
-
-        showEvents.forEach(event => {
-            sentenceElement.addEventListener(event, show);
-        });
-
-        hideEvents.forEach(event => {
-            sentenceElement.addEventListener(event, hide);
-        });
+        this.translatableText = this.sentenceElement.textContent || '';
+        this.popperElement = (sentenceElement.ownerDocument as XMLDocument)
+            .getElementById(
+                AtomizedDocument.getPopperId(
+                    this.sentenceElement.getAttribute('popper-id') as string
+                )
+            ) as unknown as XMLDocumentNode;
     }
 
     getWordElementMemberships(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
-        let children = this.sentenceElement.children;
+        let children = this.sentenceElement.childNodes;
         for (let i = 0; i < children.length; i++) {
-            const currentMark = children[i] as HTMLElement;
+            const currentMark = children[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
@@ -74,8 +52,10 @@ export class SentenceElement {
             let annotationElement: IAnnotatedCharacter = {
                 char: (this.sentenceElement.textContent as string)[i],
                 words: words,
-            el: currentMark
+                el: currentMark,
+                maxWord
             };
+
             annotationElement.words.forEach(w => {
                 if (wordElementsMap[w.word]) {
                     wordElementsMap[w.word].push(annotationElement);
@@ -83,10 +63,6 @@ export class SentenceElement {
                     wordElementsMap[w.word] = [annotationElement]
                 }
             })
-
-            if (maxWord) {
-                this.r.m.applyWordElementListener(annotationElement, maxWord, i, this);
-            }
         }
         return wordElementsMap;
     }

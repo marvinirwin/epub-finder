@@ -16,7 +16,6 @@ import {
     withLatestFrom
 } from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
-// @ts-ignore
 import {
     SerializedAnkiPackage,
     UnserializeAnkiPackage,
