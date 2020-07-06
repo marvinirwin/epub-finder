@@ -1,8 +1,6 @@
 /* eslint no-restricted-globals: 0 */
 // noinspection JSConstantReassignment
-// @ts-ignore
-import {DOMParser, XMLSerializer} from 'xmldom';
-import {ReaderDocument} from "../Books/Rendering/ReaderDocument";
+import {AtomizeDocument} from "../Pages/Rendering/AtomizeDocument";
 
 // @ts-ignore
 self["window"] = self;
@@ -14,11 +12,7 @@ ctx.onmessage = (ev) => {
     const url = ev.data as string;
     const oReq = new XMLHttpRequest();
     oReq.addEventListener("load", response => {
-        const doc = new ReaderDocument(new DOMParser().parseFromString(oReq.responseText,'text/html'));
-        doc.setSources(doc.document);
-        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
-        let innerHTML: string = new XMLSerializer().serializeToString(doc.document);
-        ctx.postMessage(innerHTML);
+        ctx.postMessage(AtomizeDocument.atomize(oReq.responseText));
     });
     oReq.open("GET", url);
     oReq.send();

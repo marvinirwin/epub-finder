@@ -1,11 +1,14 @@
 import {getIndexOfEl} from "../../Util/getIndexOfEl";
 import {uniqueId} from 'lodash';
+import {DOMParser, XMLSerializer} from "xmldom";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
-export class ReaderDocument {
+export class AtomizeDocument {
 
-    constructor(public document: XMLDocument) {}
+    constructor(public document: XMLDocument) {
+
+    }
 
     setSources(doc: Document) {
         const walk = (node: Node) => {
@@ -96,7 +99,7 @@ export class ReaderDocument {
         oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
         const popperEl = this.document.createElement('div');
         popperEl.setAttribute("class", "translation-popover");
-        popperEl.setAttribute('id', ReaderDocument.getPopperId(popperId));
+        popperEl.setAttribute('id', AtomizeDocument.getPopperId(popperId));
         popperEl.setAttribute("class", "POPPER_ELEMENT");
         newParent.insertBefore(popperEl, null);
     }
@@ -104,4 +107,13 @@ export class ReaderDocument {
     static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
+
+    public static atomize(xmlsource: string) {
+        const doc = new AtomizeDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
+        doc.setSources(doc.document);
+        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
+        let innerHTML: string = new XMLSerializer().serializeToString(doc.document);
+        return innerHTML;
+    }
 }
+

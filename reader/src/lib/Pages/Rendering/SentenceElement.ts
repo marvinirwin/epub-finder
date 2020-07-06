@@ -4,7 +4,7 @@ import {IWordInProgress} from "../../Interfaces/Annotation/IWordInProgress";
 import {Dictionary, maxBy} from "lodash";
 import {PageRenderer} from "./PageRenderer";
 import {IPositionedWord} from "../../Interfaces/Annotation/IPositionedWord";
-import {ReaderDocument} from "./ReaderDocument";
+import {AtomizeDocument} from "./ReaderDocument";
 import {createPopper} from '@popperjs/core';
 
 
@@ -23,7 +23,7 @@ export class SentenceElement {
         this.r.m.applySentenceElementSelectListener(this);
         this.translatableText = sentenceElement.textContent as string;
         let attribute = this.sentenceElement.getAttribute('popper-id') as string;
-        let popperId = ReaderDocument.getPopperId( attribute );
+        let popperId = AtomizeDocument.getPopperId( attribute );
         this.popperElement = (sentenceElement.ownerDocument as XMLDocument).getElementById(popperId) as HTMLElement;
         createPopper(this.sentenceElement, this.popperElement, {
             placement: 'top',

@@ -26,6 +26,7 @@
     "hanzi": "^2.1.5",
     "hanzi-tools": "^1.2.24",
     "idb": "^5.0.4",
+    "jest": "^26.1.0",
     "jquery": "^3.5.1",
     "jquery-ui": "^1.12.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
@@ -49,6 +50,7 @@
     "shutterstock-api": "^1.0.22",
     "sql.js": "^1.2.2",
     "trie-prefix-tree": "^1.5.1",
+    "ts-jest": "^26.1.1",
     "twitter-lite": "^0.14.0",
     "typescript": "^3.7.5",
     "worker-loader": "^2.0.0",
@@ -57,7 +59,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:3001",
