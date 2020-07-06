@@ -58,8 +58,8 @@ mark {
     background-color: transparent;
 }
 .highlighted {
-    background-color: lightgrey;
-    font-weight: bold;
+    background-color: #a0a0a0;;
+    font-weight: bolder;
 }
 
 </style>
@@ -116,14 +116,14 @@ mark {
                     return;
                 }
                 let uniqueLengths: number[] = uniq(words.map(w => w.length));
-                const chars: Dictionary<IAnnotatedCharacter[]>[] = [];
+                const wordElementsMaps: Dictionary<IAnnotatedCharacter[]>[] = [];
                 for (let i = 0; i < leaves.length; i++) {
                     const leaf = leaves[i];
-                    let wordElementMemberships = leaf.getWordElementMemberships(this.m.cardManager.trie.t, uniqueLengths);
-                    chars.push(wordElementMemberships)
+                    let wordElementsMap = leaf.getWordElementMemberships(this.m.cardManager.trie.t, uniqueLengths);
+                    wordElementsMaps.push(wordElementsMap)
                 }
 
-                const wordTextNodeMap = chars.reduce((
+                const wordTextNodeMap = wordElementsMaps.reduce((
                     acc: Dictionary<IAnnotatedCharacter[]>,
                     cDict: Dictionary<IAnnotatedCharacter[]>) => {
                     mergeWordTextNodeMap(cDict, acc);

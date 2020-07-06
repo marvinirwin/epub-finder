@@ -269,12 +269,13 @@ export class Manager {
 
         this.highlightedWord$.pipe(debounceTime(10),
             withLatestFrom(this.wordElementMap$.pipe(startWith({} as Dictionary<IAnnotatedCharacter[]>))))
-            .subscribe(([word, dict]) => {
+            .subscribe(([word, wordElementsMap]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
                     }
                     if (word) {
-                        previousHighlightedElements = dict[word]?.map(annotatedEl => {
+                        let dictElement = wordElementsMap[word];
+                        previousHighlightedElements = dictElement?.map(annotatedEl => {
                             annotatedEl.el.classList.add('highlighted');
                             return annotatedEl.el;
                         });
@@ -598,12 +599,12 @@ export class Manager {
     }
 
     applySentenceElementSelectListener(annotatedElements: SentenceElement) {
-        annotatedElements.sentenceElement.onmouseenter = (ev) => {
+        annotatedElements.sentenceElement.onmouseenter = async (ev) => {
             if (!annotatedElements.translated) {
-                getTranslation(annotatedElements.sentenceElement.textContent).then(t => {
-                    annotatedElements.translated = true;
-                    return annotatedElements.popperElement.textContent = t;
-                })
+                const t = await getTranslation(annotatedElements.sentenceElement.textContent)
+                annotatedElements.translated = true;
+                debugger;
+                return annotatedElements.popperElement.textContent = t;
             }
         };
     }
@@ -615,9 +616,10 @@ export class Manager {
         sentence: SentenceElement) {
         const child: HTMLElement = annotationElement.el;
         child.onmouseenter = (ev) => {
-            if (ev.shiftKey) {
+            this.highlightedWord$.next(maxWord.word);
+            if (this.shiftPressed || ev.shiftKey) {
                 const r = document.createRange();
-                r.selectNode(child);
+                r.selectNodeContents(child);
                 const selObj = (annotationElement.el.ownerDocument as Document).getSelection();
                 /**
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
@@ -627,10 +629,6 @@ export class Manager {
                     selObj.addRange(r);
                 }
             }
-
-        }
-        child.onmouseenter = (ev) => {
-            this.highlightedWord$.next(maxWord.word);
         };
         child.onmouseleave = (ev) => {
             this.highlightedWord$.next();
