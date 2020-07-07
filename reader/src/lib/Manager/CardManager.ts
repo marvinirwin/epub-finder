@@ -32,7 +32,7 @@ export default class CardManager {
         }
     }
 
-    constructor(public m: Manager) {
+    constructor() {
         this.cardIndex$ = this.getCardIndex();
         this.addUnpersistedCards$.pipe(
             flatMap(async cards => {

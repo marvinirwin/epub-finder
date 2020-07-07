@@ -1,25 +1,25 @@
-import {combineLatest, fromEvent, Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, filter, flatMap, map, startWith, withLatestFrom} from "rxjs/operators";
-import {Manager, sleep} from "../../Manager";
+import {debounceTime, filter, flatMap, map} from "rxjs/operators";
 import {SentenceElement} from "./SentenceElement";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeWordTextNodeMap} from "../../Util/mergeAnnotationDictionary";
-import {ANNOTATE_AND_TRANSLATE} from "./ReaderDocument";
 import {printExecTime} from "../../Util/Timer";
 import {waitFor} from "../../Util/waitFor";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../../Interfaces/IWordCountRow";
+import {ANNOTATE_AND_TRANSLATE} from "../../Atomize/AtomizedDocument";
+import {AtomizedSentence} from "../../Atomize/AtomizedSentence";
 
 
 // TODO divorce the renderer from the counter/analyzer
 export class PageRenderer {
     ref$ = new ReplaySubject<HTMLElement>();
-    textNodes$!: Observable<SentenceElement[]>;
     wordTextNodeMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1);
     text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
+    atomizedSentences$: Observable<AtomizedSentence[]>;
 
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         let style = $(`
@@ -69,7 +69,6 @@ mark {
 
     constructor(
         public src: string,
-        public m: Manager,
         public name: string,
     ) {
         this.text$.subscribe(text => {
@@ -94,17 +93,19 @@ mark {
             )
         })
 
-        this.textNodes$ = this.ref$.pipe(
+        this.atomizedSentences$ = this.ref$.pipe(
             flatMap(async ref => {
                 const iframe = await this.getIFrame(ref);
-                return iframe.contents().find('body')[0];
+                const body =  iframe.contents().find('body')[0];
+                PageRenderer.appendAnnotationStyleToPageBody(body)
+                return body;
             }),
             map((body: HTMLBodyElement) => {
-                const leaves = printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
-                this.m.applyGlobalListeners(body.ownerDocument as Document);
-                PageRenderer.appendAnnotationStyleToPageBody(body)
-                return leaves;
-            }));
+                return printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
+            })
+        );
+
+        this.
 
         combineLatest([
             this.textNodes$,

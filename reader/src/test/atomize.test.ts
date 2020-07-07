@@ -4,10 +4,10 @@ import {join} from 'path'
 import {TrieWrapper} from "../lib/TrieWrapper";
 import trie from "trie-prefix-tree";
 import {mergeWordTextNodeMap} from "../lib/Util/mergeAnnotationDictionary";
+import {getAtomizedSentences} from "./Util/Util";
 
-test('Produces marks under <p> tags', async () => {
-    const atomizedSentences = AtomizedDocument.atomizeDocument(readFileSync(join(__dirname, 'fixtures/unhydrated.html')).toString())
-        .getAtomizedSentences()
+test('Atomizes a document and produces a mapping of words to text nodes', async () => {
+    const atomizedSentences = getAtomizedSentences('BasicDoc.html')
     expect(atomizedSentences).toHaveLength(3);
     const sentenceElementMaps = atomizedSentences.map(atomizedSentence => atomizedSentence.getWordElementMemberships(
         trie(["Test"]),
@@ -20,4 +20,5 @@ test('Produces marks under <p> tags', async () => {
     const merged = mergeWordTextNodeMap(TestSentence1, TestSentence2);
     expect(merged["Test"]).toHaveLength(8);
 });
+
 

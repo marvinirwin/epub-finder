@@ -2,7 +2,7 @@ export interface XMLDocumentNode {
     nodeValue: string;
     prefix: string;
     nodeName: string;
-    nodeType: string;
+    nodeType: number;
     parentNode: XMLDocumentNode;
     childNodes: XMLDocumentNode[];
     firstChild: XMLDocumentNode | null;
@@ -29,6 +29,8 @@ export interface XMLDocumentNode {
     cloneNode(deep: XMLDocumentNode): XMLDocumentNode
 
     getAttribute(s: string):  string | null
+
+    setAttribute(s: string, v: string):  void
 
     /*
         normalize()

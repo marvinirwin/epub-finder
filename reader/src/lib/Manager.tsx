@@ -1,10 +1,9 @@
-import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, groupBy, orderBy, sortBy} from "lodash";
 import {
     debounceTime,
     delay,
     filter,
-    flatMap,
     map,
     pairwise,
     scan,
@@ -18,14 +17,12 @@ import {
 /* eslint import/no-webpack-loader-syntax:0 */
 import {
     SerializedAnkiPackage,
-    UnserializeAnkiPackage,
     UnserializedAnkiPackage
 } from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
-import {PageRenderer} from "./Books/Rendering/PageRenderer";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
 import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
@@ -42,15 +39,17 @@ import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {WavAudio} from "./WavAudio";
 import {IWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./Manager/AudioManager";
-import {Website} from "./Books/Website";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 import {IWordRecognitionRow} from "./Interfaces/IWordRecognitionRow";
 import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
 import {mergeWordTextNodeMap} from "./Util/mergeAnnotationDictionary";
 import {PageManager} from "./Manager/PageManager";
-import {SentenceElement} from "./Books/Rendering/SentenceElement";
 import {IPositionedWord} from "./Interfaces/Annotation/IPositionedWord";
+import {PageRenderer} from "./Pages/Rendering/PageRenderer";
+import {Website} from "./Pages/Website";
+import {createPopper} from "@popperjs/core";
+import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
@@ -123,7 +122,6 @@ export class Manager {
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     bookIndex$: ReplaySubject<Dictionary<PageRenderer>> = new ReplaySubject<Dictionary<PageRenderer>>(1);
-    requestBookRemove$: Subject<PageRenderer> = new Subject<PageRenderer>()
 
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
@@ -232,6 +230,37 @@ export class Manager {
 
         this.pageManager.requestRenderPage$.next(new Website('Obama', `${process.env.PUBLIC_URL}/obama.htm`));
 
+        this.pageManager.pageIndex$.pipe(
+            switchMap(pageIndex =>
+                merge(...Object.values(pageIndex).map(page => page.atomizedSentences$))
+            ),
+            map(atomizedSentences => atomizedSentences)
+        ).subscribe(atomizedSentences => {
+            atomizedSentences.forEach(s =>{
+                const showEvents = ['mouseenter', 'focus'];
+                const hideEvents = ['mouseleave', 'blur'];
+                let attribute = s.getSentenceHTMLElement().getAttribute('popper-id') as string;
+                createPopper(s.getSentenceHTMLElement(), s.getPopperHTMLElement(), {
+                    placement: 'top',
+                });
+
+                const show = () => {
+                    s.getPopperHTMLElement().setAttribute('data-show', '');
+                }
+                const hide = () => {
+                    (s.getPopperHTMLElement() as unknown as HTMLElement).removeAttribute('data-show');
+                }
+
+                showEvents.forEach(event => {
+                    s.getSentenceHTMLElement().addEventListener(event, show);
+                });
+
+                hideEvents.forEach(event => {
+                    s.getSentenceHTMLElement().addEventListener(event, hide);
+                });
+                this.applySentenceElementSelectListener(s)
+            });
+        })
     }
 
     private oAnnotations() {
@@ -275,8 +304,9 @@ export class Manager {
                     if (word) {
                         let dictElement = wordElementsMap[word];
                         previousHighlightedElements = dictElement?.map(annotatedEl => {
-                            annotatedEl.el.classList.add('highlighted');
-                            return annotatedEl.el;
+                            const html = annotatedEl.el as unknown as HTMLElement;
+                            html.classList.add('highlighted');
+                            return html
                         });
                     }
                 }
@@ -597,8 +627,8 @@ export class Manager {
         })
     }
 
-    applySentenceElementSelectListener(annotatedElements: SentenceElement) {
-        annotatedElements.sentenceElement.onmouseenter = async (ev) => {
+    applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
+        annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
             if (!annotatedElements.translated) {
                 const t = await getTranslation(annotatedElements.sentenceElement.textContent)
                 annotatedElements.translated = true;
@@ -612,8 +642,8 @@ export class Manager {
         annotationElement: IAnnotatedCharacter,
         maxWord: IPositionedWord,
         i: number,
-        sentence: SentenceElement) {
-        const child: HTMLElement = annotationElement.el;
+        sentence: AtomizedSentence) {
+        const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
         child.onmouseenter = (ev) => {
             this.highlightedWord$.next(maxWord.word);
             if (this.shiftPressed || ev.shiftKey) {
@@ -633,7 +663,7 @@ export class Manager {
             this.highlightedWord$.next();
         }
         child.onclick = (ev) => {
-            const children = sentence.sentenceElement.children;
+            const children = sentence.getSentenceHTMLElement().children;
             for (let i = 0; i < children.length; i++) {
                 const child = children[i];
                 child.classList.remove('highlighted')

@@ -1,14 +1,13 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import HTMLProcessor from 'Worker-loader?name=dist/[name].js!../Worker/HTMLProcessorThread';
-import {PageRenderer} from "../Books/Rendering/PageRenderer";
 import {Observable, ReplaySubject} from "rxjs";
 import { Dictionary } from "lodash";
 import {Manager} from "../Manager";
-import {Website} from "../Books/Website";
 import {flatMap, scan, shareReplay} from "rxjs/operators";
-import { strict as assert } from 'assert';
 import {printExecTime, printExecTimeAsync} from "../Util/Timer";
+import {PageRenderer} from "../Pages/Rendering/PageRenderer";
+import {Website} from "../Pages/Website";
 
 export class PageManager {
     pageIndex$: Observable<Dictionary<PageRenderer>>

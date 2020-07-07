@@ -1,7 +1,8 @@
 import {getIndexOfEl} from "../Util/getIndexOfEl";
 import {uniqueId} from 'lodash';
-import {DOMParser, XMLSerializer} from "xmldom";
+import {DOMParser} from "xmldom";
 import {AtomizedSentence} from "./AtomizedSentence";
+import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -119,7 +120,7 @@ export class AtomizedDocument {
         const atomized = new Array(sentenceElements.length);
         for (let i = 0; i < sentenceElements.length; i++) {
             const sentenceElement = sentenceElements[i];
-            atomized[i] = new AtomizedSentence(sentenceElement);
+            atomized[i] = new AtomizedSentence(sentenceElement as unknown as XMLDocumentNode);
         }
         return atomized;
     }

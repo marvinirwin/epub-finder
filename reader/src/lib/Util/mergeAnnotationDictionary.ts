@@ -11,3 +11,15 @@ export function mergeWordTextNodeMap(cDict: Dictionary<IAnnotatedCharacter[]>, a
     })
     return acc;
 }
+
+export function mergeDictArrays<T>(...dicts: Dictionary<T[]>[]):Dictionary<T[]> {
+    const acc: Dictionary<T[]> = {};
+    for (let i = 0; i < dicts.length; i++) {
+        const dict = dicts[i];
+        for (let key in dict) {
+            if (acc[key]) acc[key].push(...dict[key]);
+            else acc[key] = dict[key]
+        }
+    }
+    return acc;
+}

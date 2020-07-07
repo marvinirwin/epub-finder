@@ -5,8 +5,17 @@ import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 
 export class AtomizedSentence {
+
+    public static getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): Dictionary<IAnnotatedCharacter[]> {
+        let wordElementsMaps = atomizedSentences.map(atomizedSentence =>
+            atomizedSentence.getWordElementMemberships(trie, trieElementSizes)
+        );
+        return mergeDictArrays<IAnnotatedCharacter>(...wordElementsMaps);
+    }
+
     translatableText: string;
     popperElement: XMLDocumentNode;
     translated = false;
@@ -66,4 +75,13 @@ export class AtomizedSentence {
         }
         return wordElementsMap;
     }
+
+    getSentenceHTMLElement(): HTMLElement {
+        return this.sentenceElement as unknown as HTMLElement;
+    }
+
+    getPopperHTMLElement(): HTMLElement {
+        return this.popperElement as unknown as HTMLElement;
+    }
+
 }
