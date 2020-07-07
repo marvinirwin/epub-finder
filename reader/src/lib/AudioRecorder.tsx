@@ -4,9 +4,9 @@ import React from "react";
 import axios from "axios";
 import {WavAudio} from "./WavAudio";
 import {IRecordRequest} from "./Interfaces/IRecordRequest";
-import {sleep} from "./Manager";
 import {AudioConfig, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
 import assert from "assert";
+import {sleep} from "./Util/Util";
 
 // TODO does this work?
 let AZURE_SPEECH_REGION = 'westus2' as string;

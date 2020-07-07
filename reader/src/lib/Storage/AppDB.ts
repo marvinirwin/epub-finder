@@ -10,6 +10,7 @@ export interface ISetting {
 
 
 export class MyAppDatabase extends Dexie {
+    static CURRENT_VERSION = 5;
     cards: Dexie.Table<ICard, number>;
     recognitionRecords: Dexie.Table<IWordRecognitionRow, number>;
     settings: Dexie.Table<ISetting, string>;
@@ -18,7 +19,7 @@ export class MyAppDatabase extends Dexie {
     constructor() {
         super("MyAppDatabase");
         this.messages$.next("Starting database, creating stories")
-        this.version(5).stores({
+        this.version(MyAppDatabase.CURRENT_VERSION).stores({
             cards: 'id++, learningLanguage, knownLanguage, deck',
             recognitionRecords: 'id++, word, timestamp',
             settings: 'key, value'

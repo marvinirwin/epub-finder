@@ -6,6 +6,7 @@ import trie from "trie-prefix-tree";
 import {Manager} from "../Manager";
 import {buffer, concatMap, debounceTime, filter, flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
+import {MyAppDatabase} from "../Storage/AppDB";
 
 export default class CardManager {
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
@@ -32,13 +33,14 @@ export default class CardManager {
         }
     }
 
-    constructor() {
+    constructor(public db: MyAppDatabase) {
+        this.cardLoadingSignal$.next(false);
         this.cardIndex$ = this.getCardIndex();
         this.addUnpersistedCards$.pipe(
             flatMap(async cards => {
                 for (let i = 0; i < cards.length; i++) {
                     const card = cards[i];
-                    card.id = await this.m.db.cards.add(card);
+                    card.id = await this.db.cards.add(card);
                 }
                 return cards;
             })
@@ -64,7 +66,7 @@ export default class CardManager {
 
     async load() {
         this.cardLoadingSignal$.next(true);
-        let unloadedCardCount = await this.m.db.getCardsInDatabaseCount()
+        let unloadedCardCount = await this.db.getCardsInDatabaseCount()
         if (unloadedCardCount) {
             await this.getCardsFromDB();
         }
@@ -72,12 +74,12 @@ export default class CardManager {
     }
 
     private async getCardsFromDB() {
-        const priorityCards = await this.m.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
+        const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
-        for await (let cards of this.m.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
+        for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
             this.addPersistedCards$.next(cards);
         }
-        for await (let cards of this.m.db.getCardsFromDB({}, 500)) {
+        for await (let cards of this.db.getCardsFromDB({}, 500)) {
             this.addPersistedCards$.next(cards);
         }
     }

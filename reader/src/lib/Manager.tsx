@@ -1,4 +1,4 @@
-import { combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, groupBy, orderBy, sortBy} from "lodash";
 import {
     debounceTime,
@@ -15,10 +15,7 @@ import {
     withLatestFrom
 } from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
-import {
-    SerializedAnkiPackage,
-    UnserializedAnkiPackage
-} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
+import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
@@ -33,7 +30,6 @@ import axios from 'axios';
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
-import {ITweet} from "./Interfaces/ITweet";
 import {ITrend} from "./Interfaces/ITwitterTrend";
 import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {WavAudio} from "./WavAudio";
@@ -50,9 +46,8 @@ import {PageRenderer} from "./Pages/Rendering/PageRenderer";
 import {Website} from "./Pages/Website";
 import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
+import {getNewICardForWord} from "./Util/Util";
 
-
-export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
 
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
@@ -77,19 +72,6 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
 getAllLocations()
 getAllTrendsForLocation(23424948);
 */
-
-export function getNewICardForWord(word: string, deck: string) {
-    return {
-        learningLanguage: word,
-        photos: [],
-        sounds: [],
-        knownLanguage: [],
-        deck: deck,
-        fields: [],
-        illustrationPhotos: [],
-        timestamp: new Date()
-    };
-}
 
 export async function getTranslation<A>(learningText: A) {
     const result = await axios.post('/translate', {
@@ -163,8 +145,8 @@ export class Manager {
     shiftPressed = false;
 
     constructor(public db: MyAppDatabase) {
-        this.pageManager = new PageManager(this);
-        this.cardManager = new CardManager(this);
+        this.pageManager = new PageManager();
+        this.cardManager = new CardManager(this.db);
         this.cardManager.load();
 
         this.oPackageLoader();
