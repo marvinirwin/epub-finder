@@ -86,7 +86,7 @@ export class AudioRecorder {
                 recognizer.recognizeOnceAsync(
                     (result) => {
                         this.speechRecongitionText$.next(result.text)
-                        window.console.log(result);
+                        this.isRecording$.next(false);
                         recognizer.close();
                     },
                     function (err) {
@@ -100,12 +100,6 @@ export class AudioRecorder {
                     const stream = (await audioContext).createMediaStreamSource(recorder.stream);
                     return new Promise<WavAudio>(async resolve => {
                         try {
-                            recorder.ondataavailable = async (event) => {
-                                this.isRecording$.next(false);
-                                let wavAudio = new WavAudio(await new Response(new Blob([event.data])).arrayBuffer());
-                                req.cb(wavAudio)
-                                resolve(wavAudio);
-                            }
                             const analyser = (await audioContext).createAnalyser();
                             analyser.fftSize = 2048;
                             const bufferLength = analyser.frequencyBinCount;
@@ -114,15 +108,16 @@ export class AudioRecorder {
                             stream.connect(analyser)
                             const draw = () => {
                                 this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
-
                             }
                             draw();
+/*
                             recorder.start();
                             setTimeout(() => {
                                 if(recorder.state === "recording") {
                                     recorder.stop();
                                 }
                             }, req.duration * 1000 * 2)
+*/
                         } catch (e) {
                             console.error(e);
                         } finally {
