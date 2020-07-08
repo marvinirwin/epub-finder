@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 export function BottomNav({m}: { m: Manager }) {
     const item = useObs(m.bottomNavigationValue$)
     const classes = useStyles();
-    const loadingCards = useObs(m.cardManager.cardLoadingSignal$);
+    const loadingCards = useObs(m.cardManager.cardProcessingSignal$);
     const rendering = useObs(m.renderingInProgress$);
     return <BottomNavigation className={classes.bottomNav}
         value={item}

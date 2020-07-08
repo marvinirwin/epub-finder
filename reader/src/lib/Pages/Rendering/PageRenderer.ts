@@ -1,16 +1,15 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
-import {debounceTime, filter, flatMap, map} from "rxjs/operators";
-import {SentenceElement} from "./SentenceElement";
+import {flatMap, map} from "rxjs/operators";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
-import {mergeWordTextNodeMap} from "../../Util/mergeAnnotationDictionary";
 import {printExecTime} from "../../Util/Timer";
 import {waitFor} from "../../Util/waitFor";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../../Interfaces/IWordCountRow";
 import {ANNOTATE_AND_TRANSLATE} from "../../Atomize/AtomizedDocument";
 import {AtomizedSentence} from "../../Atomize/AtomizedSentence";
+import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 
 
 // TODO divorce the renderer from the counter/analyzer
@@ -105,43 +104,15 @@ mark {
             })
         );
 
-        this.
-
-        combineLatest([
-            this.textNodes$,
-            this.m.cardManager.trie.changeSignal$.pipe(debounceTime(500)),
-        ]).pipe(filter(([leaves]) => !!leaves.length)).subscribe(async ([leaves]) => {
-            printExecTime("Update words in annotated elements", () => {
-                let words = this.m.cardManager.trie.t.getWords();
-                if (!words.length) {
-                    return;
-                }
-                let uniqueLengths: number[] = uniq(words.map(w => w.length));
-                const wordElementsMaps: Dictionary<IAnnotatedCharacter[]>[] = [];
-                for (let i = 0; i < leaves.length; i++) {
-                    const leaf = leaves[i];
-                    let wordElementsMap = leaf.getWordElementMemberships(this.m.cardManager.trie.t, uniqueLengths);
-                    wordElementsMaps.push(wordElementsMap)
-                }
-
-                const wordTextNodeMap = wordElementsMaps.reduce((
-                    acc: Dictionary<IAnnotatedCharacter[]>,
-                    cDict: Dictionary<IAnnotatedCharacter[]>) => {
-                    mergeWordTextNodeMap(cDict, acc);
-                    return acc;
-                }, {});
-                this.wordTextNodeMap$.next(wordTextNodeMap);
-            })
-        })
     }
 
-    rehydratePage(htmlDocument: HTMLDocument): SentenceElement[] {
+    rehydratePage(htmlDocument: HTMLDocument): AtomizedSentence[] {
         const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
         const annotatedElements = new Array(elements.length);
         const text = [];
         for (let i = 0; i < elements.length; i++) {
             const annotatedElement = elements[i];
-            let sentenceElement = new SentenceElement(this, annotatedElement as HTMLElement);
+            let sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
             annotatedElements[i] = sentenceElement;
             text.push(sentenceElement.translatableText);
         }

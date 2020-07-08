@@ -4,10 +4,6 @@ import {uniq} from "lodash";
 
 export class TrieWrapper {
     public changeSignal$: Subject<void>;
-    getUniqueLengths(): number[] {
-        const words = this.t.getWords(false);
-        return uniq(words.map(w => w.length));
-    }
 
     constructor(public t: ITrie) {
         this.changeSignal$ = new ReplaySubject<void>(1);

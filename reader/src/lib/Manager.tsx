@@ -1,5 +1,5 @@
 import {combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, groupBy, orderBy, sortBy} from "lodash";
+import {Dictionary, groupBy, orderBy, sortBy, uniq, flatten} from "lodash";
 import {
     debounceTime,
     delay,
@@ -47,6 +47,7 @@ import {Website} from "./Pages/Website";
 import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord} from "./Util/Util";
+import {printExecTime} from "./Util/Timer";
 
 
 export enum NavigationPages {
@@ -147,13 +148,30 @@ export class Manager {
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
         this.cardManager = new CardManager(this.db);
-        this.cardManager.load();
 
         this.oPackageLoader();
         this.oMessages();
         this.oEditingCard();
 
 
+        this.wordElementMap$ = combineLatest(
+            [
+                this.cardManager.trie$,
+                this.pageManager.pageIndex$.pipe(
+                    switchMap(pageIndex => merge(
+                        ...Object.values(pageIndex)
+                            .map(page => page.atomizedSentences$)
+                        ).pipe(map(flatten))
+                    )
+                )
+            ]
+        ).pipe(map(([trie, atomizedSentences]) => {
+            return AtomizedSentence.getWordElementMappings(
+                atomizedSentences,
+                trie,
+                uniq(trie.getWords(false).map(v => v.length))
+            );
+        }))
         this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
                 r.lastWordRecognitionRecord$
@@ -190,7 +208,7 @@ export class Manager {
 
         this.audioManager = new AudioManager(this)
 
-        this.cardManager.cardLoadingSignal$.pipe(
+        this.cardManager.cardProcessingSignal$.pipe(
             filter(b => !b),
             delay(100),
             switchMapTo(this.pageManager.pageIndex$),
@@ -218,7 +236,7 @@ export class Manager {
             ),
             map(atomizedSentences => atomizedSentences)
         ).subscribe(atomizedSentences => {
-            atomizedSentences.forEach(s =>{
+            atomizedSentences.forEach(s => {
                 const showEvents = ['mouseenter', 'focus'];
                 const hideEvents = ['mouseleave', 'blur'];
                 let attribute = s.getSentenceHTMLElement().getAttribute('popper-id') as string;
@@ -243,6 +261,7 @@ export class Manager {
                 this.applySentenceElementSelectListener(s)
             });
         })
+        this.cardManager.load();
     }
 
     private oAnnotations() {

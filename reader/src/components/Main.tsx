@@ -11,13 +11,8 @@ import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
 import {PageContainer} from "./PageContainer";
 import {Dictionary} from "lodash";
-import {PageRenderer} from "../lib/Books/Rendering/PageRenderer";
 import {ImageSelectPopup} from "./ImageSelectPopup";
-
-const recordAudio = () => {
-    return new Promise<Blob>(resolve => {
-    });
-};
+import {PageRenderer} from "../lib/Pages/Rendering/PageRenderer";
 
 
 const useStyles = makeStyles((theme) => ({

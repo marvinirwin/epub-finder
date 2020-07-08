@@ -1,53 +1,58 @@
 import {getAtomizedSentences} from "./Util/Util";
 import CardManager from "../lib/Manager/CardManager";
 import {MyAppDatabase} from "../lib/Storage/AppDB";
-import {getNewICardForWord, sleep} from "../lib/Util/Util";
+import {getNewICardForWord, getUniqueLengths, sleep} from "../lib/Util/Util";
 import {AtomizedSentence} from "../lib/Atomize/AtomizedSentence";
 import {skip, take} from "rxjs/operators";
+import {ITrie} from "../lib/Interfaces/Trie";
 
 require("fake-indexeddb/auto");
-
-const request = indexedDB.open("MyAppDatabase", MyAppDatabase.CURRENT_VERSION);
+const db = new MyAppDatabase();
+/*
 request.onupgradeneeded = function () {
     var db = request.result;
-    var store = db.createObjectStore("cards", {keyPath: "id++"});
+    var store = db.createObjectStore("cards", {keyPath: "id", autoIncrement: true});
     store.createIndex("by_learningLanguage", "learningLanguage", {});
-    store.put(getNewICardForWord("Te", ""));
+    store.put();
 }
+*/
 
-const indexDBSetup = new Promise<void>(resolve => {
+/*const indexDBSetup = new Promise<void>(resolve => {
     request.onsuccess = function (event) {
         resolve();
     };
-});
+});*/
 
+function getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie) {
+    return AtomizedSentence.getWordElementMappings(
+        atomizedSentences,
+        trie,
+        getUniqueLengths(trie)
+    );
+}
+
+/*
 test('Unpersisted cards added produce new elemnents on the wordmap', async () => {
-    await indexDBSetup;
-    const db = new MyAppDatabase();
     const cardManager = new CardManager(db);
     const atomizedSentences = getAtomizedSentences('BasicDoc.html');
     cardManager.addUnpersistedCards$.next([getNewICardForWord("Te", "")]);
-    await sleep(1000);
-    expect(cardManager.trie.t.getWords()).toHaveLength(1);
-    const map = AtomizedSentence.getWordElementMappings(
-        atomizedSentences,
-        cardManager.trie.t,
-        cardManager.trie.getUniqueLengths()
-    )
-    expect(map['Te'].length === 6);
+    await sleep(0)
+    const trie = await getNextTrie(cardManager);
+    expect(getUniqueLengths(trie)).toHaveLength(1);
+    const map = getWordElementMappings(atomizedSentences, trie)
+    expect(map['Te']).toHaveLength(6);
 });
+*/
 
 
 test('Persisted cards loaded produce new elemnents on the wordmap', async () => {
-    await indexDBSetup;
-    const db = new MyAppDatabase();
+    await db.cards.add(getNewICardForWord("Te", ""));
     const cardManager = new CardManager(db);
-    cardManager.load();
-    const atomizedSentences = getAtomizedSentences('BasicDoc');
-    const map = AtomizedSentence.getWordElementMappings(
-        atomizedSentences,
-        cardManager.trie.t,
-        cardManager.trie.getUniqueLengths()
-    )
-    expect(map['Te'].length === 6);
+    const atomizedSentences = getAtomizedSentences('BasicDoc.html');
+    const triePromise: Promise<ITrie> = cardManager.trie$.pipe(take(1)).toPromise();
+    await cardManager.load();
+    const trie = await triePromise;
+    expect(getUniqueLengths(trie)).toHaveLength(1);
+    const map = getWordElementMappings(atomizedSentences, trie)
+    expect(map['Te']).toHaveLength(6);
 })

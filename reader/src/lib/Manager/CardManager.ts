@@ -1,19 +1,18 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
-import {Dictionary, flatten} from "lodash";
-import {TrieWrapper} from "../TrieWrapper";
+import {Dictionary} from "lodash";
 import trie from "trie-prefix-tree";
-import {Manager} from "../Manager";
-import {buffer, concatMap, debounceTime, filter, flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
+import {flatMap, scan, shareReplay} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
+import {ITrie} from "../Interfaces/Trie";
 
 export default class CardManager {
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
-    cardLoadingSignal$ = new ReplaySubject<boolean>(1);
-    trie = new TrieWrapper(trie([]));
+    cardProcessingSignal$ = new ReplaySubject<boolean>(1);
+    trie$: Observable<ITrie>;
 
     static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
@@ -34,8 +33,26 @@ export default class CardManager {
     }
 
     constructor(public db: MyAppDatabase) {
-        this.cardLoadingSignal$.next(false);
-        this.cardIndex$ = this.getCardIndex();
+        this.cardProcessingSignal$.next(false);
+        this.trie$ = this.addPersistedCards$.pipe(
+            scan((trie: ITrie, newCards: ICard[]) => {
+                newCards.forEach(iCard => {
+                    trie.addWord(iCard.learningLanguage)
+                })
+                return trie;
+            }, trie([])),
+            shareReplay(1)
+        )
+        this.cardIndex$ = this.addPersistedCards$.pipe(
+            scan((cardIndex: Dictionary<ICard[]>, newCards) => {
+                const o = {...cardIndex};
+                newCards.forEach(newICard => {
+                    CardManager.mergeCardIntoCardDict(newICard, o);
+                });
+                return o;
+            }, {}),
+            shareReplay(1)
+        );
         this.addUnpersistedCards$.pipe(
             flatMap(async cards => {
                 for (let i = 0; i < cards.length; i++) {
@@ -44,33 +61,17 @@ export default class CardManager {
                 }
                 return cards;
             })
-        ).subscribe(this.addPersistedCards$);
+        ).subscribe(v => {
+            this.addPersistedCards$.next(v);
+        });
     }
-
-    private getCardIndex() {
-        return this.addPersistedCards$.pipe(
-            startWith([]),
-            buffer(this.cardLoadingSignal$.pipe(filter(v => !v))),
-            map(flatten),
-            scan((cardIndex: Dictionary<ICard[]>, newCards) => {
-                const o = {...cardIndex};
-                newCards.forEach(newICard => {
-                    CardManager.mergeCardIntoCardDict(newICard, o);
-                    this.trie.addWords(newICard.learningLanguage);
-                });
-                return o;
-            }, {}),
-            shareReplay(1)
-        );
-    }
-
     async load() {
-        this.cardLoadingSignal$.next(true);
+        this.cardProcessingSignal$.next(true);
         let unloadedCardCount = await this.db.getCardsInDatabaseCount()
         if (unloadedCardCount) {
             await this.getCardsFromDB();
         }
-        this.cardLoadingSignal$.next(false);
+        this.cardProcessingSignal$.next(false);
     }
 
     private async getCardsFromDB() {
