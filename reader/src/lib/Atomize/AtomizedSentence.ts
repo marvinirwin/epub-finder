@@ -62,7 +62,9 @@ export class AtomizedSentence {
                 char: (this.sentenceElement.textContent as string)[i],
                 words: words,
                 el: currentMark,
-                maxWord
+                maxWord,
+                i,
+                parent: this
             };
 
             annotationElement.words.forEach(w => {

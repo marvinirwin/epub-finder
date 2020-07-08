@@ -104,8 +104,6 @@ export class Manager {
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    bookIndex$: ReplaySubject<Dictionary<PageRenderer>> = new ReplaySubject<Dictionary<PageRenderer>>(1);
-
     stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
 
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
@@ -162,8 +160,8 @@ export class Manager {
                         ...Object.values(pageIndex)
                             .map(page => page.atomizedSentences$)
                         ).pipe(
-                            map(flatten),
-                            filter(s => !!s.length)
+                        map(flatten),
+                        filter(s => !!s.length)
                         )
                     )
                 )
@@ -198,6 +196,13 @@ export class Manager {
                 const cards = cardMap[char] || []
                 return cards[0];
             })
+        )
+
+        this.wordElementMap$.subscribe(wordElementMap => Object
+            .values(wordElementMap)
+            .map(
+                elements => elements.forEach(element => this.applyWordElementListener(element))
+            )
         )
 
         this.oStringDisplay();
@@ -286,7 +291,7 @@ export class Manager {
 
 
         this.highlightedWord$.pipe(debounceTime(10),
-            withLatestFrom(this.wordElementMap$.pipe(startWith({} as Dictionary<IAnnotatedCharacter[]>))))
+            withLatestFrom(this.wordElementMap$))
             .subscribe(([word, wordElementsMap]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
@@ -622,20 +627,16 @@ export class Manager {
             if (!annotatedElements.translated) {
                 const t = await getTranslation(annotatedElements.sentenceElement.textContent)
                 annotatedElements.translated = true;
-                debugger;
                 return annotatedElements.popperElement.textContent = t;
             }
         };
     }
 
-    applyWordElementListener(
-        annotationElement: IAnnotatedCharacter,
-        maxWord: IPositionedWord,
-        i: number,
-        sentence: AtomizedSentence) {
+    applyWordElementListener(annotationElement: IAnnotatedCharacter) {
+        const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
         child.onmouseenter = (ev) => {
-            this.highlightedWord$.next(maxWord.word);
+            this.highlightedWord$.next(maxWord?.word);
             if (this.shiftPressed || ev.shiftKey) {
                 const r = document.createRange();
                 r.selectNodeContents(child);
@@ -658,7 +659,7 @@ export class Manager {
                 const child = children[i];
                 child.classList.remove('highlighted')
             }
-            this.requestEditWord$.next(maxWord.word);
+            this.requestEditWord$.next(maxWord?.word);
         };
         return i;
     }
