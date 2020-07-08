@@ -236,7 +236,7 @@ export class Manager {
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
 
-        this.pageManager.requestRenderPage$.next(new Website('Obama', `${process.env.PUBLIC_URL}/obama.htm`));
+        this.pageManager.requestRenderPage$.next(new Website('AlphaGo', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
 
         this.pageManager.pageIndex$.pipe(
             switchMap(pageIndex =>
@@ -623,6 +623,7 @@ export class Manager {
     }
 
     applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
+        annotatedElements.getSentenceHTMLElement().setAttribute("Mouseovered", "1");
         annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
             if (!annotatedElements.translated) {
                 const t = await getTranslation(annotatedElements.sentenceElement.textContent)

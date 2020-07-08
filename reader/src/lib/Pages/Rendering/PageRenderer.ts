@@ -10,6 +10,7 @@ import {IWordCountRow} from "../../Interfaces/IWordCountRow";
 import {ANNOTATE_AND_TRANSLATE} from "../../Atomize/AtomizedDocument";
 import {AtomizedSentence} from "../../Atomize/AtomizedSentence";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
+import {sleep} from "../../Util/Util";
 
 
 // TODO divorce the renderer from the counter/analyzer
@@ -95,9 +96,12 @@ mark {
         this.atomizedSentences$ = this.ref$.pipe(
             flatMap(async ref => {
                 const iframe = await this.getIFrame(ref);
+                await sleep(500);// If I dont put this wait, the DOM Doesnt fully load and every sentence does get parsed
+                // its weird
                 const body =  iframe.contents().find('body')[0];
                 PageRenderer.appendAnnotationStyleToPageBody(body)
                 return body;
+
             }),
             map((body: HTMLBodyElement) => {
                 return printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));

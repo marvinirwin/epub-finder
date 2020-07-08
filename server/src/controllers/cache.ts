@@ -23,6 +23,7 @@ export function memoWithMySQL<T>(serviceKey: string, f: (...a: any[]) => T) {
 
         if (!rows.length) {
             const result = await f(...args);
+            console.log()
             await query<JsonCacheRow>(connection,
                 'INSERT INTO `json_cache` (`service`, `key`, `key_hash`, `value`) VALUES (?, ?, ?, ?)',
                 [
