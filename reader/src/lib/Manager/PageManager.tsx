@@ -2,12 +2,12 @@
 // @ts-ignore
 import HTMLProcessor from 'Worker-loader?name=dist/[name].js!../Worker/HTMLProcessorThread';
 import {Observable, ReplaySubject} from "rxjs";
-import { Dictionary } from "lodash";
-import {Manager} from "../Manager";
+import {Dictionary} from "lodash";
 import {flatMap, scan, shareReplay} from "rxjs/operators";
-import {printExecTime, printExecTimeAsync} from "../Util/Timer";
+import {printExecTimeAsync} from "../Util/Timer";
 import {PageRenderer} from "../Pages/Rendering/PageRenderer";
 import {Website} from "../Pages/Website";
+import {XMLSerializer} from 'xmldom';
 
 export class PageManager {
     pageIndex$: Observable<Dictionary<PageRenderer>>
@@ -18,12 +18,12 @@ export class PageManager {
                 return printExecTimeAsync("Preprocessing xml DOM", async () => {
                     const documentProcessingWorker = new HTMLProcessor();
                     documentProcessingWorker.postMessage(page.url)
-                    const processedXML = new Promise<string>(resolve => documentProcessingWorker.onmessage = (ev: MessageEvent) => resolve(ev.data));
-                    let pageRenderer = new PageRenderer(
-                        await processedXML,
+                    // Wait how does this come from the worker as an intact document?
+                    const document = await new Promise<string>(resolve => documentProcessingWorker.onmessage = (ev: MessageEvent) => resolve(ev.data));
+                    return new PageRenderer(
+                        document,
                         page.name
-                    );
-                    return pageRenderer
+                    )
                 })
             }),
             scan((acc: Dictionary<PageRenderer>, page: PageRenderer) => {

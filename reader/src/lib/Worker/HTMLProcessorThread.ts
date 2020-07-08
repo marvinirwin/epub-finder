@@ -1,6 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../Atomize/AtomizedDocument";
+import {XMLSerializer} from 'xmldom';
 
 // @ts-ignore
 self["window"] = self;
@@ -12,7 +13,10 @@ ctx.onmessage = (ev) => {
     const url = ev.data as string;
     const oReq = new XMLHttpRequest();
     oReq.addEventListener("load", response => {
-        ctx.postMessage(AtomizedDocument.atomizeDocument(oReq.responseText));
+        const s = new XMLSerializer();
+        ctx.postMessage(
+            s.serializeToString(AtomizedDocument.atomizeDocument(oReq.responseText).document)
+        );
     });
     oReq.open("GET", url);
     oReq.send();

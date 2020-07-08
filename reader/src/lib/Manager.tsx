@@ -161,7 +161,10 @@ export class Manager {
                     switchMap(pageIndex => merge(
                         ...Object.values(pageIndex)
                             .map(page => page.atomizedSentences$)
-                        ).pipe(map(flatten))
+                        ).pipe(
+                            map(flatten),
+                            filter(s => !!s.length)
+                        )
                     )
                 )
             ]
@@ -171,7 +174,7 @@ export class Manager {
                 trie,
                 uniq(trie.getWords(false).map(v => v.length))
             );
-        }))
+        }));
         this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
                 r.lastWordRecognitionRecord$
@@ -266,20 +269,6 @@ export class Manager {
 
     private oAnnotations() {
         let previousHighlightedElements: HTMLElement[] | undefined;
-        this.wordElementMap$ = this.pageManager.pageIndex$.pipe(
-            switchMap(pageIndex => {
-                let pageRenderers = Object.values(pageIndex);
-                let sources = pageRenderers.map(book => book.wordTextNodeMap$);
-                return combineLatest(sources);
-            }),
-            map((wordTextNodeMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
-                const newMap = {};
-                wordTextNodeMaps.map(v => {
-                    mergeWordTextNodeMap(v, newMap)
-                })
-                return newMap;
-            })
-        );
         /*
                 this.bookIndex$.pipe(
                     switchMap(d =>

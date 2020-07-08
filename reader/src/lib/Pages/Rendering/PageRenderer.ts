@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
-import {flatMap, map} from "rxjs/operators";
+import {flatMap, map, share, shareReplay} from "rxjs/operators";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
 import {printExecTime} from "../../Util/Timer";
 import {waitFor} from "../../Util/waitFor";
@@ -101,7 +101,8 @@ mark {
             }),
             map((body: HTMLBodyElement) => {
                 return printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
-            })
+            }),
+            shareReplay(1)
         );
 
     }
