@@ -5,8 +5,9 @@ import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
 import SineWave from "./SineWave";
 import MultiGraph from "../MultiGraph";
-import {useObs} from "../../lib/UseObs";
+import {useObs, usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
+import {filter} from "rxjs/operators";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -34,6 +35,7 @@ export default function AudioPopup({m}:{m: Manager}) {
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const currentAudioRequest = useObs(r.recordRequest$);
+    const retryableAudioRequest = usePipe(r.recordRequest$, o => o.pipe(filter(v => !!v)));
     const recognizedText = useObs(r.speechRecongitionText$);
 
     useEffect(() => {
@@ -62,7 +64,7 @@ export default function AudioPopup({m}:{m: Manager}) {
                 {graphData && <MultiGraph plots={graphData}/>}
             </CardContent>
             <CardActions>
-                <Button>Retry</Button>
+                <Button disabled={!retryableAudioRequest} onClick={() => r.recordRequest$.next(retryableAudioRequest)}>Retry</Button>
             </CardActions>
         </Card>
     </div>
