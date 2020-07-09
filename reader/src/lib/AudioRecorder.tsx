@@ -1,4 +1,4 @@
-import {from, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, from, Observable, ReplaySubject, Subject} from "rxjs";
 import {concatMap, flatMap, map, mergeMap, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import React from "react";
 import axios from "axios";
@@ -47,7 +47,9 @@ export class AudioRecorder {
     mediaSource$: Observable<MediaStream>;
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
     isRecording$ = new ReplaySubject<boolean>(1);
-    userAudio$: Observable<WavAudio>;
+/*
+    userAudio$: Observable<WavAudio | undefined>;
+*/
     countdown$ = new ReplaySubject<number>(1);
     speechRecognitionToken$ = new ReplaySubject<string>(1);
     speechConfig$: Observable<SpeechConfig>;
@@ -70,12 +72,28 @@ export class AudioRecorder {
         )
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
 
-        this.userAudio$ = this.recordRequest$.pipe(
+        combineLatest([this.mediaSource$, this.canvas$]).subscribe(async ([source, canvas]) => {
+            const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
+            const recorder = new MediaRecorder(source);
+            const stream = (await audioContext).createMediaStreamSource(recorder.stream);
+            const analyser = (await audioContext).createAnalyser();
+            analyser.fftSize = 2048
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            // Dont connect back to speakers
+            stream.connect(analyser)
+            const draw = () => {
+                this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
+            }
+            draw();
+        })
+
+        /*this.userAudio$ = */this.recordRequest$.pipe(
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
             flatMap(async args => {
                 for (let i = 0; i <= 3; i++) {
                     this.countdown$.next(3 - i);
-                    await sleep(1000)
+                    await sleep(500)
                 }
                 return args;
             }, 1),
@@ -83,6 +101,7 @@ export class AudioRecorder {
                 this.isRecording$.next(true);
                 const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
                 const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+                this.speechRecongitionText$.next('');
                 recognizer.recognizeOnceAsync(
                     (result) => {
                         this.speechRecongitionText$.next(result.text)
@@ -93,46 +112,8 @@ export class AudioRecorder {
                         console.error(err);
                         recognizer.close();
                     });
-
-                try {
-                    const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
-                    const recorder = new MediaRecorder(source);
-                    const stream = (await audioContext).createMediaStreamSource(recorder.stream);
-                    return new Promise<WavAudio>(async resolve => {
-                        try {
-                            const analyser = (await audioContext).createAnalyser();
-                            analyser.fftSize = 2048;
-                            const bufferLength = analyser.frequencyBinCount;
-                            const dataArray = new Uint8Array(bufferLength);
-                            // Dont connect back to speakers
-                            stream.connect(analyser)
-                            const draw = () => {
-                                this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
-                            }
-                            draw();
-/*
-                            recorder.start();
-                            setTimeout(() => {
-                                if(recorder.state === "recording") {
-                                    recorder.stop();
-                                }
-                            }, req.duration * 1000 * 2)
-*/
-                        } catch (e) {
-                            console.error(e);
-                        } finally {
-                            if(recorder.state === "recording") {
-                                recorder.stop();
-                            }
-                        }
-                    })
-                } catch (e) {
-                    console.error(e);
-                    this.isRecording$.next(false);
-                    throw e;
-                }
             })
-        )
+        ).subscribe(() => {})
     }
 
     private drawSineWave(canvas: HTMLCanvasElement, draw: () => void, analyser: AnalyserNode, dataArray: Uint8Array, canvasCtx: CanvasRenderingContext2D, bufferLength: number) {

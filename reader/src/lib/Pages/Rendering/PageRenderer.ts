@@ -141,7 +141,9 @@ mark {
 
             // Maybe do this after?
         }
-        await waitFor(() => iframe.contents().find('body').find('script').length > 0, 100)
+        // await waitFor(() => iframe.contents().find('body').children.length > 0, 100)
+        // TODO figure out a reliable way to figure out when the iframe has loaded
+        await sleep(500);
         const v = iframe.contents().find('body').children().length;
         return iframe;
     }

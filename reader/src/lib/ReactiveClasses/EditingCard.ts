@@ -1,23 +1,19 @@
-import {combineLatest, interval, merge, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
-import {getIsMeFunction, ICard} from "../Interfaces/ICard";
+import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
+import {ICard} from "../Interfaces/ICard";
 import {
-    debounceTime, first,
+    first,
     flatMap,
     map,
-    mapTo, share, shareReplay,
+    mapTo,
     skip,
-    startWith,
     switchMap,
-    take,
-    takeUntil,
     withLatestFrom
 } from "rxjs/operators";
-import {IndexDBManager, LocalStorageManager} from "../Storage/StorageManagers";
+import {IndexDBManager} from "../Storage/StorageManagers";
 import {Manager} from "../Manager";
-import {debounce} from "@material-ui/core";
 import {WavAudio} from "../WavAudio";
 import {getSynthesizedAudio} from "../AudioRecorder";
-import { memoize, flatten } from "lodash";
+import { memoize, flatten} from "lodash";
 import pinyin from 'pinyin';
 
 

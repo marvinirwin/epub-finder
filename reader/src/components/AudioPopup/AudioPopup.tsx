@@ -30,9 +30,13 @@ const useStyles = makeStyles((theme) => ({
 export default function AudioPopup({m}:{m: Manager}) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
+/*
     const userAudio = useObs(r.userAudio$);
+*/
     const synthAudio = useObs(m.currentEditingSynthesizedWavFile$);
+/*
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
+*/
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const currentAudioRequest = useObs(r.recordRequest$);
     const retryableAudioRequest = usePipe(r.recordRequest$, o => o.pipe(filter(v => !!v)));
@@ -54,14 +58,18 @@ export default function AudioPopup({m}:{m: Manager}) {
                 <SineWave r={r}/>
                 <Typography variant="h3" className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
                 <Grid container>
+{/*
                     <Grid item xs={6}>
                         <audio src={userAudio?.url} controls autoPlay />
                     </Grid>
-                    <Grid item xs={6}>
+*/}
+                    <Grid item xs={12}>
                         <audio src={synthAudio?.url} controls autoPlay />
                     </Grid>
                 </Grid>
+{/*
                 {graphData && <MultiGraph plots={graphData}/>}
+*/}
             </CardContent>
             <CardActions>
                 <Button disabled={!retryableAudioRequest} onClick={() => r.recordRequest$.next(retryableAudioRequest)}>Retry</Button>

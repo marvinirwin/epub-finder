@@ -7,7 +7,6 @@ import {flatMap, map, scan, shareReplay} from "rxjs/operators";
 import {printExecTimeAsync} from "../Util/Timer";
 import {PageRenderer} from "../Pages/Rendering/PageRenderer";
 import {Website} from "../Pages/Website";
-import {XMLSerializer} from 'xmldom';
 
 export class PageManager {
     pageIndex$: Observable<Dictionary<PageRenderer>>

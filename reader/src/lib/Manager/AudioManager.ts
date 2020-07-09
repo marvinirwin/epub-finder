@@ -13,8 +13,10 @@ export type AudioPair = { user: WavAudio, synth: WavAudio };
 export class AudioManager {
     audioRecorder: AudioRecorder = new AudioRecorder();
     currentSynthesizedAudio$: Observable<WavAudio | undefined>;
+/*
     userAndSyntheticAudioLineUp$: Observable<AudioPair>;
     lineupGraphs$: Observable<[number[], number[]]>;
+*/
 
     constructor(public m: Manager) {
         this.currentSynthesizedAudio$ = m.currentEditingCard$.pipe(
@@ -23,6 +25,7 @@ export class AudioManager {
         /*
          * Im probably going to have to pair synth audio with user audio emitted after
          */
+/*
         this.userAndSyntheticAudioLineUp$ = combineLatest([
             this.audioRecorder.userAudio$,
             this.currentSynthesizedAudio$
@@ -40,5 +43,6 @@ export class AudioManager {
                 zip(synth.graphData$, user.graphData$)
             )
         )
+*/
     }
 }

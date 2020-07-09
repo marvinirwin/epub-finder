@@ -140,8 +140,6 @@ export class Manager {
 
     renderingInProgress$ = new Subject();
 
-    shiftPressed = false;
-
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
         this.cardManager = new CardManager(this.db);
@@ -153,7 +151,6 @@ export class Manager {
         this.pageManager.pageList$.pipe(
             switchMap(pageList => merge(...pageList.map(p => p.iframebody$))),
         ).subscribe(body => {
-            debugger;
             this.applyGlobalListeners(body)
         })
 
@@ -240,7 +237,9 @@ export class Manager {
             this.cardManager.addUnpersistedCards$.next(newCards);
         });
 
-        this.pageManager.requestRenderPage$.next(new Website('AlphaGo', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
+        this.pageManager.requestRenderPage$.next(
+            new Website('Homework', `${process.env.PUBLIC_URL}/homework.html`)
+        );
 
         this.pageManager.pageList$.pipe(
             switchMap(pageList =>

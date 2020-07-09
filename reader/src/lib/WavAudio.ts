@@ -17,7 +17,14 @@ export class WavAudio {
     constructor(public buffer: ArrayBuffer) {
         // decodeAudioData detached the arraybuffer into the audio thread
         const newBuffer = buffer.slice(0);
-        this.audioBuffer$ = from(audioContext.then(ctx => ctx.decodeAudioData(buffer)));
+        this.audioBuffer$ = from(audioContext.then(ctx => {
+            try {
+                return ctx.decodeAudioData(buffer);
+            } catch(e) {
+                console.error(e);
+                throw e;
+            }
+        }));
         this.blob = new Blob([newBuffer], {type: 'audio/wav'});
         this.url = URL.createObjectURL(this.blob);
         this.el = new Audio("data:audio/wav;base64," + encode(newBuffer));

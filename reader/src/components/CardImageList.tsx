@@ -1,7 +1,6 @@
-import {GridList, GridListTile, GridListTileBar} from "@material-ui/core";
+import {GridList} from "@material-ui/core";
 import {EditingImage} from "./EditingImage";
 import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
 import {makeStyles} from "@material-ui/core/styles";
 import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {Subject} from "rxjs";
