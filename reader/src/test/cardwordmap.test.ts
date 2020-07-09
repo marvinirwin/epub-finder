@@ -24,7 +24,7 @@ request.onupgradeneeded = function () {
 });*/
 
 function getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie) {
-    return AtomizedSentence.getWordElementMappings(
+    return AtomizedSentence.getTextWordData(
         atomizedSentences,
         trie,
         getUniqueLengths(trie)

@@ -6,14 +6,15 @@ import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
+import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 
 export class AtomizedSentence {
 
-    public static getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): Dictionary<IAnnotatedCharacter[]> {
-        let wordElementsMaps = atomizedSentences.map(atomizedSentence =>
-            atomizedSentence.getWordElementMemberships(trie, trieElementSizes)
+    public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
+        let textWordDataRecords = atomizedSentences.map(atomizedSentence =>
+            atomizedSentence.getTextWordData(trie, trieElementSizes)
         );
-        return mergeDictArrays<IAnnotatedCharacter>(...wordElementsMaps);
+        return mergeSentenceInfo(...textWordDataRecords);
     }
 
     translatableText: string;
@@ -32,7 +33,8 @@ export class AtomizedSentence {
             ) as unknown as XMLDocumentNode;
     }
 
-    getWordElementMemberships(t: ITrie, uniqueLengths: number[]): Dictionary<IAnnotatedCharacter[]> {
+    getTextWordData(t: ITrie, uniqueLengths: number[]): TextWordData {
+        const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
         let children = this.sentenceElement.childNodes;
@@ -49,7 +51,15 @@ export class AtomizedSentence {
                 }
                 return acc;
             }, []);
-            wordsInProgress.push(...wordsWhichStartHere.map(word => ({word, lengthRemaining: word.length})))
+            wordsInProgress.push(...wordsWhichStartHere.map(word => {
+                if (wordCounts[word]) {
+                    wordCounts[word]++;
+                } else {
+                    wordCounts[word] = 1;
+                }
+                return ({word, lengthRemaining: word.length});
+            }))
+
             let words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
                 let newWord: IPositionedWord = {
                     word,
@@ -75,7 +85,7 @@ export class AtomizedSentence {
                 }
             })
         }
-        return wordElementsMap;
+        return {wordElementsMap, wordCounts};
     }
 
     getSentenceHTMLElement(): HTMLElement {

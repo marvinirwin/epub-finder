@@ -48,7 +48,12 @@ import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord} from "./Util/Util";
 import {printExecTime} from "./Util/Timer";
+import {TextWordData} from "./Atomize/TextWordData";
 
+export interface ZippedWordRow  {
+    recognitionRows: IWordRecognitionRow[];
+    count: number;
+}
 
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
@@ -84,6 +89,7 @@ export async function getTranslation<A>(learningText: A) {
 }
 
 export class Manager {
+    atomizedSentences$: Observable<AtomizedSentence[]>;
     displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
     messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
 
@@ -108,11 +114,18 @@ export class Manager {
 
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
-    wordRowDict: ReplaySubject<Dictionary<WordCountTableRow>> = new ReplaySubject<Dictionary<WordCountTableRow>>(1);
+/*
+    wordCountDict$: Observable<Dictionary<number>>;
+*/
+
     wordsSortedByPopularityDesc$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
+
+/*
+    wordRecognitionDict$: Observable<IWordRecognitionRow[]>;
+*/
 
     cardDBManager = new IndexDBManager<ICard>(
         this.db,
@@ -139,6 +152,15 @@ export class Manager {
     pageManager: PageManager;
 
     renderingInProgress$ = new Subject();
+    textData$: Observable<TextWordData>;
+/*
+    wordPriorityDict$: Observable<Dictionary<ZippedWordRow>>;
+    recognitionRowDict$: Observable<Dictionary<IWordRecognitionRow[]>>
+
+    wordRowDict$: Observable<Dictionary<WordCountTableRow>>;
+*/
+    wordRowDict$!: Observable<Dictionary<WordCountTableRow>>;
+    wordCountDict$!: Observable<Dictionary<number>>;
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
@@ -154,26 +176,26 @@ export class Manager {
             this.applyGlobalListeners(body)
         })
 
-        this.wordElementMap$ = combineLatest(
+        this.atomizedSentences$ = this.pageManager.pageList$.pipe(
+            switchMap(pageList => merge(
+                ...pageList.map(page => page.atomizedSentences$)
+                ).pipe(map(flatten))
+            )
+        );
+
+        this.textData$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.pageManager.pageList$.pipe(
-                    switchMap(pageList => merge(
-                        ...pageList.map(page => page.atomizedSentences$)
-                        ).pipe(
-                        map(flatten),
-                        filter(s => !!s.length)
-                        )
-                    )
-                )
+                this.atomizedSentences$.pipe(filter(sentenceList => !!sentenceList.length))
             ]
         ).pipe(map(([trie, atomizedSentences]) => {
-            return AtomizedSentence.getWordElementMappings(
+            return AtomizedSentence.getTextWordData(
                 atomizedSentences,
                 trie,
                 uniq(trie.getWords(false).map(v => v.length))
             );
         }));
+        this.wordElementMap$ = this.textData$.pipe(map(t => t.wordElementsMap));
         this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
             switchMap(rows => combineLatest(rows.map(r =>
                 r.lastWordRecognitionRecord$
@@ -405,38 +427,6 @@ export class Manager {
         })).subscribe(this.stringDisplay$);
     }
 
-
-    /*
-        private oSpine() {
-            this.currentSpineItem$.next(undefined);
-            this.spineItems$.next([]);
-            this.spine$.next(undefined);
-
-            this.spine$.pipe(map(s => {
-                if (!s) return;
-                const a: aSpineItem[] = [];
-                s.each((f: aSpineItem) => {
-                    a.push(f);
-                })
-                return a;
-            }))
-                .subscribe(v => {
-                        this.spineItems$.next(v);
-                    }
-                );
-            this.spineItems$.pipe(withLatestFrom(this.currentSpineItem$)).subscribe(([spineItems, currentItem]) => {
-                if (!spineItems) {
-                    this.currentSpineItem$.next(undefined);
-                    return;
-                }
-                if (!currentItem || !spineItems.find(i => i.href === currentItem.href)) {
-                    this.currentSpineItem$.next(spineItems[0])
-                    return;
-                }
-            })
-        }
-    */
-
     private oEditingCard() {
 
 
@@ -493,32 +483,49 @@ export class Manager {
         */
     }
 
-    /*
-        private oCurrent() {
-            this.currentPackage$.next(undefined);
-            this.packageUpdate$.pipe(withLatestFrom(this.packages$)).subscribe(([newPackageUpdate, currentPackages]: [UnserializedAnkiPackage, Dictionary<UnserializedAnkiPackage>]) => {
-                currentPackages[newPackageUpdate.name] = newPackageUpdate;
-                this.packageMessages$.next(`Package ${newPackageUpdate.name} has been updated`)
-                if (Object.keys(currentPackages).length === 1) {
-                    this.packageMessages$.next(`Setting current package ${newPackageUpdate.name}`)
-                    this.currentPackage$.next(newPackageUpdate);
-                }
-                this.packages$.next({...currentPackages});
-            })
-            this.currentPackage$.pipe(map(pkg => {
-                // This probably wont work
-                const col = pkg?.collections?.find(c => c.allCards.length)
-                this.packageMessages$.next(`Setting current collection ${col?.name}`)
-                this.currentCollection$.next(col?.name);
-                let find = col?.decks.find(d => d.cards.length);
-                this.packageMessages$.next(`Setting current deck ${find?.name}`)
-                return find;
-            })).subscribe(this.currentDeck$);
-        }
-    */
-
     private oScoreAndCount() {
-        this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
+        this.wordCountDict$ = this.textData$.pipe(
+            map(textData => textData.wordCounts),
+        );
+
+
+        this.wordCountDict$.pipe(scan((oldCounts: Dictionary<number>, newCounts) => {
+            const diffs: IWordCountRow[] = [];
+            const keys = Array.from(new Set([
+                ...Object.keys(oldCounts),
+                ...Object.keys(newCounts)
+            ]));
+            for (let key of keys) {
+                const oldCount = oldCounts[key];
+                const newCount = newCounts[key];
+                if (oldCount !== newCount) {
+                    diffs.push({word: key, count: newCount - oldCount, book: ''})
+                }
+            }
+            if (diffs) {
+                this.addWordCountRows$.next(diffs)
+            }
+            return newCounts;
+        }, {})).subscribe(() => console.log()) // HACK, this puts stuff into addWordCountRows
+
+
+/*
+        this.wordPriorityDict$ = combineLatest([
+            this.wordCountDict$,
+            this.recognitionRowDict$
+        ]).pipe(map(([wordCountDict, recognitionRowDict]) => {
+            const newMap: Dictionary<ZippedWordRow> = {};
+            for (let key in wordCountDict) {
+                newMap[key] = {
+                    recognitionRows: recognitionRowDict[key] || [],
+                    count: wordCountDict[key]
+                }
+            }
+            return newMap;
+        }))
+*/
+
+        this.wordRowDict$ = this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
             const wordCountsGrouped: Dictionary<IWordCountRow[]> = groupBy(newRows, 'word');
             const newObject = {...acc};
             Object.entries(wordCountsGrouped).forEach(([word, wordCountRecords]) => {
@@ -532,7 +539,7 @@ export class Manager {
                 }
             })
             return newObject;
-        }, {})).subscribe(this.wordRowDict);
+        }, {}));
         this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
@@ -540,7 +547,7 @@ export class Manager {
             }
             this.addPersistedWordRecognitionRows$.next(rows);
         }))
-        this.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict)).subscribe(([newRecognitionRows, rowDict]) => {
+        this.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict$)).subscribe(([newRecognitionRows, rowDict]) => {
             const group = groupBy(newRecognitionRows, v => v.word);
             Object.entries(group).forEach(([word, recognitionRows]) => {
                 let rowDictElement = rowDict[word];
@@ -551,7 +558,7 @@ export class Manager {
                 rowDictElement.addNewRecognitionRecords$.next(recognitionRows)
             })
         })
-        this.wordRowDict.pipe(
+        this.wordRowDict$.pipe(
             map(d => Object.values(d)),
             switchMap(wordRows =>
                 combineLatest(wordRows.map(r => r.currentCount$.pipe(map(count => ({count, row: r})))))
@@ -559,7 +566,7 @@ export class Manager {
             map((recs: ICountRowEmitted[]) => orderBy(
                 orderBy(recs, 'recognitionScore', 'desc'), ['count'], 'desc').map(r => r.row))
         ).subscribe(this.wordsSortedByPopularityDesc$)
-        this.wordRowDict.pipe(
+        this.wordRowDict$.pipe(
             map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))
         );
         (async () => {

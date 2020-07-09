@@ -6,7 +6,7 @@ import {getAtomizedSentences} from "./Util/Util";
 it("Constructs the word element map from a bookIndex", async () => {
     const atomizedSentences = getAtomizedSentences('BasicDoc.html');
     const t = trie(['Test']);
-    const mappings = AtomizedSentence.getWordElementMappings(
+    const mappings = AtomizedSentence.getTextWordData(
         atomizedSentences,
         t,
         uniq(t.getWords(false).map(v => v.length))
