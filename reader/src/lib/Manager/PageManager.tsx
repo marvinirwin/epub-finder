@@ -3,7 +3,7 @@
 import HTMLProcessor from 'Worker-loader?name=dist/[name].js!../Worker/HTMLProcessorThread';
 import {Observable, ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
-import {flatMap, scan, shareReplay} from "rxjs/operators";
+import {flatMap, map, scan, shareReplay} from "rxjs/operators";
 import {printExecTimeAsync} from "../Util/Timer";
 import {PageRenderer} from "../Pages/Rendering/PageRenderer";
 import {Website} from "../Pages/Website";
@@ -11,6 +11,7 @@ import {XMLSerializer} from 'xmldom';
 
 export class PageManager {
     pageIndex$: Observable<Dictionary<PageRenderer>>
+    pageList$: Observable<PageRenderer[]>;
     requestRenderPage$ = new ReplaySubject<Website>(1);
     constructor() {
         this.pageIndex$ = this.requestRenderPage$.pipe(
@@ -32,5 +33,6 @@ export class PageManager {
             }, {}),
             shareReplay(1)
         )
+        this.pageList$ = this.pageIndex$.pipe(map(pageIndex => Object.values(pageIndex)), shareReplay(1))
     }
 }

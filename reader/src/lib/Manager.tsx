@@ -121,7 +121,6 @@ export class Manager {
         (i: number, c: ICard) => ({...c, id: i})
     );
 
-
     requestQuizCharacter$: Subject<string> = new Subject<string>();
     quizzingCard$: ReplaySubject<ICard | undefined> = new ReplaySubject<ICard | undefined>(1);
     quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
@@ -151,14 +150,19 @@ export class Manager {
         this.oMessages();
         this.oEditingCard();
 
+        this.pageManager.pageList$.pipe(
+            switchMap(pageList => merge(...pageList.map(p => p.iframebody$))),
+        ).subscribe(body => {
+            debugger;
+            this.applyGlobalListeners(body)
+        })
 
         this.wordElementMap$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.pageManager.pageIndex$.pipe(
-                    switchMap(pageIndex => merge(
-                        ...Object.values(pageIndex)
-                            .map(page => page.atomizedSentences$)
+                this.pageManager.pageList$.pipe(
+                    switchMap(pageList => merge(
+                        ...pageList.map(page => page.atomizedSentences$)
                         ).pipe(
                         map(flatten),
                         filter(s => !!s.length)
@@ -219,8 +223,8 @@ export class Manager {
         this.cardManager.cardProcessingSignal$.pipe(
             filter(b => !b),
             delay(100),
-            switchMapTo(this.pageManager.pageIndex$),
-            switchMap(pageIndex => merge(...Object.values(pageIndex).map(pageRenderer => pageRenderer.text$))),
+            switchMapTo(this.pageManager.pageList$),
+            switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
             withLatestFrom(this.cardManager.cardIndex$)
         ).subscribe(([text, cardIndex]) => {
             const newCharacterSet = new Set<string>();
@@ -238,9 +242,9 @@ export class Manager {
 
         this.pageManager.requestRenderPage$.next(new Website('AlphaGo', `${process.env.PUBLIC_URL}/alphago_bilibili.htm`));
 
-        this.pageManager.pageIndex$.pipe(
-            switchMap(pageIndex =>
-                merge(...Object.values(pageIndex).map(page => page.atomizedSentences$))
+        this.pageManager.pageList$.pipe(
+            switchMap(pageList =>
+                merge(...pageList.map(page => page.atomizedSentences$))
             ),
             map(atomizedSentences => atomizedSentences)
         ).subscribe(atomizedSentences => {
@@ -582,31 +586,30 @@ export class Manager {
         }
     }
 
-    applyGlobalListeners(document: Document) {
-        document.onkeydown = (e) => {
+    applyGlobalListeners(root: HTMLElement) {
+        const document = root.ownerDocument as HTMLDocument;
+
+        root.onkeydown = (e) => {
             switch (e.key) {
                 case "Escape":
                     this.queEditingCard$.next(undefined);
                     break;
-                case "Shift":
-                    this.shiftPressed = true;
-                    break;
             }
         };
 
-        document.onkeyup = (e) => {
-            switch (e.key) {
-                case "Escape":
-                    this.shiftPressed = false;
+        const onMouseUp$ = fromEvent(root, 'mouseup');
+        const shiftKeyUp$ = new Subject<KeyboardEvent>();
+        root.onkeyup = ev => {
+            if (ev.key === "Shift") {
+                shiftKeyUp$.next(ev);
             }
-        }
-
-        const onMouseUp$ = fromEvent(document, 'mouseup');
-        onMouseUp$.pipe(withLatestFrom(
-            this.cardManager.cardIndex$
-            ),
-            debounceTime(100)
-        ).subscribe(([event, currentDeck]) => {
+        };
+        merge(shiftKeyUp$, onMouseUp$)
+            .pipe(withLatestFrom(
+                this.cardManager.cardIndex$
+                ),
+                debounceTime(100)
+            ).subscribe(([event, currentDeck]) => {
             const activeEl = document.activeElement;
             if (activeEl) {
                 const selObj = document.getSelection();
@@ -638,16 +641,19 @@ export class Manager {
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
         child.onmouseenter = (ev) => {
             this.highlightedWord$.next(maxWord?.word);
-            if (this.shiftPressed || ev.shiftKey) {
-                const r = document.createRange();
-                r.selectNodeContents(child);
-                const selObj = (annotationElement.el.ownerDocument as Document).getSelection();
+            if (ev.shiftKey) {
                 /**
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
                  * whereas other browsers will return a Selection object with Selection.type set to None.
                  */
-                if (selObj) {
-                    selObj.addRange(r);
+                const selection = (annotationElement.el.ownerDocument as Document).getSelection();
+                if (selection?.anchorNode === child.parentElement) {
+                    selection.extend(child, 1);
+                } else {
+                    selection?.removeAllRanges();
+                    let range = document.createRange();
+                    range.selectNode(child);
+                    selection?.addRange(range);
                 }
             }
         };

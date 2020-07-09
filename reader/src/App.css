@@ -111,7 +111,6 @@
     animation: blinkRed 0.5s infinite;
 }
 .led-box {
-    height: 30px;
     width: 25%;
     margin: 10px 0;
     float: left;

@@ -13,13 +13,12 @@ import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 import {sleep} from "../../Util/Util";
 
 
-// TODO divorce the renderer from the counter/analyzer
 export class PageRenderer {
     ref$ = new ReplaySubject<HTMLElement>();
-    wordTextNodeMap$ = new ReplaySubject<Dictionary<IAnnotatedCharacter[]>>(1);
     text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
+    iframebody$: Observable<HTMLBodyElement>;
 
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         let style = $(`
@@ -93,7 +92,7 @@ mark {
             )
         })
 
-        this.atomizedSentences$ = this.ref$.pipe(
+        this.iframebody$ = this.ref$.pipe(
             flatMap(async ref => {
                 const iframe = await this.getIFrame(ref);
                 await sleep(500);// If I dont put this wait, the DOM Doesnt fully load and every sentence does get parsed
@@ -101,8 +100,10 @@ mark {
                 const body =  iframe.contents().find('body')[0];
                 PageRenderer.appendAnnotationStyleToPageBody(body)
                 return body;
-
             }),
+            shareReplay(1)
+        );
+        this.atomizedSentences$ = this.iframebody$.pipe(
             map((body: HTMLBodyElement) => {
                 return printExecTime("Rehydration", () => this.rehydratePage(body.ownerDocument as HTMLDocument));
             }),
