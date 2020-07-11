@@ -5,7 +5,6 @@ import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 
 export class AtomizedSentence {

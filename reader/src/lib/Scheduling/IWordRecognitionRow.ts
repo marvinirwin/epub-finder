@@ -3,4 +3,5 @@ export interface IWordRecognitionRow {
     word: string;
     timestamp: Date;
     recognitionScore: number;
+    nextDueDate?: Date;
 }

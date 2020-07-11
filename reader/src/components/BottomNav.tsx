@@ -1,6 +1,6 @@
 import {BottomNavigation, BottomNavigationAction} from "@material-ui/core";
 import React from "react";
-import {Manager, NavigationPages} from "../lib/Manager";
+import {Manager} from "../lib/Manager";
 import {useObs} from "../lib/UseObs";
 
 import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
@@ -9,6 +9,7 @@ import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import Settings from '@material-ui/icons/Settings';
 import {makeStyles} from "@material-ui/core/styles";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {NavigationPages} from "../lib/Util/Util";
 
 
 const useStyles = makeStyles((theme) => ({

@@ -15,9 +15,9 @@ test('Atomizes a document and produces a mapping of words to text nodes', async 
     ));
     const TestSentence1 = sentenceElementMaps[0];
     const TestSentence2 = sentenceElementMaps[1];
-    expect(TestSentence1['Test']).toHaveLength(4);
-    expect(TestSentence2['Test']).toHaveLength(4);
-    const merged = mergeWordTextNodeMap(TestSentence1, TestSentence2);
+    expect(TestSentence1.wordElementsMap['Test']).toHaveLength(4);
+    expect(TestSentence2.wordElementsMap['Test']).toHaveLength(4);
+    const merged = mergeWordTextNodeMap(TestSentence1.wordElementsMap, TestSentence2.wordElementsMap);
     expect(merged["Test"]).toHaveLength(8);
 });
 

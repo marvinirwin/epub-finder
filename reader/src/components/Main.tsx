@@ -4,7 +4,7 @@ import React, {Fragment, useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
-import {Manager, NavigationPages} from "../lib/Manager";
+import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {WordCountPage} from "./Pages/WordCountPage";
 import {QuizPage} from "./Pages/QuizPage";
@@ -13,6 +13,7 @@ import {PageContainer} from "./PageContainer";
 import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSelectPopup";
 import {PageRenderer} from "../lib/Pages/Rendering/PageRenderer";
+import {NavigationPages} from "../lib/Util/Util";
 
 
 const useStyles = makeStyles((theme) => ({

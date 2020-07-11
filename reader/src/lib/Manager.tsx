@@ -1,5 +1,5 @@
 import {combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, groupBy, orderBy, sortBy, uniq, flatten} from "lodash";
+import {Dictionary, flatten, groupBy, orderBy, sortBy, uniq} from "lodash";
 import {
     debounceTime,
     delay,
@@ -26,68 +26,23 @@ import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {QuizCardProps} from "../components/QuizPopup";
-import axios from 'axios';
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
-import {ITrend} from "./Interfaces/ITwitterTrend";
-import {ITrendLocation} from "./Interfaces/ITrendLocation";
 import {WavAudio} from "./WavAudio";
 import {IWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
-import {IWordRecognitionRow} from "./Interfaces/IWordRecognitionRow";
 import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
-import {mergeWordTextNodeMap} from "./Util/mergeAnnotationDictionary";
 import {PageManager} from "./Manager/PageManager";
-import {IPositionedWord} from "./Interfaces/Annotation/IPositionedWord";
-import {PageRenderer} from "./Pages/Rendering/PageRenderer";
 import {Website} from "./Pages/Website";
 import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
-import {getNewICardForWord} from "./Util/Util";
-import {printExecTime} from "./Util/Timer";
+import {getNewICardForWord, getTranslation, NavigationPages} from "./Util/Util";
 import {TextWordData} from "./Atomize/TextWordData";
 import {ShowCharacter} from "../components/Quiz/ShowCharacter";
-
-export interface ZippedWordRow  {
-    recognitionRows: IWordRecognitionRow[];
-    count: number;
-}
-
-export enum NavigationPages {
-    READING_PAGE = "READING_PAGE",
-    QUIZ_PAGE = "QUIZ_PAGE",
-    TRENDS_PAGE = "TRENDS_PAGE",
-    SETTINGS_PAGE = "SETTINGS_PAGE"
-}
-
-async function getAllLocations(): Promise<ITrendLocation[]> {
-    const result = await axios.post('/trend-locations')
-    const d: ITrendLocation[] = result.data;
-    const filtered = d.filter(r => r.country === 'Singapore')
-    return result.data;
-}
-
-async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
-    const result = await axios.post('/trends', {id: woeid})
-    return result.data;
-}
-
-/*
-getAllLocations()
-getAllTrendsForLocation(23424948);
-*/
-
-export async function getTranslation<A>(learningText: A) {
-    const result = await axios.post('/translate', {
-        from: 'zh-CN',
-        to: 'en',
-        text: learningText
-    })
-    return result.data.translation;
-}
+import {WordRecognitionManager} from "./Manager/WordRecognitionManager";
 
 export class Manager {
     atomizedSentences$: Observable<AtomizedSentence[]>;
@@ -115,18 +70,8 @@ export class Manager {
 
     allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
 
-/*
-    wordCountDict$: Observable<Dictionary<number>>;
-*/
-
     wordsSortedByPopularityDesc$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
-    addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
-    addUnpersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
-
-/*
-    wordRecognitionDict$: Observable<IWordRecognitionRow[]>;
-*/
 
     cardDBManager = new IndexDBManager<ICard>(
         this.db,
@@ -148,24 +93,22 @@ export class Manager {
 
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
+
     audioManager: AudioManager;
     cardManager: CardManager;
     pageManager: PageManager;
+    wordRecognitionManager: WordRecognitionManager;
 
     renderingInProgress$ = new Subject();
     textData$: Observable<TextWordData>;
-/*
-    wordPriorityDict$: Observable<Dictionary<ZippedWordRow>>;
-    recognitionRowDict$: Observable<Dictionary<IWordRecognitionRow[]>>
 
-    wordRowDict$: Observable<Dictionary<WordCountTableRow>>;
-*/
     wordRowDict$!: Observable<Dictionary<WordCountTableRow>>;
     wordCountDict$!: Observable<Dictionary<number>>;
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
         this.cardManager = new CardManager(this.db);
+        this.wordRecognitionManager = new WordRecognitionManager(this.db);
 
         this.oPackageLoader();
         this.oMessages();
@@ -524,14 +467,7 @@ export class Manager {
             })
             return newObject;
         }, {}));
-        this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                row.id = await this.db.recognitionRecords.add(row);
-            }
-            this.addPersistedWordRecognitionRows$.next(rows);
-        }))
-        this.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict$)).subscribe(([newRecognitionRows, rowDict]) => {
+        this.wordRecognitionManager.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict$)).subscribe(([newRecognitionRows, rowDict]) => {
             const group = groupBy(newRecognitionRows, v => v.word);
             Object.entries(group).forEach(([word, recognitionRows]) => {
                 let rowDictElement = rowDict[word];
@@ -553,12 +489,6 @@ export class Manager {
         this.wordRowDict$.pipe(
             map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))
         );
-        (async () => {
-            const generator = this.db.getRecognitionRowsFromDB();
-            for await (let rowChunk of generator) {
-                this.addPersistedWordRecognitionRows$.next(rowChunk);
-            }
-        })()
 
     }
 

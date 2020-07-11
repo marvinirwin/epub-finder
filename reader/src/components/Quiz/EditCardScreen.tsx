@@ -7,7 +7,7 @@ import {QuizCardProps} from "../QuizPopup";
 
 export function EditCardScreen({c, m}: QuizCardProps) {
     function sendWordRec(recognitionScore: number) {
-        m.addUnpersistedWordRecognitionRows$.next([
+        m.wordRecognitionManager.addUnpersistedWordRecognitionRows$.next([
             {
                 word: c.learningLanguage,
                 timestamp: new Date(),

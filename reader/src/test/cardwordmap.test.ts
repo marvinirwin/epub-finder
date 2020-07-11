@@ -5,6 +5,7 @@ import {getNewICardForWord, getUniqueLengths, sleep} from "../lib/Util/Util";
 import {AtomizedSentence} from "../lib/Atomize/AtomizedSentence";
 import {skip, take} from "rxjs/operators";
 import {ITrie} from "../lib/Interfaces/Trie";
+import {TextWordData} from "../lib/Atomize/TextWordData";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -23,7 +24,7 @@ request.onupgradeneeded = function () {
     };
 });*/
 
-function getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie) {
+function getWordElementMappings(atomizedSentences: AtomizedSentence[], trie: ITrie): TextWordData  {
     return AtomizedSentence.getTextWordData(
         atomizedSentences,
         trie,
@@ -53,6 +54,6 @@ test('Persisted cards loaded produce new elemnents on the wordmap', async () => 
     await cardManager.load();
     const trie = await triePromise;
     expect(getUniqueLengths(trie)).toHaveLength(1);
-    const map = getWordElementMappings(atomizedSentences, trie)
-    expect(map['Te']).toHaveLength(6);
+    const data = getWordElementMappings(atomizedSentences, trie)
+    expect(data.wordElementsMap['Te']).toHaveLength(6);
 })

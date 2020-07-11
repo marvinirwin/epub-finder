@@ -1,7 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
-import {Fab, Grid, Slide} from "@material-ui/core";
-import CancelIcon from "@material-ui/icons/Cancel";
+import {Grid} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../EditingCard/EditingCardComponent";

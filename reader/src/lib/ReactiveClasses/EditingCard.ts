@@ -44,7 +44,6 @@ export class EditingCard {
         public m: Manager,
         public timestamp?: Date | number | undefined,
     ) {
-        // TODO should this be a replaySubject with share?
         this.synthesizedSpeech$ = this.learningLanguage$.pipe(
             flatMap(getSynthesizedAudio),
         )

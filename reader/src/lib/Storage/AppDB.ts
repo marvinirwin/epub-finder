@@ -1,7 +1,7 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {IWordRecognitionRow} from "../Interfaces/IWordRecognitionRow";
+import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
 
 export interface ISetting {
     key: string;

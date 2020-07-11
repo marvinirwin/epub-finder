@@ -4,7 +4,9 @@ import {Button, Card, CardActions, CardContent, Grid, Typography} from "@materia
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
 import SineWave from "./SineWave";
+/*
 import MultiGraph from "../MultiGraph";
+*/
 import {useObs, usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 import {filter} from "rxjs/operators";
@@ -37,7 +39,7 @@ export default function AudioPopup({m}:{m: Manager}) {
 /*
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
 */
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>();
     const currentAudioRequest = useObs(r.recordRequest$);
     const retryableAudioRequest = usePipe(r.recordRequest$, o => o.pipe(filter(v => !!v)));
     const recognizedText = useObs(r.speechRecongitionText$);
