@@ -34,26 +34,26 @@ function perc2color(perc: number) {
 
 
 function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
-    const score = useObs(row.currentRecognitionScore$);
+    const score = useObs(row.lastWordRecognitionRecord$);
     const count = useObs(row.currentCount$);
     return (
         <TableRow key={row.word}>
             <TableCell component="th" scope="row">
                 <div onClick={() => {
-                    m.requestQuizCharacter$.next(row.word)
+                    m.quizManager.queuCharacterToBeQuizzed.next(row.word)
                 }}>
                     {row.word}
                 </div>
             </TableCell>
             <TableCell align="right">{count}</TableCell>
-            <TableCell align="right" style={{backgroundColor: perc2color(score || 0)}}>{score}</TableCell>
+            <TableCell align="right">{score?.nextDueDate}</TableCell>
         </TableRow>
     );
 }
 
 export default function WordCountTable({m}: { m: Manager }) {
     const classes = useStyles();
-    const rows = useObs(m.wordsSortedByPopularityDesc$)
+    const rows = useObs(m.scheduleManager.wordsSorted$)
     return (
         <TableContainer component={Paper} style={{flexGrow: 1, overflow: 'auto'}}>
             <Table className={classes.table} aria-label="simple table">
@@ -61,7 +61,7 @@ export default function WordCountTable({m}: { m: Manager }) {
                     <TableRow>
                         <TableCell>Word</TableCell>
                         <TableCell align="right">Count</TableCell>
-                        <TableCell align="right">Recognition Score</TableCell>
+                        <TableCell align="right">Due Date</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

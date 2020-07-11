@@ -33,7 +33,7 @@ export function ShowCharacter({c, m}: QuizCardProps) {
             </Typography>
         </CardContent>
         <CardActions className={classes.buttonBar}>
-            <Button onClick={() => m.quizDialogComponent$.next(CardPictureScreen)}>Next</Button>
+            <Button onClick={() => m.quizManager.currentQuizDialogComponent$.next(CardPictureScreen)}>Next</Button>
         </CardActions>
     </Card>
 }

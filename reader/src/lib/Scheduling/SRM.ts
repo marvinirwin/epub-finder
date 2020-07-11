@@ -11,6 +11,11 @@ export const RecognitionMap = {
     hard: 0
 }
 
+export interface Ret {
+    recognitionScore: number;
+    nextDueDate: Date
+}
+
 export class SRM {
     constructor(
         public intervals = [
@@ -37,11 +42,7 @@ export class SRM {
         previousRows: IWordRecognitionRow[],
         score: number,
         now: Date
-    ): IWordRecognitionRow {
-        const lastRow = previousRows[previousRows.length - 1];
-        if (!lastRow) {
-            throw new Error("Last row is required")
-        }
+    ): Ret {
         const newScoreIsCorrect = score === this.scoreToProgressChange.length - 1;
         if (score > (this.scoreToProgressChange.length - 1)) {
             throw new Error(`Invalid recognition score ${score}`)
@@ -53,7 +54,6 @@ export class SRM {
             dueTimestamp = now.getTime() + this.intervals[previousProgress];
         }
         return {
-            ...lastRow,
             recognitionScore: newProgress >= 0 ? newProgress : 0, // Set the floor at -2
             nextDueDate: new Date(dueTimestamp),
         }

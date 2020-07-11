@@ -42,29 +42,6 @@ class AnkiPackageLoader {
     }
 
     constructor(public name: string, public path: string) {
-/*
-        this.messages$.subscribe(s => ctx.postMessage(`
-            this.receiveDebugMessage(${JSON.stringify(s)});
-        `));
-*/
-/*
-        (async () => {
-            const cards$ = new Subject<ICard>();
-            cards$.pipe(
-                bufferCount(500)
-            ).subscribe(cards => this.sendCards(cards));
-            this.sendMessage("Getting generator")
-
-            const generator: AsyncGenerator<ICard> = await this.getCardGenerator(name);
-            this.sendMessage("Got generator")
-            for await (let c of generator) {
-                cards$.next(c);
-            }
-            this.sendMessage("Finished sending cards")
-            cards$.complete();
-        })()
-*/
-
     }
 
     private async sendCardsToMainThread(cards: ICard[], chunkSize: number) {
@@ -120,12 +97,6 @@ const loaders: AnkiPackageLoader[] = [];
 
 // Respond to message from parent thread
 ctx.onmessage = async (ev) => {
-/*
-    let next = (s: string) =>
-        ctx.postMessage(`
-                this.receiveDebugMessage(${JSON.stringify(new DebugMessage('Worker-database', s))});
-            `);
-*/
 
     const packagePath = ev.data;
 

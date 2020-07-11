@@ -9,14 +9,14 @@ export type QuizCardProps = { c: ICard, m: Manager }
 
 
 export default function QuizDialogContainer({m}: { m: Manager }) {
-    const open = useObs(m.quizDialogComponent$)
-    const quizzingCard = useObs(m.quizzingCard$);
+    const open = useObs(m.quizManager.currentQuizDialogComponent$)
+    const quizzingCard = useObs(m.quizManager.currentQuizItem$);
 
     function close() {
-        m.quizDialogComponent$.next();
+        m.quizManager.currentQuizDialogComponent$.next();
     }
 
-    const Component = useObs(m.quizDialogComponent$);
+    const Component = useObs(m.quizManager.currentQuizDialogComponent$);
 
 
     return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!open}>

@@ -17,7 +17,7 @@ export function CardPictureScreen({c, m}: QuizCardProps) {
             </GridList>
         </CardContent>
         <CardActions>
-            <Button onClick={() => m.quizDialogComponent$.next(EditCardScreen)}>Next</Button>
+            <Button onClick={() => m.quizManager.currentQuizDialogComponent$.next(EditCardScreen)}>Next</Button>
         </CardActions>
     </Card>;
 }

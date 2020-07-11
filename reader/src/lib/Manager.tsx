@@ -1,12 +1,11 @@
 import {combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, flatten, groupBy, orderBy, sortBy, uniq} from "lodash";
+import {Dictionary, flatten, uniq} from "lodash";
 import {
     debounceTime,
     delay,
     filter,
     map,
     pairwise,
-    scan,
     shareReplay,
     startWith,
     switchMap,
@@ -16,13 +15,11 @@ import {
 } from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
 import {SerializedAnkiPackage, UnserializedAnkiPackage} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
-import DebugMessage from "../Debug-Message";
 import {Deck} from "./Interfaces/OldAnkiClasses/Deck";
 import {Collection} from "./Interfaces/OldAnkiClasses/Collection";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
-import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {QuizCardProps} from "../components/QuizPopup";
@@ -30,11 +27,9 @@ import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {WavAudio} from "./WavAudio";
-import {IWordCountRow} from "./Interfaces/IWordCountRow";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
-import {ICountRowEmitted} from "./Interfaces/ICountRowEmitted";
 import {PageManager} from "./Manager/PageManager";
 import {Website} from "./Pages/Website";
 import {createPopper} from "@popperjs/core";
@@ -42,16 +37,14 @@ import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord, getTranslation, NavigationPages} from "./Util/Util";
 import {TextWordData} from "./Atomize/TextWordData";
 import {ShowCharacter} from "../components/Quiz/ShowCharacter";
-import {WordRecognitionManager} from "./Manager/WordRecognitionManager";
+import {ScheduleManager} from "./Manager/ScheduleManager";
+import {IWordRecognitionRow} from "./Scheduling/IWordRecognitionRow";
+import {QuizManager} from "./Manager/QuizManager";
 
 export class Manager {
     atomizedSentences$: Observable<AtomizedSentence[]>;
-    displayVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_observables_visible', false);
-    messagesVisible$: ReplaySubject<boolean> = LocalStored(new ReplaySubject<boolean>(1), 'debug_messages_visible', false);
 
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
-
-    messageBuffer$: Subject<DebugMessage[]> = new Subject<DebugMessage[]>();
 
     currentPackage$: ReplaySubject<UnserializedAnkiPackage | undefined> = new ReplaySubject<UnserializedAnkiPackage | undefined>(undefined);
     currentDeck$: Subject<Deck | undefined> = new Subject<Deck | undefined>();
@@ -66,13 +59,6 @@ export class Manager {
 
     selectionText$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    stringDisplay$: ReplaySubject<string> = new ReplaySubject<string>(1)
-
-    allDebugMessages$: ReplaySubject<DebugMessage> = new ReplaySubject<DebugMessage>();
-
-    wordsSortedByPopularityDesc$: ReplaySubject<WordCountTableRow[]> = new ReplaySubject<WordCountTableRow[]>(1)
-    addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
-
     cardDBManager = new IndexDBManager<ICard>(
         this.db,
         this.db.cards,
@@ -80,38 +66,32 @@ export class Manager {
         (i: number, c: ICard) => ({...c, id: i})
     );
 
-    requestQuizCharacter$: Subject<string> = new Subject<string>();
-    quizzingCard$: ReplaySubject<ICard | undefined> = new ReplaySubject<ICard | undefined>(1);
-    quizDialogComponent$: ReplaySubject<React.FunctionComponent<QuizCardProps>> = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
     queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
     );
 
-    nextQuizItem$: Observable<ICard | undefined>;
-
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
+
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     audioManager: AudioManager;
     cardManager: CardManager;
     pageManager: PageManager;
-    wordRecognitionManager: WordRecognitionManager;
+    scheduleManager: ScheduleManager;
+    quizManager: QuizManager;
 
     renderingInProgress$ = new Subject();
-    textData$: Observable<TextWordData>;
 
-    wordRowDict$!: Observable<Dictionary<WordCountTableRow>>;
-    wordCountDict$!: Observable<Dictionary<number>>;
+    textData$: Observable<TextWordData>;
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
+        this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
-        this.wordRecognitionManager = new WordRecognitionManager(this.db);
+        this.scheduleManager = new ScheduleManager(this.db);
 
-        this.oPackageLoader();
-        this.oMessages();
         this.oEditingCard();
 
         this.pageManager.pageList$.pipe(
@@ -139,41 +119,14 @@ export class Manager {
                 uniq(trie.getWords(false).map(v => v.length))
             );
         }));
+
         this.wordElementMap$ = this.textData$.pipe(map(t => t.wordElementsMap));
-        this.nextQuizItem$ = this.wordsSortedByPopularityDesc$.pipe(
-            switchMap(rows => combineLatest(rows.map(r =>
-                r.lastWordRecognitionRecord$
-                    .pipe(
-                        map(lastRecord => ({
-                                lastRecord,
-                                row: r
-                            })
-                        )
-                    )
-            )).pipe(debounceTime(100)))
-        ).pipe(map(sortedRows => {
-                let oneMinute = 60 * 1000;
-                const oneMinuteAgo = (new Date()).getTime() - oneMinute;
-                // r will be in descending order, so just find the one which has no record, or a record before 1 minute ago
-                return sortedRows.find(({lastRecord, row}) => !lastRecord || lastRecord.timestamp.getTime() < oneMinuteAgo)?.lastRecord?.word
-            }),
-            withLatestFrom(this.cardManager.cardIndex$),
-            map(([char, cardMap]) => {
-                if (!char) return undefined;
-                const cards = cardMap[char] || []
-                return cards[0];
-            })
-        )
 
         this.wordElementMap$.subscribe(wordElementMap => Object
             .values(wordElementMap)
-            .map(
-                elements => elements.forEach(element => this.applyWordElementListener(element))
-            )
+            .map(elements => elements.forEach(element => this.applyWordElementListener(element)))
         )
 
-        this.oStringDisplay();
-        this.oKeyDowns();
 
         this.oScoreAndCount()
         this.oEditWord();
@@ -243,21 +196,6 @@ export class Manager {
 
     private oAnnotations() {
         let previousHighlightedElements: HTMLElement[] | undefined;
-        /*
-                this.bookIndex$.pipe(
-                    switchMap(d =>
-                        combineLatest(Object.values(d).map(d => d.wordTextNodeMap$))
-                    ),
-                    map((elCharMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
-                        const map: Dictionary<IAnnotatedCharacter[]> = {};
-                        elCharMaps.forEach(c => {
-                            mergeWordTextNodeMap(c, map)
-                        })
-                        return map;
-                    })
-                );
-        */
-
 
         this.highlightedWord$.pipe(debounceTime(10),
             withLatestFrom(this.wordElementMap$))
@@ -278,6 +216,32 @@ export class Manager {
     }
 
     private oQuiz() {
+        this.scheduleManager.wordsSorted$
+            .pipe(
+                withLatestFrom(this.cardManager.cardIndex$),
+                map(([rows, cardIndex]) => {
+                    let word = rows[0].word;
+                    return cardIndex[word]?.length ? cardIndex[word][0] : getNewICardForWord(word, '')
+                })
+            ).subscribe(this.quizManager.nextScheduledQuizItem);
+
+        this.quizManager.completedQuizItem$.pipe(withLatestFrom(this.scheduleManager.wordScheduleRowDict$))
+            .subscribe(([scorePair, wordScheduleRowDict]) => {
+                let previousRecords = wordScheduleRowDict[scorePair.word]?.wordRecognitionRecords || [];
+                const ret = this.scheduleManager.ms.getNextRecognitionRecord(
+                    previousRecords,
+                    scorePair.score,
+                    new Date()
+                );
+                this.scheduleManager.addUnpersistedWordRecognitionRows$.next([{
+                    ...ret,
+                    word: scorePair.word,
+                    timestamp: new Date(),
+                    recognitionScore: scorePair.score,
+                }])
+            })
+
+/*
         this.requestQuizCharacter$.pipe(withLatestFrom(this.cardManager.cardIndex$)).subscribe(([char, map]) => {
             if (!map[char]) {
                 throw new Error(`Cannot quiz char ${char} because no ICard found`)
@@ -287,6 +251,7 @@ export class Manager {
             this.quizzingCard$.next(iCard);
             this.quizDialogComponent$.next(ShowCharacter);
         })
+*/
     }
 
     private oEditWord() {
@@ -308,72 +273,7 @@ export class Manager {
             })
     }
 
-    private oKeyDowns() {
-        this.stringDisplay$.next('');
-
-        fromEvent(document, 'keydown').pipe(withLatestFrom(
-            this.displayVisible$,
-            this.messagesVisible$
-        )).subscribe(([ev, display, messages]) => {
-            document.onkeydown = ev => {
-                switch (ev.key) {
-                    case "e":
-                        if (ev.ctrlKey) {
-                            this.displayVisible$.next(!display)
-                        }
-                        break;
-                    case "f":
-                        if (ev.ctrlKey) {
-                            this.messagesVisible$.next(!messages)
-                        }
-                        break;
-                }
-            }
-        })
-    }
-
-    private oStringDisplay() {
-        const observables: Observable<string>[] = [];
-        /*
-                Object.entries(this).forEach(([key, value]) => {
-                    if (key.endsWith('$')) {
-                        const obs: Observable<any> = value;
-                        if (!key.toLowerCase().includes('message') && !key.toLowerCase().includes('display')) {
-                            obs.subscribe(() => this.bookMessages$.next(`${key} fired`))
-                        }
-                        observables.push(
-                            obs.pipe(startWith('Has not emitted'), map(v => {
-                                let str = v;
-                                switch (key) {
-                                    case "currentCards$":
-                                        str = `Length: ${v.length}`;
-                                        break;
-                                    case "currentBook$":
-                                        str = v?.name
-                                        break;
-                                    case "bookDict$":
-                                        // @ts-ignore
-                                        str = Object.values(v).map((v: RenderingBook) => v.name).join(', ')
-                                        break;
-                                    default:
-                                        if (Array.isArray(v)) {
-                                            str = v.join(', ');
-                                        }
-                                }
-                                return `${key} ` + `${str}`.substr(0, 50);
-                            }))
-                        );
-                    }
-                })
-        */
-        combineLatest(observables).pipe(debounceTime(500), map(a => {
-            return a.join("</br>")
-        })).subscribe(this.stringDisplay$);
-    }
-
     private oEditingCard() {
-
-
         this.currentEditingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
             pairwise(),
@@ -408,92 +308,11 @@ export class Manager {
         )
     }
 
-    private oMessages() {
-        this.allDebugMessages$ = new ReplaySubject<DebugMessage>();
-        this.allDebugMessages$.pipe(scan((acc: DebugMessage[], m) => {
-            return [m].concat(acc).slice(0, 100)
-        }, [])).subscribe(this.messageBuffer$);
-
-    }
-
-    private oPackageLoader() {
-        /*
-                const packageLoader: Worker = new AnkiThread();
-                packageLoader.onmessage = v => eval(v.data);
-                [{name: 'Characters', path: '/files/chars.zip'}].forEach(p => {
-                    this.packageMessages$.next(`Requesting Package ${p.name} at ${p.path} `)
-                    packageLoader.postMessage(JSON.stringify(p));
-                });
-        */
-    }
 
     private oScoreAndCount() {
-        this.wordCountDict$ = this.textData$.pipe(
+        this.textData$.pipe(
             map(textData => textData.wordCounts),
-        );
-
-
-        this.wordCountDict$.pipe(scan((oldCounts: Dictionary<number>, newCounts) => {
-            const diffs: IWordCountRow[] = [];
-            const keys = Array.from(new Set([
-                ...Object.keys(oldCounts),
-                ...Object.keys(newCounts)
-            ]));
-            for (let key of keys) {
-                const oldCount = oldCounts[key] || 0;
-                const newCount = newCounts[key] || 0;
-                if (oldCount !== newCount) {
-                    diffs.push({word: key, count: newCount - oldCount, book: ''})
-                }
-            }
-            if (diffs) {
-                this.addWordCountRows$.next(diffs)
-            }
-            return newCounts;
-        }, {})).subscribe(() => console.log()) // HACK, this puts stuff into addWordCountRows
-
-        this.wordRowDict$ = this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
-            const wordCountsGrouped: Dictionary<IWordCountRow[]> = groupBy(newRows, 'word');
-            const newObject = {...acc};
-            Object.entries(wordCountsGrouped).forEach(([word, wordCountRecords]) => {
-                const currentEntry = newObject[word];
-                if (!currentEntry) {
-                    const newRow = new WordCountTableRow(word);
-                    newRow.addCountRecords$.next(wordCountRecords)
-                    newObject[word] = newRow;
-                } else {
-                    currentEntry.addCountRecords$.next(wordCountRecords);
-                }
-            })
-            return newObject;
-        }, {}));
-        this.wordRecognitionManager.addPersistedWordRecognitionRows$.pipe(withLatestFrom(this.wordRowDict$)).subscribe(([newRecognitionRows, rowDict]) => {
-            const group = groupBy(newRecognitionRows, v => v.word);
-            Object.entries(group).forEach(([word, recognitionRows]) => {
-                let rowDictElement = rowDict[word];
-                if (!rowDictElement) {
-                    // TODO handle the case when recognition records are loaded for words which aren't in the dict
-                    return;
-                }
-                rowDictElement.addNewRecognitionRecords$.next(recognitionRows)
-            })
-        })
-        this.wordRowDict$.pipe(
-            map(d => Object.values(d)),
-            switchMap(wordRows =>
-                combineLatest(wordRows.map(r => r.currentCount$.pipe(map(count => ({count, row: r})))))
-            ),
-            map((recs: ICountRowEmitted[]) => orderBy(
-                orderBy(recs, 'recognitionScore', 'desc'), ['count'], 'desc').map(r => r.row))
-        ).subscribe(this.wordsSortedByPopularityDesc$)
-        this.wordRowDict$.pipe(
-            map(dict => sortBy(Object.values(dict), d => d.currentCount$.getValue()))
-        );
-
-    }
-
-    receiveDebugMessage(o: any) {
-        this.allDebugMessages$.next(new DebugMessage(o.prefix, o.message))
+        ).subscribe(this.scheduleManager.wordCountDict$);
     }
 
     receiveSerializedPackage(s: SerializedAnkiPackage) {

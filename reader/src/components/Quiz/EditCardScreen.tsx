@@ -7,14 +7,14 @@ import {QuizCardProps} from "../QuizPopup";
 
 export function EditCardScreen({c, m}: QuizCardProps) {
     function sendWordRec(recognitionScore: number) {
-        m.wordRecognitionManager.addUnpersistedWordRecognitionRows$.next([
+        m.scheduleManager.addUnpersistedWordRecognitionRows$.next([
             {
                 word: c.learningLanguage,
                 timestamp: new Date(),
                 recognitionScore
             }
         ])
-        m.quizDialogComponent$.next()
+        m.quizManager.currentQuizDialogComponent$.next()
     }
 
     const [editingCard, setEditingCard] = useState<EditingCard | null>(null);
