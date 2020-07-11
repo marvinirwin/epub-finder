@@ -25,7 +25,7 @@ import {ICard} from "./Interfaces/ICard";
 import {WordCountTableRow} from "./ReactiveClasses/WordCountTableRow";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
-import {QuizCardProps, ShowCharacter} from "../components/QuizPopup";
+import {QuizCardProps} from "../components/QuizPopup";
 import axios from 'axios';
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
@@ -49,6 +49,7 @@ import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord} from "./Util/Util";
 import {printExecTime} from "./Util/Timer";
 import {TextWordData} from "./Atomize/TextWordData";
+import {ShowCharacter} from "../components/Quiz/ShowCharacter";
 
 export interface ZippedWordRow  {
     recognitionRows: IWordRecognitionRow[];
@@ -496,8 +497,8 @@ export class Manager {
                 ...Object.keys(newCounts)
             ]));
             for (let key of keys) {
-                const oldCount = oldCounts[key];
-                const newCount = newCounts[key];
+                const oldCount = oldCounts[key] || 0;
+                const newCount = newCounts[key] || 0;
                 if (oldCount !== newCount) {
                     diffs.push({word: key, count: newCount - oldCount, book: ''})
                 }
@@ -507,23 +508,6 @@ export class Manager {
             }
             return newCounts;
         }, {})).subscribe(() => console.log()) // HACK, this puts stuff into addWordCountRows
-
-
-/*
-        this.wordPriorityDict$ = combineLatest([
-            this.wordCountDict$,
-            this.recognitionRowDict$
-        ]).pipe(map(([wordCountDict, recognitionRowDict]) => {
-            const newMap: Dictionary<ZippedWordRow> = {};
-            for (let key in wordCountDict) {
-                newMap[key] = {
-                    recognitionRows: recognitionRowDict[key] || [],
-                    count: wordCountDict[key]
-                }
-            }
-            return newMap;
-        }))
-*/
 
         this.wordRowDict$ = this.addWordCountRows$.pipe(scan((acc: Dictionary<WordCountTableRow>, newRows) => {
             const wordCountsGrouped: Dictionary<IWordCountRow[]> = groupBy(newRows, 'word');

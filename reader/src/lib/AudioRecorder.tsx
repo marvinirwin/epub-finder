@@ -156,11 +156,15 @@ export class AudioRecorder {
 
     getRecording(text: string, duration: number): Promise<WavAudio> {
         return new Promise(resolve => {
-            this.recordRequest$.next({
-                label: text,
-                cb: resolve,
-                duration
-            })
+            try {
+                this.recordRequest$.next({
+                    label: text,
+                    cb: resolve,
+                    duration
+                })
+            } catch(e) {
+                console.error(e);
+            }
         })
     }
 }

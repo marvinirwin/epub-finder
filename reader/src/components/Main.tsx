@@ -6,7 +6,7 @@ import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
 import {Manager, NavigationPages} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
-import {TrendsPage} from "./Pages/TrendsPage";
+import {WordCountPage} from "./Pages/WordCountPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
 import {PageContainer} from "./PageContainer";
@@ -40,7 +40,7 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
         case NavigationPages.QUIZ_PAGE:
             return <QuizPage m={m}/>
         case NavigationPages.TRENDS_PAGE:
-            return <TrendsPage m={m}/>
+            return <WordCountPage m={m}/>
         case NavigationPages.READING_PAGE:
             return <ReadingPage m={m}/>
         case NavigationPages.SETTINGS_PAGE:

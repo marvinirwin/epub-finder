@@ -4,7 +4,7 @@ import React, { Fragment } from "react";
 import WordCountTable from "../WordCountTable";
 import QuizDialogContainer from "../QuizPopup";
 
-export function TrendsPage({m}: { m: Manager }) {
+export function WordCountPage({m}: { m: Manager }) {
     return <Fragment>
         <WordCountTable m={m}/>
         <QuizDialogContainer m={m}/>
