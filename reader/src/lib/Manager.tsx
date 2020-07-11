@@ -1,4 +1,4 @@
-import {combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, fromEvent, merge, Observable, of, pipe, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, flatten, uniq} from "lodash";
 import {
     debounceTime,
@@ -40,6 +40,15 @@ import {ShowCharacter} from "../components/Quiz/ShowCharacter";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {IWordRecognitionRow} from "./Scheduling/IWordRecognitionRow";
 import {QuizManager} from "./Manager/QuizManager";
+
+export const resolveICardForWord = (icardMap$: Observable<Dictionary<ICard[]>>) => (obs$: Observable<string>): Observable<ICard> =>
+    obs$.pipe(
+        withLatestFrom(icardMap$),
+        map(([word, cardIndex]: [string, Dictionary<ICard[]>]) => {
+            return cardIndex[word]?.length ? cardIndex[word][0] : getNewICardForWord(word, '')
+        })
+    );
+
 
 export class Manager {
     atomizedSentences$: Observable<AtomizedSentence[]>;
@@ -218,11 +227,9 @@ export class Manager {
     private oQuiz() {
         this.scheduleManager.wordsSorted$
             .pipe(
-                withLatestFrom(this.cardManager.cardIndex$),
-                map(([rows, cardIndex]) => {
-                    let word = rows[0].word;
-                    return cardIndex[word]?.length ? cardIndex[word][0] : getNewICardForWord(word, '')
-                })
+                filter(wordCountTableRows => !!wordCountTableRows.length),
+                map(wordCountTableRows => wordCountTableRows[0]?.word),
+                resolveICardForWord(this.cardManager.cardIndex$)
             ).subscribe(this.quizManager.nextScheduledQuizItem);
 
         this.quizManager.completedQuizItem$.pipe(withLatestFrom(this.scheduleManager.wordScheduleRowDict$))
@@ -240,36 +247,12 @@ export class Manager {
                     recognitionScore: scorePair.score,
                 }])
             })
-
-/*
-        this.requestQuizCharacter$.pipe(withLatestFrom(this.cardManager.cardIndex$)).subscribe(([char, map]) => {
-            if (!map[char]) {
-                throw new Error(`Cannot quiz char ${char} because no ICard found`)
-            }
-
-            const iCard = map[char][0];
-            this.quizzingCard$.next(iCard);
-            this.quizDialogComponent$.next(ShowCharacter);
-        })
-*/
     }
 
     private oEditWord() {
-        this.requestEditWord$.pipe(withLatestFrom(
-            this.cardManager.cardIndex$,
-            this.currentPackage$.pipe(startWith(undefined)),
-            this.currentDeck$.pipe(startWith(undefined)),
-            this.currentCollection$.pipe(startWith(undefined)))
-        )
-            .subscribe(([word, map, ankiPackage, deck, collection]) => {
-                const currentICard = map[word];
-                let iCard: ICard;
-                if (currentICard?.length) {
-                    iCard = currentICard[0];
-                } else {
-                    iCard = getNewICardForWord(word, deck?.name || '');
-                }
-                this.queEditingCard$.next(EditingCard.fromICard(iCard, this.cardDBManager, this))
+        this.requestEditWord$.pipe(resolveICardForWord(this.cardManager.cardIndex$))
+            .subscribe((icard) => {
+                this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
             })
     }
 
@@ -343,12 +326,7 @@ export class Manager {
                 shiftKeyUp$.next(ev);
             }
         };
-        merge(shiftKeyUp$, onMouseUp$)
-            .pipe(withLatestFrom(
-                this.cardManager.cardIndex$
-                ),
-                debounceTime(100)
-            ).subscribe(([event, currentDeck]) => {
+        merge(shiftKeyUp$, onMouseUp$).subscribe(() => {
             const activeEl = document.activeElement;
             if (activeEl) {
                 const selObj = document.getSelection();
