@@ -1,27 +1,25 @@
-import {BehaviorSubject, ReplaySubject} from "rxjs";
-import {scan} from "rxjs/operators";
+import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
+import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
+import assert from "assert";
+import { sumBy } from "lodash";
 
 export class WordCountTableRow {
-    addCountRecords$: ReplaySubject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>(1)
-    addNewRecognitionRecords$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>(1)
-    currentCount$: BehaviorSubject<number> = new BehaviorSubject<number>(1)
-    currentRecognitionScore$: BehaviorSubject<number> = new BehaviorSubject<number>(1)
-    lastWordRecognitionRecord$: ReplaySubject<IWordRecognitionRow | undefined> = new ReplaySubject<IWordRecognitionRow | undefined>(1);
+    wordCountRecords: IWordCountRow[] = [];
     wordRecognitionRecords: IWordRecognitionRow[] = [];
 
+    getCurrentCount(): number {
+        return sumBy(this.wordCountRecords, wordCountRow => wordCountRow.count)
+    }
+    getCurrentDueDate(): Date {
+        return this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
+    }
+    get orderValue() {
+        let number = (new Date()).getTime() - this.getCurrentDueDate().getTime();
+        return number + (number * this.getCurrentCount())
+    }
+
     constructor(public word: string) {
-        this.lastWordRecognitionRecord$.next(undefined);
-        this.addCountRecords$.pipe(scan((acc, newRecords) => {
-            return newRecords.reduce((sum, r) => sum + r.count, 0) + acc;
-        }, 0)).subscribe(this.currentCount$);
-        this.addNewRecognitionRecords$.pipe(scan((acc, newRecords) => {
-            this.wordRecognitionRecords.push(...newRecords);
-            if (newRecords.length) {
-                this.lastWordRecognitionRecord$.next(newRecords[newRecords.length - 1])
-            }
-            return newRecords.reduce((sum, r) => sum + r.recognitionScore, 0) + acc;
-        }, 0)).subscribe(this.currentRecognitionScore$);
     }
 }
