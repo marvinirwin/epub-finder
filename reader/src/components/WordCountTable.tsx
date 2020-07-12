@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import {Manager} from "../lib/Manager";
 import {useObs} from "../lib/UseObs";
 import {WordCountTableRow} from "../lib/ReactiveClasses/WordCountTableRow";
+import moment from "moment";
 
 const useStyles = makeStyles({
     table: {
@@ -34,8 +35,6 @@ function perc2color(perc: number) {
 
 
 function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
-    const score = useObs(row.lastWordRecognitionRecord$);
-    const count = useObs(row.currentCount$);
     return (
         <TableRow key={row.word}>
             <TableCell component="th" scope="row">
@@ -45,8 +44,8 @@ function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
                     {row.word}
                 </div>
             </TableCell>
-            <TableCell align="right">{count}</TableCell>
-            <TableCell align="right">{score?.nextDueDate}</TableCell>
+            <TableCell align="right">{row.getCurrentCount()}</TableCell>
+            <TableCell align="right">{moment(row.getCurrentDueDate()).format('YYYY MM DD')}</TableCell>
         </TableRow>
     );
 }
