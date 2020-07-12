@@ -28,8 +28,8 @@ export class SRM {
         public scoreToProgressChange = [-3, -1, 1]
     ) {
     }
-    private getProgressScore(rows: IWordRecognitionRow[]): number {
-        return rows[rows.length - 1].recognitionScore;
+    private static getProgressScore(rows: IWordRecognitionRow[]): number {
+        return rows[rows.length - 1]?.recognitionScore || 0;
     }
 
     private get maxProgress(): number {
@@ -47,14 +47,14 @@ export class SRM {
         if (score > (this.scoreToProgressChange.length - 1)) {
             throw new Error(`Invalid recognition score ${score}`)
         }
-        const previousProgress = this.getProgressScore(previousRows);
+        const previousProgress = SRM.getProgressScore(previousRows);
         const newProgress = previousProgress + this.scoreToProgressChange[score];
         let dueTimestamp = now.getTime() + 1;
         if (newScoreIsCorrect && newProgress < this.maxProgress) {
             dueTimestamp = now.getTime() + this.intervals[previousProgress];
         }
         return {
-            recognitionScore: newProgress >= 0 ? newProgress : 0, // Set the floor at -2
+            recognitionScore: newProgress >= 0 ? newProgress : 0,
             nextDueDate: new Date(dueTimestamp),
         }
     }

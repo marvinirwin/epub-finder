@@ -6,7 +6,6 @@ import {BottomNav} from "./BottomNav";
 import {PopupElements} from "./PopupElements";
 import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
-import {WordCountPage} from "./Pages/WordCountPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
 import {PageContainer} from "./PageContainer";
@@ -14,6 +13,7 @@ import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSelectPopup";
 import {PageRenderer} from "../lib/Pages/Rendering/PageRenderer";
 import {NavigationPages} from "../lib/Util/Util";
+import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -41,7 +41,7 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
         case NavigationPages.QUIZ_PAGE:
             return <QuizPage m={m}/>
         case NavigationPages.TRENDS_PAGE:
-            return <WordCountPage m={m}/>
+            return <ScheduleTablePage m={m}/>
         case NavigationPages.READING_PAGE:
             return <ReadingPage m={m}/>
         case NavigationPages.SETTINGS_PAGE:

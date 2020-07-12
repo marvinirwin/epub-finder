@@ -1,22 +1,13 @@
-import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {WordCountTableRow} from "../ReactiveClasses/WordCountTableRow";
-import {distinctUntilChanged, map, scan, startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {ICountRowEmitted} from "../Interfaces/ICountRowEmitted";
+import {distinctUntilChanged, map, scan, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
-
-export const WordRecognitionLevels = {
-    "Hard": -3,
-    "Medium": -1,
-    "Easy": 1
-}
-
-// TODO Make thes dynamic so pag
 
 export class ScheduleManager {
     wordsSorted$: Observable<WordCountTableRow[]>;
@@ -35,7 +26,7 @@ export class ScheduleManager {
         this.wordScheduleRowDict$.next({});
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
-        this.ms = new SRM([1, 2, 3, 8, 17], Object.values(WordRecognitionLevels));
+        this.ms = new SRM();
 
         this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
             for (let i = 0; i < rows.length; i++) {

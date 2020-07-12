@@ -22,7 +22,6 @@ import React from "react";
 import {ICard} from "./Interfaces/ICard";
 import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
-import {QuizCardProps} from "../components/QuizPopup";
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
@@ -36,9 +35,7 @@ import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord, getTranslation, NavigationPages} from "./Util/Util";
 import {TextWordData} from "./Atomize/TextWordData";
-import {ShowCharacter} from "../components/Quiz/ShowCharacter";
 import {ScheduleManager} from "./Manager/ScheduleManager";
-import {IWordRecognitionRow} from "./Scheduling/IWordRecognitionRow";
 import {QuizManager} from "./Manager/QuizManager";
 
 export const resolveICardForWord = (icardMap$: Observable<Dictionary<ICard[]>>) => (obs$: Observable<string>): Observable<ICard> =>
@@ -94,6 +91,8 @@ export class Manager {
     renderingInProgress$ = new Subject();
 
     textData$: Observable<TextWordData>;
+
+    setQuizWord$: Subject<string> = new Subject<string>();
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
@@ -200,6 +199,13 @@ export class Manager {
                 this.applySentenceElementSelectListener(s)
             });
         })
+
+        this.setQuizWord$.pipe(
+            resolveICardForWord(this.cardManager.cardIndex$)
+        ).subscribe((icard) => {
+            this.quizManager.setQuizItem(icard);
+        })
+
         this.cardManager.load();
     }
 
@@ -234,6 +240,7 @@ export class Manager {
 
         this.quizManager.completedQuizItem$.pipe(withLatestFrom(this.scheduleManager.wordScheduleRowDict$))
             .subscribe(([scorePair, wordScheduleRowDict]) => {
+                debugger;
                 let previousRecords = wordScheduleRowDict[scorePair.word]?.wordRecognitionRecords || [];
                 const ret = this.scheduleManager.ms.getNextRecognitionRecord(
                     previousRecords,

@@ -7,10 +7,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/UseObs";
-import {WordCountTableRow} from "../lib/ReactiveClasses/WordCountTableRow";
-import moment from "moment";
+import {Manager} from "../../lib/Manager";
+import {useObs} from "../../lib/UseObs";
+import {WordCountRow} from "./ScheduleTableRow";
 
 const useStyles = makeStyles({
     table: {
@@ -33,24 +32,7 @@ function perc2color(perc: number) {
     return '#' + ('000000' + h.toString(16)).slice(-6);
 }
 
-
-function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
-    return (
-        <TableRow key={row.word}>
-            <TableCell component="th" scope="row">
-                <div onClick={() => {
-                    m.quizManager.queuCharacterToBeQuizzed.next(row.word)
-                }}>
-                    {row.word}
-                </div>
-            </TableCell>
-            <TableCell align="right">{row.getCurrentCount()}</TableCell>
-            <TableCell align="right">{moment(row.getCurrentDueDate()).format('YYYY MM DD')}</TableCell>
-        </TableRow>
-    );
-}
-
-export default function WordCountTable({m}: { m: Manager }) {
+export default function ScheduleTable({m}: { m: Manager }) {
     const classes = useStyles();
     const rows = useObs(m.scheduleManager.wordsSorted$)
     return (
