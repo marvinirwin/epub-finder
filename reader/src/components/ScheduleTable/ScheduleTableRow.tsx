@@ -3,7 +3,7 @@ import {Manager} from "../../lib/Manager";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import moment from "moment";
-import React from "react";
+import React, {useRef} from "react";
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
     const classes = useStyles();
+    const ref = useRef();
     return (
         <TableRow key={row.word}>
             <TableCell component="th" scope="row">

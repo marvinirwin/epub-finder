@@ -165,7 +165,7 @@ export class Manager {
         });
 
         this.pageManager.requestRenderPage$.next(
-            new Website('Homework', `${process.env.PUBLIC_URL}/homework.html`)
+            new Website('Police', `${process.env.PUBLIC_URL}/police.htm`)
         );
 
         this.pageManager.pageList$.pipe(
@@ -179,7 +179,7 @@ export class Manager {
                 const hideEvents = ['mouseleave', 'blur'];
                 let attribute = s.getSentenceHTMLElement().getAttribute('popper-id') as string;
                 createPopper(s.getSentenceHTMLElement(), s.getPopperHTMLElement(), {
-                    placement: 'top',
+                    placement: 'top-start',
                 });
 
                 const show = () => {

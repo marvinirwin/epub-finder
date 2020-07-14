@@ -1,5 +1,5 @@
 import {combineLatest, from, Observable, ReplaySubject, Subject} from "rxjs";
-import {concatMap, flatMap, map, mergeMap, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {concatMap, count, flatMap, map, mergeMap, shareReplay, switchMap, take, withLatestFrom} from "rxjs/operators";
 import React from "react";
 import axios from "axios";
 import {WavAudio} from "./WavAudio";
@@ -43,13 +43,14 @@ export const normalizeData = (filteredData: number[]) => {
 }
 
 export class AudioRecorder {
-    recordRequest$ = new ReplaySubject<IRecordRequest>(1);
+    quedRecordRequest$ = new Subject<IRecordRequest>();
+    currentRecordRequest$ = new ReplaySubject<IRecordRequest>(1);
     mediaSource$: Observable<MediaStream>;
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
     isRecording$ = new ReplaySubject<boolean>(1);
-/*
-    userAudio$: Observable<WavAudio | undefined>;
-*/
+    /*
+        userAudio$: Observable<WavAudio | undefined>;
+    */
     countdown$ = new ReplaySubject<number>(1);
     speechRecognitionToken$ = new ReplaySubject<string>(1);
     speechConfig$: Observable<SpeechConfig>;
@@ -57,6 +58,7 @@ export class AudioRecorder {
 
 
     constructor() {
+        this.isRecording$.next(false);
         axios.post(`/speech-recognition-token`).then(result => {
             const token = result.data as string;
             this.speechRecognitionToken$.next(token);
@@ -88,32 +90,55 @@ export class AudioRecorder {
             draw();
         })
 
-        /*this.userAudio$ = */this.recordRequest$.pipe(
+        // TODO test this, this should allow painless premature ending of recordings
+        this.quedRecordRequest$
+            .pipe(withLatestFrom(this.isRecording$))
+            .subscribe(([newRequest, isRecording]) => {
+               if (!isRecording) this.currentRecordRequest$.next(newRequest);
+        })
+
+        this.currentRecordRequest$.pipe(
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
-            flatMap(async args => {
-                for (let i = 0; i <= 3; i++) {
-                    this.countdown$.next(3 - i);
-                    await sleep(500)
-                }
-                return args;
-            }, 1),
-            flatMap(async ([req, source, canvas, speechConfig]: [IRecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
-                this.isRecording$.next(true);
-                const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
-                const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
-                this.speechRecongitionText$.next('');
-                recognizer.recognizeOnceAsync(
-                    (result) => {
-                        this.speechRecongitionText$.next(result.text)
-                        this.isRecording$.next(false);
-                        recognizer.close();
-                    },
-                    function (err) {
-                        console.error(err);
-                        recognizer.close();
-                    });
+            flatMap(([req, source, canvas, speechConfig]: [IRecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
+                return new Promise(async resolve => {
+                    await this.countdown(req.duration + 1500);
+                    this.isRecording$.next(true);
+                    const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
+                    const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+                    const sub = this.quedRecordRequest$.pipe(take(1)).subscribe(r => {
+                        recognizer.close(); // TODO is this how I prematurely stop a recognizeOnceAsync?
+                        audioConfig.close(); // Will this error becauase I also close in the recognizer callbacks?
+                        this.currentRecordRequest$.next(r);
+                    })
+                    this.speechRecongitionText$.next('');
+                    recognizer.recognizeOnceAsync(
+                        (result) => {
+                            this.speechRecongitionText$.next(result.text)
+                            this.isRecording$.next(false);
+                            recognizer.close();
+                            sub.unsubscribe();
+                            resolve();
+                        },
+                        (err) => {
+                            console.error(err);
+                            sub.unsubscribe();
+                            recognizer.close();
+                            this.isRecording$.next(false);
+                            resolve();
+                        });
+                });
             })
-        ).subscribe(() => {})
+        ).subscribe(() => {
+        })
+    }
+
+    private async countdown(duration: number) {
+        let countdownIncrement = 500;
+        let countdownStart = Math.floor((duration + countdownIncrement) / (countdownIncrement));
+        for (let i = 0; i <= countdownStart; i++) {
+            this.countdown$.next(countdownStart - i);
+            await sleep(countdownIncrement)
+        }
     }
 
     private drawSineWave(canvas: HTMLCanvasElement, draw: () => void, analyser: AnalyserNode, dataArray: Uint8Array, canvasCtx: CanvasRenderingContext2D, bufferLength: number) {
@@ -157,12 +182,12 @@ export class AudioRecorder {
     getRecording(text: string, duration: number): Promise<WavAudio> {
         return new Promise(resolve => {
             try {
-                this.recordRequest$.next({
+                this.quedRecordRequest$.next({
                     label: text,
                     cb: resolve,
                     duration
                 })
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         })
@@ -179,35 +204,4 @@ export async function getSynthesizedAudio(text: string): Promise<WavAudio> {
     return new WavAudio(buffer);
 }
 
-export class AudioTest {
-    text$ = new ReplaySubject<string>(1);
-    synthesizedAudio$: Observable<WavAudio>;
-    synthesizedGraphData$: Observable<number[]>
-
-    constructor() {
-        this.synthesizedAudio$ = this.text$.pipe(
-            flatMap(async text => {
-                return await getSynthesizedAudio(text);
-            }),
-            shareReplay(1)
-        );
-        /*
-                this.synthesizedAudio$.subscribe(v => v.el.play())
-                this.userAudioNumbers$ = this.synthesizedAudio$.pipe(
-                    switchMap(
-                        (wav: WavAudio) => {
-                            const rec = new AudioRecorder();
-                            rec.rec(wav.duration$ * 1000 * 2)
-                            return rec.graphData$
-                        }
-                    ),
-                    shareReplay(1)
-                );
-        */
-        this.synthesizedGraphData$ = this.synthesizedAudio$.pipe(
-            switchMap(v => v.graphData$)
-        )
-    }
-
-}
 

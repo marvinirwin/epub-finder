@@ -40,8 +40,8 @@ export default function AudioPopup({m}:{m: Manager}) {
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
 */
     const canvasRef = useRef<HTMLCanvasElement>();
-    const currentAudioRequest = useObs(r.recordRequest$);
-    const retryableAudioRequest = usePipe(r.recordRequest$, o => o.pipe(filter(v => !!v)));
+    const currentAudioRequest = useObs(r.currentRecordRequest$);
+    const retryableAudioRequest = usePipe(r.currentRecordRequest$, o => o.pipe(filter(v => !!v)));
     const recognizedText = useObs(r.speechRecongitionText$);
 
     useEffect(() => {
@@ -74,7 +74,7 @@ export default function AudioPopup({m}:{m: Manager}) {
 */}
             </CardContent>
             <CardActions>
-                <Button disabled={!retryableAudioRequest} onClick={() => r.recordRequest$.next(retryableAudioRequest)}>Retry</Button>
+                <Button disabled={!retryableAudioRequest} onClick={() => r.currentRecordRequest$.next(retryableAudioRequest)}>Retry</Button>
             </CardActions>
         </Card>
     </div>
