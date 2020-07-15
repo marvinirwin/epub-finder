@@ -165,7 +165,7 @@ export class Manager {
         });
 
         this.pageManager.requestRenderPage$.next(
-            new Website('Police', `${process.env.PUBLIC_URL}/police.htm`)
+            new Website('Police', `${process.env.PUBLIC_URL}/story.html`)
         );
 
         this.pageManager.pageList$.pipe(

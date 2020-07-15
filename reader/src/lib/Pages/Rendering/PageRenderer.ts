@@ -23,12 +23,49 @@ export class PageRenderer {
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         let style = $(`
                     <style>
+mark {
+    position: relative;
+    background: transparent;
+}
+mark.highlighted::after {
+    opacity: 1;
+}
+mark::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #a0a0a0;
+    opacity: 0;
+    transition: opacity 250ms;
+    z-index: -1;
+}
+
 mark:hover {
   cursor: pointer;
 }
 
-body {
+.annotated_and_translated {
+    position: relative;
 }
+.annotated_and_translated:hover::after {
+    opacity: 0.15;
+}
+.annotated_and_translated::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #a0a0a0;
+    opacity: 0;
+    transition: opacity 250ms;
+}
+
 .POPPER_ELEMENT {
     background-color: #333;
     color: white;
@@ -46,20 +83,6 @@ body {
 }
 
 
-.annotated_and_translated {
-    transition-duration: 0.5s;
-}
-.annotated_and_translated:hover {
-    background-color: #eaeaea;
-}
-mark {
-    transition-duration: 0.5s;
-    background-color: transparent;
-}
-.highlighted {
-    background-color: #a0a0a0;;
-    font-weight: bolder;
-}
 
 </style>
                     `);
@@ -97,7 +120,7 @@ mark {
                 const iframe = await this.getIFrame(ref);
                 await sleep(500);// If I dont put this wait, the DOM Doesnt fully load and every sentence does get parsed
                 // its weird
-                const body =  iframe.contents().find('body')[0];
+                const body = iframe.contents().find('body')[0];
                 PageRenderer.appendAnnotationStyleToPageBody(body)
                 return body;
             }),
