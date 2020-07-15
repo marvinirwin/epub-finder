@@ -1,6 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
-import {Grid} from "@material-ui/core";
+import {Grid, Slide} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../EditingCard/EditingCardComponent";
@@ -26,13 +26,16 @@ const useStyles = makeStyles((theme) => ({
 export function ReadingPage({m}: { m: Manager }) {
     const classes = useStyles();
     const editingCard = useObs(m.currentEditingCard$);
-
-    return <Grid container>
-        <div className={classes.popup}>
-            {editingCard && <Fragment>
-                <EditingCardComponent card={editingCard}/>
-                <AudioPopup m={m}/>
-            </Fragment>}
-        </div>
-    </Grid>
+    return <div className={classes.popup}>
+        <Slide direction="down" in={!!editingCard}>
+            <div style={{width: '100%', display: 'flex'}}>
+                {
+                    editingCard && <Fragment>
+                        <EditingCardComponent card={editingCard}/>
+                        <AudioPopup m={m}/>
+                    </Fragment>
+                }
+            </div>
+        </Slide>
+    </div>
 }

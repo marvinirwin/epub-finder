@@ -101,29 +101,38 @@ export class AudioRecorder {
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
             flatMap(([req, source, canvas, speechConfig]: [IRecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
                 return new Promise(async resolve => {
+                    function closeRecognition() {
+
+                    }
                     await this.countdown(req.duration + 1500);
                     this.isRecording$.next(true);
                     const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
                     const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+
+                    const close = () => {
+                        this.isRecording$.next(false)
+                        try {
+                            recognizer.close();
+                            audioConfig.close();
+                        } catch(e) {
+                            console.error(e);
+                        }
+                    }
+
                     const sub = this.quedRecordRequest$.pipe(take(1)).subscribe(r => {
-                        recognizer.close(); // TODO is this how I prematurely stop a recognizeOnceAsync?
-                        audioConfig.close(); // Will this error becauase I also close in the recognizer callbacks?
+                        close()
                         this.currentRecordRequest$.next(r);
                     })
                     this.speechRecongitionText$.next('');
                     recognizer.recognizeOnceAsync(
                         (result) => {
                             this.speechRecongitionText$.next(result.text)
-                            this.isRecording$.next(false);
-                            recognizer.close();
-                            sub.unsubscribe();
+                            close()
                             resolve();
                         },
                         (err) => {
                             console.error(err);
-                            sub.unsubscribe();
-                            recognizer.close();
-                            this.isRecording$.next(false);
+                            close()
                             resolve();
                         });
                 });
