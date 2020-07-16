@@ -1,5 +1,5 @@
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Button, Card, CardActions, CardContent, Grid, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
@@ -10,6 +10,7 @@ import MultiGraph from "../MultiGraph";
 import {useObs, usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 import {filter} from "rxjs/operators";
+import {TutorialPopper} from "../Tutorial/TutorialPopover";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -48,9 +49,14 @@ export default function AudioPopup({m}:{m: Manager}) {
         if (canvasRef.current) r.canvas$.next(canvasRef.current)
     }, [canvasRef])
 
-    return <div className={classes.popupParent}>
+    const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
+
+    return <div className={classes.popupParent}  ref={setReferenceElement}>
         <Card>
             <CardContent>
+                <TutorialPopper referenceElement={referenceElement} storageKey={'AUDIO_POPUP'} placement="top">
+                    <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green.  The recognized text should match the pinyin on the flashcard.</Typography>
+                </TutorialPopper>
                 <div className={classes.titleRow}>
                     <div style={{justifySelf: "start"}}>
                         <CountdownCircle r={r}/>

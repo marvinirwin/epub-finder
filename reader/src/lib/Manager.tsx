@@ -165,7 +165,7 @@ export class Manager {
         });
 
         this.pageManager.requestRenderPage$.next(
-            new Website('Police', `${process.env.PUBLIC_URL}/story.html`)
+            new Website('Police', `${process.env.PUBLIC_URL}/homework.html`)
         );
 
         this.pageManager.pageList$.pipe(
@@ -180,6 +180,7 @@ export class Manager {
                 let attribute = s.getSentenceHTMLElement().getAttribute('popper-id') as string;
                 createPopper(s.getSentenceHTMLElement(), s.getPopperHTMLElement(), {
                     placement: 'top-start',
+                    strategy: 'fixed'
                 });
 
                 const show = () => {
