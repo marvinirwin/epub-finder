@@ -35,3 +35,13 @@ export function usePipe<T, J>(obs$: J | undefined, pipeFunc: ((v: J) => Observab
 
     return v;
 }
+
+export function useSub<T>(obs$: T, subFunction: (t$: T) => Subscription) {
+    let sub: Subscription | undefined;
+    useEffect(() => {
+        sub = subFunction(obs$);
+    }, []);
+    return function cleanup() {
+        if (sub) sub.unsubscribe()
+    }
+}

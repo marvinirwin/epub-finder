@@ -16,6 +16,7 @@ export function Conclusion({c, m}: QuizCardProps) {
             word: c.learningLanguage
         })
         m.quizManager.currentQuizDialogComponent$.next()
+
     }
 
     const [editingCard, setEditingCard] = useState<EditingCard | null>(null);

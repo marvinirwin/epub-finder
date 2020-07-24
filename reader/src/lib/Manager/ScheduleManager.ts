@@ -1,4 +1,4 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
@@ -6,11 +6,13 @@ import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {WordCountTableRow} from "../ReactiveClasses/WordCountTableRow";
 import {distinctUntilChanged, map, scan, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
+import {ICard} from "../Interfaces/ICard";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 export class ScheduleManager {
     wordsSorted$: Observable<WordCountTableRow[]>;
+    learningCards$: Observable<WordCountTableRow[]>;
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: Subject<IWordRecognitionRow[]> = new Subject<IWordRecognitionRow[]>();
@@ -18,9 +20,17 @@ export class ScheduleManager {
     nextWordToQuiz$: Observable<string>;
     wordScheduleRowDict$ = new ReplaySubject<Dictionary<WordCountTableRow>>();
 
+    newWordsPerDayLimit$ = new ReplaySubject<number>(1);
+    newWordsList$: Observable<string[]>;
+    overDueWordsList$: Observable<string[]>;
+    // Let's just compute the display here
+
+
     private today: number;
     private yesterday: number;
     ms: SRM;
+    newCards$: Observable<WordCountTableRow[]>;
+    toReviewCards$: Observable<WordCountTableRow[]>;
 
     constructor(public db: MyAppDatabase) {
         this.wordScheduleRowDict$.next({});
@@ -84,6 +94,32 @@ export class ScheduleManager {
             map(wordsSorted => wordsSorted[0]?.word),
             distinctUntilChanged()
         );
+
+        this.newWordsList$ = this.wordsSorted$.pipe(
+            map(words => words.filter(w => {
+                return w.wordRecognitionRecords.length === 0 && w.word;
+            }).map(w => {
+                return w.word;
+            })),
+        )
+
+        this.overDueWordsList$ = this.wordsSorted$.pipe(
+            map(words => words.filter(w => w.getCurrentDueDate() > new Date()).map(w => w.word))
+        )
+
+        this.learningCards$ = this.wordsSorted$.pipe(
+            map(rows => rows.filter(row => row.learning()))
+        )
+        this.newCards$ = this.wordsSorted$.pipe(
+            map(rows => {
+                return rows.filter(row => {
+                    return row.new();
+                });
+            })
+        )
+        this.toReviewCards$ = this.wordsSorted$.pipe(
+            map(rows => rows.filter(row => row.due()))
+        )
 
         this.loadRecognitionRows();
     }

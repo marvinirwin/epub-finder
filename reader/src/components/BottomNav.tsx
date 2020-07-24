@@ -34,9 +34,7 @@ export function BottomNav({m}: { m: Manager }) {
     >
         <BottomNavigationAction label="Read" value={NavigationPages.READING_PAGE} icon={<ChromeReaderMode/>}/>
         <BottomNavigationAction label="Word Frequency" value={NavigationPages.TRENDS_PAGE} icon={<LibraryBooks/>}/>
-{/*
         <BottomNavigationAction label="Quiz" value={NavigationPages.QUIZ_PAGE} icon={<School/>}/>
-*/}
         <BottomNavigationAction label="Settings" value={NavigationPages.SETTINGS_PAGE} icon={<Settings/>}/>
         <TutorialPopper referenceElement={referenceElement} storageKey={'BOTTOM_NAV'} placement="bottom-start">
             <Typography variant="subtitle2">Welcome to the flashcard reader, click or highlight characters and words to get started.</Typography>
