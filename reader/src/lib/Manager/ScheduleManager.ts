@@ -113,7 +113,8 @@ export class ScheduleManager {
         this.newCards$ = this.wordsSorted$.pipe(
             map(rows => {
                 return rows.filter(row => {
-                    return row.new();
+                    let b = row.new();
+                    return b;
                 });
             })
         )

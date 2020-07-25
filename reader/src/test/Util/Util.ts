@@ -48,11 +48,11 @@ export function countFactory(word: string) {
 
 let recognitionIdCounter = 0;
 
-export function recognitionFactory(word: string) {
+export function recognitionFactory(word: string, score?: number) {
     return {
         word,
         timestamp: new Date(),
-        recognitionScore: RecognitionMap.easy,
+        recognitionScore: score || RecognitionMap.easy,
         id: ++recognitionIdCounter
     }
 }

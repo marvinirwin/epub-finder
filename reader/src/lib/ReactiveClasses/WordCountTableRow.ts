@@ -38,9 +38,9 @@ export class WordCountTableRow {
             }
         })
         const lastRecord = this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1];
-        if (!advanceRecord || !lastRecord) return false;
+        if (!advanceRecord && lastRecord) return true;
+        if (!lastRecord || !advanceRecord) return false
         return moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
-
 /*
         const dayStart = moment().startOf('day').unix();
         const dayEnd = moment().endOf('day').unix();
