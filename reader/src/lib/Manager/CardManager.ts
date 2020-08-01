@@ -61,9 +61,7 @@ export default class CardManager {
                 }
                 return cards;
             })
-        ).subscribe(v => {
-            this.addPersistedCards$.next(v);
-        });
+        ).subscribe(this.addPersistedCards$);
     }
     async load() {
         this.cardProcessingSignal$.next(true);

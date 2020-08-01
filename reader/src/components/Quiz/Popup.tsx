@@ -8,7 +8,6 @@ import {DialogContent} from "@material-ui/core";
 export type QuizCardProps = { c: ICard, m: Manager }
 
 export default function QuizDialogContainer({m}: { m: Manager }) {
-    const open = useObs(m.quizManager.currentQuizDialogComponent$)
     const quizzingCard = useObs(m.quizManager.currentQuizItem$);
 
     function close() {
@@ -17,7 +16,7 @@ export default function QuizDialogContainer({m}: { m: Manager }) {
 
     const Component = useObs(m.quizManager.currentQuizDialogComponent$);
 
-    return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!open}>
+    return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!Component}>
         {/*
             <DialogTitle id="customized-dialog-title" onClose={() => m.quizDialogOpen$.next(false)}>
 

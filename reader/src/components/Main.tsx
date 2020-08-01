@@ -11,7 +11,7 @@ import {SettingsPage} from "./Pages/SettingsPage";
 import {PageContainer} from "./PageContainer";
 import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSelectPopup";
-import {PageRenderer} from "../lib/Pages/Rendering/PageRenderer";
+import {PageRenderer} from "../lib/PageRenderer";
 import {NavigationPages} from "../lib/Util/Util";
 import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
 

@@ -4,7 +4,7 @@ import axios from "axios";
 import {ITrendLocation} from "../Interfaces/ITrendLocation";
 import {ITrend} from "../Interfaces/ITwitterTrend";
 
-export function getNewICardForWord(word: string, deck: string) {
+export function getNewICardForWord(word: string, deck: string ='') {
     return {
         learningLanguage: word,
         photos: [],

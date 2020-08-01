@@ -4,18 +4,15 @@ import React from "react";
 import {QuizCardProps} from "../../components/Quiz/Popup";
 import {Characters} from "../../components/Quiz/Characters";
 import {withLatestFrom} from "rxjs/operators";
-import {LocalStorageManager} from "../Storage/StorageManagers";
-import { LocalStored } from "../Storage/LocalStored";
-import {NavigationPages} from "../Util/Util";
 
-export interface ScorePair {
+export interface QuizResult {
     word: string;
     score: number;
 }
 
 export class QuizManager {
     scheduleQuizItemList$ = new ReplaySubject<ICard[]>(1);
-    completedQuizItem$ = new Subject<ScorePair>();
+    completedQuizItem$ = new Subject<QuizResult>();
 
     currentQuizItem$ = new ReplaySubject<ICard | undefined>();
     currentQuizDialogComponent$ = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);

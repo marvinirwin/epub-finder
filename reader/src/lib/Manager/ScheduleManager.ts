@@ -1,36 +1,38 @@
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
-import {WordCountTableRow} from "../ReactiveClasses/WordCountTableRow";
+import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {distinctUntilChanged, map, scan, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
-import {ICard} from "../Interfaces/ICard";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 export class ScheduleManager {
-    wordsSorted$: Observable<WordCountTableRow[]>;
-    learningCards$: Observable<WordCountTableRow[]>;
+
+    private static resolveWordRow(wordRowDict: Dictionary<ScheduleRow>, word: string) {
+        if (!wordRowDict[word]) wordRowDict[word] = new ScheduleRow(word);
+        return wordRowDict[word];
+    }
+
+    wordsSorted$: Observable<ScheduleRow[]>;
+    learningCards$: Observable<ScheduleRow[]>;
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: Subject<IWordRecognitionRow[]> = new Subject<IWordRecognitionRow[]>();
     wordCountDict$: Subject<Dictionary<number>> = new Subject<Dictionary<number>>();
-    nextWordToQuiz$: Observable<string>;
-    wordScheduleRowDict$ = new ReplaySubject<Dictionary<WordCountTableRow>>();
+    nextWordToQuiz$: Observable<string | undefined>;
+    wordScheduleRowDict$ = new ReplaySubject<Dictionary<ScheduleRow>>();
 
     newWordsPerDayLimit$ = new ReplaySubject<number>(1);
     newWordsList$: Observable<string[]>;
-    overDueWordsList$: Observable<string[]>;
-    // Let's just compute the display here
-
 
     private today: number;
     private yesterday: number;
     ms: SRM;
-    newCards$: Observable<WordCountTableRow[]>;
-    toReviewCards$: Observable<WordCountTableRow[]>;
+    newCards$: Observable<ScheduleRow[]>;
+    toReviewCards$: Observable<ScheduleRow[]>;
 
     constructor(public db: MyAppDatabase) {
         this.wordScheduleRowDict$.next({});
@@ -90,10 +92,6 @@ export class ScheduleManager {
             return newCounts;
         }, {})).subscribe(() => console.log())
 
-        this.nextWordToQuiz$ = this.wordsSorted$.pipe(
-            map(wordsSorted => wordsSorted[0]?.word),
-            distinctUntilChanged()
-        );
 
         this.newWordsList$ = this.wordsSorted$.pipe(
             map(words => words.filter(w => {
@@ -103,9 +101,6 @@ export class ScheduleManager {
             })),
         )
 
-        this.overDueWordsList$ = this.wordsSorted$.pipe(
-            map(words => words.filter(w => w.getCurrentDueDate() > new Date()).map(w => w.word))
-        )
 
         this.learningCards$ = this.wordsSorted$.pipe(
             map(rows => rows.filter(row => row.learning()))
@@ -113,21 +108,32 @@ export class ScheduleManager {
         this.newCards$ = this.wordsSorted$.pipe(
             map(rows => {
                 return rows.filter(row => {
-                    let b = row.new();
-                    return b;
+                    return row.new();
                 });
             })
         )
         this.toReviewCards$ = this.wordsSorted$.pipe(
-            map(rows => rows.filter(row => row.due()))
+            map(rows => rows.filter(row => row.toReview()))
         )
 
-        this.loadRecognitionRows();
-    }
+        // First take from the learning
+        // Second take from the overdue
+        // Third take from the new
+        this.nextWordToQuiz$ = combineLatest([
+            this.learningCards$,
+            this.toReviewCards$,
+            this.newCards$
+        ]).pipe(
+            map((args/*[learningCards, toReviewCards, newCards]*/) => {
+                let find = args.find(cardList =>
+                    cardList.length
+                );
+                return find ? find[0].word : undefined
+            }),
+            distinctUntilChanged()
+        );
 
-    private static resolveWordRow(wordRowDict: Dictionary<WordCountTableRow>, word: string) {
-        if (!wordRowDict[word]) wordRowDict[word] = new WordCountTableRow(word);
-        return wordRowDict[word];
+        this.loadRecognitionRows();
     }
 
     private async loadRecognitionRows() {

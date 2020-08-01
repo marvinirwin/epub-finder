@@ -1,6 +1,6 @@
-import {WordCountTableRow} from "../ReactiveClasses/WordCountTableRow";
+import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 
 export interface ICountRowEmitted {
     count: number;
-    row: WordCountTableRow
+    row: ScheduleRow
 }

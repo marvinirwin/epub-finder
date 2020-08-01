@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, flatten, uniq} from "lodash";
+import {Dictionary, uniq} from "lodash";
 import {
     debounceTime,
     delay,
@@ -28,33 +28,21 @@ import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 import {PageManager} from "./Manager/PageManager";
-import {Website} from "./Pages/Website";
+import {Website} from "./Website";
 import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {getNewICardForWord, getTranslation, NavigationPages} from "./Util/Util";
 import {TextWordData} from "./Atomize/TextWordData";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
-import {UserInputManager} from "./Manager/InputManager";
-
-export const resolveICardForWord = (icardMap$: Observable<Dictionary<ICard[]>>) => (obs$: Observable<string>): Observable<ICard> =>
-    obs$.pipe(
-        withLatestFrom(icardMap$),
-        map(([word, cardIndex]: [string, Dictionary<ICard[]>]) => {
-            return cardIndex[word]?.length ? cardIndex[word][0] : getNewICardForWord(word, '')
-        })
-    );
-export const resolveICardForWords = (icardMap$: Observable<Dictionary<ICard[]>>) => (obs$: Observable<string[]>): Observable<ICard[]> =>
-    obs$.pipe(
-        withLatestFrom(icardMap$),
-        map(([words, cardIndex]: [string[], Dictionary<ICard[]>]) => {
-            return words.map(word => cardIndex[word]?.length ? cardIndex[word][0] : getNewICardForWord(word, ''))
-        })
-    );
-
+import {InputManager} from "./Manager/InputManager";
+import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
+import {QuizResultToRecognitionRow} from "./Pipes/QuizResultToRecognitionRow";
+import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
+import {PageUserInput} from "./Manager/ManagerConnections/Page-UserInput";
+import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 
 export class Manager {
-    atomizedSentences$: Observable<AtomizedSentence[]>;
 
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
 
@@ -87,7 +75,7 @@ export class Manager {
     pageManager: PageManager;
     scheduleManager: ScheduleManager;
     quizManager: QuizManager;
-    userInputManager = new UserInputManager();
+    userInputManager = new InputManager();
 
     textData$: Observable<TextWordData>;
 
@@ -99,17 +87,9 @@ export class Manager {
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
 
-        // The distinction between new and overdue is only useful for display
-        // The schedule calculates the actual next quiz item via an aggregate of both
-        this.scheduleManager.overDueWordsList$.pipe(
-            resolveICardForWords(this.cardManager.cardIndex$)
-        ).subscribe(this.quizManager.scheduleQuizItemList$);
-
-        this.scheduleManager.wordsSorted$.pipe(
-            map(rows => rows.map(r => r.word)),
-            resolveICardForWords(this.cardManager.cardIndex$),
-        ).subscribe(this.quizManager.scheduleQuizItemList$);
-
+        CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
+        PageUserInput(this.pageManager, this.userInputManager);
+        CardPage(this.cardManager, this.pageManager);
 
         this.currentEditingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
@@ -144,23 +124,10 @@ export class Manager {
             })
         )
 
-        this.pageManager.pageList$.pipe(
-            switchMap(pageList => merge(...pageList.map(p => p.iframebody$))),
-        ).subscribe(body => {
-            this.userInputManager.applyListeners(body)
-        })
-
-        this.atomizedSentences$ = this.pageManager.pageList$.pipe(
-            switchMap(pageList => merge(
-                ...pageList.map(page => page.atomizedSentences$)
-                ).pipe(map(flatten))
-            )
-        );
-
         this.textData$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.atomizedSentences$.pipe(filter(sentenceList => !!sentenceList.length))
+                this.pageManager.atomizedSentences$.pipe(filter(sentenceList => !!sentenceList.length))
             ]
         ).pipe(map(([trie, atomizedSentences]) => {
             return AtomizedSentence.getTextWordData(
@@ -180,33 +147,12 @@ export class Manager {
         this.textData$.pipe(
             map(textData => textData.wordCounts),
         ).subscribe(this.scheduleManager.wordCountDict$);
-        this.requestEditWord$.pipe(resolveICardForWord(this.cardManager.cardIndex$))
+
+        this.requestEditWord$.pipe(resolveICardForWord<string, ICard>(this.cardManager.cardIndex$))
             .subscribe((icard) => {
                 this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
             })
 
-        this.scheduleManager.wordsSorted$
-            .pipe(
-                map(words => words.map(row => row.word)),
-                resolveICardForWords(this.cardManager.cardIndex$)
-            ).subscribe(this.quizManager.scheduleQuizItemList$);
-
-        this.quizManager.completedQuizItem$.pipe(withLatestFrom(this.scheduleManager.wordScheduleRowDict$))
-            .subscribe(([scorePair, wordScheduleRowDict]) => {
-                debugger;
-                let previousRecords = wordScheduleRowDict[scorePair.word]?.wordRecognitionRecords || [];
-                const ret = this.scheduleManager.ms.getNextRecognitionRecord(
-                    previousRecords,
-                    scorePair.score,
-                    new Date()
-                );
-                this.scheduleManager.addUnpersistedWordRecognitionRows$.next([{
-                    ...ret,
-                    word: scorePair.word,
-                    timestamp: new Date(),
-                    recognitionScore: scorePair.score,
-                }])
-            })
         let previousHighlightedElements: HTMLElement[] | undefined;
 
         this.highlightedWord$.pipe(debounceTime(10),
@@ -224,69 +170,17 @@ export class Manager {
                         });
                     }
                 }
-        );
+            );
 
         this.audioManager = new AudioManager(this)
-
-        this.cardManager.cardProcessingSignal$.pipe(
-            filter(b => !b),
-            delay(100),
-            switchMapTo(this.pageManager.pageList$),
-            switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
-            withLatestFrom(this.cardManager.cardIndex$)
-        ).subscribe(([text, cardIndex]) => {
-            const newCharacterSet = new Set<string>();
-            for (let i = 0; i < text.length; i++) {
-                const textElement = text[i];
-                if (isChineseCharacter(textElement)) {
-                    if (!cardIndex[textElement]) {
-                        newCharacterSet.add(textElement);
-                    }
-                }
-            }
-            const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
-            this.cardManager.addUnpersistedCards$.next(newCards);
-        });
 
         this.pageManager.requestRenderPage$.next(
             new Website('Police', `${process.env.PUBLIC_URL}/homework.html`)
         );
 
-        this.pageManager.pageList$.pipe(
-            switchMap(pageList =>
-                merge(...pageList.map(page => page.atomizedSentences$))
-            ),
-            map(atomizedSentences => atomizedSentences)
-        ).subscribe(atomizedSentences => {
-            atomizedSentences.forEach(s => {
-                const showEvents = ['mouseenter', 'focus'];
-                const hideEvents = ['mouseleave', 'blur'];
-                let attribute = s.getSentenceHTMLElement().getAttribute('popper-id') as string;
-                createPopper(s.getSentenceHTMLElement(), s.getPopperHTMLElement(), {
-                    placement: 'top-start',
-                    strategy: 'fixed'
-                });
-
-                const show = () => {
-                    s.getPopperHTMLElement().setAttribute('data-show', '');
-                }
-                const hide = () => {
-                    (s.getPopperHTMLElement() as unknown as HTMLElement).removeAttribute('data-show');
-                }
-
-                showEvents.forEach(event => {
-                    s.getSentenceHTMLElement().addEventListener(event, show);
-                });
-
-                hideEvents.forEach(event => {
-                    s.getSentenceHTMLElement().addEventListener(event, hide);
-                });
-                this.applySentenceElementSelectListener(s)
-            });
-        })
 
         this.setQuizWord$.pipe(
-            resolveICardForWord(this.cardManager.cardIndex$)
+            resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
         ).subscribe((icard) => {
             this.quizManager.setQuizItem(icard);
         })
@@ -304,16 +198,6 @@ export class Manager {
                         this.addCards$.next(cards);
             */
         }
-    }
-
-    applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
-        annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
-            if (!annotatedElements.translated) {
-                const t = await getTranslation(annotatedElements.sentenceElement.textContent)
-                annotatedElements.translated = true;
-                return annotatedElements.popperElement.textContent = t;
-            }
-        };
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

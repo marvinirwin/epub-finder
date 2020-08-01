@@ -5,6 +5,9 @@ import {map, skip, take} from "rxjs/operators";
 import moment from "moment";
 import {countFactory, Marbles} from "./Util/Util";
 import {TestScheduler} from "rxjs/testing";
+import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
+import {createDiffieHellman} from "crypto";
+import {ScheduleRow} from "../lib/ReactiveClasses/ScheduleRow";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -17,28 +20,24 @@ it('Creates a table row for an unpersisted recognitionRow and gives it a due dat
             expect(actual).toEqual(expected);
         }
     });
-    testScheduler.run(({cold, hot, expectObservable, expectSubscriptions}) => {
+    testScheduler.run((helpers) => {
         const scheduleManager = new ScheduleManager(db);
-        const sortedRowsWordsMarbles = new Marbles();
-        const countMarbles = new Marbles();
-        countMarbles.push([
+        const sortedRowsWordsMarbles = Marbles.new<string[]>(helpers)
+            .setExpectedObservable(scheduleManager.newCards$.pipe(map(scheduleRows => scheduleRows.map(w => w.word))));
+        const countMarbles = Marbles.new<IWordCountRow[]>(helpers)
+            .setTargetSubject(scheduleManager.addWordCountRows$);
+        countMarbles.addValue([
             countFactory('你好'),
             countFactory('今天'),
         ])
-        sortedRowsWordsMarbles.push(
+        sortedRowsWordsMarbles.addValue(
             []
             ,[
                 '你好',
                 '今天'
             ]
         );
-        hot(
-            countMarbles.getMarbles(),
-            countMarbles.values
-        ).subscribe(scheduleManager.addWordCountRows$);
-
-        expectObservable(
-            scheduleManager.newCards$.pipe(map(wordsList => wordsList.map(word => word.word)))
-        ).toBe(sortedRowsWordsMarbles.getMarbles(), sortedRowsWordsMarbles.values)
+        sortedRowsWordsMarbles.done();
+        countMarbles.done()
     })
 })

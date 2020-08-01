@@ -4,7 +4,7 @@ import {Manager} from "../lib/Manager";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {withStyles} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {PageRenderer} from "../lib/Pages/Rendering/PageRenderer";
+import {PageRenderer} from "../lib/PageRenderer";
 
 const useStyles = makeStyles((theme) => ({
     collapse: {

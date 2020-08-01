@@ -1,7 +1,9 @@
 import {fromEvent, merge, Subject} from "rxjs";
 import { Dictionary } from "lodash";
+import {AtomizedSentence} from "../Atomize/AtomizedSentence";
+import {getTranslation} from "../Util/Util";
 
-export class UserInputManager {
+export class InputManager {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     selectedText$: Subject<string> = new Subject<string>();
@@ -34,5 +36,15 @@ export class UserInputManager {
     getKeyUpSubject(key: string) {
         if (!this.keyupMap[key]) this.keyupMap[key] = new Subject<KeyboardEvent>()
         return this.keyupMap[key];
+    }
+
+    public static applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
+        annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
+            if (!annotatedElements.translated) {
+                const t = await getTranslation(annotatedElements.sentenceElement.textContent)
+                annotatedElements.translated = true;
+                return annotatedElements.popperElement.textContent = t;
+            }
+        };
     }
 }

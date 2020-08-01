@@ -1,4 +1,4 @@
-import {WordCountTableRow} from "../../lib/ReactiveClasses/WordCountTableRow";
+import {ScheduleRow} from "../../lib/ReactiveClasses/ScheduleRow";
 import {Manager} from "../../lib/Manager";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export function WordCountRow({row, m}: { row: WordCountTableRow, m: Manager }) {
+export function WordCountRow({row, m}: { row: ScheduleRow, m: Manager }) {
     const classes = useStyles();
     const ref = useRef();
     return (

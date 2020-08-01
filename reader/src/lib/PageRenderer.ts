@@ -2,15 +2,15 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary, uniq} from "lodash";
 import {flatMap, map, share, shareReplay} from "rxjs/operators";
-import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
-import {printExecTime} from "../../Util/Timer";
-import {waitFor} from "../../Util/waitFor";
-import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
-import {IWordCountRow} from "../../Interfaces/IWordCountRow";
-import {ANNOTATE_AND_TRANSLATE} from "../../Atomize/AtomizedDocument";
-import {AtomizedSentence} from "../../Atomize/AtomizedSentence";
-import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
-import {sleep} from "../../Util/Util";
+import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
+import {printExecTime} from "./Util/Timer";
+import {waitFor} from "./Util/waitFor";
+import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
+import {IWordCountRow} from "./Interfaces/IWordCountRow";
+import {ANNOTATE_AND_TRANSLATE} from "./Atomize/AtomizedDocument";
+import {AtomizedSentence} from "./Atomize/AtomizedSentence";
+import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
+import {sleep} from "./Util/Util";
 
 
 export class PageRenderer {

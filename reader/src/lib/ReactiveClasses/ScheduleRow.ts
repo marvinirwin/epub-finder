@@ -6,7 +6,7 @@ import assert from "assert";
 import {sumBy, orderBy} from "lodash";
 import moment from "moment";
 
-export class WordCountTableRow {
+export class ScheduleRow {
     wordCountRecords: IWordCountRow[] = [];
     wordRecognitionRecords: IWordRecognitionRow[] = [];
 
@@ -18,29 +18,38 @@ export class WordCountTableRow {
         return this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
     }
 
-    due() {
-        return this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1]?.nextDueDate?.getTime() || 0
-            > (new Date()).getTime()
+    toReview() {
+        // To review are those cards which are past due date, but not learning
+        let learning = this.learning();
+        if (learning) return false;
+        return this.getCurrentDueDate().getTime() < (new Date().getTime());
     }
+
     new() {
         return this.wordRecognitionRecords.length === 0;
     }
 
     learning() {
         // Learning records are those whose advance record is on a different day than the last review
+        // Or they just have review records and no advance record
+
         // The "advance record" is a record which has a change in recognitionScore
-        const sortedRecords = orderBy(this.wordRecognitionRecords, 'timestmap', 'desc');
+        const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestmap', 'desc');
         let previousRecord: IWordRecognitionRow | undefined;
-        const advanceRecord = sortedRecords.find(nextRecord => {
-            if (!previousRecord) previousRecord = nextRecord;
+        const advanceRecord = mostRecentRecordsFirst.find(nextRecord => {
+            if (!previousRecord) {
+                previousRecord = nextRecord;
+            }
             else {
                 return previousRecord.recognitionScore < nextRecord.recognitionScore
             }
         })
         const lastRecord = this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1];
         if (!advanceRecord && lastRecord) return true;
-        if (!lastRecord || !advanceRecord) return false
-        return moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
+        // No last record and no
+        if (!lastRecord || !advanceRecord) return false;
+        if (lastRecord === advanceRecord) return false;
+        return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
 /*
         const dayStart = moment().startOf('day').unix();
         const dayEnd = moment().endOf('day').unix();
