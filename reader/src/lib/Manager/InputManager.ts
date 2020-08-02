@@ -29,7 +29,7 @@ export class InputManager {
         root.onmouseup = checkForSelectedText
         this.getKeyUpSubject("Shift").subscribe(checkForSelectedText)
     }
-    getKeyDownSubject(key: string) {
+    getKeyDownSubject(key: string): Subject<KeyboardEvent> {
         if (!this.keydownMap[key]) this.keydownMap[key] = new Subject<KeyboardEvent>()
         return this.keydownMap[key];
     }

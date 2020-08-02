@@ -39,8 +39,9 @@ import {InputManager} from "./Manager/InputManager";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {QuizResultToRecognitionRow} from "./Pipes/QuizResultToRecognitionRow";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
-import {PageUserInput} from "./Manager/ManagerConnections/Page-UserInput";
+import {InputPage} from "./Manager/ManagerConnections/Input-Page";
 import {CardPage} from "./Manager/ManagerConnections/Card-Page";
+import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 
 export class Manager {
 
@@ -75,7 +76,7 @@ export class Manager {
     pageManager: PageManager;
     scheduleManager: ScheduleManager;
     quizManager: QuizManager;
-    userInputManager = new InputManager();
+    inputManager = new InputManager();
 
     textData$: Observable<TextWordData>;
 
@@ -88,8 +89,9 @@ export class Manager {
         this.scheduleManager = new ScheduleManager(this.db);
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
-        PageUserInput(this.pageManager, this.userInputManager);
+        InputPage(this.inputManager, this.pageManager);
         CardPage(this.cardManager, this.pageManager);
+        InputQuiz(this.inputManager, this.quizManager)
 
         this.currentEditingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
@@ -185,7 +187,7 @@ export class Manager {
             this.quizManager.setQuizItem(icard);
         })
 
-        this.userInputManager.getKeyDownSubject("Escape").subscribe(() => this.queEditingCard$.next(undefined))
+        this.inputManager.getKeyDownSubject("Escape").subscribe(() => this.queEditingCard$.next(undefined))
 
         this.cardManager.load();
     }

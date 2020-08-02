@@ -8,10 +8,10 @@ import {quizStyles} from "./QuizStyles";
 import {useSub} from "../../lib/UseObs";
 import {Observable} from "rxjs";
 
-export function CardPictureScreen({c, m}: QuizCardProps) {
+export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
     const advance = () => m.quizManager.currentQuizDialogComponent$.next(Conclusion);
-    useSub(m.userInputManager.getKeyDownSubject("Space"), (o$: Observable<any>) => o$.subscribe(advance));
+    useSub(m.inputManager.getKeyDownSubject("Space"), (o$: Observable<any>) => o$.subscribe(advance));
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
             <GridList className={classes.center}>

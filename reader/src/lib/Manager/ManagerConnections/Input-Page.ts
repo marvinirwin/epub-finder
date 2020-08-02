@@ -3,7 +3,7 @@ import {InputManager} from "../InputManager";
 import {switchMap} from "rxjs/operators";
 import {merge} from "rxjs";
 
-export function PageUserInput(p: PageManager, u: InputManager) {
+export function InputPage(u: InputManager, p: PageManager) {
     p.pageList$.pipe(
         switchMap(pageList => merge(...pageList.map(p => p.iframebody$))),
     ).subscribe(body => {

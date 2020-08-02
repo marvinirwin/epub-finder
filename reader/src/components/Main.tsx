@@ -57,7 +57,7 @@ export function Main({s}: { s: AppSingleton }) {
     const item = useObs(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
-        m.userInputManager.applyListeners(document.body);
+        m.inputManager.applyListeners(document.body);
     }, [m]);
     const pages = useObs<Dictionary<PageRenderer>>(m.pageManager.pageIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
@@ -67,7 +67,8 @@ export function Main({s}: { s: AppSingleton }) {
             position: 'absolute',
             height: '90vh',
             width: '100vw',
-            top: iframeVisible ? 0 : '9000px'
+            top: iframeVisible ? 0 : '9000px',
+            overflow: 'hidden'
         }}>
             {Object.values(pages || {}).map(page => <PageContainer m={m} key={page.name} rb={page}/>)}
         </div>
