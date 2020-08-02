@@ -18,7 +18,7 @@ export class ScheduleManager {
         return wordRowDict[word];
     }
 
-    wordsSorted$: Observable<ScheduleRow[]>;
+    sortedScheduleRows: Observable<ScheduleRow[]>;
     learningCards$: Observable<ScheduleRow[]>;
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>();
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
@@ -42,10 +42,10 @@ export class ScheduleManager {
         this.yesterday = this.today - 1;
         this.ms = new SRM();
 
-        this.addUnpersistedWordRecognitionRows$.subscribe((async rows => {
+        this.addUnpersistedWordRecognitionRows$.subscribe((rows => {
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                row.id = await this.db.recognitionRecords.add(row);
+                this.db.recognitionRecords.add(row).then(id => row.id = id);
             }
             this.addPersistedWordRecognitionRows$.next(rows);
         }));
@@ -69,7 +69,7 @@ export class ScheduleManager {
             this.wordScheduleRowDict$.next(wordRowDict);
         })
 
-        this.wordsSorted$ = this.wordScheduleRowDict$.pipe(
+        this.sortedScheduleRows = this.wordScheduleRowDict$.pipe(
             map(dict =>
                 orderBy(Object.values(dict), ['orderValue'], ['desc'])
             )
@@ -95,7 +95,7 @@ export class ScheduleManager {
         }, {})).subscribe(() => console.log())
 
 
-        this.newWordsList$ = this.wordsSorted$.pipe(
+        this.newWordsList$ = this.sortedScheduleRows.pipe(
             map(words => words.filter(w => {
                 return w.wordRecognitionRecords.length === 0 && w.word;
             }).map(w => {
@@ -104,17 +104,17 @@ export class ScheduleManager {
         )
 
 
-        this.learningCards$ = this.wordsSorted$.pipe(
+        this.learningCards$ = this.sortedScheduleRows.pipe(
             map(rows => rows.filter(row => row.learning()))
         )
-        this.newCards$ = this.wordsSorted$.pipe(
+        this.newCards$ = this.sortedScheduleRows.pipe(
             map(rows => {
                 return rows.filter(row => {
                     return row.new();
                 });
             })
         )
-        this.toReviewCards$ = this.wordsSorted$.pipe(
+        this.toReviewCards$ = this.sortedScheduleRows.pipe(
             map(rows => rows.filter(row => row.toReview()))
         )
 

@@ -11,7 +11,7 @@ import QuizStatsHeader from "./QuizStatsHeaders";
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    let advance = () => m.quizManager.currentQuizDialogComponent$.next(Pictures);
+    let advance = () => m.quizManager.quizzingComponent$.next(Pictures);
     useSub(m.inputManager.getKeyDownSubject("Space"), (o$: Observable<any>) => o$.subscribe(advance));
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>

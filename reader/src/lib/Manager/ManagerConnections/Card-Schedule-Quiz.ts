@@ -1,6 +1,6 @@
 import {ScheduleManager} from "../ScheduleManager";
 import {QuizManager} from "../QuizManager";
-import {filter, map, shareReplay, startWith, withLatestFrom} from "rxjs/operators";
+import {filter, map, shareReplay, startWith, take, withLatestFrom} from "rxjs/operators";
 import CardManager from "../CardManager";
 import {resolveICardForWord} from "../../Pipes/ResolveICardForWord";
 import {ICard} from "../../Interfaces/ICard";
@@ -12,12 +12,16 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
         resolveICardForWord<string | undefined, ICard | undefined>(c.cardIndex$),
         shareReplay(1),
     );
-    combineLatest([
-        nextCardToQuiz$,
-        q.currentQuizItem$.pipe(startWith(undefined))
-    ]).subscribe(([nextScheduledQuizItem, currentQuizItem]) => {
-        if (!currentQuizItem && nextScheduledQuizItem) {
-            q.setQuizItem(nextScheduledQuizItem);
+    q.quizzingCard$.pipe(withLatestFrom(nextCardToQuiz$)).subscribe(([currentQuizItem, nextCardToQuiz]) => {
+        if (!currentQuizItem && nextCardToQuiz) {
+            q.setQuizItem(nextCardToQuiz);
+        }
+    });
+    nextCardToQuiz$.pipe(
+        withLatestFrom(q.quizzingCard$.pipe(startWith(undefined)))
+    ).subscribe(([nextCardToQuiz, currentQuizItem]) => {
+        if (!currentQuizItem && nextCardToQuiz) {
+            q.setQuizItem(nextCardToQuiz);
         }
     })
 }

@@ -24,14 +24,14 @@ it('Takes scheduleRows and puts them into the quizManager currentQuizItems', () 
                 addCountRecords: Marbles.new<IWordCountRow[]>(helpers)
                     .setTargetSubject(scheduleManager.addWordCountRows$),
 
-                currentQuizItem: Marbles.new<ICard | undefined>(helpers)
-                    .setExpectedObservable(quizManager.currentQuizItem$),
+                quizWord: Marbles.new<ICard | undefined>(helpers)
+                    .setExpectedObservable(quizManager.quizzingCard$),
             },
         );
         m.tick({
             addPersistedCards: [[getNewICardForWord('你好')]],
             addCountRecords: [[countFactory('你好')]],
-            currentQuizItem: getNewICardForWord('你好')
+            quizWord: getNewICardForWord('你好')
         });
         m.done();
     })

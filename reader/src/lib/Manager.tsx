@@ -80,7 +80,7 @@ export class Manager {
 
     textData$: Observable<TextWordData>;
 
-    setQuizWord$: Subject<string> = new Subject<string>();
+    setQuizWord: Subject<string> = new Subject<string>();
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
@@ -181,7 +181,7 @@ export class Manager {
         );
 
 
-        this.setQuizWord$.pipe(
+        this.setQuizWord.pipe(
             resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
         ).subscribe((icard) => {
             this.quizManager.setQuizItem(icard);

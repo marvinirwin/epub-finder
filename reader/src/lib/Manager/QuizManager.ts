@@ -13,46 +13,40 @@ export interface QuizResult {
 }
 
 export type QuizComponent = React.FunctionComponent<QuizCardProps>
+
 export class QuizManager {
-    scheduleQuizItemList$ = new ReplaySubject<ICard[]>(1);
-    completedQuizItem$ = new Subject<QuizResult>();
 
-    currentQuizItem$ = new ReplaySubject<ICard | undefined>(1);
-    currentQuizDialogComponent$ = new ReplaySubject<QuizComponent>(1);
-
-    advanceQuiz$ = new Subject();
+    quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
+    quizzingComponent$ = new ReplaySubject<QuizComponent>(1);
+    quizResult$ = new Subject<QuizResult>();
+    advanceQuizStage$ = new Subject();
 
 
-    constructor() {}
-
-    setQuizItem(icard: ICard) {
-        this.currentQuizItem$.next(icard);
-        this.currentQuizDialogComponent$.next(Characters)
-            this.currentQuizItem$.pipe(withLatestFrom(this.scheduleQuizItemList$)).subscribe(([item, nextScheduledItems]) => {
-                if (!item) {
-                    this.currentQuizItem$.next(nextScheduledItems[0])
-                }
-            })
-
-        this.advanceQuiz$.pipe(
-            withLatestFrom(this.currentQuizDialogComponent$)
+    constructor() {
+        this.advanceQuizStage$.pipe(
+            withLatestFrom(this.quizzingComponent$)
         ).subscribe(([, currentDialogComponent]) => {
-            switch(currentDialogComponent) {
+            switch (currentDialogComponent) {
                 case Characters:
-                    this.currentQuizDialogComponent$.next(Pictures)
+                    this.quizzingComponent$.next(Pictures)
                     break;
                 case Pictures:
-                    this.currentQuizDialogComponent$.next(Conclusion)
+                    this.quizzingComponent$.next(Conclusion)
             }
         })
     }
 
-    sendWordRec(word: string, recognitionScore: number) {
-        this.completedQuizItem$.next({
+    setQuizItem(icard: ICard | undefined) {
+        this.quizzingCard$.next(icard);
+        this.quizzingComponent$.next(icard ? Characters : undefined)
+    }
+
+    completeQuiz(word: string, recognitionScore: number) {
+        this.quizResult$.next({
             score: recognitionScore,
             word
         })
-        this.currentQuizDialogComponent$.next()
+        this.setQuizItem(undefined);
     }
 
 }

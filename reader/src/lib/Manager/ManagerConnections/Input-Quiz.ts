@@ -11,7 +11,7 @@ export function InputQuiz(i: InputManager, q: QuizManager) {
     const advanceSet = new Set<QuizComponent>([Characters, Pictures]);
     const conclusionSet = new Set<QuizComponent>([Conclusion]);
     const componentFilterPipe = (set: Set<QuizComponent>) => (o1$: Observable<any>): Observable<[KeyboardEvent, QuizComponent]> => o1$.pipe(
-        withLatestFrom(q.currentQuizDialogComponent$),
+        withLatestFrom(q.quizzingComponent$),
         filter(([keydownEvent, component]) => {
 
             return set.has(component);
@@ -22,10 +22,10 @@ export function InputQuiz(i: InputManager, q: QuizManager) {
         i.getKeyDownSubject(key)
             .pipe(
                 componentFilterPipe(conclusionSet),
-                withLatestFrom(q.currentQuizItem$)
+                withLatestFrom(q.quizzingCard$)
             ) .subscribe(([[event], item]) => {
                 event.preventDefault();
-                q.sendWordRec(item?.learningLanguage as string, difficulty)
+                q.completeQuiz(item?.learningLanguage as string, difficulty)
 
             })
     }
@@ -34,7 +34,7 @@ export function InputQuiz(i: InputManager, q: QuizManager) {
         .pipe(componentFilterPipe(advanceSet))
         .subscribe(([event]) => {
             event.preventDefault();
-            q.advanceQuiz$.next();
+            q.advanceQuizStage$.next();
         });
 
     listen('3', RecognitionMap.easy);

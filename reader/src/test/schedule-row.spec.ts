@@ -10,8 +10,6 @@ import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {HotObservable} from "rxjs/internal/testing/HotObservable";
 import moment from "moment";
 import {IWordRecognitionRow} from "../lib/Scheduling/IWordRecognitionRow";
-import {ScheduleQuiz} from "../lib/Manager/ManagerConnections/Schedule-Quiz";
-import {CardScheduleQuiz} from "../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -66,7 +64,7 @@ it('Sorts cards into New and out ofn ew', () => {
         const scheduleManager = new ScheduleManager(db);
         const quizManager = new QuizManager();
         const addQuizResultMarbles = Marbles.new<QuizResult>(helpers)
-            .setTargetSubject(quizManager.completedQuizItem$);
+            .setTargetSubject(quizManager.quizResult$);
         const addCountMarbles = Marbles.new<IWordCountRow[]>(helpers);
         const expectNewCardsMarbels = Marbles.new<number>(helpers)
             .setExpectedObservable(scheduleManager.newCards$.pipe(map(wordsList => wordsList.length)));
@@ -113,7 +111,7 @@ it('Sorts cards into To Review and out of To Review', () => {
         const {hot, expectObservable} = helpers;
         const scheduleManager = new ScheduleManager(db);
         const quizManager = new QuizManager();
-        const addQuizResultMarbles = Marbles.new<QuizResult>(helpers).setTargetSubject(quizManager.completedQuizItem$);
+        const addQuizResultMarbles = Marbles.new<QuizResult>(helpers).setTargetSubject(quizManager.quizResult$);
         const addCountMarbles = Marbles.new<IWordCountRow[]>(helpers).setTargetSubject(scheduleManager.addWordCountRows$);
         const expectToReviewMarbles = Marbles.new<number>(helpers).setExpectedObservable(scheduleManager.toReviewCards$.pipe(map(wordsList => wordsList.length)));
         const wordRecognitionRows = Marbles.new<IWordRecognitionRow[]>(helpers).setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);

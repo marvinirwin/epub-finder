@@ -34,7 +34,7 @@ function perc2color(perc: number) {
 
 export default function ScheduleTable({m}: { m: Manager }) {
     const classes = useStyles();
-    const rows = useObs(m.scheduleManager.wordsSorted$)
+    const rows = useObs(m.scheduleManager.sortedScheduleRows)
     return (
         <TableContainer component={Paper} style={{flexGrow: 1, overflow: 'auto'}}>
             <Table className={classes.table} aria-label="simple table">

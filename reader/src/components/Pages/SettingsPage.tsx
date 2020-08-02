@@ -7,8 +7,8 @@ export function SettingsPage({m}: { m: Manager }) {
     const cardMap = useObs(m.cardManager.cardIndex$);
     const wordElMap = useObs(m.wordElementMap$);
     const highlightedWord = useObs(m.highlightedWord$);
-    const scheduleRows = usePipe(m.scheduleManager.wordsSorted$, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
-    const currentQuizWord = useObs(m.quizManager.currentQuizItem$)
+    const scheduleRows = usePipe(m.scheduleManager.sortedScheduleRows, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
+    const currentQuizWord = useObs(m.quizManager.quizzingCard$)
     const nextQuizWord = useObs(m.scheduleManager.nextWordToQuiz$)
     return <div>
         <div>Schedule Rows: {scheduleRows}</div>

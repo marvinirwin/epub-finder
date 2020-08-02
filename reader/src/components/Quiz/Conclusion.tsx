@@ -21,9 +21,9 @@ export function Conclusion({c, m}: QuizCardProps) {
             <EditingCardComponent card={editingCard}/>
         </CardContent>
         <CardActions className={classes.cardActions}>
-            <Button onClick={() => m.quizManager.sendWordRec(c.learningLanguage, RecognitionMap.hard)}>Hard</Button>
-            <Button onClick={() => m.quizManager.sendWordRec(c.learningLanguage,RecognitionMap.medium)}>Medium</Button>
-            <Button onClick={() => m.quizManager.sendWordRec(c.learningLanguage,RecognitionMap.easy)}>Easy</Button>
+            <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.hard)}>Hard</Button>
+            <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage,RecognitionMap.medium)}>Medium</Button>
+            <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage,RecognitionMap.easy)}>Easy</Button>
         </CardActions>
     </Card> : <div/>;
 }

@@ -22,7 +22,7 @@ export function WordCountRow({row, m}: { row: ScheduleRow, m: Manager }) {
         <TableRow key={row.word}>
             <TableCell component="th" scope="row">
                 <Button className={classes.quizButton} onClick={() => {
-                    m.setQuizWord$.next(row.word)
+                    m.setQuizWord.next(row.word)
                 }}>
                     {row.word}
                 </Button>

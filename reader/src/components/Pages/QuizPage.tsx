@@ -1,10 +1,11 @@
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
 import React from "react";
-import {DialogContent} from "@material-ui/core";
 
 export function QuizPage({m}: { m: Manager }) {
-    const Component = useObs(m.quizManager.currentQuizDialogComponent$);
-    const quizzingCard = useObs(m.quizManager.currentQuizItem$);
-    return Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : <div></div>
+    const Component = useObs(m.quizManager.quizzingComponent$);
+    const quizzingCard = useObs(m.quizManager.quizzingCard$);
+    return <div style={{height: '100%'}}>
+        {Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : ''}
+    </div>
 }

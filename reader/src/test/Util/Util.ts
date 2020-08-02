@@ -17,6 +17,8 @@ export function getAtomizedSentences(paths: string) {
         .getAtomizedSentences();
 }
 
+export type Subscriber<U> = Subject<U> | ((v: U) => any);
+
 export class Marbles<T, U = T> {
     static new<A, B = A>(helpers: RunHelpers) {
         return new Marbles<A, B>(helpers)
@@ -26,7 +28,7 @@ export class Marbles<T, U = T> {
     private currentLetter = 'a';
     private marbles: string[] = [];
     private pipe: ((o$: Observable<T>) => Observable<U>) | undefined;
-    private subject$: Subject<U> | undefined;
+    private subject$: Subscriber<U> | undefined;
     private observable$: Observable<T> | undefined;
     constructor(
         public helpers: RunHelpers,
@@ -36,7 +38,7 @@ export class Marbles<T, U = T> {
         this.pipe = p;
         return this;
     }
-    setTargetSubject(s: Subject<U>) {
+    setTargetSubject(s: Subscriber<U>) {
         this.subject$ = s;
         return this;
     }
@@ -66,6 +68,7 @@ export class Marbles<T, U = T> {
     done() {
         if (this.subject$) {
             if (this.pipe) {
+                // @ts-ignore
                 this.helpers.hot(this.getMarbles(), this.values).pipe(this.pipe).subscribe(this.subject$);
             } else {
                 // @ts-ignore
@@ -84,10 +87,10 @@ export function incLetter(l: string) {
     return String.fromCharCode(l.charCodeAt(0) + 1);
 }
 
-export function countFactory(word: string) {
+export function countFactory(word: string, n=1) {
     return {
         word,
-        count: 1,
+        count: n,
         book: ''
     }
 }
