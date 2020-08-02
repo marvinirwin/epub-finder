@@ -73,7 +73,7 @@ export function Main({s}: { s: AppSingleton }) {
         </div>
         <ImageSelectPopup m={m}/>
         <PopupElements m={m}/>
-        <div style={{maxHeight: '90vh', minHeight: '90vh', overflow: 'auto'}}>
+        <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>
             {SelectedPage}
         </div>
         <BottomNav m={m}/>

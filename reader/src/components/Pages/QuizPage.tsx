@@ -6,7 +6,5 @@ import {DialogContent} from "@material-ui/core";
 export function QuizPage({m}: { m: Manager }) {
     const Component = useObs(m.quizManager.currentQuizDialogComponent$);
     const quizzingCard = useObs(m.quizManager.currentQuizItem$);
-    return <div>
-        {Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : ''}
-    </div>
+    return Component && quizzingCard ? <Component c={quizzingCard} m={m}/> : <div></div>
 }

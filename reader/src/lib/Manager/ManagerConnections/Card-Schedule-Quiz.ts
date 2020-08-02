@@ -17,7 +17,7 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
         q.currentQuizItem$.pipe(startWith(undefined))
     ]).subscribe(([nextScheduledQuizItem, currentQuizItem]) => {
         if (!currentQuizItem && nextScheduledQuizItem) {
-            q.currentQuizItem$.next(nextScheduledQuizItem)
+            q.setQuizItem(nextScheduledQuizItem);
         }
     })
 }
