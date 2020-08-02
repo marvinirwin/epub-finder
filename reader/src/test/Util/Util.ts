@@ -3,10 +3,14 @@ import {readFileSync} from "fs-extra";
 import {join} from "path";
 import {Dictionary} from "lodash";
 import {RecognitionMap} from "../../lib/Scheduling/SRM";
-import {QuizResult} from "../../lib/Manager/QuizManager";
+import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {Observable, Subject} from "rxjs";
-import {useDebugValue} from "react";
+import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
+import CardManager from "../../lib/Manager/CardManager";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {ScheduleQuiz} from "../../lib/Manager/ManagerConnections/Schedule-Quiz";
+import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
 
 export function getAtomizedSentences(paths: string) {
     return AtomizedDocument.atomizeDocument(readFileSync(join(__dirname, '../fixtures', paths)).toString())
@@ -167,4 +171,13 @@ export class MarbleGroup<T extends (Dictionary<Marbles<any>> | Marbles<any>[])> 
         console.log('printing');
         Object.values(this.marbles).forEach(m => console.log(m.getMarbles()))
     }
+}
+
+export function ScheduleQuizCard(db: MyAppDatabase) {
+    const scheduleManager = new ScheduleManager(db);
+    const quizManager = new QuizManager();
+    const cardManager = new CardManager(db);
+    ScheduleQuiz(scheduleManager, quizManager);
+    CardScheduleQuiz(cardManager, scheduleManager, quizManager);
+    return {scheduleManager, quizManager, cardManager};
 }

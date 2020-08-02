@@ -2,7 +2,7 @@ import {MyAppDatabase} from "../lib/Storage/AppDB";
 import {ScheduleManager} from "../lib/Manager/ScheduleManager";
 import {map} from "rxjs/operators";
 import {TestScheduler} from 'rxjs/testing';
-import {countFactory, MarbleGroup, Marbles, quizResultFactory} from "./Util/Util";
+import {countFactory, MarbleGroup, Marbles, quizResultFactory, ScheduleQuizCard} from "./Util/Util";
 import {RecognitionMap} from "../lib/Scheduling/SRM";
 import {QuizResultToRecognitionRow} from "../lib/Pipes/QuizResultToRecognitionRow";
 import {QuizManager, QuizResult} from "../lib/Manager/QuizManager";
@@ -10,6 +10,8 @@ import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {HotObservable} from "rxjs/internal/testing/HotObservable";
 import moment from "moment";
 import {IWordRecognitionRow} from "../lib/Scheduling/IWordRecognitionRow";
+import {ScheduleQuiz} from "../lib/Manager/ManagerConnections/Schedule-Quiz";
+import {CardScheduleQuiz} from "../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -153,27 +155,29 @@ it('Sorts cards into To Review and out of To Review', () => {
 
 it('Always has a card to quiz me on', () => {
     testScheduler.run(helpers => {
-        const scheduleManager = new ScheduleManager(db);
+        const {scheduleManager, quizManager, cardManager} = ScheduleQuizCard(db);
         const m = new MarbleGroup(
-            Marbles.new<QuizResult, IWordRecognitionRow[]>(helpers)
-                .setPipe(QuizResultToRecognitionRow(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
-                .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$),
-            Marbles.new<IWordCountRow[]>(helpers)
-                .setTargetSubject(scheduleManager.addWordCountRows$),
-            Marbles.new<string | undefined>(helpers)
-                .setExpectedObservable(scheduleManager.nextWordToQuiz$)
+            {
+                addQuizResult: Marbles.new<QuizResult, IWordRecognitionRow[]>(helpers)
+                    .setPipe(QuizResultToRecognitionRow(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
+                    .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$),
+
+                addWordCountRows: Marbles.new<IWordCountRow[]>(helpers)
+                    .setTargetSubject(scheduleManager.addWordCountRows$),
+
+                nextWordToQuiz: Marbles.new<string | undefined>(helpers)
+                    .setExpectedObservable(scheduleManager.nextWordToQuiz$)
+            }
         );
+        m.tick({
+                addWordCountRows: [[countFactory('今天'), countFactory('你好')]],
+                nextWordToQuiz: [undefined, '今天']
+        });
         m.tick(
-            m.skip(),
-            [undefined, [countFactory('今天'), countFactory('你好')]],
-            '今天'
-        );
-        m.tick(
-            quizResultFactory('今天', RecognitionMap.easy),
-            m.skip(),
-            m.skip()
+            {
+                addQuizResult: quizResultFactory('今天', RecognitionMap.easy),
+            }
         )
-        m.print()
         m.done()
     })
 })

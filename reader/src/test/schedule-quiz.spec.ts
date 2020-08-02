@@ -1,7 +1,7 @@
 import {TestScheduler} from "rxjs/testing";
 import {MyAppDatabase} from "../lib/Storage/AppDB";
 import {Manager} from "../lib/Manager";
-import {countFactory, MarbleGroup, Marbles} from "./Util/Util";
+import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "./Util/Util";
 import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {ICard} from "../lib/Interfaces/ICard";
 import {getNewICardForWord} from "../lib/Util/Util";
@@ -18,12 +18,7 @@ const testScheduler = new TestScheduler((actual, expected) => {
 });
 
 it('Takes scheduleRows and puts them into the quizManager currentQuizItems', () => {
-    const scheduleManager = new ScheduleManager(db);
-    const quizManager = new QuizManager();
-    const cardManager = new CardManager(db);
-    ScheduleQuiz(scheduleManager, quizManager);
-    CardScheduleQuiz(cardManager, scheduleManager, quizManager);
-
+    const {scheduleManager, quizManager, cardManager} = ScheduleQuizCard(db);
 
     testScheduler.run(helpers => {
         const m = new MarbleGroup(
@@ -41,7 +36,7 @@ it('Takes scheduleRows and puts them into the quizManager currentQuizItems', () 
         m.tick({
             addPersistedCards: [[getNewICardForWord('你好')]],
             addCountRecords: [[countFactory('你好')]],
-            currentQuizItem: [[getNewICardForWord('你好')]]
+            currentQuizItem: getNewICardForWord('你好')
         });
         m.done();
     })
