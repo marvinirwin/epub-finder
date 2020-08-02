@@ -14,7 +14,7 @@ export class QuizManager {
     scheduleQuizItemList$ = new ReplaySubject<ICard[]>(1);
     completedQuizItem$ = new Subject<QuizResult>();
 
-    currentQuizItem$ = new ReplaySubject<ICard | undefined>();
+    currentQuizItem$ = new ReplaySubject<ICard | undefined>(1);
     currentQuizDialogComponent$ = new ReplaySubject<React.FunctionComponent<QuizCardProps>>(1);
 
     newCount$: ReplaySubject<number>  = new ReplaySubject<number>(1)

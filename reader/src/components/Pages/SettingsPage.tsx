@@ -9,9 +9,11 @@ export function SettingsPage({m}: { m: Manager }) {
     const highlightedWord = useObs(m.highlightedWord$);
     const scheduleRows = usePipe(m.scheduleManager.wordsSorted$, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
     const currentQuizWord = useObs(m.quizManager.currentQuizItem$)
+    const nextQuizWord = useObs(m.scheduleManager.nextWordToQuiz$)
     return <div>
         <div>Schedule Rows: {scheduleRows}</div>
-        <div>Current Quiz Word: {currentQuizWord?.knownLanguage}</div>
+        <div>Current Quiz Word: {currentQuizWord?.learningLanguage}</div>
+        <div>Next Quiz Word: {nextQuizWord}</div>
 {/*
         <div>Card Map key count: {cardMap ? Object.values(cardMap).length : 'undefined'}</div>
         <div>Card Map Characters: {cardMap ? Object.entries(cardMap).map(([k, v]) => `${k}: ${v.length}`).join(',') : ''}</div>

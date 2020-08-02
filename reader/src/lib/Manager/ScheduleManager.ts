@@ -4,8 +4,10 @@ import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {distinctUntilChanged, map, scan, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, map, scan, shareReplay, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
+import {resolveICardForWord} from "../Pipes/ResolveICardForWord";
+import {ICard} from "../Interfaces/ICard";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -130,7 +132,8 @@ export class ScheduleManager {
                 );
                 return find ? find[0].word : undefined
             }),
-            distinctUntilChanged()
+            distinctUntilChanged(),
+            shareReplay(1)
         );
 
         this.loadRecognitionRows();
