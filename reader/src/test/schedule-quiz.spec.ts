@@ -5,11 +5,6 @@ import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "./Util/Util"
 import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {ICard} from "../lib/Interfaces/ICard";
 import {getNewICardForWord} from "../lib/Util/Util";
-import {ScheduleManager} from "../lib/Manager/ScheduleManager";
-import {QuizManager} from "../lib/Manager/QuizManager";
-import CardManager from "../lib/Manager/CardManager";
-import {ScheduleQuiz} from "../lib/Manager/ManagerConnections/Schedule-Quiz";
-import {CardScheduleQuiz} from "../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
