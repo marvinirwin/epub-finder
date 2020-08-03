@@ -4,16 +4,15 @@ import React from "react";
 import {debounceTime, map, scan} from "rxjs/operators";
 
 export function SettingsPage({m}: { m: Manager }) {
-    const cardMap = useObs(m.cardManager.cardIndex$);
-    const wordElMap = useObs(m.wordElementMap$);
-    const highlightedWord = useObs(m.highlightedWord$);
     const scheduleRows = usePipe(m.scheduleManager.sortedScheduleRows, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
-    const currentQuizWord = useObs(m.quizManager.quizzingCard$)
-    const nextQuizWord = useObs(m.scheduleManager.nextWordToQuiz$)
+    const quizCard = useObs(m.quizManager.quizzingCard$)
+    const nextQuizWord = useObs(m.scheduleManager.wordQuizList$)
+    const quizComponent = useObs(m.quizManager.quizzingComponent$)
     return <div>
         <div>Schedule Rows: {scheduleRows}</div>
-        <div>Current Quiz Word: {currentQuizWord?.learningLanguage}</div>
-        <div>Next Quiz Word: {nextQuizWord}</div>
+        <div>Current Quiz Word: {quizCard?.learningLanguage}</div>
+        <div>Next Quiz Word: {nextQuizWord?.join(', ')}</div>
+        <div>QuizzingComponent: {quizComponent?.name}</div>
 {/*
         <div>Card Map key count: {cardMap ? Object.values(cardMap).length : 'undefined'}</div>
         <div>Card Map Characters: {cardMap ? Object.entries(cardMap).map(([k, v]) => `${k}: ${v.length}`).join(',') : ''}</div>

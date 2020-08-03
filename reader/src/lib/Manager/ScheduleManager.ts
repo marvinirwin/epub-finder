@@ -12,6 +12,7 @@ import {ICard} from "../Interfaces/ICard";
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 export class ScheduleManager {
+    wordQuizList$: Observable<string[]>;
 
     private static resolveWordRow(wordRowDict: Dictionary<ScheduleRow>, word: string) {
         if (!wordRowDict[word]) wordRowDict[word] = new ScheduleRow(word);
@@ -24,11 +25,7 @@ export class ScheduleManager {
     addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>();
     addUnpersistedWordRecognitionRows$: Subject<IWordRecognitionRow[]> = new Subject<IWordRecognitionRow[]>();
     wordCountDict$: Subject<Dictionary<number>> = new Subject<Dictionary<number>>();
-    nextWordToQuiz$: Observable<string | undefined>;
     wordScheduleRowDict$ = new ReplaySubject<Dictionary<ScheduleRow>>();
-
-    newWordsPerDayLimit$ = new ReplaySubject<number>(1);
-    newWordsList$: Observable<string[]>;
 
     private today: number;
     private yesterday: number;
@@ -95,15 +92,6 @@ export class ScheduleManager {
         }, {})).subscribe(() => console.log())
 
 
-        this.newWordsList$ = this.sortedScheduleRows.pipe(
-            map(words => words.filter(w => {
-                return w.wordRecognitionRecords.length === 0 && w.word;
-            }).map(w => {
-                return w.word;
-            })),
-        )
-
-
         this.learningCards$ = this.sortedScheduleRows.pipe(
             map(rows => rows.filter(row => row.learning()))
         )
@@ -121,20 +109,14 @@ export class ScheduleManager {
         // First take from the learning
         // Second take from the overdue
         // Third take from the new
-        this.nextWordToQuiz$ = combineLatest([
+
+        this.wordQuizList$ = combineLatest([
             this.learningCards$,
             this.toReviewCards$,
             this.newCards$
-        ]).pipe(
-            map((args/*[learningCards, toReviewCards, newCards]*/) => {
-                let find = args.find(cardList =>
-                    cardList.length
-                );
-                return find ? find[0].word : undefined
-            }),
-            distinctUntilChanged(),
-            shareReplay(1)
-        );
+        ]).pipe(map(([c1, c2, c3]): string[] => {
+            return [...c1, ...c2, ...c3].map(r => r.word);
+        }));
 
         this.loadRecognitionRows();
     }

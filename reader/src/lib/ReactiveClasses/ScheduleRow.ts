@@ -66,6 +66,9 @@ export class ScheduleRow {
 
     get orderValue() {
         let number = (new Date()).getTime() - this.getCurrentDueDate().getTime();
+        if (this.word === '天') {
+            debugger;console.log();
+        }
         return number + (number * this.getCurrentCount())
     }
 
