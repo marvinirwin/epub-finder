@@ -5,8 +5,6 @@ import React from "react";
 import {QuizCardProps} from "./Popup";
 import {Conclusion} from "./Conclusion";
 import {quizStyles} from "./QuizStyles";
-import {useSub} from "../../lib/UseObs";
-import {Observable} from "rxjs";
 
 export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
@@ -14,7 +12,7 @@ export function Pictures({c, m}: QuizCardProps) {
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
             <GridList className={classes.center}>
-                {c?.photos.map((src: string, index: number) =>
+                {c?.photos.map((src: string) =>
                     <GridListTile key={src}>
                         <img src={src}/>
                     </GridListTile>

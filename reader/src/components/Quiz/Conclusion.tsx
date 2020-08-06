@@ -12,7 +12,7 @@ export function Conclusion({c, m}: QuizCardProps) {
     const [editingCard, setEditingCard] = useState<EditingCard | null>(null);
     useEffect(() => {
         setEditingCard(c ? EditingCard.fromICard(c, m.cardDBManager, m) : null)
-    }, [c])
+    }, [c, m])
 
     return editingCard ? <Card className={classes.card}>
         <CardContent className={classes.cardContent}>

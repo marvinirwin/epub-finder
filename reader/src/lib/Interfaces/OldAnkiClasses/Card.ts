@@ -1,4 +1,3 @@
-import {DOMParser, XMLSerializer} from 'xmldom';
 import {ICard} from "../ICard";
 
 

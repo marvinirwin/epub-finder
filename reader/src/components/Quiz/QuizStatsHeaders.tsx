@@ -14,6 +14,5 @@ export default function QuizStatsHeader({m}: {m: Manager}) {
         <div>New: <span style={{color: '#00c0c9'}}>{newCards?.length}</span></div>
         <div>Learning: <span style={{color: '#c92800'}}>{learningCards?.length}</span></div>
         <div>To Review: <span style={{color: '#15d900'}}>{toReviewCards?.length}</span></div>
-        <div>Card & Component: <span style={{color: '#000000'}}>{component} {card ? 'True' : 'False'}</span></div>
     </Typography>
 }

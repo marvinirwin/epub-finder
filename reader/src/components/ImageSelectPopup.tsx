@@ -6,11 +6,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import {
     AppBar,
     createStyles,
-    DialogActions,
-    DialogContent, Divider, fade,
+    fade,
     GridList,
-    GridListTile, IconButton, InputBase, List, ListItem, ListItemText,
-    ListSubheader,
+    GridListTile, IconButton, InputBase,
     Slide, Theme, Toolbar, Typography
 } from "@material-ui/core";
 import {TransitionProps} from "@material-ui/core/transitions";

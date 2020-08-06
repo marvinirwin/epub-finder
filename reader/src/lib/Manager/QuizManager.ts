@@ -1,12 +1,9 @@
-import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import React from "react";
-import {QuizCardProps} from "../../components/Quiz/Popup";
 import {Characters} from "../../components/Quiz/Characters";
-import {distinctUntilChanged, filter, map, shareReplay, startWith, withLatestFrom} from "rxjs/operators";
+import {debounceTime, filter, startWith, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
-import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 
 export interface QuizResult {
     word: string;
@@ -23,6 +20,8 @@ export class QuizManager {
 
     scheduledCards$ = new ReplaySubject<ICard[]>(1);
 
+    setQuizItem$ = new Subject<ICard | undefined>();
+
     /*
         learningCards$ = new Subject<ScheduleRow[]>();
         toReviewCards$ = new Subject<ScheduleRow[]>();
@@ -37,9 +36,11 @@ export class QuizManager {
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             let iCard = scheduledCards[0];
             if (iCard) {
-                this.setQuizItem(iCard);
+                this.setQuizItem$.next(iCard);
             }
         });
+
+        this.setQuizItem$.pipe(debounceTime(1)).subscribe(v => this.setQuizItem(v));
 
         this.scheduledCards$.pipe(
             withLatestFrom(
@@ -51,7 +52,7 @@ export class QuizManager {
         ).subscribe(([scheduledCards, quizzingCard]) => {
             let iCard = scheduledCards[0];
             if (iCard) {
-                this.setQuizItem(iCard);
+                this.setQuizItem$.next(iCard);
             }
         })
 
@@ -79,7 +80,7 @@ export class QuizManager {
             score: recognitionScore,
             word
         });
-        this.setQuizItem(undefined);
+        this.setQuizItem$.next(undefined);
     }
 
 }

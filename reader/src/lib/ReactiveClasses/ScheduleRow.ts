@@ -1,9 +1,6 @@
-import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
-import {last, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
-import assert from "assert";
-import {sumBy, orderBy} from "lodash";
+import {orderBy, sumBy} from "lodash";
 import moment from "moment";
 
 export class ScheduleRow {
@@ -28,8 +25,8 @@ export class ScheduleRow {
         // To review are those cards which are past due date, but not learning
         let learning = this.learning();
         if (learning) return false;
-        let b = this.getCurrentDueDate().getTime() < (new Date().getTime());
-        return b;
+        const myDueDate = this.getCurrentDueDate();
+        return myDueDate.getTime() < (new Date().getTime());
     }
 
     new() {
@@ -37,34 +34,46 @@ export class ScheduleRow {
     }
 
     learning() {
+        if (!this.wordRecognitionRecords.length) return false;
         // Learning records are those whose advance record is on a different day than the last review
         // Or they just have review records and no advance record
 
         // The "advance record" is a record which has a change in recognitionScore
         const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestamp', 'desc');
-        let previousRecord: IWordRecognitionRow | undefined;
-        const advanceRecord = mostRecentRecordsFirst.find(nextRecord => {
-            if (this.word === '上') {
+        let mostRecentRecord: IWordRecognitionRow = mostRecentRecordsFirst[0];
+        const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
+/*
+            if (this.word === 'undefined') {
                 debugger;console.log();
             }
-            if (!previousRecord) {
-                previousRecord = nextRecord;
-            } else {
-                return previousRecord.recognitionScore < nextRecord.recognitionScore
-            }
+*/
+            return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
         })
-        if (this.word === '上') {
+/*
+        if (this.word === 'undefined') {
             debugger;console.log();
         }
+*/
         const lastRecord = this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1];
-        let newVar = !advanceRecord && lastRecord;
-        // No last record and no
-        let b = !lastRecord || !advanceRecord;
-        let b1 = lastRecord === advanceRecord;
-        if (newVar) return true;
-        if (b) return false;
-        if (b1) return false;
-        // @ts-ignore
+
+        /**
+         * If there are no records then we're for sure not learning
+         */
+        if (!lastRecord) {
+            return false;
+        }
+
+        /**
+         * If there is a last record, but no advance record we're still learning
+         */
+        if (!advanceRecord) {
+            return true;
+        }
+
+        // If the advance record is the last record then we just advanced so we're not learning anymore
+        if (lastRecord === advanceRecord) {
+            return false;
+        }
         return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
 /*
         const dayStart = moment().startOf('day').unix();

@@ -1,4 +1,5 @@
 import {IWordRecognitionRow} from "./IWordRecognitionRow";
+import moment from "moment";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const MINUTE_IN_MILLISECONDS = 60 * 1000;
@@ -50,8 +51,12 @@ export class SRM {
         const previousProgress = SRM.getProgressScore(previousRows);
         const newProgress = previousProgress + this.scoreToProgressChange[score];
         let dueTimestamp = now.getTime() + 1;
-        if (newScoreIsCorrect && newProgress < this.maxProgress) {
-            dueTimestamp = now.getTime() + this.intervals[previousProgress];
+        if (newScoreIsCorrect) {
+            if (newProgress < this.maxProgress) {
+                dueTimestamp = now.getTime() + this.intervals[previousProgress];
+            } else {
+                dueTimestamp = moment(now).add(1, 'month').toDate().getTime();
+            }
         }
         return {
             recognitionScore: newProgress >= 0 ? newProgress : 0,

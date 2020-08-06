@@ -1,4 +1,4 @@
-import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
 import {
     debounceTime,
@@ -9,7 +9,6 @@ import {
     shareReplay,
     startWith,
     switchMap,
-    switchMapTo,
     take,
     withLatestFrom
 } from "rxjs/operators";
@@ -26,18 +25,15 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {WavAudio} from "./WavAudio";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 import {PageManager} from "./Manager/PageManager";
 import {Website} from "./Website";
-import {createPopper} from "@popperjs/core";
 import {AtomizedSentence} from "./Atomize/AtomizedSentence";
-import {getNewICardForWord, getTranslation, NavigationPages} from "./Util/Util";
+import {NavigationPages} from "./Util/Util";
 import {TextWordData} from "./Atomize/TextWordData";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
 import {InputManager} from "./Manager/InputManager";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
-import {QuizResultToRecognitionRow} from "./Pipes/QuizResultToRecognitionRow";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
 import {CardPage} from "./Manager/ManagerConnections/Card-Page";
