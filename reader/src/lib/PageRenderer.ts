@@ -14,7 +14,7 @@ import {sleep} from "./Util/Util";
 
 
 export class PageRenderer {
-    ref$ = new ReplaySubject<HTMLElement>();
+    ref$ = new ReplaySubject<HTMLElement>(1);
     text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
     atomizedSentences$: Observable<AtomizedSentence[]>;

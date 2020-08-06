@@ -1,11 +1,12 @@
 import {ITrie} from "../Interfaces/Trie";
-import {Dictionary, maxBy} from "lodash";
+import {Dictionary, maxBy, uniq} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 export class AtomizedSentence {
 
@@ -33,6 +34,7 @@ export class AtomizedSentence {
     }
 
     getTextWordData(t: ITrie, uniqueLengths: number[]): TextWordData {
+        uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
@@ -45,7 +47,7 @@ export class AtomizedSentence {
             }).filter(w => w.lengthRemaining > 0);
             const stringChunks = uniqueLengths.map(size => (this.sentenceElement.textContent as string).substr(i, size));
             const wordsWhichStartHere: string[] = stringChunks.reduce((acc: string[], str) => {
-                if (t.hasWord(str)) {
+                if (t.hasWord(str) || (str.length === 1 && isChineseCharacter(str))) {
                     acc.push(str);
                 }
                 return acc;

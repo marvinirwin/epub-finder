@@ -1,18 +1,16 @@
 import {BottomNavigation, BottomNavigationAction} from "@material-ui/core";
 import React, {useState} from "react";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/UseObs";
 
 import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
 import School from '@material-ui/icons/School';
 import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import Settings from '@material-ui/icons/Settings';
 import {makeStyles} from "@material-ui/core/styles";
-import CircularProgress from '@material-ui/core/CircularProgress';
 import {NavigationPages} from "../lib/Util/Util";
 import {TutorialPopper} from "./Tutorial/TutorialPopover";
 import Typography from "@material-ui/core/Typography";
-import CardContent from "@material-ui/core/CardContent";
+import {useObservableState} from "observable-hooks";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -24,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 export function BottomNav({m}: { m: Manager }) {
-    const item = useObs(m.bottomNavigationValue$)
+    const item = useObservableState(m.bottomNavigationValue$)
     const classes = useStyles();
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
     return <BottomNavigation className={classes.bottomNav}

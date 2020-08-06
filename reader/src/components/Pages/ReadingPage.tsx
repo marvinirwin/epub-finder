@@ -1,10 +1,10 @@
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../lib/UseObs";
 import {Grid, Slide} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../EditingCard/EditingCardComponent";
 import AudioPopup from "../AudioPopup/AudioPopup";
+import {useObservableState} from "observable-hooks";
 
 const useStyles = makeStyles((theme) => ({
     popup: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function ReadingPage({m}: { m: Manager }) {
     const classes = useStyles();
-    const editingCard = useObs(m.currentEditingCard$);
+    const editingCard = useObservableState(m.currentEditingCard$);
     return <div className={classes.popup}>
         <Slide direction="down" in={!!editingCard}>
             <div style={{width: '100%', display: 'flex'}}>

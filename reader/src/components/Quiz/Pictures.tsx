@@ -10,18 +10,17 @@ import {Observable} from "rxjs";
 
 export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    const advance = () => m.quizManager.quizzingComponent$.next(Conclusion);
-    useSub(m.inputManager.getKeyDownSubject("Space"), (o$: Observable<any>) => o$.subscribe(advance));
+    const advance = () => m.quizManager.quizzingComponent$.next("Conclusion");
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
             <GridList className={classes.center}>
-                {c.photos.map((src: string, index: number) =>
+                {c?.photos.map((src: string, index: number) =>
                     <GridListTile key={src}>
                         <img src={src}/>
                     </GridListTile>
                 )}
             </GridList>
-            {!c.photos.length && <Typography variant="subtitle1">No pictures were provided for {c.learningLanguage}</Typography>}
+            {!c?.photos.length && <Typography variant="subtitle1">No pictures were provided for {c?.learningLanguage}</Typography>}
         </CardContent>
         <CardActions className={classes.cardActions}>
             <Button onClick={advance}>Next</Button>

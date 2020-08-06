@@ -46,7 +46,7 @@ export function PageContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
     }, [ref])
 
 /*
-    const translationText = useObs(rb.translationText$)
+    const translationText = useObservableState(rb.translationText$)
 */
 
     return (

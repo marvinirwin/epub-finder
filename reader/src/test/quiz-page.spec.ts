@@ -43,7 +43,7 @@ it('Uses schedule rows to continuously populate the current quiz item', () => {
                     .setTargetSubject(quizManager.advanceQuizStage$),
 
                 sortedScheduleWords: Marbles.new<string[]>(helpers)
-                    .setExpectedObservable(scheduleManager.sortedScheduleRows.pipe(map(rows => rows.map(row => row.word)))),
+                    .setExpectedObservable(scheduleManager.sortedScheduleRows$.pipe(map(rows => rows.map(row => row.word)))),
 
                 quizComponent: Marbles.new<QuizComponent>(helpers)
                     .setExpectedObservable(quizManager.quizzingComponent$),

@@ -8,26 +8,24 @@ import {Observable} from "rxjs";
 import {RecognitionMap} from "../../Scheduling/SRM";
 
 export function InputQuiz(i: InputManager, q: QuizManager) {
-    const advanceSet = new Set<QuizComponent>([Characters, Pictures]);
-    const conclusionSet = new Set<QuizComponent>([Conclusion]);
+    const advanceSet = new Set<QuizComponent>(["Characters", "Pictures"]);
+    const conclusionSet = new Set<QuizComponent>(["Conclusion"]);
     const componentFilterPipe = (set: Set<QuizComponent>) => (o1$: Observable<any>): Observable<[KeyboardEvent, QuizComponent]> => o1$.pipe(
         withLatestFrom(q.quizzingComponent$),
         filter(([keydownEvent, component]) => {
-
             return set.has(component);
         }),
     );
 
-    function listen(key: string, difficulty: number) {
+    function submitQuizResult(key: string, difficulty: number) {
         i.getKeyDownSubject(key)
             .pipe(
                 componentFilterPipe(conclusionSet),
                 withLatestFrom(q.quizzingCard$)
-            ) .subscribe(([[event], item]) => {
-                event.preventDefault();
-                q.completeQuiz(item?.learningLanguage as string, difficulty)
-
-            })
+            ).subscribe(([[event], item]) => {
+            event.preventDefault();
+            q.completeQuiz(item?.learningLanguage as string, difficulty)
+        })
     }
 
     i.getKeyDownSubject(' ')
@@ -37,7 +35,7 @@ export function InputQuiz(i: InputManager, q: QuizManager) {
             q.advanceQuizStage$.next();
         });
 
-    listen('3', RecognitionMap.easy);
-    listen('2', RecognitionMap.medium);
-    listen('1', RecognitionMap.hard);
+    submitQuizResult('3', RecognitionMap.easy);
+    submitQuizResult('2', RecognitionMap.medium);
+    submitQuizResult('1', RecognitionMap.hard);
 }

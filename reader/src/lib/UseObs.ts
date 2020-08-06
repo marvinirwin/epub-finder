@@ -6,16 +6,19 @@ export function useObs<T>(obs$: Observable<T>, init?: T) {
     const [sub, setSub] = useState<Subscription | undefined>();
     useEffect(() => {
         try {
-            if (sub) sub.unsubscribe();
+            if (sub) {
+                sub.unsubscribe();
+            }
             setSub(obs$.subscribe(newV => {
-                // Cheap hack, should do this because its incompatible with init
-                setV(typeof newV === 'function' ? () => newV : newV);
+                setV(newV);
             }))
         }catch(e) {
             throw e;
         }
         return function cleanup() {
-            if (sub) sub.unsubscribe();
+            if (sub) {
+                sub.unsubscribe();
+            }
         }
     }, [obs$])
     return v;

@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import {Manager} from "../../lib/Manager";
 import {useObs} from "../../lib/UseObs";
 import {WordCountRow} from "./ScheduleTableRow";
+import {useObservableState} from "observable-hooks";
 
 const useStyles = makeStyles({
     table: {
@@ -34,7 +35,7 @@ function perc2color(perc: number) {
 
 export default function ScheduleTable({m}: { m: Manager }) {
     const classes = useStyles();
-    const rows = useObs(m.scheduleManager.sortedScheduleRows)
+    const rows = useObservableState(m.scheduleManager.sortedScheduleRows$)
     return (
         <TableContainer component={Paper} style={{flexGrow: 1, overflow: 'auto'}}>
             <Table className={classes.table} aria-label="simple table">

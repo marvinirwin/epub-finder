@@ -1,8 +1,8 @@
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
-import {useObs} from "../lib/UseObs";
 import React from 'react';
+import {useObservableState} from "observable-hooks";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EditCardEnglish({e}: { e: EditingCard }) {
     const classes = useStyles();
-    const english = useObs(e.knownLanguage$);
+    const english = useObservableState(e.knownLanguage$);
     return (
         <form className={classes.root} noValidate autoComplete="off">
             <TextField

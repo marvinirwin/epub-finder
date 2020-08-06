@@ -2,6 +2,7 @@ import {ScheduleManager} from "../ScheduleManager";
 import {QuizManager} from "../QuizManager";
 import CardManager from "../CardManager";
 import {resolveICardForWords} from "../../Pipes/ResultICardForWords";
+import { map } from "rxjs/operators";
 
 export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizManager) {
 /*
@@ -27,6 +28,6 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
 */
 
     s.wordQuizList$.pipe(
-        resolveICardForWords(c.cardIndex$)
+        resolveICardForWords(c.cardIndex$),
     ).subscribe(q.scheduledCards$)
 }

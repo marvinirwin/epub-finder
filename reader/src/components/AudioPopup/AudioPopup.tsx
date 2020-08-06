@@ -7,10 +7,11 @@ import SineWave from "./SineWave";
 /*
 import MultiGraph from "../MultiGraph";
 */
-import {useObs, usePipe} from "../../lib/UseObs";
+import {usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 import {filter} from "rxjs/operators";
 import {TutorialPopper} from "../Tutorial/TutorialPopover";
+import {useObservableState} from "observable-hooks";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -34,16 +35,16 @@ export default function AudioPopup({m}:{m: Manager}) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
 /*
-    const userAudio = useObs(r.userAudio$);
+    const userAudio = useObservableState(r.userAudio$);
 */
-    const synthAudio = useObs(m.currentEditingSynthesizedWavFile$);
+    const synthAudio = useObservableState(m.currentEditingSynthesizedWavFile$);
 /*
     const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
 */
     const canvasRef = useRef<HTMLCanvasElement>();
-    const currentAudioRequest = useObs(r.currentRecordRequest$);
+    const currentAudioRequest = useObservableState(r.currentRecordRequest$);
     const retryableAudioRequest = usePipe(r.currentRecordRequest$, o => o.pipe(filter(v => !!v)));
-    const recognizedText = useObs(r.speechRecongitionText$);
+    const recognizedText = useObservableState(r.speechRecongitionText$);
 
     useEffect(() => {
         if (canvasRef.current) r.canvas$.next(canvasRef.current)

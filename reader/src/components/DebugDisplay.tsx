@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
-import {useObs} from "../lib/UseObs";
 import React from "react";
+import {useObservableState} from "observable-hooks";
 
 interface Props {
     visible$: Observable<any>;
@@ -8,8 +8,8 @@ interface Props {
 }
 
 const DebugDisplay: React.FunctionComponent<Props> = ({visible$, text$, children}) => {
-    const visible = useObs(visible$);
-    const t = useObs(text$);
+    const visible = useObservableState(visible$);
+    const t = useObservableState(text$);
     if (children) {
         return <div className={'debug-menu'} style={{display: visible ? 'block' : 'none'}}>
             {children}

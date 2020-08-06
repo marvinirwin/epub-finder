@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {Manager} from "../lib/Manager";
-import {useObs} from "../lib/UseObs";
 import axios from 'axios';
 import Dialog from "@material-ui/core/Dialog";
 import CloseIcon from '@material-ui/icons/Close';
@@ -18,6 +17,7 @@ import {TransitionProps} from "@material-ui/core/transitions";
 import {makeStyles} from "@material-ui/core/styles";
 import SearchIcon from '@material-ui/icons/Search';
 import {debounce} from 'lodash';
+import {useObservableState} from "observable-hooks";
 
 export const getImages =  (term: string) => {
     return axios.post('/image-search', {term})
@@ -107,7 +107,7 @@ const Transition = React.forwardRef(function Transition(
 
 export function ImageSelectPopup({m}: { m: Manager }) {
     const classes = useStyles();
-    const imageRequest = useObs(m.queryImageRequest)
+    const imageRequest = useObservableState(m.queryImageRequest)
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
     const [sources, setSrces] = useState<ImageResult[]>([]);
     const debounceSearch = debounce((term: string) => {

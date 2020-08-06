@@ -10,6 +10,12 @@ export class ScheduleRow {
     wordCountRecords: IWordCountRow[] = [];
     wordRecognitionRecords: IWordRecognitionRow[] = [];
 
+
+    addWordRecognitionRecords(...records: IWordRecognitionRow[]) {
+        this.wordRecognitionRecords.push(...records);
+        this.wordRecognitionRecords = orderBy(this.wordRecognitionRecords, 'timestamp')
+    }
+
     getCurrentCount(): number {
         return sumBy(this.wordCountRecords, wordCountRow => wordCountRow.count)
     }
@@ -22,7 +28,8 @@ export class ScheduleRow {
         // To review are those cards which are past due date, but not learning
         let learning = this.learning();
         if (learning) return false;
-        return this.getCurrentDueDate().getTime() < (new Date().getTime());
+        let b = this.getCurrentDueDate().getTime() < (new Date().getTime());
+        return b;
     }
 
     new() {
@@ -34,21 +41,30 @@ export class ScheduleRow {
         // Or they just have review records and no advance record
 
         // The "advance record" is a record which has a change in recognitionScore
-        const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestmap', 'desc');
+        const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestamp', 'desc');
         let previousRecord: IWordRecognitionRow | undefined;
         const advanceRecord = mostRecentRecordsFirst.find(nextRecord => {
+            if (this.word === '上') {
+                debugger;console.log();
+            }
             if (!previousRecord) {
                 previousRecord = nextRecord;
-            }
-            else {
+            } else {
                 return previousRecord.recognitionScore < nextRecord.recognitionScore
             }
         })
+        if (this.word === '上') {
+            debugger;console.log();
+        }
         const lastRecord = this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1];
-        if (!advanceRecord && lastRecord) return true;
+        let newVar = !advanceRecord && lastRecord;
         // No last record and no
-        if (!lastRecord || !advanceRecord) return false;
-        if (lastRecord === advanceRecord) return false;
+        let b = !lastRecord || !advanceRecord;
+        let b1 = lastRecord === advanceRecord;
+        if (newVar) return true;
+        if (b) return false;
+        if (b1) return false;
+        // @ts-ignore
         return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
 /*
         const dayStart = moment().startOf('day').unix();
@@ -66,9 +82,6 @@ export class ScheduleRow {
 
     get orderValue() {
         let number = (new Date()).getTime() - this.getCurrentDueDate().getTime();
-        if (this.word === '天') {
-            debugger;console.log();
-        }
         return number + (number * this.getCurrentCount())
     }
 

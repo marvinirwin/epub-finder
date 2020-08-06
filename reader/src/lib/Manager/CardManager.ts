@@ -2,7 +2,7 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary} from "lodash";
 import trie from "trie-prefix-tree";
-import {flatMap, scan, shareReplay} from "rxjs/operators";
+import {flatMap, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {ITrie} from "../Interfaces/Trie";
@@ -35,6 +35,7 @@ export default class CardManager {
     constructor(public db: MyAppDatabase) {
         this.cardProcessingSignal$.next(false);
         this.trie$ = this.addPersistedCards$.pipe(
+            startWith([]),
             scan((trie: ITrie, newCards: ICard[]) => {
                 newCards.forEach(iCard => {
                     trie.addWord(iCard.learningLanguage)
@@ -44,6 +45,7 @@ export default class CardManager {
             shareReplay(1)
         )
         this.cardIndex$ = this.addPersistedCards$.pipe(
+            startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {
                 const o = {...cardIndex};
                 newCards.forEach(newICard => {

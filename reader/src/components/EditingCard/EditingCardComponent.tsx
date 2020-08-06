@@ -3,12 +3,11 @@ import {makeStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import {useObs} from "../../lib/UseObs";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "../CardImageList";
 import EditCardEnglish from "../EditCardEnglish";
 import {TutorialPopper} from "../Tutorial/TutorialPopover";
-import { usePopper } from 'react-popper';
+import {useObservableState} from "observable-hooks";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -38,8 +37,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EditingCardComponent({card}: { card: EditingCard }) {
     const classes = useStyles();
-    const characters = useObs(card.learningLanguage$);
-    const sounds = useObs(card.sounds$);
+    const characters = useObservableState(card.learningLanguage$);
+    const sounds = useObservableState(card.sounds$);
     useEffect(() => {
         const els = document.getElementsByClassName('new-audio');
         for (let i = 0; i < els.length; i++) {
@@ -48,7 +47,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
         }
     }, [sounds]);
 
-    const pinyin = useObs(card.pinyin$);
+    const pinyin = useObservableState(card.pinyin$);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
     return <Card className={classes.root}>
             <CardContent ref={setReferenceElement}>

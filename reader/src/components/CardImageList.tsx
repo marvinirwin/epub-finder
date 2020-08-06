@@ -4,10 +4,10 @@ import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
 import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
 import {Subject} from "rxjs";
-import {useObs} from "../lib/UseObs";
 import React from "react";
 import {Manager} from "../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import {useObservableState} from "observable-hooks";
 
 const useStylesGridListImages = makeStyles((theme) => ({
     root: {
@@ -34,7 +34,7 @@ const useStylesGridListImages = makeStyles((theme) => ({
 }));
 export default function ({photos$, card, characters, m}: { photos$: Subject<string[]>, card: EditingCard, characters: string, m: Manager }) {
     const classes = useStylesGridListImages();
-    const photos = useObs(photos$);
+    const photos = useObservableState(photos$);
     const cb = () => card.m.queryImageRequest.next({
         term: characters,
         cb: (s: string) => card.photos$.next(photos?.concat(s))

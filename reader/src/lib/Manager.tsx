@@ -42,6 +42,7 @@ import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz"
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
 import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
+import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 
 export class Manager {
 
@@ -92,6 +93,7 @@ export class Manager {
         InputPage(this.inputManager, this.pageManager);
         CardPage(this.cardManager, this.pageManager);
         InputQuiz(this.inputManager, this.quizManager)
+        ScheduleQuiz(this.scheduleManager, this.quizManager);
 
         this.currentEditingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
@@ -139,6 +141,8 @@ export class Manager {
             );
         }));
 
+        this.textData$.subscribe(() => {});
+
         this.wordElementMap$ = this.textData$.pipe(map(t => t.wordElementsMap));
 
         this.wordElementMap$.subscribe(wordElementMap => Object
@@ -147,7 +151,9 @@ export class Manager {
         )
 
         this.textData$.pipe(
-            map(textData => textData.wordCounts),
+            map(textData => {
+                return textData.wordCounts;
+            }),
         ).subscribe(this.scheduleManager.wordCountDict$);
 
         this.requestEditWord$.pipe(resolveICardForWord<string, ICard>(this.cardManager.cardIndex$))

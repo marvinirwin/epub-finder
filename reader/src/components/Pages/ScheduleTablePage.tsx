@@ -7,6 +7,5 @@ import QuizDialogContainer from "../Quiz/Popup";
 export function ScheduleTablePage({m}: { m: Manager }) {
     return <Fragment>
         <ScheduleTable m={m}/>
-        <QuizDialogContainer m={m}/>
     </Fragment>
 }

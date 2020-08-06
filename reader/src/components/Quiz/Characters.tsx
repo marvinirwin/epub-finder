@@ -11,12 +11,11 @@ import QuizStatsHeader from "./QuizStatsHeaders";
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    let advance = () => m.quizManager.quizzingComponent$.next(Pictures);
-    useSub(m.inputManager.getKeyDownSubject("Space"), (o$: Observable<any>) => o$.subscribe(advance));
+    let advance = () => m.quizManager.quizzingComponent$.next("Pictures");
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
             <Typography variant="h1" component="h1" className={classes.center}>
-                {c.learningLanguage}
+                {c?.learningLanguage}
             </Typography>
         </CardContent>
         <CardActions className={classes.cardActions}>

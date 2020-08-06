@@ -49,7 +49,6 @@ export class PageManager {
             switchMap(pageList =>
                 merge(...pageList.map(page => page.atomizedSentences$))
             ),
-            map(atomizedSentences => atomizedSentences)
         ).subscribe(atomizedSentences => {
             atomizedSentences.forEach(s => {
                 const showEvents = ['mouseenter', 'focus'];

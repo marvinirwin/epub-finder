@@ -14,6 +14,7 @@ import {ImageSelectPopup} from "./ImageSelectPopup";
 import {PageRenderer} from "../lib/PageRenderer";
 import {NavigationPages} from "../lib/Util/Util";
 import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
+import {useObservableState} from "observable-hooks";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +55,7 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
 export function Main({s}: { s: AppSingleton }) {
     const {m} = s;
     const classes = useStyles();
-    const item = useObs(m.bottomNavigationValue$);
+    const item = useObservableState(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
         m.inputManager.applyListeners(document.body);

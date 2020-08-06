@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Observable, Subject} from "rxjs";
-import {useObs} from "../lib/UseObs";
 import DebugMessage from "../Debug-Message";
 import { Dictionary } from "lodash";
+import {useObservableState} from "observable-hooks";
 
 const AllColors: Dictionary<string> = {
     aqua: "#00ffff",
@@ -72,7 +72,7 @@ const ColorArray = Object.values(AllColors)
 export function MessageList({messageBuffer$}: {messageBuffer$: Observable<DebugMessage[]>}) {
     const [colors, setColors] = useState<Dictionary<string>>({})
     let [colorIndex, setColorIndex] = useState(0);
-    const messageList = useObs(messageBuffer$, []);
+    const messageList = useObservableState(messageBuffer$, []);
     useEffect(() => {
         messageList?.forEach(m => {
             if (!colors[m.prefix]) {
