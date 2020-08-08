@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Observable, Subject} from "rxjs";
-import DebugMessage from "../Debug-Message";
+import DebugMessage from "../../Debug-Message";
 import { Dictionary } from "lodash";
 import {useObservableState} from "observable-hooks";
 

@@ -1,10 +1,10 @@
 import React, {useEffect, useRef} from "react";
 import Collapse from '@material-ui/core/Collapse';
-import {Manager} from "../lib/Manager";
+import {Manager} from "../../lib/Manager";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {withStyles} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {PageRenderer} from "../lib/PageRenderer";
+import {PageRenderer} from "../../lib/PageRenderer";
 
 const useStyles = makeStyles((theme) => ({
     collapse: {
@@ -37,7 +37,7 @@ const StyledExpansionPanelDetails = withStyles({
     }
 })(ExpansionPanelDetails);
 
-export function PageContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
+export function AtomizedFrameContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
     const classes = useStyles();
     const ref = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = React.useState(true);

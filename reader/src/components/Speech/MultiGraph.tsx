@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Plot from 'react-plotly.js';
-import {WavAudio} from "../lib/WavAudio";
+import {WavAudio} from "../../lib/WavAudio";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({

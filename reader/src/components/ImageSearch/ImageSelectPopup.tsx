@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Manager} from "../lib/Manager";
+import {Manager} from "../../lib/Manager";
 import axios from 'axios';
 import Dialog from "@material-ui/core/Dialog";
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,7 +17,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import {debounce} from 'lodash';
 import {useObservableState} from "observable-hooks";
 
-export const getImages =  (term: string) => {
+export const getImages = (term: string) => {
     return axios.post('/image-search', {term})
 }
 
@@ -105,13 +105,17 @@ const Transition = React.forwardRef(function Transition(
 
 export function ImageSelectPopup({m}: { m: Manager }) {
     const classes = useStyles();
-    const imageRequest = useObservableState(m.queryImageRequest)
+    const imageRequest = useObservableState(m.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
+    const [loading, setLoading] = useState(false);
     const [sources, setSrces] = useState<ImageResult[]>([]);
     const debounceSearch = debounce((term: string) => {
+        setLoading(true);
         getImages(term).then((response) => {
             const results: ImageSearchResponse = response.data;
             setSrces(results.images);
+        }).finally(() => {
+            setLoading(false);
         })
     }, 1000);
     useEffect(() => {
@@ -119,7 +123,7 @@ export function ImageSelectPopup({m}: { m: Manager }) {
     }, [imageRequest])
 
     function close() {
-        m.queryImageRequest.next();
+        m.queryImageRequest$.next();
     }
 
     useEffect(() => {
@@ -128,7 +132,7 @@ export function ImageSelectPopup({m}: { m: Manager }) {
         }
     }, [searchTerm])
 
-    let onClose = () => m.queryImageRequest.next(undefined);
+    let onClose = () => m.queryImageRequest$.next(undefined);
     return <Dialog fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
             <Toolbar>
@@ -161,7 +165,7 @@ export function ImageSelectPopup({m}: { m: Manager }) {
                     return <GridListTile className={classes.tile} key={index}>
                         <img onClick={() => {
                             imageRequest?.cb(src.contentUrl);
-                            m.queryImageRequest.next(undefined);
+                            m.queryImageRequest$.next(undefined);
                         }} src={src.thumbnailUrl} alt={''}/>
                     </GridListTile>
                 })}

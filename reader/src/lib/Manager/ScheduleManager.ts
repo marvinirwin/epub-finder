@@ -9,6 +9,27 @@ import {SRM} from "../Scheduling/SRM";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
+const LEARNING_CARDS_LIMIT = 20;
+
+function shuffle<T>(array: T[]): T[] {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
 export class ScheduleManager {
     wordQuizList$: Observable<string[]>;
 
@@ -114,6 +135,15 @@ export class ScheduleManager {
             this.toReviewCards$,
             this.newCards$
         ]).pipe(map(([c1, c2, c3]): string[] => {
+
+            const learningCardsRequired = LEARNING_CARDS_LIMIT - (c1.length + c2.length);
+            if (learningCardsRequired > 0) {
+                let scheduleRows = c3.slice(learningCardsRequired);
+                debugger;
+                return shuffle([
+                    ...c1, ...c2, ...scheduleRows
+                ]).map(r => r.word);
+            }
             return [...c1, ...c2, ...c3].map(r => r.word);
         }));
 

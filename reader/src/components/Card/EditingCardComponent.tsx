@@ -4,8 +4,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
-import ImageList from "../CardImageList";
-import EditCardEnglish from "../EditCardEnglish";
+import ImageList from "./CardImageList";
+import EditCardEnglish from "./EditCardEnglish";
 import {TutorialPopper} from "../Tutorial/TutorialPopover";
 import {useObservableState} from "observable-hooks";
 

@@ -9,18 +9,22 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         padding: '5px 10px',
         borderRadius: '4px',
-        maxWidth: '300px'
-    }
+        maxWidth: '300px',
+        '&:hover': {
+            cursor: 'pointer'
+        }
+    },
+
 }));
 
 export const TutorialPopper = ({referenceElement, storageKey, children, placement}: { referenceElement: HTMLDivElement | null, storageKey: string, children?: ReactNode, placement: Placement}) => {
-    const [open ,setOpen] = useState<string | null>("1");
+    const [open ,setOpen] = useState<boolean>(() => !!localStorage.getItem(storageKey));
     const classes = useStyles();
     useEffect(() => {
-        setOpen(localStorage.getItem(storageKey))
+        setOpen(!!localStorage.getItem(storageKey))
     }, [])
     useEffect(() => {
-        localStorage.setItem(storageKey, open !== null ? open : '')
+        localStorage.setItem(storageKey, open as unknown as string)
     }, [open]);
     const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
 
@@ -28,10 +32,14 @@ export const TutorialPopper = ({referenceElement, storageKey, children, placemen
         placement,
         strategy: 'fixed'
     });
-
-    return <div ref={setPopperElement} style={x.styles.popper} {...x.attributes.popper}>
-        <div className={classes.root}>
-            {children}
+    if (open) {
+        return <div ref={setPopperElement} style={x.styles.popper} {...x.attributes.popper} onClick={() => setOpen(false)}>
+            <div className={classes.root}>
+                {children}
+            </div>
         </div>
-    </div>
+    } else {
+        return <div/>;
+    }
+
 }

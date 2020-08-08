@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import {Card, CardActions, CardContent} from "@material-ui/core";
-import EditingCardComponent from "../EditingCard/EditingCardComponent";
+import EditingCardComponent from "../Card/EditingCardComponent";
 import Button from "@material-ui/core/Button";
 import {QuizCardProps} from "./Popup";
 import {quizStyles} from "./QuizStyles";

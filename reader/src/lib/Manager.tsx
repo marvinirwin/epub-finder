@@ -58,7 +58,7 @@ export class Manager {
         (i: number, c: ICard) => ({...c, id: i})
     );
 
-    queryImageRequest: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
+    queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE

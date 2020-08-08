@@ -2,15 +2,14 @@ import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../lib/UseObs";
 import React, {Fragment, useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {BottomNav} from "./BottomNav";
-import {PopupElements} from "./PopupElements";
+import {BottomNav} from "./Nav/BottomNav";
 import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
-import {PageContainer} from "./PageContainer";
+import {AtomizedFrameContainer} from "./Atomized/AtomizedFrameContainer";
 import {Dictionary} from "lodash";
-import {ImageSelectPopup} from "./ImageSelectPopup";
+import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
 import {PageRenderer} from "../lib/PageRenderer";
 import {NavigationPages} from "../lib/Util/Util";
 import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
@@ -71,10 +70,9 @@ export function Main({s}: { s: AppSingleton }) {
             top: iframeVisible ? 0 : '9000px',
             overflow: 'hidden'
         }}>
-            {Object.values(pages || {}).map(page => <PageContainer m={m} key={page.name} rb={page}/>)}
+            {Object.values(pages || {}).map(page => <AtomizedFrameContainer m={m} key={page.name} rb={page}/>)}
         </div>
         <ImageSelectPopup m={m}/>
-        <PopupElements m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>
             {SelectedPage}
         </div>

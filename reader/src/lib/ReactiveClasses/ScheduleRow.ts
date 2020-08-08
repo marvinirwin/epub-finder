@@ -1,6 +1,6 @@
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
-import {orderBy, sumBy} from "lodash";
+import {orderBy, sumBy, sum} from "lodash";
 import moment from "moment";
 
 export class ScheduleRow {
@@ -90,8 +90,7 @@ export class ScheduleRow {
     }
 
     get orderValue() {
-        let number = (new Date()).getTime() - this.getCurrentDueDate().getTime();
-        return number + (number * this.getCurrentCount())
+        return sum(this.wordCountRecords.map(c => c.count));
     }
 
     constructor(public word: string) {

@@ -2,7 +2,7 @@ import {Manager} from "../../lib/Manager";
 import {Grid, Slide} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import EditingCardComponent from "../EditingCard/EditingCardComponent";
+import EditingCardComponent from "../Card/EditingCardComponent";
 import AudioPopup from "../AudioPopup/AudioPopup";
 import {useObservableState} from "observable-hooks";
 

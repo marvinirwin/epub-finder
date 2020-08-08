@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Manager} from "../lib/Manager";
-import {ICard} from "../lib/Interfaces/ICard";
-import {EditingCard} from "../lib/ReactiveClasses/EditingCard";
+import {Manager} from "../../lib/Manager";
+import {ICard} from "../../lib/Interfaces/ICard";
+import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 
-export function FlashcardPopup({text, card, getImages, m}: { text: string, card: ICard, getImages: ((s: string) => Promise<string[]>) | undefined, m: Manager }) {
+export function CardPopup({text, card, getImages, m}: { text: string, card: ICard, getImages: ((s: string) => Promise<string[]>) | undefined, m: Manager }) {
     const [clicked, setClicked] = useState(false)
     const [insidePopup, setInsidePopup] = useState(false)
     const [srces, setSrces] = useState<string[]>([]);
