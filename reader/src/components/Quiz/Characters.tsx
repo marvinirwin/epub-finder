@@ -8,11 +8,25 @@ import {quizStyles} from "./QuizStyles";
 import {usePipe, useSub} from "../../lib/UseObs";
 import {Observable} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
-import {take} from "rxjs/operators";
+import {map, take, withLatestFrom} from "rxjs/operators";
+import {useObservable, useObservableState} from "observable-hooks";
+import {AtomizedSentence} from "../../lib/Atomize/AtomizedSentence";
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
     let advance = () => m.quizManager.quizzingComponent$.next("Pictures");
+    const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
+        (obs$: Observable<[string | undefined]>) =>
+            obs$.pipe(
+                withLatestFrom(m.textData$),
+                map(([[word], {wordSentenceMap}]) =>
+                    (wordSentenceMap[word || ''] || []).map((s: AtomizedSentence) => s.translatableText)
+                )
+            )
+        ,[c?.learningLanguage],
+
+    ))
+
     const [error, setError] = useState('');
     useEffect(() => {
         setError("");// The card has changed, clear the error message
@@ -48,6 +62,13 @@ export function Characters({c, m}: QuizCardProps) {
             <Typography variant="h1" component="h1" className={classes.center}>
                 {c?.learningLanguage}
             </Typography>
+            <div style={{display: 'flex', flexFlow: 'column nowrap', textAlign: 'left'}}>
+                {(sentences$ || []).map(sentence =>
+                    <Typography variant="subtitle2" className={classes.center}>
+                        {sentence}
+                    </Typography>
+                )}
+            </div>
         </CardContent>
         <CardActions className={classes.cardActions}>
             <QuizStatsHeader m={m}/>

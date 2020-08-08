@@ -1,9 +1,11 @@
 import {Dictionary} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
+import {AtomizedSentence} from "./AtomizedSentence";
 
 export interface TextWordData {
     wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
     wordCounts: Dictionary<number>;
+    wordSentenceMap: Dictionary<AtomizedSentence[]>;
 }
 
 export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordData {
@@ -22,6 +24,15 @@ export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordDat
                 aggSentenceInfo.wordElementsMap[key].push(...newSentenceInfo.wordElementsMap[key]);
             } else {
                 aggSentenceInfo.wordElementsMap[key] = newSentenceInfo.wordElementsMap[key]
+            }
+        }
+
+        // TODO isolate this pattern
+        for (let key in newSentenceInfo.wordSentenceMap) {
+            if (aggSentenceInfo.wordSentenceMap[key]) {
+                aggSentenceInfo.wordSentenceMap[key].push(...newSentenceInfo.wordSentenceMap[key]);
+            } else {
+                aggSentenceInfo.wordSentenceMap[key] = newSentenceInfo.wordSentenceMap[key]
             }
         }
     }

@@ -19,7 +19,11 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'visible',
         '& > *': {
             height: 'fit-content',
-            flexGrow: 0
+            flexGrow: 0,
+            '& > *': {
+                height: 'fit-content',
+                flexGrow: 0,
+            }
         }
     },
 
@@ -30,12 +34,20 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
     const classes = useStyles();
     return <div className={classes.popup}>
-        {editingCard && <Slide direction="down" in={!!recordingRequest}>
-            <EditingCardComponent card={editingCard}/>
-        </Slide>
-        } {recordingRequest && <Slide direction="down" in={!!editingCard}>
-        <AudioPopup m={m}/>
-    </Slide>}
+        {
+            editingCard && <Slide direction="down" in={!!editingCard}>
+                <div>
+                    <EditingCardComponent card={editingCard}/>
+                </div>
+            </Slide>
+        }
+        {
+            recordingRequest && <Slide direction="down" in={!!recordingRequest}>
+                <div>
+                    <AudioPopup m={m}/>
+                </div>
+            </Slide>
+        }
         {/*
             {editingCard && <EditingCardComponent card={editingCard}/>}
             <div style={{width: '100%', display: 'flex'}}>

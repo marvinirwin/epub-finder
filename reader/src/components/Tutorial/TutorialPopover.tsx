@@ -21,7 +21,7 @@ export const TutorialPopper = ({referenceElement, storageKey, children, placemen
     const [open ,setOpen] = useState<boolean>(() => !!localStorage.getItem(storageKey));
     const classes = useStyles();
     useEffect(() => {
-        setOpen(!!localStorage.getItem(storageKey))
+        setOpen(!!JSON.parse(localStorage.getItem(storageKey) || 'false'))
     }, [])
     useEffect(() => {
         localStorage.setItem(storageKey, open as unknown as string)

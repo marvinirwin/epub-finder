@@ -37,6 +37,7 @@ export class AtomizedSentence {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
+        const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
         let wordsInProgress: IWordInProgress[] = [];
         let children = this.sentenceElement.childNodes;
         for (let i = 0; i < children.length; i++) {
@@ -49,6 +50,7 @@ export class AtomizedSentence {
             const wordsWhichStartHere: string[] = stringChunks.reduce((acc: string[], str) => {
                 if (t.hasWord(str) || (str.length === 1 && isChineseCharacter(str))) {
                     acc.push(str);
+                    wordSentenceMap[str] = [this];
                 }
                 return acc;
             }, []);
@@ -86,7 +88,11 @@ export class AtomizedSentence {
                 }
             })
         }
-        return {wordElementsMap, wordCounts};
+        return {
+            wordElementsMap,
+            wordCounts,
+            wordSentenceMap
+        };
     }
 
     getSentenceHTMLElement(): HTMLElement {

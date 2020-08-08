@@ -139,7 +139,6 @@ export class ScheduleManager {
             const learningCardsRequired = LEARNING_CARDS_LIMIT - (c1.length + c2.length);
             if (learningCardsRequired > 0) {
                 let scheduleRows = c3.slice(learningCardsRequired);
-                debugger;
                 return shuffle([
                     ...c1, ...c2, ...scheduleRows
                 ]).map(r => r.word);

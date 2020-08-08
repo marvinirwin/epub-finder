@@ -40,6 +40,7 @@ import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
+import {SentenceManager} from "./Manager/SentenceManager";
 
 export class Manager {
 
@@ -76,6 +77,7 @@ export class Manager {
     quizManager: QuizManager;
     createdSentenceManager: CreatedSentenceManager;
     inputManager = new InputManager();
+    sentenceManager = new SentenceManager();
 
     textData$: Observable<TextWordData>;
 
