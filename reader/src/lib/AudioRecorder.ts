@@ -3,7 +3,7 @@ import {concatMap, count, flatMap, map, mergeMap, shareReplay, switchMap, take, 
 import React from "react";
 import axios from "axios";
 import {WavAudio} from "./WavAudio";
-import {IRecordRequest} from "./Interfaces/IRecordRequest";
+import {RecordRequest} from "./Interfaces/RecordRequest";
 import {AudioConfig, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
 import assert from "assert";
 import {sleep} from "./Util/Util";
@@ -43,8 +43,8 @@ export const normalizeData = (filteredData: number[]) => {
 }
 
 export class AudioRecorder {
-    quedRecordRequest$ = new Subject<IRecordRequest>();
-    currentRecordRequest$ = new ReplaySubject<IRecordRequest>(1);
+    quedRecordRequest$ = new Subject<RecordRequest>();
+    currentRecordRequest$ = new ReplaySubject<RecordRequest>(1);
     mediaSource$: Observable<MediaStream>;
     canvas$ = new ReplaySubject<HTMLCanvasElement>(1);
     isRecording$ = new ReplaySubject<boolean>(1);
@@ -99,7 +99,7 @@ export class AudioRecorder {
 
         this.currentRecordRequest$.pipe(
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
-            flatMap(([req, source, canvas, speechConfig]: [IRecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
+            flatMap(([req, source, canvas, speechConfig]: [RecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
                 return new Promise(async resolve => {
                     function closeRecognition() {
 
@@ -127,6 +127,7 @@ export class AudioRecorder {
                     recognizer.recognizeOnceAsync(
                         (result) => {
                             this.speechRecongitionText$.next(result.text)
+                            req.cb(result.text);
                             close()
                             resolve();
                         },
@@ -188,7 +189,7 @@ export class AudioRecorder {
         canvasCtx.stroke();
     }
 
-    getRecording(text: string, duration: number): Promise<WavAudio> {
+    getRecording(text: string, duration: number): Promise<string> {
         return new Promise(resolve => {
             try {
                 this.quedRecordRequest$.next({

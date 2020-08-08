@@ -37,7 +37,6 @@ export class EditingCard {
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
     synthesizedSpeech$: Observable<WavAudio>;
-    recordedAudio$: Observable<WavAudio>;
     pinyin$: Observable<string>;
     constructor(
         public persistor: IndexDBManager<ICard>,
@@ -47,7 +46,7 @@ export class EditingCard {
         this.synthesizedSpeech$ = this.learningLanguage$.pipe(
             flatMap(getSynthesizedAudio),
         )
-        this.recordedAudio$ = this.synthesizedSpeech$.pipe(
+        this.synthesizedSpeech$.pipe(
             withLatestFrom(
                 this.learningLanguage$
             ),
@@ -55,10 +54,6 @@ export class EditingCard {
                 return this.m.audioManager.audioRecorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
             })
         )
-        // TODO Figure out who cares about the result of recordedAudio so we dont have to put a dummy subscribe here
-        this.recordedAudio$.subscribe(v => {
-
-        })
 
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(

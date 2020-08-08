@@ -39,6 +39,7 @@ import {InputPage} from "./Manager/ManagerConnections/Input-Page";
 import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
+import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
 
 export class Manager {
 
@@ -73,6 +74,7 @@ export class Manager {
     pageManager: PageManager;
     scheduleManager: ScheduleManager;
     quizManager: QuizManager;
+    createdSentenceManager: CreatedSentenceManager;
     inputManager = new InputManager();
 
     textData$: Observable<TextWordData>;
@@ -84,6 +86,7 @@ export class Manager {
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
+        this.createdSentenceManager = new CreatedSentenceManager(this.db);
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
         InputPage(this.inputManager, this.pageManager);

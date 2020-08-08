@@ -5,6 +5,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
 import AudioPopup from "../AudioPopup/AudioPopup";
 import {useObservableState} from "observable-hooks";
+import {ClassNameMap} from "@material-ui/core/styles/withStyles";
+import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 
 const useStyles = makeStyles((theme) => ({
     popup: {
@@ -23,19 +25,25 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export function ReadingPage({m}: { m: Manager }) {
-    const classes = useStyles();
+export function SlidingTopWindows({m}: { m: Manager }) {
     const editingCard = useObservableState(m.currentEditingCard$);
+    const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
+    const classes = useStyles();
     return <div className={classes.popup}>
-        <Slide direction="down" in={!!editingCard}>
-            <div style={{width: '100%', display: 'flex'}}>
-                {
-                    editingCard && <Fragment>
-                        <EditingCardComponent card={editingCard}/>
-                        <AudioPopup m={m}/>
-                    </Fragment>
-                }
-            </div>
+        {editingCard && <Slide direction="down" in={!!recordingRequest}>
+            <EditingCardComponent card={editingCard}/>
         </Slide>
-    </div>
+        } {recordingRequest && <Slide direction="down" in={!!editingCard}>
+        <AudioPopup m={m}/>
+    </Slide>}
+        {/*
+            {editingCard && <EditingCardComponent card={editingCard}/>}
+            <div style={{width: '100%', display: 'flex'}}>
+            </div>
+        */}
+    </div>;
+}
+
+export function ReadingPage({m}: { m: Manager }) {
+    return <SlidingTopWindows m={m}/>
 }

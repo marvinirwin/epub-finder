@@ -1,7 +1,7 @@
 import {WavAudio} from "../WavAudio";
 
-export interface IRecordRequest {
+export interface RecordRequest {
     duration: number;
-    cb: (c: WavAudio) => void;
+    cb: (c: string) => void;
     label: string;
 }

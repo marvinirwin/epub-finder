@@ -2,18 +2,18 @@ import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
-
-export interface ISetting {
-    key: string;
-    value: any;
-}
+import {ISetting} from "../Interfaces/ISetting";
+import {CreatedSentence} from "../Interfaces/CreatedSentence";
 
 
 export class MyAppDatabase extends Dexie {
     static CURRENT_VERSION = 5;
+
     cards: Dexie.Table<ICard, number>;
     recognitionRecords: Dexie.Table<IWordRecognitionRow, number>;
+    createdSentences: Dexie.Table<CreatedSentence, number>;
     settings: Dexie.Table<ISetting, string>;
+
     messages$: ReplaySubject<string> = new ReplaySubject<string>();
 
     constructor() {
@@ -22,13 +22,15 @@ export class MyAppDatabase extends Dexie {
         this.version(MyAppDatabase.CURRENT_VERSION).stores({
             cards: 'id++, learningLanguage, knownLanguage, deck',
             recognitionRecords: 'id++, word, timestamp',
-            settings: 'key, value'
+            settings: 'key, value',
+            createdSentences: 'id++, learningLanguage'
         });
         this.messages$.next("Stores created, initializing AnkiPackageSQLiteTables")
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table("cards");
         this.settings = this.table("settings");
         this.recognitionRecords = this.table("recognitionRecords");
+        this.createdSentences = this.table("createdSentences");
         this.messages$.next("Tables initialized")
     }
 
@@ -48,6 +50,17 @@ export class MyAppDatabase extends Dexie {
             this.messages$.next(`Querying cards in chunks ${offset}`)
             const chunkedCards = await f().limit(chunkSize).toArray();
             yield chunkedCards;
+            offset += chunkSize;
+        }
+    }
+
+    async* getSentenceRowsFromDB(): AsyncGenerator<CreatedSentence[]>{
+        let offset = 0;
+        let chunkSize = 500;
+        while (await this.createdSentences.offset(offset).first()) {
+            this.messages$.next(`Querying cards in chunks ${offset}`)
+            const chunkedCreatedSentences = await this.createdSentences.offset(offset).limit(chunkSize).toArray();
+            yield chunkedCreatedSentences;
             offset += chunkSize;
         }
     }
