@@ -62,9 +62,9 @@ export function Characters({c, m}: QuizCardProps) {
             <Typography variant="h1" component="h1" className={classes.center}>
                 {c?.learningLanguage}
             </Typography>
-            <div style={{display: 'flex', flexFlow: 'column nowrap', textAlign: 'left'}}>
+            <div style={{display: 'flex', flexFlow: 'column nowrap', marginLeft: '30vw'}}>
                 {(sentences$ || []).map(sentence =>
-                    <Typography variant="subtitle2" className={classes.center}>
+                    <Typography variant="subtitle1" className={classes.alignLeft}>
                         {sentence}
                     </Typography>
                 )}

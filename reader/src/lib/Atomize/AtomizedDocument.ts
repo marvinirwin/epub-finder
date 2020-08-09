@@ -3,35 +3,14 @@ import {uniqueId} from 'lodash';
 import {DOMParser} from "xmldom";
 import {AtomizedSentence} from "./AtomizedSentence";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+import {splitLong} from "../Util/Util";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
 export class AtomizedDocument {
     constructor(public document: XMLDocument) {}
 
-    replaceDocumentSources(doc: Document) {
-        const walk = (node: Node) => {
-            var child, next;
-            switch (node.nodeType) {
-                case 1: // Element node
-                    const el = node as Element;
-                    this.replaceHrefOrSource(el, "src");
-                    if (el.localName === "link") {
-                        this.replaceHrefOrSource(el, "href");
-                    }
-                case 9: // Document node
-                    child = node.firstChild;
-                    while (child) {
-                        next = child.nextSibling;
-                        walk(child);
-                        child = next;
-                    }
-                    break;
-            }
-        }
-        walk(doc);
-        return doc;
-    }
 
     replaceHrefOrSource(el: Element, qualifiedName: string) {
         let currentSource = el.getAttribute(qualifiedName);
@@ -72,36 +51,38 @@ export class AtomizedDocument {
         return leaves;
     }
 
-    createMarksUnderLeaves(textNodes: Element[]) {
-        const body = (this.document.getElementsByTagName("body"))[0];
-        for (let i = 0; i < textNodes.length; i++) {
-            this.annotateTextNode(textNodes[i], i, body);
-        }
-    }
 
     annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
-        const oldParent: Element = <Element>textNode.parentNode;
         const popperId = uniqueId();
-        const myText: string = <string>textNode.nodeValue;
-        const indexOfMe = getIndexOfEl(textNode);
-        oldParent.removeChild(textNode);
-        const newParent = this.document.createElement('span');
-        newParent.setAttribute('popper-id', popperId);
-        newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
-        myText.split('').forEach(char => {
-            // I'll probably need to do labelling later so the data can be rehydrated
-            // Perhaps this is inefficient, but for character based stuff its probably fine
-            const mark = this.document.createElement("mark");
-            const textNode = this.document.createTextNode(char);
-            mark.insertBefore(textNode, null);
-            newParent.insertBefore(mark, null)
-        })
-        oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
+        const newParent = this.replaceTextNodeWithSubTextNode(
+            textNode,
+            (textNode.nodeValue as string).split(''),
+            "mark"
+        );
         const popperEl = this.document.createElement('div');
         popperEl.setAttribute("class", "translation-popover");
         popperEl.setAttribute('id', AtomizedDocument.getPopperId(popperId));
         popperEl.setAttribute("class", "POPPER_ELEMENT");
+        newParent.setAttribute('popper-id', popperId);
+        newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
         newParent.insertBefore(popperEl, null);
+    }
+
+    private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
+        const indexOfMe = getIndexOfEl(textNode);
+        (textNode.parentNode as Element).removeChild(textNode);
+        const newParent = this.document.createElement('span');
+        newSubStrings.forEach(string => {
+            // I'll probably need to do labelling later so the data can be rehydrated
+            // Perhaps this is inefficient, but for character based stuff its probably fine
+            const mark = this.document.createElement(newTagType);
+            const textNode = this.document.createTextNode(string);
+            mark.insertBefore(textNode, null);
+            newParent.insertBefore(mark, null)
+        })
+        const oldParent = textNode.parentNode as Element;
+        oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
+        return newParent;
     }
 
     public static getPopperId(popperId: string) {
@@ -111,8 +92,59 @@ export class AtomizedDocument {
     public static atomizeDocument(xmlsource: string): AtomizedDocument {
         const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
         doc.replaceDocumentSources(doc.document);
+        doc.splitLongTextElements(doc.getTextElements(doc.document));
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
         return doc;
+    }
+
+    replaceDocumentSources(doc: Document) {
+        const walk = (node: Node) => {
+            var child, next;
+            switch (node.nodeType) {
+                case 1: // Element node
+                    const el = node as Element;
+                    this.replaceHrefOrSource(el, "src");
+                    if (el.localName === "link") {
+                        this.replaceHrefOrSource(el, "href");
+                    }
+                case 9: // Document node
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        walk(child);
+                        child = next;
+                    }
+                    break;
+            }
+        }
+        walk(doc);
+        return doc;
+    }
+
+    splitLongTextElements(textElements: Element[]) {
+        textElements.forEach(textNode => {
+            const split = splitLong(
+                20,
+                textNode.nodeValue as string,
+                    (char: string) => !isChineseCharacter(char)
+            );
+
+            if (split.length > 1) {
+                this.replaceTextNodeWithSubTextNode(
+                    textNode,
+                    split,
+                    "div"
+                );
+            }
+        })
+    }
+
+    createMarksUnderLeaves(textNodes: Element[]) {
+        const body = (this.document.getElementsByTagName("body"))[0];
+        for (let i = 0; i < textNodes.length; i++) {
+            textNodes[i].textContent
+            this.annotateTextNode(textNodes[i], i, body);
+        }
     }
 
     public getAtomizedSentences(): AtomizedSentence[]  {
@@ -124,5 +156,6 @@ export class AtomizedDocument {
         }
         return atomized;
     }
+
 }
 

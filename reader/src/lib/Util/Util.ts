@@ -45,6 +45,26 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
     return result.data;
 }
 
+export function splitLong(threshhold: number, str: string, filterFunc: (char: string) => boolean): string[] {
+    const splits = [];
+    // Once the threshhold is reached, split on the next punctuation/line break
+    let currentStart = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const isPastThreshhold = (i - currentStart) > threshhold;
+        if (isPastThreshhold && filterFunc(char)) {
+            splits.push(str.substr(currentStart, i - currentStart));
+            currentStart = i;
+        }
+    }
+    splits.push(str.substr(currentStart, str.length));
+
+    return splits;
+}
+
+
+
+
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
     QUIZ_PAGE = "QUIZ_PAGE",

@@ -11,6 +11,10 @@ export const quizStyles = makeStyles((theme) => ({
         flexGrow: 1,
         textAlign: 'center'
     },
+    alignLeft: {
+        flexGrow: 1,
+        textAlign: 'left'
+    },
     cardActions: {
         display: "flex",
         justifyContent: "center"
