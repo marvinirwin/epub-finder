@@ -41,6 +41,7 @@ import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
 import {SentenceManager} from "./Manager/SentenceManager";
 import {TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
+import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 
 export class Manager {
 
@@ -82,6 +83,8 @@ export class Manager {
     textData$: Observable<TextWordData>;
 
     setQuizWord: Subject<string> = new Subject<string>();
+
+    characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
@@ -132,7 +135,9 @@ export class Manager {
         this.textData$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.pageManager.atomizedSentences$.pipe(filter(sentenceList => !!sentenceList.length))
+                this.pageManager.atomizedSentences$.pipe(
+                    filter(sentenceList => !!sentenceList.length)
+                )
             ]
         ).pipe(map(([trie, atomizedSentences]) => {
             return AtomizedSentence.getTextWordData(
@@ -144,7 +149,15 @@ export class Manager {
 
         this.textData$.subscribe(() => {});
 
-        this.wordElementMap$ = this.textData$.pipe(map(t => t.wordElementsMap));
+        this.wordElementMap$ = combineLatest([
+            this.textData$.pipe(
+                map(t => t.wordElementsMap),
+                startWith({})
+            ),
+            this.characterPageWordElementMap$.pipe(startWith({}))
+        ]).pipe(map((wordElementMaps: Dictionary<IAnnotatedCharacter[]>[]) => {
+            return mergeDictArrays<IAnnotatedCharacter>(...wordElementMaps);
+        }));
 
         this.wordElementMap$.subscribe(wordElementMap => Object
             .values(wordElementMap)

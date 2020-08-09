@@ -16,8 +16,9 @@ import {PageRenderer} from "../../lib/PageRenderer";
 import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
-import {uniq} from "lodash";
+import {Dictionary, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
+import {IAnnotatedCharacter} from "../../lib/Interfaces/Annotation/IAnnotatedCharacter";
 
 
 export function Characters({c, m}: QuizCardProps) {
@@ -67,6 +68,7 @@ ${sentences$?.map(sentence => {
                     Object.values(textWordData.wordElementsMap).forEach(elements =>
                         elements.forEach(element => m.applyWordElementListener(element))
                     )
+                    m.characterPageWordElementMap$.next(textWordData.wordElementsMap)
                 });
             });
 
