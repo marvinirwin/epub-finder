@@ -8,7 +8,7 @@ import {getAtomizedSentences} from "./Util/Util";
 
 test('Atomizes a document and produces a mapping of words to text nodes', async () => {
     const atomizedSentences = getAtomizedSentences('BasicDoc.html')
-    expect(atomizedSentences).toHaveLength(3);
+    expect(atomizedSentences).toHaveLength(5);
     const sentenceElementMaps = atomizedSentences.map(atomizedSentence => atomizedSentence.getTextWordData(
         trie(["Test"]),
         [4]
