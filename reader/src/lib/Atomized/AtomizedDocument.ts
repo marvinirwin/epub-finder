@@ -9,8 +9,8 @@ import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
 export class AtomizedDocument {
-    constructor(public document: XMLDocument) {}
 
+    constructor(public document: XMLDocument) {}
 
     replaceHrefOrSource(el: Element, qualifiedName: string) {
         let currentSource = el.getAttribute(qualifiedName);
@@ -51,12 +51,15 @@ export class AtomizedDocument {
         return leaves;
     }
 
-
     annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
         const popperId = uniqueId();
+        let nodeValue = textNode.nodeValue as string;
+        if (nodeValue === "》明确规定：对创建全国人民武装力量和领导全国人民武装力量革命战争") {
+            debugger;console.log();
+        }
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
-            (textNode.nodeValue as string).split(''),
+            nodeValue.split(''),
             "mark"
         );
         const popperEl = this.document.createElement('div');

@@ -27,9 +27,7 @@ import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {PageManager} from "./Manager/PageManager";
 import {Website} from "./Website";
-import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {NavigationPages} from "./Util/Util";
-import {TextWordData} from "./Atomize/TextWordData";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
 import {InputManager} from "./Manager/InputManager";
@@ -41,6 +39,8 @@ import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
 import {SentenceManager} from "./Manager/SentenceManager";
+import {TextWordData} from "./Atomized/TextWordData";
+import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 
 export class Manager {
 

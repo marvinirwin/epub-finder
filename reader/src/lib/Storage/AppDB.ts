@@ -1,7 +1,7 @@
 import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
+import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {ISetting} from "../Interfaces/ISetting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 
@@ -10,7 +10,7 @@ export class MyAppDatabase extends Dexie {
     static CURRENT_VERSION = 5;
 
     cards: Dexie.Table<ICard, number>;
-    recognitionRecords: Dexie.Table<IWordRecognitionRow, number>;
+    recognitionRecords: Dexie.Table<WordRecognitionRow, number>;
     createdSentences: Dexie.Table<CreatedSentence, number>;
     settings: Dexie.Table<ISetting, string>;
 
@@ -65,7 +65,7 @@ export class MyAppDatabase extends Dexie {
         }
     }
 
-    async* getRecognitionRowsFromDB(): AsyncGenerator<IWordRecognitionRow[]> {
+    async* getRecognitionRowsFromDB(): AsyncGenerator<WordRecognitionRow[]> {
         let offset = 0;
         let chunkSize = 500;
         while (await this.recognitionRecords.offset(offset).first()) {

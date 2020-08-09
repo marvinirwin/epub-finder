@@ -1,5 +1,5 @@
 import trie from "trie-prefix-tree";
-import {AtomizedSentence} from "../lib/Atomize/AtomizedSentence";
+import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
 import {uniq} from "lodash";
 import {getAtomizedSentences} from "./Util/Util";
 

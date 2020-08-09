@@ -7,8 +7,10 @@ import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {getTranslation} from "../Util/Util";
 
 export class AtomizedSentence {
+    private _translation: string | undefined;
 
     public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
         let textWordDataRecords = atomizedSentences.map(atomizedSentence =>
@@ -103,4 +105,14 @@ export class AtomizedSentence {
         return this.popperElement as unknown as HTMLElement;
     }
 
+    async getTranslation(): Promise<string> {
+        if (this.translated) {
+            return this._translation as string;
+        } else {
+            const t = await getTranslation(this.sentenceElement.textContent)
+            this.translated = true;
+            this.popperElement.textContent = t;
+            return this.translatableText;
+        }
+    }
 }

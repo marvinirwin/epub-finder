@@ -1,14 +1,14 @@
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
-import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
+import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {orderBy, sumBy, sum} from "lodash";
 import moment from "moment";
 
 export class ScheduleRow {
     wordCountRecords: IWordCountRow[] = [];
-    wordRecognitionRecords: IWordRecognitionRow[] = [];
+    wordRecognitionRecords: WordRecognitionRow[] = [];
 
 
-    addWordRecognitionRecords(...records: IWordRecognitionRow[]) {
+    addWordRecognitionRecords(...records: WordRecognitionRow[]) {
         this.wordRecognitionRecords.push(...records);
         this.wordRecognitionRecords = orderBy(this.wordRecognitionRecords, 'timestamp')
     }
@@ -40,7 +40,7 @@ export class ScheduleRow {
 
         // The "advance record" is a record which has a change in recognitionScore
         const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestamp', 'desc');
-        let mostRecentRecord: IWordRecognitionRow = mostRecentRecordsFirst[0];
+        let mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
         const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
 /*
             if (this.word === 'undefined') {

@@ -1,6 +1,6 @@
 import {fromEvent, merge, Subject} from "rxjs";
 import { Dictionary } from "lodash";
-import {AtomizedSentence} from "../Atomize/AtomizedSentence";
+import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {getTranslation} from "../Util/Util";
 
 export class InputManager {
@@ -40,11 +40,7 @@ export class InputManager {
 
     public static applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
         annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
-            if (!annotatedElements.translated) {
-                const t = await getTranslation(annotatedElements.sentenceElement.textContent)
-                annotatedElements.translated = true;
-                return annotatedElements.popperElement.textContent = t;
-            }
+            annotatedElements.getTranslation();
         };
     }
 }

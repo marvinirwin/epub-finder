@@ -1,4 +1,4 @@
-export interface IWordRecognitionRow {
+export interface WordRecognitionRow {
     id?: number;
     word: string;
     timestamp: Date;

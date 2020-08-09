@@ -7,10 +7,10 @@ import {printExecTime} from "./Util/Timer";
 import {waitFor} from "./Util/waitFor";
 import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "./Interfaces/IWordCountRow";
-import {ANNOTATE_AND_TRANSLATE} from "./Atomize/AtomizedDocument";
-import {AtomizedSentence} from "./Atomize/AtomizedSentence";
 import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
 import {sleep} from "./Util/Util";
+import {AtomizedSentence} from "./Atomized/AtomizedSentence";
+import {ANNOTATE_AND_TRANSLATE} from "./Atomized/AtomizedDocument";
 
 
 export class PageRenderer {

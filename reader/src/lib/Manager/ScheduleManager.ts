@@ -1,5 +1,5 @@
 import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
-import {IWordRecognitionRow} from "../Scheduling/IWordRecognitionRow";
+import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
@@ -41,8 +41,8 @@ export class ScheduleManager {
     sortedScheduleRows$: Observable<ScheduleRow[]>;
     learningCards$: Observable<ScheduleRow[]>;
     addWordCountRows$: Subject<IWordCountRow[]> = new ReplaySubject<IWordCountRow[]>(1);
-    addPersistedWordRecognitionRows$: ReplaySubject<IWordRecognitionRow[]> = new ReplaySubject<IWordRecognitionRow[]>(1);
-    addUnpersistedWordRecognitionRows$: Subject<IWordRecognitionRow[]> = new Subject<IWordRecognitionRow[]>();
+    addPersistedWordRecognitionRows$: ReplaySubject<WordRecognitionRow[]> = new ReplaySubject<WordRecognitionRow[]>(1);
+    addUnpersistedWordRecognitionRows$: Subject<WordRecognitionRow[]> = new Subject<WordRecognitionRow[]>();
     wordCountDict$: Subject<Dictionary<number>> = new Subject<Dictionary<number>>();
     wordScheduleRowDict$ = new ReplaySubject<Dictionary<ScheduleRow>>(1);
 

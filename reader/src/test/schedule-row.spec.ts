@@ -9,7 +9,7 @@ import {QuizManager, QuizResult} from "../lib/Manager/QuizManager";
 import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {HotObservable} from "rxjs/internal/testing/HotObservable";
 import moment from "moment";
-import {IWordRecognitionRow} from "../lib/Scheduling/IWordRecognitionRow";
+import {WordRecognitionRow} from "../lib/Scheduling/WordRecognitionRow";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -83,7 +83,7 @@ it('Sorts cards into Learning and out of learning', () => {
         const {hot, expectObservable} = helpers;
         const scheduleManager = new ScheduleManager(db);
         const addQuizResultMarbles =
-            Marbles.new<QuizResult, IWordRecognitionRow[]>(helpers)
+            Marbles.new<QuizResult, WordRecognitionRow[]>(helpers)
                 .setPipe(QuizResultToRecognitionRow(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
                 .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);
 
@@ -114,7 +114,7 @@ it('Sorts cards into To Review and out of To Review', () => {
         const addQuizResultMarbles = Marbles.new<QuizResult>(helpers).setTargetSubject(quizManager.quizResult$);
         const addCountMarbles = Marbles.new<IWordCountRow[]>(helpers).setTargetSubject(scheduleManager.addWordCountRows$);
         const expectToReviewMarbles = Marbles.new<number>(helpers).setExpectedObservable(scheduleManager.toReviewCards$.pipe(map(wordsList => wordsList.length)));
-        const wordRecognitionRows = Marbles.new<IWordRecognitionRow[]>(helpers).setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);
+        const wordRecognitionRows = Marbles.new<WordRecognitionRow[]>(helpers).setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);
 
         addCountMarbles.addValue([countFactory('今天')]);
         expectToReviewMarbles.addValue(0);
@@ -156,7 +156,7 @@ it('Always has a card to quiz me on', () => {
         const {scheduleManager, quizManager, cardManager} = ScheduleQuizCard(db);
         const m = new MarbleGroup(
             {
-                addQuizResult: Marbles.new<QuizResult, IWordRecognitionRow[]>(helpers)
+                addQuizResult: Marbles.new<QuizResult, WordRecognitionRow[]>(helpers)
                     .setPipe(QuizResultToRecognitionRow(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
                     .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$),
 

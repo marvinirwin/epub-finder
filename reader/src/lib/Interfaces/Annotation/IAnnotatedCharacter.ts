@@ -1,6 +1,6 @@
 import {IPositionedWord} from "./IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {AtomizedSentence} from "../../Atomize/AtomizedSentence";
+import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 
 export interface IAnnotatedCharacter {
     words: IPositionedWord[];

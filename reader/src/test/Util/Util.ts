@@ -1,4 +1,4 @@
-import {AtomizedDocument} from "../../lib/Atomize/AtomizedDocument";
+import {AtomizedDocument} from "../../lib/Atomized/AtomizedDocument";
 import {readFileSync} from "fs-extra";
 import {join} from "path";
 import {Dictionary} from "lodash";

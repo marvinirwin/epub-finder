@@ -10,7 +10,7 @@ import MultiGraph from "../MultiGraph";
 import {usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 import {filter} from "rxjs/operators";
-import {TutorialPopper} from "../Tutorial/TutorialPopover";
+import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 
 const useStyles = makeStyles((theme) => ({

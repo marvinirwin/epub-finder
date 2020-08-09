@@ -8,7 +8,7 @@ import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import Settings from '@material-ui/icons/Settings';
 import {makeStyles} from "@material-ui/core/styles";
 import {NavigationPages} from "../../lib/Util/Util";
-import {TutorialPopper} from "../Tutorial/TutorialPopover";
+import {TutorialPopper} from "../Popover/Tutorial";
 import Typography from "@material-ui/core/Typography";
 import {useObservableState} from "observable-hooks";
 

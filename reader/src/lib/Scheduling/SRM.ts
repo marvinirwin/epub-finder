@@ -1,4 +1,4 @@
-import {IWordRecognitionRow} from "./IWordRecognitionRow";
+import {WordRecognitionRow} from "./WordRecognitionRow";
 import moment from "moment";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -29,7 +29,7 @@ export class SRM {
         public scoreToProgressChange = [-3, -1, 1]
     ) {
     }
-    private static getProgressScore(rows: IWordRecognitionRow[]): number {
+    private static getProgressScore(rows: WordRecognitionRow[]): number {
         return rows[rows.length - 1]?.recognitionScore || 0;
     }
 
@@ -40,7 +40,7 @@ export class SRM {
         return this.scoreToProgressChange.length - 1;
     }
     getNextRecognitionRecord(
-        previousRows: IWordRecognitionRow[],
+        previousRows: WordRecognitionRow[],
         score: number,
         now: Date
     ): Ret {

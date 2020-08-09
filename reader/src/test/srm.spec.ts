@@ -1,10 +1,10 @@
-import {IWordRecognitionRow} from "../lib/Scheduling/IWordRecognitionRow";
+import {WordRecognitionRow} from "../lib/Scheduling/WordRecognitionRow";
 import moment from 'moment';
 import {RecognitionMap, SRM} from "../lib/Scheduling/SRM";
 
 const sm = new SRM();
 
-const r1: IWordRecognitionRow = {
+const r1: WordRecognitionRow = {
     word: "你好",
     timestamp: new Date(),
     recognitionScore: 0,
@@ -12,7 +12,7 @@ const r1: IWordRecognitionRow = {
 };
 
 function expectAndPush(
-    rows: IWordRecognitionRow[],
+    rows: WordRecognitionRow[],
     difficulty: number,
     expectedDay: Date | moment.Moment,
     expectedScore: number
