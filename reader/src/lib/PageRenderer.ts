@@ -24,7 +24,8 @@ export class PageRenderer {
         let style = $(`
                     <style>
 body {
-    padding-top: 50px
+    padding-top: 50px;
+    font-size: 150%;
 }
 mark {
     position: relative;
