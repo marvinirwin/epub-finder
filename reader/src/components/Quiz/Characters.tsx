@@ -10,17 +10,15 @@ import {Pictures} from "./Pictures";
 import {quizStyles} from "./QuizStyles";
 import {combineLatest, Observable} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
-import {filter, map, switchMap, take, tap, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
 import {PageRenderer} from "../../lib/PageRenderer";
 import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
-import {Dictionary, uniq} from "lodash";
+import {uniq, isEqual} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
-import {IAnnotatedCharacter} from "../../lib/Interfaces/Annotation/IAnnotatedCharacter";
 import {PageManager} from "../../lib/Manager/PageManager";
-import {TrieWrapper} from "../../lib/TrieWrapper";
 
 
 function getSrc(sentences: string[]) {
@@ -46,18 +44,30 @@ export function Characters({c, m}: QuizCardProps) {
     const [error, setError] = useState('');
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
         (obs$: Observable<[string | undefined]>) =>
-            obs$.pipe(
-                withLatestFrom(m.textData$),
-                map(([[word], {wordSentenceMap}]) =>
-                    (wordSentenceMap[word || ''] || []).map((s: AtomizedSentence) => s.translatableText)
-                )
+            combineLatest([
+                    obs$,
+                    m.textData$
+                ]
+            ).pipe(
+                map(([[word], {wordSentenceMap}]) => {
+                        let atomizedSentences1 = wordSentenceMap[word || ''] || [];
+                        let strings = atomizedSentences1.map((s: AtomizedSentence) => {
+                            return s.translatableText;
+                        });
+                        return strings;
+                    }
+                ),
+                distinctUntilChanged(isEqual)
             )
         , [c?.learningLanguage],
     ), []);
 
     const pageRenderer$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
         obs$.pipe(
-            map(([sentences]) => getSrc(sentences)),
+            filter(([strings]) => strings.length > 0),
+            map(([sentences]) => {
+                return getSrc(sentences);
+            }),
             switchMap(async (src: string) => {
                 const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
                 return new PageRenderer(atomizedSrc, 'character_translation');
@@ -68,7 +78,9 @@ export function Characters({c, m}: QuizCardProps) {
     useObservableState(useObservable((obs$: Observable<[PageRenderer | undefined]>) =>
         obs$.pipe(
             filter(([pageRenderer]) => !!pageRenderer),
-            switchMap(([pageRenderer]: [PageRenderer | undefined]) => (pageRenderer as PageRenderer).iframebody$),
+            switchMap(([pageRenderer]: [PageRenderer | undefined]) => {
+                return (pageRenderer as PageRenderer).iframebody$;
+            }),
             tap(iframeBody => {
                 m.inputManager.applyListeners(iframeBody);
             })
@@ -81,7 +93,9 @@ export function Characters({c, m}: QuizCardProps) {
                         filter(([pageRenderer]) => !!pageRenderer),
                         switchMap(([pageRenderer]) => (pageRenderer as PageRenderer).atomizedSentences$
                             .pipe(
-                                filter(atomizedSentences => atomizedSentences.length > 0)
+                                filter(atomizedSentences => {
+                                    return atomizedSentences.length > 0;
+                                })
                             )
                         )
                     ),
