@@ -9,7 +9,7 @@ import {
     shareReplay,
     startWith,
     switchMap,
-    take,
+    take, tap,
     withLatestFrom
 } from "rxjs/operators";
 /* eslint import/no-webpack-loader-syntax:0 */
@@ -147,7 +147,7 @@ export class Manager {
             );
         }));
 
-        this.textData$.subscribe(() => {});
+        this.textData$.subscribe(() => { });
 
         this.wordElementMap$ = combineLatest([
             this.textData$.pipe(
@@ -170,7 +170,9 @@ export class Manager {
             }),
         ).subscribe(this.scheduleManager.wordCountDict$);
 
-        this.requestEditWord$.pipe(resolveICardForWord<string, ICard>(this.cardManager.cardIndex$))
+        this.requestEditWord$.pipe(
+            resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
+        )
             .subscribe((icard) => {
                 this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
             })
@@ -208,6 +210,8 @@ export class Manager {
         })
 
         this.inputManager.getKeyDownSubject("Escape").subscribe(() => this.queEditingCard$.next(undefined))
+
+        this.inputManager.selectedText$.subscribe(this.requestEditWord$);
 
         this.cardManager.load();
     }
@@ -252,7 +256,7 @@ export class Manager {
                 const child = children[i];
                 child.classList.remove('highlighted')
             }
-            this.requestEditWord$.next(maxWord?.word);
+            this.inputManager.selectedText$.next(maxWord?.word)
         };
         return i;
     }

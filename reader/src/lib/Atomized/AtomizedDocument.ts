@@ -54,9 +54,6 @@ export class AtomizedDocument {
     annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
         const popperId = uniqueId();
         let nodeValue = textNode.nodeValue as string;
-        if (nodeValue === "》明确规定：对创建全国人民武装力量和领导全国人民武装力量革命战争") {
-            debugger;console.log();
-        }
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
             nodeValue.split(''),

@@ -1,9 +1,10 @@
 import {makeStyles} from "@material-ui/core/styles";
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Card, CardActions, CardContent, Grid, Typography} from "@material-ui/core";
+import {Button, Card, CardActions, CardContent, Grid, IconButton, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
 import SineWave from "./SineWave";
+import RefreshIcon from '@material-ui/icons/Refresh';
 /*
 import MultiGraph from "../MultiGraph";
 */
@@ -27,20 +28,19 @@ const useStyles = makeStyles((theme) => ({
     learningLanguage: {
         flexGrow: 1
     },
-    recognizedSpeech: {
-    }
+    recognizedSpeech: {}
 }));
 
-export default function AudioPopup({m}:{m: Manager}) {
+export default function AudioPopup({m}: { m: Manager }) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
-/*
-    const userAudio = useObservableState(r.userAudio$);
-*/
+    /*
+        const userAudio = useObservableState(r.userAudio$);
+    */
     const synthAudio = useObservableState(m.currentEditingSynthesizedWavFile$);
-/*
-    const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
-*/
+    /*
+        const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
+    */
     const canvasRef = useRef<HTMLCanvasElement>();
     const currentAudioRequest = useObservableState(r.currentRecordRequest$);
     const retryableAudioRequest = usePipe(r.currentRecordRequest$, o => o.pipe(filter(v => !!v)));
@@ -52,37 +52,32 @@ export default function AudioPopup({m}:{m: Manager}) {
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
-    return <div className={classes.popupParent}  ref={setReferenceElement}>
+    return <div className={classes.popupParent} ref={setReferenceElement}>
         <Card>
-            <CardContent>
+            <CardContent style={{display: 'flex', flexFlow: 'row nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'}}>
                 <TutorialPopper referenceElement={referenceElement} storageKey={'AUDIO_POPUP'} placement="top">
-                    <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green.  The recognized text should match the pinyin on the flashcard.</Typography>
+                    <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
+                        recognized text should match the pinyin on the flashcard.</Typography>
                 </TutorialPopper>
-                <div className={classes.titleRow}>
-                    <div style={{justifySelf: "start"}}>
-                        <CountdownCircle r={r}/>
-                    </div>
-                    <Typography variant="h3" className={classes.learningLanguage} align="center">{currentAudioRequest?.label}</Typography>
-                </div>
+                <CountdownCircle r={r}/>
+                <Typography variant="h6" className={classes.learningLanguage}
+                            align="center">{currentAudioRequest?.label}</Typography>
                 <SineWave r={r}/>
-                <Typography variant="h3" className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
-                <Grid container>
-{/*
+                <Typography variant="h6"
+                            className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
+                {/*
                     <Grid item xs={6}>
                         <audio src={userAudio?.url} controls autoPlay />
                     </Grid>
 */}
-                    <Grid item xs={12}>
-                        <audio src={synthAudio?.url} controls autoPlay />
-                    </Grid>
-                </Grid>
-{/*
+                <audio style={{height: '24px'}} src={synthAudio?.url} controls autoPlay/>
+                {/*
                 {graphData && <MultiGraph plots={graphData}/>}
 */}
+                <IconButton style={{height: '24px', width: '24px'}} disabled={!retryableAudioRequest} onClick={() => r.currentRecordRequest$.next(retryableAudioRequest)} aria-label="retry">
+                    <RefreshIcon style={{height: '24px', width: '24px'}} />
+                </IconButton>
             </CardContent>
-            <CardActions>
-                <Button disabled={!retryableAudioRequest} onClick={() => r.currentRecordRequest$.next(retryableAudioRequest)}>Retry</Button>
-            </CardActions>
         </Card>
     </div>
 }

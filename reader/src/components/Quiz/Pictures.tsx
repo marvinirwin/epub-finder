@@ -11,6 +11,7 @@ export function Pictures({c, m}: QuizCardProps) {
     const advance = () => m.quizManager.quizzingComponent$.next("Conclusion");
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
+            {c?.photos.length &&
             <GridList className={classes.center}>
                 {c?.photos.map((src: string) =>
                     <GridListTile key={src}>
@@ -18,7 +19,9 @@ export function Pictures({c, m}: QuizCardProps) {
                     </GridListTile>
                 )}
             </GridList>
-            {!c?.photos.length && <Typography variant="subtitle1">No pictures were provided for {c?.learningLanguage}</Typography>}
+            }
+            {!c?.photos.length &&
+            <Typography variant="subtitle1">No pictures were provided for {c?.learningLanguage}</Typography>}
         </CardContent>
         <CardActions className={classes.cardActions}>
             <Button onClick={advance}>Next</Button>

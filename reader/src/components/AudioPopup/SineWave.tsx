@@ -5,8 +5,8 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
     canvas: {
         flexGrow: 1,
-        height: '50px',
-        width: '100%'
+        height: '20px',
+        width: '40px'
     },
 }));
 export default function SineWave({r}: { r: AudioRecorder }) {

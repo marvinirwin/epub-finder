@@ -8,9 +8,9 @@ import React, {useEffect, useState} from "react";
 import {QuizCardProps} from "./Popup";
 import {Pictures} from "./Pictures";
 import {quizStyles} from "./QuizStyles";
-import {Observable} from "rxjs";
+import {combineLatest, Observable} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
-import {map, take, withLatestFrom} from "rxjs/operators";
+import {filter, map, switchMap, take, tap, withLatestFrom} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
 import {PageRenderer} from "../../lib/PageRenderer";
 import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
@@ -19,12 +19,31 @@ import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {Dictionary, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {IAnnotatedCharacter} from "../../lib/Interfaces/Annotation/IAnnotatedCharacter";
+import {PageManager} from "../../lib/Manager/PageManager";
+import {TrieWrapper} from "../../lib/TrieWrapper";
 
+
+function getSrc(sentences: string[]) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Title</title>
+</head>
+<body>
+${sentences.map(sentence => {
+        return `<div>${sentence}</div>`;
+    })}
+</body>
+</html>
+        `;
+}
 
 export function Characters({c, m}: QuizCardProps) {
+    const advance = () => m.quizManager.quizzingComponent$.next("Pictures");
     const classes = quizStyles();
-    const trie = useObservableState(m.cardManager.trie$);
-    let advance = () => m.quizManager.quizzingComponent$.next("Pictures");
+    const [error, setError] = useState('');
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
         (obs$: Observable<[string | undefined]>) =>
             obs$.pipe(
@@ -34,29 +53,43 @@ export function Characters({c, m}: QuizCardProps) {
                 )
             )
         , [c?.learningLanguage],
-    ));
-    const [pageRenderer, setPageRenderer] = useState();
-    useEffect(() => {
-        if (sentences$ && trie) {
-            // With the sentences we create a new pageRenderer
-            let src = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Random Title</title>
-</head>
-<body>
-${sentences$?.map(sentence => {
-                return `<div>${sentence}</div>`;
-            })}
-</body>
-</html>
-        `;
-            GetWorkerResults(new AtomizeSrcdoc(), src).then(atomizedSrc => {
-                let pageRenderer1 = new PageRenderer(atomizedSrc, 'character_translation');
-                setPageRenderer(pageRenderer1);
-                pageRenderer1.atomizedSentences$.subscribe(atomizedSentences => {
+    ), []);
+
+    const pageRenderer$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
+        obs$.pipe(
+            map(([sentences]) => getSrc(sentences)),
+            switchMap(async (src: string) => {
+                const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
+                return new PageRenderer(atomizedSrc, 'character_translation');
+            })
+        ), [sentences$])
+    );
+
+    useObservableState(useObservable((obs$: Observable<[PageRenderer | undefined]>) =>
+        obs$.pipe(
+            filter(([pageRenderer]) => !!pageRenderer),
+            switchMap(([pageRenderer]: [PageRenderer | undefined]) => (pageRenderer as PageRenderer).iframebody$),
+            tap(iframeBody => {
+                m.inputManager.applyListeners(iframeBody);
+            })
+        ), [pageRenderer$]),
+    );
+    const atomizedSentences = useObservableState(useObservable((obs$: Observable<[PageRenderer | undefined]>) =>
+            combineLatest(
+                [
+                    obs$.pipe(
+                        filter(([pageRenderer]) => !!pageRenderer),
+                        switchMap(([pageRenderer]) => (pageRenderer as PageRenderer).atomizedSentences$
+                            .pipe(
+                                filter(atomizedSentences => atomizedSentences.length > 0)
+                            )
+                        )
+                    ),
+                    m.cardManager.trie$
+                ]
+            ).pipe(
+                tap(([atomizedSentences, trie]) => {
+                    PageManager.ApplyAtomizedSentenceListeners(atomizedSentences);
                     atomizedSentences.forEach(atomizeSentence => {
                         InputManager.applySentenceElementSelectListener(atomizeSentence);
                     });
@@ -65,18 +98,12 @@ ${sentences$?.map(sentence => {
                         trie,
                         uniq(trie.getWords(false).map(v => v.length))
                     );
-                    Object.values(textWordData.wordElementsMap).forEach(elements =>
-                        elements.forEach(element => m.applyWordElementListener(element))
-                    )
                     m.characterPageWordElementMap$.next(textWordData.wordElementsMap)
-                });
-            });
+                })
+            )
+        , [pageRenderer$])
+    );
 
-        }
-    }, [sentences$, trie]);
-
-
-    const [error, setError] = useState('');
     useEffect(() => {
         setError("");// The card has changed, clear the error message
         if (!c) return;
@@ -108,13 +135,14 @@ ${sentences$?.map(sentence => {
     }, [c])
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
+            {error}
             <div>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
             </div>
             <div style={{flexGrow: 1, width: '100%'}}>
-                {pageRenderer && <AtomizedFrameContainer rb={pageRenderer} m={m}/>}
+                {pageRenderer$ && <AtomizedFrameContainer rb={pageRenderer$} m={m}/>}
             </div>
         </CardContent>
         <CardActions className={classes.cardActions}>

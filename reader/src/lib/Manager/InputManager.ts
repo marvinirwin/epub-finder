@@ -13,10 +13,10 @@ export class InputManager {
         root.onkeydown = (ev) => this.keydownMap[ev.key]?.next(ev);
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
 
-        let checkForSelectedText = () => {
-            const activeEl = document.activeElement;
+        const checkForSelectedText = () => {
+            const activeEl = root.ownerDocument?.activeElement;
             if (activeEl) {
-                const selObj = document.getSelection();
+                const selObj = root.ownerDocument?.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
                     if (text) {

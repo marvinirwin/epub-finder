@@ -23,6 +23,9 @@ export class PageRenderer {
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         let style = $(`
                     <style>
+body {
+    padding-top: 50px
+}
 mark {
     position: relative;
     background: transparent;
