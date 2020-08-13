@@ -22,6 +22,7 @@ export const quizStyles = makeStyles((theme) => ({
     cardContent: {
         flexGrow: 1,
         display: 'flex',
-        flexFlow: 'column nowrap'
+        flexFlow: 'column nowrap',
+        paddingTop: '50px'
     }
 }));

@@ -90,10 +90,14 @@ export class AtomizedSentence {
                 }
             })
         }
+        const sentenceMap: Dictionary<AtomizedSentence[]> = {
+            [this.translatableText]: [this]
+        };
         return {
             wordElementsMap,
             wordCounts,
-            wordSentenceMap
+            wordSentenceMap,
+            sentenceMap
         };
     }
 

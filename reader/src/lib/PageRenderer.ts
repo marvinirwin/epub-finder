@@ -24,7 +24,7 @@ export class PageRenderer {
         let style = $(`
                     <style>
 body {
-    padding-top: 50px;
+    padding-top: 100px;
     font-size: 150%;
 }
 mark {
@@ -46,6 +46,9 @@ mark::after {
     transition: opacity 250ms;
     z-index: -1;
 }
+.highlighted::after {
+    opacity: 1;
+}
 
 mark:hover {
   cursor: pointer;
@@ -54,7 +57,8 @@ mark:hover {
 .annotated_and_translated {
     position: relative;
 }
-.annotated_and_translated:hover::after {
+.annotated_and_translated:hover::after,
+.annotated_and_translated.highlighted-sentence{
     opacity: 0.15;
 }
 .annotated_and_translated::after {

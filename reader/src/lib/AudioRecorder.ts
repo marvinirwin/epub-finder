@@ -1,5 +1,16 @@
 import {combineLatest, from, Observable, ReplaySubject, Subject} from "rxjs";
-import {concatMap, count, flatMap, map, mergeMap, shareReplay, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {
+    concatMap,
+    count,
+    flatMap,
+    map,
+    mergeMap,
+    shareReplay,
+    startWith,
+    switchMap,
+    take, tap,
+    withLatestFrom
+} from "rxjs/operators";
 import React from "react";
 import axios from "axios";
 import {WavAudio} from "./WavAudio";
@@ -70,9 +81,13 @@ export class AudioRecorder {
                     speechConfig.speechRecognitionLanguage = "zh-CN";
                     return speechConfig;
                 }
-            )
+            ),
+            shareReplay(1)
         )
-        this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}));
+        this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true}))
+            .pipe(
+                shareReplay(1)
+            );
 
         combineLatest([this.mediaSource$, this.canvas$]).subscribe(async ([source, canvas]) => {
             const canvasCtx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -94,13 +109,18 @@ export class AudioRecorder {
         this.quedRecordRequest$
             .pipe(withLatestFrom(this.isRecording$))
             .subscribe(([newRequest, isRecording]) => {
-               if (!isRecording) this.currentRecordRequest$.next(newRequest);
-        })
+                if (!isRecording) this.currentRecordRequest$.next(newRequest);
+            })
 
         this.currentRecordRequest$.pipe(
+            tap(() => {
+                debugger;console.log();
+            }),
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
             flatMap(([req, source, canvas, speechConfig]: [RecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
+                debugger;
                 return new Promise(async resolve => {
+                    debugger;
                     function closeRecognition() {
 
                     }
@@ -114,7 +134,7 @@ export class AudioRecorder {
                         try {
                             recognizer.close();
                             audioConfig.close();
-                        } catch(e) {
+                        } catch (e) {
                             console.error(e);
                         }
                     }
@@ -127,6 +147,7 @@ export class AudioRecorder {
                     recognizer.recognizeOnceAsync(
                         (result) => {
                             this.speechRecongitionText$.next(result.text)
+                            debugger;
                             req.cb(result.text);
                             close()
                             resolve();

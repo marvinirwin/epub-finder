@@ -31,6 +31,8 @@ const useStyles = makeStyles((theme) => ({
     recognizedSpeech: {}
 }));
 
+export const SLIM_CARD_CONTENT = {display: 'flex', flexFlow: 'row nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'};
+
 export default function AudioPopup({m}: { m: Manager }) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
@@ -54,7 +56,7 @@ export default function AudioPopup({m}: { m: Manager }) {
 
     return <div className={classes.popupParent} ref={setReferenceElement}>
         <Card>
-            <CardContent style={{display: 'flex', flexFlow: 'row nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'}}>
+            <CardContent style={SLIM_CARD_CONTENT}>
                 <TutorialPopper referenceElement={referenceElement} storageKey={'AUDIO_POPUP'} placement="top">
                     <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
                         recognized text should match the pinyin on the flashcard.</Typography>

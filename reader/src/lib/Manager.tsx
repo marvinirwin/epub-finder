@@ -1,4 +1,4 @@
-import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, uniq} from "lodash";
 import {
     debounceTime,
@@ -42,14 +42,16 @@ import {SentenceManager} from "./Manager/SentenceManager";
 import {TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
+import pinyin from "pinyin";
 
 export class Manager {
 
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
 
+    showEditingCardPopup$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
-    currentEditingCardIsSaving$!: Observable<boolean | undefined>;
-    currentEditingCard$!: Observable<EditingCard | undefined>;
+    editingCardIsSaving!: Observable<boolean | undefined>;
+    editingCard!: Observable<EditingCard | undefined>;
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
     currentEditingSynthesizedWavFile$!: Observable<WavAudio>;
@@ -68,6 +70,7 @@ export class Manager {
     );
 
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
+    highlightedSentence$ = new ReplaySubject<string | undefined>(1)
 
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
@@ -85,6 +88,7 @@ export class Manager {
     setQuizWord: Subject<string> = new Subject<string>();
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
+    highlightedPinyin$: Observable<string>;
 
     constructor(public db: MyAppDatabase) {
         this.pageManager = new PageManager();
@@ -99,14 +103,14 @@ export class Manager {
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
 
-        this.currentEditingCard$ = this.queEditingCard$.pipe(
+        this.editingCard = this.queEditingCard$.pipe(
             startWith(undefined),
             pairwise(),
             switchMap(([previousCard, newCard]) => {
                 if (!previousCard) {
                     return of(newCard)
                 }
-                return this.currentEditingCardIsSaving$.pipe(
+                return this.editingCardIsSaving.pipe(
                     filter((saving) => !saving),
                     map(() => {
                         previousCard.cardClosed$.next();
@@ -117,7 +121,7 @@ export class Manager {
             }),
         )
 
-        this.currentEditingCardIsSaving$ = this.currentEditingCard$.pipe(
+        this.editingCardIsSaving = this.editingCard.pipe(
             switchMap(c =>
                 c ? c.saveInProgress$ : of(undefined)
             ),
@@ -125,7 +129,7 @@ export class Manager {
         );
 
 
-        this.currentEditingSynthesizedWavFile$ = this.currentEditingCard$.pipe(
+        this.currentEditingSynthesizedWavFile$ = this.editingCard.pipe(
             filter(c => !!c),
             switchMap(c => {
                 return (c as EditingCard).synthesizedSpeech$;
@@ -147,7 +151,8 @@ export class Manager {
             );
         }));
 
-        this.textData$.subscribe(() => { });
+        this.textData$.subscribe(() => {
+        });
 
         this.wordElementMap$ = combineLatest([
             this.textData$.pipe(
@@ -172,12 +177,20 @@ export class Manager {
 
         this.requestEditWord$.pipe(
             resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
-        )
-            .subscribe((icard) => {
-                this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
+        ).subscribe((icard) => {
+            this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
+        })
+
+        this.queEditingCard$
+            .pipe(withLatestFrom(this.showEditingCardPopup$))
+            .subscribe(([queuedEditingCard, showEditingCardPopup]) => {
+                if (!showEditingCardPopup && queuedEditingCard) {
+                    this.showEditingCardPopup$.next(true);
+                }
             })
 
         let previousHighlightedElements: HTMLElement[] | undefined;
+        let previousHighlightedSentences: HTMLElement[] | undefined;
 
         this.highlightedWord$.pipe(debounceTime(10),
             withLatestFrom(this.wordElementMap$))
@@ -196,6 +209,24 @@ export class Manager {
                 }
             );
 
+        this.highlightedSentence$.pipe(
+            debounceTime(10),
+            withLatestFrom(this.textData$)
+        ).subscribe(([sentence, textData]) => {
+            if (sentence) {
+                const HIGHLIGHTED_SENTENCE = 'highlighted-sentence';
+                if (previousHighlightedSentences) {
+                    previousHighlightedSentences.map(e => e.classList.remove(HIGHLIGHTED_SENTENCE));
+                }
+                const dictElement = textData.sentenceMap[sentence]
+                previousHighlightedSentences = dictElement?.map(atomizedSentence => {
+                    let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+                    sentenceHTMLElement.classList.add(HIGHLIGHTED_SENTENCE);
+                    return sentenceHTMLElement;
+                });
+            }
+        })
+
         this.audioManager = new AudioManager(this)
 
         this.pageManager.requestRenderPage$.next(
@@ -209,10 +240,31 @@ export class Manager {
             this.quizManager.setQuizItem(icard);
         })
 
-        this.inputManager.getKeyDownSubject("Escape").subscribe(() => this.queEditingCard$.next(undefined))
+        merge(
+            this.inputManager.getKeyDownSubject("Escape"),
+            this.inputManager.getKeyDownSubject("q"),
+        ).subscribe(() => this.showEditingCardPopup$.next(false))
 
         this.inputManager.selectedText$.subscribe(this.requestEditWord$);
 
+        this.inputManager.getKeyDownSubject('e')
+            .subscribe((event) => {
+                // Ask for a sentence
+                const s = new Subject<string>(); // Is this subject going to stay around, or get garbage collected?
+                s.pipe(withLatestFrom(this.textData$)).subscribe(([sentence, textData]) => {
+                    if (textData.sentenceMap[sentence]) {
+                        // My highlighting logic is insufficient to handle different things
+                        this.highlightedWord$.next()
+                    }// Maybe I should also do a pinyin map?
+                })
+                this.audioManager.audioRecorder.quedRecordRequest$.next({
+                    label: "Say a sentence which is present in the document",
+                    cb: sentence => s.next(sentence),
+                    duration: 1
+                })
+            })
+
+        this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
         this.cardManager.load();
     }
 

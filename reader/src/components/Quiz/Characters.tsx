@@ -16,7 +16,7 @@ import {PageRenderer} from "../../lib/PageRenderer";
 import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
-import {uniq, isEqual} from "lodash";
+import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {PageManager} from "../../lib/Manager/PageManager";
 
@@ -39,9 +39,16 @@ ${sentences.map(sentence => {
 }
 
 export function Characters({c, m}: QuizCardProps) {
-    const advance = () => m.quizManager.quizzingComponent$.next("Pictures");
     const classes = quizStyles();
     const [error, setError] = useState('');
+    const [createdSentence, setCreatedSentence] = useState();
+    const advance = () => {
+        if (createdSentence) {
+            m.quizManager.quizzingComponent$.next("Pictures");
+        } else {
+            setError("Please record novel sentence");
+        }
+    };
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
         (obs$: Observable<[string | undefined]>) =>
             combineLatest([
@@ -50,11 +57,9 @@ export function Characters({c, m}: QuizCardProps) {
                 ]
             ).pipe(
                 map(([[word], {wordSentenceMap}]) => {
-                        let atomizedSentences1 = wordSentenceMap[word || ''] || [];
-                        let strings = atomizedSentences1.map((s: AtomizedSentence) => {
+                    return (wordSentenceMap[word || ''] || []).map((s: AtomizedSentence) => {
                             return s.translatableText;
                         });
-                        return strings;
                     }
                 ),
                 distinctUntilChanged(isEqual)
@@ -119,8 +124,8 @@ export function Characters({c, m}: QuizCardProps) {
     );
 
     useEffect(() => {
-        setError("");// The card has changed, clear the error message
-        if (!c) return;
+        setError('');// The card has changed, clear the error message
+        if (!c?.learningLanguage) return;
         m.audioManager.audioRecorder.quedRecordRequest$.next({
             duration: 1,
             cb: async (createdSentence: string) => {
@@ -137,19 +142,16 @@ export function Characters({c, m}: QuizCardProps) {
                 if (allPreviousCreatedSentence[createdSentence]) {
                     setError(`You have already said ${createdSentence}`)
                 } else {
-                    setError('');
-                    m.createdSentenceManager
-                        .addUnpersistedCreatedSentence$
-                        .next([{learningLanguage: createdSentence}])
+                    setError(`Sentence "${createdSentence}" recorded`);
                     advance();
                 }
             },
-            label: c?.learningLanguage,
+            label: `Please record sentence with the word ${c?.learningLanguage}`,
         })
-    }, [c])
+    }, [c?.learningLanguage])
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
-            {error}
+            <Typography variant="h3">{error}</Typography>
             <div>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}

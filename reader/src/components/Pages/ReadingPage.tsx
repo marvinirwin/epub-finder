@@ -1,9 +1,9 @@
 import {Manager} from "../../lib/Manager";
-import {Grid, Slide} from "@material-ui/core";
+import {Card, CardContent, Grid, Slide, Typography} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
-import AudioPopup from "../AudioPopup/AudioPopup";
+import AudioPopup, {SLIM_CARD_CONTENT} from "../AudioPopup/AudioPopup";
 import {useObservableState} from "observable-hooks";
 import {ClassNameMap} from "@material-ui/core/styles/withStyles";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
@@ -30,29 +30,37 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function SlidingTopWindows({m}: { m: Manager }) {
-    const editingCard = useObservableState(m.currentEditingCard$);
-    const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
+    const editingCard = useObservableState(m.editingCard);
+    const showEditingCard = useObservableState(m.showEditingCardPopup$);
+    // const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
+    const highlightedPinyin = useObservableState(m.highlightedPinyin$);
     const classes = useStyles();
     return <div className={classes.popup}>
         {
-            editingCard && <Slide direction="down" in={!!editingCard}>
+            showEditingCard && editingCard && <Slide direction="down" in={!!editingCard}>
                 <div>
                     <EditingCardComponent card={editingCard}/>
                 </div>
             </Slide>
         }
+        <div>
+            <AudioPopup m={m}/>
+        </div>
+        <Card>
+            <CardContent style={SLIM_CARD_CONTENT}>
+                <Typography variant="h6">
+                    {highlightedPinyin}
+                </Typography>
+            </CardContent>
+        </Card>
         {
+/*
             recordingRequest && <Slide direction="down" in={!!recordingRequest}>
-                <div>
-                    <AudioPopup m={m}/>
-                </div>
             </Slide>
+*/
+
         }
-        {/*
-            {editingCard && <EditingCardComponent card={editingCard}/>}
-            <div style={{width: '100%', display: 'flex'}}>
-            </div>
-        */}
+        {}
     </div>;
 }
 

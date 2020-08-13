@@ -19,7 +19,7 @@ export class AudioManager {
 */
 
     constructor(public m: Manager) {
-        this.currentSynthesizedAudio$ = m.currentEditingCard$.pipe(
+        this.currentSynthesizedAudio$ = m.editingCard.pipe(
             switchMap(c => c?.synthesizedSpeech$ || of(undefined))
         )
         /*
