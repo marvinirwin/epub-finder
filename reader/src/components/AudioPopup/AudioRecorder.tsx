@@ -3,7 +3,6 @@ import React, {useEffect, useRef, useState} from "react";
 import {Button, Card, CardActions, CardContent, Grid, IconButton, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
-import SineWave from "./SineWave";
 import RefreshIcon from '@material-ui/icons/Refresh';
 /*
 import MultiGraph from "../MultiGraph";
@@ -33,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const SLIM_CARD_CONTENT = {display: 'flex', flexFlow: 'row nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'};
 
-export default function AudioPopup({m}: { m: Manager }) {
+export default function AudioRecorder({m}: { m: Manager }) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
     /*
@@ -64,7 +63,9 @@ export default function AudioPopup({m}: { m: Manager }) {
                 <CountdownCircle r={r}/>
                 <Typography variant="h6" className={classes.learningLanguage}
                             align="center">{currentAudioRequest?.label}</Typography>
+{/*
                 <SineWave r={r}/>
+*/}
                 <Typography variant="h6"
                             className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
                 {/*

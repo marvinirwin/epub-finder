@@ -182,7 +182,7 @@ export class Manager {
         })
 
         this.queEditingCard$
-            .pipe(withLatestFrom(this.showEditingCardPopup$))
+            .pipe(withLatestFrom(this.showEditingCardPopup$.pipe(startWith(false))))
             .subscribe(([queuedEditingCard, showEditingCardPopup]) => {
                 if (!showEditingCardPopup && queuedEditingCard) {
                     this.showEditingCardPopup$.next(true);
@@ -230,7 +230,10 @@ export class Manager {
         this.audioManager = new AudioManager(this)
 
         this.pageManager.requestRenderPage$.next(
-            new Website('Police', `${process.env.PUBLIC_URL}/homework.html`)
+            new Website('Generals', `${process.env.PUBLIC_URL}/generals.html`)
+        );
+        this.pageManager.requestRenderPage$.next(
+            new Website('Zhou Enlai', `${process.env.PUBLIC_URL}/zhou_enlai.html`)
         );
 
 

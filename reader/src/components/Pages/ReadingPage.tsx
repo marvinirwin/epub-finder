@@ -3,7 +3,7 @@ import {Card, CardContent, Grid, Slide, Typography} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
-import AudioPopup, {SLIM_CARD_CONTENT} from "../AudioPopup/AudioPopup";
+import AudioRecorder, {SLIM_CARD_CONTENT} from "../AudioPopup/AudioRecorder";
 import {useObservableState} from "observable-hooks";
 import {ClassNameMap} from "@material-ui/core/styles/withStyles";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
@@ -37,16 +37,16 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const classes = useStyles();
     return <div className={classes.popup}>
         {
-            showEditingCard && editingCard && <Slide direction="down" in={!!editingCard}>
+            editingCard && <Slide direction="down" in={!!showEditingCard}>
                 <div>
                     <EditingCardComponent card={editingCard}/>
                 </div>
             </Slide>
         }
         <div>
-            <AudioPopup m={m}/>
+            <AudioRecorder m={m}/>
         </div>
-        <Card>
+        <Card style={{flexGrow: 1}}>
             <CardContent style={SLIM_CARD_CONTENT}>
                 <Typography variant="h6">
                     {highlightedPinyin}

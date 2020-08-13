@@ -99,13 +99,15 @@ export class AudioRecorder {
             const dataArray = new Uint8Array(bufferLength);
             // Dont connect back to speakers
             stream.connect(analyser)
+/*
             const draw = () => {
                 this.drawSineWave(canvas, draw, analyser, dataArray, canvasCtx, bufferLength);
             }
+*/
+/*
             draw();
+*/
         })
-
-        // TODO test this, this should allow painless premature ending of recordings
         this.quedRecordRequest$
             .pipe(withLatestFrom(this.isRecording$))
             .subscribe(([newRequest, isRecording]) => {
@@ -113,17 +115,9 @@ export class AudioRecorder {
             })
 
         this.currentRecordRequest$.pipe(
-            tap(() => {
-                debugger;console.log();
-            }),
             withLatestFrom(this.mediaSource$, this.canvas$, this.speechConfig$),
             flatMap(([req, source, canvas, speechConfig]: [RecordRequest, MediaStream, HTMLCanvasElement, SpeechConfig]) => {
-                debugger;
                 return new Promise(async resolve => {
-                    debugger;
-                    function closeRecognition() {
-
-                    }
                     await this.countdown(req.duration + 1500);
                     this.isRecording$.next(true);
                     const audioConfig = AudioConfig.fromMicrophoneInput(source.id);
@@ -139,7 +133,7 @@ export class AudioRecorder {
                         }
                     }
 
-                    const sub = this.quedRecordRequest$.pipe(take(1)).subscribe(r => {
+                    this.quedRecordRequest$.pipe(take(1)).subscribe(r => {
                         close()
                         this.currentRecordRequest$.next(r);
                     })
@@ -173,6 +167,7 @@ export class AudioRecorder {
     }
 
     private drawSineWave(canvas: HTMLCanvasElement, draw: () => void, analyser: AnalyserNode, dataArray: Uint8Array, canvasCtx: CanvasRenderingContext2D, bufferLength: number) {
+        return;
         const WIDTH = canvas.width
         const HEIGHT = canvas.height;
 
