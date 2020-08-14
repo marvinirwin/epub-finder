@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {Card, CardContent, Grid, Slide, Typography} from "@material-ui/core";
+import {Card, CardContent, Slide, Typography} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
@@ -30,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function SlidingTopWindows({m}: { m: Manager }) {
-    const editingCard = useObservableState(m.editingCard);
-    const showEditingCard = useObservableState(m.showEditingCardPopup$);
+    const editingCard = useObservableState(m.editingCardManager.editingCard);
+    const showEditingCard = useObservableState(m.editingCardManager.showEditingCardPopup$);
     // const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
     const highlightedPinyin = useObservableState(m.highlightedPinyin$);
     const classes = useStyles();
@@ -39,7 +39,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
         {
             editingCard && <Slide direction="down" in={!!showEditingCard}>
                 <div>
-                    <EditingCardComponent card={editingCard}/>
+                    <EditingCardComponent card={editingCard} m={m}/>
                 </div>
             </Slide>
         }

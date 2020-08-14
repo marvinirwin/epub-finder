@@ -7,6 +7,7 @@ import {MyAppDatabase} from "./lib/Storage/AppDB";
 import {EditingCard} from "./lib/ReactiveClasses/EditingCard";
 import {IndexDBManager, LocalStorageManager} from "./lib/Storage/StorageManagers";
 import {ICard} from "./lib/Interfaces/ICard";
+import {BrowserAudio} from "./lib/Audio/BrowserAudio";
 
 interface Memoizable<T, MemoParamType> {
     getMemo(a: MemoParamType): T | undefined;
@@ -42,8 +43,7 @@ export interface AppSingleton {
 export async function initializeApp(): Promise<AppSingleton> {
     const messages$ = new Subject<DebugMessage>();
     const db = new MyAppDatabase();
-    const m = new Manager(db);
-
+    const m = new Manager(db, new BrowserAudio());
     return {
         m,
     }

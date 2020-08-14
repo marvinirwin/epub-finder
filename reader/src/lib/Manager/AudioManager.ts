@@ -6,22 +6,20 @@ import {debounceTime, filter, map, shareReplay, switchMap} from "rxjs/operators"
 import {AudioConfig, SpeechConfig, SpeechSynthesizer, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
 import axios from 'axios';
 import assert from "assert";
+import {AudioSource} from "../Audio/AudioSource";
 
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
 
 export class AudioManager {
-    audioRecorder: AudioRecorder = new AudioRecorder();
-    currentSynthesizedAudio$: Observable<WavAudio | undefined>;
+    audioRecorder: AudioRecorder;
 /*
     userAndSyntheticAudioLineUp$: Observable<AudioPair>;
     lineupGraphs$: Observable<[number[], number[]]>;
 */
 
-    constructor(public m: Manager) {
-        this.currentSynthesizedAudio$ = m.editingCard.pipe(
-            switchMap(c => c?.synthesizedSpeech$ || of(undefined))
-        )
+    constructor(audioSource: AudioSource) {
+        this.audioRecorder = new AudioRecorder(audioSource);
         /*
          * Im probably going to have to pair synth audio with user audio emitted after
          */

@@ -11,12 +11,17 @@ export function Conclusion({c, m}: QuizCardProps) {
     const classes = quizStyles();
     const [editingCard, setEditingCard] = useState<EditingCard | null>(null);
     useEffect(() => {
-        setEditingCard(c ? EditingCard.fromICard(c, m.cardDBManager, m) : null)
+        setEditingCard(c ? EditingCard.fromICard(
+            c,
+            m.cardDBManager,
+            m.audioManager,
+            m.cardManager
+        ) : null)
     }, [c, m])
 
     return editingCard ? <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
-            <EditingCardComponent card={editingCard}/>
+            <EditingCardComponent card={editingCard} m={m}/>
         </CardContent>
         {c && <CardActions className={classes.cardActions}>
             <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.hard)}>Hard</Button>

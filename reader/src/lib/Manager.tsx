@@ -43,20 +43,19 @@ import {TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import pinyin from "pinyin";
+import {AudioSource} from "./Audio/AudioSource";
+import EditingCardManager from "./Manager/EditingCardManager";
+import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
+import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
+import {ProgressManager} from "./Manager/ProgressManager";
+
+export type CardDB = IndexDBManager<ICard>;
 
 export class Manager {
 
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
 
-    showEditingCardPopup$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
-    queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
-    editingCardIsSaving!: Observable<boolean | undefined>;
-    editingCard!: Observable<EditingCard | undefined>;
-    requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
-
-    currentEditingSynthesizedWavFile$!: Observable<WavAudio>;
-
-    cardDBManager = new IndexDBManager<ICard>(
+    cardDBManager = new IndexDBManager<ICard> (
         this.db,
         this.db.cards,
         (c: ICard) => c.id,
@@ -89,52 +88,26 @@ export class Manager {
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
     highlightedPinyin$: Observable<string>;
+    editingCardManager: EditingCardManager;
+    progressManager: ProgressManager;
 
-    constructor(public db: MyAppDatabase) {
+    constructor(public db: MyAppDatabase, audio: AudioSource) {
         this.pageManager = new PageManager();
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
+        this.audioManager = new AudioManager(audio);
+        this.editingCardManager = new EditingCardManager();
+        this.progressManager = new ProgressManager();
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
         InputPage(this.inputManager, this.pageManager);
         CardPage(this.cardManager, this.pageManager);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-
-        this.editingCard = this.queEditingCard$.pipe(
-            startWith(undefined),
-            pairwise(),
-            switchMap(([previousCard, newCard]) => {
-                if (!previousCard) {
-                    return of(newCard)
-                }
-                return this.editingCardIsSaving.pipe(
-                    filter((saving) => !saving),
-                    map(() => {
-                        previousCard.cardClosed$.next();
-                        return newCard;
-                    }),
-                    take(1)
-                )
-            }),
-        )
-
-        this.editingCardIsSaving = this.editingCard.pipe(
-            switchMap(c =>
-                c ? c.saveInProgress$ : of(undefined)
-            ),
-            shareReplay(1)
-        );
-
-
-        this.currentEditingSynthesizedWavFile$ = this.editingCard.pipe(
-            filter(c => !!c),
-            switchMap(c => {
-                return (c as EditingCard).synthesizedSpeech$;
-            })
-        )
+        CardPageEditingCardCardDBAudio(this.cardManager, this.pageManager, this.editingCardManager, this.cardDBManager, this.audioManager)
+        ScheduleProgress(this.scheduleManager, this.progressManager);
 
         this.textData$ = combineLatest(
             [
@@ -152,6 +125,7 @@ export class Manager {
         }));
 
         this.textData$.subscribe(() => {
+
         });
 
         this.wordElementMap$ = combineLatest([
@@ -175,19 +149,6 @@ export class Manager {
             }),
         ).subscribe(this.scheduleManager.wordCountDict$);
 
-        this.requestEditWord$.pipe(
-            resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
-        ).subscribe((icard) => {
-            this.queEditingCard$.next(EditingCard.fromICard(icard, this.cardDBManager, this))
-        })
-
-        this.queEditingCard$
-            .pipe(withLatestFrom(this.showEditingCardPopup$.pipe(startWith(false))))
-            .subscribe(([queuedEditingCard, showEditingCardPopup]) => {
-                if (!showEditingCardPopup && queuedEditingCard) {
-                    this.showEditingCardPopup$.next(true);
-                }
-            })
 
         let previousHighlightedElements: HTMLElement[] | undefined;
         let previousHighlightedSentences: HTMLElement[] | undefined;
@@ -227,7 +188,6 @@ export class Manager {
             }
         })
 
-        this.audioManager = new AudioManager(this)
 
         this.pageManager.requestRenderPage$.next(
             new Website('Generals', `${process.env.PUBLIC_URL}/generals.html`)
@@ -249,9 +209,9 @@ export class Manager {
         merge(
             this.inputManager.getKeyDownSubject("Escape"),
             this.inputManager.getKeyDownSubject("q"),
-        ).subscribe(() => this.showEditingCardPopup$.next(false))
+        ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
 
-        this.inputManager.selectedText$.subscribe(this.requestEditWord$);
+        this.inputManager.selectedText$.subscribe(this.editingCardManager.requestEditWord$);
 
         this.inputManager.getKeyDownSubject('e')
             .subscribe((event) => {

@@ -1,11 +1,11 @@
 import {AtomizedDocument} from "../../lib/Atomized/AtomizedDocument";
 import {readFileSync} from "fs-extra";
 import {join} from "path";
-import {Dictionary, sum} from "lodash";
+import {Dictionary} from "lodash";
 import {RecognitionMap} from "../../lib/Scheduling/SRM";
 import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
-import {Observable, Subject, Subscription} from "rxjs";
+import {Observable, PartialObserver, Subject, Subscription} from "rxjs";
 import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import CardManager from "../../lib/Manager/CardManager";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
@@ -16,9 +16,135 @@ import moment from "moment";
 
 // import { TestMessage } from "rxjs/internal/testing/TestMessage";
 export interface TestMessage {
+
     frame: number;
     notification: Notification<any>;
     isGhost?: boolean;
+}
+
+//import {Notification} from "rxjs/src/internal/Notification";
+export class Notification<T> {
+    hasValue: boolean;
+
+    constructor(public kind: 'N' | 'E' | 'C', public value?: T, public error?: any) {
+        this.hasValue = kind === 'N';
+    }
+
+    /**
+     * Delivers to the given `observer` the value wrapped by this Notification.
+     * @param {Observer} observer
+     * @return
+     */
+    observe(observer: PartialObserver<T>): any {
+        switch (this.kind) {
+            case 'N':
+                // @ts-ignore
+                return observer.next && observer.next(this.value);
+            case 'E':
+                return observer.error && observer.error(this.error);
+            case 'C':
+                return observer.complete && observer.complete();
+        }
+    }
+
+    /**
+     * Given some {@link Observer} callbacks, deliver the value represented by the
+     * current Notification to the correctly corresponding callback.
+     * @param {function(value: T): void} next An Observer `next` callback.
+     * @param {function(err: any): void} [error] An Observer `error` callback.
+     * @param {function(): void} [complete] An Observer `complete` callback.
+     * @return {any}
+     */
+    do(next: (value: T) => void, error?: (err: any) => void, complete?: () => void): any {
+        const kind = this.kind;
+        switch (kind) {
+            case 'N':
+                // @ts-ignore
+                return next && next(this.value);
+            case 'E':
+                return error && error(this.error);
+            case 'C':
+                return complete && complete();
+        }
+    }
+
+    /**
+     * Takes an Observer or its individual callback functions, and calls `observe`
+     * or `do` methods accordingly.
+     * @param {Observer|function(value: T): void} nextOrObserver An Observer or
+     * the `next` callback.
+     * @param {function(err: any): void} [error] An Observer `error` callback.
+     * @param {function(): void} [complete] An Observer `complete` callback.
+     * @return {any}
+     */
+    accept(nextOrObserver: PartialObserver<T> | ((value: T) => void), error?: (err: any) => void, complete?: () => void) {
+        if (nextOrObserver && typeof (<PartialObserver<T>>nextOrObserver).next === 'function') {
+            return this.observe(<PartialObserver<T>>nextOrObserver);
+        } else {
+            return this.do(<(value: T) => void>nextOrObserver, error, complete);
+        }
+    }
+
+    /**
+     * Returns a simple Observable that just delivers the notification represented
+     * by this Notification instance.
+     * @return {any}
+     */
+    toObservable(): Observable<T> {
+        const kind = this.kind;
+        switch (kind) {
+            case 'N':
+                // @ts-ignore
+                return of(this.value);
+            case 'E':
+                // @ts-ignore
+                return throwError(this.error);
+            case 'C':
+                // @ts-ignore
+                return empty();
+        }
+        throw new Error('unexpected notification kind value');
+    }
+
+    private static completeNotification: Notification<any> = new Notification('C');
+    private static undefinedValueNotification: Notification<any> = new Notification('N', undefined);
+
+    /**
+     * A shortcut to create a Notification instance of the type `next` from a
+     * given value.
+     * @param {T} value The `next` value.
+     * @return {Notification<T>} The "next" Notification representing the
+     * argument.
+     * @nocollapse
+     */
+    static createNext<T>(value: T): Notification<T> {
+        if (typeof value !== 'undefined') {
+            return new Notification('N', value);
+        }
+        return Notification.undefinedValueNotification;
+    }
+
+    /**
+     * A shortcut to create a Notification instance of the type `error` from a
+     * given error.
+     * @param {any} [err] The `error` error.
+     * @return {Notification<T>} The "error" Notification representing the
+     * argument.
+     * @nocollapse
+     */
+    static createError<T>(err?: any): Notification<T> {
+        // @ts-ignore
+        return new Notification('E', undefined, err);
+    }
+
+    /**
+     * A shortcut to create a Notification instance of the type `complete`.
+     * @return {Notification<any>} The valueless "complete" Notification.
+     * @nocollapse
+     */
+    static createComplete(): Notification<any> {
+        return Notification.completeNotification;
+    }
 }
 
 interface FlushableTest {
@@ -26,8 +152,6 @@ interface FlushableTest {
     actual?: any[];
     expected?: any[];
 }
-
-import {Notification} from "rxjs/src/internal/Notification";
 
 export function getAtomizedSentences(paths: string) {
     return AtomizedDocument.atomizeDocument(readFileSync(join(__dirname, '../fixtures', paths)).toString())
@@ -250,6 +374,7 @@ export class MyTestScheduler extends TestScheduler {
             const {observable, subscriptionMarbles} = orderings[i];
             const correspondingOrdering = correspondingOrderings[i];
             const subscriptionParsed = TestScheduler.parseMarblesAsSubscriptions(
+                // @ts-ignore
                 subscriptionMarbles,
                 // @ts-ignore
                 this.runMode
@@ -282,7 +407,9 @@ export class MyTestScheduler extends TestScheduler {
                     );
                 });
 
+                // @ts-ignore
                 observable.subscriptions && swapIndexes(observable.subscriptions, 0, observable.subscriptions.length - 1);
+                // @ts-ignore
                 observable.observers && swapIndexes(observable.observers, 0, observable.observers.length - 1);
             }, subscriptionFrame);
             if (unsubscriptionFrame !== Infinity) {
@@ -329,4 +456,12 @@ export class MyTestScheduler extends TestScheduler {
             }
         };
     }
+}
+
+export function ord(obs$: Observable<any>) {
+    return {observable: obs$, subscriptionMarbles: null};
+}
+
+export function mv(marbles: string, values: { [key: string]: any }): marbleValue {
+    return {marbles, values};
 }

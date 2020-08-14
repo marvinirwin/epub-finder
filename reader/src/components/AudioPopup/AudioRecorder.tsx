@@ -1,12 +1,9 @@
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useRef, useState} from "react";
-import {Button, Card, CardActions, CardContent, Grid, IconButton, Typography} from "@material-ui/core";
+import React, {useRef, useState} from "react";
+import { Card,  CardContent,  Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
-import RefreshIcon from '@material-ui/icons/Refresh';
-import {usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
-import {filter} from "rxjs/operators";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 
@@ -35,18 +32,13 @@ export default function AudioRecorder({m}: { m: Manager }) {
     /*
         const userAudio = useObservableState(r.userAudio$);
     */
-    const synthAudio = useObservableState(m.currentEditingSynthesizedWavFile$);
+    const synthAudio = useObservableState(m.editingCardManager.currentEditingSynthesizedWavFile$);
     /*
         const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     */
     const canvasRef = useRef<HTMLCanvasElement>();
-    const currentAudioRequest = useObservableState(r.recordRequestRecording$);
-    const retryableAudioRequest = usePipe(r.recordRequestRecording$, o => o.pipe(filter(v => !!v)));
-    const recognizedText = useObservableState(r.speechRecongitionText$);
-
-    useEffect(() => {
-        if (canvasRef.current) r.canvas$.next(canvasRef.current)
-    }, [canvasRef])
+    const recognizedText = useObservableState(r.audioSource.recognizedText$);
+    const currentAudioRequest = useObservableState(r.recordRequest$)// Maybe pipe this to make it a replaySubject?
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
@@ -74,9 +66,11 @@ export default function AudioRecorder({m}: { m: Manager }) {
                 {/*
                 {graphData && <MultiGraph plots={graphData}/>}
 */}
-                <IconButton style={{height: '24px', width: '24px'}} disabled={!retryableAudioRequest} onClick={() => r.recordRequestRecording$.next(retryableAudioRequest)} aria-label="retry">
+{/*
+                <IconButton style={{height: '24px', width: '24px'}} disabled={} onClick={() => r.recordRequestRecording$.next(retryableAudioRequest)} aria-label="retry">
                     <RefreshIcon style={{height: '24px', width: '24px'}} />
                 </IconButton>
+*/}
             </CardContent>
         </Card>
     </div>

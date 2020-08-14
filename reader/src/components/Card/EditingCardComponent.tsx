@@ -8,6 +8,7 @@ import ImageList from "./CardImageList";
 import EditCardEnglish from "./EditCardEnglish";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
+import {Manager} from "../../lib/Manager";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function EditingCardComponent({card}: { card: EditingCard }) {
+export default function EditingCardComponent({card, m}: { card: EditingCard, m: Manager}) {
     const classes = useStyles();
     const characters = useObservableState(card.learningLanguage$);
     const sounds = useObservableState(card.sounds$);
@@ -55,7 +56,7 @@ export default function EditingCardComponent({card}: { card: EditingCard }) {
                     <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
-                    <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={card.m}/>
+                    <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={m}/>
                 </div>
                 <TutorialPopper referenceElement={referenceElement} storageKey={'EDITING_CARD'} placement="bottom-start">
                     <Typography variant="subtitle2">This is a flashcard, edit it by adding definitions, and stimulating pictures to aid memorization.</Typography>

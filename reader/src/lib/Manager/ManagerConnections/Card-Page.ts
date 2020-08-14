@@ -25,4 +25,25 @@ export function CardPage(c: CardManager, p: PageManager) {
         const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
         c.addUnpersistedCards$.next(newCards);
     });
+
+    c.cardProcessingSignal$.pipe(
+        filter(b => !b),
+        delay(100),
+        switchMapTo(p.pageList$),
+        switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
+        withLatestFrom(c.cardIndex$)
+    ).subscribe(([text, cardIndex]) => {
+        const newCharacterSet = new Set<string>();
+        for (let i = 0; i < text.length; i++) {
+            const textElement = text[i];
+            if (isChineseCharacter(textElement)) {
+                if (!cardIndex[textElement]) {
+                    newCharacterSet.add(textElement);
+                }
+            }
+        }
+        const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
+        c.addUnpersistedCards$.next(newCards);
+    });
+
 }

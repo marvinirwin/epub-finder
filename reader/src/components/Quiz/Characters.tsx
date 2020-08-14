@@ -19,6 +19,7 @@ import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {PageManager} from "../../lib/Manager/PageManager";
+import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 
 
 function getSrc(sentences: string[]) {
@@ -126,27 +127,24 @@ export function Characters({c, m}: QuizCardProps) {
     useEffect(() => {
         setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;
-        m.audioManager.audioRecorder.qeuedRecordRequest.next({
-            duration: 1,
-            cb: async (createdSentence: string) => {
-                if (!createdSentence) {
-                    return;
-                }
-                if (!createdSentence.includes(c.learningLanguage)) {
-                    setError(`The synthesized sentence (${createdSentence}) does not contain ${c.learningLanguage}`)
-                }
-                const allPreviousCreatedSentence = await m.createdSentenceManager.allCreatedSentences$.pipe(
-                    take(1),
-                ).toPromise();
+        const r= new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
+        r.sentence.then(async createdSentence => {
+            if (!createdSentence) {
+                return;
+            }
+            if (!createdSentence.includes(c.learningLanguage)) {
+                setError(`The synthesized sentence (${createdSentence}) does not contain ${c.learningLanguage}`)
+            }
+            const allPreviousCreatedSentence = await m.createdSentenceManager.allCreatedSentences$.pipe(
+                take(1),
+            ).toPromise();
 
-                if (allPreviousCreatedSentence[createdSentence]) {
-                    setError(`You have already said ${createdSentence}`)
-                } else {
-                    setError(`Sentence "${createdSentence}" recorded`);
-                    advance();
-                }
-            },
-            label: `Please record sentence with the word ${c?.learningLanguage}`,
+            if (allPreviousCreatedSentence[createdSentence]) {
+                setError(`You have already said ${createdSentence}`)
+            } else {
+                setError(`Sentence "${createdSentence}" recorded`);
+                advance();
+            }
         })
     }, [c?.learningLanguage])
     return <Card className={classes.card}>

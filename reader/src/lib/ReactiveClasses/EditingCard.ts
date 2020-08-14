@@ -15,6 +15,9 @@ import {WavAudio} from "../WavAudio";
 import { memoize, flatten} from "lodash";
 import pinyin from 'pinyin';
 import {getSynthesizedAudio} from "../Audio/GetSynthesizedAudio";
+import {RecordRequest} from "../Interfaces/RecordRequest";
+import {AudioManager} from "../Manager/AudioManager";
+import CardManager from "../Manager/CardManager";
 
 
 interface IDefinition {
@@ -40,7 +43,8 @@ export class EditingCard {
     pinyin$: Observable<string>;
     constructor(
         public persistor: IndexDBManager<ICard>,
-        public m: Manager,
+        public a: AudioManager,
+        private c: CardManager,
         public timestamp?: Date | number | undefined,
     ) {
         this.synthesizedSpeech$ = this.learningLanguage$.pipe(
@@ -51,7 +55,7 @@ export class EditingCard {
                 this.learningLanguage$
             ),
             flatMap(async ([synthesizedWav, characters]) => {
-                return this.m.audioManager.audioRecorder.getRecording(characters, await synthesizedWav.duration$.pipe(first()).toPromise());
+                return a.audioRecorder.recordRequest$.next(new RecordRequest(characters));
             })
         )
 
@@ -120,7 +124,7 @@ export class EditingCard {
                 throw new Error("Upserting returned a weird array")
             }
             const rec = records[0];
-            this.m.cardManager.addPersistedCards$.next([rec])
+            this.c.addPersistedCards$.next([rec])
             this.saveInProgress$.next(false);
         });
 
@@ -142,8 +146,8 @@ export class EditingCard {
 */
     }
 
-    static fromICard(iCard: ICard, persistor: IndexDBManager<ICard>, m: Manager): EditingCard {
-        const e = new EditingCard(persistor, m);
+    static fromICard(iCard: ICard, persistor: IndexDBManager<ICard>, m: AudioManager, c: CardManager): EditingCard {
+        const e = new EditingCard(persistor, m, c);
         e.deck$.next(iCard.deck || "NO_DECK");
         e.photos$.next(iCard.photos);
         e.illustrationPhotos$.next(iCard.illustrationPhotos);

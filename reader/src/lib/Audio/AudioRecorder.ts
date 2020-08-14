@@ -5,7 +5,7 @@ import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
 
 export class AudioRecorder {
-    public recordRequest = new ReplaySubject<RecordRequest>(1);
+    public recordRequest$ = new ReplaySubject<RecordRequest>(1);
     private startRecording$ = new Subject<void>();
     private countdown$ = new ReplaySubject<number>(1);
     private speechRecongitionText$ = new ReplaySubject<string>(1);
@@ -15,9 +15,9 @@ export class AudioRecorder {
     }
 
     constructor(public audioSource: AudioSource) {
-        this.recordRequest.subscribe(async (request) => {
+        this.recordRequest$.subscribe(async (request) => {
             const nextText = this.audioSource.recognizedText$.pipe(take(1)).toPromise();
-            const nextRequest = this.recordRequest.pipe(take(1)).toPromise();
+            const nextRequest = this.recordRequest$.pipe(take(1)).toPromise();
             // await this.countdown(1000);
             this.audioSource.beginRecordingSignal.next();
             const result = Promise.race([nextText, nextRequest]);

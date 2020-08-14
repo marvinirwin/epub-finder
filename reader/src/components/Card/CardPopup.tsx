@@ -21,7 +21,12 @@ export function CardPopup({text, card, getImages, m}: { text: string, card: ICar
     }}
                  onClick={() => {
                      setClicked(true);
-                     m.queEditingCard$.next(EditingCard.fromICard(card, m.cardDBManager, m))
+                     m.editingCardManager.queEditingCard$.next(EditingCard.fromICard(
+                         card,
+                         m.cardDBManager,
+                         m.audioManager,
+                         m.cardManager
+                     ))
                  }}
                  onMouseLeave={() => setClicked(false)}
     >

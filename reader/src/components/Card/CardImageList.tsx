@@ -35,7 +35,7 @@ const useStylesGridListImages = makeStyles((theme) => ({
 export default function ({photos$, card, characters, m}: { photos$: Subject<string[]>, card: EditingCard, characters: string, m: Manager }) {
     const classes = useStylesGridListImages();
     const photos = useObservableState(photos$);
-    const cb = () => card.m.queryImageRequest$.next({
+    const cb = () => m.queryImageRequest$.next({
         term: characters,
         cb: (s: string) => card.photos$.next(photos?.concat(s))
     });
