@@ -6,10 +6,17 @@ import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
 import {AudioRecorder} from "../lib/Audio/AudioRecorder";
 import {UnitTestAudio} from "../lib/Audio/UnitTestAudio";
 import {RecordRequest} from "../lib/Interfaces/RecordRequest";
+import {Observable} from "rxjs";
 
 require("fake-indexeddb/auto");
 
 const db = new MyAppDatabase();
+function ord(obs$: Observable<any>) {
+    return {observable: obs$, subscriptionMarbles: null};
+}
+function mv(marbles: string, values: {[key: string]: any}): marbleValue {
+    return {marbles, values};
+}
 
 it('Can fulfill an Audio Recording request ', async () => {
     let testScheduler = getTestScheduler();
@@ -20,18 +27,19 @@ it('Can fulfill an Audio Recording request ', async () => {
          */
         const {hot} = helpers;
         let recordRequest = new RecordRequest('test');
-        const recordRequests = hot('a', {a: recordRequest});
-        const isRecording: marbleValue = {marbles: '-b', values: {b: true}};
+        const recordRequests$ = hot('a', {a: recordRequest});
 
-        recordRequests.subscribe(r.recordRequest);
+        recordRequests$.subscribe(r.recordRequest);
 
         testScheduler.expectOrdering(
-            {observable: recordRequests, subscriptionMarbles: null},
-            {observable: r.isRecording$, subscriptionMarbles: null}
+            [
+                ord(recordRequests$),
+                ord(r.isRecording$)
+            ]
         ).toBe(
             [
-                {marbles: 'a', values: {a: recordRequest}},
-                isRecording,
+                mv('a', {a: RecordRequest}),
+                mv('-bc', {values: {b: true, c: false}}),
             ]
         );
 /*

@@ -227,7 +227,7 @@ export type ordering = { error?: any, value?: any, notification?: any, ancestors
 export type marbleValue = {marbles: string, values: {[key: string]: any}};
 
 export class MyTestScheduler extends TestScheduler {
-    expectOrdering(...orderings: orderingObservable[]) {
+    expectOrdering(orderings: orderingObservable[]) {
         const correspondingOrderings: ordering[][] = orderings.map(() => []);
         /**
          * How do I may the orderings?

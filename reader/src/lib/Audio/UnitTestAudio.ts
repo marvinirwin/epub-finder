@@ -12,7 +12,6 @@ export class UnitTestAudio {
         this.beginRecordingSignal.subscribe(async () => {
             this.isRecording$.next(true);
             const nextStopSignal = MakeQuerablePromise(this.stopRecordingSignal$.pipe(take(1)).toPromise());
-            await sleep(10);
             if (!nextStopSignal.isFulfilled()) {
                 // We've been given a stop signal, dont output anything
                 this.recognizedText$.next(text)
