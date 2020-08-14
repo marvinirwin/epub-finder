@@ -5,15 +5,18 @@ import {getTestScheduler, MyTestScheduler} from "./Util";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 
 require("fake-indexeddb/auto");
-const db = new MyAppDatabase();
 
 export type RunArguments = { manager: Manager, scheduler: MyTestScheduler, helpers: RunHelpers }
 
 export function run(cb: (r: RunArguments) => void) {
     const scheduler = getTestScheduler();
     scheduler.run(helpers => {
+        // Will I need to require the fake indexDB every time?
         cb({
-            manager: new Manager(db, new UnitTestAudio("YEET")),
+            manager: new Manager(
+                new MyAppDatabase(),
+                new UnitTestAudio("YEET"))
+            ,
             scheduler,
             helpers
         })
