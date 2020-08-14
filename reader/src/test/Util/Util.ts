@@ -11,6 +11,8 @@ import CardManager from "../../lib/Manager/CardManager";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {ScheduleQuiz} from "../../lib/Manager/ManagerConnections/Schedule-Quiz";
 import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
+import {TestScheduler} from "rxjs/testing";
+import moment from "moment";
 
 export function getAtomizedSentences(paths: string) {
     return AtomizedDocument.atomizeDocument(readFileSync(join(__dirname, '../fixtures', paths)).toString())
@@ -183,4 +185,14 @@ export function ScheduleQuizCard(db: MyAppDatabase) {
     ScheduleQuiz(scheduleManager, quizManager);
     CardScheduleQuiz(cardManager, scheduleManager, quizManager);
     return {scheduleManager, quizManager, cardManager};
+}
+
+export function getTestScheduler() {
+    return new TestScheduler((actual, expected) => {
+        if (moment.isMoment(expected)) {
+            expect(moment(actual).isSame(expected, 'day'));
+        } else {
+            expect(actual).toEqual(expected);
+        }
+    });
 }

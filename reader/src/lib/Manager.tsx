@@ -235,6 +235,9 @@ export class Manager {
         this.pageManager.requestRenderPage$.next(
             new Website('Zhou Enlai', `${process.env.PUBLIC_URL}/zhou_enlai.html`)
         );
+        this.pageManager.requestRenderPage$.next(
+            new Website('4 Modernizations', `${process.env.PUBLIC_URL}/4_modernizations.html`)
+        );
 
 
         this.setQuizWord.pipe(
@@ -259,11 +262,6 @@ export class Manager {
                         // My highlighting logic is insufficient to handle different things
                         this.highlightedWord$.next()
                     }// Maybe I should also do a pinyin map?
-                })
-                this.audioManager.audioRecorder.quedRecordRequest$.next({
-                    label: "Say a sentence which is present in the document",
-                    cb: sentence => s.next(sentence),
-                    duration: 1
                 })
             })
 

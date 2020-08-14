@@ -1,4 +1,4 @@
-import {AudioRecorder} from "../AudioRecorder";
+import {AudioRecorder} from "../Audio/AudioRecorder";
 import {combineLatest, Observable, of, ReplaySubject, zip} from "rxjs";
 import {WavAudio} from "../WavAudio";
 import {Manager} from "../Manager";

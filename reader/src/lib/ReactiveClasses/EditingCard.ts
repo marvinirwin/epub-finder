@@ -12,9 +12,9 @@ import {
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {Manager} from "../Manager";
 import {WavAudio} from "../WavAudio";
-import {getSynthesizedAudio} from "../AudioRecorder";
 import { memoize, flatten} from "lodash";
 import pinyin from 'pinyin';
+import {getSynthesizedAudio} from "../Audio/GetSynthesizedAudio";
 
 
 interface IDefinition {

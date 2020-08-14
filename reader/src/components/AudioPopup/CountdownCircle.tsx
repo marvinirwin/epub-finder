@@ -1,4 +1,4 @@
-import {AudioRecorder} from "../../lib/AudioRecorder";
+import {AudioRecorder} from "../../lib/Audio/AudioRecorder";
 import {Typography} from "@material-ui/core";
 import React from "react";
 import {useObs} from "../../lib/UseObs";

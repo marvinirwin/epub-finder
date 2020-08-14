@@ -46,14 +46,15 @@ test('Unpersisted cards added produce new elemnents on the wordmap', async () =>
 */
 
 
-test('Persisted cards loaded produce new elemnents on the wordmap', async () => {
+test('Persisted cards loaded produce new elements on the wordmap', async () => {
     await db.cards.add(getNewICardForWord("Te", ""));
     const cardManager = new CardManager(db);
     const atomizedSentences = getAtomizedSentences('BasicDoc.html');
     const triePromise: Promise<ITrie> = cardManager.trie$.pipe(take(1)).toPromise();
     await cardManager.load();
     const trie = await triePromise;
-    expect(getUniqueLengths(trie)).toHaveLength(1);
     const data = getWordElementMappings(atomizedSentences, trie)
+
+    expect(getUniqueLengths(trie)).toHaveLength(1);
     expect(data.wordElementsMap['Te']).toHaveLength(6);
 })

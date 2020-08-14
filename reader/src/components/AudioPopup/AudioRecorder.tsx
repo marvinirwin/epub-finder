@@ -4,9 +4,6 @@ import {Button, Card, CardActions, CardContent, Grid, IconButton, Typography} fr
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
 import RefreshIcon from '@material-ui/icons/Refresh';
-/*
-import MultiGraph from "../MultiGraph";
-*/
 import {usePipe} from "../../lib/UseObs";
 import {lookup} from "../../lib/ReactiveClasses/EditingCard";
 import {filter} from "rxjs/operators";
@@ -43,8 +40,8 @@ export default function AudioRecorder({m}: { m: Manager }) {
         const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     */
     const canvasRef = useRef<HTMLCanvasElement>();
-    const currentAudioRequest = useObservableState(r.currentRecordRequest$);
-    const retryableAudioRequest = usePipe(r.currentRecordRequest$, o => o.pipe(filter(v => !!v)));
+    const currentAudioRequest = useObservableState(r.recordRequestRecording$);
+    const retryableAudioRequest = usePipe(r.recordRequestRecording$, o => o.pipe(filter(v => !!v)));
     const recognizedText = useObservableState(r.speechRecongitionText$);
 
     useEffect(() => {
@@ -77,7 +74,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
                 {/*
                 {graphData && <MultiGraph plots={graphData}/>}
 */}
-                <IconButton style={{height: '24px', width: '24px'}} disabled={!retryableAudioRequest} onClick={() => r.currentRecordRequest$.next(retryableAudioRequest)} aria-label="retry">
+                <IconButton style={{height: '24px', width: '24px'}} disabled={!retryableAudioRequest} onClick={() => r.recordRequestRecording$.next(retryableAudioRequest)} aria-label="retry">
                     <RefreshIcon style={{height: '24px', width: '24px'}} />
                 </IconButton>
             </CardContent>

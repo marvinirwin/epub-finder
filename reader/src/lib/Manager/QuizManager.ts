@@ -1,7 +1,7 @@
 import {combineLatest, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Characters} from "../../components/Quiz/Characters";
-import {debounce, debounceTime, filter, startWith, withLatestFrom} from "rxjs/operators";
+import {debounce, debounceTime, filter, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
 
@@ -32,6 +32,11 @@ export class QuizManager {
         this.quizzingCard$.pipe(
             startWith(undefined),
             filter(card => card === undefined),
+/*
+            tap(() => {
+                debugger;console.log();
+            }),
+*/
             withLatestFrom(this.scheduledCards$)
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             let iCard = scheduledCards[0];

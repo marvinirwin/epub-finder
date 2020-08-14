@@ -126,7 +126,7 @@ export function Characters({c, m}: QuizCardProps) {
     useEffect(() => {
         setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;
-        m.audioManager.audioRecorder.quedRecordRequest$.next({
+        m.audioManager.audioRecorder.qeuedRecordRequest.next({
             duration: 1,
             cb: async (createdSentence: string) => {
                 if (!createdSentence) {

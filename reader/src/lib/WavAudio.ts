@@ -2,7 +2,8 @@ import {from, Observable, of} from "rxjs";
 import {encode} from "base64-arraybuffer";
 import {concatMap, delay, map, withLatestFrom} from "rxjs/operators";
 import {chunk} from "lodash";
-import {AUDIO_GRAPH_SAMPLE_SIZE, audioContext, filterData, normalizeData} from "./AudioRecorder";
+import {AUDIO_GRAPH_SAMPLE_SIZE, filterData, normalizeData} from "./Audio/AudioGraphing";
+import {audioContext} from "./Audio/AudioContext";
 
 export class WavAudio {
     blob: Blob;

@@ -42,18 +42,8 @@ export class ScheduleRow {
         const mostRecentRecordsFirst = orderBy(this.wordRecognitionRecords, 'timestamp', 'desc');
         let mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
         const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
-/*
-            if (this.word === 'undefined') {
-                debugger;console.log();
-            }
-*/
             return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
         })
-/*
-        if (this.word === 'undefined') {
-            debugger;console.log();
-        }
-*/
         const lastRecord = this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1];
 
         /**
