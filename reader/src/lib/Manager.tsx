@@ -18,7 +18,7 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {PageManager} from "./Manager/PageManager";
-import {Website} from "./WebSite/Website";
+import {Website} from "./Website/Website";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -40,7 +40,7 @@ import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {getSrcHttp} from "./WebSite/Website";
+import {getSrcHttp} from "./Website/Website";
 
 export type CardDB = IndexDBManager<ICard>;
 

@@ -1,7 +1,7 @@
 import {GetWorkerResults} from "../Util/GetWorkerResults";
 import {BookFrame} from "../BookFrame/BookFrame";
 import {from, Observable, of} from "rxjs";
-import {Website} from "../WebSite/Website";
+import {Website} from "../Website/Website";
 import {map} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from "xmldom";

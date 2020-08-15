@@ -1,27 +1,28 @@
 import {Manager} from "./lib/Manager";
-
 import {MyAppDatabase} from "./lib/Storage/AppDB";
 import {BrowserAudio} from "./lib/Audio/BrowserAudio";
 import {WorkerAtomize} from "./lib/AppContext/WorkerAtomize";
-import {getSrcHttp} from "./lib/Website/Website";
-
-interface Memoizable<T, MemoParamType> {
-    getMemo(a: MemoParamType): T | undefined;
-    memo(p: T): T
-}
+import {getSrcHttp, Website} from "./lib/Website/Website";
 
 export function getManager(mode: string): Manager {
-    const m =  new Manager(new MyAppDatabase(), {
+    const m = new Manager(new MyAppDatabase(), {
         audioSource: new BrowserAudio(),
         getPageRenderer: WorkerAtomize,
         getPageSrc: getSrcHttp
     });
 
-    if (mode !== 'test') {
-        // Load the test document
+    let websites = [];
+    if (mode === 'test') {
+        websites.push('test.html');
     } else {
-        // Load the real documents
-        // We may even choose to load a different db, or load only n cards instead of them all, for profiling purposes
+        websites.push(
+            '4_modernizations.html',
+            'generals.html',
+            'zhou_enlai.html'
+        )
     }
+    websites.forEach(filename => {
+        m.pageManager.requestRenderPage$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
+    })
     return m;
 }

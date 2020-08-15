@@ -34,10 +34,10 @@ const urlParams = new URLSearchParams(window.location.search);
 urlParams.get('mode');
 
 function App() {
-    const [manager, setManager] = useState<Manager>(() => getManager(urlParams.get('mode')));
+    const [manager, setManager] = useState<Manager>(() => getManager(urlParams.get('mode') || 'test'));
     return <ThemeProvider theme={darkTheme}>
         <CssBaseline/>
-        {manager ? <Main s={manager}/> : <div>Initializing..</div>}
+        {manager ? <Main m={manager}/> : <div>Initializing..</div>}
     </ThemeProvider>;
 }
 

@@ -2,7 +2,7 @@ import {AudioSource} from "../Audio/AudioSource";
 import {WorkerAtomize} from "./WorkerAtomize";
 import {Observable} from "rxjs";
 import {BookFrame} from "../BookFrame/BookFrame";
-import {Website} from "../WebSite/Website";
+import {Website} from "../Website/Website";
 
 export interface AppContext {
     audioSource: AudioSource;

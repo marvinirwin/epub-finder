@@ -1,4 +1,3 @@
-import {AppSingleton} from "../AppSingleton";
 import {useObs} from "../lib/UseObs";
 import React, {Fragment, useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
@@ -10,7 +9,7 @@ import {SettingsPage} from "./Pages/SettingsPage";
 import {AtomizedFrameContainer} from "./Atomized/AtomizedFrameContainer";
 import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
-import {BookFrame} from "../lib/BookFrame/PageRenderer";
+import {BookFrame} from "../lib/BookFrame/BookFrame";
 import {NavigationPages} from "../lib/Util/Util";
 import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
 import {useObservableState} from "observable-hooks";
@@ -51,8 +50,7 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
     }
 }
 
-export function Main({s}: { s: AppSingleton }) {
-    const {m} = s;
+export function Main({m}: { m: Manager }) {
     const classes = useStyles();
     const item = useObservableState(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
