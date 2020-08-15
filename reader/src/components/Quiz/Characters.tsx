@@ -12,7 +12,7 @@ import {combineLatest, Observable} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
-import {PageRenderer} from "../../lib/PageRenderer";
+import {BookFrame} from "../../lib/BookFrame/BookFrame";
 import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
@@ -76,28 +76,28 @@ export function Characters({c, m}: QuizCardProps) {
             }),
             switchMap(async (src: string) => {
                 const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
-                return new PageRenderer(atomizedSrc, 'character_translation');
+                return new BookFrame(atomizedSrc, 'character_translation');
             })
         ), [sentences$])
     );
 
-    useObservableState(useObservable((obs$: Observable<[PageRenderer | undefined]>) =>
+    useObservableState(useObservable((obs$: Observable<[BookFrame | undefined]>) =>
         obs$.pipe(
             filter(([pageRenderer]) => !!pageRenderer),
-            switchMap(([pageRenderer]: [PageRenderer | undefined]) => {
-                return (pageRenderer as PageRenderer).iframebody$;
+            switchMap(([pageRenderer]: [BookFrame | undefined]) => {
+                return (pageRenderer as BookFrame).iframebody$;
             }),
             tap(iframeBody => {
                 m.inputManager.applyListeners(iframeBody);
             })
         ), [pageRenderer$]),
     );
-    const atomizedSentences = useObservableState(useObservable((obs$: Observable<[PageRenderer | undefined]>) =>
+    const atomizedSentences = useObservableState(useObservable((obs$: Observable<[BookFrame | undefined]>) =>
             combineLatest(
                 [
                     obs$.pipe(
                         filter(([pageRenderer]) => !!pageRenderer),
-                        switchMap(([pageRenderer]) => (pageRenderer as PageRenderer).atomizedSentences$
+                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentences$
                             .pipe(
                                 filter(atomizedSentences => {
                                     return atomizedSentences.length > 0;

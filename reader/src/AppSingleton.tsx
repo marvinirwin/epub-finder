@@ -1,50 +1,27 @@
 import {Manager} from "./lib/Manager";
-import {ReplaySubject, Subject} from "rxjs";
-import DebugMessage from "./Debug-Message";
 
-import {shutterResult} from "./App";
 import {MyAppDatabase} from "./lib/Storage/AppDB";
-import {EditingCard} from "./lib/ReactiveClasses/EditingCard";
-import {IndexDBManager, LocalStorageManager} from "./lib/Storage/StorageManagers";
-import {ICard} from "./lib/Interfaces/ICard";
 import {BrowserAudio} from "./lib/Audio/BrowserAudio";
+import {WorkerAtomize} from "./lib/AppContext/WorkerAtomize";
+import {getSrcHttp} from "./lib/Website/Website";
 
 interface Memoizable<T, MemoParamType> {
     getMemo(a: MemoParamType): T | undefined;
     memo(p: T): T
 }
 
+export function getManager(mode: string): Manager {
+    const m =  new Manager(new MyAppDatabase(), {
+        audioSource: new BrowserAudio(),
+        getPageRenderer: WorkerAtomize,
+        getPageSrc: getSrcHttp
+    });
 
-interface ImageResult {
-    data: shutterResult[]
-}
-
-
-/*
-export class EditingCardClass extends EditingCard {
-    imageSources: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-    matchChange$: Subject<string> = new Subject<string>()
-    constructor(persistor: IndexDBManager<ICard>, public m: Manager) {
-        super(persistor, m);
-        this.learningLanguage$.subscribe(async v => {
-            const o = await queryImages(v, 2)
-            const data: shutterResult[] = o.data;
-            this.imageSources.next(data.map(d => d.assets.preview.url))
-        })
+    if (mode !== 'test') {
+        // Load the test document
+    } else {
+        // Load the real documents
+        // We may even choose to load a different db, or load only n cards instead of them all, for profiling purposes
     }
-}
-*/
-
-export interface AppSingleton {
-    m: Manager,
-}
-
-
-export async function initializeApp(): Promise<AppSingleton> {
-    const messages$ = new Subject<DebugMessage>();
-    const db = new MyAppDatabase();
-    const m = new Manager(db, new BrowserAudio());
-    return {
-        m,
-    }
+    return m;
 }

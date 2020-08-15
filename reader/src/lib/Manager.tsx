@@ -2,31 +2,23 @@ import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs
 import {Dictionary, uniq} from "lodash";
 import {
     debounceTime,
-    delay,
     filter,
     map,
-    pairwise,
-    shareReplay,
     startWith,
-    switchMap,
-    take, tap,
     withLatestFrom
 } from "rxjs/operators";
-/* eslint import/no-webpack-loader-syntax:0 */
 import {SerializedAnkiPackage} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
-import {EditingCard} from "./ReactiveClasses/EditingCard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
-import {WavAudio} from "./WavAudio";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {PageManager} from "./Manager/PageManager";
-import {Website} from "./Website";
+import {Website} from "./WebSite/Website";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -43,11 +35,12 @@ import {TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import pinyin from "pinyin";
-import {AudioSource} from "./Audio/AudioSource";
 import EditingCardManager from "./Manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
+import {AppContext} from "./AppContext/AppContext";
+import {getSrcHttp} from "./WebSite/Website";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -55,7 +48,7 @@ export class Manager {
 
     packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
 
-    cardDBManager = new IndexDBManager<ICard> (
+    cardDBManager = new IndexDBManager<ICard>(
         this.db,
         this.db.cards,
         (c: ICard) => c.id,
@@ -91,13 +84,13 @@ export class Manager {
     editingCardManager: EditingCardManager;
     progressManager: ProgressManager;
 
-    constructor(public db: MyAppDatabase, audio: AudioSource) {
-        this.pageManager = new PageManager();
+    constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
+        this.pageManager = new PageManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
-        this.audioManager = new AudioManager(audio);
+        this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
 
@@ -190,13 +183,25 @@ export class Manager {
 
 
         this.pageManager.requestRenderPage$.next(
-            new Website('Generals', `${process.env.PUBLIC_URL}/generals.html`)
+            new Website(
+                'Generals',
+                `${process.env.PUBLIC_URL}/generals.html`,
+                getPageSrc
+            )
         );
         this.pageManager.requestRenderPage$.next(
-            new Website('Zhou Enlai', `${process.env.PUBLIC_URL}/zhou_enlai.html`)
+            new Website(
+                'Zhou Enlai',
+                `${process.env.PUBLIC_URL}/zhou_enlai.html`,
+                getPageSrc
+            )
         );
         this.pageManager.requestRenderPage$.next(
-            new Website('4 Modernizations', `${process.env.PUBLIC_URL}/4_modernizations.html`)
+            new Website(
+                '4 Modernizations',
+                `${process.env.PUBLIC_URL}/4_modernizations.html`,
+                getPageSrc
+            )
         );
 
 

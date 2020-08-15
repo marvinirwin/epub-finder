@@ -1,35 +1,30 @@
-/* eslint import/no-webpack-loader-syntax:0 */
-// @ts-ignore
-import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 import {merge, Observable, ReplaySubject} from "rxjs";
 import {Dictionary, flatten} from "lodash";
-import {flatMap, map, scan, shareReplay, switchMap} from "rxjs/operators";
-import {printExecTimeAsync} from "../Util/Timer";
-import {PageRenderer} from "../PageRenderer";
-import {Website} from "../Website";
+import {map, scan, shareReplay, switchMap} from "rxjs/operators";
+import {BookFrame} from "../BookFrame/BookFrame";
+import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {createPopper} from "@popperjs/core";
 import {InputManager} from "./InputManager";
-import {GetWorkerResults} from "../Util/GetWorkerResults";
+
+export interface PageManagerConfig {
+    getPageRenderer: (website: Website) => Observable<BookFrame>,
+}
 
 export class PageManager {
-    pageIndex$: Observable<Dictionary<PageRenderer>>
-    pageList$: Observable<PageRenderer[]>;
+    pageIndex$: Observable<Dictionary<BookFrame>>
+    pageList$: Observable<BookFrame[]>;
     atomizedSentences$: Observable<AtomizedSentence[]>;
     requestRenderPage$ = new ReplaySubject<Website>(1);
-    constructor() {
+
+    constructor(
+        private config: PageManagerConfig
+    ) {
         this.pageIndex$ = this.requestRenderPage$.pipe(
-            flatMap(async page => {
-                return printExecTimeAsync("Preprocessing xml DOM", async () => {
-                    const documentProcessingWorker = new AtomizeUrl();
-                    const document = await GetWorkerResults(documentProcessingWorker, page.url);
-                    return new PageRenderer(
-                        document,
-                        page.name
-                    )
-                })
-            }),
-            scan((acc: Dictionary<PageRenderer>, page: PageRenderer) => {
+            switchMap(page =>
+                this.config.getPageRenderer(page)
+            ),
+            scan((acc: Dictionary<BookFrame>, page: BookFrame) => {
                 acc[page.name] = page;
                 return acc;
             }, {}),

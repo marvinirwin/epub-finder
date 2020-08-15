@@ -1,19 +1,18 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
-import {Dictionary, uniq} from "lodash";
-import {flatMap, map, share, shareReplay} from "rxjs/operators";
-import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
-import {printExecTime} from "./Util/Timer";
-import {waitFor} from "./Util/waitFor";
-import {isChineseCharacter} from "./Interfaces/OldAnkiClasses/Card";
-import {IWordCountRow} from "./Interfaces/IWordCountRow";
-import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
-import {sleep} from "./Util/Util";
-import {AtomizedSentence} from "./Atomized/AtomizedSentence";
-import {ANNOTATE_AND_TRANSLATE} from "./Atomized/AtomizedDocument";
+import {Dictionary} from "lodash";
+import {flatMap, map, shareReplay} from "rxjs/operators";
+import {printExecTime} from "../Util/Timer";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {IWordCountRow} from "../Interfaces/IWordCountRow";
+import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+import {sleep} from "../Util/Util";
+import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {ANNOTATE_AND_TRANSLATE} from "../Atomized/AtomizedDocument";
+import {bookFrameStyle} from "./BookFrameStyle";
 
 
-export class PageRenderer {
+export class BookFrame {
     ref$ = new ReplaySubject<HTMLElement>(1);
     text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
@@ -21,80 +20,7 @@ export class PageRenderer {
     iframebody$: Observable<HTMLBodyElement>;
 
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
-        let style = $(`
-                    <style>
-body {
-    padding-top: 100px;
-    font-size: 150%;
-}
-mark {
-    position: relative;
-    background: transparent;
-}
-mark.highlighted::after {
-    opacity: 1;
-}
-mark::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: #a0a0a0;
-    opacity: 0;
-    transition: opacity 250ms;
-    z-index: -1;
-}
-.highlighted::after {
-    opacity: 1;
-}
-
-mark:hover {
-  cursor: pointer;
-}
-
-.annotated_and_translated {
-    position: relative;
-}
-.annotated_and_translated:hover::after,
-.annotated_and_translated.highlighted-sentence{
-    opacity: 0.15;
-}
-.annotated_and_translated::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: #a0a0a0;
-    opacity: 0;
-    transition: opacity 250ms;
-}
-
-.POPPER_ELEMENT {
-    background-color: #333;
-    color: white;
-    padding: 15px 15px;
-    border-radius: 4px;
-    font-size: 13px;
-    height: fit-content;
-    z-index: 9999;
-    display: none;
-    
-}
-
-.POPPER_ELEMENT[data-show] {
-    display: block;
-}
-
-
-
-</style>
-                    `);
-        style.appendTo(body);
+        $(bookFrameStyle).appendTo(body);
     }
 
     constructor(
@@ -129,7 +55,7 @@ mark:hover {
                 await sleep(500);// If I dont put this wait, the DOM Doesnt fully load and every sentence does get parsed
                 // its weird
                 const body = iframe.contents().find('body')[0];
-                PageRenderer.appendAnnotationStyleToPageBody(body)
+                BookFrame.appendAnnotationStyleToPageBody(body)
                 return body;
             }),
             shareReplay(1)
@@ -167,15 +93,12 @@ mark:hover {
         } else {
             iframe = $(` <iframe style="border: none; width: 100%; height: 100%; font-family: sans-serif"> </iframe>`);
             iframe[0].srcdoc = this.src;
-
             iframe.appendTo(ref);
-
             // Maybe do this after?
         }
         // await waitFor(() => iframe.contents().find('body').children.length > 0, 100)
         // TODO figure out a reliable way to figure out when the iframe has loaded
         await sleep(500);
-        const v = iframe.contents().find('body').children().length;
         return iframe;
     }
 

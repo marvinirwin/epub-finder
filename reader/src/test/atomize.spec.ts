@@ -1,7 +1,3 @@
-import {AtomizedDocument} from '../lib/Atomized/AtomizedDocument';
-import { readFileSync} from 'fs-extra'
-import {join} from 'path'
-import {TrieWrapper} from "../lib/TrieWrapper";
 import trie from "trie-prefix-tree";
 import {mergeWordTextNodeMap} from "../lib/Util/mergeAnnotationDictionary";
 import {getAtomizedSentences} from "./Util/Util";

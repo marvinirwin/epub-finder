@@ -2,6 +2,7 @@
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from 'xmldom';
+import {getSrcHttp} from "../WebSite/Website";
 
 // @ts-ignore
 self["window"] = self;
@@ -9,16 +10,11 @@ self["window"] = self;
 const ctx: Worker = self as any;
 
 // Respond to message from parent thread
-ctx.onmessage = (ev) => {
+ctx.onmessage = async (ev) => {
     const url = ev.data as string;
-    const oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", response => {
-        const s = new XMLSerializer();
-        ctx.postMessage(
-            s.serializeToString(AtomizedDocument.atomizeDocument(oReq.responseText).document)
-        );
-    });
-    oReq.open("GET", url);
-    oReq.send();
+    const src = await getSrcHttp(url)
+    ctx.postMessage(
+        (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(src).document)
+    );
 };
 

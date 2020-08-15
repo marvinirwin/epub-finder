@@ -4,7 +4,7 @@ import {Manager} from "../../lib/Manager";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {withStyles} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {PageRenderer} from "../../lib/PageRenderer";
+import {BookFrame} from "../../lib/BookFrame/PageRenderer";
 
 const useStyles = makeStyles((theme) => ({
     collapse: {
@@ -37,7 +37,7 @@ const StyledExpansionPanelDetails = withStyles({
     }
 })(ExpansionPanelDetails);
 
-export function AtomizedFrameContainer({rb, m}: { rb: PageRenderer, m: Manager }) {
+export function AtomizedFrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
     const classes = useStyles();
     const ref = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = React.useState(true);

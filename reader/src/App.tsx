@@ -1,14 +1,13 @@
 import './declaration.d';
 import "fontsource-noto-sans"
-import $ from 'jquery';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
-import {AppSingleton, initializeApp} from "./AppSingleton";
+import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-
+import {Manager} from "./lib/Manager";
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -31,23 +30,14 @@ const darkTheme = createMuiTheme({
 });
 darkTheme.spacing(2);
 
-export interface shutterResult {
-    assets: {
-        preview: {
-            url: string;
-        }
-    }
-}
+const urlParams = new URLSearchParams(window.location.search);
+urlParams.get('mode');
 
 function App() {
-    const [appSingleton, setAppSingleton] = useState<AppSingleton | undefined>();
-    useEffect(() => {
-        initializeApp().then(s => setAppSingleton(s))
-    }, [])
-    const c = appSingleton ? <Main s={appSingleton}/> : <div>Initializing..</div>;
+    const [manager, setManager] = useState<Manager>(() => getManager(urlParams.get('mode')));
     return <ThemeProvider theme={darkTheme}>
         <CssBaseline/>
-        {c}
+        {manager ? <Main s={manager}/> : <div>Initializing..</div>}
     </ThemeProvider>;
 }
 

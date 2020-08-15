@@ -10,7 +10,7 @@ import {SettingsPage} from "./Pages/SettingsPage";
 import {AtomizedFrameContainer} from "./Atomized/AtomizedFrameContainer";
 import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
-import {PageRenderer} from "../lib/PageRenderer";
+import {BookFrame} from "../lib/BookFrame/PageRenderer";
 import {NavigationPages} from "../lib/Util/Util";
 import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
 import {useObservableState} from "observable-hooks";
@@ -59,7 +59,7 @@ export function Main({s}: { s: AppSingleton }) {
     useEffect(() => {
         m.inputManager.applyListeners(document.body);
     }, [m]);
-    const pages = useObs<Dictionary<PageRenderer>>(m.pageManager.pageIndex$);
+    const pages = useObs<Dictionary<BookFrame>>(m.pageManager.pageIndex$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
