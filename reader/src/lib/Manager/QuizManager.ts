@@ -32,11 +32,6 @@ export class QuizManager {
         this.quizzingCard$.pipe(
             startWith(undefined),
             filter(card => card === undefined),
-/*
-            tap(() => {
-                debugger;console.log();
-            }),
-*/
             withLatestFrom(this.scheduledCards$)
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             let iCard = scheduledCards[0];

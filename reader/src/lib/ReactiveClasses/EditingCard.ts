@@ -54,10 +54,9 @@ export class EditingCard {
             withLatestFrom(
                 this.learningLanguage$
             ),
-            flatMap(async ([synthesizedWav, characters]) => {
-                return a.audioRecorder.recordRequest$.next(new RecordRequest(characters));
-            })
-        )
+        ).subscribe(([synthesizedWav, characters]) => {
+            a.audioRecorder.recordRequest$.next(new RecordRequest(characters));
+        })
 
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(

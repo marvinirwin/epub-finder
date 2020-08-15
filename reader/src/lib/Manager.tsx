@@ -182,28 +182,6 @@ export class Manager {
         })
 
 
-        this.pageManager.requestRenderPage$.next(
-            new Website(
-                'Generals',
-                `${process.env.PUBLIC_URL}/generals.html`,
-                getPageSrc
-            )
-        );
-        this.pageManager.requestRenderPage$.next(
-            new Website(
-                'Zhou Enlai',
-                `${process.env.PUBLIC_URL}/zhou_enlai.html`,
-                getPageSrc
-            )
-        );
-        this.pageManager.requestRenderPage$.next(
-            new Website(
-                '4 Modernizations',
-                `${process.env.PUBLIC_URL}/4_modernizations.html`,
-                getPageSrc
-            )
-        );
-
 
         this.setQuizWord.pipe(
             resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)

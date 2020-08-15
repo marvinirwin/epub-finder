@@ -13,7 +13,6 @@ export class Website {
 
 export function getSrcHttp(url: string): Observable<string> {
     return from(new Promise<string>(resolve => {
-        debugger;
         const oReq = new XMLHttpRequest();
         oReq.addEventListener("load", response => {
             resolve(oReq.responseText);

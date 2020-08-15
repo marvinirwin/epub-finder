@@ -33,11 +33,11 @@ darkTheme.spacing(2);
 const urlParams = new URLSearchParams(window.location.search);
 urlParams.get('mode');
 
+const manager = getManager(urlParams.get('mode') || 'test')
 function App() {
-    const [manager, setManager] = useState<Manager>(() => getManager(urlParams.get('mode') || 'test'));
     return <ThemeProvider theme={darkTheme}>
         <CssBaseline/>
-        {manager ? <Main m={manager}/> : <div>Initializing..</div>}
+        <Main m={manager}/>
     </ThemeProvider>;
 }
 

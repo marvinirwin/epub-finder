@@ -1,13 +1,14 @@
 import {from, Observable, ReplaySubject, Subject} from "rxjs";
 import {AudioConfig, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
-import {map, shareReplay, withLatestFrom} from "rxjs/operators";
+import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
+import {AudioSource} from "./AudioSource";
 
 let AZURE_SPEECH_REGION = 'westus2' as string;
 
-export class BrowserAudio {
+export class BrowserAudio implements AudioSource{
     public isRecording$ = new ReplaySubject<boolean>(1);
-    public beginRecordingSignal = new Subject<void>();
+    public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new ReplaySubject<string>(1);
 
@@ -31,7 +32,7 @@ export class BrowserAudio {
 
         this.audioConfig$ = this.mediaSource$.pipe(map(mediaSource => AudioConfig.fromMicrophoneInput(mediaSource.id)));
 
-        this.beginRecordingSignal.pipe(
+        this.beginRecordingSignal$.pipe(
             withLatestFrom(this.audioConfig$, this.speechConfig$)
         ).subscribe(([_, audioConfig, speechConfig]) => {
             this.isRecording$.next(true);

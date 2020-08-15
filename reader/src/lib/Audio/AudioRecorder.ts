@@ -1,26 +1,32 @@
-import {combineLatest, ReplaySubject, Subject} from "rxjs";
-import {flatMap, take, withLatestFrom} from "rxjs/operators";
+import {race, Subject} from "rxjs";
+import {map, switchMap, take} from "rxjs/operators";
 import {RecordRequest} from "../Interfaces/RecordRequest";
 import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
 
 export class AudioRecorder {
-    public recordRequest$ = new ReplaySubject<RecordRequest>(1);
-    private startRecording$ = new Subject<void>();
-    private countdown$ = new ReplaySubject<number>(1);
-    private speechRecongitionText$ = new ReplaySubject<string>(1);
+    public recordRequest$ = new Subject<RecordRequest>();
+    private countdown$ = new Subject<number>();
 
     public get isRecording$() {
         return this.audioSource.isRecording$
     }
 
     constructor(public audioSource: AudioSource) {
-        this.recordRequest$.subscribe(async (request) => {
-            const nextText = this.audioSource.recognizedText$.pipe(take(1)).toPromise();
-            const nextRequest = this.recordRequest$.pipe(take(1)).toPromise();
-            // await this.countdown(1000);
-            this.audioSource.beginRecordingSignal.next();
-            const result = Promise.race([nextText, nextRequest]);
+        this.recordRequest$.pipe(
+            switchMap((request: RecordRequest) => {
+                this.audioSource.beginRecordingSignal$.next();
+                return race(
+                    this.audioSource.recognizedText$.pipe(take(1)),
+                    this.recordRequest$.pipe(take(1))
+                ).pipe(
+                    map((result: string | RecordRequest) => {
+                        let newVar: [string | RecordRequest, RecordRequest] = [result, request];
+                        return newVar;
+                    })
+                );
+            })
+        ).subscribe(async ([result, request]: [string | RecordRequest, RecordRequest]) => {
             if (typeof result === 'object') {
                 request.rejectSentence(new Error("Audio recording not completed"))
             } else {

@@ -5,11 +5,11 @@ import {MakeQuerablePromise} from "../Util/QueryablePromise";
 
 export class UnitTestAudio {
     public isRecording$ = new ReplaySubject<boolean>(1);
-    public beginRecordingSignal = new Subject<void>();
+    public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
     constructor(public text: string) {
-        this.beginRecordingSignal.subscribe(async () => {
+        this.beginRecordingSignal$.subscribe(async () => {
             this.isRecording$.next(true);
             const nextStopSignal = MakeQuerablePromise(this.stopRecordingSignal$.pipe(take(1)).toPromise());
             if (!nextStopSignal.isFulfilled()) {

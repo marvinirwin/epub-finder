@@ -1,4 +1,4 @@
-import {merge, Observable, ReplaySubject} from "rxjs";
+import {merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary, flatten} from "lodash";
 import {map, scan, shareReplay, switchMap} from "rxjs/operators";
 import {BookFrame} from "../BookFrame/BookFrame";
@@ -15,14 +15,15 @@ export class PageManager {
     pageIndex$: Observable<Dictionary<BookFrame>>
     pageList$: Observable<BookFrame[]>;
     atomizedSentences$: Observable<AtomizedSentence[]>;
-    requestRenderPage$ = new ReplaySubject<Website>(1);
+    requestRenderPage$ = new Subject<Website>();
 
     constructor(
         private config: PageManagerConfig
     ) {
         this.pageIndex$ = this.requestRenderPage$.pipe(
-            switchMap(page =>
-                this.config.getPageRenderer(page)
+            switchMap(page => {
+                    return this.config.getPageRenderer(page);
+                }
             ),
             scan((acc: Dictionary<BookFrame>, page: BookFrame) => {
                 acc[page.name] = page;

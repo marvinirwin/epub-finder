@@ -9,7 +9,6 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export function WorkerAtomize(page: Website): Observable<BookFrame> {
     return from(new Promise<BookFrame>(async resolve => {
-        debugger;
         const documentProcessingWorker = new AtomizeUrl();
         const document = await GetWorkerResults(documentProcessingWorker, page.url);
         resolve(new BookFrame(
