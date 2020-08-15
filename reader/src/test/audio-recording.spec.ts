@@ -22,6 +22,22 @@ it('Can fulfill an Audio Recording request ', async () => {
         const recordRequest = new RecordRequest('test');
         const recordRequests$ = hot('a', {a: recordRequest});
         recordRequests$.subscribe(recordRequest$);
+
+        const makeGraph(`
+           c
+           |
+        ---b
+        |  
+        a   
+        `, {
+            a: recordRequest,
+            b: true,
+            c: false
+        })(
+            publisher([ recordRequest ]),
+            subscriber([ isRecording$ ])
+        );
+
         scheduler.expectOrdering([
             ord(recordRequests$),
             ord(isRecording$)

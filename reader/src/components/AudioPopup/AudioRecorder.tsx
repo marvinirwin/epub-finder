@@ -52,9 +52,6 @@ export default function AudioRecorder({m}: { m: Manager }) {
                 <CountdownCircle r={r}/>
                 <Typography variant="h6" className={classes.learningLanguage}
                             align="center">{currentAudioRequest?.label}</Typography>
-{/*
-                <SineWave r={r}/>
-*/}
                 <Typography variant="h6"
                             className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
                 {/*

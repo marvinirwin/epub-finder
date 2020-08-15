@@ -6,11 +6,15 @@ import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {UnitTestAtomize} from "../../lib/AppContext/UnitTestAtomize";
 import {of} from "rxjs";
 import * as fs from "fs";
-import { join } from "path";
+import {join} from "path";
+import {Website} from "../../lib/Website/Website";
 
 require("fake-indexeddb/auto");
 
 export type RunArguments = { manager: Manager, scheduler: MyTestScheduler, helpers: RunHelpers }
+
+const UnitTestGetPageSrc = (url: string) => of(fs.readFileSync(join(__dirname, '../fixtures/', url)).toString());
+
 
 export function Run(cb: (r: RunArguments) => void) {
     const scheduler = getTestScheduler();
@@ -21,9 +25,13 @@ export function Run(cb: (r: RunArguments) => void) {
             {
                 audioSource: new UnitTestAudio("YEET"),
                 getPageRenderer: UnitTestAtomize,
-                getPageSrc: url => of(fs.readFileSync(join(__dirname, '../fixtures/', url)).toString())
+                getPageSrc: UnitTestGetPageSrc
             });
-
+        manager.pageManager.requestRenderPage$.next(new Website(
+            "Basic Doc",
+            join(__dirname, 'fixtures', 'BasicDoc.html'),
+            UnitTestGetPageSrc
+        ));
 
         cb({
             manager: manager,
