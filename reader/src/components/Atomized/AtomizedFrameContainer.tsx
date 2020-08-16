@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Collapse from '@material-ui/core/Collapse';
 import {Manager} from "../../lib/Manager";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -39,10 +39,10 @@ const StyledExpansionPanelDetails = withStyles({
 
 export function AtomizedFrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
     const classes = useStyles();
-    const ref = useRef<HTMLDivElement>(null);
+    const [ref, setRef] = useState();
     const [expanded, setExpanded] = React.useState(true);
     useEffect(() => {
-        ref && ref.current && rb.ref$.next(ref.current);
+        ref && rb.ref$.next(ref);
     }, [ref]);
 
 /*
@@ -50,6 +50,6 @@ export function AtomizedFrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
 */
 
     return (
-        <div style={{width: '100%', height: '100%'}} id={rb.getRenderParentElementId()} ref={ref}/>
+        <div style={{width: '100%', height: '100%'}} id={rb.getRenderParentElementId()} ref={setRef}/>
     );
 }

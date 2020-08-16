@@ -1,23 +1,22 @@
 import {AsciiGraph} from "./Util/GetGraphJson";
 
 const defaultGraph = `
-    d<----
-    ^    |
- e<-a<---c
-    ^  
-    |  
-    b   
+    delta<-------
+    ^           |
+ echo<-alpha<---charlie
+  ^             ^
+  |             |
+  -bravo.next(bravoValue)
 `
-const g = new AsciiGraph(defaultGraph)
+const g = new AsciiGraph(defaultGraph);
 
 it('Gets neighbors correctly', () => {
     expect(g.edges).toEqual({
-        a: ['e', 'd'],
-        b: ['a'],
-        c: ['a', 'd'],
-    })
+        alpha: ['echo'],
+        charlie: ['alpha', 'delta'],
+        'bravo.next(bravoValue)': ['charlie', 'echo'],
+        echo: ['delta']
+    });
 });
 
-it('Converts the graphs to happens before relationships', () => {
-    g.
-});
+

@@ -45,15 +45,20 @@ import {getSrcHttp} from "./Website/Website";
 export type CardDB = IndexDBManager<ICard>;
 
 export class Manager {
-
-    packageMessages$: ReplaySubject<string> = new ReplaySubject<string>()
-
-    cardDBManager = new IndexDBManager<ICard>(
+    public cardDBManager = new IndexDBManager<ICard>(
         this.db,
         this.db.cards,
         (c: ICard) => c.id,
         (i: number, c: ICard) => ({...c, id: i})
     );
+    public audioManager: AudioManager;
+    public cardManager: CardManager;
+    public pageManager: PageManager;
+    public scheduleManager: ScheduleManager;
+    public quizManager: QuizManager;
+    public createdSentenceManager: CreatedSentenceManager;
+    public inputManager = new InputManager();
+    public sentenceManager = new SentenceManager();
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -66,14 +71,6 @@ export class Manager {
 
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
-    audioManager: AudioManager;
-    cardManager: CardManager;
-    pageManager: PageManager;
-    scheduleManager: ScheduleManager;
-    quizManager: QuizManager;
-    createdSentenceManager: CreatedSentenceManager;
-    inputManager = new InputManager();
-    sentenceManager = new SentenceManager();
 
     textData$: Observable<TextWordData>;
 
@@ -83,6 +80,7 @@ export class Manager {
     highlightedPinyin$: Observable<string>;
     editingCardManager: EditingCardManager;
     progressManager: ProgressManager;
+
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
         this.pageManager = new PageManager({getPageRenderer});
@@ -210,16 +208,6 @@ export class Manager {
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
         this.cardManager.load();
-    }
-
-    receiveSerializedPackage(s: SerializedAnkiPackage) {
-        let cards = s.cards;
-        if (cards?.length) {
-            this.packageMessages$.next(`Received package with ${cards?.length} cards`)
-            /*
-                        this.addCards$.next(cards);
-            */
-        }
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

@@ -68,7 +68,7 @@ export function Characters({c, m}: QuizCardProps) {
         , [c?.learningLanguage],
     ), []);
 
-    const pageRenderer$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
+    const bookFrame$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
         obs$.pipe(
             filter(([strings]) => strings.length > 0),
             map(([sentences]) => {
@@ -90,7 +90,7 @@ export function Characters({c, m}: QuizCardProps) {
             tap(iframeBody => {
                 m.inputManager.applyListeners(iframeBody);
             })
-        ), [pageRenderer$]),
+        ), [bookFrame$]),
     );
     const atomizedSentences = useObservableState(useObservable((obs$: Observable<[BookFrame | undefined]>) =>
             combineLatest(
@@ -121,7 +121,7 @@ export function Characters({c, m}: QuizCardProps) {
                     m.characterPageWordElementMap$.next(textWordData.wordElementsMap)
                 })
             )
-        , [pageRenderer$])
+        , [bookFrame$])
     );
 
     useEffect(() => {
@@ -156,7 +156,7 @@ export function Characters({c, m}: QuizCardProps) {
                 </Typography>
             </div>
             <div style={{flexGrow: 1, width: '100%'}}>
-                {pageRenderer$ && <AtomizedFrameContainer rb={pageRenderer$} m={m}/>}
+                {bookFrame$ && <AtomizedFrameContainer rb={bookFrame$} m={m}/>}
             </div>
         </CardContent>
         <CardActions className={classes.cardActions}>
