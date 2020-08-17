@@ -51,9 +51,9 @@ export function Characters({c, m}: QuizCardProps) {
         }
     };
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
-        (obs$: Observable<[string | undefined]>) =>
+        (learningLanguage$: Observable<[string | undefined]>) =>
             combineLatest([
-                    obs$.pipe(distinctUntilChanged()),
+                    learningLanguage$.pipe(distinctUntilChanged()),
                     m.textData$
                 ]
             ).pipe(

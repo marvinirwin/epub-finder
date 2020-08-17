@@ -50,29 +50,39 @@ export class PageManager {
     }
 
     public static ApplyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
-        atomizedSentences.forEach(s => {
+        atomizedSentences.forEach(atomizedSentence => {
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
-            createPopper(s.getSentenceHTMLElement(), s.getPopperHTMLElement(), {
-                placement: 'top-start',
-                strategy: 'fixed'
-            });
+            let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
+            if (!sentenceHTMLElement || !popperHTMLElement) {
+                debugger;console.log();
+            }
+            try {
+                createPopper(sentenceHTMLElement, popperHTMLElement, {
+                    placement: 'top-start',
+                    strategy: 'fixed'
+                });
+            } catch(e) {
+                debugger;
+                console.error(e);
+            }
 
             const show = () => {
-                s.getPopperHTMLElement().setAttribute('data-show', '');
+                popperHTMLElement.setAttribute('data-show', '');
             }
             const hide = () => {
-                (s.getPopperHTMLElement() as unknown as HTMLElement).removeAttribute('data-show');
+                (popperHTMLElement as unknown as HTMLElement).removeAttribute('data-show');
             }
 
             showEvents.forEach(event => {
-                s.getSentenceHTMLElement().addEventListener(event, show);
+                sentenceHTMLElement.addEventListener(event, show);
             });
 
             hideEvents.forEach(event => {
-                s.getSentenceHTMLElement().addEventListener(event, hide);
+                sentenceHTMLElement.addEventListener(event, hide);
             });
-            InputManager.applySentenceElementSelectListener(s)
+            InputManager.applySentenceElementSelectListener(atomizedSentence)
         });
     }
 }
