@@ -13,18 +13,17 @@ export class MyTestScheduler extends TestScheduler {
                 return find;
                 }
             );
-        return b
-        ;
+        expect(b).toBeTruthy();
     }
 
     public static isSubTree(tree: causallyOrderable, subTree: causallyOrderable): boolean {
 
         if (!tree || !subTree) return false;
-        let treesAreEqual = MyTestScheduler.treeSubSet(tree, subTree);
+        let treeContainsSubTree = MyTestScheduler.treeSubSet(tree, subTree);
         let treeHasChildWhichIsEqual = tree.ancestors.find(ancestor => {
             return MyTestScheduler.isSubTree(ancestor, subTree);
         });
-        let isSubTreeResult = treesAreEqual ||
+        let isSubTreeResult = treeContainsSubTree ||
             !!treeHasChildWhichIsEqual;
         return isSubTreeResult
             ;
@@ -44,12 +43,6 @@ export class MyTestScheduler extends TestScheduler {
         return tree.value === subTree.value &&
             subTree.ancestors.every(subTreeAncestor =>
                 tree.ancestors.find(treeAncestor =>
-                    MyTestScheduler.treeSubSet(treeAncestor, subTreeAncestor)
-                )
-            )
-            &&
-            tree.ancestors.every(treeAncestor =>
-                treeAncestor.ancestors.find(subTreeAncestor =>
                     MyTestScheduler.treeSubSet(treeAncestor, subTreeAncestor)
                 )
             )

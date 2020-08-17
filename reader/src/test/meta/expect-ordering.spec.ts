@@ -67,9 +67,9 @@ it('Compares subtrees correctly', () => {
     expect(MyTestScheduler.isSubTree(tree, incorrectSubTree)).toBeFalsy();
 });
 
-it('Expects orderings correctly', async () => {
-    try {
-        await Run(({manager, scheduler, helpers: {hot}}) => {
+try {
+    it('Expects orderings correctly', async () => {
+        Run(({manager, scheduler, helpers: {hot}}) => {
             const a = hot('a');
             const b = hot('-b');
             const c = hot('--c');
@@ -77,19 +77,9 @@ it('Expects orderings correctly', async () => {
                 .expectOrderings(a, b, c)
                 .toHaveOrdering(AsciiGraph.getOrderables('a>c>b', {}))
         });
-    } catch(e) {
-        console.error(e);
-    }
-/*
-    Run(({manager, scheduler, helpers: {hot}}) => {
-        const a = hot('a');
-        const b = hot('-b');
-        const c = hot('--c');
-        scheduler
-            .expectOrderings(a, b, c)
-            .toHaveOrdering(g.getOrderables('a>c>b', {}))
     })
-*/
-})
+} catch(e) {
+    console.error(e);
+}
 
 
