@@ -1,10 +1,10 @@
 import {TestScheduler} from "rxjs/testing";
-import {MyAppDatabase} from "../lib/Storage/AppDB";
-import {Manager} from "../lib/Manager";
-import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "./Util/Util";
-import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
-import {ICard} from "../lib/Interfaces/ICard";
-import {getNewICardForWord} from "../lib/Util/Util";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {Manager} from "../../lib/Manager";
+import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
+import {IWordCountRow} from "../../lib/Interfaces/IWordCountRow";
+import {ICard} from "../../lib/Interfaces/ICard";
+import {getNewICardForWord} from "../../lib/Util/Util";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();

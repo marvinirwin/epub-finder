@@ -1,12 +1,13 @@
-import {convertGraphToOrderables, getTestScheduler, mv, ord} from "./Util/Util";
-import {RecordRequest} from "../lib/Interfaces/RecordRequest";
-import {Run} from "./Util/Run";
+import {convertGraphToOrderables, mv, ord} from "../Util/Util";
+import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
+import {Run} from "../Util/Run";
 import {Observable} from "rxjs";
-import {AsciiGraph} from "./Util/GetGraphJson";
+import {MyTestScheduler} from "../Util/MyTestScheduler";
+import {AsciiGraph} from "../Util/ASCIIGraph";
 
 
 // Can I have multiple instances of this, or can I get away with this here?
-const testScheduler = getTestScheduler();
+const testScheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
 
 it('Can fulfill an Audio Recording request ', async () => {
     Run(({
@@ -23,18 +24,7 @@ it('Can fulfill an Audio Recording request ', async () => {
         const recordRequests$ = hot('a', {a: recordRequest});
         recordRequests$.subscribe(recordRequest$);
 
-        type ObsValuePair<T> = [Observable<T>, T];
 
-        function getOrderables(s: string, values: { [key: string]: ObsValuePair<any> }) {
-            const valueMap = Object.fromEntries(
-                Object.entries(values)
-                    .map(([key, [obs$, value]]) => [key, value])
-            );
-            const g = new AsciiGraph(s);
-            const roots = g.getRoots();
-            const visited = new Set<string>();
-            return roots.map(root => convertGraphToOrderables(g.edges, valueMap, root, visited));
-        }
 
 /*
         getOrderables(`

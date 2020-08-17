@@ -1,15 +1,15 @@
-import {MyAppDatabase} from "../lib/Storage/AppDB";
-import {ScheduleManager} from "../lib/Manager/ScheduleManager";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import {map} from "rxjs/operators";
 import {TestScheduler} from 'rxjs/testing';
-import {countFactory, MarbleGroup, Marbles, quizResultFactory, ScheduleQuizCard} from "./Util/Util";
-import {RecognitionMap} from "../lib/Scheduling/SRM";
-import {QuizResultToRecognitionRow} from "../lib/Pipes/QuizResultToRecognitionRow";
-import {QuizManager, QuizResult} from "../lib/Manager/QuizManager";
-import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
+import {countFactory, MarbleGroup, Marbles, quizResultFactory, ScheduleQuizCard} from "../Util/Util";
+import {RecognitionMap} from "../../lib/Scheduling/SRM";
+import {QuizResultToRecognitionRow} from "../../lib/Pipes/QuizResultToRecognitionRow";
+import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
+import {IWordCountRow} from "../../lib/Interfaces/IWordCountRow";
 import {HotObservable} from "rxjs/internal/testing/HotObservable";
 import moment from "moment";
-import {WordRecognitionRow} from "../lib/Scheduling/WordRecognitionRow";
+import {WordRecognitionRow} from "../../lib/Scheduling/WordRecognitionRow";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();

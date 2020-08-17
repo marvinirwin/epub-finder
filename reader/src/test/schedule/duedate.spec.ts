@@ -1,10 +1,10 @@
-import {MyAppDatabase} from "../lib/Storage/AppDB";
-import {ScheduleManager} from "../lib/Manager/ScheduleManager";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import {map, skip, take} from "rxjs/operators";
 import moment from "moment";
-import {countFactory, Marbles} from "./Util/Util";
+import {countFactory, Marbles} from "../Util/Util";
 import {TestScheduler} from "rxjs/testing";
-import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
+import {IWordCountRow} from "../../lib/Interfaces/IWordCountRow";
 
 require("fake-indexeddb/auto");
 

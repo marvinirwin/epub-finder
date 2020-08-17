@@ -1,6 +1,6 @@
-import {WordRecognitionRow} from "../lib/Scheduling/WordRecognitionRow";
+import {WordRecognitionRow} from "../../lib/Scheduling/WordRecognitionRow";
 import moment from 'moment';
-import {RecognitionMap, SRM} from "../lib/Scheduling/SRM";
+import {RecognitionMap, SRM} from "../../lib/Scheduling/SRM";
 
 const sm = new SRM();
 

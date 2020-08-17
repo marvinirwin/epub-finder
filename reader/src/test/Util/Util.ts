@@ -14,6 +14,8 @@ import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedu
 import moment from "moment";
 import {MyTestScheduler} from "./MyTestScheduler";
 
+export type ObsValuePair<T> = [Observable<T>, T];
+
 // import { TestMessage } from "rxjs/internal/testing/TestMessage";
 export interface TestMessage {
 
@@ -336,16 +338,6 @@ export function ScheduleQuizCard(db: MyAppDatabase) {
     return {scheduleManager, quizManager, cardManager};
 }
 
-export function getTestScheduler() {
-    return new MyTestScheduler((actual, expected) => {
-        if (moment.isMoment(expected)) {
-            expect(moment(actual).isSame(expected, 'day'));
-        } else {
-            expect(actual).toEqual(expected);
-        }
-    });
-}
-
 export type orderingObservable = { observable: Observable<any>, subscriptionMarbles: string | null };
 export type causallyOrderable = { error?: any, value?: any, notification?: any, ancestors: causallyOrderable[] };
 export type marbleValue = {marbles: string, values: {[key: string]: any}};
@@ -372,7 +364,7 @@ export function convertGraphToOrderables(
     visited.add(node);
     return {
         error: '',
-        value: valueMap[node],
+        value: valueMap[node] || node,
         notification: '',
         ancestors: (edges[node] || []).filter(ancestor => !visited.has(ancestor)).map(ancestor => convertGraphToOrderables(
             edges,

@@ -1,16 +1,16 @@
-import {MyAppDatabase} from "../lib/Storage/AppDB";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {TestScheduler} from "rxjs/testing";
-import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "./Util/Util";
-import {ICard} from "../lib/Interfaces/ICard";
-import {IWordCountRow} from "../lib/Interfaces/IWordCountRow";
-import {getNewICardForWord} from "../lib/Util/Util";
-import {QuizComponent, QuizResult} from "../lib/Manager/QuizManager";
+import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
+import {ICard} from "../../lib/Interfaces/ICard";
+import {IWordCountRow} from "../../lib/Interfaces/IWordCountRow";
+import {getNewICardForWord} from "../../lib/Util/Util";
+import {QuizComponent, QuizResult} from "../../lib/Manager/QuizManager";
 import {SubjectSubscriber} from "rxjs/internal/Subject";
-import {Characters} from "../components/Quiz/Characters";
-import {RecognitionMap} from "../lib/Scheduling/SRM";
+import {Characters} from "../../components/Quiz/Characters";
+import {RecognitionMap} from "../../lib/Scheduling/SRM";
 import {distinct, distinctUntilChanged, map} from "rxjs/operators";
-import {Pictures} from "../components/Quiz/Pictures";
-import {Conclusion} from "../components/Quiz/Conclusion";
+import {Pictures} from "../../components/Quiz/Pictures";
+import {Conclusion} from "../../components/Quiz/Conclusion";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();

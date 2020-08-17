@@ -1,7 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {UnitTestAudio} from "../../lib/Audio/UnitTestAudio";
-import {getTestScheduler} from "./Util";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {UnitTestAtomize} from "../../lib/AppContext/UnitTestAtomize";
 import {of} from "rxjs";
@@ -18,7 +17,7 @@ const UnitTestGetPageSrc = (url: string) => of(fs.readFileSync(join(__dirname, '
 
 
 export function Run(cb: (r: RunArguments) => void) {
-    const scheduler = getTestScheduler();
+    const scheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
     scheduler.run(helpers => {
         // Will I need to require the fake indexDB every time?
         const manager = new Manager(

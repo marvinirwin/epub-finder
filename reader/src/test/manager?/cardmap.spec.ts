@@ -1,11 +1,11 @@
-import {getAtomizedSentences} from "./Util/Util";
-import CardManager from "../lib/Manager/CardManager";
-import {MyAppDatabase} from "../lib/Storage/AppDB";
-import {getNewICardForWord, getUniqueLengths, sleep} from "../lib/Util/Util";
-import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
+import {getAtomizedSentences} from "../Util/Util";
+import CardManager from "../../lib/Manager/CardManager";
+import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {getNewICardForWord, getUniqueLengths, sleep} from "../../lib/Util/Util";
+import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {skip, take} from "rxjs/operators";
-import {ITrie} from "../lib/Interfaces/Trie";
-import {TextWordData} from "../lib/Atomized/TextWordData";
+import {ITrie} from "../../lib/Interfaces/Trie";
+import {TextWordData} from "../../lib/Atomized/TextWordData";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();

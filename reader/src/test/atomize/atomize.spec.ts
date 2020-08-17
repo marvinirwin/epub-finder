@@ -1,6 +1,6 @@
 import trie from "trie-prefix-tree";
-import {mergeWordTextNodeMap} from "../lib/Util/mergeAnnotationDictionary";
-import {getAtomizedSentences} from "./Util/Util";
+import {mergeWordTextNodeMap} from "../../lib/Util/mergeAnnotationDictionary";
+import {getAtomizedSentences} from "../Util/Util";
 
 test('Atomizes a document and produces a mapping of words to text nodes', async () => {
     const atomizedSentences = getAtomizedSentences('BasicDoc.html')
