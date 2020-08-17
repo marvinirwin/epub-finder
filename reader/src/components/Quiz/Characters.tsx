@@ -47,7 +47,8 @@ export function Characters({c, m}: QuizCardProps) {
         if (createdSentence) {
             m.quizManager.quizzingComponent$.next("Pictures");
         } else {
-            setError("Please record novel sentence");
+            const r = new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
+            r.sentence.then(setCreatedSentence)
         }
     };
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
@@ -127,7 +128,7 @@ export function Characters({c, m}: QuizCardProps) {
     useEffect(() => {
         setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;
-        const r= new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
+        const r = new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
         r.sentence.then(async createdSentence => {
             if (!createdSentence) {
                 return;
