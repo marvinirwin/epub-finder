@@ -1,7 +1,7 @@
-import {combineLatest, ReplaySubject, Subject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Characters} from "../../components/Quiz/Characters";
-import {debounce, debounceTime, filter, startWith, tap, withLatestFrom} from "rxjs/operators";
+import {filter, startWith, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
 
@@ -20,7 +20,7 @@ export class QuizManager {
 
     scheduledCards$ = new ReplaySubject<ICard[]>(1);
 
-    setQuizItem$ = new Subject<ICard | undefined>();
+    requestNextCard$ = new Subject<void>();
 
     /*
         learningCards$ = new Subject<ScheduleRow[]>();
@@ -31,37 +31,42 @@ export class QuizManager {
     constructor() {
         this.quizzingCard$.pipe(
             startWith(undefined),
-            filter(card => card === undefined),
             withLatestFrom(this.scheduledCards$)
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
-            let iCard = scheduledCards[0];
-            if (iCard) {
-                this.setQuizItem$.next(iCard);
+            if (!quizzingCard && scheduledCards[0]) {
+                this.requestNextCard$.next();
             }
         });
 
+        this.requestNextCard$.pipe(
+            withLatestFrom(this.scheduledCards$)
+        ).subscribe(([_, scheduledCards]) => {
+            this.quizzingCard$.next(scheduledCards[0]);
+            this.quizzingComponent$.next("Characters");
+        })
+
+/*
         combineLatest([
             this.quizzingCard$.pipe(startWith(undefined)),
-            this.setQuizItem$.pipe(
+            this.requestNextCard$.pipe(
                 debounceTime(1)
             )
         ]).subscribe(([quizzingCard, setQuizItem]) => {
             if(!quizzingCard && setQuizItem) {
-                this.setQuizItem(setQuizItem);
+                this.requestNextCard$.next();
             }
         })
+*/
 
         this.scheduledCards$.pipe(
             withLatestFrom(
                 this.quizzingCard$.pipe(
                     startWith(undefined),
-                    filter(card => card === undefined)
                 )
-            )
+            ),
         ).subscribe(([scheduledCards, quizzingCard]) => {
-            let iCard = scheduledCards[0];
-            if (iCard) {
-                this.setQuizItem$.next(iCard);
+            if (!quizzingCard && scheduledCards[0]) {
+                this.requestNextCard$.next();
             }
         })
 
@@ -79,7 +84,7 @@ export class QuizManager {
         })
     }
 
-    setQuizItem(icard: ICard | undefined) {
+    setQuizCard(icard: ICard | undefined) {
         this.quizzingCard$.next(icard);
         this.quizzingComponent$.next("Characters")
     }
@@ -89,7 +94,7 @@ export class QuizManager {
             score: recognitionScore,
             word
         });
-        this.setQuizItem$.next(undefined);
+        this.requestNextCard$.next()
     }
 
 }

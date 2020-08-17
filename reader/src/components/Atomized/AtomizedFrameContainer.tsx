@@ -43,7 +43,7 @@ export function AtomizedFrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
     const [expanded, setExpanded] = React.useState(true);
     useEffect(() => {
         ref && rb.ref$.next(ref);
-    }, [ref]);
+    }, [ref, rb]);
 
 /*
     const translationText = useObservableState(rb.translationText$)

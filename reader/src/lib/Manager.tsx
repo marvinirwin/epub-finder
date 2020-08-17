@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, uniq} from "lodash";
+import {Dictionary, uniq, debounce} from "lodash";
 import {
     debounceTime,
     filter,
@@ -44,6 +44,8 @@ import {getSrcHttp} from "./Website/Website";
 
 export type CardDB = IndexDBManager<ICard>;
 
+const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
+
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
         this.db,
@@ -59,6 +61,8 @@ export class Manager {
     public createdSentenceManager: CreatedSentenceManager;
     public inputManager = new InputManager();
     public sentenceManager = new SentenceManager();
+    public editingCardManager: EditingCardManager;
+    public progressManager: ProgressManager;
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -71,15 +75,12 @@ export class Manager {
 
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
-
     textData$: Observable<TextWordData>;
 
-    setQuizWord: Subject<string> = new Subject<string>();
+    setQuizWord$: Subject<string> = new Subject<string>();
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
     highlightedPinyin$: Observable<string>;
-    editingCardManager: EditingCardManager;
-    progressManager: ProgressManager;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
@@ -181,10 +182,10 @@ export class Manager {
 
 
 
-        this.setQuizWord.pipe(
+        this.setQuizWord$.pipe(
             resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
         ).subscribe((icard) => {
-            this.quizManager.setQuizItem(icard);
+            this.quizManager.setQuizCard(icard);
         })
 
         merge(
@@ -210,11 +211,12 @@ export class Manager {
         this.cardManager.load();
     }
 
+
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
         child.onmouseenter = (ev) => {
-            this.highlightedWord$.next(maxWord?.word);
+            addHighlightedWord(this.highlightedWord$, maxWord?.word);
             if (ev.shiftKey) {
                 /**
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
@@ -232,7 +234,7 @@ export class Manager {
             }
         };
         child.onmouseleave = (ev) => {
-            this.highlightedWord$.next();
+            addHighlightedWord(this.highlightedWord$, maxWord?.word);
         }
         child.onclick = (ev) => {
             const children = sentence.getSentenceHTMLElement().children;

@@ -39,7 +39,7 @@ export class EditingCard {
     learningLanguage$ = new ReplaySubject<string>(1);
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
-    synthesizedSpeech$: Observable<WavAudio>;
+    synthesizedSpeech$: Observable<WavAudio | undefined>;
     pinyin$: Observable<string>;
     constructor(
         public persistor: IndexDBManager<ICard>,

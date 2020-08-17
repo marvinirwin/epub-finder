@@ -53,7 +53,7 @@ export function Characters({c, m}: QuizCardProps) {
     const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
         (obs$: Observable<[string | undefined]>) =>
             combineLatest([
-                    obs$,
+                    obs$.pipe(distinctUntilChanged()),
                     m.textData$
                 ]
             ).pipe(
@@ -63,7 +63,6 @@ export function Characters({c, m}: QuizCardProps) {
                         });
                     }
                 ),
-                distinctUntilChanged(isEqual)
             )
         , [c?.learningLanguage],
     ), []);
@@ -72,6 +71,7 @@ export function Characters({c, m}: QuizCardProps) {
         obs$.pipe(
             filter(([strings]) => strings.length > 0),
             map(([sentences]) => {
+                sentences = sentences.slice(0, 10);
                 return getSrc(sentences);
             }),
             switchMap(async (src: string) => {

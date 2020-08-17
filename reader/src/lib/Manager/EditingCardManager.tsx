@@ -12,7 +12,7 @@ export default class EditingCardManager {
     editingCard!: Observable<EditingCard | undefined>;
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
-    currentEditingSynthesizedWavFile$!: Observable<WavAudio>;
+    currentEditingSynthesizedWavFile$!: Observable<WavAudio | undefined>;
 
     constructor() {
         this.editingCard = this.queEditingCard$.pipe(
