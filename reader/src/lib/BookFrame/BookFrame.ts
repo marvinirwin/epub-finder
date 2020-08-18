@@ -1,4 +1,4 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import $ from 'jquery';
 import {Dictionary} from "lodash";
 import {flatMap, map, shareReplay} from "rxjs/operators";
@@ -6,18 +6,26 @@ import {printExecTime} from "../Util/Timer";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {sleep} from "../Util/Util";
+import {getUniqueLengths, sleep} from "../Util/Util";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {ANNOTATE_AND_TRANSLATE} from "../Atomized/AtomizedDocument";
 import {bookFrameStyle} from "./BookFrameStyle";
+import {TrieWrapper} from "../TrieWrapper";
+import {ColdSubject} from "../Util/ColdSubject";
+import {TextWordData} from "../Atomized/TextWordData";
 
 
 export class BookFrame {
+    // This shouldn't be an observable, right?
+    id: string;
     ref$ = new ReplaySubject<HTMLElement>(1);
     text$ = new ReplaySubject<string>(1);
     wordCountRecords$ = new Subject<IWordCountRow[]>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
     iframebody$: Observable<HTMLBodyElement>;
+    trie = new ColdSubject<TrieWrapper>();
+    textData$: Observable<TextWordData>;
+
 
     private static appendAnnotationStyleToPageBody(body: HTMLElement) {
         $(bookFrameStyle).appendTo(body);
@@ -27,6 +35,7 @@ export class BookFrame {
         public src: string,
         public name: string,
     ) {
+        this.id = name;
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text
                 .split('')
@@ -66,6 +75,16 @@ export class BookFrame {
             }),
             shareReplay(1)
         );
+
+        this.textData$ = combineLatest([
+            this.trie.obs$,
+            this.atomizedSentences$
+        ]).pipe(
+            map(([trie, sentences]) =>
+                AtomizedSentence.getTextWordData(sentences, trie.t, trie.getUniqueLengths()),
+            ),
+            shareReplay(1)
+        )
     }
 
     rehydratePage(htmlDocument: HTMLDocument): AtomizedSentence[] {
@@ -95,8 +114,6 @@ export class BookFrame {
             iframe.appendTo(ref);
             // Maybe do this after?
         }
-        // await waitFor(() => iframe.contents().find('body').children.length > 0, 100)
-        // TODO figure out a reliable way to figure out when the iframe has loaded
         await sleep(500);
         return iframe;
     }

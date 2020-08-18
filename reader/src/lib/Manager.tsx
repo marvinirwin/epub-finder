@@ -1,13 +1,6 @@
-import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {Dictionary, uniq, debounce} from "lodash";
-import {
-    debounceTime,
-    filter,
-    map,
-    startWith,
-    withLatestFrom
-} from "rxjs/operators";
-import {SerializedAnkiPackage} from "./Interfaces/OldAnkiClasses/SerializedAnkiPackage";
+import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {debounce, Dictionary, uniq} from "lodash";
+import {debounceTime, filter, first, map, startWith, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -18,7 +11,6 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {PageManager} from "./Manager/PageManager";
-import {Website} from "./Website/Website";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -40,11 +32,21 @@ import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {getSrcHttp} from "./Website/Website";
+import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
+import {BookFrame} from "./BookFrame/BookFrame";
 
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
+
+function splitTextDataStreams$(textData$: Observable<TextWordData>) {
+    return {
+        wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
+        wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
+        wordSentenceMap: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap)),
+        sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
+    }
+}
 
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
@@ -63,6 +65,7 @@ export class Manager {
     public sentenceManager = new SentenceManager();
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
+    public viewingFrameManager = new ViewingFrameManager();
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -80,7 +83,10 @@ export class Manager {
     setQuizWord$: Subject<string> = new Subject<string>();
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
+
     highlightedPinyin$: Observable<string>;
+
+    characterPageFrame$: Observable<BookFrame>;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
@@ -101,7 +107,30 @@ export class Manager {
         CardPageEditingCardCardDBAudio(this.cardManager, this.pageManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
-        this.textData$ = combineLatest(
+        this.bottomNavigationValue$
+            .pipe(withLatestFrom([this.pageManager.pageIndex$, this.characterPageFrame$]))
+
+            .subscribe(([value, pageIndex, characterPageFrame]) => {
+            switch(value) {
+                case NavigationPages.READING_PAGE:
+                    const firstPage = Object.values(pageIndex)[0];
+                    this.viewingFrameManager.framesInView.appendDelta$.next({
+                        set: {
+                            [firstPage.id]: {
+                                value: firstPage
+                            }
+                        }, // I want to over-write the value entirely, so I need to know what was previously here
+                    // Or i can just make a special command
+
+                {}
+                    });
+                case NavigationPages.
+            }
+        })
+        this.viewingFrameManager.
+
+
+        const textData$ = combineLatest(
             [
                 this.cardManager.trie$,
                 this.pageManager.atomizedSentences$.pipe(
@@ -115,10 +144,15 @@ export class Manager {
                 uniq(trie.getWords(false).map(v => v.length))
             );
         }));
+        /*
+         * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
+         * wordCounts: Dictionary<number>;
+         * wordSentenceMap: Dictionary<AtomizedSentence[]>;
+         * sentenceMap: Dictionary<AtomizedSentence[]>;
+         */
+         const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(textData$);
+         this.wordElementMap$ = wordElementMap$;
 
-        this.textData$.subscribe(() => {
-
-        });
 
         this.wordElementMap$ = combineLatest([
             this.textData$.pipe(
@@ -179,7 +213,6 @@ export class Manager {
                 });
             }
         })
-
 
 
         this.setQuizWord$.pipe(
