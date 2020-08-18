@@ -119,4 +119,9 @@ export class AtomizedSentence {
             return this.translatableText;
         }
     }
+
+    public destroy() {
+        this.sentenceElement.parentNode.removeChild(this.sentenceElement);
+        this.popperElement.parentNode.removeChild(this.popperElement);
+    }
 }

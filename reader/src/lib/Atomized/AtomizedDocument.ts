@@ -8,6 +8,15 @@ import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
+export function createPopperElement(document1: XMLDocument) {
+    const popperEl = document1.createElement('div');
+    const popperId = uniqueId();
+    popperEl.setAttribute("class", "translation-popover");
+    popperEl.setAttribute('id', AtomizedDocument.getPopperId(popperId));
+    popperEl.setAttribute("class", "POPPER_ELEMENT");
+    return {popperEl, popperId};
+}
+
 export class AtomizedDocument {
 
     constructor(public document: XMLDocument) {}
@@ -51,22 +60,30 @@ export class AtomizedDocument {
         return leaves;
     }
 
-    annotateTextNode(textNode: Element, i: number, body: HTMLBodyElement) {
-        const popperId = uniqueId();
+    appendRehydratableText(str: string): XMLDocumentNode {
+        const div = this.document.createElement('div');
+        const textNode = this.document.createTextNode(str);
+        this.document.body.appendChild(div);
+        div.appendChild(textNode);
+        return this.makeTextNodeRehydratable(textNode as unknown as Element)
+    }
+
+    makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
+        let document1 = this.document;
         let nodeValue = textNode.nodeValue as string;
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
             nodeValue.split(''),
             "mark"
         );
-        const popperEl = this.document.createElement('div');
-        popperEl.setAttribute("class", "translation-popover");
-        popperEl.setAttribute('id', AtomizedDocument.getPopperId(popperId));
-        popperEl.setAttribute("class", "POPPER_ELEMENT");
+        const {popperEl, popperId} = createPopperElement(document1);
         newParent.setAttribute('popper-id', popperId);
         newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
         newParent.insertBefore(popperEl, null);
+        return newParent as unknown as XMLDocumentNode;
     }
+
+
 
     private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
         const indexOfMe = getIndexOfEl(textNode);
@@ -142,7 +159,7 @@ export class AtomizedDocument {
     createMarksUnderLeaves(textNodes: Element[]) {
         const body = (this.document.getElementsByTagName("body"))[0];
         for (let i = 0; i < textNodes.length; i++) {
-            this.annotateTextNode(textNodes[i], i, body);
+            this.makeTextNodeRehydratable(textNodes[i]);
         }
     }
 

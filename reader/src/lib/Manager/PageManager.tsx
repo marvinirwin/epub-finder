@@ -35,14 +35,14 @@ export class PageManager {
 
         this.atomizedSentences$ = this.pageList$.pipe(
             switchMap(pageList => merge(
-                ...pageList.map(page => page.atomizedSentences$)
+                ...pageList.map(page => page.atomizedSentencesFromSrc$)
                 ).pipe(map(flatten))
             )
         );
 
         this.pageList$.pipe(
             switchMap(pageList =>
-                merge(...pageList.map(page => page.atomizedSentences$))
+                merge(...pageList.map(page => page.atomizedSentencesFromSrc$))
             ),
         ).subscribe(atomizedSentences => {
             PageManager.ApplyAtomizedSentenceListeners(atomizedSentences);

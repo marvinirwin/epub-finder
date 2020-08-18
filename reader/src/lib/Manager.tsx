@@ -34,6 +34,7 @@ import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {BookFrame} from "./BookFrame/BookFrame";
+import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -78,15 +79,16 @@ export class Manager {
 
     wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
-    textData$: Observable<TextWordData>;
-
     setQuizWord$: Subject<string> = new Subject<string>();
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
 
     highlightedPinyin$: Observable<string>;
 
-    characterPageFrame$: Observable<BookFrame>;
+    characterPageFrame$ = new Subject<BookFrame>();
+    wordCounts$: Observable<Dictionary<number>>;
+    sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
+    characterQuizPage = new QuizCharacterPage();
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
@@ -106,29 +108,6 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardManager, this.pageManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
-
-        this.bottomNavigationValue$
-            .pipe(withLatestFrom([this.pageManager.pageIndex$, this.characterPageFrame$]))
-
-            .subscribe(([value, pageIndex, characterPageFrame]) => {
-            switch(value) {
-                case NavigationPages.READING_PAGE:
-                    const firstPage = Object.values(pageIndex)[0];
-                    this.viewingFrameManager.framesInView.appendDelta$.next({
-                        set: {
-                            [firstPage.id]: {
-                                value: firstPage
-                            }
-                        }, // I want to over-write the value entirely, so I need to know what was previously here
-                    // Or i can just make a special command
-
-                {}
-                    });
-                case NavigationPages.
-            }
-        })
-        this.viewingFrameManager.
-
 
         const textData$ = combineLatest(
             [
@@ -152,11 +131,11 @@ export class Manager {
          */
          const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(textData$);
          this.wordElementMap$ = wordElementMap$;
-
+         this.wordCounts$ = wordCounts$;
+         this.sentenceMap$ = sentenceMap$;
 
         this.wordElementMap$ = combineLatest([
-            this.textData$.pipe(
-                map(t => t.wordElementsMap),
+            this.wordElementMap$.pipe(
                 startWith({})
             ),
             this.characterPageWordElementMap$.pipe(startWith({}))
@@ -169,11 +148,7 @@ export class Manager {
             .map(elements => elements.forEach(element => this.applyWordElementListener(element)))
         )
 
-        this.textData$.pipe(
-            map(textData => {
-                return textData.wordCounts;
-            }),
-        ).subscribe(this.scheduleManager.wordCountDict$);
+        this.wordCounts$.subscribe(this.scheduleManager.wordCountDict$);
 
 
         let previousHighlightedElements: HTMLElement[] | undefined;
@@ -198,14 +173,14 @@ export class Manager {
 
         this.highlightedSentence$.pipe(
             debounceTime(10),
-            withLatestFrom(this.textData$)
-        ).subscribe(([sentence, textData]) => {
+            withLatestFrom(this.sentenceMap$)
+        ).subscribe(([sentence, sentenceMap]) => {
             if (sentence) {
                 const HIGHLIGHTED_SENTENCE = 'highlighted-sentence';
                 if (previousHighlightedSentences) {
                     previousHighlightedSentences.map(e => e.classList.remove(HIGHLIGHTED_SENTENCE));
                 }
-                const dictElement = textData.sentenceMap[sentence]
+                const dictElement = sentenceMap[sentence]
                 previousHighlightedSentences = dictElement?.map(atomizedSentence => {
                     let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
                     sentenceHTMLElement.classList.add(HIGHLIGHTED_SENTENCE);
@@ -241,6 +216,36 @@ export class Manager {
             })
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
+
+
+        this.bottomNavigationValue$
+            .pipe(withLatestFrom(
+                this.pageManager.pageIndex$,
+                this.characterPageFrame$,
+                this.viewingFrameManager.framesInView.updates$
+            ))
+            .subscribe(([value, pageIndex, frame, framesInView]) => {
+                switch(value) {
+                    case NavigationPages.READING_PAGE:
+                        const firstPage = Object.values(pageIndex)[0];
+                        this.viewingFrameManager.framesInView.appendDelta$.next({
+                            set: {
+                                [firstPage.id]: {
+                                    value: firstPage
+                                },
+                            },
+                            remove: Object.fromEntries(
+                                Object.entries(framesInView)
+                                    .filter(([key, value]) => key !== firstPage.id)
+                                    .map(([key, value]) => [key, {delete: true}])
+                            )
+                        })
+                        break;
+                    case NavigationPages.QUIZ_PAGE:
+
+                }
+            })
+
         this.cardManager.load();
     }
 

@@ -66,7 +66,7 @@ function mergeDeleteTreeIntoAnother<T>(oldTree: DeltaScannerValueNode<T>, newTre
     return oldTree;
 }
 
-type DeltaScan<T> = { sourced: DeltaScannerDict<DeltaScannerValueNode<T>>, delta: Delta<T> };
+export type DeltaScan<T> = { sourced: DeltaScannerDict<DeltaScannerValueNode<T>>, delta: Delta<T> };
 
 // Right now we over-write things in the map, perhaps we want to merge them
 export class DeltaScanner<T> {

@@ -98,7 +98,7 @@ export function Characters({c, m}: QuizCardProps) {
                 [
                     obs$.pipe(
                         filter(([pageRenderer]) => !!pageRenderer),
-                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentences$
+                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentencesFromSrc$
                             .pipe(
                                 filter(atomizedSentences => {
                                     return atomizedSentences.length > 0;

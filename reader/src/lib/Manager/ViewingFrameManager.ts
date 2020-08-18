@@ -10,7 +10,7 @@ export class ViewingFrameManager {
     constructor() {
         this.framesInView.updates$.pipe(map(({sourced, delta: {set, remove}}) => {
             // If your frame has been removed, we remove your stuff from the wordElementFrameMap
-            Object.entries(remove).map(([removedFrameId, removedFrame]) => {
+            Object.entries(remove || {}).map(([removedFrameId, removedFrame]) => {
                 // Now we've removed all elements to do with that frame
                 this.elementsInView.appendDelta$.next({
                     remove: {
@@ -20,7 +20,7 @@ export class ViewingFrameManager {
                     }
                 });
             })
-            Object.entries(set).map(([setFrameId, setFrame]) => {
+            Object.entries(set || {}).map(([setFrameId, setFrame]) => {
                 // Now we gotta add that frame's stuff to map
                 this.elementsInView.appendDelta$.next({
                     set: {
