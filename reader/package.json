@@ -30,6 +30,7 @@
     "hanzi-tools": "^1.2.24",
     "idb": "^5.0.4",
     "jest": "^26.1.0",
+    "jest-localstorage-mock": "^2.4.3",
     "jquery": "^3.5.1",
     "jquery-ui": "^1.12.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
@@ -58,6 +59,7 @@
     "rxjs": "^6.5.5",
     "shutterstock-api": "^1.0.22",
     "sql.js": "^1.2.2",
+    "standardized-audio-context-mock": "^8.3.18",
     "trie-prefix-tree": "^1.5.1",
     "ts-jest": "^26.1.1",
     "twitter-lite": "^0.14.0",
@@ -69,7 +71,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest --watch",
+    "test": "jest --verbose \"--testNamePattern=^Loads the manager without error$\" --runTestsByPath /Users/frodo/PycharmProjects/vocabfinder/reader/src/test/manager?/manager.spec.ts",
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:3001",

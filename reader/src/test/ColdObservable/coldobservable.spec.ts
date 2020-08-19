@@ -7,6 +7,6 @@ it('Observes coldly', () => {
         const c = hot('--c');
         scheduler
             .expectOrderings(a, b, c)
-            .toHaveOrdering(AsciiGraph.getOrderables('a>b>c', {}))
+            .toHaveOrdering(AsciiGraph.getOrderables('a>b>c', {}).lastEmissionRoots)
     });
 })

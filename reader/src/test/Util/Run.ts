@@ -16,6 +16,14 @@ export type RunArguments = { manager: Manager, scheduler: MyTestScheduler, helpe
 const UnitTestGetPageSrc = (url: string) => of(fs.readFileSync(join(__dirname, '../fixtures/', url)).toString());
 
 
+function extracted(manager: Manager) {
+    manager.pageManager.addPage$.next(new Website(
+        "Basic Doc",
+        "BasicDoc.html",
+        UnitTestGetPageSrc
+    ));
+}
+
 export function Run(cb: (r: RunArguments) => void) {
     const scheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
     scheduler.run(helpers => {
@@ -27,11 +35,6 @@ export function Run(cb: (r: RunArguments) => void) {
                 getPageRenderer: UnitTestAtomize,
                 getPageSrc: UnitTestGetPageSrc
             });
-        manager.pageManager.requestRenderPage$.next(new Website(
-            "Basic Doc",
-            join(__dirname, 'fixtures', 'BasicDoc.html'),
-            UnitTestGetPageSrc
-        ));
 
         cb({
             manager: manager,

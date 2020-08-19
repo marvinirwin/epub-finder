@@ -1,6 +1,7 @@
 import {MyTestScheduler} from "../Util/MyTestScheduler";
 import {Run} from "../Util/Run";
 import {AsciiGraph} from "../Util/ASCIIGraph";
+import {isSubObject} from "../Graph/CompareFunctions";
 
 const defaultGraph = `
     delta<-------
@@ -10,6 +11,7 @@ const defaultGraph = `
   |             |
   -bravo.next(bravoValue)
 `
+
 it('Gets neighbors correctly', () => {
     expect(new AsciiGraph(defaultGraph).edges).toEqual({
         alpha: ['echo'],
@@ -63,23 +65,9 @@ it('Compares subtrees correctly', () => {
             }
         ]
     }
-    expect(MyTestScheduler.isSubTree(tree, correctSubTree));
-    expect(MyTestScheduler.isSubTree(tree, incorrectSubTree)).toBeFalsy();
+    expect(MyTestScheduler.isSubTree(tree, correctSubTree, isSubObject));
+    expect(MyTestScheduler.isSubTree(tree, incorrectSubTree, isSubObject)).toBeFalsy();
 });
 
-try {
-    it('Expects orderings correctly', async () => {
-        Run(({manager, scheduler, helpers: {hot}}) => {
-            const a = hot('a');
-            const b = hot('-b');
-            const c = hot('--c');
-            scheduler
-                .expectOrderings(a, b, c)
-                .toHaveOrdering(AsciiGraph.getOrderables('a>c>b', {}))
-        });
-    })
-} catch(e) {
-    console.error(e);
-}
 
 

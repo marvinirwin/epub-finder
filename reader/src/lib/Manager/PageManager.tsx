@@ -15,12 +15,12 @@ export class PageManager {
     pageIndex$: Observable<Dictionary<BookFrame>>
     pageList$: Observable<BookFrame[]>;
     atomizedSentences$: Observable<AtomizedSentence[]>;
-    requestRenderPage$ = new Subject<Website>();
+    addPage$ = new Subject<Website>();
 
     constructor(
         private config: PageManagerConfig
     ) {
-        this.pageIndex$ = this.requestRenderPage$.pipe(
+        this.pageIndex$ = this.addPage$.pipe(
             switchMap(page => {
                     return this.config.getPageRenderer(page);
                 }

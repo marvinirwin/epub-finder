@@ -88,7 +88,7 @@ export class Manager {
     characterPageFrame$ = new Subject<BookFrame>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    characterQuizPage = new QuizCharacterPage();
+    characterQuizPage = new QuizCharacterManager();
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
@@ -202,18 +202,6 @@ export class Manager {
         ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
 
         this.inputManager.selectedText$.subscribe(this.editingCardManager.requestEditWord$);
-
-        this.inputManager.getKeyDownSubject('e')
-            .subscribe((event) => {
-                // Ask for a sentence
-                const s = new Subject<string>(); // Is this subject going to stay around, or get garbage collected?
-                s.pipe(withLatestFrom(this.textData$)).subscribe(([sentence, textData]) => {
-                    if (textData.sentenceMap[sentence]) {
-                        // My highlighting logic is insufficient to handle different things
-                        this.highlightedWord$.next()
-                    }// Maybe I should also do a pinyin map?
-                })
-            })
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 

@@ -5,6 +5,7 @@ import {chunk} from "lodash";
 import {AUDIO_GRAPH_SAMPLE_SIZE, filterData, normalizeData} from "./Audio/AudioGraphing";
 import {audioContext} from "./Audio/AudioContext";
 
+
 export class WavAudio {
     blob: Blob;
     url: string;

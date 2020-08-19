@@ -11,8 +11,6 @@ import CardManager from "../../lib/Manager/CardManager";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {ScheduleQuiz} from "../../lib/Manager/ManagerConnections/Schedule-Quiz";
 import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
-import moment from "moment";
-import {MyTestScheduler} from "./MyTestScheduler";
 
 export type ObsValuePair<T> = [Observable<T>, T];
 
@@ -324,7 +322,6 @@ export class MarbleGroup<T extends (Dictionary<Marbles<any>> | Marbles<any>[])> 
     }
 }
 
-
 export function swapIndexes(arr: Array<any>, i1:number, i2:number){
     [arr[i1], arr[i2]] = [arr[i2], arr[i1]];
 }
@@ -339,10 +336,8 @@ export function ScheduleQuizCard(db: MyAppDatabase) {
 }
 
 export type orderingObservable = { observable: Observable<any>, subscriptionMarbles: string | null };
-export type causallyOrderable = { error?: any, value?: any, notification?: any, ancestors: causallyOrderable[] };
+
 export type marbleValue = {marbles: string, values: {[key: string]: any}};
-
-
 
 export function ord(obs$: Observable<any>) {
     return {observable: obs$, subscriptionMarbles: null};
@@ -352,25 +347,3 @@ export function mv(marbles: string, values: { [key: string]: any }): marbleValue
     return {marbles, values};
 }
 
-export type AdjList = { [key: string]: string[] };
-export type ValueMap = { [key: string]: any };
-
-export function convertGraphToOrderables(
-    edges: AdjList,
-    valueMap: ValueMap,
-    node: string,
-    visited: Set<string> = new Set()
-): causallyOrderable {
-    visited.add(node);
-    return {
-        error: '',
-        value: valueMap[node] || node,
-        notification: '',
-        ancestors: (edges[node] || []).filter(ancestor => !visited.has(ancestor)).map(ancestor => convertGraphToOrderables(
-            edges,
-            valueMap,
-            ancestor,
-            visited
-        ))
-    }
-}

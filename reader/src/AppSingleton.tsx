@@ -22,7 +22,8 @@ export function getManager(mode: string): Manager {
         )
     }
     websites.forEach(filename => {
-        m.pageManager.requestRenderPage$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
+
+        m.pageManager.addPage$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
     })
     return m;
 }

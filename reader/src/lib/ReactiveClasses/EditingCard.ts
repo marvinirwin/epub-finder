@@ -1,21 +1,14 @@
 import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {
-    first,
-    flatMap,
     map,
     mapTo,
     skip,
     switchMap,
-    withLatestFrom
 } from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
-import {Manager} from "../Manager";
-import {WavAudio} from "../WavAudio";
 import { memoize, flatten} from "lodash";
 import pinyin from 'pinyin';
-import {getSynthesizedAudio} from "../Audio/GetSynthesizedAudio";
-import {RecordRequest} from "../Interfaces/RecordRequest";
 import {AudioManager} from "../Manager/AudioManager";
 import CardManager from "../Manager/CardManager";
 
@@ -39,7 +32,6 @@ export class EditingCard {
     learningLanguage$ = new ReplaySubject<string>(1);
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
-    synthesizedSpeech$: Observable<WavAudio | undefined>;
     pinyin$: Observable<string>;
     constructor(
         public persistor: IndexDBManager<ICard>,
@@ -47,16 +39,6 @@ export class EditingCard {
         private c: CardManager,
         public timestamp?: Date | number | undefined,
     ) {
-        this.synthesizedSpeech$ = this.learningLanguage$.pipe(
-            flatMap(getSynthesizedAudio),
-        )
-        this.synthesizedSpeech$.pipe(
-            withLatestFrom(
-                this.learningLanguage$
-            ),
-        ).subscribe(([synthesizedWav, characters]) => {
-            a.audioRecorder.recordRequest$.next(new RecordRequest(characters));
-        })
 
         this.saveInProgress$.next(false);
         let firstGroup$ = combineLatest(

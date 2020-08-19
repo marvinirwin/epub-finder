@@ -1,62 +1,84 @@
 import {TestScheduler} from "rxjs/testing";
-import {Observable, Subscription} from "rxjs";
-import {causallyOrderable, FlushableTest, swapIndexes} from "./Util";
+import {Observable, Subject, Subscription} from "rxjs";
+import {FlushableTest, swapIndexes} from "./Util";
+import {CompareFn, isSubObject} from "../Graph/CompareFunctions";
+import {causallyOrderable, ValueMap} from "../Graph/CasuallyOrderable";
 
 export class MyTestScheduler extends TestScheduler {
-    public static orderingCompareFn(actualRoots: causallyOrderable[], expectedRoots: causallyOrderable[]) {
-        let b = expectedRoots
-            .every(expectedRoot => {
-                let find = actualRoots
-                    .find(actualRoot => {
-                        return MyTestScheduler.isSubTree(actualRoot, expectedRoot);
-                    });
-                return find;
-                }
-            );
-        expect(b).toBeTruthy();
-    }
+    expectOrderings(
+        observables: Observable<any>[],
+        expectedRoots: causallyOrderable[],
+        valueMap: ValueMap,
+        firstEmissionRoots: causallyOrderable[]
+    ) {
+        let walkingRoots = {walkingRoots: firstEmissionRoots.slice()};
 
-    public static isSubTree(tree: causallyOrderable, subTree: causallyOrderable): boolean {
-
-        if (!tree || !subTree) return false;
-        let treeContainsSubTree = MyTestScheduler.treeSubSet(tree, subTree);
-        let treeHasChildWhichIsEqual = tree.ancestors.find(ancestor => {
-            return MyTestScheduler.isSubTree(ancestor, subTree);
-        });
-        let isSubTreeResult = treeContainsSubTree ||
-            !!treeHasChildWhichIsEqual;
-        return isSubTreeResult
-            ;
-    }
-
-    private static treeSubSet(tree: causallyOrderable, subTree: causallyOrderable): boolean {
-        if (!tree && !subTree) {
-            return true;
-        }
-        if (!tree && subTree) {
-            return false;
-        }
-        if (!tree && !subTree) {
-            return false;
-        }
-
-        return tree.value === subTree.value &&
-            subTree.ancestors.every(subTreeAncestor =>
-                tree.ancestors.find(treeAncestor =>
-                    MyTestScheduler.treeSubSet(treeAncestor, subTreeAncestor)
-                )
-            )
-    }
-
-    expectOrderings(...observables: Observable<any>[]) {
         const emittedValues: causallyOrderable[][] = observables.map(() => []);
-        const actualRoots: causallyOrderable[] = [];
         const flushTest: FlushableTest = {
-            ready: false
+            ready: false,
+            actual: []
         }
 
-        function setLastValue(value: any) {
-            flushTest.actual = [value];
+        function executeSubscribersInTree(): boolean {
+            const newWalkingRoots: causallyOrderable[] = [];
+            const changed = {changed: false};
+            const copyWalkingRoots = walkingRoots.walkingRoots.slice();
+            for (let i = 0; i < copyWalkingRoots.length; i++) {
+                const walkingRoot = copyWalkingRoots[i];
+                if (walkingRoot.next) {
+                    const contains = observables.includes(walkingRoot.value);
+                    const children = walkingRoot.ancestors;
+                    changed.changed = true;
+                    walkingRoots.walkingRoots = [
+                        ...copyWalkingRoots.slice(0, i),
+                        ...children,
+                        ...copyWalkingRoots.slice(i + 1)// TODO this goes i + 1 -> lastElement, right?
+                    ];
+                    emittedValues.push([walkingRoot])
+                    flushTest.actual = [
+                        walkingRoot
+                    ];
+                    (walkingRoot.value as Subject<any>).next(walkingRoot.next)
+                    break;
+                }
+            }
+
+            walkingRoots.walkingRoots = newWalkingRoots;
+            return changed.changed;
+        }
+
+        /**
+         * Every time an observable fires we potentially advance another step down our expected tree
+         * We only advance if this is the value we expect
+         * My only concern, is that I might advance mistakenly
+         * I guess I should keep track of previous emissions and make sure this emission fits the profile?
+         * Confusing.
+         */
+        function pruneValueInTree(value: any): boolean {
+            const newWalkingRoots: causallyOrderable[] = [];
+            const changed = {changed: false};
+            walkingRoots.walkingRoots.forEach(walkingRoot => {
+                if (isSubObject(value, walkingRoot.value)) {
+                    const children = walkingRoot.ancestors;
+                    changed.changed = true;
+                    newWalkingRoots.push(...children);
+                } else {
+                    newWalkingRoots.push(walkingRoot);
+                }
+            });
+            walkingRoots.walkingRoots = newWalkingRoots;
+            return changed.changed;
+        }
+
+        function onValueEmitted(orderable: causallyOrderable) {
+            // The last value emitted will be our tree root
+            flushTest.actual = [orderable];
+            // Keep moving down the tree with this value?
+            // We should only do it once
+            pruneValueInTree(orderable.value);
+            // This we can do as many times as there are subscribers.next here
+            while (executeSubscribersInTree()) {
+            }
         }
 
         observables.forEach((observable, index) => {
@@ -68,7 +90,7 @@ export class MyTestScheduler extends TestScheduler {
                         value: x,
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
                     };
-                    setLastValue(items);
+                    onValueEmitted(items);
                     emittedValues[index].push(
                         items
                     )
@@ -77,7 +99,7 @@ export class MyTestScheduler extends TestScheduler {
                         error,
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
                     };
-                    setLastValue(items);
+                    onValueEmitted(items);
                     emittedValues[index].push(
                         items
                     );
@@ -86,7 +108,7 @@ export class MyTestScheduler extends TestScheduler {
                         notification: "COMPLETE_NOTIFICATION",
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
                     };
-                    setLastValue(items);
+                    onValueEmitted(items);
                     emittedValues[index].push(
                         items
                     );
@@ -97,18 +119,18 @@ export class MyTestScheduler extends TestScheduler {
                 // @ts-ignore
                 observable.observers && swapIndexes(observable.observers, 0, observable.observers.length - 1);
             }, 0);
+            this.schedule(() => {
+                executeSubscribersInTree();
+            }, 0)
         });
+
         // @ts-ignore
         this.flushTests.push(flushTest);
         // @ts-ignore
         const {runMode} = this;
 
-        return {
-            toHaveOrdering(rootOrderings: causallyOrderable[]) {
-                flushTest.ready = true;
-                flushTest.expected = rootOrderings;
-            }
-        };
+        flushTest.ready = true;
+        flushTest.expected = expectedRoots;
     }
 
 
