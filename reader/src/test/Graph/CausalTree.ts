@@ -122,7 +122,7 @@ export class CausalTree {
 
     getFirstEmissionRoots(): causallyOrderable[] {
         const visited = new Set<string>();
-        return this.getRootsWhichAreFirstOccurrances()
+        return this.getRootsWhichAreLastOccurrances()
             .map(root => convertGraphToOrderables(
                 this.getAdjListThatMovesForwardsInTime(),
                 this.valueMap,
