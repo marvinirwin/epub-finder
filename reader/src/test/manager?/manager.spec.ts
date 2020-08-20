@@ -1,5 +1,7 @@
 import {Run} from "../Util/Run";
 import {AsciiGraph} from "../Util/ASCIIGraph";
+import {getOrderables} from "../Graph/CasuallyOrderable";
+import {CausalTree} from "../Graph/CausalTree";
 
 require('jest-localstorage-mock');
 
@@ -35,13 +37,17 @@ it("Loads the manager without error", () => {
             },
             addPage$
         };
-        let orderables = AsciiGraph.getOrderables(`addPage$.next(mainPage)--->scheduledCards--->quizzingCard `, valueMap);
+
+        const causalTree = new CausalTree(
+            new AsciiGraph( `addPage$.next(mainPage)--->scheduledCards--->quizzingCard`).edges,
+            valueMap
+        )
         scheduler
             .expectOrderings(
                 [addPage$, hot('------a')],
-                orderables.lastEmissionRoots,
-                valueMap,
-                orderables.firstEmissionRoots
+                causalTree.getLastEmissionRoots(),
+                causalTree.valueMap,
+                causalTree.getFirstEmissionRoots()
             )
     });
 });

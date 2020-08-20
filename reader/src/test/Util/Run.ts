@@ -8,6 +8,7 @@ import * as fs from "fs";
 import {join} from "path";
 import {Website} from "../../lib/Website/Website";
 import {MyTestScheduler} from "./MyTestScheduler";
+import {OrderingCompareFn} from "../Graph/CompareFunctions";
 
 require("fake-indexeddb/auto");
 
@@ -25,7 +26,7 @@ function extracted(manager: Manager) {
 }
 
 export function Run(cb: (r: RunArguments) => void) {
-    const scheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
+    const scheduler = new MyTestScheduler(OrderingCompareFn);
     scheduler.run(helpers => {
         // Will I need to require the fake indexDB every time?
         const manager = new Manager(

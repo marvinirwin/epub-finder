@@ -59,6 +59,23 @@ export class CausalTree {
         return this.adjListThatMovesForwardInTime;
     }
 
+    /**
+     * TODO this and the one below might be mis-named
+     * While at the same time working
+     */
+    getRootsWhichAreFirstOccurrances(): string[] {
+        return getRootsFromAdjList(this.getAdjListThatMovesForwardsInTime())
+    }
+
+
+    /**
+     * TODO this and the one above might be mis-named
+     * While at the same time working
+     */
+    getRootsWhichAreLastOccurrances(): string[]{
+        return getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime())
+    }
+
     getCompressedTree(): CausalTree {
         let myStartNodes = getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime());
         /**
@@ -101,5 +118,28 @@ export class CausalTree {
             newAdjacencies,
             newValueMap
         )
+    }
+
+    getFirstEmissionRoots(): causallyOrderable[] {
+        const visited = new Set<string>();
+        return this.getRootsWhichAreFirstOccurrances()
+            .map(root => convertGraphToOrderables(
+                this.getAdjListThatMovesForwardsInTime(),
+                this.valueMap,
+                root,
+                visited
+                )
+            )
+    }
+    getLastEmissionRoots(): causallyOrderable[] {
+        const visited = new Set<string>();
+        return this.getRootsWhichAreFirstOccurrances()
+            .map(root => convertGraphToOrderables(
+                this.getAdjListThatMovesForwardsInTime(),
+                this.valueMap,
+                root,
+                visited
+                )
+            )
     }
 }

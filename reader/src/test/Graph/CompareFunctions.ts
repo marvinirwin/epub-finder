@@ -90,7 +90,7 @@ export function isSubObject(superObject: any, subObject: any): boolean {
     return superObject === subObject;
 }
 
-export function orderingCompareFn(actualRoots: causallyOrderable[], expectedRoots: causallyOrderable[]) {
+export function OrderingCompareFn(actualRoots: causallyOrderable[], expectedRoots: causallyOrderable[]) {
     expect(actualRoots.length).toBeGreaterThan(0);
     let actual = expectedRoots
         .every(expectedRoot => {

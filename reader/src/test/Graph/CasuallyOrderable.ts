@@ -71,8 +71,7 @@ export function adjListToRoots() {
 
 }
 
-export function getOrderables(s: string, valueMap: ValueMap): { lastEmissionRoots: causallyOrderable[], firstEmissionRoots: causallyOrderable[]
-}{
+export function getOrderables(s: string, valueMap: ValueMap): { lastEmissionRoots: causallyOrderable[], firstEmissionRoots: causallyOrderable[] }{
     const g = new AsciiGraph(s);
     const rootsAreFirstOccurrances = g.getRoots();
     const rootsAreLastOccurrances = getRootsFromAdjList(invertedEdges);
