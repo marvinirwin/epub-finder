@@ -1,4 +1,4 @@
-import {AdjList, causallyOrderable, ValueMap} from "../Graph/CasuallyOrderable";
+import {AdjList, CausallyOrderable, ValueMap} from "../Graph/CasuallyOrderable";
 
 function safeGet(obj: {[key: string]: any}, key: string, defaultValue?: string) {
     if (!obj.hasOwnProperty(key)) {
@@ -15,7 +15,7 @@ export function convertGraphToOrderables(
     valueMap: ValueMap,
     node: string,
     visited: Set<string> = new Set()
-): causallyOrderable {
+): CausallyOrderable {
     visited.add(node);
     const next = /(.*?).next\((.*?)\)/.exec(node);
 
@@ -31,7 +31,8 @@ export function convertGraphToOrderables(
                 valueMap,
                 ancestor,
                 visited
-            ))
+            )),
+            nodeLabel: node,
         }
     } else {
         return {
@@ -41,7 +42,8 @@ export function convertGraphToOrderables(
                 valueMap,
                 ancestor,
                 visited
-            ))
+            )),
+            nodeLabel: node,
         }
     }
 }

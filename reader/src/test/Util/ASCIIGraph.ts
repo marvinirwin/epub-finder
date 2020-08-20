@@ -1,7 +1,7 @@
 import {PointMap} from "./PointMap";
 import {BoundingBox, Neighbor, nodeRegexp, Point, safePush, setCharAt} from "./GetGraphJson";
 import {convertGraphToOrderables} from "./ConvertGraphToOrderables";
-import {causallyOrderable, getRootsFromAdjList, ValueMap} from "../Graph/CasuallyOrderable";
+import {CausallyOrderable, getRootsFromAdjList, ValueMap} from "../Graph/CasuallyOrderable";
 
 export class AsciiGraph {
     private static resolveAllowedNeighbors(str: string): RegExp {

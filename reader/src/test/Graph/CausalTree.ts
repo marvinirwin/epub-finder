@@ -2,14 +2,14 @@ import {flatten, uniqueId} from "lodash";
 import {convertGraphToOrderables} from "../Util/ConvertGraphToOrderables";
 import {
     AdjList,
-    causallyOrderable,
+    CausallyOrderable,
     getRootsFromAdjList,
     prefixAdjList,
     prefixValueMap,
     reverseAdjList,
-    rootsToCausallyOrderable,
     ValueMap
 } from "./CasuallyOrderable";
+import {AsciiGraph} from "../Util/ASCIIGraph";
 
 
 export function mergeAdjacencyLists(...adjLists: AdjList[]) {
@@ -25,18 +25,25 @@ export function mergeAdjacencyLists(...adjLists: AdjList[]) {
 }
 
 export class CausalTree {
+    public static init(str: string, valueMap: ValueMap) {
+        return new CausalTree(
+            new AsciiGraph(str
+            ).edges,
+            valueMap
+        );
+    }
+
     public ancestors: CausalTree[] = [];
 
     constructor(
         private adjListThatMovesForwardInTime: AdjList,
         public valueMap: ValueMap
-    ) {
-    }
+    ) {}
 
     /**
      * Am I sure this gets roots by forward in time?
      */
-    getCasualGraphForwardInTime(): causallyOrderable[] {
+    getCasualGraphForwardInTime(): CausallyOrderable[] {
         const visited = new Set<string>();
         return getRootsFromAdjList(this.adjListThatMovesForwardInTime)
             .map(root => convertGraphToOrderables(this.adjListThatMovesForwardInTime, this.valueMap, root, visited));
@@ -45,7 +52,7 @@ export class CausalTree {
     /**
      * Am I sure this gets roots by backwards in time?
      */
-    getCausalGraphBackwardInTime(): causallyOrderable[] {
+    getCausalGraphBackwardInTime(): CausallyOrderable[] {
         const visited = new Set<string>();
         return getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime())
             .map(root => convertGraphToOrderables(this.adjListThatMovesForwardInTime, this.valueMap, root, visited));
@@ -120,7 +127,7 @@ export class CausalTree {
         )
     }
 
-    getFirstEmissionRoots(): causallyOrderable[] {
+    getFirstEmissionRoots(): CausallyOrderable[] {
         const visited = new Set<string>();
         return this.getRootsWhichAreLastOccurrances()
             .map(root => convertGraphToOrderables(
@@ -131,7 +138,7 @@ export class CausalTree {
                 )
             )
     }
-    getLastEmissionRoots(): causallyOrderable[] {
+    getLastEmissionRoots(): CausallyOrderable[] {
         const visited = new Set<string>();
         return this.getRootsWhichAreFirstOccurrances()
             .map(root => convertGraphToOrderables(

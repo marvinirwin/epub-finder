@@ -1,7 +1,5 @@
 import {Run} from "../Util/Run";
-import {AsciiGraph} from "../Util/ASCIIGraph";
-import {getOrderables} from "../Graph/CasuallyOrderable";
-import {CausalTree} from "../Graph/CausalTree";
+import {AddPageScheduleCardsQuizzingCard} from "../causal-trees/addPage-scheduleCards-quizzingCard";
 
 require('jest-localstorage-mock');
 
@@ -15,6 +13,9 @@ it("Loads the manager without error", () => {
                 },
                 pageManager: {
                     addPage$
+                },
+                quizCharacterManager: {
+                    exampleSentences$
                 }
             },
             scheduler,
@@ -23,31 +24,19 @@ it("Loads the manager without error", () => {
             }
         }
     ) => {
-        let valueMap = {
-            scheduledCards: [
-                {
-                    learningLanguage: '今天',
-                }
-            ],
-            quizzingCard: {
-                learningLanguage: '今天'
-            },
-            mainPage: {
-                name: "Basic Doc"
-            },
-            addPage$
-        };
-
-        const causalTree = new CausalTree(
-            new AsciiGraph( `addPage$.next(mainPage)--->scheduledCards--->quizzingCard`).edges,
-            valueMap
-        )
         scheduler
             .expectOrderings(
-                [addPage$, hot('------a')],
-                causalTree.getLastEmissionRoots(),
-                causalTree.valueMap,
-                causalTree.getFirstEmissionRoots()
+                {
+                    addPage$,
+                    quizzingCard$,
+                    scheduledCards$,
+                    exampleSentences$: exampleSentences$.obs$,
+                },
+                AddPageScheduleCardsQuizzingCard(addPage$)
             )
     });
 });
+
+it('Loads a page, which creates new cards, which makes a quizItem, which fetches sentences for itself', () => {
+
+})

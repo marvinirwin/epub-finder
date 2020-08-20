@@ -1,40 +1,49 @@
 import {TestScheduler} from "rxjs/testing";
 import {Observable, Subject, Subscription} from "rxjs";
 import {FlushableTest, swapIndexes} from "./Util";
-import {CompareFn, isSubObject} from "../Graph/CompareFunctions";
-import {causallyOrderable, ValueMap} from "../Graph/CasuallyOrderable";
+import {isSubObject} from "../Graph/CompareFunctions";
+import {CausallyOrderable} from "../Graph/CasuallyOrderable";
+import {CausalTree} from "../Graph/CausalTree";
 
 export class MyTestScheduler extends TestScheduler {
     expectOrderings(
-        observables: Observable<any>[],
-        expectedRoots: causallyOrderable[],
-        valueMap: ValueMap,
-        firstEmissionRoots: causallyOrderable[]
+        observables: {[key: string]: Observable<any>},
+        causalTree: CausalTree,
+        maxLength: number = 10
     ) {
-        let walkingRoots = {walkingRoots: firstEmissionRoots.slice()};
+        /**
+         * The test scheduler ends when the last hot observable finishes
+         * Use this one for length by default
+         */
+        const maxLengthObservable = this.createHotObservable(`${'-'.repeat(maxLength)}a`);
 
-        const emittedValues: causallyOrderable[][] = observables.map(() => []);
+        const expectedRoots = causalTree.getLastEmissionRoots();
+        const treesBeingTraversed = {
+            treesBeingTraversed: causalTree.getFirstEmissionRoots()
+        };
+        const visitedNodeLabels = new Set<string>();
+
+        const emittedValues: CausallyOrderable[][] = Object.keys(observables).map(() => []);
         const flushTest: FlushableTest = {
             ready: false,
             actual: []
         }
 
         function executeSubscribersInTree(): boolean {
-            const newWalkingRoots: causallyOrderable[] = [];
+            const newWalkingRoots: CausallyOrderable[] = [];
             const changed = {changed: false};
-            const copyWalkingRoots = walkingRoots.walkingRoots.slice();
+            const copyWalkingRoots = treesBeingTraversed.treesBeingTraversed.slice();
             for (let i = 0; i < copyWalkingRoots.length; i++) {
                 const walkingRoot = copyWalkingRoots[i];
                 if (walkingRoot.next) {
-                    const contains = observables.includes(walkingRoot.value);
                     const children = walkingRoot.ancestors;
                     changed.changed = true;
-                    walkingRoots.walkingRoots = [
+                    treesBeingTraversed.treesBeingTraversed = [
                         ...copyWalkingRoots.slice(0, i),
                         ...children,
                         ...copyWalkingRoots.slice(i + 1)// TODO this goes i + 1 -> lastElement, right?
                     ];
-                    emittedValues.push([walkingRoot])
+                    emittedValues.push([{...walkingRoot, ancestors: []}])
                     flushTest.actual = [
                         walkingRoot
                     ];
@@ -43,7 +52,7 @@ export class MyTestScheduler extends TestScheduler {
                 }
             }
 
-            walkingRoots.walkingRoots = newWalkingRoots;
+            treesBeingTraversed.treesBeingTraversed = newWalkingRoots;
             return changed.changed;
         }
 
@@ -54,23 +63,25 @@ export class MyTestScheduler extends TestScheduler {
          * I guess I should keep track of previous emissions and make sure this emission fits the profile?
          * Confusing.
          */
-        function pruneValueInTree(value: any): boolean {
-            const newWalkingRoots: causallyOrderable[] = [];
-            const changed = {changed: false};
-            walkingRoots.walkingRoots.forEach(walkingRoot => {
-                if (isSubObject(value, walkingRoot.value)) {
-                    const children = walkingRoot.ancestors;
-                    changed.changed = true;
-                    newWalkingRoots.push(...children);
+        function pruneValueInTree(causalEvent: CausallyOrderable) {
+            const newWalkingRoots: CausallyOrderable[] = [];
+            treesBeingTraversed.treesBeingTraversed.forEach(walkingRoot => {
+                if (isSubObject(causalEvent.value, walkingRoot.value)) {
+                    visitedNodeLabels.add(walkingRoot.nodeLabel as string)
+                    const childrenWithSatisfiedDependencies = walkingRoot.ancestors.filter(child => {
+                            const dependencies = causalTree.getAdjListThatMovesForwardsInTime()[child.nodeLabel as string] || [];
+                            return dependencies.every(dependency => visitedNodeLabels.has(dependency))
+                        }
+                    )
+                    newWalkingRoots.push(...childrenWithSatisfiedDependencies);
                 } else {
                     newWalkingRoots.push(walkingRoot);
                 }
             });
-            walkingRoots.walkingRoots = newWalkingRoots;
-            return changed.changed;
+            treesBeingTraversed.treesBeingTraversed = newWalkingRoots;
         }
 
-        function onValueEmitted(orderable: causallyOrderable) {
+        function onValueEmitted(orderable: CausallyOrderable) {
             // The last value emitted will be our tree root
             flushTest.actual = [orderable];
             // Keep moving down the tree with this value?
@@ -80,24 +91,26 @@ export class MyTestScheduler extends TestScheduler {
             while (executeSubscribersInTree()) {
             }
         }
+        this.schedule(() => {
+            maxLengthObservable.subscribe(() => {});
+        })
 
-        observables.forEach((observable, index) => {
+        Object.entries(observables).forEach(([observableLabel, observable], index) => {
             // We're assuming for now that everyone subscribes at the start and never unsubscribes
-            let subscription: Subscription;
             this.schedule(() => {
-                subscription = observable.subscribe(x => {
+                observable.subscribe(x => {
                     let items = {
                         value: x,
-                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
+                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
+                        emitterName: observableLabel
                     };
                     onValueEmitted(items);
-                    emittedValues[index].push(
-                        items
-                    )
+                    emittedValues[index].push(items)
                 }, (error) => {
                     let items = {
                         error,
-                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
+                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
+                        emitterName: observableLabel
                     };
                     onValueEmitted(items);
                     emittedValues[index].push(
@@ -106,7 +119,8 @@ export class MyTestScheduler extends TestScheduler {
                 }, () => {
                     let items = {
                         notification: "COMPLETE_NOTIFICATION",
-                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v)
+                        ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
+                        emitterName: observableLabel
                     };
                     onValueEmitted(items);
                     emittedValues[index].push(

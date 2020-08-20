@@ -67,6 +67,7 @@ export class Manager {
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
+    public quizCharacterManager = new QuizCharacterManager();
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -88,7 +89,6 @@ export class Manager {
     characterPageFrame$ = new Subject<BookFrame>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    characterQuizPage = new QuizCharacterManager();
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {

@@ -2,12 +2,13 @@ import {safePush} from "../Util/GetGraphJson";
 import {convertGraphToOrderables} from "../Util/ConvertGraphToOrderables";
 import {AsciiGraph} from "../Util/ASCIIGraph";
 
-export type causallyOrderable = {
+export type CausallyOrderable = {
     error?: any,
     value?: any,
     notification?: any,
+    nodeLabel?: string,
     next?: any
-    ancestors: causallyOrderable[],
+    ancestors: CausallyOrderable[],
 };
 
 
@@ -21,10 +22,6 @@ export function prefixAdjList(adjList: AdjList, prefix: string): AdjList {
     ]))
 }
 
-export function toAdjList(roots: causallyOrderable[]) {
-
-}
-
 export function reverseAdjList(adjList: AdjList): AdjList {
     const reversedAdjList: AdjList = {};
     Object.entries(adjList).map(([source, destinations]) => {
@@ -33,10 +30,6 @@ export function reverseAdjList(adjList: AdjList): AdjList {
         });
     });
     return reversedAdjList;
-}
-
-export function invertCausallyOrderable(roots: causallyOrderable[]) {
-
 }
 
 export type AdjList = { [key: string]: string[] };
@@ -64,24 +57,3 @@ export function invertAdjList(adjList: AdjList): AdjList {
     }, {});
 }
 
-export function rootsToCausallyOrderable(roots: string[], valueMap: ValueMap, adjList: AdjList): causallyOrderable[] {
-}
-
-export function adjListToRoots() {
-
-}
-
-export function getOrderables(s: string, valueMap: ValueMap): { lastEmissionRoots: causallyOrderable[], firstEmissionRoots: causallyOrderable[] }{
-    const g = new AsciiGraph(s);
-    const rootsAreFirstOccurrances = g.getRoots();
-    const rootsAreLastOccurrances = getRootsFromAdjList(invertedEdges);
-    // This is confusing as fuck
-    // lastEmissionRoots are used for comparing actual/expected at the end of everything
-    // firstEmissionRoots are used for walking through the tree during runtime
-    // I suppose that lastEmissionRoots is kind of useless, since we already know the test will have passed
-    // If we get to the end and the tree walking has not been completed yet
-    return {
-        lastEmissionRoots: rootsAreFirstOccurrances.map(root => convertGraphToOrderables(invertedEdges, valueMap, root, visited)),
-ouyt        // firstEmissionRoots: rootsAreLastOccurrances.map(root => convertGraphToOrderables(g.edges, valueMap, root, visited))
-    };
-}
