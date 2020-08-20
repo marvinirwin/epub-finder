@@ -6,7 +6,7 @@ import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
-import {AtomizedFrameContainer} from "./Atomized/AtomizedFrameContainer";
+import {FrameContainer} from "./Atomized/FrameContainer";
 import {Dictionary} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
 import {BookFrame} from "../lib/BookFrame/BookFrame";
@@ -57,7 +57,7 @@ export function Main({m}: { m: Manager }) {
     useEffect(() => {
         m.inputManager.applyListeners(document.body);
     }, [m]);
-    const pages = useObs<Dictionary<BookFrame>>(m.pageManager.pageIndex$);
+    const pages = useObs<Dictionary<BookFrame>>(m.pageManager.bookFrames$);
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
@@ -68,7 +68,7 @@ export function Main({m}: { m: Manager }) {
             top: iframeVisible ? 0 : '9000px',
             overflow: 'hidden'
         }}>
-            {Object.values(pages || {}).map(page => <AtomizedFrameContainer m={m} key={page.name} rb={page}/>)}
+            {Object.values(pages || {}).map(page => <FrameContainer m={m} key={page.name} rb={page}/>)}
         </div>
         <ImageSelectPopup m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>

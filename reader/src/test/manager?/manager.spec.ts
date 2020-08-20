@@ -1,5 +1,5 @@
 import {Run} from "../Util/Run";
-import {AddPageScheduleCardsQuizzingCard} from "../causal-trees/addPage-scheduleCards-quizzingCard";
+import {CausalTree} from "../Graph/CausalTree";
 
 require('jest-localstorage-mock');
 
@@ -31,8 +31,38 @@ it("Loads the manager without error", () => {
                     quizzingCard$,
                     scheduledCards$,
                     exampleSentences$: exampleSentences$.obs$,
+
                 },
-                AddPageScheduleCardsQuizzingCard(addPage$)
+                CausalTree.init(`
+          sentences
+             ^
+             |
+        quizzingCard
+             ^
+             |
+       scheduledCards
+             ^
+             |
+             
+    addPage$.next(mainPage)
+    `, {
+                    sentences: [
+                        '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,',
+                        '一二三四五六七八九十'
+                    ],
+                    scheduledCards: [
+                        {
+                            learningLanguage: '今天',
+                        }
+                    ],
+                    quizzingCard: {
+                        learningLanguage: '今天'
+                    },
+                    mainPage: {
+                        name: "Basic Doc"
+                    },
+                    addPage$
+                })
             )
     });
 });

@@ -3,9 +3,10 @@ import {ReplaySubject, Subject} from "rxjs";
 import {DeltaScan, DeltaScannerDict} from "../Util/DeltaScanner";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {filter, scan, withLatestFrom} from "rxjs/operators";
-import {BookFrame, Frame} from "../BookFrame/BookFrame";
+import {BookFrame} from "../BookFrame/BookFrame";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+import {Frame} from "../BookFrame/Frame";
 
 export const EMPTY_SRC = (src: string = '') => `
 

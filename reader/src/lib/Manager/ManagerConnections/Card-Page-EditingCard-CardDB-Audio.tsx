@@ -1,5 +1,5 @@
 import CardManager from "../CardManager";
-import {PageManager} from "../PageManager";
+import {BookFrameManager} from "../BookFrameManager";
 import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operators";
 import {merge} from "rxjs";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
@@ -14,7 +14,7 @@ import {AudioManager} from "../AudioManager";
 
 export function CardPageEditingCardCardDBAudio(
     c: CardManager,
-    p: PageManager,
+    p: BookFrameManager,
     e: EditingCardManager,
     cdb: CardDB,
     a: AudioManager,

@@ -5,13 +5,15 @@ import {Website} from "../Website/Website";
 import {map} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from "xmldom";
+import {BookFrameRendererInMemory} from "../BookFrame/Renderer/BookFrameRendererInMemory";
 
 export function UnitTestAtomize(page: Website): Observable<BookFrame> {
     return page.getSrc(page.url)
         .pipe(
             map(src => new BookFrame(
                 (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(src).document),
-                page.name
+                page.name,
+                new BookFrameRendererInMemory()
                 )
             )
         )

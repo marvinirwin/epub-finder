@@ -2,6 +2,7 @@ import {fromEvent, merge, Subject} from "rxjs";
 import { Dictionary } from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {getTranslation} from "../Util/Util";
+import {createPopper} from "@popperjs/core";
 
 export class InputManager {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
@@ -38,9 +39,46 @@ export class InputManager {
         return this.keyupMap[key];
     }
 
-    public static applySentenceElementSelectListener(annotatedElements: AtomizedSentence) {
+    public static applyAtomizedSentenceGetTranslationListeners(annotatedElements: AtomizedSentence) {
         annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
             annotatedElements.getTranslation();
         };
+    }
+
+    public static applyAtomizedSentencePopperListeners(atomizedSentences: AtomizedSentence[]) {
+        atomizedSentences.forEach(atomizedSentence => {
+            const showEvents = ['mouseenter', 'focus'];
+            const hideEvents = ['mouseleave', 'blur'];
+            let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
+            if (!sentenceHTMLElement || !popperHTMLElement) {
+                debugger;
+                console.log();
+            }
+            try {
+                createPopper(sentenceHTMLElement, popperHTMLElement, {
+                    placement: 'top-start',
+                    strategy: 'fixed'
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+            const show = () => {
+                popperHTMLElement.setAttribute('data-show', '');
+            }
+            const hide = () => {
+                (popperHTMLElement as unknown as HTMLElement).removeAttribute('data-show');
+            }
+
+            showEvents.forEach(event => {
+                sentenceHTMLElement.addEventListener(event, show);
+            });
+
+            hideEvents.forEach(event => {
+                sentenceHTMLElement.addEventListener(event, hide);
+            });
+            InputManager.applyAtomizedSentenceGetTranslationListeners(atomizedSentence)
+        });
     }
 }

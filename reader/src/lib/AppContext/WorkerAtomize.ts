@@ -13,7 +13,7 @@ export function WorkerAtomize(page: Website): Observable<BookFrame> {
         const document = await GetWorkerResults(documentProcessingWorker, page.url);
         resolve(new BookFrame(
             document,
-            page.name
+            page.name,
         ))
     }))
 }

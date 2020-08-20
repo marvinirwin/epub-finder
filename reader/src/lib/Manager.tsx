@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {PageManager} from "./Manager/PageManager";
+import {BookFrameManager} from "./Manager/BookFrameManager";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -58,7 +58,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public pageManager: PageManager;
+    public pageManager: BookFrameManager;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -92,7 +92,7 @@ export class Manager {
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
-        this.pageManager = new PageManager({getPageRenderer});
+        this.pageManager = new BookFrameManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
@@ -208,7 +208,7 @@ export class Manager {
 
         this.bottomNavigationValue$
             .pipe(withLatestFrom(
-                this.pageManager.pageIndex$,
+                this.pageManager.bookFrames$,
                 this.characterPageFrame$,
                 this.viewingFrameManager.framesInView.updates$
             ))

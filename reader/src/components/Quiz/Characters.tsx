@@ -13,12 +13,12 @@ import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
 import {BookFrame} from "../../lib/BookFrame/BookFrame";
-import {AtomizedFrameContainer} from "../Atomized/AtomizedFrameContainer";
+import {FrameContainer} from "../Atomized/FrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
-import {PageManager} from "../../lib/Manager/PageManager";
+import {BookFrameManager} from "../../lib/Manager/BookFrameManager";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 
 
@@ -98,7 +98,7 @@ export function Characters({c, m}: QuizCardProps) {
                 [
                     obs$.pipe(
                         filter(([pageRenderer]) => !!pageRenderer),
-                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentencesFromSrc$
+                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentences$
                             .pipe(
                                 filter(atomizedSentences => {
                                     return atomizedSentences.length > 0;
@@ -110,9 +110,9 @@ export function Characters({c, m}: QuizCardProps) {
                 ]
             ).pipe(
                 tap(([atomizedSentences, trie]) => {
-                    PageManager.ApplyAtomizedSentenceListeners(atomizedSentences);
+                    BookFrameManager.ApplyAtomizedSentenceListeners(atomizedSentences);
                     atomizedSentences.forEach(atomizeSentence => {
-                        InputManager.applySentenceElementSelectListener(atomizeSentence);
+                        InputManager.applyAtomizedSentenceGetTranslationListeners(atomizeSentence);
                     });
                     const textWordData = AtomizedSentence.getTextWordData(
                         atomizedSentences,
@@ -157,7 +157,7 @@ export function Characters({c, m}: QuizCardProps) {
                 </Typography>
             </div>
             <div style={{flexGrow: 1, width: '100%'}}>
-                {bookFrame$ && <AtomizedFrameContainer rb={bookFrame$} m={m}/>}
+                {bookFrame$ && <FrameContainer rb={bookFrame$} m={m}/>}
             </div>
         </CardContent>
         <CardActions className={classes.cardActions}>

@@ -1,15 +1,15 @@
-import {PageManager} from "../PageManager";
+import {BookFrameManager} from "../BookFrameManager";
 import CardManager from "../CardManager";
 import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operators";
 import {merge} from "rxjs";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {getNewICardForWord} from "../../Util/Util";
 
-export function CardPage(c: CardManager, p: PageManager) {
+export function CardPage(c: CardManager, p: BookFrameManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.pageList$),
+        switchMapTo(p.bookFrameList$),
         switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {
@@ -29,7 +29,7 @@ export function CardPage(c: CardManager, p: PageManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.pageList$),
+        switchMapTo(p.bookFrameList$),
         switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {

@@ -37,12 +37,12 @@ const StyledExpansionPanelDetails = withStyles({
     }
 })(ExpansionPanelDetails);
 
-export function AtomizedFrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
+export function FrameContainer({rb, m}: { rb: BookFrame, m: Manager }) {
     const classes = useStyles();
     const [ref, setRef] = useState();
     const [expanded, setExpanded] = React.useState(true);
     useEffect(() => {
-        ref && rb.ref$.next(ref);
+        ref && rb.frame.iframeContainerRef$.next(ref);
     }, [ref, rb]);
 
 /*
