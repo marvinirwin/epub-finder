@@ -29,9 +29,8 @@ export class CausalTree {
 
     constructor(
         private adjListThatMovesForwardInTime: AdjList,
-        private valueMap: ValueMap
+        public valueMap: ValueMap
     ) {
-
     }
 
     /**
@@ -60,7 +59,7 @@ export class CausalTree {
         return this.adjListThatMovesForwardInTime;
     }
 
-    compreessAncestorsIntoSingleTree(): CausalTree {
+    getCompressedTree(): CausalTree {
         let myStartNodes = getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime());
         /**
          * Our adj list going forwards in time will look like this
@@ -71,15 +70,10 @@ export class CausalTree {
          * Every ancestor we have will have come before us, so we take the nodes which occur first (a, b)
          * And put an adjacency from them to the last nodes of our ancestors
          */
-        const firstNodes = rootsToCausallyOrderable(
-            myStartNodes,
-            this.valueMap,
-            this.getAdjListThatMovesForwardsInTime()
-        );
-        const ancestorTrees = this.ancestors.map(ancestor => ancestor.compreessAncestorsIntoSingleTree())
+        const ancestorTrees = this.ancestors.map(ancestor => ancestor.getCompressedTree())
         const endNodesOfAncestorTrees: string[] = flatten(
             ancestorTrees.map(ancestorTree =>
-                getRootsFromAdjList(ancestorTree.compreessAncestorsIntoSingleTree().getAdjListThatMovesBackwardsInTime())
+                getRootsFromAdjList(ancestorTree.getCompressedTree().getAdjListThatMovesForwardsInTime())
             )
         );
 
@@ -95,13 +89,13 @@ export class CausalTree {
         const newAdjacencies = mergeAdjacencyLists(
             ...connectingAdjLists,
             this.getAdjListThatMovesForwardsInTime(),
-            ...ancestorTrees.map(ancestorTree => ancestorTree.compreessAncestorsIntoSingleTree().getAdjListThatMovesForwardsInTime())
+            ...ancestorTrees.map(ancestorTree => ancestorTree.getCompressedTree().getAdjListThatMovesForwardsInTime())
         );
 
         const newValueMap = Object.assign(
             {},
             this.valueMap,
-            ...ancestorTrees.map(ancestorTree => ancestorTree.compreessAncestorsIntoSingleTree().valueMap)
+            ...ancestorTrees.map(ancestorTree => ancestorTree.getCompressedTree().valueMap)
         );
         return new CausalTree(
             newAdjacencies,

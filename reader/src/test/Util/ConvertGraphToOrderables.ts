@@ -1,7 +1,10 @@
 import {AdjList, causallyOrderable, ValueMap} from "../Graph/CasuallyOrderable";
 
-function safeGet(obj: {[key: string]: any}, key: string) {
+function safeGet(obj: {[key: string]: any}, key: string, defaultValue?: string) {
     if (!obj.hasOwnProperty(key)) {
+        if (arguments.length === 3) {
+            return arguments[2];
+        }
         throw new Error(`Could not find prop ${key}`)
     }
     return obj[key];
@@ -17,12 +20,12 @@ export function convertGraphToOrderables(
     const next = /(.*?).next\((.*?)\)/.exec(node);
 
     if (next) {
-        const [_, observable, valueBeingEmitted] = next;
-        let valueMapElement = safeGet(valueMap, observable);
-        let valueMapElement1 = safeGet(valueMap, valueBeingEmitted);
+        const [_, observableLabel, valueBeingEmittedLabel] = next;
+        let observable = safeGet(valueMap, observableLabel);
+        let valueBeingEmitted = safeGet(valueMap, valueBeingEmittedLabel, valueBeingEmittedLabel);
         return {
-            value: valueMapElement,
-            next: valueMapElement1,
+            value: observable,
+            next: valueBeingEmitted,
             ancestors: (edges[node] || []).filter(ancestor => !visited.has(ancestor)).map(ancestor => convertGraphToOrderables(
                 edges,
                 valueMap,

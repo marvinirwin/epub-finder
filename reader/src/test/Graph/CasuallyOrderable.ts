@@ -8,7 +8,6 @@ export type causallyOrderable = {
     notification?: any,
     next?: any
     ancestors: causallyOrderable[],
-    id: string
 };
 
 
@@ -27,7 +26,13 @@ export function toAdjList(roots: causallyOrderable[]) {
 }
 
 export function reverseAdjList(adjList: AdjList): AdjList {
-
+    const reversedAdjList: AdjList = {};
+    Object.entries(adjList).map(([source, destinations]) => {
+        destinations.forEach(destination => {
+            safePush(reversedAdjList, destination, source)
+        });
+    });
+    return reversedAdjList;
 }
 
 export function invertCausallyOrderable(roots: causallyOrderable[]) {
