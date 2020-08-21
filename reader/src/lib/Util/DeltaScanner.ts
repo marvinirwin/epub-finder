@@ -1,5 +1,5 @@
 import {Observable, Subject} from "rxjs";
-import {scan} from "rxjs/operators";
+import {scan, tap} from "rxjs/operators";
 import {uniq} from "lodash";
 
 export type ds_Dict<T, U extends string = string> = {
@@ -41,7 +41,6 @@ function applyTreeDiff<T>(oldTree: ds_Tree<T> | undefined, diffTree: ds_Tree<T> 
         children: newChildren,
     }
 
-
     /*
         oldTree.value = diffTree.value;
         // I could do it by returing new Nodes, but that might be slow?
@@ -68,6 +67,12 @@ export type DeltaScan<T, U extends string = string> = {
     delta: ds_Tree<T, U>
 };
 
+export type InitDelta<T, U extends string = string> = {
+    sourced: ds_Tree<T, U> | undefined,
+    previousTree: ds_Tree<T, U> | undefined,
+    delta: ds_Tree<T, U>
+};
+
 export type DeltaScanMapFunc<T, U> = (v: T) => U;
 
 // Right now we over-write things in the map, perhaps we want to merge them
@@ -76,28 +81,32 @@ export class DeltaScanner<T, U extends string = string> {
     updates$: Observable<DeltaScan<T, U>>;
 
     constructor() {
+        // @ts-ignore
         this.updates$ = this.appendDelta$.pipe(
+            // @ts-ignore
             scan((scan: DeltaScan<T, U> | undefined, delta: ds_Tree<T, U>) => {
                     if (!scan) return {
                         sourced: delta,
                         delta
                     } as DeltaScan<T, U>;
+
                     const newSourced = applyTreeDiff(scan.sourced, delta);
+
                     return {
                         sourced: newSourced,
                         previousTree: scan.sourced,
                         delta
                     } as DeltaScan<T, U>;
                 },
-            )
+                undefined
+            ),
         )
     }
 
-    mapWith<T, U>(mapFunc: DeltaScanMapFunc<T, U>): DeltaScanner<U> {
+    mapWith<U>(mapFunc: DeltaScanMapFunc<T, U>): DeltaScanner<U> {
         const derivedTree = new DeltaScanner<U>();
         this.updates$.subscribe(({delta}) => {
             derivedTree.appendDelta$.next(
-                // @ts-ignore
                 MapTree(delta, mapFunc)
             )
         })

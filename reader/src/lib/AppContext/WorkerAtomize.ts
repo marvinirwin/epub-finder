@@ -5,7 +5,6 @@ import {Website} from "../Website/Website";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {BookFrameRendererIFrame} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
 
 export function WorkerAtomize(page: Website): Observable<BookFrame> {

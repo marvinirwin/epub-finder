@@ -3,7 +3,6 @@ import {Observable, Subject} from "rxjs";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {scan, shareReplay} from "rxjs/operators";
 import { Dictionary } from "lodash";
-import {create} from "domain";
 
 export class CreatedSentenceManager {
     addUnpersistedCreatedSentence$ = new Subject<CreatedSentence[]>();

@@ -14,7 +14,7 @@ import {NavigationPages} from "../lib/Util/Util";
 import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
 import {useObservable, useObservableState} from "observable-hooks";
 import {map} from "rxjs/operators";
-import {flattenTree} from "../lib/Util/DeltaScanner";
+import {ds_Dict, flattenTree} from "../lib/Util/DeltaScanner";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -66,7 +66,11 @@ export function Main({m}: { m: Manager }) {
             .updates$
             .pipe(
                 map(({sourced}) => {
-                    return sourced ? flatten(flattenTree(sourced).map(Object.values)) : [];
+                    if (sourced) {
+                        return flattenTree(sourced);
+                    } else {
+                        return [];
+                    }
                 })
             ),
         []
