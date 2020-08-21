@@ -10,6 +10,8 @@ import {TextWordData} from "../Atomized/TextWordData";
 import {DeltaScanner} from "../Util/DeltaScanner";
 import {BookFrameRenderer} from "./Renderer/BookFrameRenderer";
 import {Frame} from "./Frame";
+import {BookFrameRendererIFrame} from "./Renderer/BookFrameRendererInIFrame";
+
 
 export class BookFrame {
     public frame = new Frame();
@@ -22,6 +24,7 @@ export class BookFrame {
     public textData$: Observable<TextWordData>;
     public srcDoc$ = new ReplaySubject<string>(1);
     public manuallyAddedAtomizedSentences = new DeltaScanner<AtomizedSentence>();
+;
 
     constructor(
         srcDoc: string,
@@ -56,15 +59,16 @@ export class BookFrame {
         })
 
 
-/*
-        this.atomizedSentencesFromSrc$.pipe(
-            withLatestFrom(this.manuallyAddedAtomizedSentences.updates$, this.frame.iframe$)
-        ).subscribe(([atomizedSentencesFromSrc, {sourced}, iframeBbdy]) => {
-            Object.values(sourced).map(v => v.value).forEach(manuallyAddedSentence => {
-                manuallyAddedSentence.(iframebody);
-            })
-        })
-*/
+        /*
+                this.atomizedSentencesFromSrc$.pipe(
+                    withLatestFrom(this.manuallyAddedAtomizedSentences.updates$, this.frame.iframe$)
+                ).subscribe(([atomizedSentencesFromSrc, {sourced}, iframeBbdy]) => {
+                    Object.values(sourced).map(v => v.value).forEach(manuallyAddedSentence => {
+                        manuallyAddedSentence.(iframebody);
+                    })
+                })
+        */
+
 
         this.textData$ = combineLatest([
             this.trie.obs$,

@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, uniq} from "lodash";
-import {debounceTime, filter, first, map, startWith, withLatestFrom} from "rxjs/operators";
+import {debounceTime, filter, map, startWith, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -35,6 +35,7 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {BookFrame} from "./BookFrame/BookFrame";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
+import {DeltaScanner} from "./Util/DeltaScanner";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -58,7 +59,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public pageManager: BookFrameManager;
+    public bookFrameManager: BookFrameManager;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -92,7 +93,7 @@ export class Manager {
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
-        this.pageManager = new BookFrameManager({getPageRenderer});
+        this.bookFrameManager = new BookFrameManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
@@ -102,17 +103,29 @@ export class Manager {
         this.progressManager = new ProgressManager();
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
-        InputPage(this.inputManager, this.pageManager);
-        CardPage(this.cardManager, this.pageManager);
+        InputPage(this.inputManager, this.bookFrameManager);
+        CardPage(this.cardManager, this.bookFrameManager);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardManager, this.pageManager, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardManager, this.bookFrameManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
+
+        merge(
+            this.bookFrameManager.atomizedSentences$,
+            this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
+        ).subscribe(atomizedSentenceList => {
+                InputManager.applyAtomizedSentenceListeners(atomizedSentenceList);
+            }
+        )
+
+        this.quizCharacterManager.bookFrame.frame.iframe$.subscribe(({iframe, body}) => {
+            this.inputManager.applyListeners(body);
+        });
 
         const textData$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.pageManager.atomizedSentences$.pipe(
+                this.bookFrameManager.atomizedSentences$.pipe(
                     filter(sentenceList => !!sentenceList.length)
                 )
             ]
@@ -129,10 +142,10 @@ export class Manager {
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-         const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(textData$);
-         this.wordElementMap$ = wordElementMap$;
-         this.wordCounts$ = wordCounts$;
-         this.sentenceMap$ = sentenceMap$;
+        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(textData$);
+        this.wordElementMap$ = wordElementMap$;
+        this.wordCounts$ = wordCounts$;
+        this.sentenceMap$ = sentenceMap$;
 
         this.wordElementMap$ = combineLatest([
             this.wordElementMap$.pipe(
@@ -205,32 +218,25 @@ export class Manager {
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 
-
         this.bottomNavigationValue$
             .pipe(withLatestFrom(
-                this.pageManager.bookFrames$,
-                this.characterPageFrame$,
-                this.viewingFrameManager.framesInView.updates$
+                this.bookFrameManager.bookFrames.updates$,
             ))
-            .subscribe(([value, pageIndex, frame, framesInView]) => {
-                switch(value) {
+            .subscribe(([bottomNavigationValue, {sourced}]) => {
+                if (!sourced) return;
+                switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-                        const firstPage = Object.values(pageIndex)[0];
                         this.viewingFrameManager.framesInView.appendDelta$.next({
-                            set: {
-                                [firstPage.id]: {
-                                    value: firstPage
-                                },
-                            },
-                            remove: Object.fromEntries(
-                                Object.entries(framesInView)
-                                    .filter(([key, value]) => key !== firstPage.id)
-                                    .map(([key, value]) => [key, {delete: true}])
-                            )
+                            nodeLabel: "root",
+                            value: DeltaScanner.getElementByKeyPath(sourced, ['readingPages']) as BookFrame
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:
-
+                        this.viewingFrameManager.framesInView.appendDelta$.next({
+                            nodeLabel: 'root',
+                            value: DeltaScanner.getElementByKeyPath(sourced, ['characterPage'])
+                        })
+                        break;
                 }
             })
 

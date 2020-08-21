@@ -7,6 +7,7 @@ import {BookFrame} from "../BookFrame/BookFrame";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {Frame} from "../BookFrame/Frame";
+import {BookFrameRendererIFrame} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -19,19 +20,39 @@ ${src}
 </div>
 </body>
 `
+function getSrc(sentences: string[]) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Title</title>
+</head>
+<body>
+${sentences.map(sentence => {
+        return `<div>${sentence}</div>`;
+    })}
+</body>
+</html>
+        `;
+}
 
 export class QuizCharacterManager {
     exampleSentences$ = new ColdSubject<DeltaScan<string>>();
     learningLanguage$ = new Subject<string | undefined>();
     atomizedSentenceMap$ = new ReplaySubject<DeltaScannerDict<AtomizedSentence>>(1);
-    frame = new Frame();
+    public bookFrame = new BookFrame(
+        getSrc([]),
+        'character_translation',
+        new BookFrameRendererIFrame()
+    );
     constructor() {
         /**
          * If we have a learningLanguage, and have less than 10 sentences
          * I want to hear about deltas in the sentenceMap about my word to see if there are new ones
          */
         this.exampleSentences$.obs$.pipe(
-            withLatestFrom(this.frame.iframe$, this.atomizedSentenceMap$),
+            withLatestFrom(this.bookFrame.frame.iframe$, this.atomizedSentenceMap$),
             scan((
                 currentExampleSentenceElements: DeltaScannerDict<string>,
                 [{delta}, {body, iframe}, atomizedSentenceMap],
@@ -50,6 +71,7 @@ export class QuizCharacterManager {
             }, {})
         ).subscribe(() => {
             // HACK, because I want the side effects of my scan
-        })
+        });
+
     }
 }

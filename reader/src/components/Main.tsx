@@ -6,13 +6,15 @@ import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
-import {FrameContainer} from "./Atomized/FrameContainer";
-import {Dictionary} from "lodash";
+import {FrameContainer} from "./Frame/FrameContainer";
+import {Dictionary, flatten} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
 import {BookFrame} from "../lib/BookFrame/BookFrame";
 import {NavigationPages} from "../lib/Util/Util";
-import { ScheduleTablePage } from "./Pages/ScheduleTablePage";
-import {useObservableState} from "observable-hooks";
+import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
+import {useObservable, useObservableState} from "observable-hooks";
+import {map} from "rxjs/operators";
+import {flattenTree} from "../lib/Util/DeltaScanner";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -57,7 +59,18 @@ export function Main({m}: { m: Manager }) {
     useEffect(() => {
         m.inputManager.applyListeners(document.body);
     }, [m]);
-    const pages = useObs<Dictionary<BookFrame>>(m.pageManager.bookFrames$);
+
+    const [allBookFrames] = useObservableState<BookFrame[]>(
+        () => m.bookFrameManager
+            .bookFrames
+            .updates$
+            .pipe(
+                map(({sourced}) => {
+                    return sourced ? flatten(flattenTree(sourced).map(Object.values)) : [];
+                })
+            ),
+        []
+    );
     const iframeVisible = item === NavigationPages.READING_PAGE;
 
     return <div>
@@ -68,7 +81,7 @@ export function Main({m}: { m: Manager }) {
             top: iframeVisible ? 0 : '9000px',
             overflow: 'hidden'
         }}>
-            {Object.values(pages || {}).map(page => <FrameContainer m={m} key={page.name} rb={page}/>)}
+            {allBookFrames.map(page => <FrameContainer m={m} key={page.name} rb={page}/>)}
         </div>
         <ImageSelectPopup m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>

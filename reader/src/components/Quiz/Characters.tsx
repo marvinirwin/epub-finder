@@ -13,7 +13,7 @@ import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
 import {BookFrame} from "../../lib/BookFrame/BookFrame";
-import {FrameContainer} from "../Atomized/FrameContainer";
+import {FrameContainer} from "../Frame/FrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
@@ -21,23 +21,6 @@ import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {BookFrameManager} from "../../lib/Manager/BookFrameManager";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 
-
-function getSrc(sentences: string[]) {
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Random Title</title>
-</head>
-<body>
-${sentences.map(sentence => {
-        return `<div>${sentence}</div>`;
-    })}
-</body>
-</html>
-        `;
-}
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
@@ -47,88 +30,30 @@ export function Characters({c, m}: QuizCardProps) {
         if (createdSentence) {
             m.quizManager.quizzingComponent$.next("Pictures");
         } else {
-            const r = new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
+            const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
             r.sentence.then(setCreatedSentence)
         }
     };
-    const sentences$ = useObservableState(useObservable<string[], [string | undefined]>(
-        (learningLanguage$: Observable<[string | undefined]>) =>
-            combineLatest([
-                    learningLanguage$.pipe(distinctUntilChanged()),
-                    m.textData$
-                ]
-            ).pipe(
-                map(([[word], {wordSentenceMap}]) => {
-                    return (wordSentenceMap[word || ''] || []).map((s: AtomizedSentence) => {
-                            return s.translatableText;
-                        });
-                    }
-                ),
-            )
-        , [c?.learningLanguage],
-    ), []);
 
-    const bookFrame$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
-        obs$.pipe(
-            filter(([strings]) => strings.length > 0),
-            map(([sentences]) => {
-                sentences = sentences.slice(0, 10);
-                return getSrc(sentences);
-            }),
-            switchMap(async (src: string) => {
-                const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
-                return new BookFrame(atomizedSrc, 'character_translation');
-            })
-        ), [sentences$])
-    );
-
-    useObservableState(useObservable((obs$: Observable<[BookFrame | undefined]>) =>
-        obs$.pipe(
-            filter(([pageRenderer]) => !!pageRenderer),
-            switchMap(([pageRenderer]: [BookFrame | undefined]) => {
-                return (pageRenderer as BookFrame).iframebody$;
-            }),
-            tap(iframeBody => {
-                m.inputManager.applyListeners(iframeBody);
-            })
-        ), [bookFrame$]),
-    );
-    const atomizedSentences = useObservableState(useObservable((obs$: Observable<[BookFrame | undefined]>) =>
-            combineLatest(
-                [
-                    obs$.pipe(
-                        filter(([pageRenderer]) => !!pageRenderer),
-                        switchMap(([pageRenderer]) => (pageRenderer as BookFrame).atomizedSentences$
-                            .pipe(
-                                filter(atomizedSentences => {
-                                    return atomizedSentences.length > 0;
-                                })
-                            )
-                        )
-                    ),
-                    m.cardManager.trie$
-                ]
-            ).pipe(
-                tap(([atomizedSentences, trie]) => {
-                    BookFrameManager.ApplyAtomizedSentenceListeners(atomizedSentences);
-                    atomizedSentences.forEach(atomizeSentence => {
-                        InputManager.applyAtomizedSentenceGetTranslationListeners(atomizeSentence);
-                    });
-                    const textWordData = AtomizedSentence.getTextWordData(
-                        atomizedSentences,
-                        trie,
-                        uniq(trie.getWords(false).map(v => v.length))
-                    );
-                    m.characterPageWordElementMap$.next(textWordData.wordElementsMap)
+    /*
+        const bookFrame$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
+            obs$.pipe(
+                filter(([strings]) => strings.length > 0),
+                map(([sentences]) => {
+                    sentences = sentences.slice(0, 10);
+                    return getSrc(sentences);
+                }),
+                switchMap(async (src: string) => {
+                    const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
                 })
-            )
-        , [bookFrame$])
-    );
+            ), [sentences$])
+        );
+    */
 
     useEffect(() => {
         setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;
-        const r = new RecordRequest( `Please record sentence with the word ${c?.learningLanguage}`);
+        const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
         r.sentence.then(async createdSentence => {
             if (!createdSentence) {
                 return;
@@ -147,7 +72,9 @@ export function Characters({c, m}: QuizCardProps) {
                 advance();
             }
         })
-    }, [c?.learningLanguage])
+    }, [c?.learningLanguage]);
+
+
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
             <Typography variant="h3">{error}</Typography>
@@ -157,7 +84,10 @@ export function Characters({c, m}: QuizCardProps) {
                 </Typography>
             </div>
             <div style={{flexGrow: 1, width: '100%'}}>
-                {bookFrame$ && <FrameContainer rb={bookFrame$} m={m}/>}
+                {
+                    m.quizCharacterManager.bookFrame
+                    && <FrameContainer rb={m.quizCharacterManager.bookFrame} m={m}/>
+                }
             </div>
         </CardContent>
         <CardActions className={classes.cardActions}>

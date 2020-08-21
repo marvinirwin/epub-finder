@@ -23,7 +23,7 @@ export function getManager(mode: string): Manager {
     }
     websites.forEach(filename => {
 
-        m.pageManager.addPage$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
+        m.bookFrameManager.addReadingBookFrame$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
     })
     return m;
 }

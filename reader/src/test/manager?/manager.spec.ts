@@ -11,8 +11,8 @@ it("Loads the manager without error", () => {
                     scheduledCards$,
                     quizzingCard$
                 },
-                pageManager: {
-                    addPage$
+                bookFrameManager: {
+                    addReadingBookFrame$
                 },
                 quizCharacterManager: {
                     exampleSentences$
@@ -27,7 +27,7 @@ it("Loads the manager without error", () => {
         scheduler
             .expectOrderings(
                 {
-                    addPage$,
+                    addReadingPage$: addPage$,
                     quizzingCard$,
                     scheduledCards$,
                     exampleSentences$: exampleSentences$.obs$,
@@ -61,7 +61,7 @@ it("Loads the manager without error", () => {
                     mainPage: {
                         name: "Basic Doc"
                     },
-                    addPage$
+                    addReadingPage$: addPage$
                 })
             )
     });

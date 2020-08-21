@@ -6,6 +6,7 @@ import {Website} from "../Website/Website";
 // @ts-ignore
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {BookFrameRendererIFrame} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
 
 export function WorkerAtomize(page: Website): Observable<BookFrame> {
     return from(new Promise<BookFrame>(async resolve => {
@@ -14,6 +15,7 @@ export function WorkerAtomize(page: Website): Observable<BookFrame> {
         resolve(new BookFrame(
             document,
             page.name,
+            new BookFrameRendererIFrame()
         ))
     }))
 }

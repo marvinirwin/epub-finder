@@ -39,14 +39,12 @@ export class InputManager {
         return this.keyupMap[key];
     }
 
-    public static applyAtomizedSentenceGetTranslationListeners(annotatedElements: AtomizedSentence) {
-        annotatedElements.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
-            annotatedElements.getTranslation();
-        };
-    }
 
-    public static applyAtomizedSentencePopperListeners(atomizedSentences: AtomizedSentence[]) {
+    public static applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
         atomizedSentences.forEach(atomizedSentence => {
+            atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
+                atomizedSentence.getTranslation();
+            };
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
             let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
@@ -78,7 +76,6 @@ export class InputManager {
             hideEvents.forEach(event => {
                 sentenceHTMLElement.addEventListener(event, hide);
             });
-            InputManager.applyAtomizedSentenceGetTranslationListeners(atomizedSentence)
         });
     }
 }

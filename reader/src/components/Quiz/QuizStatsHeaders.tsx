@@ -8,8 +8,6 @@ export default function QuizStatsHeader({m}: {m: Manager}) {
     const newCards = useObservableState(m.scheduleManager.newCards$, []);
     const learningCards = useObservableState(m.scheduleManager.learningCards$, []);
     const toReviewCards = useObservableState(m.scheduleManager.toReviewCards$, []);
-    const card = useObservableState(m.quizManager.quizzingCard$);
-    const textData = useObservableState(m.textData$);
 
     return <Typography variant="subtitle1">
         <div>New: <span style={{color: '#00c0c9'}}>{newCards?.length}</span></div>
