@@ -27,9 +27,9 @@ it("Loads the manager without error", () => {
         scheduler
             .expectOrderings(
                 {
-                    addReadingPage$: addPage$,
+                    addReadingBookFrame$,
                     quizzingCard$,
-                    scheduledCards$,
+                    scheduledCards$: scheduledCards$.obs$,
                     exampleSentences$: exampleSentences$.obs$,
 
                 },
@@ -43,8 +43,8 @@ it("Loads the manager without error", () => {
        scheduledCards
              ^
              |
-             
-    addPage$.next(mainPage)
+             |
+    addReadingBookFrame$.next(mainPage)
     `, {
                     sentences: [
                         '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,',
@@ -61,7 +61,7 @@ it("Loads the manager without error", () => {
                     mainPage: {
                         name: "Basic Doc"
                     },
-                    addReadingPage$: addPage$
+                    addReadingBookFrame$
                 })
             )
     });

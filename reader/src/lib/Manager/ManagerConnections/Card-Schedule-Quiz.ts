@@ -27,7 +27,9 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
     });
 */
 
-    s.wordQuizList$.pipe(
-        resolveICardForWords(c.cardIndex$),
-    ).subscribe(q.scheduledCards$)
+    q.scheduledCards$.addObservable$.next(
+        s.wordQuizList$.pipe(
+            resolveICardForWords(c.cardIndex$),
+        )
+    )
 }

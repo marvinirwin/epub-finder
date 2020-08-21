@@ -1,9 +1,10 @@
 import {ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Characters} from "../../components/Quiz/Characters";
-import {filter, startWith, withLatestFrom} from "rxjs/operators";
+import { startWith, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
+import {ColdSubject} from "../Util/ColdSubject";
 
 export interface QuizResult {
     word: string;
@@ -18,7 +19,7 @@ export class QuizManager {
     quizResult$ = new Subject<QuizResult>();
     advanceQuizStage$ = new Subject();
 
-    scheduledCards$ = new ReplaySubject<ICard[]>(1);
+    scheduledCards$ = new ColdSubject<ICard[]>();
 
     requestNextCard$ = new Subject<void>();
 
@@ -29,9 +30,12 @@ export class QuizManager {
     */
 
     constructor() {
+        this.quizzingCard$.subscribe(() => {
+            console.log();
+        })
         this.quizzingCard$.pipe(
             startWith(undefined),
-            withLatestFrom(this.scheduledCards$)
+            withLatestFrom(this.scheduledCards$.obs$)
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             if (!quizzingCard && scheduledCards[0]) {
                 this.requestNextCard$.next();
@@ -39,7 +43,7 @@ export class QuizManager {
         });
 
         this.requestNextCard$.pipe(
-            withLatestFrom(this.scheduledCards$)
+            withLatestFrom(this.scheduledCards$.obs$)
         ).subscribe(([_, scheduledCards]) => {
             this.quizzingCard$.next(scheduledCards[0]);
             this.quizzingComponent$.next("Characters");
@@ -58,7 +62,7 @@ export class QuizManager {
         })
 */
 
-        this.scheduledCards$.pipe(
+        this.scheduledCards$.obs$.pipe(
             withLatestFrom(
                 this.quizzingCard$.pipe(
                     startWith(undefined),
