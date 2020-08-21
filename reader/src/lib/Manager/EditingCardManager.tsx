@@ -1,8 +1,6 @@
 import {filter, map, pairwise, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {Observable, of, ReplaySubject} from "rxjs";
 import {EditingCard} from "../ReactiveClasses/EditingCard";
-import {resolveICardForWord} from "../Pipes/ResolveICardForWord";
-import {ICard} from "../Interfaces/ICard";
 import {WavAudio} from "../WavAudio";
 
 export default class EditingCardManager {
@@ -32,12 +30,14 @@ export default class EditingCardManager {
                 )
             }),
         );
+/*
         this.currentEditingSynthesizedWavFile$ = this.editingCard.pipe(
             filter(c => !!c),
             switchMap(c => {
                 return (c as EditingCard).synthesizedSpeech$;
             })
         )
+*/
         this.editingCardIsSaving = this.editingCard.pipe(
             switchMap(c =>
                 c ? c.saveInProgress$ : of(undefined)

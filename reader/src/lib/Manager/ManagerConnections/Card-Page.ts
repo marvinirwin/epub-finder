@@ -4,13 +4,14 @@ import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operat
 import {merge} from "rxjs";
 import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {getNewICardForWord} from "../../Util/Util";
+import {flattenTree} from "../../Util/DeltaScanner";
 
 export function CardPage(c: CardManager, p: BookFrameManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.bookFrameList$),
-        switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
+        switchMapTo(p.bookFrames.updates$),
+        switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {
         const newCharacterSet = new Set<string>();
@@ -29,8 +30,8 @@ export function CardPage(c: CardManager, p: BookFrameManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.bookFrameList$),
-        switchMap(pageList => merge(...pageList.map(pageRenderer => pageRenderer.text$))),
+        switchMapTo(p.bookFrames.updates$),
+        switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {
         const newCharacterSet = new Set<string>();

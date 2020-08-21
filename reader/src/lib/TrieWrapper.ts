@@ -1,6 +1,5 @@
 import {ReplaySubject, Subject} from "rxjs";
 import {ITrie} from "./Interfaces/Trie";
-import {DeltaScannerDict} from "./Util/DeltaScanner";
 
 export class TrieWrapper {
     public changeSignal$: Subject<void>;

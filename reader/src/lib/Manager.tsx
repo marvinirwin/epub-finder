@@ -35,7 +35,7 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {BookFrame} from "./BookFrame/BookFrame";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {DeltaScanner} from "./Util/DeltaScanner";
+import {DeltaScanner, getElementByKeyPath} from "./Util/DeltaScanner";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -228,13 +228,13 @@ export class Manager {
                     case NavigationPages.READING_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: DeltaScanner.getElementByKeyPath(sourced, ['readingPages']) as BookFrame
+                            value: getElementByKeyPath(sourced, ['readingPages']) as BookFrame
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: DeltaScanner.getElementByKeyPath(sourced, ['characterPage'])
+                            value: getElementByKeyPath(sourced, ['characterPage'])
                         })
                         break;
                 }

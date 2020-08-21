@@ -24,7 +24,6 @@ export class BookFrame {
     public textData$: Observable<TextWordData>;
     public srcDoc$ = new ReplaySubject<string>(1);
     public manuallyAddedAtomizedSentences = new DeltaScanner<AtomizedSentence>();
-;
 
     constructor(
         srcDoc: string,

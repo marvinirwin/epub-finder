@@ -5,11 +5,11 @@ import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {BookFrameManagerConfig} from "./BookFrameManager/BookFrameManagerConfig";
 import { flattenDeep } from "lodash";
-import { DeltaScanner } from "../Util/DeltaScanner";
+import {DeltaScanner, ds_Dict, ds_Tree, flattenTree} from "../Util/DeltaScanner";
 
 
 export class BookFrameManager {
-    bookFrames = new DeltaScanner.DeltaScanner<BookFrame, 'characterPage' | 'readingPages' | string>();
+    bookFrames = new DeltaScanner<BookFrame, 'characterPage' | 'readingPages' | string>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
     addReadingBookFrame$ = new Subject<Website>();
 
@@ -35,11 +35,11 @@ export class BookFrameManager {
                     {
                         sourced
                     }: {
-                        sourced: DeltaScanner.Tree<Observable<DeltaScanner.Dict<AtomizedSentence>>> | undefined
+                        sourced: ds_Tree<Observable<ds_Dict<AtomizedSentence>>> | undefined
                     }
                 ) =>
-                    combineLatest(sourced ? DeltaScanner.flattenTree(sourced) : [])),
-                map((atomizedSentenceArrays: DeltaScanner.Dict<AtomizedSentence>[]) =>
+                    combineLatest(sourced ? flattenTree(sourced) : [])),
+                map((atomizedSentenceArrays: ds_Dict<AtomizedSentence>[]) =>
                     flattenDeep(atomizedSentenceArrays.map(Object.values))
                 )
             )
