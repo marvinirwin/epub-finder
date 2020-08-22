@@ -7,5 +7,5 @@ import {ds_Dict} from "../../Util/DeltaScanner";
 export class BookFrameRenderer {
     srcDoc$ = new Subject<string>();
     frame$ = new ColdSubject<Frame>();
-    atomizedSentences$ = new Subject<ds_Dict<AtomizedSentence>>();
+    atomizedSentences$ = new ColdSubject<ds_Dict<AtomizedSentence>>();
 }

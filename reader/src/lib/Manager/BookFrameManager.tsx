@@ -32,31 +32,25 @@ export class BookFrameManager {
                 })
             });
 
-        let deltaScanner = this.bookFrames.mapWith((bookFrame: BookFrame) => bookFrame.renderer.atomizedSentences$);
+        let deltaScanner = this.bookFrames.mapWith((bookFrame: BookFrame) => bookFrame.renderer.atomizedSentences$.obs$);
 
-        let called = 0;
-        let project = ({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {
-            called++;
-            let v1 = sourced ? flattenTree(sourced) : [];
-            v1[0].subscribe(() => {
-                console.log();
-            })
-            if (called > 1) {
-                console.log();
-            }
-            return combineLatest(v1).pipe(
-                tap(() => {
-                    console.log();
-                })
-            );
-        };
         this.atomizedSentences$ = deltaScanner.updates$.pipe(
-            switchMap(project),
+            switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {
+                return combineLatest(sourced ? flattenTree(sourced) : []).pipe(
+                    tap(() => {
+                        console.log();
+                    })
+                );
+            }),
             map((atomizedSentenceArrays: ds_Dict<AtomizedSentence>[]) => {
                     return flattenDeep(atomizedSentenceArrays.map(Object.values));
                 }
             ),
             shareReplay(1)
-        )
+        );
+
+        this.atomizedSentences$.subscribe(() => {
+            console.log();
+        })
     }
 }

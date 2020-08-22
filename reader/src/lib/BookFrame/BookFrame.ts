@@ -22,21 +22,21 @@ export class BookFrame {
     public wordCountRecords$ = new Subject<IWordCountRow[]>();
     public trie = new ColdSubject<TrieWrapper>();
     public textData$: Observable<TextWordData>;
-    public srcDoc$ = new ReplaySubject<string>(1);
-    public manuallyAddedAtomizedSentences = new DeltaScanner<AtomizedSentence>();
 
     constructor(
         srcDoc: string,
         public name: string,
         public renderer: BookFrameRenderer
     ) {
-        this.srcDoc$.next(srcDoc);
         this.id = name;
-        this.text$ = this.renderer.atomizedSentences$.pipe(
+        this.text$ = this.renderer.atomizedSentences$.obs$.pipe(
             map(atomizedSentences => {
-                return Object.values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText).join('\n');
+                return Object
+                    .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
+                    .join('\n');
             }),
         )
+        this.renderer.srcDoc$.next(srcDoc);
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text
                 .split('')
@@ -73,7 +73,7 @@ export class BookFrame {
 
         this.textData$ = combineLatest([
             this.trie.obs$,
-            this.renderer.atomizedSentences$
+            this.renderer.atomizedSentences$.obs$
         ]).pipe(
             map(([trie, sentences]) =>
                 AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths()),
