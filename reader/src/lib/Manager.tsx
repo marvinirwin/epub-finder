@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {BookFrameManager} from "./Manager/BookFrameManager";
+import {OpenBookManager} from "./Manager/OpenBookManager";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -59,7 +59,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public bookFrameManager: BookFrameManager;
+    public bookFrameManager: OpenBookManager;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -93,7 +93,7 @@ export class Manager {
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
-        this.bookFrameManager = new BookFrameManager({getPageRenderer});
+        this.bookFrameManager = new OpenBookManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
@@ -220,7 +220,7 @@ export class Manager {
 
         this.bottomNavigationValue$
             .pipe(withLatestFrom(
-                this.bookFrameManager.bookFrames.updates$,
+                this.bookFrameManager.openedBooks.updates$,
             ))
             .subscribe(([bottomNavigationValue, {sourced}]) => {
                 if (!sourced) return;

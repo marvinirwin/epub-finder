@@ -8,31 +8,31 @@ import {flattenDeep} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
 
 
-export class BookFrameManager {
-    bookFrames = new DeltaScanner<BookFrame, 'characterPageFrame' | 'readingFrames' | string>();
+export class OpenBookManager {
+    openedBooks = new DeltaScanner<BookFrame, 'characterPageFrame' | 'readingFrames' | string>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
-    addReadingBookFrame$ = new Subject<Website>();
+    addOpenBook$ = new Subject<Website>();
 
     constructor(
         private config: BookFrameManagerConfig
     ) {
-        this.addReadingBookFrame$
+        this.addOpenBook$
             .pipe(switchMap(page => {
                 return this.config.getPageRenderer(page);
             }))
-            .subscribe(newBookFrame => {
-                this.bookFrames.appendDelta$.next({
+            .subscribe(openBook => {
+                this.openedBooks.appendDelta$.next({
                     nodeLabel: 'readingFrames',
                     children: {
-                        [newBookFrame.name]: {
-                            nodeLabel: newBookFrame.name,
-                            value: newBookFrame
+                        [openBook.name]: {
+                            nodeLabel: openBook.name,
+                            value: openBook
                         }
                     }
                 })
             });
 
-        let deltaScanner = this.bookFrames.mapWith((bookFrame: BookFrame) => bookFrame.renderer.atomizedSentences$.obs$);
+        let deltaScanner = this.openedBooks.mapWith((bookFrame: BookFrame) => bookFrame.renderer.atomizedSentences$.obs$);
 
         this.atomizedSentences$ = deltaScanner.updates$.pipe(
             switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {

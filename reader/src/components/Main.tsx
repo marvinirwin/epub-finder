@@ -62,7 +62,7 @@ export function Main({m}: { m: Manager }) {
 
     const [allBookFrames] = useObservableState<BookFrame[]>(
         () => m.bookFrameManager
-            .bookFrames
+            .openedBooks
             .updates$
             .pipe(
                 map(({sourced}) => {

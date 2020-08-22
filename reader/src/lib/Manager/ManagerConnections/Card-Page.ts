@@ -1,4 +1,4 @@
-import {BookFrameManager} from "../BookFrameManager";
+import {OpenBookManager} from "../OpenBookManager";
 import CardManager from "../CardManager";
 import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operators";
 import {merge} from "rxjs";
@@ -6,11 +6,11 @@ import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {getNewICardForWord} from "../../Util/Util";
 import {flattenTree} from "../../Util/DeltaScanner";
 
-export function CardPage(c: CardManager, p: BookFrameManager) {
+export function CardPage(c: CardManager, p: OpenBookManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.bookFrames.updates$),
+        switchMapTo(p.openedBooks.updates$),
         switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {
@@ -30,7 +30,7 @@ export function CardPage(c: CardManager, p: BookFrameManager) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
-        switchMapTo(p.bookFrames.updates$),
+        switchMapTo(p.openedBooks.updates$),
         switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {

@@ -6,7 +6,7 @@ it("Generates wordCountRecords for a page", () => {
         {
             manager: {
                 bookFrameManager: {
-                    addReadingBookFrame$
+                    addOpenBook$
                 },
             },
             scheduler,
@@ -15,7 +15,7 @@ it("Generates wordCountRecords for a page", () => {
         scheduler
             .expectOrderings(
                 {
-                    addReadingBookFrame$,
+                    addOpenBook$,
                 },
                 CausalTree.init(`
           sentences
@@ -28,7 +28,7 @@ it("Generates wordCountRecords for a page", () => {
              ^
              |
              |
-    addReadingBookFrame$.next(mainPage)
+    addOpenBook$.next(mainPage)
     `, {
                     quizzingCard: {
                         learningLanguage: '今天'
@@ -36,7 +36,7 @@ it("Generates wordCountRecords for a page", () => {
                     mainPage: {
                         name: "Basic Doc"
                     },
-                    addReadingBookFrame$
+                    addOpenBook$
                 })
             )
     });

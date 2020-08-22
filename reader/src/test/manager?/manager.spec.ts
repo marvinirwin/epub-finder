@@ -3,6 +3,13 @@ import {CausalTree} from "../Graph/CausalTree";
 import {Website} from "../../lib/Website/Website";
 
 require('jest-localstorage-mock');
+['unhandledRejection', 'uncaughtException'].forEach(event => {
+    // @ts-ignore
+    process.on(event, (err: any) => {
+        console.error(err);
+    });
+});
+
 
 it("Loads the manager without error", () => {
     Run((
@@ -13,7 +20,7 @@ it("Loads the manager without error", () => {
                     quizzingCard$
                 },
                 bookFrameManager: {
-                    addReadingBookFrame$
+                    addOpenBook$
                 },
                 quizCharacterManager: {
                     exampleSentences$
@@ -28,7 +35,7 @@ it("Loads the manager without error", () => {
         scheduler
             .expectOrderings(
                 {
-                    addReadingBookFrame$,
+                    addOpenBook$,
                     quizzingCard$,
                     scheduledCards$: scheduledCards$.obs$,
                     exampleSentences$: exampleSentences$.obs$,
@@ -45,7 +52,7 @@ it("Loads the manager without error", () => {
              ^
              |
              |
-    addReadingBookFrame$.next(mainPage)
+    addOpenBook$.next(mainPage)
     `, {
                     sentences: [
                         '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,',
@@ -64,7 +71,7 @@ it("Loads the manager without error", () => {
                         "BasicDoc.html",
                         UnitTestGetPageSrc
                     ),
-                    addReadingBookFrame$
+                    addOpenBook$
                 })
             )
     });

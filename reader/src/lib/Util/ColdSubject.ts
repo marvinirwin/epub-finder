@@ -8,6 +8,5 @@ export class ColdSubject<T> {
         this.obs$ = this.addObservable$.pipe(
             mergeAll(),
         );
-
     }
 }

@@ -35,7 +35,10 @@ export class BookFrame {
                     .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
                     .join('\n');
             }),
-        )
+        );
+        this.renderer.atomizedSentences$.obs$.subscribe(() => {
+            console.log();
+        })
         this.renderer.srcDoc$.next(srcDoc);
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text
