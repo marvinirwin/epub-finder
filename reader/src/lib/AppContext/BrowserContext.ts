@@ -1,7 +1,7 @@
-import {BrowserAudio} from "../Audio/BrowserAudio";
-import {WorkerAtomize} from "./WorkerAtomize";
+import {AudioSourceBrowser} from "../Audio/AudioSourceBrowser";
+import {getPageRendererWorker} from "./GetPageRendererWorker";
 
 export class BrowserContext {
-    audioSource = new BrowserAudio();
-    getPageRenderer = WorkerAtomize;
+    audioSource = new AudioSourceBrowser();
+    getPageRenderer = getPageRendererWorker;
 }

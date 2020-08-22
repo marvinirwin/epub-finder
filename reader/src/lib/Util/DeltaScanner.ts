@@ -1,5 +1,5 @@
 import {Observable, Subject} from "rxjs";
-import {scan, tap} from "rxjs/operators";
+import {scan} from "rxjs/operators";
 import {uniq} from "lodash";
 
 export type ds_Dict<T, U extends string = string> = {
@@ -85,15 +85,14 @@ export class DeltaScanner<T, U extends string = string> {
         this.updates$ = this.appendDelta$.pipe(
             // @ts-ignore
             scan((scan: DeltaScan<T, U> | undefined, delta: ds_Tree<T, U>) => {
-                    if (!scan) return {
-                        sourced: delta,
-                        delta
-                    } as DeltaScan<T, U>;
-
-                    const newSourced = applyTreeDiff(scan.sourced, delta);
+                    if (!scan)
+                        return {
+                            sourced: delta,
+                            delta
+                        } as DeltaScan<T, U>;
 
                     return {
-                        sourced: newSourced,
+                        sourced: applyTreeDiff(scan.sourced, delta),
                         previousTree: scan.sourced,
                         delta
                     } as DeltaScan<T, U>;
@@ -127,10 +126,11 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
             )
     );
     if (node.hasOwnProperty('value')) {
+        let value = mapFunc(node.value as T);
         return {
             nodeLabel: node.nodeLabel,
             children: newChildren,
-            value: mapFunc(node.value as T)
+            value: value
         }
     } else {
         // @ts-ignore

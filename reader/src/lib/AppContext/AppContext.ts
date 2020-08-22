@@ -1,5 +1,5 @@
 import {AudioSource} from "../Audio/AudioSource";
-import {WorkerAtomize} from "./WorkerAtomize";
+import {getPageRendererWorker} from "./GetPageRendererWorker";
 import {Observable} from "rxjs";
 import {BookFrame} from "../BookFrame/BookFrame";
 import {Website} from "../Website/Website";

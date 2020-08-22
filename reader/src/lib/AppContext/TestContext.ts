@@ -1,7 +1,3 @@
 import {UnitTestAudio} from "../Audio/UnitTestAudio";
-import {UnitTestAtomize} from "./UnitTestAtomize";
+import {UnitTestGetPageRenderer} from "./UnitTestGetPageRenderer";
 
-export class TestContext {
-    audioSource = new UnitTestAudio('YEET');
-    getPageRenderer = UnitTestAtomize;
-}

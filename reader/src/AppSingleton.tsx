@@ -1,14 +1,14 @@
 import {Manager} from "./lib/Manager";
 import {MyAppDatabase} from "./lib/Storage/AppDB";
-import {BrowserAudio} from "./lib/Audio/BrowserAudio";
-import {WorkerAtomize} from "./lib/AppContext/WorkerAtomize";
-import {getSrcHttp, Website} from "./lib/Website/Website";
+import {AudioSourceBrowser} from "./lib/Audio/AudioSourceBrowser";
+import {getPageRendererWorker} from "./lib/AppContext/GetPageRendererWorker";
+import {getPageSrcHttp, Website} from "./lib/Website/Website";
 
 export function getManager(mode: string): Manager {
     const m = new Manager(new MyAppDatabase(), {
-        audioSource: new BrowserAudio(),
-        getPageRenderer: WorkerAtomize,
-        getPageSrc: getSrcHttp
+        audioSource: new AudioSourceBrowser(),
+        getPageRenderer: getPageRendererWorker,
+        getPageSrc: getPageSrcHttp
     });
 
     let websites = [];
@@ -23,7 +23,7 @@ export function getManager(mode: string): Manager {
     }
     websites.forEach(filename => {
 
-        m.bookFrameManager.addReadingBookFrame$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getSrcHttp))
+        m.bookFrameManager.addReadingBookFrame$.next(new Website(filename, `${process.env.PUBLIC_URL}/books/${filename}`, getPageSrcHttp))
     })
     return m;
 }

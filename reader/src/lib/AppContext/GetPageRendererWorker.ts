@@ -7,7 +7,7 @@ import {Website} from "../Website/Website";
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 import {BookFrameRendererIFrame} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
 
-export function WorkerAtomize(page: Website): Observable<BookFrame> {
+export function getPageRendererWorker(page: Website): Observable<BookFrame> {
     return from(new Promise<BookFrame>(async resolve => {
         const documentProcessingWorker = new AtomizeUrl();
         const document = await GetWorkerResults(documentProcessingWorker, page.url);

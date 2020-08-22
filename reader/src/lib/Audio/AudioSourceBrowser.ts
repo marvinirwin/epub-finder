@@ -6,7 +6,7 @@ import {AudioSource} from "./AudioSource";
 
 let AZURE_SPEECH_REGION = 'westus2' as string;
 
-export class BrowserAudio implements AudioSource{
+export class AudioSourceBrowser implements AudioSource{
     public isRecording$ = new ReplaySubject<boolean>(1);
     public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();

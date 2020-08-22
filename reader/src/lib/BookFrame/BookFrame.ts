@@ -33,7 +33,9 @@ export class BookFrame {
         this.srcDoc$.next(srcDoc);
         this.id = name;
         this.text$ = this.renderer.atomizedSentences$.pipe(
-            map(atomizedSentences => Object.values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText).join('\n')),
+            map(atomizedSentences => {
+                return Object.values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText).join('\n');
+            }),
         )
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text

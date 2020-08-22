@@ -11,8 +11,8 @@ export class BookFrameRendererInMemory extends BookFrameRenderer {
                 // The documentation doesn't say anything about getElementsByClassName
                 // However i Use it in unit tests, and it apparently works?
                 const atomizedSentenceElements = doc.getAtomizedSentences();
-                return doc.getAtomizedSentences();
+                return Object.fromEntries(doc.getAtomizedSentences().map(sentence => [sentence.translatableText, sentence]));
             })
-        )
+        ).subscribe(this.atomizedSentences$);
     }
 }

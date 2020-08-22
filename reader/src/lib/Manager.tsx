@@ -228,13 +228,13 @@ export class Manager {
                     case NavigationPages.READING_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: getElementByKeyPath(sourced, ['readingPages']) as BookFrame
+                            value: getElementByKeyPath(sourced, ['readingFrames']) as BookFrame
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: getElementByKeyPath(sourced, ['characterPage'])
+                            value: getElementByKeyPath(sourced, ['characterPageFrame'])
                         })
                         break;
                 }

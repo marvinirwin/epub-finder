@@ -1,5 +1,6 @@
-import {Run} from "../Util/Run";
+import {Run, UnitTestGetPageSrc} from "../Util/Run";
 import {CausalTree} from "../Graph/CausalTree";
+import {Website} from "../../lib/Website/Website";
 
 require('jest-localstorage-mock');
 
@@ -58,15 +59,14 @@ it("Loads the manager without error", () => {
                     quizzingCard: {
                         learningLanguage: '今天'
                     },
-                    mainPage: {
-                        name: "Basic Doc"
-                    },
+                    mainPage: new Website(
+                        "Basic Doc",
+                        "BasicDoc.html",
+                        UnitTestGetPageSrc
+                    ),
                     addReadingBookFrame$
                 })
             )
     });
 });
 
-it('Loads a page, which creates new cards, which makes a quizItem, which fetches sentences for itself', () => {
-
-})

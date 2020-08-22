@@ -11,7 +11,7 @@ export class Website {
     }
 }
 
-export function getSrcHttp(url: string): Observable<string> {
+export function getPageSrcHttp(url: string): Observable<string> {
     return from(new Promise<string>(resolve => {
         const oReq = new XMLHttpRequest();
         oReq.addEventListener("load", response => {
