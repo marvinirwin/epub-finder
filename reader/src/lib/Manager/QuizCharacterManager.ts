@@ -1,13 +1,9 @@
 import {ColdSubject} from "../Util/ColdSubject";
 import {ReplaySubject, Subject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {filter, scan, withLatestFrom} from "rxjs/operators";
-import {BookFrame} from "../BookFrame/BookFrame";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {Frame} from "../BookFrame/Frame";
-import {BookFrameRendererIFrame} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
-import {DeltaScan, ds_Dict, getDeletedValues} from "../Util/DeltaScanner";
+import {OpenBook} from "../BookFrame/OpenBook";
+import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
+import {DeltaScan, ds_Dict} from "../Util/DeltaScanner";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -42,10 +38,10 @@ export class QuizCharacterManager {
     exampleSentences$ = new ColdSubject<DeltaScan<string>>();
     learningLanguage$ = new Subject<string | undefined>();
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
-    public bookFrame = new BookFrame(
+    public bookFrame = new OpenBook(
         getSrc([]),
         'character_translation',
-        new BookFrameRendererIFrame()
+        new IFrameBookRenderer()
     );
 
     constructor() {

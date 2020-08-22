@@ -33,7 +33,7 @@ import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
-import {BookFrame} from "./BookFrame/BookFrame";
+import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
 import {DeltaScanner, getElementByKeyPath} from "./Util/DeltaScanner";
 
@@ -87,7 +87,7 @@ export class Manager {
 
     highlightedPinyin$: Observable<string>;
 
-    characterPageFrame$ = new Subject<BookFrame>();
+    characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
@@ -228,7 +228,7 @@ export class Manager {
                     case NavigationPages.READING_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: getElementByKeyPath(sourced, ['readingFrames']) as BookFrame
+                            value: getElementByKeyPath(sourced, ['readingFrames']) as OpenBook
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:

@@ -1,4 +1,4 @@
-import {BookFrameRenderer} from "./BookFrameRenderer";
+import {BookRenderer} from "./BookRenderer";
 import {switchMap, withLatestFrom} from "rxjs/operators";
 import {printExecTime} from "../../Util/Timer";
 import {InputManager} from "../../Manager/InputManager";
@@ -7,7 +7,7 @@ import {ANNOTATE_AND_TRANSLATE} from "../../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 import {Frame} from "../Frame";
 
-export class BookFrameRendererIFrame extends BookFrameRenderer {
+export class IFrameBookRenderer extends BookRenderer {
     constructor() {
         super();
         this.srcDoc$.pipe(

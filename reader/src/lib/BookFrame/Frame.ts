@@ -2,7 +2,7 @@ import {sleep} from "../Util/Util";
 import {Observable, ReplaySubject} from "rxjs";
 import {switchMap} from "rxjs/operators";
 import $ from "jquery";
-import {appendBookFrameStyle} from "./AppendBookFrameStyle";
+import {appendBookStyle} from "./AppendBookStyle";
 
 export type IFrameReturnValue = { iframe: HTMLIFrameElement; body: HTMLBodyElement };
 
@@ -20,7 +20,7 @@ export class Frame {
             switchMap(async containerRef => {
                 const iframe = await this.createIFrame(containerRef);
                 const body = $(iframe).contents().find('body')[0];
-                appendBookFrameStyle(body.ownerDocument as Document);
+                appendBookStyle(body.ownerDocument as Document);
                 return {iframe, body};
             })
         )

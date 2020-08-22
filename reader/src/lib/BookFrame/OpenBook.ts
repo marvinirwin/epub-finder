@@ -8,25 +8,25 @@ import {TrieWrapper} from "../TrieWrapper";
 import {ColdSubject} from "../Util/ColdSubject";
 import {TextWordData} from "../Atomized/TextWordData";
 import {DeltaScanner} from "../Util/DeltaScanner";
-import {BookFrameRenderer} from "./Renderer/BookFrameRenderer";
+import {BookRenderer} from "./Renderer/BookRenderer";
 import {Frame} from "./Frame";
-import {BookFrameRendererIFrame} from "./Renderer/BookFrameRendererInIFrame";
+import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 
 
-export class BookFrame {
+export class OpenBook {
     public frame = new Frame();
 
     // This shouldn't be an observable, right?
     public id: string;
     public text$: Observable<string>;
-    public wordCountRecords$ = new Subject<IWordCountRow[]>();
+    public wordCountRecords$ = new ReplaySubject<IWordCountRow[]>(1);
     public trie = new ColdSubject<TrieWrapper>();
     public textData$: Observable<TextWordData>;
 
     constructor(
         srcDoc: string,
         public name: string,
-        public renderer: BookFrameRenderer
+        public renderer: BookRenderer
     ) {
         this.id = name;
         this.text$ = this.renderer.atomizedSentences$.obs$.pipe(
@@ -35,6 +35,7 @@ export class BookFrame {
                     .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
                     .join('\n');
             }),
+            shareReplay(1)
         );
         this.renderer.atomizedSentences$.obs$.subscribe(() => {
             console.log();

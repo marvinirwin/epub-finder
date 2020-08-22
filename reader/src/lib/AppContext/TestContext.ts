@@ -1,3 +1,3 @@
 import {UnitTestAudio} from "../Audio/UnitTestAudio";
-import {UnitTestGetPageRenderer} from "./UnitTestGetPageRenderer";
+import {UnitTestGetBookRenderer} from "./UnitTestGetPageRenderer";
 

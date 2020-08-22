@@ -1,13 +1,13 @@
 import {Manager} from "./lib/Manager";
 import {MyAppDatabase} from "./lib/Storage/AppDB";
 import {AudioSourceBrowser} from "./lib/Audio/AudioSourceBrowser";
-import {getPageRendererWorker} from "./lib/AppContext/GetPageRendererWorker";
+import {WorkerGetBookRenderer} from "./lib/AppContext/WorkerGetBookRenderer";
 import {getPageSrcHttp, Website} from "./lib/Website/Website";
 
 export function getManager(mode: string): Manager {
     const m = new Manager(new MyAppDatabase(), {
         audioSource: new AudioSourceBrowser(),
-        getPageRenderer: getPageRendererWorker,
+        getPageRenderer: WorkerGetBookRenderer,
         getPageSrc: getPageSrcHttp
     });
 

@@ -9,7 +9,7 @@ import {SettingsPage} from "./Pages/SettingsPage";
 import {FrameContainer} from "./Frame/FrameContainer";
 import {Dictionary, flatten} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
-import {BookFrame} from "../lib/BookFrame/BookFrame";
+import {OpenBook} from "../lib/BookFrame/OpenBook";
 import {NavigationPages} from "../lib/Util/Util";
 import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
 import {useObservable, useObservableState} from "observable-hooks";
@@ -60,7 +60,7 @@ export function Main({m}: { m: Manager }) {
         m.inputManager.applyListeners(document.body);
     }, [m]);
 
-    const [allBookFrames] = useObservableState<BookFrame[]>(
+    const [allBookFrames] = useObservableState<OpenBook[]>(
         () => m.bookFrameManager
             .openedBooks
             .updates$

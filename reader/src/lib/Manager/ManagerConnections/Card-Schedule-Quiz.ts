@@ -31,5 +31,8 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
         s.wordQuizList$.pipe(
             resolveICardForWords(c.cardIndex$),
         )
-    )
+    );
+    q.scheduledCards$.obs$.subscribe(args => {
+        console.log();
+    })
 }

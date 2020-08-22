@@ -2,7 +2,7 @@ import {Manager} from "../../lib/Manager";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {UnitTestAudio} from "../../lib/Audio/UnitTestAudio";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
-import {UnitTestGetPageRenderer} from "../../lib/AppContext/UnitTestGetPageRenderer";
+import {UnitTestGetBookRenderer} from "../../lib/AppContext/UnitTestGetBookRenderer";
 import {of} from "rxjs";
 import * as fs from "fs";
 import {join} from "path";
@@ -38,7 +38,7 @@ export function Run(cb: (r: RunArguments) => void) {
             new MyAppDatabase(),
             {
                 audioSource: new UnitTestAudio("YEET"),
-                getPageRenderer: UnitTestGetPageRenderer,
+                getPageRenderer: UnitTestGetBookRenderer,
                 getPageSrc: UnitTestGetPageSrc
             }
         );

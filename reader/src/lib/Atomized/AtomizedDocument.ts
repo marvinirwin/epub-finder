@@ -157,7 +157,6 @@ export class AtomizedDocument {
     }
 
     createMarksUnderLeaves(textNodes: Element[]) {
-        const body = (this.document.getElementsByTagName("body"))[0];
         for (let i = 0; i < textNodes.length; i++) {
             this.makeTextNodeRehydratable(textNodes[i]);
         }

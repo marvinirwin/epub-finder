@@ -12,7 +12,7 @@ import {combineLatest, Observable} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
-import {BookFrame} from "../../lib/BookFrame/BookFrame";
+import {OpenBook} from "../../lib/BookFrame/OpenBook";
 import {FrameContainer} from "../Frame/FrameContainer";
 import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";

@@ -1,6 +1,6 @@
 import {combineLatest, Observable, Subject} from "rxjs";
 import {map, shareReplay, switchMap, tap} from "rxjs/operators";
-import {BookFrame} from "../BookFrame/BookFrame";
+import {OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {BookFrameManagerConfig} from "./BookFrameManager/BookFrameManagerConfig";
@@ -9,7 +9,7 @@ import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanne
 
 
 export class OpenBookManager {
-    openedBooks = new DeltaScanner<BookFrame, 'characterPageFrame' | 'readingFrames' | string>();
+    openedBooks = new DeltaScanner<OpenBook, 'characterPageFrame' | 'readingFrames' | string>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
     addOpenBook$ = new Subject<Website>();
 
@@ -32,11 +32,16 @@ export class OpenBookManager {
                 })
             });
 
-        let deltaScanner = this.openedBooks.mapWith((bookFrame: BookFrame) => bookFrame.renderer.atomizedSentences$.obs$);
+        let deltaScanner = this.openedBooks.mapWith((bookFrame: OpenBook) => bookFrame.renderer.atomizedSentences$.obs$);
 
         this.atomizedSentences$ = deltaScanner.updates$.pipe(
             switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {
-                return combineLatest(sourced ? flattenTree(sourced) : []).pipe(
+                let sources = sourced ? flattenTree(sourced) : [];
+                let observable = combineLatest(sources);
+                observable.subscribe(args => {
+                    console.log();
+                })
+                return observable.pipe(
                     tap(() => {
                         console.log();
                     })
@@ -48,9 +53,13 @@ export class OpenBookManager {
             ),
             shareReplay(1)
         );
+        this.extracted();
+        console.log();
+    }
 
+    private extracted() {
         this.atomizedSentences$.subscribe(() => {
             console.log();
-        })
+        });
     }
 }

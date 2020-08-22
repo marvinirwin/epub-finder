@@ -1,7 +1,7 @@
 import {AudioSourceBrowser} from "../Audio/AudioSourceBrowser";
-import {getPageRendererWorker} from "./GetPageRendererWorker";
+import {WorkerGetBookRenderer} from "./WorkerGetBookRenderer";
 
 export class BrowserContext {
     audioSource = new AudioSourceBrowser();
-    getPageRenderer = getPageRendererWorker;
+    getPageRenderer = WorkerGetBookRenderer;
 }

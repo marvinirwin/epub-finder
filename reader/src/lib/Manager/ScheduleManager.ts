@@ -4,7 +4,7 @@ import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {map, scan, withLatestFrom} from "rxjs/operators";
+import {map, scan, share, shareReplay, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
@@ -89,7 +89,8 @@ export class ScheduleManager {
             map(dict => {
                     return orderBy(Object.values(dict), ['orderValue'], ['desc']);
                 }
-            )
+            ),
+            shareReplay(1)
         )
 
         this.wordCountDict$.pipe(scan((oldCounts: Dictionary<number>, newCounts) => {
@@ -113,17 +114,20 @@ export class ScheduleManager {
 
 
         this.learningCards$ = this.sortedScheduleRows$.pipe(
-            map(rows => rows.filter(row => row.learning()))
+            map(rows => rows.filter(row => row.learning())),
+            shareReplay(1)
         )
         this.newCards$ = this.sortedScheduleRows$.pipe(
             map(rows => {
                 return rows.filter(row => {
                     return row.new();
                 });
-            })
+            }),
+            shareReplay(1)
         )
         this.toReviewCards$ = this.sortedScheduleRows$.pipe(
-            map(rows => rows.filter(row => row.toReview()))
+            map(rows => rows.filter(row => row.toReview())),
+            shareReplay(1)
         )
 
         // First take from the learning
@@ -134,17 +138,20 @@ export class ScheduleManager {
             this.learningCards$,
             this.toReviewCards$,
             this.newCards$
-        ]).pipe(map(([c1, c2, c3]): string[] => {
-
-            const learningCardsRequired = LEARNING_CARDS_LIMIT - (c1.length + c2.length);
-            if (learningCardsRequired > 0) {
-                let scheduleRows = c3.slice(learningCardsRequired);
-                return shuffle([
-                    ...c1, ...c2, ...scheduleRows
-                ]).map(r => r.word);
-            }
-            return [...c1, ...c2, ...c3].map(r => r.word);
-        }));
+        ]).pipe(
+            map(([c1, c2, c3]): string[] => {
+                    const learningCardsRequired = LEARNING_CARDS_LIMIT - (c1.length + c2.length);
+                    if (learningCardsRequired > 0) {
+                        let scheduleRows = c3.slice(learningCardsRequired);
+                        return shuffle([
+                            ...c1, ...c2, ...scheduleRows
+                        ]).map(r => r.word);
+                    }
+                    return [...c1, ...c2, ...c3].map(r => r.word);
+                }
+            ),
+            shareReplay(1)
+        );
 
         this.loadRecognitionRows();
     }

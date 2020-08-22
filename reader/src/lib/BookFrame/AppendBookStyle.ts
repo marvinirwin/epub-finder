@@ -1,4 +1,4 @@
-export const appendBookFrameStyle = (document: Document) => {
+export const appendBookStyle = (document: Document) => {
     const innerText = `
         body {
         padding-top: 100px;

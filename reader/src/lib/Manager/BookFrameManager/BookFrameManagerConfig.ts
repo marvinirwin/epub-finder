@@ -1,7 +1,7 @@
 import {Website} from "../../Website/Website";
 import {Observable} from "rxjs";
-import {BookFrame} from "../../BookFrame/BookFrame";
+import {OpenBook} from "../../BookFrame/OpenBook";
 
 export interface BookFrameManagerConfig {
-    getPageRenderer: (website: Website) => Observable<BookFrame>,
+    getPageRenderer: (website: Website) => Observable<OpenBook>,
 }

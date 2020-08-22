@@ -1,19 +1,19 @@
-import {BookFrame} from "../BookFrame/BookFrame";
+import {OpenBook} from "../BookFrame/OpenBook";
 import {Observable} from "rxjs";
 import {Website} from "../Website/Website";
 import {map} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from "xmldom";
-import {BookFrameRendererInMemory} from "../BookFrame/Renderer/BookFrameRendererInMemory";
+import {InMemoryBookRenderer} from "../BookFrame/Renderer/InMemoryBookRenderer";
 
-export function UnitTestGetPageRenderer(page: Website): Observable<BookFrame> {
+export function UnitTestGetBookRenderer(page: Website): Observable<OpenBook> {
     try {
         return page.getSrc(page.url).pipe(
             map(src => {
-                    return new BookFrame(
+                    return new OpenBook(
                         (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(src).document),
                         page.name,
-                        new BookFrameRendererInMemory()
+                        new InMemoryBookRenderer()
                     );
                 }
             )
