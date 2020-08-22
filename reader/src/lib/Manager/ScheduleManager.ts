@@ -4,7 +4,7 @@ import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {map, scan, share, shareReplay, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, map, scan, share, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
@@ -90,6 +90,7 @@ export class ScheduleManager {
                     return orderBy(Object.values(dict), ['orderValue'], ['desc']);
                 }
             ),
+            distinctUntilChanged((x, y) => x.length !== 0 ),
             shareReplay(1)
         )
 
@@ -126,7 +127,9 @@ export class ScheduleManager {
             shareReplay(1)
         )
         this.toReviewCards$ = this.sortedScheduleRows$.pipe(
-            map(rows => rows.filter(row => row.toReview())),
+            map(rows => {
+                return rows.filter(row => row.toReview());
+            }),
             shareReplay(1)
         )
 
@@ -139,17 +142,25 @@ export class ScheduleManager {
             this.toReviewCards$,
             this.newCards$
         ]).pipe(
-            map(([c1, c2, c3]): string[] => {
-                    const learningCardsRequired = LEARNING_CARDS_LIMIT - (c1.length + c2.length);
+            map(([learningCards, toReviewCards, newCards]): string[] => {
+                    const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
                     if (learningCardsRequired > 0) {
-                        let scheduleRows = c3.slice(learningCardsRequired);
-                        return shuffle([
-                            ...c1, ...c2, ...scheduleRows
-                        ]).map(r => r.word);
+                        let scheduleRows = newCards.slice(0, learningCardsRequired);
+                        if (newCards.length) {
+                            console.log();
+                        }
+                        let a = [
+                            ...learningCards, ...toReviewCards, ...(scheduleRows || [])
+                        ];
+                        let what = shuffle(a).map(r => r.word);
+                        return what;
                     }
-                    return [...c1, ...c2, ...c3].map(r => r.word);
+                    return [...learningCards, ...toReviewCards, ...newCards].map(r => r.word);
                 }
             ),
+            tap(args => {
+                console.log();
+            }),
             shareReplay(1)
         );
 
