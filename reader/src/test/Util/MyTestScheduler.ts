@@ -9,7 +9,7 @@ export class MyTestScheduler extends TestScheduler {
     expectOrderings(
         observables: {[key: string]: Observable<any>},
         causalTree: CausalTree,
-        maxLength: number = 50
+        maxLength: number = 1000
     ) {
         /**
          * The test scheduler ends when the last hot observable finishes

@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, uniq, flatten} from "lodash";
-import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, filter, map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -37,6 +37,7 @@ import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
 import {DeltaScanner, ds_Dict, flattenTree, getElementByKeyPath} from "./Util/DeltaScanner";
 import {ITrie} from "./Interfaces/Trie";
+import {RecordRequest} from "./Interfaces/RecordRequest";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -60,7 +61,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public bookFrameManager: OpenBookManager;
+    public openedBooksManager: OpenBookManager;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -95,7 +96,7 @@ export class Manager {
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
-        this.bookFrameManager = new OpenBookManager({getPageRenderer});
+        this.openedBooksManager = new OpenBookManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
         this.scheduleManager = new ScheduleManager(this.db);
@@ -105,17 +106,17 @@ export class Manager {
         this.progressManager = new ProgressManager();
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
-        InputPage(this.inputManager, this.bookFrameManager);
-        CardPage(this.cardManager, this.bookFrameManager);
+        InputPage(this.inputManager, this.openedBooksManager);
+        CardPage(this.cardManager, this.openedBooksManager);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardManager, this.bookFrameManager, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
         this.quizCharacterManager.quizzingCard$.addObservable$.next(this.quizManager.quizzingCard$);
 
         this.openBookSentenceData$ = this
-            .bookFrameManager
+            .openedBooksManager
             .openedBooks
             .mapWith(bookFrame => bookFrame
                 .renderer
@@ -160,13 +161,21 @@ export class Manager {
             }),
             shareReplay(1)
         );
-        const o = this.quizCharacterManager.exampleSentences.obs$;
         this.quizCharacterManager.exampleSentences.addObservable$.next(
             exampleSentences$
-        )
+        );
+
+        /**
+         * Maybe later I should only do this if I'm currently at the quiz page
+         */
+        this.quizManager.quizzingCard$.subscribe(quizzingCard => {
+            if (quizzingCard) {
+                this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(quizzingCard.learningLanguage));
+            }
+        });
 
         merge(
-            this.bookFrameManager.atomizedSentences$,
+            this.openedBooksManager.atomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
         ).subscribe(atomizedSentenceList => {
                 InputManager.applyAtomizedSentenceListeners(atomizedSentenceList);
@@ -180,7 +189,7 @@ export class Manager {
         const textData$ = combineLatest(
             [
                 this.cardManager.trie$,
-                this.bookFrameManager.atomizedSentences$.pipe(
+                this.openedBooksManager.atomizedSentences$.pipe(
                     filter(sentenceList => !!sentenceList.length)
                 )
             ]
@@ -273,27 +282,36 @@ export class Manager {
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 
-        this.bottomNavigationValue$
-            .pipe(withLatestFrom(
-                this.bookFrameManager.openedBooks.updates$,
-            ))
-            .subscribe(([bottomNavigationValue, {sourced}]) => {
-                if (!sourced) return;
-                switch (bottomNavigationValue) {
+        let source2 = this.openedBooksManager.openedBooks.updates$;
+        let op2 = withLatestFrom(
+            source2,
+        );
+        this.bottomNavigationValue$.pipe(
+            tap(() => {
+                console.log();
+            }),
+            op2,
+            tap(() => {
+                console.log();
+            }),
+        ).subscribe((x) => {
+                if (!x[1].sourced) return;
+                switch (x[0]) {
                     case NavigationPages.READING_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: getElementByKeyPath(sourced, ['readingFrames']) as OpenBook
+                            value: getElementByKeyPath(x[1].sourced, ['readingFrames']) as OpenBook
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: getElementByKeyPath(sourced, ['characterPageFrame'])
+                            value: getElementByKeyPath(x[1].sourced, ['characterPageFrame'])
                         })
                         break;
                 }
-            })
+            }
+        );
 
         this.cardManager.load();
     }

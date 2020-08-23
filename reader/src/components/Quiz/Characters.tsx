@@ -35,21 +35,6 @@ export function Characters({c, m}: QuizCardProps) {
         }
     };
 
-    /*
-        const bookFrame$ = useObservableState(useObservable((obs$: Observable<[string[]]>) =>
-            obs$.pipe(
-                filter(([strings]) => strings.length > 0),
-                map(([sentences]) => {
-                    sentences = sentences.slice(0, 10);
-                    return getSrc(sentences);
-                }),
-                switchMap(async (src: string) => {
-                    const atomizedSrc = await GetWorkerResults(new AtomizeSrcdoc(), src);
-                })
-            ), [sentences$])
-        );
-    */
-
     useEffect(() => {
         setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;

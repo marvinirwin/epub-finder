@@ -7,7 +7,6 @@ import {BookFrameManagerConfig} from "./BookFrameManager/BookFrameManagerConfig"
 import {flattenDeep} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
 
-
 export class OpenBookManager {
     openedBooks = new DeltaScanner<OpenBook, 'characterPageFrame' | 'readingFrames' | string>();
     atomizedSentences$: Observable<AtomizedSentence[]>;

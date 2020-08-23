@@ -1,6 +1,7 @@
 import {Run, UnitTestGetPageSrc} from "../Util/Run";
 import {CausalTree} from "../Graph/CausalTree";
 import {Website} from "../../lib/Website/Website";
+import {NavigationPages} from "../../lib/Util/Util";
 
 require('jest-localstorage-mock');
 ['unhandledRejection', 'uncaughtException'].forEach(event => {
@@ -19,7 +20,7 @@ it("Loads the manager without error", () => {
                     scheduledCards$,
                     quizzingCard$
                 },
-                bookFrameManager: {
+                openedBooksManager: {
                     addOpenBook$
                 },
                 quizCharacterManager: {
@@ -29,7 +30,12 @@ it("Loads the manager without error", () => {
                     addUnpersistedCards$,
                     trie$
                 },
-                openBookSentenceData$
+                audioManager: {
+                    audioRecorder: {
+                        recordRequest$
+                    }
+                },
+                bottomNavigationValue$
             },
             scheduler,
             helpers: {
@@ -44,35 +50,31 @@ it("Loads the manager without error", () => {
                     quizzingCard$,
                     scheduledCards$: scheduledCards$.obs$,
                     exampleSentences$: exampleSentences.obs$,
-                    addUnpersistedCards$,
-                    openBookSentenceData$,
-                    trie$
+                    recordRequest$,
+                    bottomNavigationValue$
                 },
                 CausalTree.init(`
-    sentences
+    bottomNavigationValue$.next(READING_PAGE)
         ^
-    scheduledCards
+    exampleSentences
         ^
     addOpenBook$.next(mainPage)
-    `, {
-                    sentences: [
-                        {translatableText: '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,'},
-                        {translatableText: '一二三四五六七八九十'}
-                    ],
-                    scheduledCards: [
+    `,
+                    {
+                    exampleSentences: [
                         {
-                            learningLanguage: '今天',
-                        }
+                            translatableText: '\n' +
+                                '    一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十'
+                        },
                     ],
-                    quizzingCard: {
-                        learningLanguage: '今天'
-                    },
                     mainPage: new Website(
                         "Basic Doc",
                         "BasicDoc.html",
                         UnitTestGetPageSrc
                     ),
-                    addOpenBook$
+                    addOpenBook$,
+                    bottomNavigationValue$,
+                    READING_PAGE: NavigationPages.READING_PAGE
                 })
             )
     });
