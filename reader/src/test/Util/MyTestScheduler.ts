@@ -95,9 +95,9 @@ export class MyTestScheduler extends TestScheduler {
             maxLengthObservable.subscribe(() => {});
         })
 
-        Object.entries(observables).forEach(([observableLabel, observable], index) => {
+        this.schedule(() => {
+            Object.entries(observables).forEach(([observableLabel, observable], index) => {
             // We're assuming for now that everyone subscribes at the start and never unsubscribes
-            this.schedule(() => {
                 observable.subscribe(x => {
                     let items = {
                         value: x,
@@ -133,10 +133,10 @@ export class MyTestScheduler extends TestScheduler {
                 // @ts-ignore
                 observable.observers && swapIndexes(observable.observers, 0, observable.observers.length - 1);
             }, 0);
-            this.schedule(() => {
-                executeSubscribersInTree();
-            }, 1)
         });
+        this.schedule(() => {
+            executeSubscribersInTree();
+        }, 1)
 
         // @ts-ignore
         this.flushTests.push(flushTest);

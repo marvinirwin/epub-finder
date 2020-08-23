@@ -144,22 +144,25 @@ export class Manager {
             )
         ;
 
-        this.quizCharacterManager.exampleSentences.addObservable$.next(
-            this.openBookSentenceData$.pipe(
-                withLatestFrom(this.quizManager.quizzingCard$),
-                map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
-                    if (!quizzingCard) return [];
-                    const limit = 10;
-                    const sentenceMatches: AtomizedSentence[] = [];
-                    for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                        const v = textWordData[i];
-                        if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                            sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
-                        }
+        let exampleSentences$ = this.openBookSentenceData$.pipe(
+            withLatestFrom(this.quizManager.quizzingCard$),
+            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                if (!quizzingCard) return [];
+                const limit = 10;
+                const sentenceMatches: AtomizedSentence[] = [];
+                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                    const v = textWordData[i];
+                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
                     }
-                    return sentenceMatches;
-                })
-            )
+                }
+                return sentenceMatches;
+            }),
+            shareReplay(1)
+        );
+        const o = this.quizCharacterManager.exampleSentences.obs$;
+        this.quizCharacterManager.exampleSentences.addObservable$.next(
+            exampleSentences$
         )
 
         merge(

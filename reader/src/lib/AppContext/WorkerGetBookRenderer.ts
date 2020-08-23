@@ -5,7 +5,7 @@ import {Website} from "../Website/Website";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
-import {IFrameBookRenderer} from "../BookFrame/Renderer/BookFrameRendererInIFrame";
+import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 
 export function WorkerGetBookRenderer(page: Website): Observable<OpenBook> {
     return from(new Promise<OpenBook>(async resolve => {
