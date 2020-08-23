@@ -37,7 +37,7 @@ it("Loads the manager without error", () => {
                 },
                 bottomNavigationValue$,
                 viewingFrameManager: {
-                    elementsInView$
+                    visibleWordElementMaps$
                 }
             },
             scheduler,
@@ -54,7 +54,8 @@ it("Loads the manager without error", () => {
                     scheduledCards$: scheduledCards$.obs$,
                     exampleSentences$: exampleSentences.obs$,
                     recordRequest$,
-                    bottomNavigationValue$
+                    bottomNavigationValue$,
+                    visibleWordElementMaps$
                 },
                 CausalTree.init(`
     bottomNavigationValue$.next(READING_PAGE)

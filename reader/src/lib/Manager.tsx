@@ -1,6 +1,6 @@
-import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, flatten, uniq} from "lodash";
-import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom, tap} from "rxjs/operators";
+import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -32,10 +32,10 @@ import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
+import {flattenTreeOfObservables, ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {ds_Dict, flattenTree, getElementByKeyPath} from "./Util/DeltaScanner";
+import {DeltaScan, ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
 import {ITrie} from "./Interfaces/Trie";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 
@@ -92,10 +92,10 @@ export class Manager {
     characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    openBookSentenceData$: Observable<TextWordData[]>;
+    readingBookSentenceData: Observable<TextWordData[]>;
 
 
-    constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
+    constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
         this.openedBooksManager = new OpenBookManager({getPageRenderer});
         this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
@@ -115,7 +115,7 @@ export class Manager {
 
         this.quizCharacterManager.quizzingCard$.addObservable$.next(this.quizManager.quizzingCard$);
 
-        this.openBookSentenceData$ = this
+        let openBookTextDataTree$ = this
             .openedBooksManager
             .openedBooks
             .mapWith(bookFrame => bookFrame
@@ -135,9 +135,42 @@ export class Manager {
                     ),
                     shareReplay(1)
                 )
-            )
+            );
+        let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
+            openBookTextDataTree$.updates$,
+            this.bottomNavigationValue$
+        ]).pipe(
+            switchMap(([{sourced}, bottomNavigationValue]) => {
+                if (!sourced?.children) {
+                    throw new Error("OpenedBooks has no tree, this should not happen")
+                }
+                switch(bottomNavigationValue) {
+                    case NavigationPages.READING_PAGE:
+                        return combineLatest(flattenTree(sourced.children['readingFrames']));
+                    case NavigationPages.QUIZ_PAGE:
+                        return combineLatest(flattenTree(sourced.children['characterPageFrame']));
+                    default:
+                        return combineLatest([]);
+                }
+            }),
+            shareReplay(1)
+        );
+
+        let visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>> = visibleOpenedBookData$.pipe(
+            map(flatten),
+            map(sentenceData =>
+                mergeDictArrays(...sentenceData.map(sentenceDatum => sentenceDatum.wordElementsMap))
+            ),
+            shareReplay(1)
+        );
+
+        this.readingBookSentenceData = openBookTextDataTree$
             .updates$.pipe(
-                switchMap(({sourced}) => combineLatest(sourced ? flattenTree<Observable<TextWordData[]>>(sourced) : [])),
+                switchMap(({sourced}) => {
+                    // I only want the tree from 'readingFrames'
+                    let readingFrames = sourced?.children?.['readingFrames'];
+                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : []);
+                }),
                 map((v: TextWordData[][]) => {
                     return flatten(v);
                 }),
@@ -145,7 +178,7 @@ export class Manager {
             )
         ;
 
-        let exampleSentences$ = this.openBookSentenceData$.pipe(
+        let exampleSentences$ = this.readingBookSentenceData.pipe(
             withLatestFrom(this.quizManager.quizzingCard$),
             map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
                 if (!quizzingCard) return [];
@@ -232,13 +265,13 @@ export class Manager {
         let previousHighlightedSentences: HTMLElement[] | undefined;
 
         this.highlightedWord$.pipe(debounceTime(10),
-            withLatestFrom(this.wordElementMap$))
-            .subscribe(([word, wordElementsMap]) => {
+            withLatestFrom(visibleElements$))
+            .subscribe(([word, wordElementsMaps]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
                     }
                     if (word) {
-                        let dictElement = wordElementsMap[word];
+                        let dictElement = wordElementsMaps[word];
                         previousHighlightedElements = dictElement?.map(annotatedEl => {
                             const html = annotatedEl.el as unknown as HTMLElement;
                             html.classList.add('highlighted');
@@ -291,12 +324,11 @@ export class Manager {
                 if (!sourced) return;
                 switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-/*
+                        const o: ds_Dict<ds_Tree<OpenBook>, string> = sourced.children as ds_Dict<ds_Tree<OpenBook>, string>;
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: elementByKeyPath as OpenBook
+                            value: Object.values(o)[0].value
                         })
-*/
                         break;
                     case NavigationPages.QUIZ_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({

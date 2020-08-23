@@ -11,6 +11,8 @@ export type ds_Tree<T, U extends string = string> = {
     children?: ds_Dict<ds_Tree<T, U>>
     nodeLabel: U | 'root';
     delete?: boolean;
+    // When applying a tree diff, you may want to say "Disregard all previous changes to this tree"
+    newTree?: boolean;
 }
 
 /**
@@ -20,10 +22,11 @@ export type ds_Tree<T, U extends string = string> = {
  * @param diffTree
  */
 function applyTreeDiff<T>(oldTree: ds_Tree<T> | undefined, diffTree: ds_Tree<T> | undefined): ds_Tree<T> | undefined {
-    if (!oldTree && !diffTree) throw new Error("Both trees cannot be undefined in applyTreeDiff");
+    if (!oldTree && !diffTree) return undefined;
     if (!oldTree) return diffTree;
     if (!diffTree) return oldTree;
     if (diffTree?.delete) return undefined;
+    if (diffTree.newTree) return diffTree;
     const allChildKeys = uniq(Object.keys(oldTree.children || {}).concat(Object.keys(diffTree.children || {})))
     const newChildren = Object.fromEntries(
         allChildKeys.map(key => {
@@ -74,18 +77,19 @@ export type InitDelta<T, U extends string = string> = {
 };
 
 export type DeltaScanMapFunc<T, U> = (v: T) => U;
+export type DeltaScanSubTreeFunc<T> = (v: ds_Tree<T>) => ds_Tree<T> | undefined;
 
 // Right now we over-write things in the map, perhaps we want to merge them
 export class DeltaScanner<T, U extends string = string> {
     // I dont think this needs to be a replaySubject, but lets see if this works
-    appendDelta$ = new ReplaySubject<ds_Tree<T, U>>(1);
+    appendDelta$ = new ReplaySubject<ds_Tree<T, U> | undefined>(1);
     updates$: Observable<DeltaScan<T, U>>;
 
     constructor() {
         // @ts-ignore
         this.updates$ = this.appendDelta$.pipe(
             // @ts-ignore
-            scan((scan: DeltaScan<T, U> | undefined, delta: ds_Tree<T, U>) => {
+            scan((scan: DeltaScan<T, U> | undefined, delta: ds_Tree<T, U> | undefined) => {
                     if (!scan)
                         return {
                             sourced: delta,
@@ -110,6 +114,21 @@ export class DeltaScanner<T, U extends string = string> {
             derivedTree.appendDelta$.next(
                 MapTree(delta, mapFunc)
             )
+        })
+        return derivedTree;
+    }
+
+    subTree(subTreeFunc: DeltaScanSubTreeFunc<T>): DeltaScanner<T> {
+        const derivedTree = new DeltaScanner<T>();
+        this.updates$.subscribe(({sourced}) => {
+            if (sourced) {
+                let newSubTree = subTreeFunc(sourced);
+                if (newSubTree) {
+                    newSubTree.newTree = true;
+                }
+                derivedTree.appendDelta$.next(newSubTree);
+            }
+            derivedTree.appendDelta$.next(sourced);
         })
         return derivedTree;
     }
