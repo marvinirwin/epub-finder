@@ -35,7 +35,10 @@ it("Loads the manager without error", () => {
                         recordRequest$
                     }
                 },
-                bottomNavigationValue$
+                bottomNavigationValue$,
+                viewingFrameManager: {
+                    elementsInView$
+                }
             },
             scheduler,
             helpers: {

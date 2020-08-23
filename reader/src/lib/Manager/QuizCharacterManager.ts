@@ -47,7 +47,7 @@ export class QuizCharacterManager {
         new IFrameBookRenderer()
     );
 
-    constructor(c: AppContext) {
+    constructor() {
         this.exampleSentences.obs$.pipe(
             map(sentences => getSrc(sentences.map(sentence => sentence.translatableText)))
         ).subscribe(this.exampleSentencesFrame.renderer.srcDoc$);

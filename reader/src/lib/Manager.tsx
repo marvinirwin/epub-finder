@@ -1,6 +1,6 @@
-import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, flatten, uniq} from "lodash";
-import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom, tap} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -282,25 +282,26 @@ export class Manager {
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 
-        this.bottomNavigationValue$.pipe(
-            withLatestFrom(this.openedBooksManager.openedBooks.updates$)
-        ).subscribe(
-            ([navigationValue, {sourced}]) => {
-                debugger;
+
+        combineLatest([
+            this.bottomNavigationValue$,
+            this.openedBooksManager.openedBooks.updates$,
+        ]).subscribe(
+            ([bottomNavigationValue, {sourced}]) => {
                 if (!sourced) return;
-                switch (navigationValue) {
+                switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-                        let elementByKeyPath = getElementByKeyPath(sourced, ['readingFrames']);
+/*
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
                             value: elementByKeyPath as OpenBook
                         })
+*/
                         break;
                     case NavigationPages.QUIZ_PAGE:
-                        let elementByKeyPath1 = getElementByKeyPath(sourced, ['characterPageFrame']);
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: elementByKeyPath1
+                            value: this.quizCharacterManager.exampleSentencesFrame
                         })
                         break;
                 }
