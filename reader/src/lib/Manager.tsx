@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary, uniq} from "lodash";
-import {debounceTime, filter, map, startWith, withLatestFrom} from "rxjs/operators";
+import {debounce, Dictionary, uniq, flatten} from "lodash";
+import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -35,7 +35,8 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {DeltaScanner, getElementByKeyPath} from "./Util/DeltaScanner";
+import {DeltaScanner, ds_Dict, flattenTree, getElementByKeyPath} from "./Util/DeltaScanner";
+import {ITrie} from "./Interfaces/Trie";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -90,6 +91,7 @@ export class Manager {
     characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
+    openBookSentenceData$: Observable<TextWordData[]>;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer, getPageSrc}: AppContext) {
@@ -109,6 +111,56 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardManager, this.bookFrameManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
+
+        this.quizCharacterManager.quizzingCard$.addObservable$.next(this.quizManager.quizzingCard$);
+
+        this.openBookSentenceData$ = this
+            .bookFrameManager
+            .openedBooks
+            .mapWith(bookFrame => bookFrame
+                .renderer
+                .atomizedSentences$
+                .obs$.pipe(
+                    withLatestFrom(this.cardManager.trie$),
+                    map(([sentences, trie]: [ds_Dict<AtomizedSentence>, ITrie]) => {
+                            let uniqueLengths: number[] = Object.keys(trie.getWords(false).reduce((acc: { [key: number]: number }, word) => {
+                                acc[word.length] = 1;
+                                return acc;
+                            }, {})).map(str => parseInt(str));
+                            return Object.entries(sentences).map(([sentenceStr, sentence]) =>
+                                sentence.getTextWordData(trie, uniqueLengths)
+                            );
+                        }
+                    ),
+                    shareReplay(1)
+                )
+            )
+            .updates$.pipe(
+                switchMap(({sourced}) => combineLatest(sourced ? flattenTree<Observable<TextWordData[]>>(sourced) : [])),
+                map((v: TextWordData[][]) => {
+                    return flatten(v);
+                }),
+                shareReplay(1)
+            )
+        ;
+
+        this.quizCharacterManager.exampleSentences.addObservable$.next(
+            this.openBookSentenceData$.pipe(
+                withLatestFrom(this.quizManager.quizzingCard$),
+                map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                    if (!quizzingCard) return [];
+                    const limit = 10;
+                    const sentenceMatches: AtomizedSentence[] = [];
+                    for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                        const v = textWordData[i];
+                        if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                            sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
+                        }
+                    }
+                    return sentenceMatches;
+                })
+            )
+        )
 
         merge(
             this.bookFrameManager.atomizedSentences$,

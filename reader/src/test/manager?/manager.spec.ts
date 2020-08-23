@@ -23,11 +23,13 @@ it("Loads the manager without error", () => {
                     addOpenBook$
                 },
                 quizCharacterManager: {
-                    exampleSentences$
+                    exampleSentences
                 },
                 cardManager: {
-                    addUnpersistedCards$
-                }
+                    addUnpersistedCards$,
+                    trie$
+                },
+                openBookSentenceData$
             },
             scheduler,
             helpers: {
@@ -41,21 +43,21 @@ it("Loads the manager without error", () => {
                     addOpenBook$,
                     quizzingCard$,
                     scheduledCards$: scheduledCards$.obs$,
-                    exampleSentences$: exampleSentences$.obs$,
-                    addUnpersistedCards$
+                    exampleSentences$: exampleSentences.obs$,
+                    addUnpersistedCards$,
+                    openBookSentenceData$,
+                    trie$
                 },
                 CausalTree.init(`
     sentences
-        ^
-    quizzingCard
         ^
     scheduledCards
         ^
     addOpenBook$.next(mainPage)
     `, {
                     sentences: [
-                        '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,',
-                        '一二三四五六七八九十'
+                        {translatableText: '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十,'},
+                        {translatableText: '一二三四五六七八九十'}
                     ],
                     scheduledCards: [
                         {

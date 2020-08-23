@@ -4,6 +4,7 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {DeltaScan, ds_Dict} from "../Util/DeltaScanner";
+import {ICard} from "../Interfaces/ICard";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -35,8 +36,8 @@ ${sentences.map(sentence => {
 }
 
 export class QuizCharacterManager {
-    exampleSentences$ = new ColdSubject<DeltaScan<string>>();
-    learningLanguage$ = new Subject<string | undefined>();
+    exampleSentences = new ColdSubject<AtomizedSentence[]>();
+    quizzingCard$ = new ColdSubject<ICard | undefined>();
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
     public bookFrame = new OpenBook(
         getSrc([]),
@@ -45,10 +46,16 @@ export class QuizCharacterManager {
     );
 
     constructor() {
+        let obs$ = this.exampleSentences.obs$;
         /**
          * If we have a learningLanguage, and have less than 10 sentences
          * I want to hear about deltas in the sentenceMap about my word to see if there are new ones
          */
+/*
+        obs$.subscribe(args => {
+            console.log();
+        })
+*/
 /*
         this.exampleSentences$.obs$.pipe(
             withLatestFrom(

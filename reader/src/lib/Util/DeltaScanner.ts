@@ -1,5 +1,5 @@
-import {Observable, Subject} from "rxjs";
-import {scan} from "rxjs/operators";
+import {Observable, ReplaySubject, Subject} from "rxjs";
+import {scan, shareReplay} from "rxjs/operators";
 import {uniq} from "lodash";
 
 export type ds_Dict<T, U extends string = string> = {
@@ -77,7 +77,8 @@ export type DeltaScanMapFunc<T, U> = (v: T) => U;
 
 // Right now we over-write things in the map, perhaps we want to merge them
 export class DeltaScanner<T, U extends string = string> {
-    appendDelta$ = new Subject<ds_Tree<T, U>>();
+    // I dont think this needs to be a replaySubject, but lets see if this works
+    appendDelta$ = new ReplaySubject<ds_Tree<T, U>>(1);
     updates$: Observable<DeltaScan<T, U>>;
 
     constructor() {
@@ -99,6 +100,7 @@ export class DeltaScanner<T, U extends string = string> {
                 },
                 undefined
             ),
+            shareReplay(1)
         )
     }
 
