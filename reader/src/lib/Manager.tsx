@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary, uniq, flatten} from "lodash";
-import {debounceTime, filter, map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {debounce, Dictionary, flatten, uniq} from "lodash";
+import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -35,7 +35,7 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {DeltaScanner, ds_Dict, flattenTree, getElementByKeyPath} from "./Util/DeltaScanner";
+import {ds_Dict, flattenTree, getElementByKeyPath} from "./Util/DeltaScanner";
 import {ITrie} from "./Interfaces/Trie";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 
@@ -182,7 +182,7 @@ export class Manager {
             }
         )
 
-        this.quizCharacterManager.bookFrame.frame.iframe$.subscribe(({iframe, body}) => {
+        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe(({iframe, body}) => {
             this.inputManager.applyListeners(body);
         });
 
@@ -282,31 +282,25 @@ export class Manager {
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 
-        let source2 = this.openedBooksManager.openedBooks.updates$;
-        let op2 = withLatestFrom(
-            source2,
-        );
         this.bottomNavigationValue$.pipe(
-            tap(() => {
-                console.log();
-            }),
-            op2,
-            tap(() => {
-                console.log();
-            }),
-        ).subscribe((x) => {
-                if (!x[1].sourced) return;
-                switch (x[0]) {
+            withLatestFrom(this.openedBooksManager.openedBooks.updates$)
+        ).subscribe(
+            ([navigationValue, {sourced}]) => {
+                debugger;
+                if (!sourced) return;
+                switch (navigationValue) {
                     case NavigationPages.READING_PAGE:
+                        let elementByKeyPath = getElementByKeyPath(sourced, ['readingFrames']);
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: "root",
-                            value: getElementByKeyPath(x[1].sourced, ['readingFrames']) as OpenBook
+                            value: elementByKeyPath as OpenBook
                         })
                         break;
                     case NavigationPages.QUIZ_PAGE:
+                        let elementByKeyPath1 = getElementByKeyPath(sourced, ['characterPageFrame']);
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: getElementByKeyPath(x[1].sourced, ['characterPageFrame'])
+                            value: elementByKeyPath1
                         })
                         break;
                 }

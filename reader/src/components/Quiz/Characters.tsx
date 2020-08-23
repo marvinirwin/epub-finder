@@ -70,8 +70,8 @@ export function Characters({c, m}: QuizCardProps) {
             </div>
             <div style={{flexGrow: 1, width: '100%'}}>
                 {
-                    m.quizCharacterManager.bookFrame
-                    && <FrameContainer rb={m.quizCharacterManager.bookFrame} m={m}/>
+                    m.quizCharacterManager.exampleSentencesFrame
+                    && <FrameContainer rb={m.quizCharacterManager.exampleSentencesFrame} m={m}/>
                 }
             </div>
         </CardContent>
