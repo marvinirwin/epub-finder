@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, flatten} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -156,9 +156,11 @@ export class Manager {
                 }
                 switch(bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-                        return combineLatest(flattenTree(sourced.children['readingFrames']));
+                        let child = sourced.children['readingFrames'];
+                        return combineLatest(child ? flattenTree(child) : []);
                     case NavigationPages.QUIZ_PAGE:
-                        return combineLatest(flattenTree(sourced.children['characterPageFrame']));
+                        let child1 = sourced.children['characterPageFrame'];
+                        return combineLatest(child1 ? flattenTree(child1) : []);
                     default:
                         return combineLatest([]);
                 }
@@ -187,24 +189,23 @@ export class Manager {
                 shareReplay(1)
             );
 
-        let exampleSentences$ = this.readingBookSentenceData$.pipe(
-            withLatestFrom(this.quizManager.quizzingCard$),
-            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
-                if (!quizzingCard) return [];
-                const limit = 10;
-                const sentenceMatches: AtomizedSentence[] = [];
-                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                    const v = textWordData[i];
-                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
-                    }
-                }
-                return sentenceMatches;
-            }),
-            shareReplay(1)
-        );
         this.quizCharacterManager.exampleSentences.addObservable$.next(
-            exampleSentences$
+            this.readingBookSentenceData$.pipe(
+                withLatestFrom(this.quizManager.quizzingCard$),
+                map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                    if (!quizzingCard) return [];
+                    const limit = 10;
+                    const sentenceMatches: AtomizedSentence[] = [];
+                    for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                        const v = textWordData[i];
+                        if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                            sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
+                        }
+                    }
+                    return sentenceMatches;
+                }),
+                shareReplay(1)
+            )
         );
 
         /**

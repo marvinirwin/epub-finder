@@ -15,6 +15,7 @@ export class IFrameBookRenderer extends BookRenderer {
                 switchMap(frame => frame.iframe$)
             )),
             switchMap(async ([srcDoc, frame]) => {
+                debugger;
                 await Frame.SetIFrameSource(frame.iframe, srcDoc);
                 const sentences = printExecTime("Rehydration", () => this.rehydratePage(frame.body.ownerDocument as HTMLDocument));
                 InputManager.applyAtomizedSentenceListeners(sentences);

@@ -167,6 +167,9 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
 }
 
 export function flattenTree<T>(tree: ds_Tree<T>, a: T[] = []): T[] {
+    if (!tree) {
+        debugger;
+    }
     if (tree.hasOwnProperty('value')) {
         if (!tree.value) {
             debugger;
