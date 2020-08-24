@@ -20,8 +20,6 @@ export class Frame {
             switchMap(async containerRef => {
                 const iframe = await this.createIFrame(containerRef);
                 const body = $(iframe).contents().find('body')[0];
-                appendBookStyle(body.ownerDocument as Document);
-                debugger;
                 return {iframe, body};
             }),
             shareReplay(1)

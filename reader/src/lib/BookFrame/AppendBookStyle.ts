@@ -1,4 +1,4 @@
-export const appendBookStyle = (document: Document) => {
+export const appendBookStyle = (d: Document) => {
     const innerText = `
         body {
         padding-top: 100px;
@@ -69,7 +69,8 @@ export const appendBookStyle = (document: Document) => {
         
     }`;
 
-    const el = document.createElement('style');
+    const el = d.createElement('style');
+    debugger;
     el.innerText = innerText;
-    document.body.appendChild(el);
+    d.body.appendChild(el);
 }

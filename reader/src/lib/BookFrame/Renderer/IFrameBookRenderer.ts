@@ -7,6 +7,7 @@ import {ANNOTATE_AND_TRANSLATE} from "../../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 import {Frame} from "../Frame";
 import {combineLatest} from "rxjs";
+import {appendBookStyle} from "../AppendBookStyle";
 
 export class IFrameBookRenderer extends BookRenderer {
     constructor() {
@@ -15,15 +16,15 @@ export class IFrameBookRenderer extends BookRenderer {
             this.srcDoc$,
             this.frame$.obs$.pipe(
                 switchMap(frame => {
-                    debugger;
                     return frame.iframe$;
                 }),
             )
         ]).subscribe(async ([srcDoc, frame]) => {
-            debugger;
             await Frame.SetIFrameSource(frame.iframe, srcDoc);
             const sentences = printExecTime("Rehydration", () => this.rehydratePage(frame.body.ownerDocument as HTMLDocument));
             InputManager.applyAtomizedSentenceListeners(sentences);
+            debugger;
+            appendBookStyle(frame.body.ownerDocument as Document);
         });
     }
 
