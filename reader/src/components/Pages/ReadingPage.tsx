@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function SlidingTopWindows({m}: { m: Manager }) {
-    const editingCard = useObservableState(m.editingCardManager.editingCard);
+    const editingCard = useObservableState(m.editingCardManager.editingCard$);
     const showEditingCard = useObservableState(m.editingCardManager.showEditingCardPopup$);
     // const recordingRequest = useObservableState(m.audioManager.audioRecorder.currentRecordRequest$);
     const highlightedPinyin = useObservableState(m.highlightedPinyin$);

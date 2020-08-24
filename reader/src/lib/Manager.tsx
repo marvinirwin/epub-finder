@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary, flatten, uniq} from "lodash";
-import {debounceTime, filter, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounce, Dictionary, flatten} from "lodash";
+import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -23,7 +23,7 @@ import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
 import {SentenceManager} from "./Manager/SentenceManager";
-import {TextWordData} from "./Atomized/TextWordData";
+import {mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import pinyin from "pinyin";
@@ -32,10 +32,10 @@ import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {flattenTreeOfObservables, ViewingFrameManager} from "./Manager/ViewingFrameManager";
+import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {DeltaScan, ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
+import {ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
 import {ITrie} from "./Interfaces/Trie";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 
@@ -92,7 +92,7 @@ export class Manager {
     characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    readingBookSentenceData: Observable<TextWordData[]>;
+    readingBookSentenceData$: Observable<TextWordData[]>;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
@@ -104,6 +104,16 @@ export class Manager {
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
+
+        this.openedBooksManager.openedBooks.appendDelta$.next({
+            nodeLabel: 'root',
+            children: {
+                'characterPageFrame': {
+                    nodeLabel: 'characterPageFrame',
+                    value: this.quizCharacterManager.exampleSentencesFrame
+                }
+            }
+        })
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
         InputPage(this.inputManager, this.openedBooksManager);
@@ -164,7 +174,7 @@ export class Manager {
             shareReplay(1)
         );
 
-        this.readingBookSentenceData = openBookTextDataTree$
+        this.readingBookSentenceData$ = openBookTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
@@ -175,10 +185,9 @@ export class Manager {
                     return flatten(v);
                 }),
                 shareReplay(1)
-            )
-        ;
+            );
 
-        let exampleSentences$ = this.readingBookSentenceData.pipe(
+        let exampleSentences$ = this.readingBookSentenceData$.pipe(
             withLatestFrom(this.quizManager.quizzingCard$),
             map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
                 if (!quizzingCard) return [];
@@ -219,27 +228,15 @@ export class Manager {
             this.inputManager.applyListeners(body);
         });
 
-        const textData$ = combineLatest(
-            [
-                this.cardManager.trie$,
-                this.openedBooksManager.atomizedSentences$.pipe(
-                    filter(sentenceList => !!sentenceList.length)
-                )
-            ]
-        ).pipe(map(([trie, atomizedSentences]) => {
-            return AtomizedSentence.getTextWordData(
-                atomizedSentences,
-                trie,
-                uniq(trie.getWords(false).map(v => v.length))
-            );
-        }));
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
          * wordCounts: Dictionary<number>;
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(textData$);
+        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(this.readingBookSentenceData$.pipe(map(textData => {
+            return mergeSentenceInfo(...textData);
+        })));
         this.wordElementMap$ = wordElementMap$;
         this.wordCounts$ = wordCounts$;
         this.sentenceMap$ = sentenceMap$;

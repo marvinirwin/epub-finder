@@ -38,11 +38,15 @@ function applyTreeDiff<T>(oldTree: ds_Tree<T> | undefined, diffTree: ds_Tree<T> 
         ).filter(([key, childNode]) => childNode)
     );
 
-    return {
-        value: diffTree.value,
+    const ret: ds_Tree<T> = {
         nodeLabel: diffTree.nodeLabel,
         children: newChildren,
+    };
+
+    if (diffTree.hasOwnProperty('value')) {
+        ret.value = diffTree.value;
     }
+    return ret;
 
     /*
         oldTree.value = diffTree.value;
@@ -164,6 +168,9 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
 
 export function flattenTree<T>(tree: ds_Tree<T>, a: T[] = []): T[] {
     if (tree.hasOwnProperty('value')) {
+        if (!tree.value) {
+            debugger;
+        }
         a.push(tree.value as T);
     }
     Object.values(tree.children || {}).forEach(child => flattenTree(child, a))

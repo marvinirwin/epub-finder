@@ -7,7 +7,7 @@ export default class EditingCardManager {
     showEditingCardPopup$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
     queEditingCard$: ReplaySubject<EditingCard | undefined> = new ReplaySubject<EditingCard | undefined>(1);
     editingCardIsSaving!: Observable<boolean | undefined>;
-    editingCard!: Observable<EditingCard | undefined>;
+    editingCard$!: Observable<EditingCard | undefined>;
     requestEditWord$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
 /*
@@ -15,7 +15,7 @@ export default class EditingCardManager {
 */
 
     constructor() {
-        this.editingCard = this.queEditingCard$.pipe(
+        this.editingCard$ = this.queEditingCard$.pipe(
             startWith(undefined),
             pairwise(),
             switchMap(([previousCard, newCard]) => {
@@ -40,7 +40,7 @@ export default class EditingCardManager {
             })
         )
 */
-        this.editingCardIsSaving = this.editingCard.pipe(
+        this.editingCardIsSaving = this.editingCard$.pipe(
             switchMap(c =>
                 c ? c.saveInProgress$ : of(undefined)
             ),

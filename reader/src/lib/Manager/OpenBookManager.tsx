@@ -20,15 +20,22 @@ export class OpenBookManager {
                 return this.config.getPageRenderer(page);
             }))
             .subscribe(openBook => {
-                this.openedBooks.appendDelta$.next({
-                    nodeLabel: 'readingFrames',
-                    children: {
-                        [openBook.name]: {
-                            nodeLabel: openBook.name,
-                            value: openBook
+                this.openedBooks.appendDelta$.next(
+                    {
+                        nodeLabel: 'root',
+                        children: {
+                            'readingFrames': {
+                                nodeLabel: 'readingFrames',
+                                children: {
+                                    [openBook.name]: {
+                                        nodeLabel: openBook.name,
+                                        value: openBook
+                                    }
+                                }
+                            }
                         }
                     }
-                })
+                )
             });
 
         this.atomizedSentences$ = this.openedBooks

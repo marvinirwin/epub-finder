@@ -66,8 +66,9 @@ export function Main({m}: { m: Manager }) {
             .updates$
             .pipe(
                 map(({sourced}) => {
-                    if (sourced) {
-                        return flattenTree(sourced);
+                    let readingFrames = sourced?.children?.['readingFrames'];
+                    if (readingFrames) {
+                        return flattenTree(readingFrames);
                     } else {
                         return [];
                     }
