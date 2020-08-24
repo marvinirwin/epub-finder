@@ -1,6 +1,6 @@
-import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, shareReplay} from "rxjs/operators";
+import {map, shareReplay, tap} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -37,9 +37,10 @@ export class OpenBook {
             }),
             shareReplay(1)
         );
+        this.renderer.frame$.addObservable$.next(of(this.frame));
         this.renderer.atomizedSentences$.obs$.subscribe(() => {
             console.log();
-        })
+        });
         this.renderer.srcDoc$.next(srcDoc);
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text

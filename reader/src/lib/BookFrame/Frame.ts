@@ -1,6 +1,6 @@
 import {sleep} from "../Util/Util";
 import {Observable, ReplaySubject} from "rxjs";
-import {switchMap} from "rxjs/operators";
+import {shareReplay, switchMap} from "rxjs/operators";
 import $ from "jquery";
 import {appendBookStyle} from "./AppendBookStyle";
 
@@ -21,8 +21,10 @@ export class Frame {
                 const iframe = await this.createIFrame(containerRef);
                 const body = $(iframe).contents().find('body')[0];
                 appendBookStyle(body.ownerDocument as Document);
+                debugger;
                 return {iframe, body};
-            })
+            }),
+            shareReplay(1)
         )
     }
 

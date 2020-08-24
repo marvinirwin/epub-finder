@@ -1,26 +1,30 @@
 import {BookRenderer} from "./BookRenderer";
-import {switchMap, withLatestFrom} from "rxjs/operators";
+import {switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {printExecTime} from "../../Util/Timer";
 import {InputManager} from "../../Manager/InputManager";
 import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 import {ANNOTATE_AND_TRANSLATE} from "../../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 import {Frame} from "../Frame";
+import {combineLatest} from "rxjs";
 
 export class IFrameBookRenderer extends BookRenderer {
     constructor() {
         super();
-        this.srcDoc$.pipe(
-            withLatestFrom(this.frame$.obs$.pipe(
-                switchMap(frame => frame.iframe$)
-            )),
-            switchMap(async ([srcDoc, frame]) => {
-                debugger;
-                await Frame.SetIFrameSource(frame.iframe, srcDoc);
-                const sentences = printExecTime("Rehydration", () => this.rehydratePage(frame.body.ownerDocument as HTMLDocument));
-                InputManager.applyAtomizedSentenceListeners(sentences);
-            }),
-        )
+        combineLatest([
+            this.srcDoc$,
+            this.frame$.obs$.pipe(
+                switchMap(frame => {
+                    debugger;
+                    return frame.iframe$;
+                }),
+            )
+        ]).subscribe(async ([srcDoc, frame]) => {
+            debugger;
+            await Frame.SetIFrameSource(frame.iframe, srcDoc);
+            const sentences = printExecTime("Rehydration", () => this.rehydratePage(frame.body.ownerDocument as HTMLDocument));
+            InputManager.applyAtomizedSentenceListeners(sentences);
+        });
     }
 
     rehydratePage(htmlDocument: HTMLDocument): AtomizedSentence[] {
