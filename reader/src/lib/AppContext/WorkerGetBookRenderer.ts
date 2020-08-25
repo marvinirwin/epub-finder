@@ -6,15 +6,21 @@ import {Website} from "../Website/Website";
 // @ts-ignore
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
+import {TrieWrapper} from "../TrieWrapper";
+export type TrieObservable = Observable<TrieWrapper>
 
-export function WorkerGetBookRenderer(page: Website): Observable<OpenBook> {
+export function WorkerGetBookRenderer(
+    page: Website,
+    trie$: TrieObservable
+): Observable<OpenBook> {
     return from(new Promise<OpenBook>(async resolve => {
         const documentProcessingWorker = new AtomizeUrl();
         const document = await GetWorkerResults(documentProcessingWorker, page.url);
         resolve(new OpenBook(
             document,
             page.name,
-            new IFrameBookRenderer()
+            new IFrameBookRenderer(),
+            trie$
         ))
     }))
 }

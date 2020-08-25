@@ -38,6 +38,8 @@ import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
 import {ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
 import {ITrie} from "./Interfaces/Trie";
 import {RecordRequest} from "./Interfaces/RecordRequest";
+import {resolveICardForWords} from "./Pipes/ResultICardForWords";
+import {TrieWrapper} from "./TrieWrapper";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -70,7 +72,7 @@ export class Manager {
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
-    public quizCharacterManager = new QuizCharacterManager();
+    public quizCharacterManager: QuizCharacterManager ;
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -96,33 +98,17 @@ export class Manager {
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
-        this.openedBooksManager = new OpenBookManager({getPageRenderer});
-        this.quizManager = new QuizManager();
         this.cardManager = new CardManager(this.db);
+        this.openedBooksManager = new OpenBookManager({getPageRenderer, trie$: this.cardManager.trie$});
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
-
-        this.openedBooksManager.openedBooks.appendDelta$.next({
-            nodeLabel: 'root',
-            children: {
-                'characterPageFrame': {
-                    nodeLabel: 'characterPageFrame',
-                    value: this.quizCharacterManager.exampleSentencesFrame
-                }
-            }
-        })
-
-        CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
-        InputPage(this.inputManager, this.openedBooksManager);
-        CardPage(this.cardManager, this.openedBooksManager);
-        InputQuiz(this.inputManager, this.quizManager)
-        ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
-        ScheduleProgress(this.scheduleManager, this.progressManager);
-
+        this.quizManager = new QuizManager({scheduledCards$: this.scheduleManager.sortedScheduleRows$.pipe(
+            map(rows => rows.map(row => row.word)),
+                resolveICardForWords(this.cardManager.cardIndex$)
+            )});
 
         let openBookTextDataTree$ = this
             .openedBooksManager
@@ -133,13 +119,10 @@ export class Manager {
                     .atomizedSentences$
                     .pipe(
                         withLatestFrom(this.cardManager.trie$),
-                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, ITrie]) => {
-                                let uniqueLengths: number[] = Object.keys(trie.getWords(false).reduce((acc: { [key: number]: number }, word) => {
-                                    acc[word.length] = 1;
-                                    return acc;
-                                }, {})).map(str => parseInt(str));
+                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
+                                let uniqueLengths: number[] = trie.getUniqueLengths();
                                 return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                    sentence.getTextWordData(trie, uniqueLengths)
+                                    sentence.getTextWordData(trie.t, uniqueLengths)
                                 );
                             }
                         ),
@@ -148,9 +131,62 @@ export class Manager {
                 observable.subscribe(args => {
                     debugger;
                 })
-                    return observable;
+                return observable;
                 }
             );
+        this.sourceBookSentenceData$ = openBookTextDataTree$
+            .updates$.pipe(
+                switchMap(({sourced}) => {
+                    // I only want the tree from 'readingFrames'
+                    let readingFrames = sourced?.children?.['readingFrames'];
+                    let sources = readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [];
+                    return combineLatest(sources);
+                }),
+                map((v: TextWordData[][]) => {
+                    return flatten(v);
+                }),
+                shareReplay(1)
+            );
+        const exampleSentences = combineLatest([
+            this.sourceBookSentenceData$,
+            this.quizManager.quizzingCard$
+        ]).pipe(
+            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                if (!quizzingCard) return [];
+                const limit = 10;
+                const sentenceMatches: AtomizedSentence[] = [];
+                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                    const v = textWordData[i];
+                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
+                    }
+                }
+                return sentenceMatches;
+            }),
+            shareReplay(1)
+        );
+
+        this.quizCharacterManager = new QuizCharacterManager(
+            {
+                exampleSentences$: exampleSentences,
+                quizzingCard$: this.quizManager.quizzingCard$,
+                trie$: this.cardManager.trie$
+            }
+        )
+
+        CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
+        InputPage(this.inputManager, this.openedBooksManager);
+        CardPage(this.cardManager, this.openedBooksManager);
+        InputQuiz(this.inputManager, this.quizManager)
+        ScheduleQuiz(this.scheduleManager, this.quizManager);
+        CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
+        ScheduleProgress(this.scheduleManager, this.progressManager);
+
+
+        /**
+         * TODO, each bookframe is given a cardIndex, right?  So its atomizedSentences should fire their own textData
+         * I thi
+         */
         let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
             openBookTextDataTree$.updates$,
             this.bottomNavigationValue$
@@ -182,39 +218,8 @@ export class Manager {
         );
 
 
-        this.sourceBookSentenceData$ = openBookTextDataTree$
-            .updates$.pipe(
-                switchMap(({sourced}) => {
-                    // I only want the tree from 'readingFrames'
-                    let readingFrames = sourced?.children?.['readingFrames'];
-                    let sources = readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [];
-                    return combineLatest(sources);
-                }),
-                map((v: TextWordData[][]) => {
-                    return flatten(v);
-                }),
-                shareReplay(1)
-            );
 
 
-        const exampleSentences = combineLatest([
-            this.sourceBookSentenceData$,
-            this.quizManager.quizzingCard$
-        ]).pipe(
-            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
-                if (!quizzingCard) return [];
-                const limit = 10;
-                const sentenceMatches: AtomizedSentence[] = [];
-                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                    const v = textWordData[i];
-                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
-                    }
-                }
-                return sentenceMatches;
-            }),
-            shareReplay(1)
-        );
 
         /**
          * Maybe later I should only do this if I'm currently at the quiz page
@@ -233,7 +238,7 @@ export class Manager {
             }
         )
 
-        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe) => {
+        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe: HTMLIFrameElement) => {
             this.inputManager.applyListeners((iframe.contentDocument as Document).body);
         });
 
@@ -351,6 +356,15 @@ export class Manager {
             }
         );
 
+        this.openedBooksManager.openedBooks.appendDelta$.next({
+            nodeLabel: 'root',
+            children: {
+                'characterPageFrame': {
+                    nodeLabel: 'characterPageFrame',
+                    value: this.quizCharacterManager.exampleSentencesFrame
+                }
+            }
+        });
         this.cardManager.load();
     }
 

@@ -5,14 +5,15 @@ import trie from "trie-prefix-tree";
 import {flatMap, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
-import {ITrie} from "../Interfaces/Trie";
+import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
+import {TrieWrapper} from "../TrieWrapper";
 
 export default class CardManager {
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
     cardProcessingSignal$ = new ReplaySubject<boolean>(1);
-    trie$: Observable<ITrie>;
+    trie$: TrieObservable;
 
     static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
@@ -36,12 +37,14 @@ export default class CardManager {
         this.cardProcessingSignal$.next(false);
         this.trie$ = this.addPersistedCards$.pipe(
             startWith([]),
-            scan((trie: ITrie, newCards: ICard[]) => {
-                newCards.forEach(iCard => {
-                    trie.addWord(iCard.learningLanguage)
-                })
+            scan((trie: TrieWrapper, newCards: ICard[]) => {
+                trie.addWords(
+                    ...newCards.map(
+                        card => card.learningLanguage
+                    )
+                );
                 return trie;
-            }, trie([])),
+            }, new TrieWrapper(trie([]))),
             shareReplay(1)
         )
         this.cardIndex$ = this.addPersistedCards$.pipe(

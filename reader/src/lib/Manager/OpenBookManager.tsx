@@ -17,7 +17,7 @@ export class OpenBookManager {
     ) {
         this.addOpenBook$
             .pipe(switchMap(page => {
-                return this.config.getPageRenderer(page);
+                return this.config.getPageRenderer(page, config.trie$);
             }))
             .subscribe(openBook => {
                 this.openedBooks.appendDelta$.next(

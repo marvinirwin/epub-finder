@@ -1,4 +1,4 @@
-import {ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Characters} from "../../components/Quiz/Characters";
 import { startWith, withLatestFrom} from "rxjs/operators";
@@ -13,17 +13,23 @@ export interface QuizResult {
 export type QuizComponent = string;
 
 
+export interface QuizManagerParams {
+    scheduledCards$: Observable<ICard[]>;
+}
+
+
 export class QuizManager {
     quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
     quizzingComponent$ = new ReplaySubject<QuizComponent>(1);
     quizResult$ = new Subject<QuizResult>();
     advanceQuizStage$ = new Subject();
 
-    scheduledCards$: ReplaySubject<ICard[]>;
+    scheduledCards$: Observable<ICard[]>;
 
     requestNextCard$ = new Subject<void>();
 
-    constructor() {
+    constructor({scheduledCards$}: QuizManagerParams) {
+        this.scheduledCards$ = scheduledCards$;
         this.quizzingCard$.subscribe(() => {
             console.log();
         })

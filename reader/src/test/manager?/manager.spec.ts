@@ -29,7 +29,7 @@ it("Loads the manager without error", () => {
                     addOpenBook$
                 },
                 quizCharacterManager: {
-                    exampleSentences
+                    exampleSentences$
                 },
                 editingCardManager: {
                     queEditingCard$,
@@ -58,7 +58,7 @@ it("Loads the manager without error", () => {
                 {
                     quizzingCard$,
                     scheduledCards$: scheduledCards$.obs$,
-                    exampleSentences$: exampleSentences.obs$,
+                    exampleSentences$: exampleSentences$.obs$,
                     recordRequest$,
                     bottomNavigationValue$,
                     sourceBookSentenceData$: sourceBookSentenceData$,

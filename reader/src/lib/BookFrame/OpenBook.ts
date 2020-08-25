@@ -17,13 +17,13 @@ export class OpenBook {
     public id: string;
     public text$: Observable<string>;
     public wordCountRecords$ = new ReplaySubject<IWordCountRow[]>(1);
-    public trie: ReplaySubject<TrieWrapper>;
     public textData$: Observable<TextWordData>;
 
     constructor(
         srcDoc: string,
         public name: string,
-        public renderer: BookRenderer
+        public renderer: BookRenderer,
+        public trie: Observable<TrieWrapper>
     ) {
         this.id = name;
         this.text$ = this.renderer.atomizedSentences$.pipe(

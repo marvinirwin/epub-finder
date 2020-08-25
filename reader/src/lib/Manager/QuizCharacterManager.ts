@@ -1,4 +1,4 @@
-import {ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
@@ -6,6 +6,7 @@ import {DeltaScan, ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {AppContext} from "../AppContext/AppContext";
 import {map} from "rxjs/operators";
+import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -36,18 +37,32 @@ ${sentences.map(sentence => {
         `;
 }
 
-export class QuizCharacterManager {
-    exampleSentences: ReplaySubject<AtomizedSentence[]>;
-    quizzingCard$: ReplaySubject<ICard | undefined>;
-    atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
-    public exampleSentencesFrame = new OpenBook(
-        getSrc([]),
-        'character_translation',
-        new IFrameBookRenderer()
-    );
+export interface QuizCharacterManagerParams {
+    exampleSentences$: Observable<AtomizedSentence[]>,
+    quizzingCard$: Observable<ICard | undefined>;
+    trie$: TrieObservable
+}
 
-    constructor() {
-        this.exampleSentences.pipe(
+export class QuizCharacterManager {
+    exampleSentences$: Observable<AtomizedSentence[]>;
+    quizzingCard$: Observable<ICard | undefined>;
+    atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
+    public exampleSentencesFrame: OpenBook;
+
+    constructor({
+                    exampleSentences$,
+                    quizzingCard$,
+                    trie$
+                }: QuizCharacterManagerParams) {
+        this.exampleSentences$ = exampleSentences$;
+        this.quizzingCard$ = quizzingCard$;
+        this.exampleSentencesFrame = new OpenBook(
+            getSrc([]),
+            'character_translation',
+            new IFrameBookRenderer(),
+            trie$
+        );
+        this.exampleSentences$.pipe(
             map(sentences => getSrc(sentences.map(sentence => sentence.translatableText)))
         ).subscribe(this.exampleSentencesFrame.renderer.srcDoc$);
         /**
