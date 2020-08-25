@@ -45,7 +45,7 @@ it("Loads the manager without error", () => {
                     }
                 },
                 bottomNavigationValue$,
-                readingBookSentenceData$
+                sourceBookSentenceData$
             },
             scheduler,
             helpers: {
@@ -61,7 +61,7 @@ it("Loads the manager without error", () => {
                     exampleSentences$: exampleSentences.obs$,
                     recordRequest$,
                     bottomNavigationValue$,
-                    readingBookSentenceData$,
+                    sourceBookSentenceData$: sourceBookSentenceData$,
                     addOpenBook$,
                 },
                 CausalTree.init(`

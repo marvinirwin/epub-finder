@@ -1,16 +1,13 @@
-import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, shareReplay, tap} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
-import {ColdSubject} from "../Util/ColdSubject";
 import {TextWordData} from "../Atomized/TextWordData";
-import {DeltaScanner} from "../Util/DeltaScanner";
 import {BookRenderer} from "./Renderer/BookRenderer";
 import {Frame} from "./Frame";
-import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 
 
 export class OpenBook {
@@ -20,7 +17,7 @@ export class OpenBook {
     public id: string;
     public text$: Observable<string>;
     public wordCountRecords$ = new ReplaySubject<IWordCountRow[]>(1);
-    public trie = new ColdSubject<TrieWrapper>();
+    public trie: ReplaySubject<TrieWrapper>;
     public textData$: Observable<TextWordData>;
 
     constructor(
@@ -29,16 +26,19 @@ export class OpenBook {
         public renderer: BookRenderer
     ) {
         this.id = name;
-        this.text$ = this.renderer.atomizedSentences$.obs$.pipe(
+        this.text$ = this.renderer.atomizedSentences$.pipe(
             map(atomizedSentences => {
+                debugger;
                 return Object
                     .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
                     .join('\n');
             }),
             shareReplay(1)
         );
-        this.renderer.frame$.addObservable$.next(of(this.frame));
-        this.renderer.atomizedSentences$.obs$.subscribe(() => {
+
+
+        this.renderer.frame$.next(this.frame);
+        this.renderer.atomizedSentences$.subscribe(() => {
             console.log();
         });
         this.renderer.srcDoc$.next(srcDoc);
@@ -77,11 +77,13 @@ export class OpenBook {
 
 
         this.textData$ = combineLatest([
-            this.trie.obs$,
-            this.renderer.atomizedSentences$.obs$
+            this.trie,
+            this.renderer.atomizedSentences$
         ]).pipe(
-            map(([trie, sentences]) =>
-                AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths()),
+            map(([trie, sentences]) => {
+                    debugger;
+                    return AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths());
+                },
             ),
             shareReplay(1)
         )

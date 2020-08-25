@@ -70,7 +70,6 @@ export const appendBookStyle = (d: Document) => {
     }`;
 
     const el = d.createElement('style');
-    debugger;
     el.innerText = innerText;
     d.body.appendChild(el);
 }

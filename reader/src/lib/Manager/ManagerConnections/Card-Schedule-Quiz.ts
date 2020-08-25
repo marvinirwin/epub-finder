@@ -1,8 +1,6 @@
 import {ScheduleManager} from "../ScheduleManager";
 import {QuizManager} from "../QuizManager";
 import CardManager from "../CardManager";
-import {resolveICardForWords} from "../../Pipes/ResultICardForWords";
-import {map, tap} from "rxjs/operators";
 
 export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizManager) {
 /*
@@ -27,18 +25,14 @@ export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizMana
     });
 */
 
+/*
     q.scheduledCards$.addObservable$.next(
         s.wordQuizList$.pipe(
-            tap(args => {
-                console.log();
-            }),
             resolveICardForWords(c.cardIndex$),
-            tap(args => {
-                console.log();
-            }),
         )
     );
     q.scheduledCards$.obs$.subscribe(args => {
         console.log();
     })
+*/
 }

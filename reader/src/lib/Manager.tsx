@@ -92,7 +92,7 @@ export class Manager {
     characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    readingBookSentenceData$: Observable<TextWordData[]>;
+    sourceBookSentenceData$: Observable<TextWordData[]>;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
@@ -123,28 +123,33 @@ export class Manager {
         CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
-        this.quizCharacterManager.quizzingCard$.addObservable$.next(this.quizManager.quizzingCard$);
 
         let openBookTextDataTree$ = this
             .openedBooksManager
             .openedBooks
-            .mapWith(bookFrame => bookFrame
-                .renderer
-                .atomizedSentences$
-                .obs$.pipe(
-                    withLatestFrom(this.cardManager.trie$),
-                    map(([sentences, trie]: [ds_Dict<AtomizedSentence>, ITrie]) => {
-                            let uniqueLengths: number[] = Object.keys(trie.getWords(false).reduce((acc: { [key: number]: number }, word) => {
-                                acc[word.length] = 1;
-                                return acc;
-                            }, {})).map(str => parseInt(str));
-                            return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                sentence.getTextWordData(trie, uniqueLengths)
-                            );
-                        }
-                    ),
-                    shareReplay(1)
-                )
+            .mapWith(bookFrame => {
+                let observable = bookFrame
+                    .renderer
+                    .atomizedSentences$
+                    .pipe(
+                        withLatestFrom(this.cardManager.trie$),
+                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, ITrie]) => {
+                                let uniqueLengths: number[] = Object.keys(trie.getWords(false).reduce((acc: { [key: number]: number }, word) => {
+                                    acc[word.length] = 1;
+                                    return acc;
+                                }, {})).map(str => parseInt(str));
+                                return Object.entries(sentences).map(([sentenceStr, sentence]) =>
+                                    sentence.getTextWordData(trie, uniqueLengths)
+                                );
+                            }
+                        ),
+                        shareReplay(1)
+                    );
+                observable.subscribe(args => {
+                    debugger;
+                })
+                    return observable;
+                }
             );
         let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
             openBookTextDataTree$.updates$,
@@ -154,7 +159,7 @@ export class Manager {
                 if (!sourced?.children) {
                     throw new Error("OpenedBooks has no tree, this should not happen")
                 }
-                switch(bottomNavigationValue) {
+                switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
                         let child = sourced.children['readingFrames'];
                         return combineLatest(child ? flattenTree(child) : []);
@@ -176,12 +181,14 @@ export class Manager {
             shareReplay(1)
         );
 
-        this.readingBookSentenceData$ = openBookTextDataTree$
+
+        this.sourceBookSentenceData$ = openBookTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
                     let readingFrames = sourced?.children?.['readingFrames'];
-                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : []);
+                    let sources = readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [];
+                    return combineLatest(sources);
                 }),
                 map((v: TextWordData[][]) => {
                     return flatten(v);
@@ -189,23 +196,24 @@ export class Manager {
                 shareReplay(1)
             );
 
-        this.quizCharacterManager.exampleSentences.addObservable$.next(
-            this.readingBookSentenceData$.pipe(
-                withLatestFrom(this.quizManager.quizzingCard$),
-                map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
-                    if (!quizzingCard) return [];
-                    const limit = 10;
-                    const sentenceMatches: AtomizedSentence[] = [];
-                    for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                        const v = textWordData[i];
-                        if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                            sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
-                        }
+
+        const exampleSentences = combineLatest([
+            this.sourceBookSentenceData$,
+            this.quizManager.quizzingCard$
+        ]).pipe(
+            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                if (!quizzingCard) return [];
+                const limit = 10;
+                const sentenceMatches: AtomizedSentence[] = [];
+                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                    const v = textWordData[i];
+                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
                     }
-                    return sentenceMatches;
-                }),
-                shareReplay(1)
-            )
+                }
+                return sentenceMatches;
+            }),
+            shareReplay(1)
         );
 
         /**
@@ -225,8 +233,8 @@ export class Manager {
             }
         )
 
-        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe(({iframe, body}) => {
-            this.inputManager.applyListeners(body);
+        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe) => {
+            this.inputManager.applyListeners((iframe.contentDocument as Document).body);
         });
 
         /*
@@ -235,9 +243,14 @@ export class Manager {
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(this.readingBookSentenceData$.pipe(map(textData => {
-            return mergeSentenceInfo(...textData);
-        })));
+        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(
+            this.sourceBookSentenceData$.pipe(
+                map(textData => {
+                        return mergeSentenceInfo(...textData);
+                    }
+                )
+            )
+        );
         this.wordElementMap$ = wordElementMap$;
         this.wordCounts$ = wordCounts$;
         this.sentenceMap$ = sentenceMap$;
@@ -251,9 +264,9 @@ export class Manager {
             return mergeDictArrays<IAnnotatedCharacter>(...wordElementMaps);
         }));
 
-        this.wordElementMap$.subscribe(wordElementMap => Object
-            .values(wordElementMap)
-            .map(elements => elements.forEach(element => this.applyWordElementListener(element)))
+        this.wordElementMap$.subscribe(wordElementMap => {
+                Object.values(wordElementMap).map(elements => elements.forEach(element => this.applyWordElementListener(element)));
+            }
         )
 
         this.wordCounts$.subscribe(this.scheduleManager.wordCountDict$);
@@ -345,7 +358,9 @@ export class Manager {
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
+        debugger;
         child.onmouseenter = (ev) => {
+            debugger;
             addHighlightedWord(this.highlightedWord$, maxWord?.word);
             if (ev.shiftKey) {
                 /**

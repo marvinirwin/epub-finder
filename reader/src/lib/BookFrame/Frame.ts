@@ -2,7 +2,6 @@ import {sleep} from "../Util/Util";
 import {Observable, ReplaySubject} from "rxjs";
 import {shareReplay, switchMap} from "rxjs/operators";
 import $ from "jquery";
-import {appendBookStyle} from "./AppendBookStyle";
 
 export type IFrameReturnValue = { iframe: HTMLIFrameElement; body: HTMLBodyElement };
 
@@ -13,14 +12,12 @@ export class Frame {
     }
 
     iframeContainerRef$ = new ReplaySubject<HTMLElement>(1);
-    iframe$: Observable<IFrameReturnValue>;
+    iframe$: Observable<HTMLIFrameElement>;
 
     constructor() {
         this.iframe$ = this.iframeContainerRef$.pipe(
             switchMap(async containerRef => {
-                const iframe = await this.createIFrame(containerRef);
-                const body = $(iframe).contents().find('body')[0];
-                return {iframe, body};
+                return await this.createIFrame(containerRef);
             }),
             shareReplay(1)
         )

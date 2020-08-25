@@ -1,15 +1,18 @@
 import {BookRenderer} from "./BookRenderer";
 import {map, shareReplay} from "rxjs/operators";
 import {AtomizedDocument} from "../../Atomized/AtomizedDocument";
+import {Observable, ReplaySubject} from "rxjs";
+import {Frame} from "../Frame";
+import {ds_Dict} from "../../Util/DeltaScanner";
+import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 
-export class InMemoryBookRenderer extends BookRenderer {
+export class InMemoryBookRenderer implements BookRenderer {
+    srcDoc$ = new ReplaySubject<string>(1);
+    frame$ = new ReplaySubject<Frame>(1);
+    atomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
     constructor() {
-        super();
-        this.atomizedSentences$.obs$.subscribe(args => {
-            console.log();
-        })
-        this.atomizedSentences$.addObservable$.next(
-            this.srcDoc$.pipe(
+        this.atomizedSentences$ = this.srcDoc$
+            .pipe(
                 map(srcDoc => {
                     const doc = AtomizedDocument.atomizeDocument(srcDoc);
                     // The documentation doesn't say anything about getElementsByClassName
@@ -18,6 +21,5 @@ export class InMemoryBookRenderer extends BookRenderer {
                 }),
                 shareReplay(1)
             )
-        );
     }
 }

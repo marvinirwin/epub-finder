@@ -4,7 +4,6 @@ import {Characters} from "../../components/Quiz/Characters";
 import { startWith, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
-import {ColdSubject} from "../Util/ColdSubject";
 
 export interface QuizResult {
     word: string;
@@ -13,21 +12,16 @@ export interface QuizResult {
 
 export type QuizComponent = string;
 
+
 export class QuizManager {
     quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
     quizzingComponent$ = new ReplaySubject<QuizComponent>(1);
     quizResult$ = new Subject<QuizResult>();
     advanceQuizStage$ = new Subject();
 
-    scheduledCards$ = new ColdSubject<ICard[]>();
+    scheduledCards$: ReplaySubject<ICard[]>;
 
     requestNextCard$ = new Subject<void>();
-
-    /*
-        learningCards$ = new Subject<ScheduleRow[]>();
-        toReviewCards$ = new Subject<ScheduleRow[]>();
-        newCards$ = new Subject<ScheduleRow[]>();
-    */
 
     constructor() {
         this.quizzingCard$.subscribe(() => {
@@ -35,7 +29,7 @@ export class QuizManager {
         })
         this.quizzingCard$.pipe(
             startWith(undefined),
-            withLatestFrom(this.scheduledCards$.obs$)
+            withLatestFrom(this.scheduledCards$)
         ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             if (!quizzingCard && scheduledCards[0]) {
                 this.requestNextCard$.next();
@@ -43,7 +37,7 @@ export class QuizManager {
         });
 
         this.requestNextCard$.pipe(
-            withLatestFrom(this.scheduledCards$.obs$)
+            withLatestFrom(this.scheduledCards$)
         ).subscribe(([_, scheduledCards]) => {
             this.quizzingCard$.next(scheduledCards[0]);
             this.quizzingComponent$.next("Characters");
@@ -62,7 +56,7 @@ export class QuizManager {
         })
 */
 
-        this.scheduledCards$.obs$.pipe(
+        this.scheduledCards$.pipe(
             withLatestFrom(
                 this.quizzingCard$.pipe(
                     startWith(undefined),

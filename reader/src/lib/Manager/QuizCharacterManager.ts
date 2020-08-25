@@ -1,4 +1,3 @@
-import {ColdSubject} from "../Util/ColdSubject";
 import {ReplaySubject, Subject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
@@ -38,8 +37,8 @@ ${sentences.map(sentence => {
 }
 
 export class QuizCharacterManager {
-    exampleSentences = new ColdSubject<AtomizedSentence[]>();
-    quizzingCard$ = new ColdSubject<ICard | undefined>();
+    exampleSentences: ReplaySubject<AtomizedSentence[]>;
+    quizzingCard$: ReplaySubject<ICard | undefined>;
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
     public exampleSentencesFrame = new OpenBook(
         getSrc([]),
@@ -48,7 +47,7 @@ export class QuizCharacterManager {
     );
 
     constructor() {
-        this.exampleSentences.obs$.pipe(
+        this.exampleSentences.pipe(
             map(sentences => getSrc(sentences.map(sentence => sentence.translatableText)))
         ).subscribe(this.exampleSentencesFrame.renderer.srcDoc$);
         /**

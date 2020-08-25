@@ -39,7 +39,7 @@ export class OpenBookManager {
             });
 
         this.atomizedSentences$ = this.openedBooks
-            .mapWith((bookFrame: OpenBook) => bookFrame.renderer.atomizedSentences$.obs$).updates$.pipe(
+            .mapWith((bookFrame: OpenBook) => bookFrame.renderer.atomizedSentences$).updates$.pipe(
                 switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {
                     let sources = sourced ? flattenTree(sourced) : [];
                     let observable = combineLatest(sources);
@@ -53,6 +53,7 @@ export class OpenBookManager {
                     );
                 }),
                 map((atomizedSentenceArrays: ds_Dict<AtomizedSentence>[]) => {
+                    debugger;
                         return flattenDeep(atomizedSentenceArrays.map(Object.values));
                     }
                 ),
