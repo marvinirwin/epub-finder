@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, flatten} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap, take, tap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -72,7 +72,7 @@ export class Manager {
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
-    public quizCharacterManager: QuizCharacterManager ;
+    public quizCharacterManager: QuizCharacterManager;
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -99,39 +99,45 @@ export class Manager {
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
         this.cardManager = new CardManager(this.db);
-        this.openedBooksManager = new OpenBookManager({getPageRenderer, trie$: this.cardManager.trie$});
+        this.openedBooksManager = new OpenBookManager({
+            getPageRenderer,
+            trie$: this.cardManager.trie$,
+            applyListeners: b => this.inputManager.applyListeners(b)
+        });
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
-        this.quizManager = new QuizManager({scheduledCards$: this.scheduleManager.sortedScheduleRows$.pipe(
-            map(rows => rows.map(row => row.word)),
+        this.quizManager = new QuizManager({
+            scheduledCards$: this.scheduleManager.sortedScheduleRows$.pipe(
+                map(rows => rows.map(row => row.word)),
                 resolveICardForWords(this.cardManager.cardIndex$)
-            )});
+            )
+        });
 
         let openBookTextDataTree$ = this
             .openedBooksManager
             .openedBooks
             .mapWith(bookFrame => {
-                let observable = bookFrame
-                    .renderer
-                    .atomizedSentences$
-                    .pipe(
-                        withLatestFrom(this.cardManager.trie$),
-                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
-                                let uniqueLengths: number[] = trie.getUniqueLengths();
-                                return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                    sentence.getTextWordData(trie.t, uniqueLengths)
-                                );
-                            }
-                        ),
-                        shareReplay(1)
-                    );
-                observable.subscribe(args => {
-                    debugger;
-                })
-                return observable;
+                    let observable = bookFrame
+                        .renderer
+                        .atomizedSentences$
+                        .pipe(
+                            withLatestFrom(this.cardManager.trie$),
+                            map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
+                                    let uniqueLengths: number[] = trie.getUniqueLengths();
+                                    return Object.entries(sentences).map(([sentenceStr, sentence]) =>
+                                        sentence.getTextWordData(trie.t, uniqueLengths)
+                                    );
+                                }
+                            ),
+                            shareReplay(1)
+                        );
+                    observable.subscribe(args => {
+                        debugger;
+                    })
+                    return observable;
                 }
             );
         this.sourceBookSentenceData$ = openBookTextDataTree$
@@ -218,9 +224,6 @@ export class Manager {
         );
 
 
-
-
-
         /**
          * Maybe later I should only do this if I'm currently at the quiz page
          */
@@ -241,6 +244,17 @@ export class Manager {
         this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe: HTMLIFrameElement) => {
             this.inputManager.applyListeners((iframe.contentDocument as Document).body);
         });
+
+        // Instead of doing this, I should probably just give the inputManager to the openBookManager and let it
+        // Do the listener applying
+        this.openedBooksManager.openedBooks.updates$.subscribe(({delta}) => {
+            flattenTree(delta).forEach(openFrame => {
+                if (openFrame) {
+                    openFrame.frame.iframe$.pipe(take(1)).subscribe(iframe => {
+                    });
+                }
+            })
+        })
 
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;

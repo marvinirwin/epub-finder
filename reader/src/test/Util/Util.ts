@@ -326,6 +326,7 @@ export function swapIndexes(arr: Array<any>, i1:number, i2:number){
     [arr[i1], arr[i2]] = [arr[i2], arr[i1]];
 }
 
+/*
 export function ScheduleQuizCard(db: MyAppDatabase) {
     const scheduleManager = new ScheduleManager(db);
     const quizManager = new QuizManager();
@@ -334,6 +335,7 @@ export function ScheduleQuizCard(db: MyAppDatabase) {
     CardScheduleQuiz(cardManager, scheduleManager, quizManager);
     return {scheduleManager, quizManager, cardManager};
 }
+*/
 
 export type orderingObservable = { observable: Observable<any>, subscriptionMarbles: string | null };
 

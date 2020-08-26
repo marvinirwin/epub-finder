@@ -1,9 +1,9 @@
 import {combineLatest, Observable, Subject} from "rxjs";
-import {map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {map, shareReplay, switchMap, tap} from "rxjs/operators";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {BookFrameManagerConfig} from "./BookFrameManager/BookFrameManagerConfig";
+import {OpenBookManagerConfig} from "./BookFrameManager/OpenBookManagerConfig";
 import {flattenDeep} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
 
@@ -13,7 +13,7 @@ export class OpenBookManager {
     addOpenBook$ = new Subject<Website>();
 
     constructor(
-        private config: BookFrameManagerConfig
+        private config: OpenBookManagerConfig
     ) {
         this.addOpenBook$
             .pipe(switchMap(page => {
