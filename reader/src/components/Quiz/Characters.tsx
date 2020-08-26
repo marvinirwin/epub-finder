@@ -18,7 +18,7 @@ import {InputManager} from "../../lib/Manager/InputManager";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
-import {OpenBookManager} from "../../lib/Manager/OpenBookManager";
+import {OpenBooks} from "../../lib/Manager/OpenBooks";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 
 

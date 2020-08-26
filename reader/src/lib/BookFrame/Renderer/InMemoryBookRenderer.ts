@@ -9,6 +9,7 @@ import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 export class InMemoryBookRenderer implements BookRenderer {
     srcDoc$ = new ReplaySubject<string>(1);
     frame$ = new ReplaySubject<Frame>(1);
+    body$ = new ReplaySubject<HTMLBodyElement>(1);
     atomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
     constructor() {
         this.atomizedSentences$ = this.srcDoc$

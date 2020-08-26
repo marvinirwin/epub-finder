@@ -1,9 +1,9 @@
-import {OpenBookManager} from "../OpenBookManager";
+import {OpenBooks} from "../OpenBooks";
 import {InputManager} from "../InputManager";
 import {map, switchMap} from "rxjs/operators";
 import {merge} from "rxjs";
 
-export function InputPage(u: InputManager, p: OpenBookManager) {
+export function InputPage(u: InputManager, p: OpenBooks) {
 /*
     p.bookFrames.updates$.pipe(
         switchMap(pageList => merge(

@@ -45,7 +45,6 @@ it("Loads the manager without error", () => {
                     }
                 },
                 bottomNavigationValue$,
-                sourceBookSentenceData$
             },
             scheduler,
             helpers: {

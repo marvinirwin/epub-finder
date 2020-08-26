@@ -1,12 +1,13 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
-import {DeltaScan, ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
-import {AppContext} from "../AppContext/AppContext";
 import {map} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
+import {XMLSerializer} from "xmldom";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -52,7 +53,7 @@ export class QuizCharacterManager {
     constructor({
                     exampleSentences$,
                     quizzingCard$,
-                    trie$
+                    trie$,
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
@@ -63,7 +64,10 @@ export class QuizCharacterManager {
             trie$
         );
         this.exampleSentences$.pipe(
-            map(sentences => getSrc(sentences.map(sentence => sentence.translatableText)))
+            map(sentences => getSrc(sentences.map(sentence => sentence.translatableText))),
+            map(srcDoc => {
+                return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
+            })
         ).subscribe(this.exampleSentencesFrame.renderer.srcDoc$);
         /**
          * If we have a learningLanguage, and have less than 10 sentences

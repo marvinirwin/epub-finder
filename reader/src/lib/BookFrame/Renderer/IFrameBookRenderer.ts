@@ -13,6 +13,7 @@ import {ds_Dict} from "../../Util/DeltaScanner";
 export class IFrameBookRenderer implements BookRenderer {
     srcDoc$ = new ReplaySubject<string>(1);
     frame$ = new ReplaySubject<Frame>(1);
+    body$ = new ReplaySubject<HTMLBodyElement>(1);
     atomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
     constructor() {
         this.atomizedSentences$ = combineLatest([
@@ -24,9 +25,12 @@ export class IFrameBookRenderer implements BookRenderer {
             )
         ]).pipe(
             switchMap(async ([srcDoc, frame]) => {
+
                 await Frame.SetIFrameSource(frame, srcDoc);
-                const sentences = printExecTime("Rehydration", () => this.rehydratePage(frame.contentDocument as HTMLDocument));
+                let contentDocument = frame.contentDocument as HTMLDocument;
+                const sentences = printExecTime("Rehydration", () => this.rehydratePage(contentDocument));
                 InputManager.applyAtomizedSentenceListeners(Object.values(sentences));
+                this.body$.next(contentDocument.body as HTMLBodyElement);
                 appendBookStyle(frame.contentDocument as Document);
                 return sentences;
             }),

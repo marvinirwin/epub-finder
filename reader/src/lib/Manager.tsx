@@ -1,6 +1,6 @@
 import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, flatten} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap, take, tap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {OpenBookManager} from "./Manager/OpenBookManager";
+import {OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -36,7 +36,6 @@ import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
 import {ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
-import {ITrie} from "./Interfaces/Trie";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {TrieWrapper} from "./TrieWrapper";
@@ -63,7 +62,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public openedBooksManager: OpenBookManager;
+    public openedBooksManager: OpenBooks;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -94,15 +93,15 @@ export class Manager {
     characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
-    sourceBookSentenceData$: Observable<TextWordData[]>;
 
 
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
         this.cardManager = new CardManager(this.db);
-        this.openedBooksManager = new OpenBookManager({
+        this.openedBooksManager = new OpenBooks({
             getPageRenderer,
             trie$: this.cardManager.trie$,
-            applyListeners: b => this.inputManager.applyListeners(b)
+            applyListeners: b => this.inputManager.applyListeners(b),
+            bottomNavigationValue$: this.bottomNavigationValue$
         });
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
@@ -116,65 +115,26 @@ export class Manager {
             )
         });
 
-        let openBookTextDataTree$ = this
-            .openedBooksManager
-            .openedBooks
-            .mapWith(bookFrame => {
-                    let observable = bookFrame
-                        .renderer
-                        .atomizedSentences$
-                        .pipe(
-                            withLatestFrom(this.cardManager.trie$),
-                            map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
-                                    let uniqueLengths: number[] = trie.getUniqueLengths();
-                                    return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                        sentence.getTextWordData(trie.t, uniqueLengths)
-                                    );
-                                }
-                            ),
-                            shareReplay(1)
-                        );
-                    observable.subscribe(args => {
-                        debugger;
-                    })
-                    return observable;
-                }
-            );
-        this.sourceBookSentenceData$ = openBookTextDataTree$
-            .updates$.pipe(
-                switchMap(({sourced}) => {
-                    // I only want the tree from 'readingFrames'
-                    let readingFrames = sourced?.children?.['readingFrames'];
-                    let sources = readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [];
-                    return combineLatest(sources);
-                }),
-                map((v: TextWordData[][]) => {
-                    return flatten(v);
-                }),
-                shareReplay(1)
-            );
-        const exampleSentences = combineLatest([
-            this.sourceBookSentenceData$,
-            this.quizManager.quizzingCard$
-        ]).pipe(
-            map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
-                if (!quizzingCard) return [];
-                const limit = 10;
-                const sentenceMatches: AtomizedSentence[] = [];
-                for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                    const v = textWordData[i];
-                    if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                        sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
-                    }
-                }
-                return sentenceMatches;
-            }),
-            shareReplay(1)
-        );
-
         this.quizCharacterManager = new QuizCharacterManager(
             {
-                exampleSentences$: exampleSentences,
+                exampleSentences$: combineLatest([
+                    this.openedBooksManager.sourceBookSentenceData$,
+                    this.quizManager.quizzingCard$
+                ]).pipe(
+                    map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                        if (!quizzingCard) return [];
+                        const limit = 10;
+                        const sentenceMatches: AtomizedSentence[] = [];
+                        for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
+                            const v = textWordData[i];
+                            if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
+                                sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
+                            }
+                        }
+                        return sentenceMatches;
+                    }),
+                    shareReplay(1)
+                ),
                 quizzingCard$: this.quizManager.quizzingCard$,
                 trie$: this.cardManager.trie$
             }
@@ -189,39 +149,6 @@ export class Manager {
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
 
-        /**
-         * TODO, each bookframe is given a cardIndex, right?  So its atomizedSentences should fire their own textData
-         * I thi
-         */
-        let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
-            openBookTextDataTree$.updates$,
-            this.bottomNavigationValue$
-        ]).pipe(
-            switchMap(([{sourced}, bottomNavigationValue]) => {
-                if (!sourced?.children) {
-                    throw new Error("OpenedBooks has no tree, this should not happen")
-                }
-                switch (bottomNavigationValue) {
-                    case NavigationPages.READING_PAGE:
-                        let child = sourced.children['readingFrames'];
-                        return combineLatest(child ? flattenTree(child) : []);
-                    case NavigationPages.QUIZ_PAGE:
-                        let child1 = sourced.children['characterPageFrame'];
-                        return combineLatest(child1 ? flattenTree(child1) : []);
-                    default:
-                        return combineLatest([]);
-                }
-            }),
-            shareReplay(1)
-        );
-
-        let visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>> = visibleOpenedBookData$.pipe(
-            map(flatten),
-            map(sentenceData =>
-                mergeDictArrays(...sentenceData.map(sentenceDatum => sentenceDatum.wordElementsMap))
-            ),
-            shareReplay(1)
-        );
 
 
         /**
@@ -245,16 +172,6 @@ export class Manager {
             this.inputManager.applyListeners((iframe.contentDocument as Document).body);
         });
 
-        // Instead of doing this, I should probably just give the inputManager to the openBookManager and let it
-        // Do the listener applying
-        this.openedBooksManager.openedBooks.updates$.subscribe(({delta}) => {
-            flattenTree(delta).forEach(openFrame => {
-                if (openFrame) {
-                    openFrame.frame.iframe$.pipe(take(1)).subscribe(iframe => {
-                    });
-                }
-            })
-        })
 
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -263,7 +180,7 @@ export class Manager {
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
         const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(
-            this.sourceBookSentenceData$.pipe(
+            this.openedBooksManager.sourceBookSentenceData$.pipe(
                 map(textData => {
                         return mergeSentenceInfo(...textData);
                     }
@@ -295,7 +212,7 @@ export class Manager {
         let previousHighlightedSentences: HTMLElement[] | undefined;
 
         this.highlightedWord$.pipe(debounceTime(10),
-            withLatestFrom(visibleElements$))
+            withLatestFrom(this.openedBooksManager.visibleElements$))
             .subscribe(([word, wordElementsMaps]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
@@ -386,9 +303,7 @@ export class Manager {
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
-        debugger;
         child.onmouseenter = (ev) => {
-            debugger;
             addHighlightedWord(this.highlightedWord$, maxWord?.word);
             if (ev.shiftKey) {
                 /**

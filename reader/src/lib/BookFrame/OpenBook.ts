@@ -28,7 +28,6 @@ export class OpenBook {
         this.id = name;
         this.text$ = this.renderer.atomizedSentences$.pipe(
             map(atomizedSentences => {
-                debugger;
                 return Object
                     .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
                     .join('\n');
@@ -38,9 +37,6 @@ export class OpenBook {
 
 
         this.renderer.frame$.next(this.frame);
-        this.renderer.atomizedSentences$.subscribe(() => {
-            console.log();
-        });
         this.renderer.srcDoc$.next(srcDoc);
         this.text$.subscribe(text => {
             const countedCharacters: Dictionary<number> = text
@@ -81,7 +77,6 @@ export class OpenBook {
             this.renderer.atomizedSentences$
         ]).pipe(
             map(([trie, sentences]) => {
-                    debugger;
                     return AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths());
                 },
             ),

@@ -1,4 +1,4 @@
-import {OpenBookManager} from "../OpenBookManager";
+import {OpenBooks} from "../OpenBooks";
 import CardManager from "../CardManager";
 import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operators";
 import {merge} from "rxjs";
@@ -6,7 +6,7 @@ import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
 import {getNewICardForWord} from "../../Util/Util";
 import {flattenTree} from "../../Util/DeltaScanner";
 
-export function CardPage(c: CardManager, p: OpenBookManager) {
+export function CardPage(c: CardManager, p: OpenBooks) {
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
