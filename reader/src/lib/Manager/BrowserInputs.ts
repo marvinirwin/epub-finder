@@ -4,13 +4,13 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {getTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
 
-export class InputManager {
+export class BrowserInputs {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     selectedText$: Subject<string> = new Subject<string>();
     constructor() {}
 
-    applyListeners(root: HTMLElement) {
+    applyBodyListeners(root: HTMLElement) {
         root.onkeydown = (ev) => this.keydownMap[ev.key]?.next(ev);
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
 

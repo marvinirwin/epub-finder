@@ -14,7 +14,7 @@ import {OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
-import {InputManager} from "./Manager/InputManager";
+import {BrowserInputs} from "./Manager/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
@@ -66,7 +66,7 @@ export class Manager {
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
-    public inputManager = new InputManager();
+    public inputManager = new BrowserInputs();
     public sentenceManager = new SentenceManager();
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
@@ -100,8 +100,9 @@ export class Manager {
         this.openedBooksManager = new OpenBooks({
             getPageRenderer,
             trie$: this.cardManager.trie$,
-            applyListeners: b => this.inputManager.applyListeners(b),
-            bottomNavigationValue$: this.bottomNavigationValue$
+            applyListeners: b => this.inputManager.applyBodyListeners(b),
+            bottomNavigationValue$: this.bottomNavigationValue$,
+            applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement)
         });
         this.scheduleManager = new ScheduleManager(this.db);
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
@@ -164,12 +165,12 @@ export class Manager {
             this.openedBooksManager.atomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
         ).subscribe(atomizedSentenceList => {
-                InputManager.applyAtomizedSentenceListeners(atomizedSentenceList);
+                BrowserInputs.applyAtomizedSentenceListeners(atomizedSentenceList);
             }
         )
 
         this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe: HTMLIFrameElement) => {
-            this.inputManager.applyListeners((iframe.contentDocument as Document).body);
+            this.inputManager.applyBodyListeners((iframe.contentDocument as Document).body);
         });
 
 
@@ -200,10 +201,6 @@ export class Manager {
             return mergeDictArrays<IAnnotatedCharacter>(...wordElementMaps);
         }));
 
-        this.wordElementMap$.subscribe(wordElementMap => {
-                Object.values(wordElementMap).map(elements => elements.forEach(element => this.applyWordElementListener(element)));
-            }
-        )
 
         this.wordCounts$.subscribe(this.scheduleManager.wordCountDict$);
 
@@ -298,7 +295,6 @@ export class Manager {
         });
         this.cardManager.load();
     }
-
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;

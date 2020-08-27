@@ -21,7 +21,6 @@ export class OpenBooks {
     sourceBookSentenceData$: Observable<TextWordData[]>;
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
-
     constructor(
         private config: OpenBooksConfig
     ) {
@@ -80,6 +79,17 @@ export class OpenBooks {
                         );
                 }
             );
+        this.openBookTextDataTree$.updates$.subscribe(({delta}) => {
+            flattenTree(delta)
+                .forEach(
+                    textData => textData.subscribe(
+                        textDatas => textDatas.forEach(datum => flatten(
+                            Object.values(datum.wordElementsMap)
+                            ).forEach(config.applyWordElementListener)
+                        )
+                    )
+                )
+        })
         this.sourceBookSentenceData$ = this.openBookTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
@@ -98,13 +108,14 @@ export class OpenBooks {
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
                     let readingFrames = sourced?.children?.['characterPageFrame'];
-                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : []);
+                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [])
                 }),
                 map((v: TextWordData[][]) => {
                     return flatten(v);
                 }),
                 shareReplay(1)
             );
+        this.exampleSentenceSentenceData$.subscribe();
 
         let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
             this.openBookTextDataTree$.updates$,

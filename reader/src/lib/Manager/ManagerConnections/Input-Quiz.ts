@@ -1,4 +1,4 @@
-import {InputManager} from "../InputManager";
+import {BrowserInputs} from "../BrowserInputs";
 import {QuizComponent, QuizManager} from "../QuizManager";
 import {filter, withLatestFrom} from "rxjs/operators";
 import {Characters} from "../../../components/Quiz/Characters";
@@ -7,7 +7,7 @@ import {Conclusion} from "../../../components/Quiz/Conclusion";
 import {Observable} from "rxjs";
 import {RecognitionMap} from "../../Scheduling/SRM";
 
-export function InputQuiz(i: InputManager, q: QuizManager) {
+export function InputQuiz(i: BrowserInputs, q: QuizManager) {
     const advanceSet = new Set<QuizComponent>(["Characters", "Pictures"]);
     const conclusionSet = new Set<QuizComponent>(["Conclusion"]);
     const componentFilterPipe = (set: Set<QuizComponent>) => (o1$: Observable<any>): Observable<[KeyboardEvent, QuizComponent]> => o1$.pipe(

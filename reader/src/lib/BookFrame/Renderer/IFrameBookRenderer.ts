@@ -1,7 +1,7 @@
 import {BookRenderer} from "./BookRenderer";
 import {shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {printExecTime} from "../../Util/Timer";
-import {InputManager} from "../../Manager/InputManager";
+import {BrowserInputs} from "../../Manager/BrowserInputs";
 import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 import {ANNOTATE_AND_TRANSLATE} from "../../Atomized/AtomizedDocument";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
@@ -25,11 +25,10 @@ export class IFrameBookRenderer implements BookRenderer {
             )
         ]).pipe(
             switchMap(async ([srcDoc, frame]) => {
-
                 await Frame.SetIFrameSource(frame, srcDoc);
                 let contentDocument = frame.contentDocument as HTMLDocument;
                 const sentences = printExecTime("Rehydration", () => this.rehydratePage(contentDocument));
-                InputManager.applyAtomizedSentenceListeners(Object.values(sentences));
+                BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
                 this.body$.next(contentDocument.body as HTMLBodyElement);
                 appendBookStyle(frame.contentDocument as Document);
                 return sentences;

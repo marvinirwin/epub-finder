@@ -14,7 +14,7 @@ import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/oper
 import {useObservable, useObservableState} from "observable-hooks";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
 import {FrameContainer} from "../Frame/FrameContainer";
-import {InputManager} from "../../lib/Manager/InputManager";
+import {BrowserInputs} from "../../lib/Manager/BrowserInputs";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";

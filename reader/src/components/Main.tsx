@@ -57,7 +57,7 @@ export function Main({m}: { m: Manager }) {
     const item = useObservableState(m.bottomNavigationValue$);
     const SelectedPage = resolveCurrentComponent(item, m);
     useEffect(() => {
-        m.inputManager.applyListeners(document.body);
+        m.inputManager.applyBodyListeners(document.body);
     }, [m]);
 
     const [allBookFrames] = useObservableState<OpenBook[]>(
