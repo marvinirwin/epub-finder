@@ -1,5 +1,13 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {switchMap} from "rxjs/operators";
+import axios from 'axios';
+
+export interface Profile {
+    name: string;
+    picture: string;
+    location: string | null;
+    website: string;
+}
 
 export class User {
     usage$ = new ReplaySubject<number>();
@@ -9,7 +17,10 @@ export class User {
     ) {
     }
     static async FromSessionId(sessionid: string) {
-        await axios.get('')
+        const response = await axios.get('/profile');
+        return new User(
+            response.data.name, response.data.picture
+        );
     }
 }
 
@@ -23,7 +34,7 @@ export class AuthenticationMonitor {
                 if (!sessionId) {
                     return undefined;
                 }
-                return
+                return User.FromSessionId(sessionId);
             })
         )
     }
