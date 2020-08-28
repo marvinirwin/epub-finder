@@ -16,9 +16,9 @@ import session from "express-session";
 import * as chalk from "chalk";
 import connectMongo from "connect-mongo";
 const MongoStore = connectMongo(session);
-import * as flash from "express-flash";
+import flash from "express-flash";
 import  mongoose from "mongoose";
-import * as passport from "passport";
+import passport from "passport";
 import expressStatusMonitor from "express-status-monitor";
 import sass from "node-sass-middleware";
 /**
@@ -31,7 +31,7 @@ import * as contactController from "../controllers/contact";
 /**
  * API keys and Passport configuration.
  */
-import * as passportConfig from "../config/passport";
+import passportConfig from "../config/passport";
 
 
 /*
