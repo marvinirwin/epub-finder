@@ -1,30 +1,42 @@
-const { promisify } = require('util');
-const cheerio = require('cheerio');
-const graph = require('fbgraph');
-const { LastFmNode } = require('lastfm');
-const tumblr = require('tumblr.js');
-const { Octokit } = require('@octokit/rest');
-const Twit = require('twit');
-const stripe = require('stripe')(process.env.STRIPE_SKEY);
-const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
-const clockwork = require('clockwork')({ key: process.env.CLOCKWORK_KEY });
-const paypal = require('paypal-rest-sdk');
-const lob = require('lob')(process.env.LOB_KEY);
-const ig = require('instagram-node').instagram();
-const axios = require('axios');
-const { google } = require('googleapis');
-const Quickbooks = require('node-quickbooks');
-const validator = require('validator');
+const { promisify } = require("util");
+/*
+const cheerio = require("cheerio");
+*/
+/*
+const graph = require("fbgraph");
+const { LastFmNode } = require("lastfm");
+const tumblr = require("tumblr.js");
+*/
+const { Octokit } = require("@octokit/rest");
+/*
+const Twit = require("twit");
+*/
+/*
+const stripe = require("stripe")(process.env.STRIPE_SKEY);
+const twilio = require("twilio")(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+*/
+/*
+const clockwork = require("clockwork")({ key: process.env.CLOCKWORK_KEY });
+*/
+/*
+const paypal = require("paypal-rest-sdk");
+const lob = require("lob")(process.env.LOB_KEY);
+const ig = require("instagram-node").instagram();
+const axios = require("axios");
+const { google } = require("googleapis");
+const Quickbooks = require("node-quickbooks");
+*/
+const validator = require("validator");
 
-Quickbooks.setOauthVersion('2.0');
+// Quickbooks.setOauthVersion("2.0");
 
 /**
  * GET /api
  * List of API examples.
  */
 exports.getApi = (req, res) => {
-  res.render('api/index', {
-    title: 'API Examples'
+  res.render("api/index", {
+    title: "API Examples"
   });
 };
 
@@ -33,7 +45,7 @@ exports.getApi = (req, res) => {
  * Foursquare API example.
  */
 exports.getFoursquare = async (req, res, next) => {
-  const token = await req.user.tokens.find((token) => token.kind === 'foursquare');
+  const token = await req.user.tokens.find((token) => token.kind === "foursquare");
   let trendingVenues;
   let venueDetail;
   let userCheckins;
@@ -46,8 +58,8 @@ exports.getFoursquare = async (req, res, next) => {
       trendingVenues = trendingVenuesRes.data.response;
       venueDetail = venueDetailRes.data.response;
       userCheckins = userCheckinsRes.data.response;
-      res.render('api/foursquare', {
-        title: 'Foursquare API',
+      res.render("api/foursquare", {
+        title: "Foursquare API",
         trendingVenues,
         venueDetail,
         userCheckins
@@ -63,17 +75,17 @@ exports.getFoursquare = async (req, res, next) => {
  * Tumblr API example.
  */
 exports.getTumblr = (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'tumblr');
+  const token = req.user.tokens.find((token) => token.kind === "tumblr");
   const client = tumblr.createClient({
     consumer_key: process.env.TUMBLR_KEY,
     consumer_secret: process.env.TUMBLR_SECRET,
     token: token.accessToken,
     token_secret: token.tokenSecret
   });
-  client.blogPosts('mmosdotcom.tumblr.com', { type: 'photo' }, (err, data) => {
+  client.blogPosts("mmosdotcom.tumblr.com", { type: "photo" }, (err, data) => {
     if (err) { return next(err); }
-    res.render('api/tumblr', {
-      title: 'Tumblr API',
+    res.render("api/tumblr", {
+      title: "Tumblr API",
       blog: data.blog,
       photoset: data.posts[0].photos
     });
@@ -85,12 +97,12 @@ exports.getTumblr = (req, res, next) => {
  * Facebook API example.
  */
 exports.getFacebook = (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'facebook');
+  const token = req.user.tokens.find((token) => token.kind === "facebook");
   graph.setAccessToken(token.accessToken);
   graph.get(`${req.user.facebook}?fields=id,name,email,first_name,last_name,gender,link,locale,timezone`, (err, profile) => {
     if (err) { return next(err); }
-    res.render('api/facebook', {
-      title: 'Facebook API',
+    res.render("api/facebook", {
+      title: "Facebook API",
       profile
     });
   });
@@ -101,15 +113,15 @@ exports.getFacebook = (req, res, next) => {
  * Web scraping example using Cheerio library.
  */
 exports.getScraping = (req, res, next) => {
-  axios.get('https://news.ycombinator.com/')
+  axios.get("https://news.ycombinator.com/")
     .then((response) => {
       const $ = cheerio.load(response.data);
       const links = [];
-      $('.title a[href^="http"], a[href^="https"]').slice(1).each((index, element) => {
+      $(".title a[href^=\"http\"], a[href^=\"https\"]").slice(1).each((index, element) => {
         links.push($(element));
       });
-      res.render('api/scraping', {
-        title: 'Web Scraping',
+      res.render("api/scraping", {
+        title: "Web Scraping",
         links
       });
     })
@@ -123,9 +135,9 @@ exports.getScraping = (req, res, next) => {
 exports.getGithub = async (req, res, next) => {
   const github = new Octokit();
   try {
-    const { data: repo } = await github.repos.get({ owner: 'sahat', repo: 'hackathon-starter' });
-    res.render('api/github', {
-      title: 'GitHub API',
+    const { data: repo } = await github.repos.get({ owner: "sahat", repo: "hackathon-starter" });
+    res.render("api/github", {
+      title: "GitHub API",
       repo
     });
   } catch (error) {
@@ -134,14 +146,14 @@ exports.getGithub = async (req, res, next) => {
 };
 
 exports.getQuickbooks = (req, res) => {
-  const token = req.user.tokens.find((token) => token.kind === 'quickbooks');
+  const token = req.user.tokens.find((token) => token.kind === "quickbooks");
 
   const qbo = new Quickbooks(process.env.QUICKBOOKS_CLIENT_ID, process.env.QUICKBOOKS_CLIENT_SECRET,
-    token.accessToken, false, req.user.quickbooks, true, false, null, '2.0', token.refreshToken);
+    token.accessToken, false, req.user.quickbooks, true, false, null, "2.0", token.refreshToken);
 
   qbo.findCustomers((_, customers) => {
-    res.render('api/quickbooks', {
-      title: 'Quickbooks API',
+    res.render("api/quickbooks", {
+      title: "Quickbooks API",
       customers: customers.QueryResponse.Customer
     });
   });
@@ -156,8 +168,8 @@ exports.getNewYorkTimes = (req, res, next) => {
   axios.get(`http://api.nytimes.com/svc/books/v2/lists?list-name=young-adult&api-key=${apiKey}`)
     .then((response) => {
       const books = response.data.results;
-      res.render('api/nyt', {
-        title: 'New York Times API',
+      res.render("api/nyt", {
+        title: "New York Times API",
         books
       });
     })
@@ -178,8 +190,8 @@ exports.getLastfm = async (req, res, next) => {
   });
   const getArtistInfo = () =>
     new Promise((resolve, reject) => {
-      lastfm.request('artist.getInfo', {
-        artist: 'Roniit',
+      lastfm.request("artist.getInfo", {
+        artist: "Roniit",
         handlers: {
           success: resolve,
           error: reject
@@ -188,8 +200,8 @@ exports.getLastfm = async (req, res, next) => {
     });
   const getArtistTopTracks = () =>
     new Promise((resolve, reject) => {
-      lastfm.request('artist.getTopTracks', {
-        artist: 'Roniit',
+      lastfm.request("artist.getTopTracks", {
+        artist: "Roniit",
         handlers: {
           success: ({ toptracks }) => {
             resolve(toptracks.track.slice(0, 10));
@@ -200,8 +212,8 @@ exports.getLastfm = async (req, res, next) => {
     });
   const getArtistTopAlbums = () =>
     new Promise((resolve, reject) => {
-      lastfm.request('artist.getTopAlbums', {
-        artist: 'Roniit',
+      lastfm.request("artist.getTopAlbums", {
+        artist: "Roniit",
         handlers: {
           success: ({ topalbums }) => {
             resolve(topalbums.album.slice(0, 3));
@@ -216,16 +228,16 @@ exports.getLastfm = async (req, res, next) => {
     const topAlbums = await getArtistTopAlbums();
     const artist = {
       name: artistInfo.name,
-      image: artistInfo.image ? artistInfo.image.slice(-1)[0]['#text'] : null,
+      image: artistInfo.image ? artistInfo.image.slice(-1)[0]["#text"] : null,
       tags: artistInfo.tags ? artistInfo.tags.tag : [],
-      bio: artistInfo.bio ? artistInfo.bio.summary : '',
+      bio: artistInfo.bio ? artistInfo.bio.summary : "",
       stats: artistInfo.stats,
       similar: artistInfo.similar ? artistInfo.similar.artist : [],
       topTracks,
       topAlbums
     };
-    res.render('api/lastfm', {
-      title: 'Last.fm API',
+    res.render("api/lastfm", {
+      title: "Last.fm API",
       artist
     });
   } catch (err) {
@@ -235,12 +247,12 @@ exports.getLastfm = async (req, res, next) => {
       switch (err.error) {
       // potentially handle each code uniquely
         case 10: // Invalid API key
-          res.render('api/lastfm', {
+          res.render("api/lastfm", {
             error: err
           });
           break;
         default:
-          res.render('api/lastfm', {
+          res.render("api/lastfm", {
             error: err
           });
       }
@@ -255,7 +267,7 @@ exports.getLastfm = async (req, res, next) => {
  * Twitter API example.
  */
 exports.getTwitter = async (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'twitter');
+  const token = req.user.tokens.find((token) => token.kind === "twitter");
   const T = new Twit({
     consumer_key: process.env.TWITTER_KEY,
     consumer_secret: process.env.TWITTER_SECRET,
@@ -263,13 +275,13 @@ exports.getTwitter = async (req, res, next) => {
     access_token_secret: token.tokenSecret
   });
   try {
-    const { data: { statuses: tweets } } = await T.get('search/tweets', {
-      q: 'nodejs since:2013-01-01',
-      geocode: '40.71448,-74.00598,5mi',
+    const { data: { statuses: tweets } } = await T.get("search/tweets", {
+      q: "nodejs since:2013-01-01",
+      geocode: "40.71448,-74.00598,5mi",
       count: 10
     });
-    res.render('api/twitter', {
-      title: 'Twitter API',
+    res.render("api/twitter", {
+      title: "Twitter API",
       tweets
     });
   } catch (error) {
@@ -283,24 +295,24 @@ exports.getTwitter = async (req, res, next) => {
  */
 exports.postTwitter = (req, res, next) => {
   const validationErrors = [];
-  if (validator.isEmpty(req.body.tweet)) validationErrors.push({ msg: 'Tweet cannot be empty' });
+  if (validator.isEmpty(req.body.tweet)) validationErrors.push({ msg: "Tweet cannot be empty" });
 
   if (validationErrors.length) {
-    req.flash('errors', validationErrors);
-    return res.redirect('/api/twitter');
+    req.flash("errors", validationErrors);
+    return res.redirect("/api/twitter");
   }
 
-  const token = req.user.tokens.find((token) => token.kind === 'twitter');
+  const token = req.user.tokens.find((token) => token.kind === "twitter");
   const T = new Twit({
     consumer_key: process.env.TWITTER_KEY,
     consumer_secret: process.env.TWITTER_SECRET,
     access_token: token.accessToken,
     access_token_secret: token.tokenSecret
   });
-  T.post('statuses/update', { status: req.body.tweet }, (err) => {
+  T.post("statuses/update", { status: req.body.tweet }, (err) => {
     if (err) { return next(err); }
-    req.flash('success', { msg: 'Your tweet has been posted.' });
-    res.redirect('/api/twitter');
+    req.flash("success", { msg: "Your tweet has been posted." });
+    res.redirect("/api/twitter");
   });
 };
 
@@ -310,7 +322,7 @@ exports.postTwitter = (req, res, next) => {
  */
 exports.getSteam = async (req, res, next) => {
   const steamId = req.user.steam;
-  const params = { l: 'english', steamid: steamId, key: process.env.STEAM_KEY };
+  const params = { l: "english", steamid: steamId, key: process.env.STEAM_KEY };
 
   // makes a url with search query
   const makeURL = (baseURL, params) => {
@@ -321,7 +333,7 @@ exports.getSteam = async (req, res, next) => {
   };
     // get the list of the recently played games, pick the most recent one and get its achievements
   const getPlayerAchievements = () => {
-    const recentGamesURL = makeURL('http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/', params);
+    const recentGamesURL = makeURL("http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/", params);
     return axios.get(recentGamesURL)
       .then(({ data }) => {
         // handle if player owns no games
@@ -333,7 +345,7 @@ exports.getSteam = async (req, res, next) => {
           return null;
         }
         params.appid = data.response.games[0].appid;
-        const achievementsURL = makeURL('http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/', params);
+        const achievementsURL = makeURL("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/", params);
         return axios.get(achievementsURL)
           .then(({ data }) => {
             // handle if there are no achievements for most recent game
@@ -350,30 +362,30 @@ exports.getSteam = async (req, res, next) => {
             return null;
           }
         }
-        return Promise.reject(new Error('There was an error while getting achievements'));
+        return Promise.reject(new Error("There was an error while getting achievements"));
       });
   };
   const getPlayerSummaries = () => {
     params.steamids = steamId;
-    const url = makeURL('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/', params);
+    const url = makeURL("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/", params);
     return axios.get(url)
       .then(({ data }) => data)
-      .catch(() => Promise.reject(new Error('There was an error while getting player summary')));
+      .catch(() => Promise.reject(new Error("There was an error while getting player summary")));
   };
   const getOwnedGames = () => {
     params.include_appinfo = 1;
     params.include_played_free_games = 1;
-    const url = makeURL('http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/', params);
+    const url = makeURL("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/", params);
     return axios.get(url)
       .then(({ data }) => data)
-      .catch(() => Promise.reject(new Error('There was an error while getting owned games')));
+      .catch(() => Promise.reject(new Error("There was an error while getting owned games")));
   };
   try {
     const playerstats = await getPlayerAchievements();
     const playerSummaries = await getPlayerSummaries();
     const ownedGames = await getOwnedGames();
-    res.render('api/steam', {
-      title: 'Steam Web API',
+    res.render("api/steam", {
+      title: "Steam Web API",
       ownedGames: ownedGames.response,
       playerAchievements: playerstats,
       playerSummary: playerSummaries.response.players[0]
@@ -388,8 +400,8 @@ exports.getSteam = async (req, res, next) => {
  * Stripe API example.
  */
 exports.getStripe = (req, res) => {
-  res.render('api/stripe', {
-    title: 'Stripe API',
+  res.render("api/stripe", {
+    title: "Stripe API",
     publishableKey: process.env.STRIPE_PKEY
   });
 };
@@ -402,16 +414,16 @@ exports.postStripe = (req, res) => {
   const { stripeToken, stripeEmail } = req.body;
   stripe.charges.create({
     amount: 395,
-    currency: 'usd',
+    currency: "usd",
     source: stripeToken,
     description: stripeEmail
   }, (err) => {
-    if (err && err.type === 'StripeCardError') {
-      req.flash('errors', { msg: 'Your card has been declined.' });
-      return res.redirect('/api/stripe');
+    if (err && err.type === "StripeCardError") {
+      req.flash("errors", { msg: "Your card has been declined." });
+      return res.redirect("/api/stripe");
     }
-    req.flash('success', { msg: 'Your card has been successfully charged.' });
-    res.redirect('/api/stripe');
+    req.flash("success", { msg: "Your card has been successfully charged." });
+    res.redirect("/api/stripe");
   });
 };
 
@@ -420,8 +432,8 @@ exports.postStripe = (req, res) => {
  * Twilio API example.
  */
 exports.getTwilio = (req, res) => {
-  res.render('api/twilio', {
-    title: 'Twilio API'
+  res.render("api/twilio", {
+    title: "Twilio API"
   });
 };
 
@@ -431,22 +443,22 @@ exports.getTwilio = (req, res) => {
  */
 exports.postTwilio = (req, res, next) => {
   const validationErrors = [];
-  if (validator.isEmpty(req.body.number)) validationErrors.push({ msg: 'Phone number is required.' });
-  if (validator.isEmpty(req.body.message)) validationErrors.push({ msg: 'Message cannot be blank.' });
+  if (validator.isEmpty(req.body.number)) validationErrors.push({ msg: "Phone number is required." });
+  if (validator.isEmpty(req.body.message)) validationErrors.push({ msg: "Message cannot be blank." });
 
   if (validationErrors.length) {
-    req.flash('errors', validationErrors);
-    return res.redirect('/api/twilio');
+    req.flash("errors", validationErrors);
+    return res.redirect("/api/twilio");
   }
 
   const message = {
     to: req.body.number,
-    from: '+13472235148',
+    from: "+13472235148",
     body: req.body.message
   };
   twilio.messages.create(message).then((sentMessage) => {
-    req.flash('success', { msg: `Text send to ${sentMessage.to}` });
-    res.redirect('/api/twilio');
+    req.flash("success", { msg: `Text send to ${sentMessage.to}` });
+    res.redirect("/api/twilio");
   }).catch(next);
 };
 
@@ -454,7 +466,7 @@ exports.postTwilio = (req, res, next) => {
  * Get /api/twitch
  */
 exports.getTwitch = async (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'twitch');
+  const token = req.user.tokens.find((token) => token.kind === "twitch");
   const twitchID = req.user.twitch;
 
   const getUser = (userID) =>
@@ -470,8 +482,8 @@ exports.getTwitch = async (req, res, next) => {
     const yourTwitchUser = await getUser(twitchID);
     const otherTwitchUser = await getUser(44322889);
     const twitchFollowers = await getFollowers();
-    res.render('api/twitch', {
-      title: 'Twitch API',
+    res.render("api/twitch", {
+      title: "Twitch API",
       yourTwitchUserData: yourTwitchUser.data[0],
       otherTwitchUserData: otherTwitchUser.data[0],
       twitchFollowers,
@@ -486,8 +498,8 @@ exports.getTwitch = async (req, res, next) => {
  * Clockwork SMS API example.
  */
 exports.getClockwork = (req, res) => {
-  res.render('api/clockwork', {
-    title: 'Clockwork SMS API'
+  res.render("api/clockwork", {
+    title: "Clockwork SMS API"
   });
 };
 
@@ -498,13 +510,13 @@ exports.getClockwork = (req, res) => {
 exports.postClockwork = (req, res, next) => {
   const message = {
     To: req.body.telephone,
-    From: 'Hackathon',
-    Content: 'Hello from the Hackathon Starter'
+    From: "Hackathon",
+    Content: "Hello from the Hackathon Starter"
   };
   clockwork.sendSms(message, (err, responseData) => {
     if (err) { return next(err.errDesc); }
-    req.flash('success', { msg: `Text sent to ${responseData.responses[0].to}` });
-    res.redirect('/api/clockwork');
+    req.flash("success", { msg: `Text sent to ${responseData.responses[0].to}` });
+    res.redirect("/api/clockwork");
   });
 };
 
@@ -516,21 +528,21 @@ exports.getChart = async (req, res, next) => {
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&outputsize=compact&apikey=${process.env.ALPHA_VANTAGE_KEY}`;
   axios.get(url)
     .then((response) => {
-      const arr = response.data['Time Series (Daily)'];
+      const arr = response.data["Time Series (Daily)"];
       let dates = [];
       let closing = []; // stock closing value
       const keys = Object.getOwnPropertyNames(arr);
       for (let i = 0; i < 100; i++) {
         dates.push(keys[i]);
-        closing.push(arr[keys[i]]['4. close']);
+        closing.push(arr[keys[i]]["4. close"]);
       }
       // reverse so dates appear from left to right
       dates.reverse();
       closing.reverse();
       dates = JSON.stringify(dates);
       closing = JSON.stringify(closing);
-      res.render('api/chart', {
-        title: 'Chart',
+      res.render("api/chart", {
+        title: "Chart",
         dates,
         closing
       });
@@ -544,14 +556,14 @@ exports.getChart = async (req, res, next) => {
  * Instagram API example.
  */
 exports.getInstagram = async (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'instagram');
+  const token = req.user.tokens.find((token) => token.kind === "instagram");
   ig.use({ client_id: process.env.INSTAGRAM_ID, client_secret: process.env.INSTAGRAM_SECRET });
   ig.use({ access_token: token.accessToken });
   try {
     const userSelfMediaRecentAsync = promisify(ig.user_self_media_recent);
     const myRecentMedia = await userSelfMediaRecentAsync();
-    res.render('api/instagram', {
-      title: 'Instagram API',
+    res.render("api/instagram", {
+      title: "Instagram API",
       myRecentMedia
     });
   } catch (error) {
@@ -565,25 +577,25 @@ exports.getInstagram = async (req, res, next) => {
  */
 exports.getPayPal = (req, res, next) => {
   paypal.configure({
-    mode: 'sandbox',
+    mode: "sandbox",
     client_id: process.env.PAYPAL_ID,
     client_secret: process.env.PAYPAL_SECRET
   });
 
   const paymentDetails = {
-    intent: 'sale',
+    intent: "sale",
     payer: {
-      payment_method: 'paypal'
+      payment_method: "paypal"
     },
     redirect_urls: {
       return_url: process.env.PAYPAL_RETURN_URL,
       cancel_url: process.env.PAYPAL_CANCEL_URL
     },
     transactions: [{
-      description: 'Hackathon Starter',
+      description: "Hackathon Starter",
       amount: {
-        currency: 'USD',
-        total: '1.99'
+        currency: "USD",
+        total: "1.99"
       }
     }]
   };
@@ -593,8 +605,8 @@ exports.getPayPal = (req, res, next) => {
     const { links, id } = payment;
     req.session.paymentId = id;
     for (let i = 0; i < links.length; i++) {
-      if (links[i].rel === 'approval_url') {
-        res.render('api/paypal', {
+      if (links[i].rel === "approval_url") {
+        res.render("api/paypal", {
           approvalUrl: links[i].href
         });
       }
@@ -610,7 +622,7 @@ exports.getPayPalSuccess = (req, res) => {
   const { paymentId } = req.session;
   const paymentDetails = { payer_id: req.query.PayerID };
   paypal.payment.execute(paymentId, paymentDetails, (err) => {
-    res.render('api/paypal', {
+    res.render("api/paypal", {
       result: true,
       success: !err
     });
@@ -623,7 +635,7 @@ exports.getPayPalSuccess = (req, res) => {
  */
 exports.getPayPalCancel = (req, res) => {
   req.session.paymentId = null;
-  res.render('api/paypal', {
+  res.render("api/paypal", {
     result: true,
     canceled: true
   });
@@ -635,30 +647,30 @@ exports.getPayPalCancel = (req, res) => {
  */
 exports.getLob = async (req, res, next) => {
   let recipientName;
-  if (req.user) { recipientName = req.user.profile.name; } else { recipientName = 'John Doe'; }
+  if (req.user) { recipientName = req.user.profile.name; } else { recipientName = "John Doe"; }
   const addressTo = {
     name: recipientName,
-    address_line1: '123 Main Street',
-    address_city: 'New York',
-    address_state: 'NY',
-    address_zip: '94107'
+    address_line1: "123 Main Street",
+    address_city: "New York",
+    address_state: "NY",
+    address_zip: "94107"
   };
   const addressFrom = {
-    name: 'Hackathon Starter',
-    address_line1: '123 Test Street',
-    address_line2: 'Unit 200',
-    address_city: 'Chicago',
-    address_state: 'IL',
-    address_zip: '60012',
-    address_country: 'US'
+    name: "Hackathon Starter",
+    address_line1: "123 Test Street",
+    address_line2: "Unit 200",
+    address_city: "Chicago",
+    address_state: "IL",
+    address_zip: "60012",
+    address_country: "US"
   };
 
-  const lookupZip = () => lob.usZipLookups.lookup({ zip_code: '94107' })
+  const lookupZip = () => lob.usZipLookups.lookup({ zip_code: "94107" })
     .then((zipdetails) => (zipdetails))
     .catch((error) => Promise.reject(new Error(`Could not get zip code details: ${error}`)));
 
   const createAndMailLetter = () => lob.letters.create({
-    description: 'My First Class Letter',
+    description: "My First Class Letter",
     to: addressTo,
     from: addressFrom,
     // file: minified version of https://github.com/lob/lob-node/blob/master/examples/html/letter.html with slight changes as an example
@@ -674,8 +686,8 @@ exports.getLob = async (req, res, next) => {
   try {
     const uspsLetter = await createAndMailLetter();
     const zipDetails = await lookupZip();
-    res.render('api/lob', {
-      title: 'Lob API',
+    res.render("api/lob", {
+      title: "Lob API",
       zipDetails,
       uspsLetter,
     });
@@ -690,14 +702,14 @@ exports.getLob = async (req, res, next) => {
  */
 
 exports.getFileUpload = (req, res) => {
-  res.render('api/upload', {
-    title: 'File Upload'
+  res.render("api/upload", {
+    title: "File Upload"
   });
 };
 
 exports.postFileUpload = (req, res) => {
-  req.flash('success', { msg: 'File was uploaded successfully.' });
-  res.redirect('/api/upload');
+  req.flash("success", { msg: "File was uploaded successfully." });
+  res.redirect("/api/upload");
 };
 
 /**
@@ -705,11 +717,11 @@ exports.postFileUpload = (req, res) => {
  * Pinterest API example.
  */
 exports.getPinterest = (req, res, next) => {
-  const token = req.user.tokens.find((token) => token.kind === 'pinterest');
+  const token = req.user.tokens.find((token) => token.kind === "pinterest");
   axios.get(`https://api.pinterest.com/v1/me/boards?access_token=${token.accessToken}`)
     .then((response) => {
-      res.render('api/pinterest', {
-        title: 'Pinterest API',
+      res.render("api/pinterest", {
+        title: "Pinterest API",
         boards: response.data.data
       });
     })
@@ -723,16 +735,16 @@ exports.getPinterest = (req, res, next) => {
  */
 exports.postPinterest = (req, res, next) => {
   const validationErrors = [];
-  if (validator.isEmpty(req.body.board)) validationErrors.push({ msg: 'Board is required.' });
-  if (validator.isEmpty(req.body.note)) validationErrors.push({ msg: 'Note cannot be blank.' });
-  if (validator.isEmpty(req.body.image_url)) validationErrors.push({ msg: 'Image URL cannot be blank.' });
+  if (validator.isEmpty(req.body.board)) validationErrors.push({ msg: "Board is required." });
+  if (validator.isEmpty(req.body.note)) validationErrors.push({ msg: "Note cannot be blank." });
+  if (validator.isEmpty(req.body.image_url)) validationErrors.push({ msg: "Image URL cannot be blank." });
 
   if (validationErrors.length) {
-    req.flash('errors', validationErrors);
-    return res.redirect('/api/pinterest');
+    req.flash("errors", validationErrors);
+    return res.redirect("/api/pinterest");
   }
 
-  const token = req.user.tokens.find((token) => token.kind === 'pinterest');
+  const token = req.user.tokens.find((token) => token.kind === "pinterest");
   const formData = {
     board: req.body.board,
     note: req.body.note,
@@ -742,12 +754,12 @@ exports.postPinterest = (req, res, next) => {
 
   axios.post(`https://api.pinterest.com/v1/pins/?access_token=${token.accessToken}`, formData)
     .then(() => {
-      req.flash('success', { msg: 'Pin created' });
-      res.redirect('/api/pinterest');
+      req.flash("success", { msg: "Pin created" });
+      res.redirect("/api/pinterest");
     })
     .catch((error) => {
-      req.flash('errors', { msg: error.response.data.message });
-      res.redirect('/api/pinterest');
+      req.flash("errors", { msg: error.response.data.message });
+      res.redirect("/api/pinterest");
     });
 };
 
@@ -763,71 +775,71 @@ u=1500&\
 vt=1&&z=13&\
 h=500&w=800&`;
 
-  res.render('api/here-maps', {
+  res.render("api/here-maps", {
     app_id: process.env.HERE_APP_ID,
     app_code: process.env.HERE_APP_CODE,
-    title: 'Here Maps API',
+    title: "Here Maps API",
     imageMapURL
   });
 };
 
 exports.getGoogleMaps = (req, res) => {
-  res.render('api/google-maps', {
-    title: 'Google Maps API',
+  res.render("api/google-maps", {
+    title: "Google Maps API",
     google_map_api_key: process.env.GOOGLE_MAP_API_KEY
   });
 };
 
 exports.getGoogleDrive = (req, res) => {
-  const token = req.user.tokens.find((token) => token.kind === 'google');
+  const token = req.user.tokens.find((token) => token.kind === "google");
   const authObj = new google.auth.OAuth2({
-    access_type: 'offline'
+    access_type: "offline"
   });
   authObj.setCredentials({
     access_token: token.accessToken
   });
 
   const drive = google.drive({
-    version: 'v3',
+    version: "v3",
     auth: authObj
   });
 
   drive.files.list({
-    fields: 'files(iconLink, webViewLink, name)'
+    fields: "files(iconLink, webViewLink, name)"
   }, (err, response) => {
     if (err) return console.log(`The API returned an error: ${err}`);
-    res.render('api/google-drive', {
-      title: 'Google Drive API',
+    res.render("api/google-drive", {
+      title: "Google Drive API",
       files: response.data.files,
     });
   });
 };
 
 exports.getGoogleSheets = (req, res) => {
-  const token = req.user.tokens.find((token) => token.kind === 'google');
+  const token = req.user.tokens.find((token) => token.kind === "google");
   const authObj = new google.auth.OAuth2({
-    access_type: 'offline'
+    access_type: "offline"
   });
   authObj.setCredentials({
     access_token: token.accessToken
   });
 
   const sheets = google.sheets({
-    version: 'v4',
+    version: "v4",
     auth: authObj
   });
 
-  const url = 'https://docs.google.com/spreadsheets/d/12gm6fRAp0bC8TB2vh7sSPT3V75Ug99JaA9L0PqiWS2s/edit#gid=0';
+  const url = "https://docs.google.com/spreadsheets/d/12gm6fRAp0bC8TB2vh7sSPT3V75Ug99JaA9L0PqiWS2s/edit#gid=0";
   const re = /spreadsheets\/d\/([a-zA-Z0-9-_]+)/;
   const id = url.match(re)[1];
 
   sheets.spreadsheets.values.get({
     spreadsheetId: id,
-    range: 'Class Data!A1:F',
+    range: "Class Data!A1:F",
   }, (err, response) => {
     if (err) return console.log(`The API returned an error: ${err}`);
-    res.render('api/google-sheets', {
-      title: 'Google Sheets API',
+    res.render("api/google-sheets", {
+      title: "Google Sheets API",
       values: response.data.values,
     });
   });
