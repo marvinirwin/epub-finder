@@ -567,3 +567,7 @@ exports.postForgot = (req, res, next) => {
     .then(() => res.redirect("/forgot"))
     .catch(next);
 };
+
+exports.getProfile = (req, res, next) => {
+    res.json(req.user.profile);
+}
