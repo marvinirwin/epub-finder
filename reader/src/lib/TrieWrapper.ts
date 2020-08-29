@@ -1,8 +1,10 @@
-import {ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
 import {ITrie} from "./Interfaces/Trie";
 
 export class TrieWrapper {
     public changeSignal$: Subject<void>;
+    public newWords$ = new ReplaySubject<string[]>(1);
+
     private lengths: {[key: number]: number} = {};
     private wordSet = new Set<string>();
 
@@ -12,14 +14,19 @@ export class TrieWrapper {
     }
 
     addWords(...words: string[]) {
+        const newWords: string[] = [];
         words.forEach(w => {
             if (!this.wordSet.has(w)) {
+                newWords.push(w);
                 this.wordSet.add(w);
                 this.lengths[w.length] = (this.lengths[w.length] || 0) + 1;
             }
             this.t.addWord(w);
         })
-        if (words.length) this.changeSignal$.next()
+        if (words.length) {
+            this.changeSignal$.next()
+            this.newWords$.next(newWords);
+        }
     }
 
     removeWords(...words: string[]) {

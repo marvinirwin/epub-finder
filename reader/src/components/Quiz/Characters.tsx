@@ -27,12 +27,14 @@ export function Characters({c, m}: QuizCardProps) {
     const [error, setError] = useState('');
     const [createdSentence, setCreatedSentence] = useState();
     const advance = () => {
+        m.quizManager.quizzingComponent$.next("Pictures");
+/*
         if (createdSentence) {
-            m.quizManager.quizzingComponent$.next("Pictures");
         } else {
             const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
             r.sentence.then(setCreatedSentence)
         }
+*/
     };
 
     useEffect(() => {

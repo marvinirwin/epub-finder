@@ -8,9 +8,11 @@ export const appendBookStyle = (d: Document) => {
         position: relative;
         background: transparent;
     }
+    
     mark.highlighted::after {
         opacity: 1;
     }
+    
     mark::after {
         content: "";
         position: absolute;
@@ -23,6 +25,7 @@ export const appendBookStyle = (d: Document) => {
         transition: opacity 250ms;
         z-index: -1;
     }
+    
 .highlighted::after {
         opacity: 1;
     }

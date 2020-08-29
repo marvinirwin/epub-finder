@@ -9,7 +9,7 @@ import {
     fade,
     GridList,
     GridListTile, IconButton, InputBase,
-    Slide, Theme, Toolbar, Typography
+    Slide, TextField, Theme, Toolbar, Typography
 } from "@material-ui/core";
 import {TransitionProps} from "@material-ui/core/transitions";
 import {makeStyles} from "@material-ui/core/styles";
@@ -143,16 +143,20 @@ export function ImageSelectPopup({m}: { m: Manager }) {
                     <div className={classes.searchIcon}>
                         <SearchIcon />
                     </div>
+                    <TextField
+    placeholder="Search…"
+    value={searchTerm}
+    onChange={e => setSearchTerm(e.target.value)}
+    />
+{/*
                     <InputBase
-                        placeholder="Search…"
                         classes={{
                             root: classes.inputRoot,
                             input: classes.inputInput,
                         }}
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
                         inputProps={{ 'aria-label': 'search' }}
                     />
+*/}
                 </div>
                 <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
                     <CloseIcon/>
@@ -160,16 +164,19 @@ export function ImageSelectPopup({m}: { m: Manager }) {
             </Toolbar>
         </AppBar>
         <div className={classes.root}>
-            <GridList cellHeight={160} className={classes.gridList} cols={12}>
-                {sources.map((src, index) => {
-                    return <GridListTile className={classes.tile} key={index}>
-                        <img onClick={() => {
-                            imageRequest?.cb(src.contentUrl);
-                            m.queryImageRequest$.next(undefined);
-                        }} src={src.thumbnailUrl} alt={''}/>
-                    </GridListTile>
-                })}
-            </GridList>
+            {
+                sources.length &&
+                    <GridList cellHeight={160} className={classes.gridList} cols={12}>
+                        {sources.map((src, index) => {
+                            return <GridListTile className={classes.tile} key={index}>
+                                <img onClick={() => {
+                                    imageRequest?.cb(src.contentUrl);
+                                    m.queryImageRequest$.next(undefined);
+                                }} src={src.thumbnailUrl} alt={''}/>
+                            </GridListTile>
+                        })}
+                    </GridList>
+            }
         </div>
     </Dialog>
 }

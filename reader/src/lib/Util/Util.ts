@@ -53,8 +53,8 @@ export function splitLong(threshhold: number, str: string, filterFunc: (char: st
         const char = str[i];
         const isPastThreshhold = (i - currentStart) > threshhold;
         if (isPastThreshhold && filterFunc(char)) {
-            splits.push(str.substr(currentStart, i - currentStart));
-            currentStart = i;
+            splits.push(str.substr(currentStart, i - currentStart + 1));
+            currentStart = i + 1;
         }
     }
     splits.push(str.substr(currentStart, str.length));

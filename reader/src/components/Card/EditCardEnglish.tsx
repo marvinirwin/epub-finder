@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EditCardEnglish({e}: { e: EditingCard }) {
     const classes = useStyles();
-    const english = useObservableState(e.knownLanguage$);
+    const knownLanguage = useObservableState(e.knownLanguage$);
     return (
         <form className={classes.root} noValidate autoComplete="off">
             <TextField
@@ -25,8 +25,12 @@ export default function EditCardEnglish({e}: { e: EditingCard }) {
                 rows={4}
                 defaultValue="Default Value"
                 variant="outlined"
-                value={english}
-                onChange={t => e.knownLanguage$.next(t.target.value.split('\n'))}
+                value={knownLanguage}
+                onChange={t => {
+                    t.preventDefault();
+                    t.stopPropagation();
+                    e.knownLanguage$.next(t.target.value.split('\n'));
+                }}
             />
         </form>
     );

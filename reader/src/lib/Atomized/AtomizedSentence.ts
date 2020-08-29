@@ -8,9 +8,12 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {getTranslation} from "../Util/Util";
+import {ReplaySubject} from "rxjs";
 
 export class AtomizedSentence {
     private _translation: string | undefined;
+    private _previousWords = new Set<string>();
+    public newWords$ = new ReplaySubject<Set<string>>(1);
 
     public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
         let textWordDataRecords = atomizedSentences.map(atomizedSentence =>
@@ -40,6 +43,7 @@ export class AtomizedSentence {
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
+        const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
         let children = this.sentenceElement.childNodes;
         for (let i = 0; i < children.length; i++) {
@@ -66,11 +70,16 @@ export class AtomizedSentence {
             }))
 
             let words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
-                let newWord: IPositionedWord = {
+                let position = word.length - lengthRemaining;
+                let newPositionedWord: IPositionedWord = {
                     word,
-                    position: word.length - lengthRemaining
+                    position: position
                 };
-                return newWord;
+                if (!this._previousWords.has(word)) {
+                    newWords.add(word);
+                }
+                this._previousWords.add(`${word}`);
+                return newPositionedWord;
             });
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let annotationElement: IAnnotatedCharacter = {
@@ -93,6 +102,9 @@ export class AtomizedSentence {
         const sentenceMap: Dictionary<AtomizedSentence[]> = {
             [this.translatableText]: [this]
         };
+        if (newWords.size) {
+            this.newWords$.next(newWords);
+        }
         return {
             wordElementsMap,
             wordCounts,

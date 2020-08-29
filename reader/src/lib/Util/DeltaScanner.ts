@@ -166,7 +166,7 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
     }
 }
 
-export function flattenTree<T>(tree: ds_Tree<T>, a: T[] = []): T[] {
+export function flattenTree<T, U extends string = string>(tree: ds_Tree<T, U>, a: T[] = []): T[] {
     if (!tree) {
         debugger;
     }

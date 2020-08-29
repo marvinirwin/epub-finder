@@ -1,5 +1,5 @@
 import {combineLatest, Observable, Subject} from "rxjs";
-import {map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -51,8 +51,10 @@ export class OpenBooks {
 
         this.atomizedSentences$ = this.openedBooks
             .mapWith((bookFrame: OpenBook) => bookFrame.renderer.atomizedSentences$).updates$.pipe(
-                switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence, string>>>) => {
-                    return combineLatest(sourced ? flattenTree(sourced) : []);
+                switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence>>>) => {
+                    return combineLatest(
+                        sourced ? flattenTree(sourced) : []
+                    );
                 }),
                 map((atomizedSentenceArrays: ds_Dict<AtomizedSentence>[]) => {
                         return flattenDeep(atomizedSentenceArrays.map(Object.values));

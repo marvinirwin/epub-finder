@@ -1,13 +1,8 @@
 import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {
-    map,
-    mapTo,
-    skip,
-    switchMap,
-} from "rxjs/operators";
+import {map, mapTo, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
-import { memoize, flatten} from "lodash";
+import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
 import {AudioManager} from "../Manager/AudioManager";
 import CardManager from "../Manager/CardManager";
@@ -33,6 +28,7 @@ export class EditingCard {
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
     pinyin$: Observable<string>;
+
     constructor(
         public persistor: IndexDBManager<ICard>,
         public a: AudioManager,
@@ -41,27 +37,7 @@ export class EditingCard {
     ) {
 
         this.saveInProgress$.next(false);
-        let firstGroup$ = combineLatest(
-            [
-                this.photos$,
-                this.sounds$,
-                this.knownLanguage$,
-                this.illustrationPhotos$
-            ]
-        );
-        let secondGroup$ = combineLatest([
-                this.deck$
-            ]
-        );
-
-        let saveData$ = combineLatest(
-            [
-                firstGroup$,
-                this.learningLanguage$,
-                secondGroup$
-            ]
-            // This debounce Time and then skip means skip the first emit when we create the ReactiveClasses
-        ).pipe(skip(1));
+        let saveData$ = this.saveDataObservable();
 
         saveData$.subscribe(() => {
             this.saveInProgress$.next(true);
@@ -75,7 +51,7 @@ export class EditingCard {
                 ).pipe(mapTo(d))
             )
         ).subscribe(async (
-            [[photos, sounds, english, frontPhotos], characters, [deck]]
+            [photos, sounds, english, frontPhotos, characters, deck]
         ) => {
             const iCard: ICard = {
                 id: this.id,
@@ -116,20 +92,25 @@ export class EditingCard {
                 return char;
             }).join(' ')
         }));
+    }
 
-/*
-        this.pinyin$.pipe(withLatestFrom(this.knownLanguage$)).subscribe(([pinyin, definition]) => {
-            const defString = definition.join('');
-            if (!defString || !defString.trim()) {
-                this.knownLanguage$.next([pinyin]);
-            }
-        })
-*/
+    private saveDataObservable() {
+        return combineLatest(
+            [
+                this.photos$,
+                this.sounds$,
+                this.knownLanguage$,
+                this.illustrationPhotos$,
+                this.learningLanguage$,
+                this.deck$
+            ]
+            // This debounce Time and then skip means skip the first emit when we create the ReactiveClasses
+        ).pipe(skip(1));
     }
 
     static fromICard(iCard: ICard, persistor: IndexDBManager<ICard>, m: AudioManager, c: CardManager): EditingCard {
         const e = new EditingCard(persistor, m, c);
-        e.deck$.next(iCard.deck || "NO_DECK");
+        e.deck$.next(iCard.deck || "");
         e.photos$.next(iCard.photos);
         e.illustrationPhotos$.next(iCard.illustrationPhotos);
         e.sounds$.next(iCard.sounds);

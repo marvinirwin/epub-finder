@@ -11,7 +11,7 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {OpenBooks} from "./Manager/OpenBooks";
-import {NavigationPages} from "./Util/Util";
+import {NavigationPages, sleep} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Manager/BrowserInputs";
@@ -39,6 +39,7 @@ import {ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {TrieWrapper} from "./TrieWrapper";
+import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -72,6 +73,7 @@ export class Manager {
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
     public quizCharacterManager: QuizCharacterManager;
+    public authenticationMonitor = new AuthenticationMonitor();
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -148,8 +150,6 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
-
-
 
 
         /**
@@ -293,7 +293,30 @@ export class Manager {
                 }
             }
         });
+        this.highlightNewWords();
         this.cardManager.load();
+    }
+
+    private highlightNewWords() {
+        this.openedBooksManager.atomizedSentences$.pipe(
+            switchMap(atomizedSentences => {
+                    return combineLatest(atomizedSentences.map(atomizedSentence => atomizedSentence.newWords$));
+                }
+            ),
+        ).subscribe(async (newWordSets: Set<string>[]) => {
+            const bigSet = new Set<string>();
+            for (let i = 0; i < newWordSets.length; i++) {
+                const newWordSet = newWordSets[i];
+                Array.from(newWordSet.values()).forEach(word => bigSet.add(word))
+            }
+            const newWords = Array.from(bigSet);
+            for (let i = 0; i < newWords.length; i++) {
+                const newWord = newWords[i];
+                this.highlightedWord$.next(newWord);
+                await sleep(250);
+            }
+            this.highlightedWord$.next('');
+        })
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

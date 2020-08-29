@@ -25,7 +25,6 @@ export class IFrameBookRenderer implements BookRenderer {
             )
         ]).pipe(
             switchMap(async ([srcDoc, frame]) => {
-                debugger;
                 await Frame.SetIFrameSource(frame, srcDoc);
                 let contentDocument = frame.contentDocument as HTMLDocument;
                 const sentences = printExecTime("Rehydration", () => this.rehydratePage(contentDocument));
