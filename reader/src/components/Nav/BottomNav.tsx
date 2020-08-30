@@ -16,7 +16,8 @@ import {useObservableState} from "observable-hooks";
 const useStyles = makeStyles((theme) => ({
     bottomNav: {
         maxHeight: '10vh',
-        minHeight: '10vh'
+        minHeight: '10vh',
+        bottom: 0
     }
 }));
 

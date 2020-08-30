@@ -17,7 +17,7 @@ export const InnerHTMLIFrame: React.FunctionComponent<{
             renderHandler(headRef, bodyRef);
         }
     }, [headText, bodyText, headRef, bodyRef]);
-    return <Iframe>
+    return <Iframe >
         <Fragment>
             <title ref={setHeadRef}>Ref</title>
             <style>{BodyStyle}</style>

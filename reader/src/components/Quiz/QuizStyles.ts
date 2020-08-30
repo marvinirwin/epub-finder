@@ -17,12 +17,15 @@ export const quizStyles = makeStyles((theme) => ({
     },
     cardActions: {
         display: "flex",
-        justifyContent: "center"
+        justifyContent: "center",
+        backgroundColor: 'transparent',
+        zIndex: 2
     },
     cardContent: {
         flexGrow: 1,
         display: 'flex',
         flexFlow: 'column nowrap',
-        paddingTop: '50px'
+        paddingTop: '50px',
+        height: '35vh'
     }
 }));

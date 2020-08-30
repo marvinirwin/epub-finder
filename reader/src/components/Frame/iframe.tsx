@@ -10,7 +10,7 @@ export const Iframe: React.FunctionComponent = ({ children, ...props }) => {
     // @ts-ignore
     const bodyChild = children[1];
     return (
-        <iframe {...props} ref={setContentRef}>
+        <iframe style={{minHeight: '100%', maxHeight: '100%', width: '100%'}} {...props} ref={setContentRef} >
         {head && createPortal( headChild, head ) }
         {body && createPortal( bodyChild, body ) }
     </iframe>

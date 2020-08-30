@@ -79,13 +79,13 @@ export function Main({m}: { m: Manager }) {
     const iframeVisible = item === NavigationPages.READING_PAGE;
     const characterPageShows = item === NavigationPages.QUIZ_PAGE;
 
-    return <div>
+    return <div style={{maxHeight: '100vh', maxWidth: '100vw', overflow: 'hidden'}}>
         <StaticFrame
             visible={characterPageShows}
             visibleStyle={{
                 position: 'absolute',
-                top: '30vh',
-                height: '50vh',
+                top: '35vh',
+                height: '55vh',
                 width: '100vw',
                 overflow: 'hidden',
                 zIndex: 1
@@ -97,7 +97,6 @@ export function Main({m}: { m: Manager }) {
                 key={page.name}
                 visibleStyle={{
                     position: 'absolute',
-                    top: '10vh',
                     height: '90vh',
                     width: '100vw',
                     overflow: 'hidden',
@@ -107,7 +106,10 @@ export function Main({m}: { m: Manager }) {
             </StaticFrame>
         )}
         <ImageSelectPopup m={m}/>
-        <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>
+        <div style={{
+            overflow: 'auto',
+            height: '90vh',
+        }}>
             {SelectedPage}
         </div>
         <BottomNav m={m}/>
