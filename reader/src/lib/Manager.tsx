@@ -255,10 +255,12 @@ export class Manager {
             this.inputManager.getKeyDownSubject("q"),
         ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
 
-        this.inputManager.selectedText$.subscribe(this.editingCardManager.requestEditWord$);
+        this.inputManager.selectedText$.subscribe(word => {
+            this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));
+            this.editingCardManager.requestEditWord$.next(word);
+        });
 
         this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
-
 
         combineLatest([
             this.bottomNavigationValue$,

@@ -32,9 +32,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
     /*
         const userAudio = useObservableState(r.userAudio$);
     */
-/*
     const synthAudio = useObservableState(m.editingCardManager.currentEditingSynthesizedWavFile$);
-*/
     /*
         const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     */
@@ -61,9 +59,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
                         <audio src={userAudio?.url} controls autoPlay />
                     </Grid>
 */}
-{/*
                 <audio style={{height: '24px'}} src={synthAudio?.url} controls autoPlay/>
-*/}
                 {/*
                 {graphData && <MultiGraph plots={graphData}/>}
 */}

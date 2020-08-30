@@ -12,6 +12,7 @@ import {AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
 import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
+import {BrowserInputs} from "../Manager/BrowserInputs";
 
 export type SentenceDataPipe = (srcDoc$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
 
@@ -40,7 +41,11 @@ export class OpenBook {
         ]).pipe(sentenceDataPipe, shareReplay(1))
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
         this.srcDoc$.next(srcDoc);
-        this.wordCountRecords$ = this.wordCountRecords()
+        this.wordCountRecords$ = this.wordCountRecords();
+        this.renderedSentences$.subscribe(sentences => {
+            BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
+        })
+
 
         this.htmlElementIndex$ =  combineLatest([
             this.trie,

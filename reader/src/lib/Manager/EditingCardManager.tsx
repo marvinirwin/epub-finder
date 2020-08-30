@@ -31,6 +31,7 @@ export default class EditingCardManager {
                     take(1)
                 )
             }),
+
         );
 /*
         this.currentEditingSynthesizedWavFile$ = this.editingCard.pipe(
