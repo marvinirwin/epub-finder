@@ -32,7 +32,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
     /*
         const userAudio = useObservableState(r.userAudio$);
     */
-    const synthAudio = useObservableState(m.editingCardManager.currentEditingSynthesizedWavFile$);
+    const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
     /*
         const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     */

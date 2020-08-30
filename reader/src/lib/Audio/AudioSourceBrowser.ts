@@ -3,6 +3,7 @@ import {AudioConfig, SpeechConfig, SpeechRecognizer} from "microsoft-cognitivese
 import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
+import {sleep} from "../Util/Util";
 
 let AZURE_SPEECH_REGION = 'westus2' as string;
 
@@ -22,29 +23,47 @@ export class AudioSourceBrowser implements AudioSource{
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true})).pipe(shareReplay(1));
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
             map(t => {
+                try {
                     const speechConfig = SpeechConfig.fromAuthorizationToken(t, AZURE_SPEECH_REGION);
                     speechConfig.speechRecognitionLanguage = "zh-CN";
                     return speechConfig;
+                } catch(e) {
+                    console.error(e);
+                    throw e;
+                }
                 }
             ),
             shareReplay(1)
         );
 
-        this.audioConfig$ = this.mediaSource$.pipe(map(mediaSource => AudioConfig.fromMicrophoneInput(mediaSource.id)));
+        this.audioConfig$ = this.mediaSource$.pipe(map(mediaSource => {
+            try {
+                return AudioConfig.fromMicrophoneInput(mediaSource.id);
+            } catch(e) {
+                console.error(e);
+                throw e;
+            }
+        }));
 
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.audioConfig$, this.speechConfig$)
-        ).subscribe(([_, audioConfig, speechConfig]) => {
+        ).subscribe(async ([_, audioConfig, speechConfig]) => {
             this.isRecording$.next(true);
-            this.getNewRecognizer(speechConfig, audioConfig).recognizeOnceAsync(
-                (result) => {
-                    this.isRecording$.next(false);
-                    this.recognizedText$.next(result.text);
-                },
-                (err) => {
-                    this.isRecording$.next(false);
-                    console.error(err);
-                });
+            try {
+                (await this.getNewRecognizer(speechConfig, audioConfig)).recognizeOnceAsync(
+                    (result) => {
+                        this.isRecording$.next(false);
+                        this.recognizedText$.next(result.text);
+                    },
+                    (err) => {
+                        debugger;
+                        this.isRecording$.next(false);
+                        console.error(err);
+                    });
+            } catch(e) {
+                debugger;
+                console.error(e);
+            }
         });
 
         this.stopRecordingSignal$.subscribe(() => {
@@ -53,17 +72,14 @@ export class AudioSourceBrowser implements AudioSource{
         this.loadToken();
     }
 
-    private loadToken() {
-        axios.post(`/speech-recognition-token`).then(result =>
-            this.speechRecognitionToken$.next(result.data as string)
-        );
-    }
 
-    private getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): SpeechRecognizer {
+    private async getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): Promise<SpeechRecognizer> {
         if (this.recognizer) {
             // In the old method I closed the audioConfig, do I need to close it this time?
             this.cancelRecognizer();
+
         }
+        await sleep(1000);
         this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
         return this.recognizer;
     }
@@ -74,5 +90,11 @@ export class AudioSourceBrowser implements AudioSource{
         } catch (e) {
             console.warn(e);
         }
+    }
+
+    private loadToken() {
+        axios.post(`/speech-recognition-token`).then(result =>
+            this.speechRecognitionToken$.next(result.data as string)
+        );
     }
 }

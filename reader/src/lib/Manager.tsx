@@ -257,6 +257,7 @@ export class Manager {
 
         this.inputManager.selectedText$.subscribe(word => {
             this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));
+            this.audioManager.queSynthesizedSpeechRequest$.next(word);
             this.editingCardManager.requestEditWord$.next(word);
         });
 

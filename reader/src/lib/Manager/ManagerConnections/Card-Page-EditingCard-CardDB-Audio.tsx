@@ -24,5 +24,6 @@ export function CardPageEditingCardCardDBAudio(
         resolveICardForWord<string, ICard>(c.cardIndex$)
     ).subscribe((icard) => {
         e.queEditingCard$.next(EditingCard.fromICard(icard, cdb, a, c))
+        a.queSynthesizedSpeechRequest$.next(icard.learningLanguage);
     });
 }
