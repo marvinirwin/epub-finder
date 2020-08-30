@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
                 height: 'fit-content',
                 flexGrow: 0,
             }
-        }
+        },
     },
 
 }));
@@ -33,6 +33,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const editingCard = useObservableState(m.editingCardManager.editingCard$);
     const showEditingCard = useObservableState(m.editingCardManager.showEditingCardPopup$);
     const highlightedPinyin = useObservableState(m.highlightedPinyin$);
+    const user = useObservableState(m.authenticationMonitor.user$);
     const classes = useStyles();
     return <div className={classes.popup}>
         {
@@ -45,13 +46,23 @@ export function SlidingTopWindows({m}: { m: Manager }) {
         <div>
             <AudioRecorder m={m}/>
         </div>
-        <Card>
-            <CardContent style={SLIM_CARD_CONTENT}>
-                <Typography variant="h6">
-                    {highlightedPinyin}
-                </Typography>
-            </CardContent>
-        </Card>
+        <div style={{display: 'flex', flexFlow: 'row nowrap'}}>
+            <Card style={{width: '50%'}}>
+                <CardContent style={SLIM_CARD_CONTENT}>
+                    <Typography variant="h6">
+                        {highlightedPinyin}
+                    </Typography>
+                </CardContent>
+            </Card>
+            <Card style={{width: '50%'}}>
+                <CardContent style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh'}}>
+                    <Typography variant="subtitle2">
+                        {user?.name}
+                    </Typography>
+                    <img style={{maxHeight: '100%', width: 'auto'}} src={user?.picture}/>
+                </CardContent>
+            </Card>
+        </div>
     </div>;
 }
 

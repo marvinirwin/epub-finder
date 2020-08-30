@@ -48,19 +48,15 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("combined"));
+/*
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
+*/
 app.use((req, res, next) => {
     res.locals.user = req.user;
     next();
 });
 
-app.post("/translate", translateFunc);
-app.post("/image-search", imageSearchFunc);
-app.post("/trend-locations", getLocations);
-app.post("/trends", getTrendForLocation);
-app.post("/get-speech", synthesisController.TextToSpeech);
-app.post("/speech-recognition-token", synthesisController.GetSpeechRecognitionToken);
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
@@ -109,6 +105,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+/*
 app.use((req, res, next) => {
     if (req.path === "/api/upload") {
         // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
@@ -117,8 +114,11 @@ app.use((req, res, next) => {
         lusca.csrf()(req, res, next);
     }
 });
+*/
+/*
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
+*/
 app.disable("x-powered-by");
 app.use((req, res, next) => {
     res.locals.user = req.user;
@@ -280,5 +280,12 @@ app.get("/auth/quickbooks/callback", passport.authorize("quickbooks", { failureR
     // @ts-ignore
     res.redirect(req.session.returnTo);
 });
+
+app.post("/translate", translateFunc);
+app.post("/image-search", imageSearchFunc);
+app.post("/trend-locations", getLocations);
+app.post("/trends", getTrendForLocation);
+app.post("/get-speech", synthesisController.TextToSpeech);
+app.post("/speech-recognition-token", synthesisController.GetSpeechRecognitionToken);
 
 export default app;
