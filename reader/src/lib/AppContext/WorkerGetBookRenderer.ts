@@ -20,7 +20,6 @@ export function WorkerGetBookRenderer(
         resolve(new OpenBook(
             document,
             page.name,
-            new IFrameBookRenderer(page.name),
             trie$,
             AtomizePipe
         ))

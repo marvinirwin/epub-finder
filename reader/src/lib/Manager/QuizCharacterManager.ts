@@ -61,7 +61,6 @@ export class QuizCharacterManager {
         this.exampleSentencesFrame = new OpenBook(
             interpolateSourceDoc([]),
             'character_translation',
-            new IFrameBookRenderer('exampleSentences'),
             trie$,
             AtomizePipe
         );

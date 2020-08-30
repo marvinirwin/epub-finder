@@ -18,7 +18,6 @@ export function UnitTestGetBookRenderer(
                     return new OpenBook(
                         (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(src).document),
                         page.name,
-                        new InMemoryBookRenderer(),
                         trie$,
                         AtomizePipe
                     );

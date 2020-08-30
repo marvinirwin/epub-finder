@@ -25,22 +25,21 @@ export class OpenBook {
     public htmlElementIndex$: Observable<TextWordData>;
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
     public bookStats$: Observable<AtomizedDocumentStats>;
-
+    public srcDoc$ = new ReplaySubject<string>(1);
+    public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
     constructor(
         srcDoc: string,
         public name: string,
-        public renderer: BookRenderer,
         public trie: Observable<TrieWrapper>,
-        public sentenceDataPipe: SentenceDataPipe,
+        sentenceDataPipe: SentenceDataPipe,
     ) {
         this.id = name;
         this.bookStats$ = combineLatest([
-            this.renderer.srcDoc$,
+            this.srcDoc$,
             trie
-        ]).pipe(this.sentenceDataPipe, shareReplay(1))
+        ]).pipe(sentenceDataPipe, shareReplay(1))
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
-        this.renderer.frame$.next(this.frame);
-        this.renderer.srcDoc$.next(srcDoc);
+        this.srcDoc$.next(srcDoc);
         this.wordCountRecords$ = this.wordCountRecords()
 
         this.htmlElementIndex$ =  combineLatest([
@@ -83,6 +82,7 @@ export class OpenBook {
 
     handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
         const sentences = printExecTime("Rehydration", () => IFrameBookRenderer.rehydratePage(head.ownerDocument as HTMLDocument));
+        this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSentences$.next(sentences);
     }
 }

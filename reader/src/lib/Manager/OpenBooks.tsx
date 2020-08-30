@@ -67,8 +67,7 @@ export class OpenBooks {
             .openedBooks
             .mapWith(bookFrame => {
                     return bookFrame
-                        .renderer
-                        .renderedAtomizedSentences$
+                        .renderedSentences$
                         .pipe(
                             withLatestFrom(config.trie$),
                             map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
@@ -152,7 +151,7 @@ export class OpenBooks {
 
     private applyListenersToOpenedBookBodies() {
         this.openedBooks.updates$.subscribe(({delta}) => {
-            flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderer.body$.subscribe(this.config.applyListeners))
+            flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(this.config.applyListeners))
         })
     }
 }
