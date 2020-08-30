@@ -116,7 +116,6 @@ export class OpenBooks {
                 }),
                 shareReplay(1)
             );
-        this.exampleSentenceSentenceData$.subscribe();
 
         let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
             this.openBookTextDataTree$.updates$,

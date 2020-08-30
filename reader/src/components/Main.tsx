@@ -13,7 +13,6 @@ import {useObservableState} from "observable-hooks";
 import {map} from "rxjs/operators";
 import {flattenTree} from "../lib/Util/DeltaScanner";
 import {StaticFrame} from "./Frame/StaticFrame";
-import {InnerHTMLIFrame} from "./Frame/innerHTMLIFrame";
 import {OpenedBook} from "../lib/Atomized/OpenedBook";
 
 
