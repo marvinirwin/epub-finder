@@ -72,7 +72,7 @@ export class QuizCharacterManager {
             map(srcDoc => {
                 return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
             })
-        ).subscribe(this.exampleSentencesFrame.renderer.srcDoc$);
+        )/*.subscribe(this.exampleSentencesFrame.renderer.srcDoc$);*/
         /**
          * If we have a learningLanguage, and have less than 10 sentences
          * I want to hear about deltas in the sentenceMap about my word to see if there are new ones

@@ -8,5 +8,6 @@ import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 
 export const OpenedBook: React.FunctionComponent<{openedBook: OpenBook}> = ({openedBook}) => {
     const bookStats = useObservableState<AtomizedDocumentStats>(openedBook.bookStats$)
-    return <InnerHTMLIFrame bodyText={bookStats?.body || ''} headText={bookStats?.head || ''} renderHandler={openedBook.handleHTMLHasBeenRendered}/>
+    return <InnerHTMLIFrame bodyText={bookStats?.body || ''} headText={bookStats?.head || ''} renderHandler={(head, body) =>
+        openedBook.handleHTMLHasBeenRendered(head, body)}/>
 }

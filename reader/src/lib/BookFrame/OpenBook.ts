@@ -1,6 +1,6 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, shareReplay} from "rxjs/operators";
+import {map, shareReplay, tap} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -34,7 +34,10 @@ export class OpenBook {
         public sentenceDataPipe: SentenceDataPipe,
     ) {
         this.id = name;
-        this.bookStats$ = combineLatest([this.renderer.srcDoc$, trie]).pipe(this.sentenceDataPipe)
+        this.bookStats$ = combineLatest([
+            this.renderer.srcDoc$,
+            trie
+        ]).pipe(this.sentenceDataPipe, shareReplay(1))
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
         this.renderer.frame$.next(this.frame);
         this.renderer.srcDoc$.next(srcDoc);

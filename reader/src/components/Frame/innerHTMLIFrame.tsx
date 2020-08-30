@@ -1,6 +1,7 @@
 import React, {useEffect, useState, Fragment} from 'react'
 import {createPortal} from 'react-dom'
 import {Iframe} from './iframe'
+import {BodyStyle} from "../../lib/BookFrame/AppendBookStyle";
 
 export type IFrameRenderHandler = (head: HTMLHeadElement, body: HTMLBodyElement) => void;
 
@@ -16,11 +17,11 @@ export const InnerHTMLIFrame: React.FunctionComponent<{
             renderHandler(headRef, bodyRef);
         }
     }, [headText, bodyText, headRef, bodyRef]);
-    debugger;
     return <Iframe>
         <Fragment>
-            <head ref={setHeadRef} dangerouslySetInnerHTML={{__html: headText}}/>
-            <body ref={setBodyRef} dangerouslySetInnerHTML={{__html: bodyText}}/>
+            <title ref={setHeadRef}>Ref</title>
+            <style>{BodyStyle}</style>
         </Fragment>
+        <div ref={setBodyRef} dangerouslySetInnerHTML={{__html: bodyText}}/>
     </Iframe>
 }

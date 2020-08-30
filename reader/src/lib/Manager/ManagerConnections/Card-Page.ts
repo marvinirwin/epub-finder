@@ -24,27 +24,8 @@ export function CardPage(c: CardManager, p: OpenBooks) {
             }
         }
         const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
-        c.addUnpersistedCards$.next(newCards);
-    });
-
-    c.cardProcessingSignal$.pipe(
-        filter(b => !b),
-        delay(100),
-        switchMapTo(p.openedBooks.updates$),
-        switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
-        withLatestFrom(c.cardIndex$)
-    ).subscribe(([text, cardIndex]) => {
-        const newCharacterSet = new Set<string>();
-        for (let i = 0; i < text.length; i++) {
-            const textElement = text[i];
-            if (isChineseCharacter(textElement)) {
-                if (!cardIndex[textElement]) {
-                    newCharacterSet.add(textElement);
-                }
-            }
+        if (newCards.length) {
+            c.addUnpersistedCards$.next(newCards);
         }
-        const newCards = Array.from(newCharacterSet.keys()).map(c => getNewICardForWord(c, ''));
-        c.addUnpersistedCards$.next(newCards);
     });
-
 }

@@ -27,9 +27,7 @@ export class IFrameBookRenderer implements BookRenderer {
             )
         ]).pipe(
             flatMap(async ([srcDoc, frame]) => {
-                const contentDocument = frame.contentDocument as HTMLDocument;
-                const sentences = printExecTime("Rehydration", () => IFrameBookRenderer.rehydratePage(contentDocument));
-                return sentences;
+                return {}
             }, 1),
             shareReplay(1)
         )

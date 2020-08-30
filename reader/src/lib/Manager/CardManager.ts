@@ -35,18 +35,11 @@ export default class CardManager {
 
     constructor(public db: MyAppDatabase) {
         this.cardProcessingSignal$.next(false);
-        this.trie$ = this.addPersistedCards$.pipe(
-            startWith([]),
-            scan((trie: TrieWrapper, newCards: ICard[]) => {
-                trie.addWords(
-                    ...newCards.map(
-                        card => card.learningLanguage
-                    )
-                );
-                return trie;
-            }, new TrieWrapper(trie([]))),
-            shareReplay(1)
-        )
+        const t = new TrieWrapper(trie([]));
+        this.trie$ = t.changeSignal$;
+        this.addUnpersistedCards$.subscribe(newPersistedCards => {
+            t.addWords(...newPersistedCards.map(card => card.learningLanguage))
+        })
         this.cardIndex$ = this.addPersistedCards$.pipe(
             startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {
