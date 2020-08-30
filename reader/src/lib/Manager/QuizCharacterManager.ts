@@ -4,7 +4,7 @@ import {OpenBook} from "../BookFrame/OpenBook";
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
-import {map} from "rxjs/operators";
+import {map, scan, distinctUntilChanged, distinct} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
 import {XMLSerializer} from "xmldom";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
@@ -42,7 +42,8 @@ ${sentences.map(sentence => {
 export interface QuizCharacterManagerParams {
     exampleSentences$: Observable<AtomizedSentence[]>,
     quizzingCard$: Observable<ICard | undefined>;
-    trie$: TrieObservable
+    trie$: TrieObservable;
+    requestPlayAudio: (sentence: string) => void
 }
 
 export class QuizCharacterManager {
@@ -51,10 +52,13 @@ export class QuizCharacterManager {
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
     public exampleSentencesFrame: OpenBook;
 
+    private sentenceCache = new Set<string>();
+
     constructor({
                     exampleSentences$,
                     quizzingCard$,
                     trie$,
+        requestPlayAudio
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
@@ -66,12 +70,26 @@ export class QuizCharacterManager {
         );
         this.exampleSentences$.pipe(
             map(sentences => {
-                return interpolateSourceDoc(sentences.map(sentence => sentence.translatableText));
+                return interpolateSourceDoc(sentences.map(sentence => {
+                    let translatableText = sentence.translatableText;
+                    debugger;
+                    if (!this.sentenceCache.has(translatableText)) {
+                        requestPlayAudio(translatableText);
+                        this.sentenceCache.add(translatableText);
+                    }
+                    return translatableText;
+                }));
             }),
             map(srcDoc => {
                 return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
             })
         ).subscribe(this.exampleSentencesFrame.srcDoc$);
+
+        this.quizzingCard$.pipe(
+            distinct(card => card?.learningLanguage)
+        ).subscribe(() => {
+            this.sentenceCache.clear();
+        })
         /**
          * If we have a learningLanguage, and have less than 10 sentences
          * I want to hear about deltas in the sentenceMap about my word to see if there are new ones

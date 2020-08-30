@@ -26,7 +26,6 @@ export class AudioManager {
     constructor(audioSource: AudioSource) {
         this.audioRecorder = new AudioRecorder(audioSource);
         this.queSynthesizedSpeechRequest$.pipe(
-            debounceTime(0),
             flatMap(async speechText => {
                     const wavAudio = await fetchSynthesizedAudio(speechText);
                     if (!wavAudio) {
@@ -35,7 +34,7 @@ export class AudioManager {
                     this.currentSynthesizedAudio$.next(wavAudio);
                     const duration = await wavAudio.duration$.pipe(take(1)).toPromise();
                     // Is this seconds or milliseconds?
-                    await sleep(duration);
+                    await sleep(duration * 1000);
                 },
                 1
             )

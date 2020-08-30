@@ -139,7 +139,8 @@ export class Manager {
                     shareReplay(1)
                 ),
                 quizzingCard$: this.quizManager.quizzingCard$,
-                trie$: this.cardManager.trie$
+                trie$: this.cardManager.trie$,
+                requestPlayAudio: sentence => this.audioManager.queSynthesizedSpeechRequest$.next(sentence)
             }
         )
 
