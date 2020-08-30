@@ -13,7 +13,6 @@ import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
-import {FrameContainer} from "../Frame/FrameContainer";
 import {BrowserInputs} from "../../lib/Manager/BrowserInputs";
 import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
 import {isEqual, uniq} from "lodash";
@@ -69,12 +68,6 @@ export function Characters({c, m}: QuizCardProps) {
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
-            </div>
-            <div style={{flexGrow: 1, width: '100%'}}>
-                {
-                    m.quizCharacterManager.exampleSentencesFrame
-                    && <FrameContainer rb={m.quizCharacterManager.exampleSentencesFrame} m={m}/>
-                }
             </div>
         </CardContent>
         <CardActions className={classes.cardActions}>

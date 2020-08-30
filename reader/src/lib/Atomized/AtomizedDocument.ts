@@ -1,10 +1,13 @@
 import {getIndexOfEl} from "../Util/getIndexOfEl";
-import {uniqueId} from 'lodash';
-import {DOMParser} from "xmldom";
+import {Dictionary, uniqueId} from 'lodash';
+import {DOMParser, XMLSerializer} from "xmldom";
 import {AtomizedSentence} from "./AtomizedSentence";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {splitLong} from "../Util/Util";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {TrieWrapper} from "../TrieWrapper";
+import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
+import {mergeSentenceInfo} from "./TextWordData";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -19,6 +22,41 @@ export function createPopperElement(document1: XMLDocument) {
 
 export class AtomizedDocument {
 
+    public static find(document: XMLDocument, cb: (n: Node) => boolean): Node | undefined {
+        function walk(node: Node, cb: (n: Node) => any): Node | undefined {
+            if (cb(node)) {
+                return node;
+            }
+            var child, next;
+            let TEXT_NODE = 3;
+            let ELEMENT_NODE = 1;
+            let DOCUMENT_NODE = 9;
+            switch (node.nodeType) {
+                case TEXT_NODE: // Text node
+                    break;
+                case ELEMENT_NODE: // Element node
+                    // @ts-ignore
+                    if (node.localName === 'script') break;
+                    // @ts-ignore
+                    if (node.localName === 'style') break;
+                case DOCUMENT_NODE: // Document node
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        let foundNode = walk(child, cb);
+                        if(foundNode) {
+                            return foundNode;
+                        }
+                        child = next;
+                    }
+                    break;
+            }
+        }
+        return walk(document, n => {
+            return cb(n)
+        });
+    }
+
     constructor(public document: XMLDocument) {}
 
     replaceHrefOrSource(el: Element, qualifiedName: string) {
@@ -30,6 +68,7 @@ export class AtomizedDocument {
 
     getTextElements(doc: Document) {
         const leaves: Element[] = [];
+
         function walk(node: Node, cb: (n: Node) => any) {
             var child, next;
             switch (node.nodeType) {
@@ -51,6 +90,7 @@ export class AtomizedDocument {
                     break;
             }
         }
+
         walk(doc, (node: Node) => {
             let text = (node.textContent as string).trim();
             if (text)  {
@@ -172,5 +212,34 @@ export class AtomizedDocument {
         return atomized;
     }
 
+
+
+    public getDocumentStats(trie: TrieWrapper):AtomizedDocumentStats {
+        const atomizedSentences = this.getAtomizedSentences();
+        const sentenceStats = atomizedSentences.map(atomizedSentence => atomizedSentence.getTextWordData(trie.t, trie.getUniqueLengths()))
+        const data =  mergeSentenceInfo(...sentenceStats);
+        return {
+            wordCounts: data.wordCounts,
+            wordSentenceMap: data.wordSentenceMap,
+            text: atomizedSentences.map(sentence => sentence.translatableText).join('\n'),
+            head: this.headInnerHTML(),
+            body: this.bodyInnerHTML(),
+        }
+    }
+
+    headInnerHTML() {
+        const head = AtomizedDocument.find(this.document, n => {
+            // @ts-ignore
+            return n.tagName  === 'head';
+        });
+        return (new XMLSerializer()).serializeToString(<Node>head)
+    }
+    bodyInnerHTML() {
+        const body = AtomizedDocument.find(this.document, n => {
+            // @ts-ignore
+            return n.tagName === 'body';
+        });
+        return (new XMLSerializer()).serializeToString(<Node>body)
+    }
 }
 

@@ -7,5 +7,5 @@ export interface BookRenderer {
     srcDoc$: ReplaySubject<string>;
     frame$: ReplaySubject<Frame>;
     body$: ReplaySubject<HTMLBodyElement>;
-    atomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
+    renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
 }

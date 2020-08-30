@@ -50,7 +50,7 @@ export class OpenBooks {
         this.applyListenersToOpenedBookBodies();
 
         this.atomizedSentences$ = this.openedBooks
-            .mapWith((bookFrame: OpenBook) => bookFrame.renderer.atomizedSentences$).updates$.pipe(
+            .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
                 switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence>>>) => {
                     return combineLatest(
                         sourced ? flattenTree(sourced) : []
@@ -68,7 +68,7 @@ export class OpenBooks {
             .mapWith(bookFrame => {
                     return bookFrame
                         .renderer
-                        .atomizedSentences$
+                        .renderedAtomizedSentences$
                         .pipe(
                             withLatestFrom(config.trie$),
                             map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {

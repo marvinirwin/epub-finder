@@ -1,20 +1,20 @@
-import {useObs} from "../lib/UseObs";
-import React, {Fragment, useEffect} from "react";
+import React, {CSSProperties, useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./Nav/BottomNav";
 import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
-import {FrameContainer} from "./Frame/FrameContainer";
-import {Dictionary, flatten} from "lodash";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
 import {OpenBook} from "../lib/BookFrame/OpenBook";
 import {NavigationPages} from "../lib/Util/Util";
 import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
-import {useObservable, useObservableState} from "observable-hooks";
+import {useObservableState} from "observable-hooks";
 import {map} from "rxjs/operators";
-import {ds_Dict, flattenTree} from "../lib/Util/DeltaScanner";
+import {flattenTree} from "../lib/Util/DeltaScanner";
+import {StaticFrame} from "./Frame/StaticFrame";
+import {InnerHTMLIFrame} from "./Frame/innerHTMLIFrame";
+import {OpenedBook} from "../lib/Atomized/OpenedBook";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -77,17 +77,35 @@ export function Main({m}: { m: Manager }) {
         []
     );
     const iframeVisible = item === NavigationPages.READING_PAGE;
+    const characterPageShows = item === NavigationPages.QUIZ_PAGE;
 
     return <div>
-        <div style={{
-            position: 'absolute',
-            height: '90vh',
-            width: '100vw',
-            top: iframeVisible ? 0 : '9000px',
-            overflow: 'hidden'
-        }}>
-            {allBookFrames.map(page => <FrameContainer m={m} key={page.name} rb={page}/>)}
-        </div>
+        <StaticFrame
+            visible={characterPageShows}
+            visibleStyle={{
+                position: 'absolute',
+                top: '30vh',
+                height: '50vh',
+                width: '100vw',
+                overflow: 'hidden',
+                zIndex: 1
+            }}>
+            <OpenedBook openedBook={m.quizCharacterManager.exampleSentencesFrame}/>
+        </StaticFrame>
+        {allBookFrames.map(page => <StaticFrame
+                visible={iframeVisible}
+                key={page.name}
+                visibleStyle={{
+                    position: 'absolute',
+                    top: '10vh',
+                    height: '90vh',
+                    width: '100vw',
+                    overflow: 'hidden',
+                    zIndex: 1
+                }}>
+                <OpenedBook openedBook={page}/>
+            </StaticFrame>
+        )}
         <ImageSelectPopup m={m}/>
         <div style={{maxHeight: '90vh', minHeight: '90vh', height: '90vh', overflow: 'auto'}}>
             {SelectedPage}

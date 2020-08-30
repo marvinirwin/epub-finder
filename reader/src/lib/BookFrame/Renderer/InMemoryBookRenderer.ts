@@ -10,9 +10,9 @@ export class InMemoryBookRenderer implements BookRenderer {
     srcDoc$ = new ReplaySubject<string>(1);
     frame$ = new ReplaySubject<Frame>(1);
     body$ = new ReplaySubject<HTMLBodyElement>(1);
-    atomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
+    renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence>>;
     constructor() {
-        this.atomizedSentences$ = this.srcDoc$
+        this.renderedAtomizedSentences$ = this.srcDoc$
             .pipe(
                 map(srcDoc => {
                     const doc = AtomizedDocument.atomizeDocument(srcDoc);

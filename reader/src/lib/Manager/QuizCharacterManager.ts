@@ -8,6 +8,7 @@ import {map} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
 import {XMLSerializer} from "xmldom";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizePipe} from "../Atomized/AtomizePipe";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -21,13 +22,13 @@ ${src}
 </body>
 `
 
-function getSrc(sentences: string[]) {
+function interpolateSourceDoc(sentences: string[]) {
     return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Random Title</title>
+    <title>Example Sentences</title>
 </head>
 <body>
 ${sentences.map(sentence => {
@@ -58,13 +59,16 @@ export class QuizCharacterManager {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
         this.exampleSentencesFrame = new OpenBook(
-            getSrc([]),
+            interpolateSourceDoc([]),
             'character_translation',
-            new IFrameBookRenderer(),
-            trie$
+            new IFrameBookRenderer('exampleSentences'),
+            trie$,
+            AtomizePipe
         );
         this.exampleSentences$.pipe(
-            map(sentences => getSrc(sentences.map(sentence => sentence.translatableText))),
+            map(sentences => {
+                return interpolateSourceDoc(sentences.map(sentence => sentence.translatableText));
+            }),
             map(srcDoc => {
                 return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
             })

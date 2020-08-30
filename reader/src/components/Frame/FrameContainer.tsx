@@ -38,7 +38,6 @@ const StyledExpansionPanelDetails = withStyles({
 })(ExpansionPanelDetails);
 
 export function FrameContainer({rb, m}: { rb: OpenBook, m: Manager }) {
-    const classes = useStyles();
     const [ref, setRef] = useState();
     const [expanded, setExpanded] = React.useState(true);
     useEffect(() => {
@@ -50,6 +49,6 @@ export function FrameContainer({rb, m}: { rb: OpenBook, m: Manager }) {
 */
 
     return (
-        <div style={{width: '100%', height: '100%'}} id={rb.getRenderParentElementId()} ref={setRef}/>
+        <div style={{width: '100%', height: '100%'}} ref={setRef}/>
     );
 }

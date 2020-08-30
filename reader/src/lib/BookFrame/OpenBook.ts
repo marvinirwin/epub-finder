@@ -8,7 +8,12 @@ import {TrieWrapper} from "../TrieWrapper";
 import {TextWordData} from "../Atomized/TextWordData";
 import {BookRenderer} from "./Renderer/BookRenderer";
 import {Frame} from "./Frame";
+import {AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
+import {printExecTime} from "../Util/Timer";
+import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
+import {ds_Dict} from "../Util/DeltaScanner";
 
+export type SentenceDataPipe = (srcDoc$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
 
 export class OpenBook {
     public frame = new Frame();
@@ -16,65 +21,28 @@ export class OpenBook {
     // This shouldn't be an observable, right?
     public id: string;
     public text$: Observable<string>;
-    public wordCountRecords$ = new ReplaySubject<IWordCountRow[]>(1);
-    public textData$: Observable<TextWordData>;
+    public wordCountRecords$: Observable<IWordCountRow[]>;
+    public htmlElementIndex$: Observable<TextWordData>;
+    public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
+    public bookStats$: Observable<AtomizedDocumentStats>;
 
     constructor(
         srcDoc: string,
         public name: string,
         public renderer: BookRenderer,
-        public trie: Observable<TrieWrapper>
+        public trie: Observable<TrieWrapper>,
+        public sentenceDataPipe: SentenceDataPipe,
     ) {
         this.id = name;
-        this.text$ = this.renderer.atomizedSentences$.pipe(
-            map(atomizedSentences => {
-                return Object
-                    .values(atomizedSentences).map(atomizedSentence => atomizedSentence.translatableText)
-                    .join('\n');
-            }),
-            shareReplay(1)
-        );
-
-
+        this.bookStats$ = combineLatest([this.renderer.srcDoc$, trie]).pipe(this.sentenceDataPipe)
+        this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
         this.renderer.frame$.next(this.frame);
         this.renderer.srcDoc$.next(srcDoc);
-        this.text$.subscribe(text => {
-            const countedCharacters: Dictionary<number> = text
-                .split('')
-                .filter(isChineseCharacter)
-                .reduce((acc: Dictionary<number>, letter) => {
-                    if (!acc[letter]) {
-                        acc[letter] = 1;
-                    } else {
-                        acc[letter]++;
-                    }
-                    return acc;
-                }, {});
+        this.wordCountRecords$ = this.wordCountRecords()
 
-            this.wordCountRecords$.next(
-                Object.entries(countedCharacters).map(([letter, count]) => ({
-                    book: this.name,
-                    word: letter,
-                    count
-                }))
-            )
-        })
-
-
-        /*
-                this.atomizedSentencesFromSrc$.pipe(
-                    withLatestFrom(this.manuallyAddedAtomizedSentences.updates$, this.frame.iframe$)
-                ).subscribe(([atomizedSentencesFromSrc, {sourced}, iframeBbdy]) => {
-                    Object.values(sourced).map(v => v.value).forEach(manuallyAddedSentence => {
-                        manuallyAddedSentence.(iframebody);
-                    })
-                })
-        */
-
-
-        this.textData$ = combineLatest([
+        this.htmlElementIndex$ =  combineLatest([
             this.trie,
-            this.renderer.atomizedSentences$
+            this.renderedSentences$
         ]).pipe(
             map(([trie, sentences]) => {
                     return AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths());
@@ -85,8 +53,34 @@ export class OpenBook {
     }
 
 
-    getRenderParentElementId() {
-        return `render_parent_${this.name}`
+    private wordCountRecords() {
+        return this.text$.pipe(
+            map(text => {
+                const countedCharacters: Dictionary<number> = text
+                    .split('')
+                    .filter(isChineseCharacter)
+                    .reduce((acc: Dictionary<number>, letter) => {
+                        if (!acc[letter]) {
+                            acc[letter] = 1;
+                        } else {
+                            acc[letter]++;
+                        }
+                        return acc;
+                    }, {});
+
+                return Object.entries(countedCharacters).map(([letter, count]) => ({
+                    book: this.name,
+                    word: letter,
+                    count
+                }))
+            }),
+            shareReplay(1)
+        );
+    }
+
+    handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
+        const sentences = printExecTime("Rehydration", () => IFrameBookRenderer.rehydratePage(head.ownerDocument as HTMLDocument));
+        this.renderedSentences$.next(sentences);
     }
 }
 

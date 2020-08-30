@@ -7,6 +7,7 @@ import {Website} from "../Website/Website";
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {TrieWrapper} from "../TrieWrapper";
+import {AtomizePipe} from "../Atomized/AtomizePipe";
 export type TrieObservable = Observable<TrieWrapper>
 
 export function WorkerGetBookRenderer(
@@ -19,8 +20,9 @@ export function WorkerGetBookRenderer(
         resolve(new OpenBook(
             document,
             page.name,
-            new IFrameBookRenderer(),
-            trie$
+            new IFrameBookRenderer(page.name),
+            trie$,
+            AtomizePipe
         ))
     }))
 }

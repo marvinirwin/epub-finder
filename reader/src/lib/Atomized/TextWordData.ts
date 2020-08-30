@@ -4,8 +4,8 @@ import {AtomizedSentence} from "./AtomizedSentence";
 
 export interface TextWordData {
     wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
-    wordCounts: Dictionary<number>;
     wordSentenceMap: Dictionary<AtomizedSentence[]>;
+    wordCounts: Dictionary<number>;
     sentenceMap: Dictionary<AtomizedSentence[]>;
 }
 
