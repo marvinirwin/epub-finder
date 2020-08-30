@@ -105,5 +105,5 @@
     "nodemon": "^2.0.4",
     "python-shell": "^2.0.1"
   },
-  "homepage": "reader"
+  "homepage": "."
 }

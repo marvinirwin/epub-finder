@@ -18,7 +18,7 @@ import {debounce} from 'lodash';
 import {useObservableState} from "observable-hooks";
 
 export const getImages = (term: string) => {
-    return axios.post('/image-search', {term})
+    return axios.post(`${process.env.PUBLIC_URL}/image-search`, {term})
 }
 
 export interface ImageResult {

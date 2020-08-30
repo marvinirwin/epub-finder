@@ -25,7 +25,7 @@ export function getUniqueLengths(t: ITrie): number[] {
 }
 
 export async function getTranslation<A>(learningText: A) {
-    const result = await axios.post('/translate', {
+    const result = await axios.post(`${process.env.PUBLIC_URL}/translate`, {
         from: 'zh-CN',
         to: 'en',
         text: learningText

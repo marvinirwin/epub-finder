@@ -1,5 +1,5 @@
-import {Observable, ReplaySubject} from "rxjs";
-import {switchMap} from "rxjs/operators";
+import {interval, Observable, ReplaySubject} from "rxjs";
+import {switchMap, withLatestFrom} from "rxjs/operators";
 import axios from 'axios';
 
 var getCookie = function (name: string) {
@@ -28,8 +28,8 @@ export class User {
     ) {
     }
 
-    static async RetrieveUserInfo() {
-        const response = await axios.get('/profile');
+    static async FetchUserInfo() {
+        const response = await axios.get(`${process.env.PUBLIC_URL}/profile`);
         return new User(
             response.data.name,
             response.data.picture
@@ -38,16 +38,27 @@ export class User {
 }
 
 export class AuthenticationMonitor {
-    user$ = new ReplaySubject<User>();
+    user$ = new ReplaySubject<User>(1);
 
     constructor() {
-        setInterval(async () => {
+        this.fetchProfileData();
+        interval(5000).pipe(
+            withLatestFrom(this.user$)
+        ).subscribe(([_, user]) => {
+            if (!user) {
+                this.fetchProfileData();
+            }
+        })
+    }
+
+    private fetchProfileData() {
+        (async () => {
             try {
-                const user = await User.RetrieveUserInfo();
+                const user = await User.FetchUserInfo();
                 this.user$.next(user);
             } catch (e) {
                 console.warn(e);
             }
-        }, 1000);
+        })();
     }
 }

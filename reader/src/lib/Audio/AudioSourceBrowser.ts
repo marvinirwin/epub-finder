@@ -93,7 +93,7 @@ export class AudioSourceBrowser implements AudioSource{
     }
 
     private loadToken() {
-        axios.post(`/speech-recognition-token`).then(result =>
+        axios.post(`${process.env.PUBLIC_URL}/speech-recognition-token`).then(result =>
             this.speechRecognitionToken$.next(result.data as string)
         );
     }

@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {Card, CardContent, Slide, Typography} from "@material-ui/core";
+import {Card, CardContent, Slide, Typography, Link} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
@@ -56,9 +56,11 @@ export function SlidingTopWindows({m}: { m: Manager }) {
             </Card>
             <Card style={{width: '50%'}}>
                 <CardContent style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh'}}>
-                    <Typography variant="subtitle2">
-                        {user?.name}
-                    </Typography>
+                    {user?.name ? <Typography variant="subtitle2">
+                            {user?.name || 'Please log in'}
+                        </Typography> :
+                        <Link href={`${process.env.PUBLIC_URL}/login`}>Please Log In</Link>
+                    }
                     <img style={{maxHeight: '100%', width: 'auto'}} src={user?.picture}/>
                 </CardContent>
             </Card>
