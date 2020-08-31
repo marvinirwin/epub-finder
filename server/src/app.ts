@@ -199,14 +199,10 @@ app.get("/auth/facebook/callback", passport.authenticate("facebook", {failureRed
     res.redirect(req.session.returnTo || "/");
 });
 app.get("/auth/github", passport.authenticate("github"));
-app.get("/auth/github/callback",
-    function (req, res, next) {
-        console.log();
-        next();
-    }, passport.authenticate("github", {failureRedirect: "/login"}), (req, res) => {
-        // @ts-ignore
-        res.redirect(req.session.returnTo || "/");
-    });
+app.get("/auth/github/callback", passport.authenticate("github", {failureRedirect: "/login"}), (req, res) => {
+    // @ts-ignore
+    res.redirect(req.session.returnTo || "/");
+});
 // @ts-ignore
 app.get("/auth/google", passport.authenticate("google", {
     scope: ["profile", "email", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets.readonly"],
@@ -263,11 +259,11 @@ app.get("/auth/quickbooks/callback", passport.authorize("quickbooks", {failureRe
 });
 
 app.post("/translate", passportConfig.isAuthenticated, enforceBudget, translateFunc);
-app.post("/image-search", enforceBudget, passportConfig.isAuthenticated, imageSearchFunc);
-app.post("/trend-locations", enforceBudget, passportConfig.isAuthenticated, getLocations);
-app.post("/trends", enforceBudget, passportConfig.isAuthenticated, getTrendForLocation);
-app.post("/get-speech", enforceBudget, passportConfig.isAuthenticated, synthesisController.TextToSpeech);
-app.post("/speech-recognition-token", enforceBudget, passportConfig.isAuthenticated, synthesisController.GetSpeechRecognitionToken);
+app.post("/image-search", passportConfig.isAuthenticated, enforceBudget, imageSearchFunc);
+app.post("/trend-locations", passportConfig.isAuthenticated, enforceBudget, getLocations);
+app.post("/trends", passportConfig.isAuthenticated, enforceBudget, getTrendForLocation);
+app.post("/get-speech", passportConfig.isAuthenticated, enforceBudget, synthesisController.TextToSpeech);
+app.post("/speech-recognition-token", passportConfig.isAuthenticated, enforceBudget, synthesisController.GetSpeechRecognitionToken);
 
 /*
 app.get("/api/lastfm", apiController.getLastfm);
