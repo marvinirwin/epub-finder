@@ -26,7 +26,7 @@ export class OpenBook {
     public htmlElementIndex$: Observable<TextWordData>;
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
     public bookStats$: Observable<AtomizedDocumentStats>;
-    public srcDoc$ = new ReplaySubject<string>(1);
+    public atomizedSrcDoc$ = new ReplaySubject<string>(1);
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
     constructor(
         srcDoc: string,
@@ -36,11 +36,11 @@ export class OpenBook {
     ) {
         this.id = name;
         this.bookStats$ = combineLatest([
-            this.srcDoc$,
+            this.atomizedSrcDoc$,
             trie
         ]).pipe(sentenceDataPipe, shareReplay(1))
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
-        this.srcDoc$.next(srcDoc);
+        this.atomizedSrcDoc$.next(srcDoc);
         this.wordCountRecords$ = this.wordCountRecords();
         this.renderedSentences$.subscribe(sentences => {
             BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));

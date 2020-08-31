@@ -8,8 +8,10 @@ export function SettingsPage({m}: { m: Manager }) {
     const scheduleRows = usePipe(m.scheduleManager.sortedScheduleRows$, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
     const quizCard = useObservableState(m.quizManager.quizzingCard$)
     const nextQuizWord = useObservableState(m.scheduleManager.wordQuizList$)
-    const quizComponent = useObservableState(m.quizManager.quizzingComponent$)
+    const quizComponent = useObservableState(m.quizManager.quizzingComponent$);
+    const user = useObservableState(m.authenticationMonitor.user$);
     return <div>
+        <div>Budget: {user?.profile.usedBudget} / {user?.profile.maxBudget}</div>
         <div>Schedule Rows: {scheduleRows}</div>
         <div>Current Quiz Word: {quizCard?.learningLanguage}</div>
         <div>Next Quiz Word: {nextQuizWord?.join(', ')}</div>

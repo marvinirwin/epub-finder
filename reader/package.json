@@ -28,6 +28,7 @@
     "fs-extra": "^9.0.1",
     "hanzi": "^2.1.5",
     "hanzi-tools": "^1.2.24",
+    "http-proxy-middleware": "^1.0.5",
     "idb": "^5.0.4",
     "jest": "^26.1.0",
     "jest-localstorage-mock": "^2.4.3",

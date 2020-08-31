@@ -8,7 +8,7 @@ import {map, scan, distinctUntilChanged, distinct} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
 import {XMLSerializer} from "xmldom";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {AtomizePipe} from "../Atomized/AtomizePipe";
+import {AtomizeSrcDocPipe} from "../Atomized/AtomizeSrcDocPipe";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -66,13 +66,12 @@ export class QuizCharacterManager {
             interpolateSourceDoc([]),
             'character_translation',
             trie$,
-            AtomizePipe
+            AtomizeSrcDocPipe
         );
         this.exampleSentences$.pipe(
             map(sentences => {
                 return interpolateSourceDoc(sentences.map(sentence => {
                     let translatableText = sentence.translatableText;
-                    debugger;
                     if (!this.sentenceCache.has(translatableText)) {
                         requestPlayAudio(translatableText);
                         this.sentenceCache.add(translatableText);
@@ -83,7 +82,7 @@ export class QuizCharacterManager {
             map(srcDoc => {
                 return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
             })
-        ).subscribe(this.exampleSentencesFrame.srcDoc$);
+        ).subscribe(this.exampleSentencesFrame.atomizedSrcDoc$);
 
         this.quizzingCard$.pipe(
             distinct(card => card?.learningLanguage)

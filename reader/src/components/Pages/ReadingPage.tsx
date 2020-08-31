@@ -56,12 +56,12 @@ export function SlidingTopWindows({m}: { m: Manager }) {
             </Card>
             <Card style={{width: '50%'}}>
                 <CardContent style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh'}}>
-                    {user?.name ? <Typography variant="subtitle2">
-                            {user?.name || 'Please log in'}
+                    {user?.profile.name ? <Typography variant="subtitle2">
+                            {user?.profile.name}
                         </Typography> :
                         <Link href={`${process.env.PUBLIC_URL}/login`}>Please Log In</Link>
                     }
-                    <img style={{maxHeight: '100%', width: 'auto'}} src={user?.picture}/>
+                    <img style={{maxHeight: '100%', width: 'auto'}} src={user?.profile.picture}/>
                 </CardContent>
             </Card>
         </div>

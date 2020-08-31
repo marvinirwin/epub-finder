@@ -106,7 +106,7 @@ export class Manager {
                 // if has response show the error
                 if (error.response) {
                     this.alertMessagesVisible$.next(true);
-                    this.alertMessages$.next(this.alertMessages$.getValue().concat(error.response).slice(0, 10))
+                    this.alertMessages$.next(this.alertMessages$.getValue().concat(JSON.stringify(error.response)).slice(0, 10))
                 }
             }
         );

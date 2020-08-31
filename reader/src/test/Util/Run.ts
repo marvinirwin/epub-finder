@@ -15,8 +15,12 @@ require("fake-indexeddb/auto");
 
 export type RunArguments = { manager: Manager, scheduler: MyTestScheduler, helpers: RunHelpers }
 
+export function UnitTestGetPageSrcText(url: string) {
+    return fs.readFileSync(join(__dirname, '../fixtures/', url)).toString();
+}
+
 export const UnitTestGetPageSrc = (url: string) => of(
-    fs.readFileSync(join(__dirname, '../fixtures/', url)).toString()
+    UnitTestGetPageSrcText(url)
 );
 
 

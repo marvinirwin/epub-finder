@@ -17,6 +17,8 @@ export interface Profile {
     picture: string;
     location: string | null;
     website: string;
+    usedBudget: number;
+    maxBudget: number;
 }
 
 export class User {
@@ -24,15 +26,14 @@ export class User {
     maxUsage$ = new ReplaySubject<number>();
 
     constructor(
-        public name: string, public picture: string
+        public profile: Profile,
     ) {
     }
 
     static async FetchUserInfo() {
         const response = await axios.get(`${process.env.PUBLIC_URL}/profile`);
         return new User(
-            response.data.name,
-            response.data.picture
+            response.data
         );
     }
 }

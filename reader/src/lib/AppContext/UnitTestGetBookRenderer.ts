@@ -6,7 +6,7 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from "xmldom";
 import {InMemoryBookRenderer} from "../BookFrame/Renderer/InMemoryBookRenderer";
 import {TrieWrapper} from "../TrieWrapper";
-import {AtomizePipe} from "../Atomized/AtomizePipe";
+import {AtomizeSrcDocPipe} from "../Atomized/AtomizeSrcDocPipe";
 
 export function UnitTestGetBookRenderer(
     page: Website,
@@ -19,7 +19,7 @@ export function UnitTestGetBookRenderer(
                         (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(src).document),
                         page.name,
                         trie$,
-                        AtomizePipe
+                        AtomizeSrcDocPipe
                     );
                 }
             )

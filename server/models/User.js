@@ -56,7 +56,7 @@ userSchema.pre("save", function save(next) {
  */
 userSchema.pre("save", function save(next) {
   const user = this;
-  if (!user.budget || !user.maxBudget) {
+  if (!user.usedBudget || !user.maxBudget) {
     user.usedBudget = 0;
     user.maxBudget = 250000; // About 5 dollars worth of google translated characters
   }

@@ -62,8 +62,7 @@ export function splitLong(threshhold: number, str: string, filterFunc: (char: st
     return splits;
 }
 
-
-
+export const jestDetected = () => process.env.JEST_WORKER_ID !== undefined;
 
 export enum NavigationPages {
     READING_PAGE = "READING_PAGE",
