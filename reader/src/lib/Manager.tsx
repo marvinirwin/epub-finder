@@ -1,6 +1,6 @@
-import {combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary, flatten} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {debounce, Dictionary} from "lodash";
+import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -35,11 +35,11 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
-import {ds_Dict, ds_Tree, flattenTree} from "./Util/DeltaScanner";
+import {ds_Dict, ds_Tree} from "./Util/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
-import {TrieWrapper} from "./TrieWrapper";
 import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
+import axios from 'axios';
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -75,6 +75,9 @@ export class Manager {
     public quizCharacterManager: QuizCharacterManager;
     public authenticationMonitor = new AuthenticationMonitor();
 
+    public alertMessages$ = new BehaviorSubject<string[]>([]);
+    public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
+
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
@@ -96,8 +99,17 @@ export class Manager {
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
-
     constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
+        axios.interceptors.response.use(
+            response => response,
+             (error)  => {
+                // if has response show the error
+                if (error.response) {
+                    this.alertMessagesVisible$.next(true);
+                    this.alertMessages$.next(this.alertMessages$.getValue().concat(error.response).slice(0, 10))
+                }
+            }
+        );
         this.cardManager = new CardManager(this.db);
         this.openedBooksManager = new OpenBooks({
             getPageRenderer,

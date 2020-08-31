@@ -14,6 +14,8 @@ import {map} from "rxjs/operators";
 import {flattenTree} from "../lib/Util/DeltaScanner";
 import {StaticFrame} from "./Frame/StaticFrame";
 import {OpenedBook} from "../lib/Atomized/OpenedBook";
+import {Alert} from "@material-ui/lab";
+import {Snackbar} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -78,6 +80,9 @@ export function Main({m}: { m: Manager }) {
     const iframeVisible = item === NavigationPages.READING_PAGE;
     const characterPageShows = item === NavigationPages.QUIZ_PAGE;
 
+    const alertMessagesVisible = useObservableState(m.alertMessagesVisible$);
+    const alertMessages = useObservableState(m.alertMessages$);
+
     return <div style={{maxHeight: '100vh', maxWidth: '100vw', overflow: 'hidden'}}>
         <StaticFrame
             visible={characterPageShows}
@@ -111,6 +116,20 @@ export function Main({m}: { m: Manager }) {
         }}>
             {SelectedPage}
         </div>
+        <Snackbar
+            open={alertMessagesVisible}
+            autoHideDuration={6000}
+            onClose={e => m.alertMessagesVisible$.next(false)}>
+            <div>
+                {
+                    (alertMessages || []).map(alertMessage =>
+                        <Alert key={alertMessage} severity="error">
+                            {alertMessage}
+                        </Alert>
+                    )
+                }
+            </div>
+        </Snackbar>
         <BottomNav m={m}/>
     </div>;
 }

@@ -303,7 +303,6 @@ passport.use(new TwitterStrategy({
 /**
  * Sign in with Google.
  */
-/*
 const googleStrategyConfig = new GoogleStrategy({
   clientID: process.env.GOOGLE_ID,
   clientSecret: process.env.GOOGLE_SECRET,
@@ -370,7 +369,6 @@ const googleStrategyConfig = new GoogleStrategy({
 });
 passport.use("google", googleStrategyConfig);
 refresh.use("google", googleStrategyConfig);
-*/
 
 /**
  * Sign in with LinkedIn.

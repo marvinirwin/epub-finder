@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
   quickbooks: String,
   tokens: Array,
 
+  usedBudget: Number,
+  maxBudget: Number,
+
+
   profile: {
     name: String,
     gender: String,
@@ -45,6 +49,17 @@ userSchema.pre("save", function save(next) {
       next();
     });
   });
+});
+
+/**
+ * Set the budget TODO not hardcode this
+ */
+userSchema.pre("save", function save(next) {
+  const user = this;
+  if (!user.budget || !user.maxBudget) {
+    user.usedBudget = 0;
+    user.maxBudget = 250000; // About 5 dollars worth of google translated characters
+  }
 });
 
 /**
