@@ -11,7 +11,7 @@ import AtomizeSrcdoc from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeSr
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
 
 import {jestDetected} from "../Util/Util";
-import {UnitTestGetPageSrc, UnitTestGetPageSrcText} from "../../test/Util/Run";
+import { UnitTestGetPageSrcText} from "../../test/Util/Run";
 
 export const cache = new Map<string, AtomizedDocument>();
 export const AtomizeUrlPipe = (urlAndTrie: Observable<[string, TrieWrapper]>): Observable<AtomizedDocumentStats> => {
@@ -33,17 +33,20 @@ export const AtomizeUrlPipe = (urlAndTrie: Observable<[string, TrieWrapper]>): O
     return urlAndTrie.pipe(
         switchMap(async ([url, trie]) => {
             if (!cache.get(url)) {
+                let str = await GetWorkerResults(
+                    new AtomizeUrl(),
+                    url
+                );
+                let document = (new DOMParser())
+                    .parseFromString(
+                        str,
+                        'text/html'
+                    );
+                debugger;
                 cache.set(
                     url,
                     new AtomizedDocument(
-                        (new DOMParser())
-                            .parseFromString(
-                                await GetWorkerResults(
-                                    new AtomizeUrl(),
-                                    url
-                                ),
-                                'text/html'
-                            )
+                        document
                     ),
                 );
             }

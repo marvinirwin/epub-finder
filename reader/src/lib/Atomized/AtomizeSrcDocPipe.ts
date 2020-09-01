@@ -8,6 +8,7 @@ import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdoc from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeSrcdoc';
 
+import {DOMParser} from 'xmldom';
 import {jestDetected} from "../Util/Util";
 
 export const cache = new Map<string, AtomizedDocument>();
@@ -34,15 +35,16 @@ export const AtomizeSrcDocPipe = (docAndTrie: Observable<[string, TrieWrapper]>)
                     new AtomizeSrcdoc(),
                     unAtomizedDocument
                 );
-                let document = (new DOMParser())
+                let d = (new DOMParser())
                     .parseFromString(
                         str,
                         'text/html'
                     );
                 let atomizedDocument = new AtomizedDocument(
-                    document
+                    d
                 );
                 const s = atomizedDocument.getAtomizedSentences();
+                debugger;
                 cache.set(
                     unAtomizedDocument,
                     atomizedDocument,
