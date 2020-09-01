@@ -69,6 +69,7 @@
     "worker-loader": "^2.0.0",
     "xmldom": "^0.3.0"
   },
+  "proxy": "http://localhost:3001",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
