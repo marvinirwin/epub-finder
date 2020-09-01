@@ -4,6 +4,16 @@ module.exports = function(app) {
         '/login',
         createProxyMiddleware({
             target: 'http://localhost:3001',
+            changeOrigin: true,
+            logLevel: 'debug'
+        })
+    );
+    app.use(
+        '/auth/*',
+        createProxyMiddleware({
+            target: 'http://localhost:3001',
+            changeOrigin: true,
+            logLevel: 'debug'
         })
     );
 };

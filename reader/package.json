@@ -77,7 +77,6 @@
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build"
   },
-  "proxy": "http://localhost:3001",
   "eslintConfig": {
     "extends": "react-app"
   },

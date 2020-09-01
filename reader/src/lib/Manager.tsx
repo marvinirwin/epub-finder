@@ -95,7 +95,6 @@ export class Manager {
 
     highlightedPinyin$: Observable<string>;
 
-    characterPageFrame$ = new Subject<OpenBook>();
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
@@ -152,7 +151,10 @@ export class Manager {
                 ),
                 quizzingCard$: this.quizManager.quizzingCard$,
                 trie$: this.cardManager.trie$,
-                requestPlayAudio: sentence => this.audioManager.queSynthesizedSpeechRequest$.next(sentence)
+                requestPlayAudio: sentence => {
+                    this.highlightedSentence$.next(sentence);
+                    this.audioManager.queSynthesizedSpeechRequest$.next(sentence);
+                }
             }
         )
 

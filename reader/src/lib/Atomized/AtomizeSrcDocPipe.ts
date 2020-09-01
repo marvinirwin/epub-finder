@@ -30,18 +30,22 @@ export const AtomizeSrcDocPipe = (docAndTrie: Observable<[string, TrieWrapper]>)
     return docAndTrie.pipe(
         switchMap(async ([unAtomizedDocument, trie]) => {
             if (!cache.get(unAtomizedDocument)) {
+                let str = await GetWorkerResults(
+                    new AtomizeSrcdoc(),
+                    unAtomizedDocument
+                );
+                let document = (new DOMParser())
+                    .parseFromString(
+                        str,
+                        'text/html'
+                    );
+                let atomizedDocument = new AtomizedDocument(
+                    document
+                );
+                const s = atomizedDocument.getAtomizedSentences();
                 cache.set(
                     unAtomizedDocument,
-                    new AtomizedDocument(
-                        (new DOMParser())
-                            .parseFromString(
-                                await GetWorkerResults(
-                                    new AtomizeSrcdoc(),
-                                    unAtomizedDocument
-                                ),
-                                'text/html'
-                            )
-                    ),
+                    atomizedDocument,
                 );
             }
             return (cache.get(unAtomizedDocument) as AtomizedDocument).getDocumentStats(trie)

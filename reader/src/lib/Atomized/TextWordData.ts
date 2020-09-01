@@ -10,7 +10,7 @@ export interface TextWordData {
 }
 
 export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordData {
-    let aggregateSentenceInfo = sentenceInfos[0];
+    let aggregateSentenceInfo: TextWordData = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}};
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
         for (let key in dict) {
@@ -22,7 +22,7 @@ export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordDat
         }
     }
 
-    for (let i = 1; i < sentenceInfos.length; i++) {
+    for (let i = 0; i < sentenceInfos.length; i++) {
         const newSentenceInfo = sentenceInfos[i];
         Object.entries(newSentenceInfo.wordCounts).forEach(([key, val]) => {
             if (!aggregateSentenceInfo .wordCounts[key]) {
