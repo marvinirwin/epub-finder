@@ -1,7 +1,7 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
-import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentString';
+import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromSrcDoc';
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
 
