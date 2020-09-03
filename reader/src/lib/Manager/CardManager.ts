@@ -2,7 +2,7 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary} from "lodash";
 import trie from "trie-prefix-tree";
-import {flatMap, scan, shareReplay, startWith} from "rxjs/operators";
+import {flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {TrieObservable} from "../AppContext/NewOpenBook";
@@ -34,7 +34,7 @@ export default class CardManager {
     }
 
     constructor(public db: MyAppDatabase) {
-        this.cardProcessingSignal$.next(false);
+        this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
         this.addUnpersistedCards$.subscribe(newPersistedCards => {
@@ -43,6 +43,7 @@ export default class CardManager {
         this.cardIndex$ = this.addPersistedCards$.pipe(
             startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {
+                debugger;
                 const o = {...cardIndex};
                 newCards.forEach(newICard => {
                     CardManager.mergeCardIntoCardDict(newICard, o);
@@ -52,10 +53,11 @@ export default class CardManager {
             shareReplay(1)
         );
         this.addUnpersistedCards$.pipe(
-            flatMap(async cards => {
+            map((cards) => {
+                debugger;
                 for (let i = 0; i < cards.length; i++) {
                     const card = cards[i];
-                    card.id = await this.db.cards.add(card);
+                    this.db.cards.add(card).then(id => card.id = id);
                 }
                 return cards;
             })
@@ -67,7 +69,6 @@ export default class CardManager {
         if (unloadedCardCount) {
             await this.getCardsFromDB();
         }
-        this.cardProcessingSignal$.next(false);
     }
 
     private async getCardsFromDB() {

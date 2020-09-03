@@ -8,12 +8,16 @@ import {flattenTree} from "../../Util/DeltaScanner";
 
 export function CardPage(c: CardManager, p: OpenBooks) {
     c.cardProcessingSignal$.pipe(
-        filter(b => !b),
+        filter(b => {
+            debugger;
+            return !b;
+        }),
         delay(100),
         switchMapTo(p.openedBooks.updates$),
         switchMap(({sourced}) => merge(...(sourced ? flattenTree(sourced) : []).map(pageRenderer => pageRenderer.text$))),
         withLatestFrom(c.cardIndex$)
     ).subscribe(([text, cardIndex]) => {
+        debugger;
         const newCharacterSet = new Set<string>();
         for (let i = 0; i < text.length; i++) {
             const textElement = text[i];

@@ -14,7 +14,7 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (ev) => {
     const url = ev.data as string;
     const response = await fetch(url);
-    const srcDoc = new TextDecoder().decode(await response.arrayBuffer());
+    const srcDoc = new TextDecoder().decode(await   response.arrayBuffer());
     let message = (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
     ctx.postMessage(
         message
