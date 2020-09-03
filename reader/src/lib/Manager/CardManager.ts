@@ -5,7 +5,7 @@ import trie from "trie-prefix-tree";
 import {flatMap, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
-import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
+import {TrieObservable} from "../AppContext/NewOpenBook";
 import {TrieWrapper} from "../TrieWrapper";
 
 export default class CardManager {

@@ -98,7 +98,7 @@ export class Manager {
     wordCounts$: Observable<Dictionary<number>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
-    constructor(public db: MyAppDatabase, {audioSource, getPageRenderer}: AppContext) {
+    constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
             response => response,
              (error)  => {
@@ -111,7 +111,6 @@ export class Manager {
         );
         this.cardManager = new CardManager(this.db);
         this.openedBooksManager = new OpenBooks({
-            getPageRenderer,
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyBodyListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,

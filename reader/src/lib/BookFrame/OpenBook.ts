@@ -1,6 +1,6 @@
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject, merge} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, shareReplay, tap} from "rxjs/operators";
+import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -13,41 +13,60 @@ import {printExecTime} from "../Util/Timer";
 import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {BrowserInputs} from "../Manager/BrowserInputs";
+import {AtomizedStringForRawHTML} from "../Pipes/AtomizedStringForRawHTML";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedStringForURL} from "../Pipes/AtomizedStringForURL";
 
-export type SentenceDataPipe = (srcDoc$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
+/*
+export type AtomizedDocumentSentenceDataPipe = (atomizedSrcDocStringAndTrie$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
+export type AtomizedDocumentStringPipe = (unatomizedSrcDoc$: Observable<string>) => Observable<string>;
+*/
 
 export class OpenBook {
     public frame = new Frame();
-
-    // This shouldn't be an observable, right?
     public id: string;
     public text$: Observable<string>;
     public wordCountRecords$: Observable<IWordCountRow[]>;
     public htmlElementIndex$: Observable<TextWordData>;
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
     public bookStats$: Observable<AtomizedDocumentStats>;
-    public atomizedSrcDoc$ = new ReplaySubject<string>(1);
+
+    public unAtomizedSrcDoc$ = new ReplaySubject<string>(1);
+    public url$ = new ReplaySubject<string>(1)
+
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
+    atomizedSrcDocString$: Observable<string>;
+    atomizedDocument$: Observable<AtomizedDocument>;
+
     constructor(
-        srcDoc: string,
         public name: string,
         public trie: Observable<TrieWrapper>,
-        sentenceDataPipe: SentenceDataPipe,
     ) {
         this.id = name;
+        this.atomizedSrcDocString$ = merge(
+            this.unAtomizedSrcDoc$.pipe(
+                AtomizedStringForRawHTML
+            ),
+            this.url$.pipe(
+                AtomizedStringForURL
+            )
+        );
+        this.atomizedDocument$ = this.atomizedSrcDocString$.pipe(map(AtomizedDocument.fromString))
         this.bookStats$ = combineLatest([
-            this.atomizedSrcDoc$,
+            this.atomizedDocument$,
             trie
-        ]).pipe(sentenceDataPipe, shareReplay(1))
+        ]).pipe(
+            map(([document, trie]) => document.getDocumentStats(trie)),
+            shareReplay(1)
+        )
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
-        this.atomizedSrcDoc$.next(srcDoc);
         this.wordCountRecords$ = this.wordCountRecords();
         this.renderedSentences$.subscribe(sentences => {
             BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
         })
 
 
-        this.htmlElementIndex$ =  combineLatest([
+        this.htmlElementIndex$ = combineLatest([
             this.trie,
             this.renderedSentences$
         ]).pipe(

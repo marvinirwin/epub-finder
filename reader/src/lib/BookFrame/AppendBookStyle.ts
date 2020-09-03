@@ -35,9 +35,9 @@ export const BodyStyle = `
 
 .annotated_and_translated {
         position: relative;
-    }
+}
 .annotated_and_translated:hover::after,
-.annotated_and_translated.highlighted-sentence{
+.annotated_and_translated.highlighted-sentence::after {
         opacity: 0.15;
     }
 .annotated_and_translated::after {

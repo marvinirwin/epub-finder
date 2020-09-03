@@ -29,7 +29,7 @@ export function QuizPage({m}: { m: Manager }) {
                     height: '100%',
                     width: '100%',
                     position: 'absolute',
-                    top: currentComponent === Component ? '0' : '9000px'
+                    zIndex: currentComponent === Component ? 0 : -1
                 }
                 }>
                     <Component c={quizzingCard} m={m}/>

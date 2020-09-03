@@ -17,11 +17,19 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
+export function tryParse<T>(serialized: string, defaultVal: T):T  {
+    try {
+        return JSON.parse(serialized)
+    } catch(e) {
+        return defaultVal;
+    }
+}
+
 export const TutorialPopper = ({referenceElement, storageKey, children, placement}: { referenceElement: HTMLDivElement | null, storageKey: string, children?: ReactNode, placement: Placement}) => {
-    const [open ,setOpen] = useState<boolean>(() => !!localStorage.getItem(storageKey));
+    const [open ,setOpen] = useState<boolean>();
     const classes = useStyles();
     useEffect(() => {
-        setOpen(!!JSON.parse(localStorage.getItem(storageKey) || 'false'))
+        setOpen(tryParse(localStorage.getItem(storageKey) || 'false', false))
     }, [])
     useEffect(() => {
         localStorage.setItem(storageKey, open as unknown as string)

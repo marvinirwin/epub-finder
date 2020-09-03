@@ -25,8 +25,10 @@ export class OpenBooks {
         private config: OpenBooksConfig
     ) {
         this.addOpenBook$
-            .pipe(switchMap(page => {
-                return this.config.getPageRenderer(page, config.trie$);
+            .pipe(map(page => {
+                const b = new OpenBook(page.name, config.trie$);
+                b.url$.next(page.url)
+                return b;
             }))
             .subscribe(openBook => {
                 this.openedBooks.appendDelta$.next(

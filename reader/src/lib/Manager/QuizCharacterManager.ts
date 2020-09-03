@@ -5,10 +5,9 @@ import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {map, scan, distinctUntilChanged, distinct} from "rxjs/operators";
-import {TrieObservable} from "../AppContext/WorkerGetBookRenderer";
+import {TrieObservable} from "../AppContext/NewOpenBook";
 import {XMLSerializer} from "xmldom";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {AtomizeSrcDocPipe} from "../Atomized/AtomizeSrcDocPipe";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -63,10 +62,8 @@ export class QuizCharacterManager {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
         this.exampleSentencesFrame = new OpenBook(
-            interpolateSourceDoc([]),
-            'character_translation',
+            'ExampleSentences',
             trie$,
-            AtomizeSrcDocPipe
         );
         this.exampleSentences$.pipe(
             map(sentences => {
@@ -82,7 +79,7 @@ export class QuizCharacterManager {
             map(srcDoc => {
                 return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
             })
-        ).subscribe(this.exampleSentencesFrame.atomizedSrcDoc$);
+        ).subscribe(this.exampleSentencesFrame.unAtomizedSrcDoc$);
 
         this.quizzingCard$.pipe(
             distinct(card => card?.learningLanguage)

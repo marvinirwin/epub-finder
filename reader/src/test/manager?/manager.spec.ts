@@ -1,8 +1,9 @@
-import {Run, UnitTestGetPageSrc} from "../Util/Run";
+import {Run, UnitTestGetPageSrcText} from "../Util/Run";
 import {CausalTree} from "../Graph/CausalTree";
 import {Website} from "../../lib/Website/Website";
 import {getNewICardForWord, NavigationPages} from "../../lib/Util/Util";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
+import {of} from "rxjs";
 
 require('jest-localstorage-mock');
 ['unhandledRejection', 'uncaughtException'].forEach(event => {
@@ -87,7 +88,9 @@ it("Loads the manager without error", () => {
                     queEditingCard$, editingCard:  EditingCard.fromICard(getNewICardForWord('一', ''), manager.cardDBManager, manager.audioManager, manager.cardManager ),
                     highlightedWord$, highlightedWord: '一',
                     readingPageAtomizedSentences: { translatableText: `TODO` },
-                    mainPage: new Website( "Basic Doc", "BasicDoc.html", UnitTestGetPageSrc ),
+                    mainPage: new Website( "Basic Doc", "BasicDoc.html", (url: string) => of(
+                        UnitTestGetPageSrcText(url)
+                    ) ),
                     addOpenBook$,
                 })
             )

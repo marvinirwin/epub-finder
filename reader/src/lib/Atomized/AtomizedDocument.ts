@@ -21,6 +21,17 @@ export function createPopperElement(document1: XMLDocument) {
 }
 
 export class AtomizedDocument {
+    public static getPopperId(popperId: string) {
+        return `translate-popper_${popperId}`;
+    }
+
+    public static atomizeDocument(xmlsource: string): AtomizedDocument {
+        const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
+        doc.replaceDocumentSources(doc.document);
+        doc.splitLongTextElements(doc.getTextElements(doc.document));
+        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
+        return doc;
+    }
 
     public static find(document: XMLDocument, cb: (n: Node) => boolean): Node | undefined {
         function walk(node: Node, cb: (n: Node) => any): Node | undefined {
@@ -44,7 +55,7 @@ export class AtomizedDocument {
                     while (child) {
                         next = child.nextSibling;
                         let foundNode = walk(child, cb);
-                        if(foundNode) {
+                        if (foundNode) {
                             return foundNode;
                         }
                         child = next;
@@ -52,12 +63,18 @@ export class AtomizedDocument {
                     break;
             }
         }
+
         return walk(document, n => {
             return cb(n)
         });
     }
 
-    constructor(public document: XMLDocument) {}
+    public static fromString(atomizedString: string) {
+        return new AtomizedDocument(new DOMParser().parseFromString(atomizedString));
+    }
+
+    constructor(public document: XMLDocument) {
+    }
 
     replaceHrefOrSource(el: Element, qualifiedName: string) {
         let currentSource = el.getAttribute(qualifiedName);
@@ -93,7 +110,7 @@ export class AtomizedDocument {
 
         walk(doc, (node: Node) => {
             let text = (node.textContent as string).trim();
-            if (text)  {
+            if (text) {
                 leaves.push(node as Element);
             }
         })
@@ -123,9 +140,7 @@ export class AtomizedDocument {
         return newParent as unknown as XMLDocumentNode;
     }
 
-
-
-    private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
+    replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
         const indexOfMe = getIndexOfEl(textNode);
         (textNode.parentNode as Element).removeChild(textNode);
         const newParent = this.document.createElement('span');
@@ -140,18 +155,6 @@ export class AtomizedDocument {
         const oldParent = textNode.parentNode as Element;
         oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
         return newParent;
-    }
-
-    public static getPopperId(popperId: string) {
-        return `translate-popper_${popperId}`;
-    }
-
-    public static atomizeDocument(xmlsource: string): AtomizedDocument {
-        const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
-        doc.replaceDocumentSources(doc.document);
-        doc.splitLongTextElements(doc.getTextElements(doc.document));
-        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
-        return doc;
     }
 
     replaceDocumentSources(doc: Document) {
@@ -183,7 +186,7 @@ export class AtomizedDocument {
             const split = splitLong(
                 20,
                 textNode.nodeValue as string,
-                    (char: string) => !isChineseCharacter(char)
+                (char: string) => !isChineseCharacter(char)
             );
 
             if (split.length > 1) {
@@ -202,8 +205,8 @@ export class AtomizedDocument {
         }
     }
 
-    public getAtomizedSentences(): AtomizedSentence[]  {
-        const sentenceElements =  this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
+    getAtomizedSentences(): AtomizedSentence[] {
+        const sentenceElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
         const atomized = new Array(sentenceElements.length);
         for (let i = 0; i < sentenceElements.length; i++) {
             const sentenceElement = sentenceElements[i];
@@ -212,12 +215,10 @@ export class AtomizedDocument {
         return atomized;
     }
 
-
-
-    public getDocumentStats(trie: TrieWrapper):AtomizedDocumentStats {
+    getDocumentStats(trie: TrieWrapper): AtomizedDocumentStats {
         const atomizedSentences = this.getAtomizedSentences();
         const sentenceStats = atomizedSentences.map(atomizedSentence => atomizedSentence.getTextWordData(trie.t, trie.getUniqueLengths()))
-        const data =  mergeSentenceInfo(...sentenceStats);
+        const data = mergeSentenceInfo(...sentenceStats);
         return {
             wordCounts: data.wordCounts,
             wordSentenceMap: data.wordSentenceMap,
@@ -230,16 +231,21 @@ export class AtomizedDocument {
     headInnerHTML() {
         const head = AtomizedDocument.find(this.document, n => {
             // @ts-ignore
-            return n.tagName  === 'head';
+            return n.tagName === 'head';
         });
         return (new XMLSerializer()).serializeToString(<Node>head)
     }
+
     bodyInnerHTML() {
         const body = AtomizedDocument.find(this.document, n => {
             // @ts-ignore
             return n.tagName === 'body';
         });
         return (new XMLSerializer()).serializeToString(<Node>body)
+    }
+
+    toString() {
+        return new XMLSerializer().serializeToString(this.document);
     }
 }
 

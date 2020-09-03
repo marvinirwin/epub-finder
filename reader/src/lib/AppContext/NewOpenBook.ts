@@ -5,23 +5,16 @@ import {Website} from "../Website/Website";
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
 import AtomizeUrl from 'Worker-loader?name=dist/[name].js!../Worker/AtomizeUrl';
-import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {TrieWrapper} from "../TrieWrapper";
-import {AtomizeSrcDocPipe} from "../Atomized/AtomizeSrcDocPipe";
+
 export type TrieObservable = Observable<TrieWrapper>
 
-export function WorkerGetBookRenderer(
+export function NewOpenBook(
     page: Website,
     trie$: TrieObservable
 ): Observable<OpenBook> {
     return from(new Promise<OpenBook>(async resolve => {
-        const documentProcessingWorker = new AtomizeUrl();
-        const document = await GetWorkerResults(documentProcessingWorker, page.url);
-        resolve(new OpenBook(
-            document,
-            page.name,
-            trie$,
-            AtomizeSrcDocPipe
-        ))
+        new OpenBook(page.name, trie$).url$.next(page.url);
+        resolve(new OpenBook(page.name, trie$))
     }))
 }

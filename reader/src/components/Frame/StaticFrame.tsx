@@ -10,9 +10,10 @@ export const StaticFrame: FunctionComponent<props> = (
     ) => {
     const [el, setEl] = useState();
     const divStyle = visible ? visibleStyle : {
-        top: '9000px',
+        zIndex: -1,
         width: '100vw',
-        height: '10vh'
+        height: '10vh',
+        overflow: 'hidden'
     };
     return <div style={
         {
