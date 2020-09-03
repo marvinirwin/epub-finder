@@ -43,7 +43,6 @@ export default class CardManager {
         this.cardIndex$ = this.addPersistedCards$.pipe(
             startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {
-                debugger;
                 const o = {...cardIndex};
                 newCards.forEach(newICard => {
                     CardManager.mergeCardIntoCardDict(newICard, o);
@@ -54,7 +53,6 @@ export default class CardManager {
         );
         this.addUnpersistedCards$.pipe(
             map((cards) => {
-                debugger;
                 for (let i = 0; i < cards.length; i++) {
                     const card = cards[i];
                     this.db.cards.add(card).then(id => card.id = id);
@@ -68,7 +66,9 @@ export default class CardManager {
         let unloadedCardCount = await this.db.getCardsInDatabaseCount()
         if (unloadedCardCount) {
             await this.getCardsFromDB();
+
         }
+        this.cardProcessingSignal$.next(false);
     }
 
     private async getCardsFromDB() {
