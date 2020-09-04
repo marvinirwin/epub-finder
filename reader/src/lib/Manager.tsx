@@ -218,7 +218,6 @@ export class Manager {
 
         this.wordCounts$.subscribe(this.scheduleManager.wordCountDict$);
 
-
         let previousHighlightedElements: HTMLElement[] | undefined;
         let previousHighlightedSentences: HTMLElement[] | undefined;
 
@@ -310,12 +309,13 @@ export class Manager {
                 }
             }
         });
-        this.highlightNewWords();
+        this.highlightSavedWord();
         this.cardManager.load();
     }
 
-    private highlightNewWords() {
-        this.openedBooksManager.atomizedSentences$.pipe(
+    private highlightSavedWord() {
+/*
+        this.cardManager.addPersistedCards$.pipe(
             switchMap(atomizedSentences => {
                     return combineLatest(atomizedSentences.map(atomizedSentence => atomizedSentence.newWords$));
                 }
@@ -334,6 +334,7 @@ export class Manager {
             }
             this.highlightedWord$.next('');
         })
+*/
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

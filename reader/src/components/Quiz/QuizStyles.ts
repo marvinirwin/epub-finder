@@ -22,10 +22,10 @@ export const quizStyles = makeStyles((theme) => ({
         zIndex: 2
     },
     cardContent: {
-        flexGrow: 1,
-        display: 'flex',
+        display: 'grid',
         flexFlow: 'column nowrap',
+        gridTemplateColumns: '25% 50% 25%',
         paddingTop: '50px',
-        height: '35vh'
+        height: '35vh',
     }
 }));

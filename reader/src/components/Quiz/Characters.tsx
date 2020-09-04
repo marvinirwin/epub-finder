@@ -26,7 +26,7 @@ export function Characters({c, m}: QuizCardProps) {
     const [error, setError] = useState('');
     const [createdSentence, setCreatedSentence] = useState();
     const advance = () => {
-        m.quizManager.quizzingComponent$.next("Pictures");
+        m.quizManager.quizzingComponent$.next("Conclusion");
 /*
         if (createdSentence) {
         } else {
@@ -63,16 +63,21 @@ export function Characters({c, m}: QuizCardProps) {
 
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
-            <Typography variant="h3">{error}</Typography>
+            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'spaceAround'}}>
+                <QuizStatsHeader m={m}/>
+            </div>
             <div>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
             </div>
+            <div>
+                <Button onClick={advance}>Next</Button>
+            </div>
         </CardContent>
+{/*
         <CardActions className={classes.cardActions}>
-            <QuizStatsHeader m={m}/>
-            <Button onClick={advance}>Next</Button>
         </CardActions>
+*/}
     </Card>
 }

@@ -38,11 +38,12 @@ export default class CardManager {
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
         this.addUnpersistedCards$.subscribe(newPersistedCards => {
-            t.addWords(...newPersistedCards.map(card => card.learningLanguage))
+            debugger;
         })
         this.cardIndex$ = this.addPersistedCards$.pipe(
             startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {
+                t.addWords(...Object.values(newCards).map(card => card.learningLanguage))
                 const o = {...cardIndex};
                 newCards.forEach(newICard => {
                     CardManager.mergeCardIntoCardDict(newICard, o);
