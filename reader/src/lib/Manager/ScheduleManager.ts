@@ -4,7 +4,7 @@ import {MyAppDatabase} from "../Storage/AppDB";
 import {Dictionary, groupBy, orderBy} from "lodash";
 import {IWordCountRow} from "../Interfaces/IWordCountRow";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {distinctUntilChanged, map, scan, share, shareReplay, tap, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, map, scan, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
@@ -87,7 +87,7 @@ export class ScheduleManager {
 
         this.sortedScheduleRows$ = this.wordScheduleRowDict$.pipe(
             map(dict => {
-                    return orderBy(Object.values(dict), ['orderValue'], ['desc']);
+                    return orderBy(Object.values(dict), ['dueDate'], ['asc']);
                 }
             ),
             distinctUntilChanged((x, y) => x.length !== 0 ),
@@ -146,21 +146,16 @@ export class ScheduleManager {
                     const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
                     if (learningCardsRequired > 0) {
                         let scheduleRows = newCards.slice(0, learningCardsRequired);
-                        if (newCards.length) {
-                            console.log();
-                        }
                         let a = [
-                            ...learningCards, ...toReviewCards, ...(scheduleRows || [])
+                            ...learningCards,
+                            ...toReviewCards,
+                            ...(scheduleRows || [])
                         ];
-                        let what = shuffle(a).map(r => r.word);
-                        return what;
+                        return shuffle(a).map(r => r.word);
                     }
                     return [...learningCards, ...toReviewCards, ...newCards].map(r => r.word);
                 }
             ),
-            tap(args => {
-                console.log();
-            }),
             shareReplay(1)
         );
 

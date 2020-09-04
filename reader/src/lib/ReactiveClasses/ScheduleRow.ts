@@ -17,6 +17,10 @@ export class ScheduleRow {
         return sumBy(this.wordCountRecords, wordCountRow => wordCountRow.count)
     }
 
+    get dueDate() {
+        return this.getCurrentDueDate();
+    }
+
     getCurrentDueDate(): Date {
         return this.wordRecognitionRecords[this.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
     }
