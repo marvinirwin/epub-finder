@@ -12,11 +12,9 @@ export interface QuizResult {
 
 export type QuizComponent = string;
 
-
 export interface QuizManagerParams {
     scheduledCards$: Observable<ICard[]>;
 }
-
 
 export class QuizManager {
     quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
