@@ -3,7 +3,7 @@ import React from "react";
 import {useObs} from "../../lib/UseObs";
 import {Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
-import {dueDate} from "../../lib/ReactiveClasses/ScheduleRow";
+import {dueDate, wordCount} from "../../lib/ReactiveClasses/ScheduleRow";
 import moment from "moment";
 
 export default function QuizStatsHeader({m}: { m: Manager }) {
@@ -18,9 +18,11 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
             <div>Learning: <span style={{color: '#c92800'}}>{learningCards?.length}</span></div>
             <div>To Review: <span style={{color: '#15d900'}}>{toReviewCards?.length}</span></div>
             <ul>
-                {scheduledCards.map(scheduledWord => <li key={scheduledWord.word}>
+                {scheduledCards.slice(0, 5).map(scheduledWord => <li key={scheduledWord.word}>
+                    {scheduledWord.word} { moment(dueDate(scheduledWord)).format('DD hh:mm') } {wordCount(scheduledWord)}
+{/*
                     <ul>
-                        <li>{scheduledWord.word} { moment(dueDate(scheduledWord)).format('DD hh:mm') }</li>
+                        <li></li>
                         {scheduledWord.wordRecognitionRecords.map(record =>
                             <li key={record.timestamp.toISOString()}>
                                 {moment(record.nextDueDate).format('DD hh:mm')}
@@ -28,6 +30,7 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
                             </li>
                         )}
                     </ul>
+*/}
                 </li>)}
             </ul>
         </Typography>

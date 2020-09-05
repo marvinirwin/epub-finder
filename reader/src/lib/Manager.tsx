@@ -160,7 +160,7 @@ export class Manager {
                         for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
                             const v = textWordData[i];
                             if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                                sentenceMatches.push(...v.wordSentenceMap[quizzingCard.learningLanguage]);
+                                sentenceMatches.push(v.wordSentenceMap[quizzingCard.learningLanguage][0]);
                             }
                         }
                         return sentenceMatches;
@@ -340,6 +340,7 @@ export class Manager {
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
+        child.classList.add("applied-word-element-listener");
         child.onmouseenter = (ev) => {
             addHighlightedWord(this.highlightedWord$, maxWord?.word);
             if (ev.shiftKey) {

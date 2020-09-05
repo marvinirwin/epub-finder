@@ -1,12 +1,11 @@
-import {combineLatest, Observable, ReplaySubject, merge} from "rxjs";
+import {combineLatest, merge, Observable, ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
-import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
+import {map, shareReplay, tap} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
-import {BookRenderer} from "./Renderer/BookRenderer";
 import {Frame} from "./Frame";
 import {AtomizedDocumentBookStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
@@ -14,8 +13,9 @@ import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {BrowserInputs} from "../Manager/BrowserInputs";
 import {AtomizedStringForRawHTML} from "../Pipes/AtomizedStringForRawHTML";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringForURL} from "../Pipes/AtomizedStringForURL";
+import {sleep} from "../Util/Util";
 
 /*
 export type AtomizedDocumentSentenceDataPipe = (atomizedSrcDocStringAndTrie$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
@@ -68,15 +68,23 @@ export class OpenBook {
                 AtomizedStringForURL
             )
         );
-        this.atomizedDocument$ = this.atomizedSrcDocString$.pipe(map(AtomizedDocument.fromString))
+        this.atomizedDocument$ = this.atomizedSrcDocString$.pipe(
+/*
+            tap(() => {
+                if (this.name === 'ExampleSentences') {
+                    debugger;console.log()
+                }
+            }),
+*/
+            map(AtomizedDocument.fromString)
+        )
         this.bookStats$ = combineLatest([
             this.atomizedDocument$,
             trie
         ]).pipe(
             map(([document, trie]) => {
                 const stats = document.getDocumentStats(trie);
-                const name = this.name;
-                return getAtomizedDocumentBookStats(stats, name);
+                return getAtomizedDocumentBookStats(stats, this.name);
             }),
             shareReplay(1)
         )
@@ -85,7 +93,6 @@ export class OpenBook {
         this.renderedSentences$.subscribe(sentences => {
             BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
         })
-
 
         this.htmlElementIndex$ = combineLatest([
             this.trie,
@@ -125,8 +132,13 @@ export class OpenBook {
         );
     }
 
-    handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
-        const sentences = printExecTime("Rehydration", () => IFrameBookRenderer.rehydratePage(head.ownerDocument as HTMLDocument));
+    async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
+        await sleep(500);
+        // @ts-ignore
+        const t = body.ownerDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
+        const sentences = printExecTime("Rehydration", () => {
+            return IFrameBookRenderer.rehydratePage(body.ownerDocument as HTMLDocument);
+        });
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSentences$.next(sentences);
     }

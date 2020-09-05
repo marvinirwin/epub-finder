@@ -45,13 +45,20 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
     return result.data;
 }
 
-export function splitLong(threshhold: number, str: string, filterFunc: (char: string) => boolean): string[] {
+/**
+ * Chnaged this to split on linebreak because I'm lazy for now
+ * @param threshhold
+ * @param str
+ * @param filterFunc
+ */
+export function splitPunctuation(threshhold: number, str: string, filterFunc: (char: string) => boolean): string[] {
+    return str.split('\n');
     const splits = [];
     // Once the threshhold is reached, split on the next punctuation/line break
     let currentStart = 0;
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
-        const isPastThreshhold = (i - currentStart) > threshhold;
+        const isPastThreshhold = (i - currentStart) > (threshhold - 1);
         if (isPastThreshhold && filterFunc(char)) {
             splits.push(str.substr(currentStart, i - currentStart + 1));
             currentStart = i + 1;

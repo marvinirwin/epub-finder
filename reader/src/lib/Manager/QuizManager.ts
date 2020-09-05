@@ -43,7 +43,6 @@ export class QuizManager {
         this.requestNextCard$.pipe(
             withLatestFrom(this.scheduledCards$)
         ).subscribe(([_, scheduledCards]) => {
-            debugger;
             this.quizzingCard$.next(scheduledCards[0]);
             this.quizzingComponent$.next("Characters");
         })

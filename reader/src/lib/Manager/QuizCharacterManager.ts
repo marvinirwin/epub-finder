@@ -1,13 +1,10 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
-import {IFrameBookRenderer} from "../BookFrame/Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
-import {map, scan, distinctUntilChanged, distinct} from "rxjs/operators";
+import {distinct, map} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/NewOpenBook";
-import {XMLSerializer} from "xmldom";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export const EMPTY_SRC = (src: string = '') => `
 
@@ -32,7 +29,7 @@ function interpolateSourceDoc(sentences: string[]) {
 <body>
 ${sentences.map(sentence => {
         return `<div>${sentence}</div>`;
-    })}
+    }).join('</br>')}
 </body>
 </html>
         `;
@@ -67,18 +64,21 @@ export class QuizCharacterManager {
         );
         this.exampleSentences$.pipe(
             map(sentences => {
-                return interpolateSourceDoc(sentences.map(sentence => {
+                let s = interpolateSourceDoc(sentences.map(sentence => {
                     let translatableText = sentence.translatableText;
                     if (!this.sentenceCache.has(translatableText)) {
                         requestPlayAudio(translatableText);
-                        this.sentenceCache.add(translatableText);
                     }
+                    this.sentenceCache.add(translatableText);
                     return translatableText;
                 }));
+/*
+                if (sentences.length) {
+                    debugger;console.log();
+                }
+*/
+                return s;
             }),
-            map(srcDoc => {
-                return (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
-            })
         ).subscribe(this.exampleSentencesFrame.unAtomizedSrcDoc$);
 
         this.quizzingCard$.pipe(

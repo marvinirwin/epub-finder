@@ -48,6 +48,7 @@ export class BrowserInputs {
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
             let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            sentenceHTMLElement.classList.add('applied-sentence-listener');
             let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
             if (!sentenceHTMLElement || !popperHTMLElement) {
                 debugger;
