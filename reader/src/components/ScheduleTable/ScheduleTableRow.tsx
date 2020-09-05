@@ -1,4 +1,4 @@
-import {ScheduleRow} from "../../lib/ReactiveClasses/ScheduleRow";
+import {ScheduleRow, wordCount, dueDate} from "../../lib/ReactiveClasses/ScheduleRow";
 import {Manager} from "../../lib/Manager";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
@@ -27,8 +27,8 @@ export function WordCountRow({row, m}: { row: ScheduleRow, m: Manager }) {
                     {row.word}
                 </Button>
             </TableCell>
-            <TableCell align="right">{row.getCurrentCount()}</TableCell>
-            <TableCell align="right">{moment(row.getCurrentDueDate()).format('YYYY MM DD')}</TableCell>
+            <TableCell align="right">{wordCount(row)}</TableCell>
+            <TableCell align="right">{moment(dueDate(row)).format('YYYY MM DD')}</TableCell>
         </TableRow>
     );
 }

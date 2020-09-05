@@ -2,7 +2,7 @@ import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {TestScheduler} from "rxjs/testing";
 import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
 import {ICard} from "../../lib/Interfaces/ICard";
-import {IWordCountRow} from "../../lib/Interfaces/IWordCountRow";
+import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
 import {getNewICardForWord} from "../../lib/Util/Util";
 import {QuizComponent, QuizResult} from "../../lib/Manager/QuizManager";
 import {SubjectSubscriber} from "rxjs/internal/Subject";
@@ -30,7 +30,7 @@ it('Uses schedule rows to continuously populate the current quiz item', () => {
                 addPersistedCards: Marbles.new<ICard[]>(helpers)
                     .setTargetSubject(cardManager.addPersistedCards$),
 
-                addCountRecords: Marbles.new<IWordCountRow[]>(helpers)
+                addCountRecords: Marbles.new<BookWordCount[]>(helpers)
                     .setTargetSubject(scheduleManager.addWordCountRows$),
 
 

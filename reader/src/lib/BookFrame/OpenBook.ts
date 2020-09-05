@@ -2,13 +2,13 @@ import {combineLatest, Observable, ReplaySubject, merge} from "rxjs";
 import {Dictionary} from "lodash";
 import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
-import {IWordCountRow} from "../Interfaces/IWordCountRow";
+import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
-import {TextWordData} from "../Atomized/TextWordData";
+import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {BookRenderer} from "./Renderer/BookRenderer";
 import {Frame} from "./Frame";
-import {AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
+import {AtomizedDocumentBookStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
 import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
@@ -22,14 +22,31 @@ export type AtomizedDocumentSentenceDataPipe = (atomizedSrcDocStringAndTrie$: Ob
 export type AtomizedDocumentStringPipe = (unatomizedSrcDoc$: Observable<string>) => Observable<string>;
 */
 
+export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentBookStats {
+    return {
+        ...stats,
+        bookWordCounts: Object.fromEntries(
+            Object.entries(stats.wordCounts).map(([word, count]) => [word, {count, word, book: name}])
+        )
+    }
+}
+export function getBookWordData(stats: TextWordData, name: string): BookWordData {
+    return {
+        ...stats,
+        bookWordCounts: Object.fromEntries(
+            Object.entries(stats.wordCounts).map(([word, count]) => [word, [{count, word, book: name}]])
+        )
+    }
+}
+
 export class OpenBook {
     public frame = new Frame();
     public id: string;
     public text$: Observable<string>;
-    public wordCountRecords$: Observable<IWordCountRow[]>;
+    public wordCountRecords$: Observable<BookWordCount[]>;
     public htmlElementIndex$: Observable<TextWordData>;
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
-    public bookStats$: Observable<AtomizedDocumentStats>;
+    public bookStats$: Observable<AtomizedDocumentBookStats>;
 
     public unAtomizedSrcDoc$ = new ReplaySubject<string>(1);
     public url$ = new ReplaySubject<string>(1)
@@ -56,7 +73,11 @@ export class OpenBook {
             this.atomizedDocument$,
             trie
         ]).pipe(
-            map(([document, trie]) => document.getDocumentStats(trie)),
+            map(([document, trie]) => {
+                const stats = document.getDocumentStats(trie);
+                const name = this.name;
+                return getAtomizedDocumentBookStats(stats, name);
+            }),
             shareReplay(1)
         )
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))

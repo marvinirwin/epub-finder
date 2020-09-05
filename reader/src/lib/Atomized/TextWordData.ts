@@ -1,6 +1,7 @@
 import {Dictionary} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {AtomizedSentence} from "./AtomizedSentence";
+import {BookWordCount} from "../Interfaces/BookWordCount";
 
 export interface TextWordData {
     wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -8,9 +9,13 @@ export interface TextWordData {
     wordCounts: Dictionary<number>;
     sentenceMap: Dictionary<AtomizedSentence[]>;
 }
+export interface BookWordData extends TextWordData {
+    bookWordCounts: Dictionary<BookWordCount[]>;
+}
 
-export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordData {
-    let aggregateSentenceInfo: TextWordData = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}};
+export function mergeSentenceInfo<T extends (BookWordData | TextWordData)>(...sentenceInfos: T[]): T {
+    // @ts-ignore
+    let aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, bookWordCounts: {}};
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
         for (let key in dict) {
@@ -25,25 +30,19 @@ export function mergeSentenceInfo(...sentenceInfos: TextWordData[]): TextWordDat
     for (let i = 0; i < sentenceInfos.length; i++) {
         const newSentenceInfo = sentenceInfos[i];
         Object.entries(newSentenceInfo.wordCounts).forEach(([key, val]) => {
-            if (!aggregateSentenceInfo .wordCounts[key]) {
-                aggregateSentenceInfo .wordCounts[key] = 0;
+            if (!aggregateSentenceInfo.wordCounts[key]) {
+                aggregateSentenceInfo.wordCounts[key] = 0;
             }
             aggregateSentenceInfo.wordCounts[key] += val
         });
-
         merge(newSentenceInfo.wordElementsMap, aggregateSentenceInfo.wordElementsMap);
-/*
-        for (let key in newSentenceInfo.wordElementsMap) {
-            if (aggregateSentenceInfo.wordElementsMap[key]) {
-                aggregateSentenceInfo.wordElementsMap[key].push(...newSentenceInfo.wordElementsMap[key]);
-            } else {
-                aggregateSentenceInfo.wordElementsMap[key] = newSentenceInfo.wordElementsMap[key]
-            }
-        }
-*/
-
         merge(newSentenceInfo.wordSentenceMap, aggregateSentenceInfo.wordSentenceMap);
         merge(newSentenceInfo.sentenceMap, aggregateSentenceInfo.sentenceMap)
+        // @ts-ignore
+        if (newSentenceInfo.bookWordCounts) {
+            // @ts-ignore
+            merge(newSentenceInfo.bookWordCounts, aggregateSentenceInfo.bookWordCounts)
+        }
     }
     return aggregateSentenceInfo;
 }

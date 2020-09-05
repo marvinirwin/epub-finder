@@ -4,6 +4,6 @@ import {QuizResultToRecognitionRow} from "../../Pipes/QuizResultToRecognitionRow
 
 export function ScheduleQuiz(s: ScheduleManager, q: QuizManager) {
     q.quizResult$.pipe(
-        QuizResultToRecognitionRow(s.wordScheduleRowDict$, s.ms)
-    ).subscribe(s.addUnpersistedWordRecognitionRows$);
+        QuizResultToRecognitionRow(s.indexedScheduleRows$, s.ms)
+    ).subscribe(s.addWordRecognitionRecords$);
 }

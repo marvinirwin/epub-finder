@@ -1,12 +1,12 @@
 import {combineLatest, Observable, Subject} from "rxjs";
 import {map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
-import {OpenBook} from "../BookFrame/OpenBook";
+import {getAtomizedDocumentBookStats, getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
 import {Dictionary, flatten, flattenDeep} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
-import {TextWordData} from "../Atomized/TextWordData";
+import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
@@ -16,9 +16,9 @@ export class OpenBooks {
     openedBooks = new DeltaScanner<OpenBook, 'characterPageFrame' | 'readingFrames' | string>();
     atomizedSentences$: Observable<AtomizedSentence[]>;
     addOpenBook$ = new Subject<Website>();
-    openBookTextDataTree$: DeltaScanner<Observable<TextWordData[]>>;
+    renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
-    sourceBookSentenceData$: Observable<TextWordData[]>;
+    sourceBookSentenceData$: Observable<BookWordData[]>;
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     constructor(
@@ -65,7 +65,7 @@ export class OpenBooks {
                 shareReplay(1)
             );
 
-        this.openBookTextDataTree$ = this
+        this.renderedSentenceTextDataTree$ = this
             .openedBooks
             .mapWith(bookFrame => {
                     return bookFrame
@@ -74,7 +74,7 @@ export class OpenBooks {
                             withLatestFrom(config.trie$),
                             map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
                                     return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                        sentence.getTextWordData(trie.t, trie.getUniqueLengths())
+                                        getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
                                     );
                                 }
                             ),
@@ -82,7 +82,7 @@ export class OpenBooks {
                         );
                 }
             );
-        this.openBookTextDataTree$.updates$.subscribe(({delta}) => {
+        this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
             flattenTree(delta)
                 .forEach(
                     textData => textData.subscribe(
@@ -93,20 +93,20 @@ export class OpenBooks {
                     )
                 )
         })
-        this.sourceBookSentenceData$ = this.openBookTextDataTree$
+        this.sourceBookSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
                     let readingFrames = sourced?.children?.['readingFrames'];
-                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : []);
+                    return combineLatest(readingFrames ? flattenTree<Observable<BookWordData[]>>(readingFrames) : []);
                 }),
-                map((v: TextWordData[][]) => {
+                map((v: BookWordData[][]) => {
                     return flatten(v);
                 }),
                 shareReplay(1)
             );
 
-        this.exampleSentenceSentenceData$ = this.openBookTextDataTree$
+        this.exampleSentenceSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
@@ -120,7 +120,7 @@ export class OpenBooks {
             );
 
         let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
-            this.openBookTextDataTree$.updates$,
+            this.renderedSentenceTextDataTree$.updates$,
             config.bottomNavigationValue$
         ]).pipe(
             switchMap(([{sourced}, bottomNavigationValue]) => {

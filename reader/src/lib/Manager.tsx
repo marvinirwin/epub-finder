@@ -23,7 +23,7 @@ import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
 import {SentenceManager} from "./Manager/SentenceManager";
-import {mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
+import {BookWordData, mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import pinyin from "pinyin";
@@ -40,15 +40,17 @@ import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
 import axios from 'axios';
+import {BookWordCount} from "./Interfaces/BookWordCount";
 
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 
-function splitTextDataStreams$(textData$: Observable<TextWordData>) {
+function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
         wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
         wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
+        bookWordCounts: textData$.pipe(map(({bookWordCounts}) => bookWordCounts)),
         wordSentenceMap: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap)),
         sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
     }
@@ -95,7 +97,7 @@ export class Manager {
 
     highlightedPinyin$: Observable<string>;
 
-    wordCounts$: Observable<Dictionary<number>>;
+    wordCounts$: Observable<Dictionary<BookWordCount[]>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
@@ -116,7 +118,24 @@ export class Manager {
             bottomNavigationValue$: this.bottomNavigationValue$,
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement)
         });
-        this.scheduleManager = new ScheduleManager(this.db);
+        /*
+         * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
+         * wordCounts: Dictionary<number>;
+         * wordSentenceMap: Dictionary<AtomizedSentence[]>;
+         * sentenceMap: Dictionary<AtomizedSentence[]>;
+         */
+        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$, bookWordCounts} = splitTextDataStreams$(
+            this.openedBooksManager.sourceBookSentenceData$.pipe(
+                map(textData => {
+                        return mergeSentenceInfo(...textData);
+                    }
+                )
+            )
+        );
+        this.wordElementMap$ = wordElementMap$;
+        this.wordCounts$ = bookWordCounts;
+        this.sentenceMap$ = sentenceMap$;
+        this.scheduleManager = new ScheduleManager({db, wordCounts$: this.wordCounts$});
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
@@ -188,23 +207,6 @@ export class Manager {
         });
 
 
-        /*
-         * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
-         * wordCounts: Dictionary<number>;
-         * wordSentenceMap: Dictionary<AtomizedSentence[]>;
-         * sentenceMap: Dictionary<AtomizedSentence[]>;
-         */
-        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$} = splitTextDataStreams$(
-            this.openedBooksManager.sourceBookSentenceData$.pipe(
-                map(textData => {
-                        return mergeSentenceInfo(...textData);
-                    }
-                )
-            )
-        );
-        this.wordElementMap$ = wordElementMap$;
-        this.wordCounts$ = wordCounts$;
-        this.sentenceMap$ = sentenceMap$;
 
         this.wordElementMap$ = combineLatest([
             this.wordElementMap$.pipe(
@@ -215,8 +217,6 @@ export class Manager {
             return mergeDictArrays<IAnnotatedCharacter>(...wordElementMaps);
         }));
 
-
-        this.wordCounts$.subscribe(this.scheduleManager.wordCountDict$);
 
         let previousHighlightedElements: HTMLElement[] | undefined;
         let previousHighlightedSentences: HTMLElement[] | undefined;
