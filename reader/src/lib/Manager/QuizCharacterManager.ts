@@ -27,9 +27,11 @@ function interpolateSourceDoc(sentences: string[]) {
     <title>Example Sentences</title>
 </head>
 <body>
+<div class="popper-container">
 ${sentences.map(sentence => {
         return `<div>${sentence}</div>`;
     }).join('</br>')}
+</div>
 </body>
 </html>
         `;

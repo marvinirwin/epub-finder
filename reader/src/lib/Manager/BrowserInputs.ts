@@ -57,7 +57,7 @@ export class BrowserInputs {
             try {
                 createPopper(sentenceHTMLElement, popperHTMLElement, {
                     placement: 'top-start',
-                    strategy: 'fixed'
+                    // strategy: 'fixed'
                 });
             } catch (e) {
                 console.error(e);

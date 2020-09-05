@@ -12,6 +12,7 @@ import {mergeSentenceInfo} from "./TextWordData";
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
 export function createPopperElement(document1: XMLDocument) {
+
     const popperEl = document1.createElement('div');
     const popperId = uniqueId();
     popperEl.setAttribute("class", "translation-popover");
@@ -27,6 +28,7 @@ export class AtomizedDocument {
 
     public static atomizeDocument(xmlsource: string): AtomizedDocument {
         const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
+        doc.ensurePopperContainer();
         doc.replaceDocumentSources(doc.document);
         doc.splitLongTextElements(doc.getTextElements(doc.document));
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
@@ -136,7 +138,7 @@ export class AtomizedDocument {
         const {popperEl, popperId} = createPopperElement(document1);
         newParent.setAttribute('popper-id', popperId);
         newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
-        newParent.insertBefore(popperEl, null);
+        (this.findPopperContainer() as Node).insertBefore(popperEl, popperEl.firstChild);
         return newParent as unknown as XMLDocumentNode;
     }
 
@@ -229,19 +231,53 @@ export class AtomizedDocument {
     }
 
     headInnerHTML() {
-        const head = AtomizedDocument.find(this.document, n => {
-            // @ts-ignore
-            return n.tagName === 'head';
-        });
+        const head = this.findHead();
         return (new XMLSerializer()).serializeToString(<Node>head)
     }
 
+    private findHead() {
+        return AtomizedDocument.find(this.document, n => {
+            // @ts-ignore
+            return n.tagName === 'head';
+        });
+    }
+
     bodyInnerHTML() {
-        const body = AtomizedDocument.find(this.document, n => {
+        const body = this.findBody();
+        return (new XMLSerializer()).serializeToString(<Node>body)
+    }
+
+    private findBody(): Element {
+        // @ts-ignore
+        return AtomizedDocument.find(this.document, n => {
             // @ts-ignore
             return n.tagName === 'body';
         });
-        return (new XMLSerializer()).serializeToString(<Node>body)
+    }
+
+    private ensurePopperContainer() {
+        if (!this.findPopperContainer()) {
+            const popperEl = this.document.createElement('div');
+            popperEl.setAttribute("class", "popper-container");
+            const body = this.findBody();
+            body.insertBefore(popperEl, body.firstChild);
+            if (!this.findPopperContainer()) {
+                debugger;console.log();
+            }
+        }
+        // @ts-ignore
+        return AtomizedDocument.find(this.document, n => {
+            // @ts-ignore
+            return n.tagName === 'body';
+        });
+    }
+    private findPopperContainer() {
+        // @ts-ignore
+        return AtomizedDocument.find(this.document, (n) => {
+            // @ts-ignore
+            let namedItem = n.attributes?.getNamedItem('class')?.nodeValue;
+            return namedItem === 'popper-container';
+        });
     }
 
     toString() {

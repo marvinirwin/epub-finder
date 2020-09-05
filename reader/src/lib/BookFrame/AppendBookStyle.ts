@@ -1,17 +1,23 @@
 export const BodyStyle = `
-        body {
+    .popper-container {
+        /* Required to make the positioning of popper-elements nice */
+        position: relative;
+        z-index: 2;
+    }
+    body {
         padding-top: 100px;
         font-size: 150%;
     }
     mark {
-        position: relative;
+        position: relative; /*  Required to keep our pseudo elements in check*/
         background: transparent;
     }
-    
+    mark:hover {
+        cursor: pointer;
+    }
     mark.highlighted::after {
         opacity: 1;
     }
-    
     mark::after {
         content: "";
         position: absolute;
@@ -25,22 +31,20 @@ export const BodyStyle = `
         z-index: -1;
     }
     
-.highlighted::after {
+    .highlighted::after {
         opacity: 1;
     }
 
-    mark:hover {
-        cursor: pointer;
-    }
 
-.annotated_and_translated {
+    .annotated_and_translated {
         position: relative;
-}
-.annotated_and_translated:hover::after,
-.annotated_and_translated.highlighted-sentence::after {
-        opacity: 0.15;
+        
     }
-.annotated_and_translated::after {
+    .annotated_and_translated:hover::after,
+    .annotated_and_translated.highlighted-sentence::after {
+            opacity: 0.15;
+        }
+    .annotated_and_translated::after {
         content: "";
         position: absolute;
         z-index: -1;
@@ -59,16 +63,13 @@ export const BodyStyle = `
         padding: 15px 15px;
         border-radius: 4px;
         font-size: 13px;
-        height: fit-content;
-        z-index: 9999;
         display: none;
-
+        z-index: 2;
     }
 
     .POPPER_ELEMENT[data-show] {
             display: block;
         }
-        
     }
 `;
 
