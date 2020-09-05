@@ -4,7 +4,7 @@ import {map} from "rxjs/operators";
 import {TestScheduler} from 'rxjs/testing';
 import {countFactory, MarbleGroup, Marbles, quizResultFactory, ScheduleQuizCard} from "../Util/Util";
 import {RecognitionMap} from "../../lib/Scheduling/SRM";
-import {QuizResultToRecognitionRow} from "../../lib/Pipes/QuizResultToRecognitionRow";
+import {QuizResultToRecognitionRows} from "../../lib/Pipes/QuizResultToRecognitionRows";
 import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
 import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
 import {HotObservable} from "rxjs/internal/testing/HotObservable";
@@ -84,7 +84,7 @@ it('Sorts cards into Learning and out of learning', () => {
         const scheduleManager = new ScheduleManager(db);
         const addQuizResultMarbles =
             Marbles.new<QuizResult, WordRecognitionRow[]>(helpers)
-                .setPipe(QuizResultToRecognitionRow(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
+                .setPipe(QuizResultToRecognitionRows(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
                 .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);
 
         const addCountMarbles = Marbles.new<BookWordCount[]>(helpers)

@@ -4,7 +4,7 @@ import {MyAppDatabase} from "../Storage/AppDB";
 import {orderBy} from "lodash";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {isLearning, isNew, isToReview, ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {distinctUntilChanged, filter, map, scan, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {safePush} from "../../test/Util/GetGraphJson";
@@ -38,7 +38,7 @@ interface ScheduleManagerParams {
 }
 
 export class ScheduleManager {
-    wordQuizList$: Observable<string[]>;
+    wordQuizList$: Observable<ScheduleRow[]>;
     sortedScheduleRows$: Observable<ScheduleRow[]>;
     indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;
     learningCards$: Observable<ScheduleRow[]>;
@@ -60,10 +60,11 @@ export class ScheduleManager {
 
         this.addWordRecognitionRecords$.pipe(
             filter(rows => !!rows.length),
-            withLatestFrom(this.wordRecognitionRecords$),
-            tap(([rows, wordRecognitionRecords]) => {
+            withLatestFrom(this.wordRecognitionRecords$.pipe(startWith({}))),
+            tap(([rows, wordRecognitionRecords]: [WordRecognitionRow[], ds_Dict<WordRecognitionRow[]>]) => {
                 rows.forEach(row => {
                     safePush(wordRecognitionRecords, row.word, row);
+                    wordRecognitionRecords[row.word] = orderBy(wordRecognitionRecords[row.word], 'timestamp');
                 });
                 this.wordRecognitionRecords$.next(wordRecognitionRecords);
             }),
@@ -82,7 +83,6 @@ export class ScheduleManager {
         ]).pipe(
             map(([wordRecognition, wordCounts]) => {
                 const scheduleRows: ds_Dict<ScheduleRow> = {};
-
                 function ensureScheduleRow(word: string) {
                     if (!scheduleRows[word]) {
                         scheduleRows[word] = {wordRecognitionRecords: [], wordCountRecords: [], word};
@@ -97,7 +97,8 @@ export class ScheduleManager {
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
                 });
                 return scheduleRows;
-            })
+            }),
+            shareReplay(1)
         );
 
         this.sortedScheduleRows$ = this.indexedScheduleRows$.pipe(
@@ -105,7 +106,6 @@ export class ScheduleManager {
                     return orderBy(Object.values(dict), ['dueDate'], ['asc']);
                 }
             ),
-            distinctUntilChanged((x, y) => x.length !== 0),
             shareReplay(1)
         )
 
@@ -137,18 +137,16 @@ export class ScheduleManager {
             this.toReviewCards$,
             this.newCards$
         ]).pipe(
-            map(([learningCards, toReviewCards, newCards]): string[] => {
+            map(([learningCards, toReviewCards, newCards]) => {
                     const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
                     if (learningCardsRequired > 0) {
-                        let scheduleRows = newCards.slice(0, learningCardsRequired);
-                        let a = [
+                        return [
                             ...learningCards,
                             ...toReviewCards,
-                            ...(scheduleRows || [])
+                            ...(newCards.slice(0, learningCardsRequired) || [])
                         ];
-                        return a.map(r => r.word);
                     }
-                    return [...learningCards, ...toReviewCards, ...newCards].map(r => r.word);
+                    return [...learningCards, ...toReviewCards, ...newCards];
                 }
             ),
             shareReplay(1)

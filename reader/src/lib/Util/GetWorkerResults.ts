@@ -1,6 +1,8 @@
 
-export async function GetWorkerResults(documentProcessingWorker: Worker, message: string) {
-    documentProcessingWorker.postMessage(message)
+export async function GetWorkerResults(worker: Worker, message: string): Promise<string> {
+    worker.postMessage(message)
     // Wait how does this come from the worker as an intact document?
-    return await new Promise<string>(resolve => documentProcessingWorker.onmessage = (ev: MessageEvent) => resolve(ev.data));
+    const result = await new Promise<string>(resolve => worker.onmessage = (ev: MessageEvent) => resolve(ev.data));
+    worker.terminate();
+    return result;
 }

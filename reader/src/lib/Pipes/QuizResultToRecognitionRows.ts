@@ -6,7 +6,7 @@ import {QuizResult} from "../Manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 
-export const QuizResultToRecognitionRow =
+export const QuizResultToRecognitionRows =
     (
         scheduleRows$: Observable<Dictionary<ScheduleRow>>,
         ms: SRM

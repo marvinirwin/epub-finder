@@ -141,7 +141,7 @@ export class Manager {
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
         this.quizManager = new QuizManager({
-            scheduledCards$: this.scheduleManager.sortedScheduleRows$.pipe(
+            scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
                 map(rows => rows.map(row => row.word)),
                 resolveICardForWords(this.cardManager.cardIndex$)
             )

@@ -50,7 +50,9 @@ export class SRM {
         }
         const previousProgress = SRM.getProgressScore(previousRows);
         const newProgress = previousProgress + this.scoreToProgressChange[score];
-        let dueTimestamp = now.getTime() + 1;
+        let FiveMinutes = 1000 * 60 * 4;
+        let OneMinute = 1000 * 60 * 1;
+        let dueTimestamp = now.getTime() + Math.floor(Math.random() * FiveMinutes) + OneMinute;
         if (newScoreIsCorrect) {
             if (newProgress < this.maxProgress) {
                 dueTimestamp = now.getTime() + this.intervals[previousProgress];
