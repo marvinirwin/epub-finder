@@ -81,6 +81,7 @@ export class AtomizedSentence {
                 this._previousWords.add(`${word}`);
                 return newPositionedWord;
             });
+
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let annotationElement: IAnnotatedCharacter = {
                 char: (this.sentenceElement.textContent as string)[i],

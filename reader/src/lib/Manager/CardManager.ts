@@ -37,9 +37,6 @@ export default class CardManager {
         this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
-        this.addUnpersistedCards$.subscribe(newPersistedCards => {
-            debugger;
-        })
         this.cardIndex$ = this.addPersistedCards$.pipe(
             startWith([]),
             scan((cardIndex: Dictionary<ICard[]>, newCards) => {

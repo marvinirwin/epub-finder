@@ -68,30 +68,30 @@ export class OpenBooks {
         this.renderedSentenceTextDataTree$ = this
             .openedBooks
             .mapWith(bookFrame => {
-                    return bookFrame
-                        .renderedSentences$
-                        .pipe(
-                            withLatestFrom(config.trie$),
-                            map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
-                                    return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                        getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
-                                    );
-                                }
-                            ),
-                            shareReplay(1)
-                        );
+                    return combineLatest([
+                        bookFrame.renderedSentences$,
+                        config.trie$
+                    ]).pipe(
+                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
+                                return Object.entries(sentences).map(([sentenceStr, sentence]) =>
+                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
+                                );
+                            }
+                        ),
+                        shareReplay(1)
+                    );
                 }
             );
         this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
-            flattenTree(delta)
-                .forEach(
-                    textData => textData.subscribe(
-                        textDatas => textDatas.forEach(datum => flatten(
-                            Object.values(datum.wordElementsMap)
-                            ).forEach(config.applyWordElementListener)
-                        )
-                    )
-                )
+            combineLatest(flattenTree(delta))
+                .subscribe(bookStats => {
+                    bookStats.forEach(atomizedSentenceStats => {
+                        atomizedSentenceStats.forEach(sentenceStats => {
+                            debugger;
+                            flatten(Object.values(sentenceStats.wordElementsMap)).forEach(config.applyWordElementListener)
+                        })
+                    })
+                })
         })
         this.sourceBookSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
