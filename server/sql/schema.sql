@@ -39,8 +39,7 @@ create table if not exists word_popularity
     word_popularity_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     lang VARCHAR(255) NOT NULL,
     word VARCHAR(255) charset utf8mb4 not null,
+    count BIGINT NOT NULL,
     percentile DOUBLE NOT NULL
 );
-ALTER TABLE article_element
-ADD FULLTEXT(text_content);
 

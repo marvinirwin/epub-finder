@@ -31,7 +31,7 @@ async function query(
     await query(con, 'DELETE FROM word_popularity WHERE lang = ?', [lang]);
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const [, word,, percentile] = line.split('\t');
-        await query(con, `INSERT INTO word_popularity (lang, word, percentile) VALUES (?, ?, ?)`, [lang, word, percentile]);
+        const [, word, count, percentile] = line.split('\t');
+        await query(con, `INSERT INTO word_popularity (lang, word, percentile, count) VALUES (?, ?, ?, ?)`, [lang, word, percentile]);
     }
 })();
