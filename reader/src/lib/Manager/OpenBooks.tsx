@@ -87,7 +87,6 @@ export class OpenBooks {
                 .subscribe(bookStats => {
                     bookStats.forEach(atomizedSentenceStats => {
                         atomizedSentenceStats.forEach(sentenceStats => {
-                            debugger;
                             flatten(Object.values(sentenceStats.wordElementsMap)).forEach(config.applyWordElementListener)
                         })
                     })

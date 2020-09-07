@@ -23,7 +23,6 @@ export class TrieWrapper {
             this.t.addWord(w);
         })
         if (newWords.length) {
-            debugger;
             this.changeSignal$.next(this)
             this.newWords$.next(newWords);
         }
