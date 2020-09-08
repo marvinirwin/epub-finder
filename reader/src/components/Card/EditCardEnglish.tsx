@@ -26,6 +26,9 @@ export default function EditCardEnglish({e}: { e: EditingCard }) {
                 defaultValue="Default Value"
                 variant="outlined"
                 value={knownLanguage}
+                onKeyDown={t => {
+                    t.stopPropagation();
+                }}
                 onChange={t => {
                     t.preventDefault();
                     t.stopPropagation();

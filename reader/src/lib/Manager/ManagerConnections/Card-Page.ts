@@ -7,6 +7,7 @@ import {getNewICardForWord} from "../../Util/Util";
 import {flattenTree} from "../../Util/DeltaScanner";
 
 export function CardPage(c: CardManager, p: OpenBooks) {
+/*
     c.cardProcessingSignal$.pipe(
         filter(b => !b),
         delay(100),
@@ -30,4 +31,5 @@ export function CardPage(c: CardManager, p: OpenBooks) {
             c.addUnpersistedCards$.next(newCards);
         }
     });
+*/
 }

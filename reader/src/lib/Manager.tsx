@@ -103,7 +103,7 @@ export class Manager {
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
             response => response,
-             (error)  => {
+            (error) => {
                 // if has response show the error
                 if (error.response) {
                     this.alertMessagesVisible$.next(true);
@@ -141,12 +141,22 @@ export class Manager {
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager();
         this.quizManager = new QuizManager({
-            scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
-                map(rows => rows.map(row => row.word)),
-                resolveICardForWords(this.cardManager.cardIndex$)
-            )
-        });
+                scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
+                    map(rows => rows.map(row => row.word)),
+                    resolveICardForWords(this.cardManager.cardIndex$)
+                ),
+                requestHighlightedWord: s => this.highlightedWord$.next(s)
+            },
+        );
 
+        combineLatest([
+            this.scheduleManager.indexedScheduleRows$,
+            this.quizManager.quizzingCard$
+        ]).pipe(debounceTime(0)).subscribe(([indexedScheduleRows, quizzingCard]) => {
+            if (quizzingCard && !indexedScheduleRows[quizzingCard.learningLanguage]) {
+                this.quizManager.requestNextCard$.next();
+            }
+        })
         this.quizCharacterManager = new QuizCharacterManager(
             {
                 exampleSentences$: combineLatest([
@@ -205,7 +215,6 @@ export class Manager {
         this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe: HTMLIFrameElement) => {
             this.inputManager.applyBodyListeners((iframe.contentDocument as Document).body);
         });
-
 
 
         this.wordElementMap$ = combineLatest([
@@ -314,27 +323,27 @@ export class Manager {
     }
 
     private highlightSavedWord() {
-/*
-        this.cardManager.addPersistedCards$.pipe(
-            switchMap(atomizedSentences => {
-                    return combineLatest(atomizedSentences.map(atomizedSentence => atomizedSentence.newWords$));
-                }
-            ),
-        ).subscribe(async (newWordSets: Set<string>[]) => {
-            const bigSet = new Set<string>();
-            for (let i = 0; i < newWordSets.length; i++) {
-                const newWordSet = newWordSets[i];
-                Array.from(newWordSet.values()).forEach(word => bigSet.add(word))
-            }
-            const newWords = Array.from(bigSet);
-            for (let i = 0; i < newWords.length; i++) {
-                const newWord = newWords[i];
-                this.highlightedWord$.next(newWord);
-                await sleep(250);
-            }
-            this.highlightedWord$.next('');
-        })
-*/
+        /*
+                this.cardManager.addPersistedCards$.pipe(
+                    switchMap(atomizedSentences => {
+                            return combineLatest(atomizedSentences.map(atomizedSentence => atomizedSentence.newWords$));
+                        }
+                    ),
+                ).subscribe(async (newWordSets: Set<string>[]) => {
+                    const bigSet = new Set<string>();
+                    for (let i = 0; i < newWordSets.length; i++) {
+                        const newWordSet = newWordSets[i];
+                        Array.from(newWordSet.values()).forEach(word => bigSet.add(word))
+                    }
+                    const newWords = Array.from(bigSet);
+                    for (let i = 0; i < newWords.length; i++) {
+                        const newWord = newWords[i];
+                        this.highlightedWord$.next(newWord);
+                        await sleep(250);
+                    }
+                    this.highlightedWord$.next('');
+                })
+        */
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

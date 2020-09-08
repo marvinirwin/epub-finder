@@ -40,9 +40,6 @@ export class IFrameBookRenderer implements BookRenderer {
         for (let i = 0; i < elements.length; i++) {
             const annotatedElement = elements[i];
             let sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
-            if (annotatedElements[sentenceElement.translatableText]) {
-                debugger;console.log();
-            }
             annotatedElements[sentenceElement.translatableText] = sentenceElement;
             text.push(sentenceElement.translatableText);
         }

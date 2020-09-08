@@ -46,21 +46,30 @@ export class AtomizedSentence {
         const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
         let children = this.sentenceElement.childNodes;
+        let textContent = this.sentenceElement.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
             }).filter(w => w.lengthRemaining > 0);
-            const stringChunks = uniqueLengths.map(size => (this.sentenceElement.textContent as string).substr(i, size));
+            const stringChunks = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
             const wordsWhichStartHere: string[] = stringChunks.reduce((acc: string[], str) => {
-                if (t.hasWord(str) || (str.length === 1 && isChineseCharacter(str))) {
+                if (t.hasWord(str)) {
                     acc.push(str);
                     wordSentenceMap[str] = [this];
                 }
                 return acc;
             }, []);
+
+            // If there is a chinese character here which isn't part of a word, add it to the counts
+            if ((wordsWhichStartHere.length === 0 && wordsInProgress.length === 0) && isChineseCharacter(textContent[i])) {
+                wordSentenceMap[textContent[i]] = [this];
+                wordsWhichStartHere.push(textContent[i]);
+            }
+
             wordsInProgress.push(...wordsWhichStartHere.map(word => {
+                debugger;
                 if (wordCounts[word]) {
                     wordCounts[word]++;
                 } else {
@@ -84,7 +93,7 @@ export class AtomizedSentence {
 
             let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             let annotationElement: IAnnotatedCharacter = {
-                char: (this.sentenceElement.textContent as string)[i],
+                char: (textContent as string)[i],
                 words: words,
                 el: currentMark,
                 maxWord,

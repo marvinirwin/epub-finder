@@ -3,8 +3,8 @@ import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {orderBy} from "lodash";
 import {BookWordCount} from "../Interfaces/BookWordCount";
-import {isLearning, isNew, isToReview, ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {distinctUntilChanged, filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
+import {dueDate, isLearning, isNew, isToReview, ScheduleRow, wordCount} from "../ReactiveClasses/ScheduleRow";
+import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {safePush} from "../../test/Util/GetGraphJson";
@@ -89,12 +89,11 @@ export class ScheduleManager {
                     }
                     return scheduleRows[word];
                 }
-
-                Object.entries(wordRecognition).forEach(([word, wordRecognitionRecords]) => {
-                    ensureScheduleRow(word).wordRecognitionRecords.push(...wordRecognitionRecords);
-                });
                 Object.entries(wordCounts).forEach(([word, wordCountRecords]) => {
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
+                });
+                Object.entries(wordRecognition).forEach(([word, wordRecognitionRecords]) => {
+                    scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 return scheduleRows;
             }),
@@ -103,7 +102,9 @@ export class ScheduleManager {
 
         this.sortedScheduleRows$ = this.indexedScheduleRows$.pipe(
             map(dict => {
-                    return orderBy(Object.values(dict), ['dueDate'], ['asc']);
+                    return orderBy(Object.values(dict), ['dueDate', (row) => {
+                        return wordCount(row);
+                    }], ['asc', 'desc']);
                 }
             ),
             shareReplay(1)
@@ -140,13 +141,19 @@ export class ScheduleManager {
             map(([learningCards, toReviewCards, newCards]) => {
                     const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
                     if (learningCardsRequired > 0) {
-                        return [
+                        let collection1 = [
                             ...learningCards,
                             ...toReviewCards,
                             ...(newCards.slice(0, learningCardsRequired) || [])
                         ];
+                        return orderBy(collection1, r => {
+                            return dueDate(r);
+                        });
                     }
-                    return [...learningCards, ...toReviewCards, ...newCards];
+                let collection = [...learningCards, ...toReviewCards, ...newCards];
+                return orderBy(collection, r => {
+                    return dueDate(r);
+                });
                 }
             ),
             shareReplay(1)

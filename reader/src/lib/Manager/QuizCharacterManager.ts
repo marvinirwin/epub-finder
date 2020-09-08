@@ -66,20 +66,19 @@ export class QuizCharacterManager {
         );
         this.exampleSentences$.pipe(
             map(sentences => {
-                let s = interpolateSourceDoc(sentences.map(sentence => {
+                /*
+                                if (sentences.length) {
+                                    debugger;console.log();
+                                }
+                */
+                return interpolateSourceDoc(sentences.map(sentence => {
                     let translatableText = sentence.translatableText;
                     if (!this.sentenceCache.has(translatableText)) {
                         requestPlayAudio(translatableText);
                     }
                     this.sentenceCache.add(translatableText);
                     return translatableText;
-                }));
-/*
-                if (sentences.length) {
-                    debugger;console.log();
-                }
-*/
-                return s;
+                }).concat(Array(10).fill('_')));
             }),
         ).subscribe(this.exampleSentencesFrame.unAtomizedSrcDoc$);
 

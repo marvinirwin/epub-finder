@@ -4,6 +4,7 @@ import {Characters} from "../../components/Quiz/Characters";
 import { startWith, withLatestFrom} from "rxjs/operators";
 import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
+import {sleep} from "../Util/Util";
 
 export interface QuizResult {
     word: string;
@@ -14,6 +15,7 @@ export type QuizComponent = string;
 
 export interface QuizManagerParams {
     scheduledCards$: Observable<ICard[]>;
+    requestHighlightedWord: (s: string) => void
 }
 
 export class QuizManager {
@@ -26,7 +28,7 @@ export class QuizManager {
 
     requestNextCard$ = new Subject<void>();
 
-    constructor({scheduledCards$}: QuizManagerParams) {
+    constructor({scheduledCards$, requestHighlightedWord}: QuizManagerParams) {
         this.scheduledCards$ = scheduledCards$;
         this.quizzingCard$.subscribe(() => {
             console.log();
@@ -34,7 +36,7 @@ export class QuizManager {
         this.quizzingCard$.pipe(
             startWith(undefined),
             withLatestFrom(this.scheduledCards$)
-        ).subscribe(([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
+        ).subscribe(async ([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
             if (!quizzingCard && scheduledCards[0]) {
                 this.requestNextCard$.next();
             }
@@ -42,9 +44,12 @@ export class QuizManager {
 
         this.requestNextCard$.pipe(
             withLatestFrom(this.scheduledCards$)
-        ).subscribe(([_, scheduledCards]) => {
-            this.quizzingCard$.next(scheduledCards[0]);
+        ).subscribe(async ([_, scheduledCards]) => {
+            let iCard = scheduledCards[0];
+            this.quizzingCard$.next(iCard);
             this.quizzingComponent$.next("Characters");
+            await sleep(1000);
+            requestHighlightedWord(iCard.learningLanguage)
         })
 
 /*

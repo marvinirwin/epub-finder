@@ -16,6 +16,7 @@ export default class EditingCardManager {
 
     constructor() {
         this.editingCard$ = this.queEditingCard$.pipe(
+
             startWith(undefined),
             pairwise(),
             switchMap(([previousCard, newCard]) => {

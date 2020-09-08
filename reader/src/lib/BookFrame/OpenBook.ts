@@ -1,7 +1,5 @@
 import {combineLatest, merge, Observable, ReplaySubject} from "rxjs";
-import {Dictionary} from "lodash";
-import {map, shareReplay, tap} from "rxjs/operators";
-import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {map, shareReplay} from "rxjs/operators";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
@@ -89,7 +87,16 @@ export class OpenBook {
             shareReplay(1)
         )
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
-        this.wordCountRecords$ = this.wordCountRecords();
+        this.wordCountRecords$ = this.bookStats$.pipe(
+            map(bookStat => {
+                if (bookStat.bookWordCounts['宋']) {
+                    debugger;console.log();
+                }
+                    return Object.values(bookStat.bookWordCounts);
+                }
+            ),
+            shareReplay(1)
+        );
         this.renderedSentences$.subscribe(sentences => {
             BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
         })
@@ -105,33 +112,6 @@ export class OpenBook {
             shareReplay(1)
         )
     }
-
-
-    private wordCountRecords() {
-        return this.text$.pipe(
-            map(text => {
-                const countedCharacters: Dictionary<number> = text
-                    .split('')
-                    .filter(isChineseCharacter)
-                    .reduce((acc: Dictionary<number>, letter) => {
-                        if (!acc[letter]) {
-                            acc[letter] = 1;
-                        } else {
-                            acc[letter]++;
-                        }
-                        return acc;
-                    }, {});
-
-                return Object.entries(countedCharacters).map(([letter, count]) => ({
-                    book: this.name,
-                    word: letter,
-                    count
-                }))
-            }),
-            shareReplay(1)
-        );
-    }
-
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
         await sleep(500);
         // @ts-ignore
