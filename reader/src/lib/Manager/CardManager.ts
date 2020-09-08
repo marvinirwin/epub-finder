@@ -1,4 +1,4 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary} from "lodash";
 import trie from "trie-prefix-tree";
@@ -9,6 +9,7 @@ import {TrieObservable} from "../AppContext/NewOpenBook";
 import {TrieWrapper} from "../TrieWrapper";
 
 export default class CardManager {
+    deleteCards$: Subject<string[]> = new Subject<string[]>();
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
@@ -37,18 +38,28 @@ export default class CardManager {
         this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
-        this.cardIndex$ = this.addPersistedCards$.pipe(
-            startWith([]),
-            scan((cardIndex: Dictionary<ICard[]>, newCards) => {
-                t.addWords(...Object.values(newCards).map(card => card.learningLanguage))
-                const o = {...cardIndex};
-                newCards.forEach(newICard => {
-                    CardManager.mergeCardIntoCardDict(newICard, o);
-                });
-                return o;
-            }, {}),
-            shareReplay(1)
-        );
+        this.cardIndex$ = merge(
+            this.addPersistedCards$.pipe(map(addCards => [addCards, []])),
+            this.deleteCards$.pipe(map(deleteCards => [[], deleteCards]))
+        )
+            .pipe(
+                // @ts-ignore
+                startWith([[], []]),
+                scan((cardIndex: Dictionary<ICard[]>, [newCards, cardsToDelete]: [ICard[], string[]]) => {
+                    t.removeWords(...cardsToDelete);
+                    t.addWords(...Object.values(newCards).map(card => card.learningLanguage))
+                    // TODO I think this is wrong because technically we can have more than 1 card per word
+                    // But its a hack that works for now
+                    cardsToDelete.forEach(cardToDelete => delete cardIndex[cardToDelete])
+                    // TODO I dont think we need to shallow clone here
+                    const newCardIndex = {...cardIndex};
+                    newCards.forEach(newICard => {
+                        CardManager.mergeCardIntoCardDict(newICard, newCardIndex);
+                    });
+                    return newCardIndex;
+                }, {}),
+                shareReplay(1)
+            );
         this.addUnpersistedCards$.pipe(
             map((cards) => {
                 for (let i = 0; i < cards.length; i++) {
@@ -58,7 +69,14 @@ export default class CardManager {
                 return cards;
             })
         ).subscribe(this.addPersistedCards$);
+        this.deleteCards$.subscribe(cards => {
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                this.db.cards.where({learningLanguage: card}).delete();
+            }
+        })
     }
+
     async load() {
         this.cardProcessingSignal$.next(true);
         let unloadedCardCount = await this.db.getCardsInDatabaseCount()

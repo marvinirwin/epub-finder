@@ -9,6 +9,9 @@ import EditCardEnglish from "./EditCardEnglish";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 import {Manager} from "../../lib/Manager";
+import {IconButton} from "@material-ui/core";
+import DeleteIcon from '@material-ui/icons/Delete';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,6 +56,9 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
     return <Card className={classes.root}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
+                    <IconButton aria-label="delete" onClick={() => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined)}>
+                        <DeleteIcon fontSize="large" />
+                    </IconButton>
                     <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
