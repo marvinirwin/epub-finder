@@ -67,7 +67,7 @@ export function Characters({c, m}: QuizCardProps) {
             <div>
                 <QuizStatsHeader m={m}/>
             </div>
-            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
+            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', height: '100%'}}>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
