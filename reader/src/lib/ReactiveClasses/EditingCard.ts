@@ -14,7 +14,7 @@ interface IDefinition {
     pinyin: string;
 }
 
-export const lookup: (s: string) => string[] = memoize(s => flatten(pinyin(s)))
+export const lookupPinyin: (s: string) => string[] = memoize(s => flatten(pinyin(s)))
 
 
 export class EditingCard {
@@ -87,7 +87,7 @@ export class EditingCard {
 
         this.pinyin$ = this.learningLanguage$.pipe(map(s => {
             return s.split('').map(char => {
-                let definitions = lookup(char);
+                let definitions = lookupPinyin(char);
                 if (definitions) return definitions.join('/')
                 return char;
             }).join(' ')

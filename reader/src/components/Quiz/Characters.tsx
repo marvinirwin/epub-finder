@@ -19,6 +19,7 @@ import {isEqual, uniq} from "lodash";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {OpenBooks} from "../../lib/Manager/OpenBooks";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
+import GridListTile from "@material-ui/core/GridListTile";
 
 
 export function Characters({c, m}: QuizCardProps) {
@@ -63,13 +64,14 @@ export function Characters({c, m}: QuizCardProps) {
 
     return <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
-            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'spaceAround'}}>
+            <div>
                 <QuizStatsHeader m={m}/>
             </div>
-            <div>
+            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
+                {c?.photos[0] && <img src={c?.photos[0]} style={{height: '100%', width: 'auto'}}/>}
             </div>
             <div>
                 <Button onClick={advance}>Next</Button>

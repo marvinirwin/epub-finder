@@ -69,7 +69,6 @@ export class AtomizedSentence {
             }
 
             wordsInProgress.push(...wordsWhichStartHere.map(word => {
-                debugger;
                 if (wordCounts[word]) {
                     wordCounts[word]++;
                 } else {

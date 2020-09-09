@@ -131,4 +131,12 @@
 
 
 
+.grow-from-one-line {
+    height: 74px;
+    transition: max-height 0.5s;
+    overflow: hidden;
+}
+.grow-from-one-line:hover {
+    height: fit-content;
+}
 

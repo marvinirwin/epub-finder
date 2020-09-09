@@ -56,10 +56,12 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
     return <Card className={classes.root}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
-                    <IconButton aria-label="delete" onClick={() => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined)}>
-                        <DeleteIcon fontSize="large" />
-                    </IconButton>
-                    <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
+                    <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
+                        <IconButton aria-label="delete" onClick={() => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined)}>
+                            <DeleteIcon fontSize="large" />
+                        </IconButton>
+                        <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
+                    </div>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
                     <ImageList photos$={card.photos$} card={card} characters={characters || ""} m={m}/>

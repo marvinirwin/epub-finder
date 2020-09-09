@@ -3,7 +3,7 @@ import React, {useRef, useState} from "react";
 import { Card,  CardContent,  Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import CountdownCircle from "./CountdownCircle";
-import {lookup} from "../../lib/ReactiveClasses/EditingCard";
+import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
     learningLanguage: {
         flexGrow: 1
     },
-    recognizedSpeech: {}
 }));
 
 export const SLIM_CARD_CONTENT = {display: 'flex', flexFlow: 'row nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'};
@@ -43,23 +42,29 @@ export default function AudioRecorder({m}: { m: Manager }) {
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
     return <div className={classes.popupParent} ref={setReferenceElement}>
-        <Card>
-            <CardContent style={SLIM_CARD_CONTENT}>
+        <Card className={'grow-from-one-line'}>
+            <CardContent style={{display: 'flex', flexFlow: 'column nowrap', paddingTop: '5px', paddingBottom: 0, paddingLeft: '5px'}}>
                 <TutorialPopper referenceElement={referenceElement} storageKey={'AUDIO_POPUP'} placement="top">
                     <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
                         recognized text should match the pinyin on the flashcard.</Typography>
                 </TutorialPopper>
-                <CountdownCircle r={r}/>
-                <Typography variant="h6" className={classes.learningLanguage}
-                            align="center">{currentAudioRequest?.label}</Typography>
-                <Typography variant="h6"
-                            className={classes.recognizedSpeech}>{recognizedText} {lookup(recognizedText || '').join(' ')}</Typography>
+                <div style={{display: 'grid', gridTemplateColumns: '10% 90%'}}>
+                    <CountdownCircle r={r}/>
+                    <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-around'}}>
+                        <span style={{flexGrow: 1}}>
+                        <Typography variant="h6" className={classes.learningLanguage}
+                                    align="center">{currentAudioRequest?.label}</Typography>
+                        </span>
+                        <audio style={{height: '24px', flexGrow: 1}} src={synthAudio?.url} controls autoPlay/>
+                    </div>
+                </div>
+                <Typography variant="h6" >{recognizedText}</Typography>
+                <Typography variant="h6" >{lookupPinyin(recognizedText || '').join(' ')}</Typography>
                 {/*
                     <Grid item xs={6}>
                         <audio src={userAudio?.url} controls autoPlay />
                     </Grid>
 */}
-                <audio style={{height: '24px'}} src={synthAudio?.url} controls autoPlay/>
                 {/*
                 {graphData && <MultiGraph plots={graphData}/>}
 */}
