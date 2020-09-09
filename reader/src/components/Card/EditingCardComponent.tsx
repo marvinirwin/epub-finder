@@ -43,6 +43,7 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
     const classes = useStyles();
     const characters = useObservableState(card.learningLanguage$);
     const sounds = useObservableState(card.sounds$);
+    const translation = useObservableState(card.translation$);
     useEffect(() => {
         const els = document.getElementsByClassName('new-audio');
         for (let i = 0; i < els.length; i++) {
@@ -61,6 +62,7 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
                             <DeleteIcon fontSize="large" />
                         </IconButton>
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
+                        <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
                     </div>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>

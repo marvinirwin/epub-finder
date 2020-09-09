@@ -1,11 +1,12 @@
 import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {map, mapTo, skip, switchMap,} from "rxjs/operators";
+import {flatMap, map, mapTo, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
 import {AudioManager} from "../Manager/AudioManager";
 import CardManager from "../Manager/CardManager";
+import {getTranslation} from "../Util/Util";
 
 
 interface IDefinition {
@@ -28,6 +29,7 @@ export class EditingCard {
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
     pinyin$: Observable<string>;
+    translation$: Observable<string>;
 
     constructor(
         public persistor: IndexDBManager<ICard>,
@@ -36,6 +38,11 @@ export class EditingCard {
         public timestamp?: Date | number | undefined,
     ) {
 
+        this.translation$ = this.learningLanguage$.pipe(
+            flatMap(async (learningLanguage) =>
+                learningLanguage ? await getTranslation(learningLanguage) : ''
+            )
+        )
         this.saveInProgress$.next(false);
         let saveData$ = this.saveDataObservable();
 
