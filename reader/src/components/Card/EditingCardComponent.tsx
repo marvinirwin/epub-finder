@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         '& > *': {
             width: '100%'
         },
-        position: 'relative'
+        position: 'relative',
     },
     media: {
         height: 0,

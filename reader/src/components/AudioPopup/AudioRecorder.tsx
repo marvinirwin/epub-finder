@@ -36,7 +36,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
         const graphData = useObs<number[][]>(m.audioManager.lineupGraphs$)
     */
     const canvasRef = useRef<HTMLCanvasElement>();
-    const recognizedText = useObservableState(r.audioSource.recognizedText$);
+    const recognizedText = useObservableState(r.audioSource.mostRecentRecognizedText$);
     const currentAudioRequest = useObservableState(r.recordRequest$)// Maybe pipe this to make it a replaySubject?
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);

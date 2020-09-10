@@ -10,19 +10,10 @@ import {Pictures} from "./Pictures";
 import {quizStyles} from "./QuizStyles";
 import {combineLatest, Observable, of} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
-import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
-import {useObservable, useObservableState} from "observable-hooks";
-import {OpenBook} from "../../lib/BookFrame/OpenBook";
-import {BrowserInputs} from "../../lib/Manager/BrowserInputs";
-import {GetWorkerResults} from "../../lib/Util/GetWorkerResults";
-import {isEqual, uniq} from "lodash";
-import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
-import {OpenBooks} from "../../lib/Manager/OpenBooks";
+import {take} from "rxjs/operators";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
-import GridListTile from "@material-ui/core/GridListTile";
 import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
-
-const falseObservable$ = of(false);
+import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
@@ -74,7 +65,9 @@ export function Characters({c, m}: QuizCardProps) {
             }
         })
         newRecordRequest.sentence.then(sentence => {
-            if (sentence.split('').filter(isChineseCharacter).join('') === c?.learningLanguage) {
+            if (!c) return;
+            if (lookupPinyin(sentence.split('').filter(isChineseCharacter).join('')).join('')
+                === lookupPinyin(c.learningLanguage).join('')) {
                 setRecordingClass('prompting-recording recording-success');
                 setTimeout(() => {
                     advance();

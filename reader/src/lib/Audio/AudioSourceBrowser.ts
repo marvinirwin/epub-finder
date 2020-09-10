@@ -11,7 +11,8 @@ export class AudioSourceBrowser implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1);
     public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();
-    public recognizedText$ = new ReplaySubject<string>(1);
+    public recognizedText$ = new Subject<string>();
+    public mostRecentRecognizedText$: Observable<string>;
 
     private speechRecognitionToken$ = new ReplaySubject<string>(1);
     private speechConfig$: Observable<SpeechConfig>;
@@ -23,6 +24,7 @@ export class AudioSourceBrowser implements AudioSource {
 
 
     constructor() {
+        this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true})).pipe(shareReplay(1));
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
             map(t => {
@@ -99,7 +101,7 @@ export class AudioSourceBrowser implements AudioSource {
     private getRecognizerCB() {
         return () => {
             this.isRecording$.next(true);
-            this.recognizedText$.pipe(take(2)).toPromise().then(() => {
+            this.recognizedText$.pipe(take(1)).toPromise().then(() => {
                 this.isRecording$.next(false);
             });
         };

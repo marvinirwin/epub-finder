@@ -20,13 +20,13 @@ export function Conclusion({c, m}: QuizCardProps) {
     }, [c, m])
 
     return editingCard ? <Card className={classes.card}>
-        <CardContent className={classes.cardContent}>
-            <div>
+        <CardContent style={{height: '25vh', display: 'flex', flexFlow: "row nowrap"}}>
+            <div style={{minWidth: '25%'}}>
             </div>
-            <div>
+            <div style={{width: '25%'}}>
                 <EditingCardComponent card={editingCard} m={m}/>
             </div>
-            <div>
+            <div style={{width: '25%', marginTop: '57px'}}>
                 {
                     c &&
                     <Fragment>

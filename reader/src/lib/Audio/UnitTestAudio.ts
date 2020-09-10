@@ -1,5 +1,5 @@
-import {ReplaySubject, Subject} from "rxjs";
-import {withLatestFrom, take} from "rxjs/operators";
+import {Observable, ReplaySubject, Subject} from "rxjs";
+import {withLatestFrom, take, shareReplay} from "rxjs/operators";
 import {sleep} from "../Util/Util";
 import {MakeQuerablePromise} from "../Util/QueryablePromise";
 
@@ -8,6 +8,7 @@ export class UnitTestAudio {
     public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
+    public mostRecentRecognizedText$: Observable<string>;
     constructor(public text: string) {
         this.beginRecordingSignal$.subscribe(async () => {
             this.isRecording$.next(true);
@@ -18,5 +19,6 @@ export class UnitTestAudio {
             }
             this.isRecording$.next(false);
         });
+        this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
     }
 }
