@@ -16,13 +16,15 @@ export class AudioRecorder {
         this.recordRequest$.pipe(
             switchMap((request: RecordRequest) => {
                 this.audioSource.beginRecordingSignal$.next();
+                request.recording$.next(true);
                 return race(
                     this.audioSource.recognizedText$.pipe(take(1)),
                     this.recordRequest$.pipe(take(1))
                 ).pipe(
                     map((result: string | RecordRequest) => {
-                        let newVar: [string | RecordRequest, RecordRequest] = [result, request];
-                        return newVar;
+                        request.recording$.next(false);
+                        let resultArray: [string | RecordRequest, RecordRequest] = [result, request];
+                        return resultArray;
                     })
                 );
             })

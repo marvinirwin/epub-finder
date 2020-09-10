@@ -195,14 +195,6 @@ export class Manager {
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
 
-        /**
-         * Maybe later I should only do this if I'm currently at the quiz page
-         */
-        this.quizManager.quizzingCard$.subscribe(quizzingCard => {
-            if (quizzingCard) {
-                this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(quizzingCard.learningLanguage));
-            }
-        });
 
         merge(
             this.openedBooksManager.atomizedSentences$,

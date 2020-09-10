@@ -56,7 +56,7 @@ export class QuizCharacterManager {
                     exampleSentences$,
                     quizzingCard$,
                     trie$,
-        requestPlayAudio
+                    requestPlayAudio
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
@@ -72,12 +72,7 @@ export class QuizCharacterManager {
                                 }
                 */
                 return interpolateSourceDoc(sentences.map(sentence => {
-                    let translatableText = sentence.translatableText;
-                    if (!this.sentenceCache.has(translatableText)) {
-                        requestPlayAudio(translatableText);
-                    }
-                    this.sentenceCache.add(translatableText);
-                    return translatableText;
+                    return sentence.translatableText;
                 }).concat(Array(10).fill('_')));
             }),
         ).subscribe(this.exampleSentencesFrame.unAtomizedSrcDoc$);

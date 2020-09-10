@@ -89,9 +89,6 @@ export class OpenBook {
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
         this.wordCountRecords$ = this.bookStats$.pipe(
             map(bookStat => {
-                if (bookStat.bookWordCounts['宋']) {
-                    debugger;console.log();
-                }
                     return Object.values(bookStat.bookWordCounts);
                 }
             ),

@@ -18,10 +18,11 @@ export class AudioSourceBrowser implements AudioSource {
     private mediaSource$: Observable<MediaStream>;
     private audioConfig$: Observable<AudioConfig>;
     private recognizer: SpeechRecognizer | undefined;
+    private recognizing: boolean = false;
     recognizer$: Observable<SpeechRecognizer>;
 
+
     constructor() {
-        this.recognizedText$.next('');
         this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true})).pipe(shareReplay(1));
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
             map(t => {
@@ -38,70 +39,70 @@ export class AudioSourceBrowser implements AudioSource {
             shareReplay(1)
         );
 
-        this.audioConfig$ = this.mediaSource$.pipe(map(mediaSource => {
-            try {
-                return AudioConfig.fromMicrophoneInput(mediaSource.id);
-            } catch (e) {
-                console.error(e);
-                throw e;
-            }
-        }));
+        this.audioConfig$ = this.mediaSource$.pipe(
+            map(mediaSource => {
+                try {
+                    return AudioConfig.fromMicrophoneInput(mediaSource.id);
+                } catch (e) {
+                    console.error(e);
+                    throw e;
+                }
+            }),
+            shareReplay(1)
+        );
         this.recognizer$ = combineLatest([this.audioConfig$, this.speechConfig$]).pipe(
             map(([audio, speech]) => {
                 return this.getNewRecognizer(speech, audio);
-            })
+            }),
+            shareReplay(1)
         )
 
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.recognizer$)
         ).subscribe(([, recognizer]) => {
             return new Promise((resolve, reject) => {
-                recognizer.startContinuousRecognitionAsync(
-                    () => {
-                        this.isRecording$.next(true);
-
-                        this.recognizedText$.pipe(take(2)).toPromise().then(() => {
-                            this.isRecording$.next(false);
-                            recognizer.stopKeywordRecognitionAsync()
-                        });
-                    }, (error) => {
-                        console.error(error);
-                        this.isRecording$.next(false);
-                        recognizer.stopKeywordRecognitionAsync()
-                    }
-                );
+                if (!this.recognizing) {
+                    this.recognizer?.startContinuousRecognitionAsync();
+                }
             })
         });
 
-        this.stopRecordingSignal$.subscribe(() => {
-            this.cancelRecognizer();
-        });
         this.loadToken();
     }
 
 
     private getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): SpeechRecognizer {
-        if (this.recognizer) {
-            // In the old method I closed the audioConfig, do I need to close it this time?
-            this.cancelRecognizer();
-
-        }
         this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
         this.recognizer.recognized = (s, e) => {
             if (e.result.reason == ResultReason.RecognizedSpeech) {
                 this.recognizedText$.next(e.result.text)
+                this.recognizer?.stopContinuousRecognitionAsync();
+                this.recognizing = false;
             }
         };
+        this.recognizing = true;
+        this.recognizer.startContinuousRecognitionAsync(
+            this.getRecognizerCB(),
+            this.getRecognizerError()
+        );
         // Start continuous speech recognition
         return this.recognizer;
     }
 
-    private cancelRecognizer() {
-        try {
-            this.recognizer?.close();
-        } catch (e) {
-            console.warn(e);
-        }
+    private getRecognizerError() {
+        return (error: string) => {
+            console.error(error);
+            this.isRecording$.next(false);
+        };
+    }
+
+    private getRecognizerCB() {
+        return () => {
+            this.isRecording$.next(true);
+            this.recognizedText$.pipe(take(2)).toPromise().then(() => {
+                this.isRecording$.next(false);
+            });
+        };
     }
 
     private loadToken() {

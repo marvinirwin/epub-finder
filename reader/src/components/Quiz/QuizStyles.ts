@@ -23,9 +23,9 @@ export const quizStyles = makeStyles((theme) => ({
     },
     cardContent: {
         display: 'grid',
-        flexFlow: 'column nowrap',
         gridTemplateColumns: '25% 50% 25%',
-        paddingTop: '50px',
-        height: '35vh',
+        marginTop: '50px',
+        height: '25vh',
+        padding: 0
     }
 }));

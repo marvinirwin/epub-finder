@@ -142,3 +142,26 @@
     max-height: none;
 }
 
+.prompting-recording {
+    border-width: 2px 2px 4px;
+    border-bottom-width: 2px;
+    border-style: solid;
+    bottom: -2px !important;
+
+    background-color: #ddf4ff;
+    border-radius: 16px;
+    box-shadow: 0px 0px 0px 5px rgb(28, 176, 246);
+    transition: box-shadow 0.6s linear;
+    margin: 0.5em; /* Increased margin since the box-shado expands outside the element, like outline */
+}
+
+.recording-success {
+    background-color: #b8f28b;
+    box-shadow: 0px 0px 0px 5px #58a700;
+}
+.recording-failed {
+    background-color: #ffc1c1;
+    box-shadow: 0px 0px 0px 5px #ea2b2b;
+}
+
+

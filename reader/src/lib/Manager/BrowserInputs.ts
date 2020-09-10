@@ -14,7 +14,6 @@ export class BrowserInputs {
         root.onkeydown = (ev) => {
             let tagName = (ev.target as HTMLElement).tagName;
             if (tagName === 'INPUT' || tagName === "TEXTAREA") return;
-            debugger;
             return this.keydownMap[ev.key]?.next(ev);
         };
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);

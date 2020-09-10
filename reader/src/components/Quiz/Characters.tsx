@@ -8,7 +8,7 @@ import React, {useEffect, useState} from "react";
 import {QuizCardProps} from "./Popup";
 import {Pictures} from "./Pictures";
 import {quizStyles} from "./QuizStyles";
-import {combineLatest, Observable} from "rxjs";
+import {combineLatest, Observable, of} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
 import {distinctUntilChanged, filter, map, switchMap, take, tap} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
@@ -20,21 +20,22 @@ import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {OpenBooks} from "../../lib/Manager/OpenBooks";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 import GridListTile from "@material-ui/core/GridListTile";
+import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
 
+const falseObservable$ = of(false);
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
     const [error, setError] = useState('');
-    const [createdSentence, setCreatedSentence] = useState();
     const advance = () => {
         m.quizManager.quizzingComponent$.next("Conclusion");
-/*
-        if (createdSentence) {
-        } else {
-            const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
-            r.sentence.then(setCreatedSentence)
-        }
-*/
+        /*
+                if (createdSentence) {
+                } else {
+                    const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
+                    r.sentence.then(setCreatedSentence)
+                }
+        */
     };
 
     useEffect(() => {
@@ -61,25 +62,56 @@ export function Characters({c, m}: QuizCardProps) {
         })
     }, [c?.learningLanguage]);
 
+    const [recordRequest, setRecordRequest] = useState<RecordRequest>();
+    const [recordingClass, setRecordingClass] = useState<string>('');
 
-    return <Card className={classes.card}>
-        <CardContent className={classes.cardContent}>
-            <div>
-                <QuizStatsHeader m={m}/>
-            </div>
-            <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', height: '100%'}}>
+    function tryAudio() {
+        if (!c) return;
+        let newRecordRequest = new RecordRequest(c.learningLanguage);
+        newRecordRequest.recording$.subscribe(isRecording => {
+            if (isRecording) {
+                setRecordingClass('prompting-recording');
+            }
+        })
+        newRecordRequest.sentence.then(sentence => {
+            if (sentence.split('').filter(isChineseCharacter).join('') === c?.learningLanguage) {
+                setRecordingClass('prompting-recording recording-success');
+                setTimeout(() => {
+                    advance();
+                }, 1000);
+            } else {
+                setRecordingClass('prompting-recording recording-failed');
+            }
+        });
+        m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
+    }
+
+    useEffect(() => {
+        if (!c?.learningLanguage) return;
+        tryAudio();
+    }, [c?.learningLanguage])
+
+    return <div style={{
+        marginTop: '50px',
+        height: '25vh',
+        padding: 0,
+        backgroundColor: 'white',
+        display: 'flex'
+    }}>
+        <div style={{width: '25%', overflow: 'hidden'}}>
+            <QuizStatsHeader m={m}/>
+        </div>
+        <div style={{width: '50%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', height: '100%'}}>
+            <div className={recordingClass}>
+                <Button onClick={tryAudio}>retry</Button>
                 <Typography variant="h1" component="h1" className={classes.center}>
                     {c?.learningLanguage}
                 </Typography>
-                {c?.photos[0] && <img src={c?.photos[0]} style={{height: '100%', width: 'auto'}}/>}
             </div>
-            <div>
-                <Button onClick={advance}>Next</Button>
-            </div>
-        </CardContent>
-{/*
-        <CardActions className={classes.cardActions}>
-        </CardActions>
-*/}
-    </Card>
+            {c?.photos[0] && <img src={c?.photos[0]} style={{height: '100%', width: 'auto'}}/>}
+        </div>
+        <div style={{width: '25%'}}>
+            <Button onClick={advance}>Next</Button>
+        </div>
+    </div>
 }
