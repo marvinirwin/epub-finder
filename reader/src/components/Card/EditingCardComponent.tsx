@@ -11,6 +11,8 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {Manager} from "../../lib/Manager";
 import {IconButton} from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
+import {HotkeyWrapper} from "../HotkeyWrapper";
 
 
 
@@ -64,14 +66,18 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
                     <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
-                        <IconButton aria-label="delete" onClick={deleteCard}>
-                            <DeleteIcon fontSize="large" />
-                        </IconButton>
+                        <HotkeyWrapper shortcutKey={"Esc"}>
+                            <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
+                                <KeyboardArrowUp fontSize="small" />
+                            </IconButton>
+                        </HotkeyWrapper>
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
-                        <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
-                            <DeleteIcon fontSize="large" />
-                        </IconButton>
+                        <HotkeyWrapper shortcutKey={"d"}>
+                            <IconButton aria-label="delete" onClick={deleteCard}>
+                                <DeleteIcon fontSize="large" />
+                            </IconButton>
+                        </HotkeyWrapper>
                     </div>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>
