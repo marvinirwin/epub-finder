@@ -11,6 +11,7 @@ import StarBorderIcon from "@material-ui/icons/StarBorder";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
+import {HotkeyWrapper} from "../HotkeyWrapper";
 
 
 const useStyles = makeStyles((theme) => ({

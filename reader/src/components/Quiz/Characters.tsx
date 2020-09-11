@@ -14,10 +14,16 @@ import {take} from "rxjs/operators";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
 import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
+import {HotkeyWrapper} from "../HotkeyWrapper";
+import {useSubscription} from "observable-hooks";
+
+const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
+const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
     const [error, setError] = useState('');
+    const requestEditWord = () => c && m.editingCardManager.requestEditWord$.next(c.learningLanguage);
     const advance = () => {
         m.quizManager.quizzingComponent$.next("Conclusion");
         /*
@@ -56,6 +62,7 @@ export function Characters({c, m}: QuizCardProps) {
     const [recordRequest, setRecordRequest] = useState<RecordRequest>();
     const [recordingClass, setRecordingClass] = useState<string>('');
 
+
     function tryAudio() {
         if (!c) return;
         let newRecordRequest = new RecordRequest(c.learningLanguage);
@@ -68,16 +75,20 @@ export function Characters({c, m}: QuizCardProps) {
             if (!c) return;
             if (lookupPinyin(sentence.split('').filter(isChineseCharacter).join('')).join('')
                 === lookupPinyin(c.learningLanguage).join('')) {
-                setRecordingClass('prompting-recording recording-success');
+                setRecordingClass(promptingRecordingRecordingSuccess);
                 setTimeout(() => {
                     advance();
-                }, 1000);
+                }, 250);
             } else {
-                setRecordingClass('prompting-recording recording-failed');
+                setRecordingClass(promptingRecordingRecordingFailed);
             }
         });
         m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
     }
+
+    // Subscribe to the keydown "r" while we can
+    useSubscription(m.inputManager.getKeyDownSubject('r'), tryAudio);
+    useSubscription(m.inputManager.getKeyDownSubject('e'), requestEditWord);
 
     useEffect(() => {
         if (!c?.learningLanguage) return;
@@ -95,16 +106,30 @@ export function Characters({c, m}: QuizCardProps) {
             <QuizStatsHeader m={m}/>
         </div>
         <div style={{width: '50%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', height: '100%'}}>
-            <div className={recordingClass}>
-                <Button onClick={tryAudio}>retry</Button>
-                <Typography variant="h1" component="h1" className={classes.center}>
-                    {c?.learningLanguage}
-                </Typography>
+            <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'flex-end', width: '100%'}}>
+{/*
+                {
+                    recordingClass === promptingRecordingRecordingFailed ? <HotkeyWrapper shortcutKey={'r'}>
+                        <Button onClick={tryAudio}>retry</Button>
+                    </HotkeyWrapper> : <div/>
+                }
+*/}
+                <div style={{width: '100%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'center'}}>
+                    <HotkeyWrapper shortcutKey={'e'}>
+                        <div className={`${recordingClass} quiz-character`} onClick={requestEditWord}>
+                            <Typography variant="h1" component="h1" className={classes.center}>
+                                {c?.learningLanguage}
+                            </Typography>
+                        </div>
+                    </HotkeyWrapper>
+                </div>
             </div>
             {c?.photos[0] && <img src={c?.photos[0]} style={{height: '100%', width: 'auto'}}/>}
         </div>
+{/*
         <div style={{width: '25%'}}>
             <Button onClick={advance}>Next</Button>
         </div>
+*/}
     </div>
 }

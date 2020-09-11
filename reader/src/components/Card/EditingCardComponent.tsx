@@ -7,7 +7,7 @@ import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import ImageList from "./CardImageList";
 import EditCardEnglish from "./EditCardEnglish";
 import {TutorialPopper} from "../Popover/Tutorial";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {Manager} from "../../lib/Manager";
 import {IconButton} from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -54,15 +54,24 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
 
     const pinyin = useObservableState(card.pinyin$);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
+
+    const deleteCard = () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined);
+    const hideEditCard = () => m.editingCardManager.showEditingCardPopup$.next(false);
+    useSubscription(m.inputManager.getKeyDownSubject('d'), deleteCard);// Maybe I want to make this harder to do
+    useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
+
     return <Card className={classes.root}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
                     <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
-                        <IconButton aria-label="delete" onClick={() => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined)}>
+                        <IconButton aria-label="delete" onClick={deleteCard}>
                             <DeleteIcon fontSize="large" />
                         </IconButton>
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
+                        <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
+                            <DeleteIcon fontSize="large" />
+                        </IconButton>
                     </div>
                     <EditCardEnglish e={card}/>
                     <Typography variant="h6" gutterBottom> Pictures </Typography>

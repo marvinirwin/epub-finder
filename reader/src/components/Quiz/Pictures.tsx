@@ -10,6 +10,7 @@ export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
     const advance = () => m.quizManager.quizzingComponent$.next("Conclusion");
     return <Card className={classes.card}>
+{/*
         <CardContent className={classes.cardContent}>
             {c?.photos.length &&
             <GridList className={classes.center}>
@@ -23,8 +24,6 @@ export function Pictures({c, m}: QuizCardProps) {
             {!c?.photos.length &&
             <Typography variant="subtitle1">No pictures were provided for {c?.learningLanguage}</Typography>}
         </CardContent>
-        <CardActions className={classes.cardActions}>
-            <Button onClick={advance}>Next</Button>
-        </CardActions>
+*/}
     </Card>;
 }

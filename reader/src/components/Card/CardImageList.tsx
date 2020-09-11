@@ -7,7 +7,8 @@ import {Subject} from "rxjs";
 import React from "react";
 import {Manager} from "../../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
+import {HotkeyWrapper} from "../HotkeyWrapper";
 
 const useStylesGridListImages = makeStyles((theme) => ({
     root: {
@@ -35,21 +36,28 @@ const useStylesGridListImages = makeStyles((theme) => ({
 export default function ({photos$, card, characters, m}: { photos$: Subject<string[]>, card: EditingCard, characters: string, m: Manager }) {
     const classes = useStylesGridListImages();
     const photos = useObservableState(photos$);
-    const cb = () => m.queryImageRequest$.next({
+    const openQueryImageRequest = () => m.queryImageRequest$.next({
         term: characters,
         cb: (s: string) => card.photos$.next(photos?.concat(s))
     });
+    useSubscription(m.inputManager.getKeyDownSubject('s'), openQueryImageRequest);
+
     return photos?.length ?
-        <GridList className={classes.gridList}>
-            {photos?.map((src, index) => {
-                return <EditingImage key={index} index={index} card={card} src={src}
-                                     photos={photos} characters={characters}
-                                     addCb={index === photos?.length - 1 ? cb : undefined}
-                />
-            })}
-        </GridList> : <div>
-            <IconButton onClick={cb}>
-                <LibraryAddIcon/>
-            </IconButton>
+        <HotkeyWrapper shortcutKey={'s'}>
+            <GridList className={classes.gridList}>
+                {photos?.map((src, index) => {
+                    return <EditingImage key={index} index={index} card={card} src={src}
+                                         photos={photos} characters={characters}
+                                         addCb={index === photos?.length - 1 ? openQueryImageRequest : undefined}
+                    />
+                })}
+            </GridList>
+        </HotkeyWrapper>
+         : <div>
+            <HotkeyWrapper shortcutKey={'s'}>
+                <IconButton onClick={openQueryImageRequest}>
+                    <LibraryAddIcon/>
+                </IconButton>
+            </HotkeyWrapper>
         </div>
 }

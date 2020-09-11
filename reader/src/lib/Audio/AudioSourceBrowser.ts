@@ -63,8 +63,9 @@ export class AudioSourceBrowser implements AudioSource {
             withLatestFrom(this.recognizer$)
         ).subscribe(([, recognizer]) => {
             return new Promise((resolve, reject) => {
-                if (!this.recognizing) {
-                    this.recognizer?.startContinuousRecognitionAsync();
+                if (!this.recognizing && this.recognizer) {
+                    this.recognizer.startContinuousRecognitionAsync();
+                    this.recognizing = true;
                 }
             })
         });
