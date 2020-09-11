@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -11,7 +11,7 @@ import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
 import {OpenBooks} from "./Manager/OpenBooks";
-import {NavigationPages, sleep} from "./Util/Util";
+import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Manager/BrowserInputs";
@@ -46,6 +46,7 @@ import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
+const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 
 function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
@@ -345,8 +346,7 @@ export class Manager {
         child.classList.add("applied-word-element-listener");
         child.onmouseenter = (ev) => {
             if (maxWord) {
-                let s = lookupPinyin(maxWord.word).join('');
-                addHighlightedWord(this.highlightedPinyin$, s);
+                addHighlightedPinyin(this.highlightedPinyin$, lookupPinyin(maxWord.word).join(''));
                 addHighlightedWord(this.highlightedWord$, maxWord?.word);
             }
             if (ev.shiftKey) {

@@ -17,7 +17,7 @@ export function getManager(mode: string): Manager {
         websites.push('test.html');
     } else {
         websites.push(
-            'generals.html',
+            'song_1.html',
         )
     }
     websites.forEach(filename => {

@@ -1,4 +1,4 @@
-import {uniq} from "lodash";
+import {uniq, flatten} from "lodash";
 import {ITrie} from "../Interfaces/Trie";
 import axios from "axios";
 import {ITrendLocation} from "../Interfaces/ITrendLocation";
@@ -46,13 +46,13 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
 }
 
 /**
- * Chnaged this to split on linebreak because I'm lazy for now
+ * Changed this to split on linebreak because I'm lazy for now
  * @param threshhold
  * @param str
  * @param filterFunc
  */
 export function splitPunctuation(threshhold: number, str: string, filterFunc: (char: string) => boolean): string[] {
-    return str.split('\n');
+    return flatten(str.split('\n').map(str => str.split('。')));
     const splits = [];
     // Once the threshhold is reached, split on the next punctuation/line break
     let currentStart = 0;
