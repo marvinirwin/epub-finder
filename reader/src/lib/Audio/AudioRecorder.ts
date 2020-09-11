@@ -16,19 +16,21 @@ export class AudioRecorder {
         this.recordRequest$.pipe(
             switchMap((request: RecordRequest) => {
                 this.audioSource.beginRecordingSignal$.next();
+                this.isRecording$.next(true);
                 request.recording$.next(true);
                 return race(
                     this.audioSource.recognizedText$.pipe(take(1)),
                     this.recordRequest$.pipe(take(1))
                 ).pipe(
                     map((result: string | RecordRequest) => {
-                        request.recording$.next(false);
+                        this.isRecording$.next(false);
                         let resultArray: [string | RecordRequest, RecordRequest] = [result, request];
                         return resultArray;
                     })
                 );
             })
         ).subscribe(async ([result, request]: [string | RecordRequest, RecordRequest]) => {
+            request.recording$.next(false);
             if (typeof result === 'object') {
                 request.rejectSentence(new Error("Audio recording not completed"))
             } else {

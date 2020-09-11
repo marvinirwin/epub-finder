@@ -1,13 +1,9 @@
 import {AudioRecorder} from "../../lib/Audio/AudioRecorder";
 import {Typography} from "@material-ui/core";
 import React from "react";
-import {useObs} from "../../lib/UseObs";
 import {useObservableState} from "observable-hooks";
 
-export default function CountdownCircle({r}: {r: AudioRecorder}) {
-/*
-    const countdown = useObservableState(r.$);
-*/
+export default function RecordingCircle({r}: {r: AudioRecorder}) {
     const isRecording = useObservableState(r.isRecording$);
     return <div className="led-container">
         <div className="led-box">
