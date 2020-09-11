@@ -41,6 +41,7 @@ import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
 import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
+import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -95,7 +96,7 @@ export class Manager {
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
 
-    highlightedPinyin$: Observable<string>;
+    highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
 
     wordCounts$: Observable<Dictionary<BookWordCount[]>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
@@ -275,7 +276,7 @@ export class Manager {
             this.editingCardManager.requestEditWord$.next(word);
         });
 
-        this.highlightedPinyin$ = this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
+        this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
 
         combineLatest([
             this.bottomNavigationValue$,
@@ -343,7 +344,11 @@ export class Manager {
         const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
         child.classList.add("applied-word-element-listener");
         child.onmouseenter = (ev) => {
-            addHighlightedWord(this.highlightedWord$, maxWord?.word);
+            if (maxWord) {
+                let s = lookupPinyin(maxWord.word).join('');
+                addHighlightedWord(this.highlightedPinyin$, s);
+                addHighlightedWord(this.highlightedWord$, maxWord?.word);
+            }
             if (ev.shiftKey) {
                 /**
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
