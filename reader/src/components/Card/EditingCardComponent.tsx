@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function EditingCardComponent({card, m}: { card: EditingCard, m: Manager}) {
+const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Manager, className?: string}> = ({card, m, className}) => {
     const classes = useStyles();
     const characters = useObservableState(card.learningLanguage$);
     const sounds = useObservableState(card.sounds$);
@@ -62,7 +62,7 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
     useSubscription(m.inputManager.getKeyDownSubject('d'), deleteCard);// Maybe I want to make this harder to do
     useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
 
-    return <Card className={classes.root}>
+    return <Card className={`${className || ''} ${classes.root}`}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
                     <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
@@ -89,3 +89,5 @@ export default function EditingCardComponent({card, m}: { card: EditingCard, m: 
             </CardContent>
         </Card> ;
 }
+
+export default EditingCardComponent;

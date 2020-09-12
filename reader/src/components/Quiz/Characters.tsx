@@ -26,13 +26,6 @@ export function Characters({c, m}: QuizCardProps) {
     const requestEditWord = () => c && m.editingCardManager.requestEditWord$.next(c.learningLanguage);
     const advance = () => {
         m.quizManager.quizzingComponent$.next("Conclusion");
-        /*
-                if (createdSentence) {
-                } else {
-                    const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
-                    r.sentence.then(setCreatedSentence)
-                }
-        */
     };
 
     useEffect(() => {

@@ -39,7 +39,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
         {
             <Slide direction="down" in={!!showEditingCard}>
                 <div>
-                    {editingCard && <EditingCardComponent card={editingCard} m={m}/>}
+                    {editingCard && <EditingCardComponent className={'editing-card-dropdown'} card={editingCard} m={m}/>}
                 </div>
             </Slide>
         }

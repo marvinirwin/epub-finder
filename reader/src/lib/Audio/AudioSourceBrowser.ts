@@ -1,6 +1,6 @@
 import {combineLatest, from, Observable, ReplaySubject, Subject} from "rxjs";
 import {AudioConfig, ResultReason, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
-import {map, shareReplay, take, tap, withLatestFrom} from "rxjs/operators";
+import {flatMap, map, shareReplay, take, tap, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
 import {sleep} from "../Util/Util";
@@ -20,12 +20,20 @@ export class AudioSourceBrowser implements AudioSource {
     private audioConfig$: Observable<AudioConfig>;
     private recognizer: SpeechRecognizer | undefined;
     private recognizing: boolean = false;
+    private mediaDevices = new ReplaySubject<MediaDevices>(1)
     recognizer$: Observable<SpeechRecognizer>;
 
 
     constructor() {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
-        this.mediaSource$ = from(navigator.mediaDevices.getUserMedia({audio: true})).pipe(shareReplay(1));
+        if (navigator.mediaDevices) {
+            this.mediaDevices.next(navigator.mediaDevices);
+        }
+
+        this.mediaSource$ = this.mediaDevices.pipe(
+            flatMap( mediaDevices => mediaDevices.getUserMedia({audio: true})),
+            shareReplay(1)
+        );
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
             map(t => {
                     try {
