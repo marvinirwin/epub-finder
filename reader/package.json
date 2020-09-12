@@ -71,7 +71,7 @@
   },
   "proxy": "http://localhost:3001",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HOST=0.0.0.0 react-scripts start",
     "build": "react-scripts build",
     "test": "jest --verbose \"--testNamePattern=^Loads the manager without error$\" --runTestsByPath /Users/frodo/PycharmProjects/vocabfinder/reader/src/test/manager?/manager.spec.ts",
     "eject": "react-scripts eject",
