@@ -168,14 +168,20 @@ export class Manager {
                     map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
                         if (!quizzingCard) return [];
                         const limit = 10;
-                        const sentenceMatches: AtomizedSentence[] = [];
-                        for (let i = 0; i < textWordData.length && sentenceMatches.length < limit; i++) {
-                            const v = textWordData[i];
-                            if (v.wordSentenceMap[quizzingCard.learningLanguage]) {
-                                sentenceMatches.push(v.wordSentenceMap[quizzingCard.learningLanguage][0]);
+                        let count = 0;
+                        const sentenceMatches: ds_Dict<AtomizedSentence> = {};
+                        for (let i = 0; i < textWordData.length && count < limit; i++) {
+                            const textData = textWordData[i];
+                            let wordSentenceMapElement = textData.wordSentenceMap[quizzingCard.learningLanguage];
+                            if (wordSentenceMapElement) {
+                                let translatableText = wordSentenceMapElement[0].translatableText;
+                                if (!sentenceMatches[translatableText]) {
+                                    sentenceMatches[translatableText] = wordSentenceMapElement[0];
+                                    count++;
+                                }
                             }
                         }
-                        return sentenceMatches;
+                        return Object.values(sentenceMatches);
                     }),
                     shareReplay(1)
                 ),
