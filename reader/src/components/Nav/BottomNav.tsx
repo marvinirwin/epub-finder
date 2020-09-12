@@ -31,10 +31,10 @@ export function BottomNav({m}: { m: Manager }) {
         onChange={(_, v) => m.bottomNavigationValue$.next(v)}
         ref={setReferenceElement}
     >
-        <BottomNavigationAction label="Read" value={NavigationPages.READING_PAGE} icon={<ChromeReaderMode/>}/>
-        <BottomNavigationAction label="Word Frequency" value={NavigationPages.TRENDS_PAGE} icon={<LibraryBooks/>}/>
-        <BottomNavigationAction label="Quiz" value={NavigationPages.QUIZ_PAGE} icon={<School/>}/>
-        <BottomNavigationAction label="Settings" value={NavigationPages.SETTINGS_PAGE} icon={<Settings/>}/>
+        <BottomNavigationAction id={"reading_page"} label="Read" value={NavigationPages.READING_PAGE} icon={<ChromeReaderMode/>}/>
+        <BottomNavigationAction id={"word_frequency_page"} label="Word Frequency" value={NavigationPages.TRENDS_PAGE} icon={<LibraryBooks/>}/>
+        <BottomNavigationAction id={"quiz_page"} label="Quiz" value={NavigationPages.QUIZ_PAGE} icon={<School/>}/>
+        <BottomNavigationAction id={"settings_page"} label="Settings" value={NavigationPages.SETTINGS_PAGE} icon={<Settings/>}/>
         <TutorialPopper referenceElement={referenceElement} storageKey={'BOTTOM_NAV'} placement="bottom-start">
             <Typography variant="subtitle2">Welcome to the flashcard reader, click or highlight characters and words to get started.</Typography>
         </TutorialPopper>
