@@ -26,7 +26,7 @@ it("Loads the manager without error", () => {
                     scheduledCards$,
                     quizzingCard$
                 },
-                openedBooksManager: {
+                openedBooks: {
                     addOpenBook$
                 },
                 quizCharacterManager: {

@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {OpenBooks} from "./Manager/OpenBooks";
+import {CHARACTER_BOOK_NODE_LABEL, OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
@@ -67,7 +67,7 @@ export class Manager {
     );
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public openedBooksManager: OpenBooks;
+    public openedBooks: OpenBooks;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -91,7 +91,7 @@ export class Manager {
     highlightedWord$ = new ReplaySubject<string | undefined>(1);
     highlightedSentence$ = new ReplaySubject<string | undefined>(1)
 
-    wordElementMap$!: Observable<Dictionary<IAnnotatedCharacter[]>>;
+    readingWordElementMap!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     setQuizWord$: Subject<string> = new Subject<string>();
 
@@ -99,8 +99,8 @@ export class Manager {
 
     highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
 
-    wordCounts$: Observable<Dictionary<BookWordCount[]>>;
-    sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
+    readingWordCounts$: Observable<Dictionary<BookWordCount[]>>;
+    readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
@@ -115,7 +115,7 @@ export class Manager {
             }
         );
         this.cardManager = new CardManager(this.db);
-        this.openedBooksManager = new OpenBooks({
+        this.openedBooks = new OpenBooks({
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyBodyListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
@@ -127,18 +127,18 @@ export class Manager {
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-        const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$, bookWordCounts} = splitTextDataStreams$(
-            this.openedBooksManager.renderedBookSentenceData$.pipe(
+        const {wordElementMap$, sentenceMap$, bookWordCounts} = splitTextDataStreams$(
+            this.openedBooks.renderedBookSentenceData$.pipe(
                 map(textData => {
                         return mergeSentenceInfo(...textData);
                     }
                 )
             )
         );
-        this.wordElementMap$ = wordElementMap$;
-        this.wordCounts$ = bookWordCounts;
-        this.sentenceMap$ = sentenceMap$;
-        this.scheduleManager = new ScheduleManager({db, wordCounts$: this.wordCounts$});
+        this.readingWordElementMap = wordElementMap$;
+        this.readingWordCounts$ = bookWordCounts;
+        this.readingWordSentenceMap = sentenceMap$;
+        this.scheduleManager = new ScheduleManager({db, wordCounts$: this.readingWordCounts$});
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
@@ -165,7 +165,7 @@ export class Manager {
         this.quizCharacterManager = new QuizCharacter(
             {
                 exampleSentences$: combineLatest([
-                    this.openedBooksManager.renderedBookSentenceData$,
+                    this.openedBooks.renderedBookSentenceData$,
                     this.quizManager.quizzingCard$
                 ]).pipe(
                     map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
@@ -198,23 +198,23 @@ export class Manager {
         )
 
         CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
-        InputPage(this.inputManager, this.openedBooksManager);
-        CardPage(this.cardManager, this.openedBooksManager);
+        InputPage(this.inputManager, this.openedBooks);
+        CardPage(this.cardManager, this.openedBooks);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooks, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
         merge(
-            this.openedBooksManager.renderedAtomizedSentences,
+            this.openedBooks.renderedAtomizedSentences,
             this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
         ).subscribe(atomizedSentenceList => {
                 BrowserInputs.applyAtomizedSentenceListeners(atomizedSentenceList);
             }
         )
 
-        this.wordElementMap$ = combineLatest([
-            this.wordElementMap$.pipe(
+        this.readingWordElementMap = combineLatest([
+            this.readingWordElementMap.pipe(
                 startWith({})
             ),
             this.characterPageWordElementMap$.pipe(startWith({}))
@@ -227,7 +227,7 @@ export class Manager {
         let previousHighlightedSentences: HTMLElement[] | undefined;
 
         this.highlightedWord$.pipe(debounceTime(10),
-            withLatestFrom(this.openedBooksManager.visibleElements$))
+            withLatestFrom(this.openedBooks.visibleElements$))
             .subscribe(([word, wordElementsMaps]) => {
                     if (previousHighlightedElements) {
                         previousHighlightedElements.map(e => e.classList.remove('highlighted'));
@@ -245,7 +245,7 @@ export class Manager {
 
         this.highlightedSentence$.pipe(
             debounceTime(10),
-            withLatestFrom(this.sentenceMap$)
+            withLatestFrom(this.readingWordSentenceMap)
         ).subscribe(([sentence, sentenceMap]) => {
             if (sentence) {
                 const HIGHLIGHTED_SENTENCE = 'highlighted-sentence';
@@ -283,7 +283,7 @@ export class Manager {
 
         combineLatest([
             this.bottomNavigationValue$,
-            this.openedBooksManager.openedBooks.updates$,
+            this.openedBooks.openedBooks.updates$,
         ]).subscribe(
             ([bottomNavigationValue, {sourced}]) => {
                 if (!sourced) return;
@@ -298,19 +298,19 @@ export class Manager {
                     case NavigationPages.QUIZ_PAGE:
                         this.viewingFrameManager.framesInView.appendDelta$.next({
                             nodeLabel: 'root',
-                            value: this.quizCharacterManager.exampleSentencesFrame
+                            value: this.quizCharacterManager.exampleSentencesBook
                         })
                         break;
                 }
             }
         );
 
-        this.openedBooksManager.openedBooks.appendDelta$.next({
+        this.openedBooks.openedBooks.appendDelta$.next({
             nodeLabel: 'root',
             children: {
-                'characterPageFrame': {
-                    nodeLabel: 'characterPageFrame',
-                    value: this.quizCharacterManager.exampleSentencesFrame
+                [CHARACTER_BOOK_NODE_LABEL]: {
+                    nodeLabel: CHARACTER_BOOK_NODE_LABEL,
+                    value: this.quizCharacterManager.exampleSentencesBook
                 }
             }
         });

@@ -71,13 +71,13 @@ export function SlidingTopWindows({m}: { m: Manager }) {
 
 
 export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const library = useObservableState(m.openedBooksManager.library$);
+    const library = useObservableState(m.openedBooks.library$);
     return <div className={'library'}>
         <List dense={true}>
             {
                 Object.values(library || {}).map(libraryBook => {
                     return <ListItem key={libraryBook.name} className={'library-book'}>
-                        <ListItemText primary={libraryBook.name} onClick={() => m.openedBooksManager.readingBook$.next(libraryBook)} />
+                        <ListItemText primary={libraryBook.name} onClick={() => m.openedBooks.readingBook$.next(libraryBook)} />
                     </ListItem>;
                 })
             }

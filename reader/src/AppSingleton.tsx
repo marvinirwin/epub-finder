@@ -17,7 +17,7 @@ export function getManager(mode: string): Manager {
         )
     }
     websites.forEach(filename => {
-        m.openedBooksManager.addOpenBook$.next(new Website(
+        m.openedBooks.addOpenBook$.next(new Website(
             filename,
             `${process.env.PUBLIC_URL}/books/${filename}`
             ))

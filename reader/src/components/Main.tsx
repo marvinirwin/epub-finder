@@ -61,7 +61,7 @@ export function Main({m}: { m: Manager }) {
         m.inputManager.applyBodyListeners(document.body);
     }, [m]);
 
-    const readingBook = m.openedBooksManager.readingBook;
+    const readingBook = m.openedBooks.readingBook;
     const iframeVisible = currentPage === NavigationPages.READING_PAGE;
     const characterPageShows = currentPage === NavigationPages.QUIZ_PAGE;
 
@@ -79,7 +79,7 @@ export function Main({m}: { m: Manager }) {
                 overflow: 'hidden',
                 zIndex: 1
             }}>
-            <OpenedBook openedBook={m.quizCharacterManager.exampleSentencesFrame}/>
+            <OpenedBook openedBook={m.quizCharacterManager.exampleSentencesBook}/>
         </StaticFrame>
 
         <StaticFrame
@@ -92,7 +92,7 @@ export function Main({m}: { m: Manager }) {
                 zIndex: 1
             }}
         >
-            {readingBook && <OpenedBook openedBook={readingBook}/>}
+            <OpenedBook openedBook={readingBook}/>
         </StaticFrame>
         <ImageSelectPopup m={m}/>
         <div style={{

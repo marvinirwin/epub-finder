@@ -20,7 +20,7 @@ export class QuizCharacter {
     exampleSentences$: Observable<AtomizedSentence[]>;
     quizzingCard$: Observable<ICard | undefined>;
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
-    public exampleSentencesFrame: OpenBook;
+    public exampleSentencesBook: OpenBook;
 
     private sentenceCache = new Set<string>();
 
@@ -32,7 +32,7 @@ export class QuizCharacter {
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
-        this.exampleSentencesFrame = new OpenBook(
+        this.exampleSentencesBook = new OpenBook(
             'ExampleSentences',
             trie$,
             this.exampleSentences$.pipe(
@@ -42,7 +42,7 @@ export class QuizCharacter {
                     }).concat(Array(10).fill('_')));
                 }),
                 AtomizedStringsForRawHTML,
-                map(atomizedStrings => AtomizedDocument.fromString(atomizedStrings[0]))
+                map(atomizedStrings => AtomizedDocument.fromAtomizedString(atomizedStrings[0]))
             )
         );
 

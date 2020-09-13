@@ -5,7 +5,7 @@ it("Generates wordCountRecords for a page", () => {
     Run((
         {
             manager: {
-                openedBooksManager: {
+                openedBooks: {
                     addOpenBook$
                 },
             },

@@ -73,7 +73,7 @@ export class AtomizedDocument {
         });
     }
 
-    public static fromString(atomizedString: string) {
+    public static fromAtomizedString(atomizedString: string) {
         return new AtomizedDocument(new DOMParser().parseFromString(atomizedString));
     }
 

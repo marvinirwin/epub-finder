@@ -71,20 +71,21 @@ export class OpenBook {
             shareReplay(1)
         );
         this.atomizedDocument$ = atomizedDocuments$ || this.atomizedSrcDocString$.pipe(
-            map(AtomizedDocument.fromString),
+            map(AtomizedDocument.fromAtomizedString),
             shareReplay(1)
-        )
+        );
+
         this.bookStats$ = combineLatest([
             this.atomizedDocument$,
             trie
         ]).pipe(
             map(([document, trie]) => {
-                debugger;
                 const stats = document.getDocumentStats(trie);
                 return getAtomizedDocumentBookStats(stats, this.name);
             }),
             shareReplay(1)
-        )
+        );
+
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1))
         this.wordCountRecords$ = this.bookStats$.pipe(
             map(bookStat => {
@@ -110,12 +111,10 @@ export class OpenBook {
 
         this.children$ = this.atomizedSrcDocStrings$.pipe(
             map(([originalDoc, ...documentChunks]) => {
-                debugger;
-                return Object.fromEntries(
+                    return Object.fromEntries(
                         documentChunks.map((childDocStr, index) => {
                             let childName = `${this.name}_${index}`;
-                            debugger;
-                            let args = AtomizedDocument.fromString(childDocStr);
+                            let args = AtomizedDocument.fromAtomizedString(childDocStr);
                             const childDoc = of(args)
                             return [
                                 childName,
@@ -130,8 +129,6 @@ export class OpenBook {
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
-        // @ts-ignore
-        const t = body.ownerDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
         const sentences = printExecTime("Rehydration", () => {
             return IFrameBookRenderer.rehydratePage(body.ownerDocument as HTMLDocument);
         });
