@@ -3,39 +3,11 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
-import {distinct, map} from "rxjs/operators";
+import {distinct, map, switchMap} from "rxjs/operators";
 import {TrieObservable} from "../AppContext/NewOpenBook";
-
-export const EMPTY_SRC = (src: string = '') => `
-
-<head>
-<title>QuizCharactePageFrame</title>
-</head>
-<body>
-<div>
-${src}
-</div>
-</body>
-`
-
-function interpolateSourceDoc(sentences: string[]) {
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Example Sentences</title>
-</head>
-<body>
-<div class="popper-container">
-${sentences.map(sentence => {
-        return `<div>${sentence}</div>`;
-    }).join('</br>')}
-</div>
-</body>
-</html>
-        `;
-}
+import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
+import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export interface QuizCharacterManagerParams {
     exampleSentences$: Observable<AtomizedSentence[]>,
@@ -44,7 +16,7 @@ export interface QuizCharacterManagerParams {
     requestPlayAudio: (sentence: string) => void
 }
 
-export class QuizCharacterManager {
+export class QuizCharacter {
     exampleSentences$: Observable<AtomizedSentence[]>;
     quizzingCard$: Observable<ICard | undefined>;
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
@@ -63,19 +35,16 @@ export class QuizCharacterManager {
         this.exampleSentencesFrame = new OpenBook(
             'ExampleSentences',
             trie$,
+            this.exampleSentences$.pipe(
+                map(sentences => {
+                    return interpolateSourceDoc(sentences.map(sentence => {
+                        return sentence.translatableText;
+                    }).concat(Array(10).fill('_')));
+                }),
+                AtomizedStringsForRawHTML,
+                map(atomizedStrings => AtomizedDocument.fromString(atomizedStrings[0]))
+            )
         );
-        this.exampleSentences$.pipe(
-            map(sentences => {
-                /*
-                                if (sentences.length) {
-                                    debugger;console.log();
-                                }
-                */
-                return interpolateSourceDoc(sentences.map(sentence => {
-                    return sentence.translatableText;
-                }).concat(Array(10).fill('_')));
-            }),
-        ).subscribe(this.exampleSentencesFrame.unAtomizedSrcDoc$);
 
         this.quizzingCard$.pipe(
             distinct(card => card?.learningLanguage)

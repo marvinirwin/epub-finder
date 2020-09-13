@@ -14,10 +14,13 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (ev) => {
     const url = ev.data as string;
     const response = await fetch(url);
-    const srcDoc = new TextDecoder().decode(await   response.arrayBuffer());
-    let message = (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcDoc).document);
+    const srcdoc = new TextDecoder().decode(await response.arrayBuffer());
+    let doc = AtomizedDocument.atomizeDocument(srcdoc);
     ctx.postMessage(
-        message
+        [
+            doc.toString(),
+            doc.getChunkedDocuments().map(doc => doc.toString())
+        ]
     );
 };
 

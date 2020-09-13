@@ -5,7 +5,14 @@ import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDoc
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
 
-export const AtomizeSrcDoc = async (HTMLString: string) => GetWorkerResults(new AtomizeSrcdocWorker(), HTMLString);
+export const AtomizeSrcDoc: (s: string) => Promise<string[]> = async (HTMLString: string) => {
+    return GetWorkerResults<string[]>(new AtomizeSrcdocWorker(), HTMLString);
+};
 
-export const AtomizeUrl = async (url: string) => localStorage.getItem(AtomizeUrlKey(url)) || GetWorkerResults(new AtomizeUrlWorker(), url);
+export const AtomizeUrl: (s: string) => Promise<string[]> =
+    async (url: string) => {
+        let storedArray = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '[]');
+        return storedArray.length ? storedArray :
+            GetWorkerResults<string[]>(new AtomizeUrlWorker(), url);
+    };
 export const AtomizeUrlKey = (url: string) => `ATOMIZED_URL_${url}`;

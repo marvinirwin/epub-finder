@@ -1,6 +1,6 @@
-import {combineLatest, Observable, Subject} from "rxjs";
-import {map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
-import {getAtomizedDocumentBookStats, getBookWordData, OpenBook} from "../BookFrame/OpenBook";
+import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
@@ -11,26 +11,34 @@ import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export class OpenBooks {
     openedBooks = new DeltaScanner<OpenBook, 'characterPageFrame' | 'readingFrames' | string>();
-    atomizedSentences$: Observable<AtomizedSentence[]>;
+    renderedAtomizedSentences: Observable<AtomizedSentence[]>;
     addOpenBook$ = new Subject<Website>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
-    sourceBookSentenceData$: Observable<BookWordData[]>;
+    renderedBookSentenceData$: Observable<BookWordData[]>;
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
+    library$: Observable<ds_Dict<OpenBook>>;
+    readingBook: OpenBook;
+    sourceBooks$: Observable<ds_Dict<OpenBook>>;
+    readingDocument$: Observable<AtomizedDocument>;
+    readingBook$ = new ReplaySubject<OpenBook>(1);
 
     constructor(
         private config: OpenBooksConfig
     ) {
         this.addOpenBook$
-            .pipe(map(page => {
-                const b = new OpenBook(page.name, config.trie$);
-                b.url$.next(page.url)
-                return b;
-            }))
-            .subscribe(openBook => {
+            .pipe(
+                map(page => {
+                    const b = new OpenBook(page.name, config.trie$);
+                    b.url$.next(page.url)
+                    return b;
+                }),
+            )
+            .subscribe((openBook) => {
                 this.openedBooks.appendDelta$.next(
                     {
                         nodeLabel: 'root',
@@ -49,9 +57,10 @@ export class OpenBooks {
                 )
             });
 
+
         this.applyListenersToOpenedBookBodies();
 
-        this.atomizedSentences$ = this.openedBooks
+        this.renderedAtomizedSentences = this.openedBooks
             .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
                 switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence>>>) => {
                     return combineLatest(
@@ -91,12 +100,40 @@ export class OpenBooks {
                         })
                     })
                 })
-        })
-        this.sourceBookSentenceData$ = this.renderedSentenceTextDataTree$
+        });
+
+        this.sourceBooks$ = this.openedBooks.updates$.pipe(
+            map(({sourced}) => {
+                const readingFrames = sourced?.children?.['readingFrames'];
+                return Object.fromEntries(
+                    readingFrames ? flattenTree<OpenBook>(
+                        readingFrames
+                    ).map(frame => [frame.name, frame]) : []
+                );
+            })
+        );
+
+        this.library$ = this.sourceBooks$.pipe(
+            switchMap(sourceBooks =>
+                combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))
+            ),
+            map(bookChildrenList => {
+                return Object.fromEntries(
+                        flatten(
+                            bookChildrenList.map(
+                                bookChildrenMap => Object.values(bookChildrenMap).map(bookChild => [bookChild.name, bookChild])
+                            )
+                        )
+                    );
+                }
+            )
+        )
+
+        this.renderedBookSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
-                    let readingFrames = sourced?.children?.['readingFrames'];
+                    const readingFrames = sourced?.children?.['readingFrames'];
                     return combineLatest(readingFrames ? flattenTree<Observable<BookWordData[]>>(readingFrames) : []);
                 }),
                 map((v: BookWordData[][]) => {
@@ -147,6 +184,28 @@ export class OpenBooks {
             ),
             shareReplay(1)
         );
+
+        this.sourceBooks$.pipe(
+            withLatestFrom(this.readingBook$)
+        ).subscribe(([openSourceBooks, readingBook]) => {
+            let openBooks = Object.values(openSourceBooks);
+            if (!readingBook && openBooks.length) {
+                this.readingBook$.next(openBooks[0]);
+            }
+        });
+
+        this.readingDocument$ = this.readingBook$.pipe(
+            switchMap(readingBook => {
+                if (!readingBook) return of<AtomizedDocument>();
+                return readingBook.atomizedDocument$;
+            }),
+            shareReplay(1)
+        )
+        this.readingBook = new OpenBook(
+            "Reading Book",
+            config.trie$,
+            this.readingDocument$
+        )
     }
 
     private applyListenersToOpenedBookBodies() {

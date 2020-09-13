@@ -13,9 +13,12 @@ const ctx: Worker = self as any;
 // Respond to message from parent thread
 ctx.onmessage = (ev) => {
     const srcdoc = ev.data as string;
-    let message = (new XMLSerializer()).serializeToString(AtomizedDocument.atomizeDocument(srcdoc).document);
+    let doc = AtomizedDocument.atomizeDocument(srcdoc);
     ctx.postMessage(
-        message
+        [
+            doc.toString(),
+            ...doc.getChunkedDocuments().map(doc => doc.toString())
+        ]
     );
 };
 

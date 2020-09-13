@@ -23,11 +23,11 @@ const useStyles = makeStyles((theme) => ({
 
 
 export function BottomNav({m}: { m: Manager }) {
-    const item = useObservableState(m.bottomNavigationValue$)
+    const navigationPage = useObservableState(m.bottomNavigationValue$)
     const classes = useStyles();
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
     return <BottomNavigation className={classes.bottomNav}
-        value={item}
+        value={navigationPage}
         onChange={(_, v) => m.bottomNavigationValue$.next(v)}
         ref={setReferenceElement}
     >

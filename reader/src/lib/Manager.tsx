@@ -34,7 +34,7 @@ import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
-import {QuizCharacterManager} from "./Manager/QuizCharacterManager";
+import {QuizCharacter} from "./Manager/QuizCharacter";
 import {ds_Dict, ds_Tree} from "./Util/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
@@ -76,7 +76,7 @@ export class Manager {
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
-    public quizCharacterManager: QuizCharacterManager;
+    public quizCharacterManager: QuizCharacter;
     public authenticationMonitor = new AuthenticationMonitor();
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
@@ -101,6 +101,7 @@ export class Manager {
 
     wordCounts$: Observable<Dictionary<BookWordCount[]>>;
     sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
+
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
@@ -127,7 +128,7 @@ export class Manager {
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
         const {wordElementMap$, wordCounts$, wordSentenceMap, sentenceMap$, bookWordCounts} = splitTextDataStreams$(
-            this.openedBooksManager.sourceBookSentenceData$.pipe(
+            this.openedBooksManager.renderedBookSentenceData$.pipe(
                 map(textData => {
                         return mergeSentenceInfo(...textData);
                     }
@@ -158,11 +159,13 @@ export class Manager {
             if (quizzingCard && !indexedScheduleRows[quizzingCard.learningLanguage]) {
                 this.quizManager.requestNextCard$.next();
             }
-        })
-        this.quizCharacterManager = new QuizCharacterManager(
+        });
+
+        const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
+        this.quizCharacterManager = new QuizCharacter(
             {
                 exampleSentences$: combineLatest([
-                    this.openedBooksManager.sourceBookSentenceData$,
+                    this.openedBooksManager.renderedBookSentenceData$,
                     this.quizManager.quizzingCard$
                 ]).pipe(
                     map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
@@ -202,20 +205,13 @@ export class Manager {
         CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooksManager, this.editingCardManager, this.cardDBManager, this.audioManager)
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
-
-
         merge(
-            this.openedBooksManager.atomizedSentences$,
+            this.openedBooksManager.renderedAtomizedSentences,
             this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
         ).subscribe(atomizedSentenceList => {
                 BrowserInputs.applyAtomizedSentenceListeners(atomizedSentenceList);
             }
         )
-
-        this.quizCharacterManager.exampleSentencesFrame.frame.iframe$.subscribe((iframe: HTMLIFrameElement) => {
-            this.inputManager.applyBodyListeners((iframe.contentDocument as Document).body);
-        });
-
 
         this.wordElementMap$ = combineLatest([
             this.wordElementMap$.pipe(

@@ -7,9 +7,9 @@ import {jestDetected} from "../Util/Util";
 import {AtomizeUrl} from "../Workers/WorkerHelpers";
 import {UnitTestGetPageSrcText} from "../../test/Util/Run";
 
-export const AtomizedStringForURL = (rawHTML$: Observable<string>): Observable<string> => {
+export const AtomizedStringsForURL = (rawHTML$: Observable<string>): Observable<string[]> => {
     return rawHTML$.pipe(
-        switchMap(AtomizeUrl),
+        switchMap(AtomizeUrl)
     )
     /*
         if (jestDetected()) {

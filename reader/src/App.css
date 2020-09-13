@@ -168,3 +168,13 @@
     cursor: pointer;
 }
 
+.library {
+    position: fixed;
+    width: 25vw;
+    right: -20vw;
+    margin-top: 25vh;
+}
+.library:hover {
+    transform: translateX(25vw);
+}
+

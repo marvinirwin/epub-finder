@@ -1,24 +1,17 @@
-import {combineLatest, merge, Observable, ReplaySubject} from "rxjs";
-import {map, shareReplay} from "rxjs/operators";
+import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
+import {map, pluck, shareReplay} from "rxjs/operators";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
-import {Frame} from "./Frame";
 import {AtomizedDocumentBookStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
 import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {BrowserInputs} from "../Manager/BrowserInputs";
-import {AtomizedStringForRawHTML} from "../Pipes/AtomizedStringForRawHTML";
+import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {AtomizedStringForURL} from "../Pipes/AtomizedStringForURL";
-import {sleep} from "../Util/Util";
-
-/*
-export type AtomizedDocumentSentenceDataPipe = (atomizedSrcDocStringAndTrie$: Observable<[string, TrieWrapper]>) => Observable<AtomizedDocumentStats>;
-export type AtomizedDocumentStringPipe = (unatomizedSrcDoc$: Observable<string>) => Observable<string>;
-*/
+import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
 
 export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentBookStats {
     return {
@@ -28,6 +21,7 @@ export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name:
         )
     }
 }
+
 export function getBookWordData(stats: TextWordData, name: string): BookWordData {
     return {
         ...stats,
@@ -38,7 +32,6 @@ export function getBookWordData(stats: TextWordData, name: string): BookWordData
 }
 
 export class OpenBook {
-    public frame = new Frame();
     public id: string;
     public text$: Observable<string>;
     public wordCountRecords$: Observable<BookWordCount[]>;
@@ -46,35 +39,41 @@ export class OpenBook {
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
     public bookStats$: Observable<AtomizedDocumentBookStats>;
 
-    public unAtomizedSrcDoc$ = new ReplaySubject<string>(1);
+    public unAtomizedSrcDoc$: Observable<string> = new ReplaySubject<string>(1);
     public url$ = new ReplaySubject<string>(1)
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
     atomizedSrcDocString$: Observable<string>;
     atomizedDocument$: Observable<AtomizedDocument>;
 
+    children$: Observable<ds_Dict<OpenBook>>;
+    atomizedSrcDocStrings$: Observable<string[]>;
+
+
     constructor(
         public name: string,
         public trie: Observable<TrieWrapper>,
+        atomizedDocuments$?: Observable<AtomizedDocument>
     ) {
         this.id = name;
-        this.atomizedSrcDocString$ = merge(
+        this.atomizedSrcDocStrings$ = merge(
             this.unAtomizedSrcDoc$.pipe(
-                AtomizedStringForRawHTML
+                AtomizedStringsForRawHTML,
             ),
             this.url$.pipe(
-                AtomizedStringForURL
+                AtomizedStringsForURL,
             )
-        );
-        this.atomizedDocument$ = this.atomizedSrcDocString$.pipe(
-/*
-            tap(() => {
-                if (this.name === 'ExampleSentences') {
-                    debugger;console.log()
-                }
+        ).pipe(shareReplay(1));
+        this.atomizedSrcDocString$ = this.atomizedSrcDocStrings$.pipe(
+            map(strings => {
+                debugger;
+                return strings[0];
             }),
-*/
-            map(AtomizedDocument.fromString)
+            shareReplay(1)
+        );
+        this.atomizedDocument$ = atomizedDocuments$ || this.atomizedSrcDocString$.pipe(
+            map(AtomizedDocument.fromString),
+            shareReplay(1)
         )
         this.bookStats$ = combineLatest([
             this.atomizedDocument$,
@@ -108,9 +107,26 @@ export class OpenBook {
             ),
             shareReplay(1)
         )
+
+        this.children$ = this.atomizedSrcDocStrings$.pipe(
+            map(([originalDoc, ...documentChunks]) => {
+                    return Object.fromEntries(
+                        documentChunks.map((childDocStr, index) => {
+                            let childName = `${this.name}_${index}`;
+                            const childDoc = of(AtomizedDocument.fromString(childDocStr))
+                            return [
+                                childName,
+                                new OpenBook(childName, trie, childDoc)
+                            ];
+                        })
+                    );
+                }
+            ),
+            shareReplay(1)
+        );
     }
+
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
-        await sleep(500);
         // @ts-ignore
         const t = body.ownerDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
         const sentences = printExecTime("Rehydration", () => {

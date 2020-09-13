@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {Card, CardContent, Slide, Typography, Link} from "@material-ui/core";
+import {Card, CardContent, Slide, Typography, Link, List, ListItemText, ListItem} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
@@ -39,7 +39,8 @@ export function SlidingTopWindows({m}: { m: Manager }) {
         {
             <Slide direction="down" in={!!showEditingCard}>
                 <div>
-                    {editingCard && <EditingCardComponent className={'editing-card-dropdown'} card={editingCard} m={m}/>}
+                    {editingCard &&
+                    <EditingCardComponent className={'editing-card-dropdown'} card={editingCard} m={m}/>}
                 </div>
             </Slide>
         }
@@ -68,6 +69,25 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     </div>;
 }
 
+
+export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => {
+    const library = useObservableState(m.openedBooksManager.library$);
+    return <div className={'library'}>
+        <List dense={true}>
+            {
+                Object.values(library || {}).map(libraryBook => {
+                    return <ListItem className={'library-book'}>
+                        <ListItemText primary={libraryBook.name} onClick={() => m.openedBooksManager.readingBook$.next(libraryBook)} />
+                    </ListItem>;
+                })
+            }
+        </List>
+    </div>
+}
+
 export function ReadingPage({m}: { m: Manager }) {
-    return <SlidingTopWindows m={m}/>
+    return <Fragment>
+        <SlidingTopWindows m={m}/>
+        <LibrarySidebar m={m}/>
+    </Fragment>
 }

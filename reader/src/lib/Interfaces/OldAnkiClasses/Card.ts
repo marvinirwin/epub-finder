@@ -66,7 +66,8 @@ export interface SerializedCard {
 }
 
 
+const chineseCharacterRegexp = /[\u4E00-\uFA29]/;
 // Dont know if this matches simplified or traditional
 export function isChineseCharacter(s: string) {
-    return s.match(/[\u4E00-\uFA29]/);
+    return s.match(chineseCharacterRegexp);
 }

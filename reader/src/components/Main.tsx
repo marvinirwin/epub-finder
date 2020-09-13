@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect} from "react";
+import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./Nav/BottomNav";
 import {Manager} from "../lib/Manager";
@@ -55,30 +55,15 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
 
 export function Main({m}: { m: Manager }) {
     const classes = useStyles();
-    const item = useObservableState(m.bottomNavigationValue$);
-    const SelectedPage = resolveCurrentComponent(item, m);
+    const currentPage = useObservableState(m.bottomNavigationValue$);
+    const SelectedPage = resolveCurrentComponent(currentPage, m);
     useEffect(() => {
         m.inputManager.applyBodyListeners(document.body);
     }, [m]);
 
-    const [allBookFrames] = useObservableState<OpenBook[]>(
-        () => m.openedBooksManager
-            .openedBooks
-            .updates$
-            .pipe(
-                map(({sourced}) => {
-                    let readingFrames = sourced?.children?.['readingFrames'];
-                    if (readingFrames) {
-                        return flattenTree(readingFrames);
-                    } else {
-                        return [];
-                    }
-                })
-            ),
-        []
-    );
-    const iframeVisible = item === NavigationPages.READING_PAGE;
-    const characterPageShows = item === NavigationPages.QUIZ_PAGE;
+    const readingBook = m.openedBooksManager.readingBook;
+    const iframeVisible = currentPage === NavigationPages.READING_PAGE;
+    const characterPageShows = currentPage === NavigationPages.QUIZ_PAGE;
 
     const alertMessagesVisible = useObservableState(m.alertMessagesVisible$);
     const alertMessages = useObservableState(m.alertMessages$);
@@ -96,25 +81,28 @@ export function Main({m}: { m: Manager }) {
             }}>
             <OpenedBook openedBook={m.quizCharacterManager.exampleSentencesFrame}/>
         </StaticFrame>
-        {allBookFrames.map(page => <StaticFrame
-                visible={iframeVisible}
-                key={page.name}
-                visibleStyle={{
-                    position: 'absolute',
-                    height: '90vh',
-                    width: '100vw',
-                    overflow: 'hidden',
-                    zIndex: 1
-                }}>
-                <OpenedBook openedBook={page}/>
-            </StaticFrame>
-        )}
+
+        <StaticFrame
+            visible={iframeVisible}
+            visibleStyle={{
+                position: 'absolute',
+                height: '90vh',
+                width: '100vw',
+                overflow: 'hidden',
+                zIndex: 1
+            }}
+        >
+            {readingBook && <OpenedBook openedBook={readingBook}/>}
+        </StaticFrame>
         <ImageSelectPopup m={m}/>
         <div style={{
             overflow: 'auto',
             height: '90vh',
         }}>
-            {SelectedPage}
+            {currentPage === NavigationPages.QUIZ_PAGE && <QuizPage m={m}/>}
+            {currentPage === NavigationPages.TRENDS_PAGE && <ScheduleTablePage m={m}/>}
+            {(currentPage === NavigationPages.READING_PAGE || !currentPage) && <ReadingPage m={m}/>}
+            {currentPage === NavigationPages.SETTINGS_PAGE && <SettingsPage m={m}/>}
         </div>
         <Snackbar
             open={alertMessagesVisible}

@@ -8,6 +8,8 @@ import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {mergeSentenceInfo} from "./TextWordData";
+import {chunk} from 'lodash';
+import {interpolateSourceDoc} from "./AtomizedDocumentFromSentences";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -78,14 +80,19 @@ export class AtomizedDocument {
     constructor(public document: XMLDocument) {
     }
 
-    replaceHrefOrSource(el: Element, qualifiedName: string) {
+    public getChunkedDocuments() {
+        return chunk(this.getAtomizedSentences(), 20)
+            .map(sentenceChunk => AtomizedDocument.fromString(interpolateSourceDoc(sentenceChunk.map(sentence => sentence.translatableText))))
+    }
+
+    private static replaceHrefOrSource(el: Element, qualifiedName: string) {
         let currentSource = el.getAttribute(qualifiedName);
         if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
         }
     }
 
-    getTextElements(doc: Document) {
+    private getTextElements(doc: Document) {
         const leaves: Element[] = [];
 
         function walk(node: Node, cb: (n: Node) => any) {
@@ -165,9 +172,9 @@ export class AtomizedDocument {
             switch (node.nodeType) {
                 case 1: // Element node
                     const el = node as Element;
-                    this.replaceHrefOrSource(el, "src");
+                    AtomizedDocument.replaceHrefOrSource(el, "src");
                     if (el.localName === "link") {
-                        this.replaceHrefOrSource(el, "href");
+                        AtomizedDocument.replaceHrefOrSource(el, "href");
                     }
                 case 9: // Document node
                     child = node.firstChild;
@@ -280,7 +287,7 @@ export class AtomizedDocument {
         });
     }
 
-    toString() {
+    public toString() {
         return new XMLSerializer().serializeToString(this.document);
     }
 }
