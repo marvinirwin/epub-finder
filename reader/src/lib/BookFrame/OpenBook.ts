@@ -66,7 +66,6 @@ export class OpenBook {
         ).pipe(shareReplay(1));
         this.atomizedSrcDocString$ = this.atomizedSrcDocStrings$.pipe(
             map(strings => {
-                debugger;
                 return strings[0];
             }),
             shareReplay(1)
@@ -80,6 +79,7 @@ export class OpenBook {
             trie
         ]).pipe(
             map(([document, trie]) => {
+                debugger;
                 const stats = document.getDocumentStats(trie);
                 return getAtomizedDocumentBookStats(stats, this.name);
             }),
@@ -110,10 +110,13 @@ export class OpenBook {
 
         this.children$ = this.atomizedSrcDocStrings$.pipe(
             map(([originalDoc, ...documentChunks]) => {
-                    return Object.fromEntries(
+                debugger;
+                return Object.fromEntries(
                         documentChunks.map((childDocStr, index) => {
                             let childName = `${this.name}_${index}`;
-                            const childDoc = of(AtomizedDocument.fromString(childDocStr))
+                            debugger;
+                            let args = AtomizedDocument.fromString(childDocStr);
+                            const childDoc = of(args)
                             return [
                                 childName,
                                 new OpenBook(childName, trie, childDoc)

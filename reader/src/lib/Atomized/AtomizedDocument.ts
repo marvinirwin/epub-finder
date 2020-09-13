@@ -82,7 +82,7 @@ export class AtomizedDocument {
 
     public getChunkedDocuments() {
         return chunk(this.getAtomizedSentences(), 20)
-            .map(sentenceChunk => AtomizedDocument.fromString(interpolateSourceDoc(sentenceChunk.map(sentence => sentence.translatableText))))
+            .map(sentenceChunk => AtomizedDocument.atomizeDocument(interpolateSourceDoc(sentenceChunk.map(sentence => sentence.translatableText))))
     }
 
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {

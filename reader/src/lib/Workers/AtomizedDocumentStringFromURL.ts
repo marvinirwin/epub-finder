@@ -19,7 +19,7 @@ ctx.onmessage = async (ev) => {
     ctx.postMessage(
         [
             doc.toString(),
-            doc.getChunkedDocuments().map(doc => doc.toString())
+            ...doc.getChunkedDocuments().map(doc => doc.toString())
         ]
     );
 };

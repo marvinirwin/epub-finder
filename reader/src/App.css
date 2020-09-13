@@ -173,8 +173,11 @@
     width: 25vw;
     right: -20vw;
     margin-top: 25vh;
+    z-index: 3;
+    transition: transform 0.5s;
 }
 .library:hover {
-    transform: translateX(25vw);
+    transform: translateX(-10vw);
+    cursor: pointer;
 }
 
