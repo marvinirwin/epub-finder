@@ -168,11 +168,11 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
 
 export function flattenTree<T, U extends string = string>(tree: ds_Tree<T, U>, a: T[] = []): T[] {
     if (!tree) {
-        debugger;
+        throw new Error("Tree is undefined")
     }
     if (tree.hasOwnProperty('value')) {
         if (!tree.value) {
-            debugger;
+            throw new Error("Tree has no value")
         }
         a.push(tree.value as T);
     }

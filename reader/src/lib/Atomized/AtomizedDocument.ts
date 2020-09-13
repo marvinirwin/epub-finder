@@ -269,7 +269,7 @@ export class AtomizedDocument {
             const body = this.findBody();
             body.insertBefore(popperEl, body.firstChild);
             if (!this.findPopperContainer()) {
-                debugger;console.log();
+                throw new Error("Cannot find popper container")
             }
         }
         // @ts-ignore

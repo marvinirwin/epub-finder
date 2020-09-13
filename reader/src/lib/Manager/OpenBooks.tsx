@@ -82,13 +82,11 @@ export class OpenBooks {
         this.renderedSentenceTextDataTree$ = this
             .openedBooks
             .mapWith(bookFrame => {
-                debugger;
                     return combineLatest([
                         bookFrame.renderedSentences$,
                         config.trie$
                     ]).pipe(
                         map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
-                            debugger;
                                 return Object.entries(sentences).map(([sentenceStr, sentence]) =>
                                     getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
                                 );
@@ -193,9 +191,10 @@ export class OpenBooks {
         );
 
         this.sourceBooks$.pipe(
+            switchMap(sourceBooks => combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))),
             withLatestFrom(this.readingBook$.pipe(startWith(undefined)))
         ).subscribe(([openSourceBooks, readingBook]) => {
-            let openBooks = Object.values(openSourceBooks);
+            let openBooks = flatten(openSourceBooks.map(openSourceBookChildren => Object.values(openSourceBookChildren)));
             if (!readingBook && openBooks.length) {
                 this.readingBook$.next(openBooks[0]);
             }

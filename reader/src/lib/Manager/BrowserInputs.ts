@@ -55,8 +55,7 @@ export class BrowserInputs {
             sentenceHTMLElement.classList.add('applied-sentence-listener');
             let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
             if (!sentenceHTMLElement || !popperHTMLElement) {
-                debugger;
-                console.log();
+                throw new Error("Cannot find sentenceElement or popperElement")
             }
             try {
                 createPopper(sentenceHTMLElement, popperHTMLElement, {
