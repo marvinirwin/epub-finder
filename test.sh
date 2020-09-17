@@ -15,10 +15,10 @@ docker run  -p 4444:4444 \
 
 
 docker run \
-  --rm \
   --network=host \
+  --rm \
   --mount=type=bind,source=$PWD/specs,target=/specs \
   quickstrom/quickstrom:latest \
   quickstrom check \
-  /specs/Example.spec.purs \
-  http://host.docker.internal:3000/ # or http://host.docker.internal:3000 for MacOS
+  /specs/Default.spec.purs \
+  http://host.docker.internal:3000/

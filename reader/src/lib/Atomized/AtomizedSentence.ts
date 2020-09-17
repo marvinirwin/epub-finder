@@ -94,7 +94,7 @@ export class AtomizedSentence {
             let annotationElement: IAnnotatedCharacter = {
                 char: (textContent as string)[i],
                 words: words,
-                el: currentMark,
+                element: currentMark,
                 maxWord,
                 i,
                 parent: this

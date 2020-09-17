@@ -42,6 +42,7 @@ import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
 import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
+import { Highlighter } from "./Manager/Highlighter";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -78,9 +79,11 @@ export class Manager {
     public viewingFrameManager = new ViewingFrameManager();
     public quizCharacterManager: QuizCharacter;
     public authenticationMonitor = new AuthenticationMonitor();
+    public highlighter: Highlighter;
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
+
 
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
@@ -88,16 +91,12 @@ export class Manager {
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
     );
 
-    highlightedWord$ = new ReplaySubject<string | undefined>(1);
-    highlightedSentence$ = new ReplaySubject<string | undefined>(1)
 
     readingWordElementMap!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     setQuizWord$: Subject<string> = new Subject<string>();
 
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
-
-    highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
 
     readingWordCounts$: Observable<Dictionary<BookWordCount[]>>;
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
@@ -344,7 +343,7 @@ export class Manager {
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
-        const child: HTMLElement = annotationElement.el as unknown as HTMLElement;
+        const child: HTMLElement = annotationElement.element as unknown as HTMLElement;
         child.classList.add("applied-word-element-listener");
         child.onmouseenter = (ev) => {
             if (maxWord) {
@@ -356,7 +355,7 @@ export class Manager {
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
                  * whereas other browsers will return a Selection object with Selection.type set to None.
                  */
-                const selection = (annotationElement.el.ownerDocument as Document).getSelection();
+                const selection = (annotationElement.element.ownerDocument as Document).getSelection();
                 if (selection?.anchorNode === child.parentElement) {
                     selection.extend(child, 1);
                 } else {

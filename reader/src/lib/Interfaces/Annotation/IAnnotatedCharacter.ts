@@ -5,7 +5,7 @@ import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 export interface IAnnotatedCharacter {
     words: IPositionedWord[];
     char: string;
-    el: XMLDocumentNode;
+    element: XMLDocumentNode;
     maxWord: IPositionedWord | undefined;
     i: number;
     parent: AtomizedSentence;

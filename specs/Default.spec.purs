@@ -1,10 +1,15 @@
+-- The following specifies a audio player, featuring a button that
+-- toggles between the paused and playing states. The system under
+-- test in this case is `RecordPlayer.html`.
 module AudioPlayer where
 
 import Quickstrom
 import Data.Maybe (Maybe(..))
 
+-- The specification waits for a DOM element matching a CSS selector
+-- before taking any action.
 readyWhen :: Selector
-readyWhen = "#quiz_page"
+readyWhen = ".audio-player"
 
 -- Based on the specified actions, Quickstrom generates click actions
 -- for all clickable elements.
@@ -18,27 +23,32 @@ proposition :: Boolean
 proposition =
   let
     -- When in the `playing` state, the button text is "Pause"
-    atQuizPage = selectedNavItemId == Just "quiz_page"
+    playing = buttonText == Just "Pause"
 
     -- When in the `paused` state, the button text is "Play"
-    atReadingPage = selectedNavItemId == Just "reading_page"
+    paused = buttonText == Just "Play"
 
     -- The `play` transition means going from `paused` to `playing`
-    quizPageToReadingPage =
-      atQuizPage
-        && next atReadingPage
+    play =
+      paused
+        && next playing
+        && timeDisplayText
+        == next timeDisplayText
 
     -- The `pause` transition means going from `playing` to `paused`
-    readingpageToQuizPage =
-      atReadingPage
-        && next atQuizPage
+    pause =
+      playing
+        && next paused
+        && timeDisplayText
+        == next timeDisplayText
 
     -- The `tick` transitions happens when we're in `playing`,
     -- changing the time display's text
-    editCardDropsDown =
-      (atQuizPage || atReadingPage) -- TODO can I use || like this?
-        && next editingCardIsDroppedDown
-    
+    tick =
+      playing
+        && next playing
+        && timeDisplayText
+        /= next timeDisplayText
   in
     -- This last part is the central part of the specification,
     -- describing the initial state and the possible transitions. It
@@ -47,13 +57,13 @@ proposition =
     --   Initially, the record player is paused. From that point, one
     --   can either play or pause, or the time can tick while playing,
     --   all indefinitely.
-    always (atQuizPage || atReadingPage)
+    paused && always (play || pause || tick)
 
-selectedNavItemId :: Maybe String
-selectedNavItemId = map _.textContent (queryOne "MuiBottomNavigationAction-root Mui-selected" { textContent })
+-- This helper definition finds an optional text for the play/pause
+-- button.
+buttonText :: Maybe String
+buttonText = map _.textContent (queryOne ".play-pause" { textContent })
 
--- quizzingCharacterText :: Maybe String
--- quizzingCharacterText = map _.textContent (queryOne ".quiz-character" { textContent })
-
-editingCardIsDroppedDown :: Maybe String
-editingCardIsDroppedDown = map _.textContent (queryOne ".editing-card-dropdown" { textContent })
+-- This helper definition finds an optional text for the time display.
+timeDisplayText :: Maybe String
+timeDisplayText = map _.textContent (queryOne ".time-display" { textContent })
