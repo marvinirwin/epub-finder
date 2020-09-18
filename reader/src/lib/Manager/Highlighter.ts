@@ -5,7 +5,7 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {map, withLatestFrom} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {ScheduleRow, wordRecognitionScore} from "../ReactiveClasses/ScheduleRow";
+import {dueDate, ScheduleRow, wordRecognitionScore} from "../ReactiveClasses/ScheduleRow";
 import {colorForPercentage} from "../color/Range";
 
 function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => TimedHighlightDelta {
@@ -61,14 +61,29 @@ export class Highlighter {
             config.visibleElements$,
             'CREATED_CARDS_HIGHLIGHT'
         );
+        const now = new Date();
+        function clamp(min: number, max: number, v: number) {
+            if (v < min) return min;
+            if (v > max) return max;
+            return v;
+        }
+        function getDatePercentage(d: Date): number {
+            const date = d.getTime();
+            const sevenDays = 86400000 * 7;
+            const SevenDaysAgo = now.getTime() - sevenDays;
+            const sevenDaysInTheFuture = now.getTime() + sevenDays;
+            const fourteenDays = sevenDays * 2;
+            const clampedDate = clamp(0.001, fourteenDays - 0.001 , date - SevenDaysAgo);
+            const percentage = clampedDate / fourteenDays * 100;
+            return percentage;
+        }
         singleHighlight(
             this.highlightWithDifficulty$.pipe(map(indexedScheduleRows => {
                 const highlights: HighlightDelta = {};
                 for (let word in indexedScheduleRows) {
                     const row = indexedScheduleRows[word];
                     if (row.wordRecognitionRecords.length) {
-                        const score = wordRecognitionScore(indexedScheduleRows[word]) + 0.0001;
-                        highlights[word] = colorForPercentage(score / 5 + 100);
+                        highlights[word] = colorForPercentage(getDatePercentage(dueDate(indexedScheduleRows[word])));
                     }
                 }
                 return highlights;
