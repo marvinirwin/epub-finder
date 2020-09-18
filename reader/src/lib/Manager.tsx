@@ -85,7 +85,6 @@ export class Manager {
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
 
-
     queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
@@ -102,6 +101,8 @@ export class Manager {
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
+
+
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(

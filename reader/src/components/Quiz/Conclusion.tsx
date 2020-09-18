@@ -1,7 +1,6 @@
 import React, {useEffect, useState, Fragment} from "react";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
-import {Card, CardActions, CardContent} from "@material-ui/core";
-import EditingCardComponent from "../Card/EditingCardComponent";
+import {Card, CardContent} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {QuizCardProps} from "./Popup";
 import {quizStyles} from "./QuizStyles";
@@ -16,7 +15,6 @@ export function Conclusion({c, m}: QuizCardProps) {
         setEditingCard(c ? EditingCard.fromICard(
             c,
             m.cardDBManager,
-            m.audioManager,
             m.cardManager
         ) : null);
     }, [c, m])

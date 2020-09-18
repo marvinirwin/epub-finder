@@ -33,7 +33,6 @@ export class EditingCard {
 
     constructor(
         public persistor: IndexDBManager<ICard>,
-        public a: AudioManager,
         private c: CardManager,
         public timestamp?: Date | number | undefined,
     ) {
@@ -115,8 +114,11 @@ export class EditingCard {
         ).pipe(skip(1));
     }
 
-    static fromICard(iCard: ICard, persistor: IndexDBManager<ICard>, m: AudioManager, c: CardManager): EditingCard {
-        const e = new EditingCard(persistor, m, c);
+    static fromICard( iCard: ICard, persistor: IndexDBManager<ICard>, c: CardManager): EditingCard {
+        const e = new EditingCard(
+            persistor,
+            c
+        );
         e.deck$.next(iCard.deck || "");
         e.photos$.next(iCard.photos);
         e.illustrationPhotos$.next(iCard.illustrationPhotos);

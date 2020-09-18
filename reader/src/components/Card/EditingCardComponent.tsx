@@ -13,6 +13,8 @@ import {IconButton} from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import {HotkeyWrapper} from "../HotkeyWrapper";
+import {map} from "rxjs/operators";
+import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
 
 
 
@@ -62,6 +64,10 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     useSubscription(m.inputManager.getKeyDownSubject('d'), deleteCard);// Maybe I want to make this harder to do
     useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
 
+    const cardIndex = useObservableState(m.scheduleManager.indexedScheduleRows$);
+    const scheduleRow = (cardIndex && characters) ? cardIndex[characters] : undefined;
+    const score = scheduleRow ? wordRecognitionScore(scheduleRow) : undefined;
+
     return <Card className={`${className || ''} ${classes.root}`}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
@@ -71,7 +77,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                                 <KeyboardArrowUp fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
-                        <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) </Typography>
+                        <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) ({score})</Typography>
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
                         <HotkeyWrapper shortcutKey={"d"}>
                             <IconButton aria-label="delete" onClick={deleteCard}>

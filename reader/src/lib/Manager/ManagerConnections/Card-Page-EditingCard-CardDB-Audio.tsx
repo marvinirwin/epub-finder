@@ -23,7 +23,7 @@ export function CardPageEditingCardCardDBAudio(
     e.requestEditWord$.pipe(
         resolveICardForWord<string, ICard>(c.cardIndex$)
     ).subscribe((icard) => {
-        e.queEditingCard$.next(EditingCard.fromICard(icard, cdb, a, c))
+        e.queEditingCard$.next(EditingCard.fromICard(icard, cdb, c))
         a.queSynthesizedSpeechRequest$.next(icard.learningLanguage);
     });
 }

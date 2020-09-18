@@ -67,7 +67,7 @@ export class Highlighter {
                 for (let word in indexedScheduleRows) {
                     const row = indexedScheduleRows[word];
                     if (row.wordRecognitionRecords.length) {
-                        const score = wordRecognitionScore(indexedScheduleRows[word]);
+                        const score = wordRecognitionScore(indexedScheduleRows[word]) + 0.0001;
                         highlights[word] = colorForPercentage(score / 5 + 100);
                     }
                 }
