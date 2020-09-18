@@ -13,6 +13,7 @@ export class AudioSourceBrowser implements AudioSource {
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
     public mostRecentRecognizedText$: Observable<string>;
+    public error$ = new ReplaySubject<string>(1)
 
     private speechRecognitionToken$ = new ReplaySubject<string>(1);
     private speechConfig$: Observable<SpeechConfig>;
@@ -28,10 +29,20 @@ export class AudioSourceBrowser implements AudioSource {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
         if (navigator.mediaDevices) {
             this.mediaDevices.next(navigator.mediaDevices);
+        } else {
+            this.error$.next(`navigator.mediaDevices not found, cannot use microphone`)
         }
 
         this.mediaSource$ = this.mediaDevices.pipe(
-            flatMap( mediaDevices => mediaDevices.getUserMedia({audio: true})),
+            flatMap( mediaDevices => {
+                try {
+                    return mediaDevices.getUserMedia({audio: true});
+                } catch(e) {
+                    this.error$.next(e);
+                    this.error$.next(`Failed to get Microphone information`);
+                    throw e;
+                }
+            }),
             shareReplay(1)
         );
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
@@ -41,6 +52,7 @@ export class AudioSourceBrowser implements AudioSource {
                         speechConfig.speechRecognitionLanguage = "zh-CN";
                         return speechConfig;
                     } catch (e) {
+                        this.error$.next(e);
                         console.error(e);
                         throw e;
                     }
@@ -54,7 +66,7 @@ export class AudioSourceBrowser implements AudioSource {
                 try {
                     return AudioConfig.fromMicrophoneInput(mediaSource.id);
                 } catch (e) {
-                    console.error(e);
+                    this.error$.next(e);
                     throw e;
                 }
             }),
@@ -86,8 +98,9 @@ export class AudioSourceBrowser implements AudioSource {
         this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
         this.recognizer.recognized = (s, e) => {
             if (e.result.reason == ResultReason.RecognizedSpeech) {
+                debugger;
                 this.recognizedText$.next(e.result.text)
-                this.recognizer?.stopContinuousRecognitionAsync();
+                this.recognizer?.stopContinuousRecognitionAsync(() => this.isRecording$.next(false));
                 this.recognizing = false;
             }
         };
@@ -102,17 +115,17 @@ export class AudioSourceBrowser implements AudioSource {
 
     private getRecognizerError() {
         return (error: string) => {
+            debugger;
             console.error(error);
+            this.error$.next(error);
             this.isRecording$.next(false);
         };
     }
 
     private getRecognizerCB() {
         return () => {
+            debugger;
             this.isRecording$.next(true);
-            this.recognizedText$.pipe(take(1)).toPromise().then(() => {
-                this.isRecording$.next(false);
-            });
         };
     }
 

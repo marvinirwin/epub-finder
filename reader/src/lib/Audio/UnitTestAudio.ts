@@ -2,13 +2,15 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {withLatestFrom, take, shareReplay} from "rxjs/operators";
 import {sleep} from "../Util/Util";
 import {MakeQuerablePromise} from "../Util/QueryablePromise";
+import {AudioSource} from "./AudioSource";
 
-export class UnitTestAudio {
+export class UnitTestAudio implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1);
     public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
     public mostRecentRecognizedText$: Observable<string>;
+    public error$ = new ReplaySubject<string>(1);
     constructor(public text: string) {
         this.beginRecordingSignal$.subscribe(async () => {
             this.isRecording$.next(true);

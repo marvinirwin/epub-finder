@@ -101,7 +101,7 @@ export class Manager {
     readingWordCounts$: Observable<Dictionary<BookWordCount[]>>;
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
-    highlightAllWithDifficultySignal$ = new ReplaySubject<void>(1);
+    highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
@@ -110,7 +110,7 @@ export class Manager {
                 // if has response show the error
                 if (error.response) {
                     this.alertMessagesVisible$.next(true);
-                    this.alertMessages$.next(this.alertMessages$.getValue().concat(JSON.stringify(error.response)).slice(0, 10))
+                    this.appendAlertMessage(JSON.stringify(error.response));
                 }
             }
         );
@@ -243,7 +243,7 @@ export class Manager {
 
         merge(
             this.inputManager.getKeyDownSubject("d"),
-        ).subscribe(() => this.highlightAllWithDifficultySignal$.next())
+        ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
 
         this.inputManager.selectedText$.subscribe(word => {
             this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));
@@ -252,15 +252,13 @@ export class Manager {
         });
 
         let even = 1;
-        this.highlightAllWithDifficultySignal$.pipe(
-            withLatestFrom(this.scheduleManager.indexedScheduleRows$)
-        ).subscribe(([, indexedScheduleRows]) => {
-            even++;
-            if (even % 2) {
-                this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows);
-            } else {
-                this.highlighter.highlightWithDifficulty$.next();
-            }
+        combineLatest([
+            this.highlightAllWithDifficultySignal$,
+            this.scheduleManager.indexedScheduleRows$,
+        ]).subscribe(([signal, indexedScheduleRows]) => {
+            signal ?
+                this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows) :
+                this.highlighter.highlightWithDifficulty$.next({})
         })
 
         combineLatest([
@@ -286,6 +284,9 @@ export class Manager {
                 }
             }
         );
+        this.audioManager.audioRecorder.audioSource.error$.subscribe(error =>
+            this.appendAlertMessage(error)
+        )
 
         this.openedBooks.openedBooks.appendDelta$.next({
             nodeLabel: 'root',
@@ -296,12 +297,16 @@ export class Manager {
                 }
             }
         });
-        this.highlightSavedWord();
         this.cardManager.load();
     }
 
-    private highlightSavedWord() {
+    private appendAlertMessage(error: string) {
+        const messages = this.alertMessages$.getValue();
+        const MAX_MESSAGES = 10;
+        const sliceStart = messages.length - MAX_MESSAGES > 0 ? messages.length - MAX_MESSAGES : 0;
+        this.alertMessages$.next(messages.concat(error).slice(sliceStart, sliceStart + MAX_MESSAGES));
     }
+
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
