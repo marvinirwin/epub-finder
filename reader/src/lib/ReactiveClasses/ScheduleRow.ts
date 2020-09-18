@@ -7,6 +7,10 @@ export function wordCount(s: ScheduleRow) {
     return sumBy(s.wordCountRecords, wordCountRow => wordCountRow.count)
 }
 
+export function wordRecognitionScore(s: ScheduleRow) {
+    return s.wordRecognitionRecords[s.wordRecognitionRecords.length - 1]?.recognitionScore || 0;
+}
+
 export function dueDate(s: ScheduleRow) {
     return s.wordRecognitionRecords[s.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
 }

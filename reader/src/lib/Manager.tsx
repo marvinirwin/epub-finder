@@ -92,7 +92,6 @@ export class Manager {
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
     );
 
-
     readingWordElementMap!: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     setQuizWord$: Subject<string> = new Subject<string>();
@@ -102,6 +101,7 @@ export class Manager {
     readingWordCounts$: Observable<Dictionary<BookWordCount[]>>;
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
+    highlightAllWithDifficultySignal$ = new ReplaySubject<void>(1);
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
@@ -148,7 +148,8 @@ export class Manager {
                     map(rows => rows.map(row => row.word)),
                     resolveICardForWords(this.cardManager.cardIndex$)
                 ),
-                requestHighlightedWord: s => {}
+                requestHighlightedWord: s => {
+                }
             },
         );
 
@@ -229,49 +230,6 @@ export class Manager {
         }));
 
 
-        let previousHighlightedElements: HTMLElement[] | undefined;
-        let previousHighlightedSentences: HTMLElement[] | undefined;
-
-/*
-        this.highlighter.pipe(debounceTime(10),
-            withLatestFrom(this.openedBooks.visibleElements$))
-            .subscribe(([word, wordElementsMaps]) => {
-                    if (previousHighlightedElements) {
-                        previousHighlightedElements.map(e => e.classList.remove('highlighted'));
-                    }
-                    if (word) {
-                        let dictElement = wordElementsMaps[word];
-                        previousHighlightedElements = dictElement?.map(annotatedEl => {
-                            const html = annotatedEl.el as unknown as HTMLElement;
-                            html.classList.add('highlighted');
-                            return html
-                        });
-                    }
-                }
-            );
-*/
-
-/*
-        this.highlightedSentence$.pipe(
-            debounceTime(10),
-            withLatestFrom(this.readingWordSentenceMap)
-        ).subscribe(([sentence, sentenceMap]) => {
-            if (sentence) {
-                const HIGHLIGHTED_SENTENCE = 'highlighted-sentence';
-                if (previousHighlightedSentences) {
-                    previousHighlightedSentences.map(e => e.classList.remove(HIGHLIGHTED_SENTENCE));
-                }
-                const dictElement = sentenceMap[sentence]
-                previousHighlightedSentences = dictElement?.map(atomizedSentence => {
-                    let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
-                    sentenceHTMLElement.classList.add(HIGHLIGHTED_SENTENCE);
-                    return sentenceHTMLElement;
-                });
-            }
-        })
-*/
-
-
         this.setQuizWord$.pipe(
             resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
         ).subscribe((icard) => {
@@ -283,15 +241,21 @@ export class Manager {
             this.inputManager.getKeyDownSubject("q"),
         ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
 
+        merge(
+            this.inputManager.getKeyDownSubject("d"),
+        ).subscribe(() => this.highlightAllWithDifficultySignal$.next())
+
         this.inputManager.selectedText$.subscribe(word => {
             this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));
             this.audioManager.queSynthesizedSpeechRequest$.next(word);
             this.editingCardManager.requestEditWord$.next(word);
         });
 
-/*
-        this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
-*/
+        this.highlightAllWithDifficultySignal$.pipe(
+            withLatestFrom(this.scheduleManager.indexedScheduleRows$)
+        ).subscribe(([, indexedScheduleRows]) => {
+            this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows);
+        })
 
         combineLatest([
             this.bottomNavigationValue$,
@@ -331,27 +295,6 @@ export class Manager {
     }
 
     private highlightSavedWord() {
-        /*
-                this.cardManager.addPersistedCards$.pipe(
-                    switchMap(atomizedSentences => {
-                            return combineLatest(atomizedSentences.map(atomizedSentence => atomizedSentence.newWords$));
-                        }
-                    ),
-                ).subscribe(async (newWordSets: Set<string>[]) => {
-                    const bigSet = new Set<string>();
-                    for (let i = 0; i < newWordSets.length; i++) {
-                        const newWordSet = newWordSets[i];
-                        Array.from(newWordSet.values()).forEach(word => bigSet.add(word))
-                    }
-                    const newWords = Array.from(bigSet);
-                    for (let i = 0; i < newWords.length; i++) {
-                        const newWord = newWords[i];
-                        this.highlightedWord$.next(newWord);
-                        await sleep(250);
-                    }
-                    this.highlightedWord$.next('');
-                })
-        */
     }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {

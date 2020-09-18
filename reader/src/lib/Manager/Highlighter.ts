@@ -5,6 +5,8 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {map, withLatestFrom} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+import {ScheduleRow, wordRecognitionScore} from "../ReactiveClasses/ScheduleRow";
+import {colorForPercentage} from "../color/Range";
 
 function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => TimedHighlightDelta {
     return (words: string[]) => {
@@ -26,6 +28,7 @@ export class Highlighter {
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
     highlightMap$ = new ReplaySubject<HighlightMap>(1);
+    highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow>>(1);
 
     constructor(config: HighlighterConfig) {
         singleHighlight(
@@ -58,6 +61,27 @@ export class Highlighter {
             config.visibleElements$,
             'CREATED_CARDS_HIGHLIGHT'
         );
+        timedHighlight(
+            this.highlightWithDifficulty$.pipe(map(indexedScheduleRows => {
+                const highlights: TimedHighlightDelta = {
+                    timeout: 1000,
+                    delta: {
+
+                    }
+                };
+                for (let word in indexedScheduleRows) {
+                    const row = indexedScheduleRows[word];
+                    if (row.wordRecognitionRecords.length) {
+                        const score = wordRecognitionScore(indexedScheduleRows[word]);
+                        highlights.delta[word] = colorForPercentage(score / 5 + 100);
+                    }
+                }
+                return highlights;
+            })),
+            this.highlightMap$,
+            config.visibleElements$,
+            'DIFFICULTY_HIGHLIGHT'
+        )
 
 
         this.highlightMap$.next({});
@@ -104,7 +128,7 @@ function singleHighlight(
 ) {
     let oldHighlightDelta: HighlightDelta | undefined;
     combineLatest([
-        newHighlightDelta$,highlightedWords$, wordElementMap$
+        newHighlightDelta$, highlightedWords$, wordElementMap$
     ]).subscribe(([newHighlightDelta, currentHighlightMap, wordElementMap]) => {
         const highlightWordsToUpdate = new Set<string>();
         if (oldHighlightDelta) {
