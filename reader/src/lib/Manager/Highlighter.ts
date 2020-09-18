@@ -2,16 +2,29 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {Dictionary} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {withLatestFrom, map} from "rxjs/operators";
+import {map, withLatestFrom} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
+
+function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => TimedHighlightDelta {
+    return (words: string[]) => {
+        return ({
+            timeout: timeout,
+            delta: Object.fromEntries(
+                words.map(word => [word, numbers])
+            )
+        });
+    };
+}
 
 /**
  * TODO probably execute all these things in a try since elements may disappear
  */
 export class Highlighter {
     mouseoverHighlightedWords$ = new ReplaySubject<string | undefined>(1);
-    mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1)
+    mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
+    deletedCards$ = new ReplaySubject<string[]>(1);
+    createdCards$ = new ReplaySubject<string[]>(1);
     highlightMap$ = new ReplaySubject<HighlightMap>(1);
 
     constructor(config: HighlighterConfig) {
@@ -22,11 +35,30 @@ export class Highlighter {
             'MOUSEOVER_CHARACTER_HIGHLIGHT'
         )
         singleHighlight(
-            this.mouseoverHighlightedWords$.pipe(map(word => (word ? {[word]: [160, 160, 160, 0.5]} : {}))),
+            this.mouseoverHighlightedSentences$.pipe(map(word => (word ? {[word]: [160, 160, 160, 0.5]} : {}))),
             this.highlightMap$,
             config.visibleElements$,
             'MOUSEOVER_SENTENCE_HIGHLIGHT'
         );
+        singleHighlight(
+            config.quizWord$.pipe(map(word => (word ? {[word]: [28, 176, 246, 0.5]} : {}))),
+            this.highlightMap$,
+            config.visibleElements$,
+            'QUIZ_WORD_HIGHLIGHT'
+        );
+        timedHighlight(
+            this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
+            this.highlightMap$,
+            config.visibleElements$,
+            'DELETED_CARDS_HIGHLIGHT'
+        );
+        timedHighlight(
+            this.createdCards$.pipe(map(timeWordsMap(500, [255, 215, 0, 0.5]))),
+            this.highlightMap$,
+            config.visibleElements$,
+            'CREATED_CARDS_HIGHLIGHT'
+        );
+
 
         this.highlightMap$.next({});
     }
@@ -35,6 +67,7 @@ export class Highlighter {
 interface HighlighterConfig {
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleSentences$: Observable<Dictionary<AtomizedSentence[]>>;
+    quizWord$: Observable<string | undefined>;
 }
 
 /**
@@ -51,7 +84,11 @@ export interface TimedHighlightDelta {
 
 export type RGBA = [number, number, number, number];
 
-function removeHighlightDelta(oldHighlightDelta: HighlightDelta, currentHighlightMap: ObservedValueOf<Observable<HighlightMap>>, highlighterKey: string, highlightWordsToUpdate: Set<string>) {
+function removeHighlightDelta(
+    oldHighlightDelta: HighlightDelta,
+    currentHighlightMap: HighlightMap,
+    highlighterKey: string,
+    highlightWordsToUpdate: Set<string>) {
     Object.entries(oldHighlightDelta).forEach(([word, colors]) => {
         // TODO figure out if this is tolerant of nonexistant word keys
         delete currentHighlightMap[word][highlighterKey];
@@ -66,9 +103,9 @@ function singleHighlight(
     highlighterKey: string
 ) {
     let oldHighlightDelta: HighlightDelta | undefined;
-    newHighlightDelta$.pipe(
-        withLatestFrom(highlightedWords$, wordElementMap$),
-    ).subscribe(([newHighlightDelta, currentHighlightMap, wordElementMap]) => {
+    combineLatest([
+        newHighlightDelta$,highlightedWords$, wordElementMap$
+    ]).subscribe(([newHighlightDelta, currentHighlightMap, wordElementMap]) => {
         const highlightWordsToUpdate = new Set<string>();
         if (oldHighlightDelta) {
             /**
@@ -77,6 +114,7 @@ function singleHighlight(
             removeHighlightDelta(oldHighlightDelta, currentHighlightMap, highlighterKey, highlightWordsToUpdate);
         }
         if (newHighlightDelta) {
+            oldHighlightDelta = newHighlightDelta;
             addHighlightedDelta(newHighlightDelta, currentHighlightMap, highlighterKey, highlightWordsToUpdate);
         }
         updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
@@ -90,14 +128,18 @@ function updateHighlightBackgroundColors(
     // @ts-ignore
     for (var word of highlightWordsToUpdate) {
         const elements = wordElementMap[word];
+        if (!elements) continue;
         const backgroundColor = recomputeColor(currentHighlightMap[word]);
         // @ts-ignore
         elements.forEach(element => element.element.style.backgroundColor = backgroundColor)
     }
 }
 
-function addHighlightedDelta(o: HighlightDelta, currentHighlightMap: HighlightMap, highlighterKey: string, highlightWordsToUpdate: Set<string>) {
-    Object.entries(o).forEach(([word, colors]) => {
+function addHighlightedDelta(highlightDelta: HighlightDelta, currentHighlightMap: HighlightMap, highlighterKey: string, highlightWordsToUpdate: Set<string>) {
+    Object.entries(highlightDelta).forEach(([word, colors]) => {
+        if (!currentHighlightMap[word]) {
+            currentHighlightMap[word] = {};
+        }
         currentHighlightMap[word][highlighterKey] = colors;
         highlightWordsToUpdate.add(word);
     });
@@ -109,9 +151,11 @@ function timedHighlight(
     wordElementMap$: Observable<ds_Dict<HasElement[]>>,
     highlighterKey: string
 ) {
-    newHighlightDelta$.pipe(
-        withLatestFrom(highlightedWords$, wordElementMap$),
-    ).subscribe(([timedHighlightDelta, currentHighlightMap, wordElementMap]) => {
+    combineLatest([
+        newHighlightDelta$,
+        highlightedWords$,
+        wordElementMap$
+    ]).subscribe(([timedHighlightDelta, currentHighlightMap, wordElementMap]) => {
         const highlightWordsToUpdate = new Set<string>();
         let o = timedHighlightDelta.delta;
         addHighlightedDelta(o, currentHighlightMap, highlighterKey, highlightWordsToUpdate);
@@ -178,6 +222,7 @@ function blendColors(args: RGBA[]) {
  */
 function recomputeColor(h: HighlightDelta): string {
     const colors = Object.values(h);
+    if (!colors.length) return `transparent`;
     return `RGBA(${blendColors(colors)})`
 }
 

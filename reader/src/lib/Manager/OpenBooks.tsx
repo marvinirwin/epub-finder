@@ -19,7 +19,7 @@ export const READING_BOOK_NODE_LABEL = 'readingBook';
 
 export class OpenBooks {
     openedBooks = new DeltaScanner<OpenBook,  string>();
-    renderedAtomizedSentences: Observable<AtomizedSentence[]>;
+    renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
     addOpenBook$ = new Subject<Website>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
@@ -64,17 +64,13 @@ export class OpenBooks {
 
         this.applyListenersToOpenedBookBodies();
 
-        this.renderedAtomizedSentences = this.openedBooks
+        this.renderedAtomizedSentences$ = this.openedBooks
             .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
-                switchMap(({sourced}: DeltaScan<Observable<ds_Dict<AtomizedSentence>>>) => {
-                    let sources = sourced ? flattenTree(sourced) : [];
-                    return combineLatest(
-                        sources
-                    );
+                switchMap(({sourced}) => {
+                    let sources = sourced ? flattenTree(sourced) : []; return combineLatest( sources );
                 }),
-                map((atomizedSentenceArrays: ds_Dict<AtomizedSentence>[]) => {
-                        return flattenDeep(atomizedSentenceArrays.map(Object.values));
-                    }
+                map((atomizedSentenceArrays) =>
+                    mergeDictArrays(...atomizedSentenceArrays)
                 ),
                 shareReplay(1)
             );
@@ -86,10 +82,12 @@ export class OpenBooks {
                         bookFrame.renderedSentences$,
                         config.trie$
                     ]).pipe(
-                        map(([sentences, trie]: [ds_Dict<AtomizedSentence>, TrieWrapper]) => {
-                                return Object.entries(sentences).map(([sentenceStr, sentence]) =>
-                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
-                                );
+                        map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
+                                return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
+                                    sentences.map(sentence =>
+                                        getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
+                                    )
+                                ));
                             }
                         ),
                         shareReplay(1)

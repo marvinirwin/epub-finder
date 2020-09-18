@@ -42,7 +42,7 @@ import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
 import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
-import { Highlighter } from "./Manager/Highlighter";
+import {Highlighter} from "./Manager/Highlighter";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -80,6 +80,7 @@ export class Manager {
     public quizCharacterManager: QuizCharacter;
     public authenticationMonitor = new AuthenticationMonitor();
     public highlighter: Highlighter;
+    public highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
@@ -147,7 +148,7 @@ export class Manager {
                     map(rows => rows.map(row => row.word)),
                     resolveICardForWords(this.cardManager.cardIndex$)
                 ),
-                requestHighlightedWord: s => this.highlightedWord$.next(s)
+                requestHighlightedWord: s => {}
             },
         );
 
@@ -190,7 +191,7 @@ export class Manager {
                 quizzingCard$: this.quizManager.quizzingCard$,
                 trie$: this.cardManager.trie$,
                 requestPlayAudio: sentence => {
-                    this.highlightedSentence$.next(sentence);
+                    this.highlighter.mouseoverHighlightedSentences$.next(sentence);
                     this.audioManager.queSynthesizedSpeechRequest$.next(sentence);
                 }
             }
@@ -205,12 +206,18 @@ export class Manager {
         ScheduleProgress(this.scheduleManager, this.progressManager);
 
         merge(
-            this.openedBooks.renderedAtomizedSentences,
-            this.quizCharacterManager.atomizedSentenceMap$.pipe(map(Object.values))
+            this.openedBooks.renderedAtomizedSentences$,
+            this.quizCharacterManager.atomizedSentenceMap$
         ).subscribe(atomizedSentenceList => {
-                BrowserInputs.applyAtomizedSentenceListeners(atomizedSentenceList);
+                Object.values(atomizedSentenceList).map(BrowserInputs.applyAtomizedSentenceListeners)
             }
-        )
+        );
+
+        this.highlighter = new Highlighter({
+            visibleElements$: this.openedBooks.visibleElements$,
+            visibleSentences$: this.openedBooks.renderedAtomizedSentences$,
+            quizWord$: this.quizManager.quizzingCard$.pipe(map(c => c?.learningLanguage))
+        })
 
         this.readingWordElementMap = combineLatest([
             this.readingWordElementMap.pipe(
@@ -225,7 +232,8 @@ export class Manager {
         let previousHighlightedElements: HTMLElement[] | undefined;
         let previousHighlightedSentences: HTMLElement[] | undefined;
 
-        this.highlightedWord$.pipe(debounceTime(10),
+/*
+        this.highlighter.pipe(debounceTime(10),
             withLatestFrom(this.openedBooks.visibleElements$))
             .subscribe(([word, wordElementsMaps]) => {
                     if (previousHighlightedElements) {
@@ -241,7 +249,9 @@ export class Manager {
                     }
                 }
             );
+*/
 
+/*
         this.highlightedSentence$.pipe(
             debounceTime(10),
             withLatestFrom(this.readingWordSentenceMap)
@@ -259,6 +269,7 @@ export class Manager {
                 });
             }
         })
+*/
 
 
         this.setQuizWord$.pipe(
@@ -278,7 +289,9 @@ export class Manager {
             this.editingCardManager.requestEditWord$.next(word);
         });
 
+/*
         this.highlightedWord$.pipe(map(highlightedWord => highlightedWord ? pinyin(highlightedWord).join(' ') : ''))
+*/
 
         combineLatest([
             this.bottomNavigationValue$,
@@ -348,7 +361,7 @@ export class Manager {
         child.onmouseenter = (ev) => {
             if (maxWord) {
                 addHighlightedPinyin(this.highlightedPinyin$, lookupPinyin(maxWord.word).join(''));
-                addHighlightedWord(this.highlightedWord$, maxWord?.word);
+                addHighlightedWord(this.highlighter.mouseoverHighlightedWords$, maxWord?.word);
             }
             if (ev.shiftKey) {
                 /**
@@ -367,7 +380,7 @@ export class Manager {
             }
         };
         child.onmouseleave = (ev) => {
-            addHighlightedWord(this.highlightedWord$, maxWord?.word);
+            addHighlightedWord(this.highlighter.mouseoverHighlightedWords$, maxWord?.word);
         }
         child.onclick = (ev) => {
             const children = sentence.getSentenceHTMLElement().children;

@@ -11,6 +11,7 @@ import {appendBookStyle} from "../AppendBookStyle";
 import {ds_Dict} from "../../Util/DeltaScanner";
 import {DOMParser, XMLSerializer} from "xmldom";
 import {waitFor} from "../../Util/waitFor";
+import {safePush} from "../../../test/Util/GetGraphJson";
 
 export class IFrameBookRenderer implements BookRenderer {
     srcDoc$ = new ReplaySubject<string>(1);
@@ -33,18 +34,13 @@ export class IFrameBookRenderer implements BookRenderer {
         )
     }
 
-    static rehydratePage(htmlDocument: HTMLDocument): ds_Dict<AtomizedSentence> {
+    static rehydratePage(htmlDocument: HTMLDocument): ds_Dict<AtomizedSentence[]> {
         const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
-        const annotatedElements: ds_Dict<AtomizedSentence> = {};
-        const text = [];
+        const annotatedElements: ds_Dict<AtomizedSentence[]> = {};
         for (let i = 0; i < elements.length; i++) {
             const annotatedElement = elements[i];
-            let sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
-            while (annotatedElements[sentenceElement.translatableText]) {
-                sentenceElement.translatableText += ' ';
-            }
-            annotatedElements[sentenceElement.translatableText] = sentenceElement;
-            text.push(sentenceElement.translatableText);
+            const sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
+            safePush(annotatedElements, sentenceElement.translatableText, sentenceElement);
         }
         return annotatedElements;
     }

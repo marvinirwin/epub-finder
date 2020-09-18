@@ -12,6 +12,7 @@ import {BrowserInputs} from "../Manager/BrowserInputs";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
+import { flatten } from "lodash";
 
 export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentBookStats {
     return {
@@ -36,7 +37,7 @@ export class OpenBook {
     public text$: Observable<string>;
     public wordCountRecords$: Observable<BookWordCount[]>;
     public htmlElementIndex$: Observable<TextWordData>;
-    public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1)
+    public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence[]>>(1)
     public bookStats$: Observable<AtomizedDocumentBookStats>;
 
     public unAtomizedSrcDoc$: Observable<string> = new ReplaySubject<string>(1);
@@ -98,7 +99,7 @@ export class OpenBook {
         );
 
         this.renderedSentences$.subscribe(sentences => {
-            BrowserInputs.applyAtomizedSentenceListeners(Object.values(sentences));
+            BrowserInputs.applyAtomizedSentenceListeners(flatten(Object.values(sentences)));
         })
 
         this.htmlElementIndex$ = combineLatest([
@@ -106,7 +107,7 @@ export class OpenBook {
             this.renderedSentences$
         ]).pipe(
             map(([trie, sentences]) => {
-                    return AtomizedSentence.getTextWordData(Object.values(sentences), trie.t, trie.getUniqueLengths());
+                    return AtomizedSentence.getTextWordData(flatten(Object.values(sentences)), trie.t, trie.getUniqueLengths());
                 },
             ),
             shareReplay(1)

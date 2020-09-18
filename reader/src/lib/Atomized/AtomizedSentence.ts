@@ -27,13 +27,13 @@ export class AtomizedSentence {
     translated = false;
 
     constructor(
-        public sentenceElement: XMLDocumentNode
+        public element: XMLDocumentNode
     ) {
-        this.translatableText = this.sentenceElement.textContent || '';
-        this.popperElement = (sentenceElement.ownerDocument as XMLDocument)
+        this.translatableText = this.element.textContent || '';
+        this.popperElement = (element.ownerDocument as XMLDocument)
             .getElementById(
                 AtomizedDocument.getPopperId(
-                    this.sentenceElement.getAttribute('popper-id') as string
+                    this.element.getAttribute('popper-id') as string
                 )
             ) as unknown as XMLDocumentNode;
     }
@@ -45,8 +45,8 @@ export class AtomizedSentence {
         const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
         const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
-        let children = this.sentenceElement.childNodes;
-        let textContent = this.sentenceElement.textContent as string;
+        let children = this.element.childNodes;
+        let textContent = this.element.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
@@ -123,7 +123,7 @@ export class AtomizedSentence {
     }
 
     getSentenceHTMLElement(): HTMLElement {
-        return this.sentenceElement as unknown as HTMLElement;
+        return this.element as unknown as HTMLElement;
     }
 
     getPopperHTMLElement(): HTMLElement {
@@ -134,15 +134,15 @@ export class AtomizedSentence {
         if (this.translated) {
             return this._translation as string;
         } else {
-            const t = await getTranslation(this.sentenceElement.textContent)
+            const translatedText = await getTranslation(this.translatableText)
             this.translated = true;
-            this.popperElement.textContent = t;
+            this.popperElement.textContent = translatedText;
             return this.translatableText;
         }
     }
 
     public destroy() {
-        this.sentenceElement.parentNode.removeChild(this.sentenceElement);
+        this.element.parentNode.removeChild(this.element);
         this.popperElement.parentNode.removeChild(this.popperElement);
     }
 }
