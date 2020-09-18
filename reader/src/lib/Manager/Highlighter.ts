@@ -61,19 +61,14 @@ export class Highlighter {
             config.visibleElements$,
             'CREATED_CARDS_HIGHLIGHT'
         );
-        timedHighlight(
+        singleHighlight(
             this.highlightWithDifficulty$.pipe(map(indexedScheduleRows => {
-                const highlights: TimedHighlightDelta = {
-                    timeout: 1000,
-                    delta: {
-
-                    }
-                };
+                const highlights: HighlightDelta = {};
                 for (let word in indexedScheduleRows) {
                     const row = indexedScheduleRows[word];
                     if (row.wordRecognitionRecords.length) {
                         const score = wordRecognitionScore(indexedScheduleRows[word]);
-                        highlights.delta[word] = colorForPercentage(score / 5 + 100);
+                        highlights[word] = colorForPercentage(score / 5 + 100);
                     }
                 }
                 return highlights;

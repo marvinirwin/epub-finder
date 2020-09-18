@@ -251,10 +251,16 @@ export class Manager {
             this.editingCardManager.requestEditWord$.next(word);
         });
 
+        let even = 1;
         this.highlightAllWithDifficultySignal$.pipe(
             withLatestFrom(this.scheduleManager.indexedScheduleRows$)
         ).subscribe(([, indexedScheduleRows]) => {
-            this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows);
+            even++;
+            if (even % 2) {
+                this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows);
+            } else {
+                this.highlighter.highlightWithDifficulty$.next();
+            }
         })
 
         combineLatest([
