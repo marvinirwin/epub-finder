@@ -55,11 +55,9 @@ function resolveCurrentComponent(item: NavigationPages | undefined, m: Manager) 
 }
 
 export function Main({m}: { m: Manager }) {
-    const classes = useStyles();
     const currentPage = useObservableState(m.bottomNavigationValue$);
-    const SelectedPage = resolveCurrentComponent(currentPage, m);
     useEffect(() => {
-        m.inputManager.applyBodyListeners(document.body);
+        m.inputManager.applyDocumentListeners(document);
     }, [m]);
 
     const readingBook = m.openedBooks.readingBook;

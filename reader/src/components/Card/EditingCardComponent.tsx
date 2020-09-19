@@ -12,9 +12,11 @@ import {Manager} from "../../lib/Manager";
 import {IconButton} from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
+import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../HotkeyWrapper";
 import {map} from "rxjs/operators";
 import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
+import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
 
 
@@ -61,7 +63,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
 
     const deleteCard = () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined);
     const hideEditCard = () => m.editingCardManager.showEditingCardPopup$.next(false);
-    useSubscription(m.inputManager.getKeyDownSubject('d'), deleteCard);// Maybe I want to make this harder to do
+    useSubscription(m.inputManager.getKeyDownSubject('d').pipe(filterTextInputEvents), deleteCard);// Maybe I want to make this harder to do
     useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
 
     const cardIndex = useObservableState(m.scheduleManager.indexedScheduleRows$);
@@ -75,6 +77,11 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                         <HotkeyWrapper shortcutKey={"Esc"}>
                             <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
                                 <KeyboardArrowUp fontSize="small" />
+                            </IconButton>
+                        </HotkeyWrapper>
+                        <HotkeyWrapper shortcutKey={"g"}>
+                            <IconButton aria-label="done" onClick={() => characters && m.quizManager.quizResult$.next({word: characters, score: 2})}>
+                                <Done fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) ({score})</Typography>

@@ -231,7 +231,7 @@ export class OpenBooks {
 
     private applyListenersToOpenedBookBodies() {
         this.openedBooks.updates$.subscribe(({delta}) => {
-            flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(this.config.applyListeners))
+            flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
         })
     }
 }

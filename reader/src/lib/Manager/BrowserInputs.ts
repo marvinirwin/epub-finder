@@ -3,6 +3,7 @@ import { Dictionary } from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {getTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
+import {filter} from "rxjs/operators";
 
 export class BrowserInputs {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
@@ -10,10 +11,8 @@ export class BrowserInputs {
     selectedText$: Subject<string> = new Subject<string>();
     constructor() {}
 
-    applyBodyListeners(root: HTMLElement) {
+    applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
-            let tagName = (ev.target as HTMLElement).tagName;
-            if (tagName === 'INPUT' || tagName === "TEXTAREA") return;
             return this.keydownMap[ev.key]?.next(ev);
         };
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
@@ -83,3 +82,8 @@ export class BrowserInputs {
         });
     }
 }
+
+export const filterTextInputEvents = filter((ev: KeyboardEvent) => {
+    let tagName = (ev.target as HTMLElement).tagName;
+    return !(tagName === 'INPUT' || tagName === "TEXTAREA")
+});

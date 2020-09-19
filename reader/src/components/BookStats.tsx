@@ -35,8 +35,8 @@ export const BookStats: React.FunctionComponent<{m: Manager, b: OpenBook}> = ({c
     return <div className={'bookstats'}>
         <div>Distinct Characters: {Object.keys(characterCounts).length}</div>
         <div>HSK-1 Characters: {Object.keys(characterCounts).filter(character => hsk1Characters.has(character)).length}</div>
-        {orderBy(Object.entries(characterCounts), ([character, count]) => count).map(([char, count]) => <div>
-            {char}: {count}
+        {orderBy(Object.entries(characterCounts), ([character, count]) => count).map(([char, count]) => <div key={char}>
+            {char}: {count} HSK1: {hsk1Characters.has(char) ? 'True' : 'False'}
         </div>)}
     </div>
 }

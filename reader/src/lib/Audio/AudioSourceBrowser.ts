@@ -1,9 +1,8 @@
-import {combineLatest, from, Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {AudioConfig, ResultReason, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
-import {flatMap, map, shareReplay, take, tap, withLatestFrom} from "rxjs/operators";
+import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
-import {sleep} from "../Util/Util";
 
 let AZURE_SPEECH_REGION = 'westus2' as string;
 
@@ -34,10 +33,10 @@ export class AudioSourceBrowser implements AudioSource {
         }
 
         this.mediaSource$ = this.mediaDevices.pipe(
-            flatMap( mediaDevices => {
+            flatMap(mediaDevices => {
                 try {
                     return mediaDevices.getUserMedia({audio: true});
-                } catch(e) {
+                } catch (e) {
                     this.error$.next(e);
                     this.error$.next(`Failed to get Microphone information`);
                     throw e;
@@ -97,36 +96,45 @@ export class AudioSourceBrowser implements AudioSource {
     private getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): SpeechRecognizer {
         this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
         this.recognizer.recognized = (s, e) => {
-            if (e.result.reason == ResultReason.RecognizedSpeech) {
-                debugger;
-                this.recognizedText$.next(e.result.text)
-                this.recognizer?.stopContinuousRecognitionAsync(() => this.isRecording$.next(false));
-                this.recognizing = false;
+            switch (e.result.reason) {
+                case ResultReason.NoMatch:
+                    this.error$.next(`Cannot understand`)
+                case ResultReason.Canceled:
+                    this.recognizing = false;
+                    this.recognizedText$.next('')
+                    this.isRecording$.next(false);
+                case ResultReason.RecognizingSpeech:
+                    // We don't care abou this event type
+                    break;
+                case ResultReason.RecognizedSpeech:
+                    this.recognizing = false;
+                    this.recognizedText$.next(e.result.text)
+                    this.recognizer?.stopContinuousRecognitionAsync(() => this.isRecording$.next(false));
+                    break;
+                case ResultReason.RecognizingIntent:
+                case ResultReason.RecognizedIntent:
+                case ResultReason.TranslatingSpeech:
+                case ResultReason.SynthesizingAudio:
+                case ResultReason.SynthesizingAudioCompleted:
+                case ResultReason.TranslatedSpeech:
+                case ResultReason.SynthesizingAudioStarted:
+                    this.error$.next("Strange speech recognition result returned")
+                    break;
             }
         };
-        this.recognizing = true;
         this.recognizer.startContinuousRecognitionAsync(
-            this.getRecognizerCB(),
-            this.getRecognizerError()
+            () => {
+                this.recognizing = true;
+                this.isRecording$.next(true);
+            },
+            (error: string) => {
+                console.error(error);
+                this.error$.next(error);
+                this.isRecording$.next(false);
+            }
         );
         // Start continuous speech recognition
         return this.recognizer;
-    }
-
-    private getRecognizerError() {
-        return (error: string) => {
-            debugger;
-            console.error(error);
-            this.error$.next(error);
-            this.isRecording$.next(false);
-        };
-    }
-
-    private getRecognizerCB() {
-        return () => {
-            debugger;
-            this.isRecording$.next(true);
-        };
     }
 
     private loadToken() {

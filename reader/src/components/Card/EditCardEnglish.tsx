@@ -25,7 +25,7 @@ export default function EditCardEnglish({e}: { e: EditingCard }) {
                 rows={4}
                 defaultValue="Default Value"
                 variant="outlined"
-                value={knownLanguage}
+                value={knownLanguage ? knownLanguage.join('\n') : ''}
                 onKeyDown={t => {
                     t.stopPropagation();
                 }}

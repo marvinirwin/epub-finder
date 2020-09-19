@@ -1,9 +1,5 @@
 import CardManager from "../CardManager";
 import {OpenBooks} from "../OpenBooks";
-import {delay, filter, switchMap, switchMapTo, withLatestFrom} from "rxjs/operators";
-import {merge} from "rxjs";
-import {isChineseCharacter} from "../../Interfaces/OldAnkiClasses/Card";
-import {getNewICardForWord} from "../../Util/Util";
 import EditingCardManager from "../EditingCardManager";
 import {resolveICardForWord} from "../../Pipes/ResolveICardForWord";
 import {ICard} from "../../Interfaces/ICard";
@@ -18,7 +14,6 @@ export function CardPageEditingCardCardDBAudio(
     e: EditingCardManager,
     cdb: CardDB,
     a: AudioManager,
-
 ) {
     e.requestEditWord$.pipe(
         resolveICardForWord<string, ICard>(c.cardIndex$)

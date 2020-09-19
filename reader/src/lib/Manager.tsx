@@ -14,7 +14,7 @@ import {CHARACTER_BOOK_NODE_LABEL, OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizManager} from "./Manager/QuizManager";
-import {BrowserInputs} from "./Manager/BrowserInputs";
+import {BrowserInputs, filterTextInputEvents} from "./Manager/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
@@ -118,7 +118,7 @@ export class Manager {
         this.cardManager = new CardManager(this.db);
         this.openedBooks = new OpenBooks({
             trie$: this.cardManager.trie$,
-            applyListeners: b => this.inputManager.applyBodyListeners(b),
+            applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement)
         });
@@ -239,11 +239,11 @@ export class Manager {
 
         merge(
             this.inputManager.getKeyDownSubject("Escape"),
-            this.inputManager.getKeyDownSubject("q"),
+            this.inputManager.getKeyDownSubject("q").pipe(filterTextInputEvents),
         ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
 
         merge(
-            this.inputManager.getKeyDownSubject("d"),
+            this.inputManager.getKeyDownSubject("d").pipe(filterTextInputEvents),
         ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
 
         this.inputManager.selectedText$.subscribe(word => {

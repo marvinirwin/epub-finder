@@ -9,6 +9,7 @@ import {Manager} from "../../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../HotkeyWrapper";
+import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
 const useStylesGridListImages = makeStyles((theme) => ({
     root: {
@@ -40,7 +41,7 @@ export default function ({photos$, card, characters, m}: { photos$: Subject<stri
         term: characters,
         cb: (s: string) => card.photos$.next(photos?.concat(s))
     });
-    useSubscription(m.inputManager.getKeyDownSubject('s'), openQueryImageRequest);
+    useSubscription(m.inputManager.getKeyDownSubject('s').pipe(filterTextInputEvents), openQueryImageRequest);
 
     return photos?.length ?
         <HotkeyWrapper shortcutKey={'s'}>

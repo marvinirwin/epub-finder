@@ -52,19 +52,6 @@ export class QuizManager {
             requestHighlightedWord(iCard.learningLanguage)
         })
 
-/*
-        combineLatest([
-            this.quizzingCard$.pipe(startWith(undefined)),
-            this.requestNextCard$.pipe(
-                debounceTime(1)
-            )
-        ]).subscribe(([quizzingCard, setQuizItem]) => {
-            if(!quizzingCard && setQuizItem) {
-                this.requestNextCard$.next();
-            }
-        })
-*/
-
         this.scheduledCards$.pipe(
             withLatestFrom(
                 this.quizzingCard$.pipe(

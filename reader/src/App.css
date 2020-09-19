@@ -197,3 +197,7 @@
     cursor: pointer;
 }
 
+*:focus {
+    background-color: #3db5eb;
+}
+

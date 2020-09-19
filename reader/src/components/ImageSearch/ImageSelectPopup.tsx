@@ -16,6 +16,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import SearchIcon from '@material-ui/icons/Search';
 import {debounce} from 'lodash';
 import {useObservableState} from "observable-hooks";
+import {search} from "../../../../server/src/types/fbgraph";
 
 export const getImages = (term: string) => {
     return axios.post(`${process.env.PUBLIC_URL}/image-search`, {term})
@@ -107,15 +108,15 @@ export function ImageSelectPopup({m}: { m: Manager }) {
     const classes = useStyles();
     const imageRequest = useObservableState(m.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState("");
     const [sources, setSrces] = useState<ImageResult[]>([]);
     const debounceSearch = debounce((term: string) => {
-        setLoading(true);
+        setLoading(term);
         getImages(term).then((response) => {
             const results: ImageSearchResponse = response.data;
             setSrces(results.images);
         }).finally(() => {
-            setLoading(false);
+            setLoading('');
         })
     }, 1000);
     useEffect(() => {
@@ -130,33 +131,35 @@ export function ImageSelectPopup({m}: { m: Manager }) {
         if (searchTerm) {
             debounceSearch(searchTerm)
         }
-    }, [searchTerm])
+    }, [searchTerm]);
+
+    const SearchResults = () => sources.length ? <GridList cellHeight={160} className={classes.gridList} cols={12}>
+        {sources.map((src, index) => {
+            return <GridListTile className={classes.tile} key={index}>
+                <img onClick={() => {
+                    imageRequest?.cb(src.thumbnailUrl); // TODO download the thumbnail as base64
+                    m.queryImageRequest$.next(undefined);
+                }} src={src.thumbnailUrl} alt={''}/>
+            </GridListTile>
+        })}
+    </GridList> : <div>`No results for found for ${searchTerm}, this should never happen, is it a bug?`</div>
 
     let onClose = () => m.queryImageRequest$.next(undefined);
     return <Dialog fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
             <Toolbar>
-                <Typography  variant="h6" noWrap>
+                <Typography variant="h6" noWrap>
                     {imageRequest?.term}
                 </Typography>
                 <div className={classes.search}>
                     <div className={classes.searchIcon}>
-                        <SearchIcon />
+                        <SearchIcon/>
                     </div>
                     <TextField
-    placeholder="Search…"
-    value={searchTerm}
-    onChange={e => setSearchTerm(e.target.value)}
-    />
-{/*
-                    <InputBase
-                        classes={{
-                            root: classes.inputRoot,
-                            input: classes.inputInput,
-                        }}
-                        inputProps={{ 'aria-label': 'search' }}
+                        placeholder="Search…"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
                     />
-*/}
                 </div>
                 <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
                     <CloseIcon/>
@@ -164,19 +167,7 @@ export function ImageSelectPopup({m}: { m: Manager }) {
             </Toolbar>
         </AppBar>
         <div className={classes.root}>
-            {
-                sources.length &&
-                    <GridList cellHeight={160} className={classes.gridList} cols={12}>
-                        {sources.map((src, index) => {
-                            return <GridListTile className={classes.tile} key={index}>
-                                <img onClick={() => {
-                                    imageRequest?.cb(src.contentUrl);
-                                    m.queryImageRequest$.next(undefined);
-                                }} src={src.thumbnailUrl} alt={''}/>
-                            </GridListTile>
-                        })}
-                    </GridList>
-            }
+            {loading ? `Loading ${loading}` : <SearchResults/>}
         </div>
     </Dialog>
 }

@@ -16,6 +16,7 @@ import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
 import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {HotkeyWrapper} from "../HotkeyWrapper";
 import {useSubscription} from "observable-hooks";
+import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
 const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
 const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
@@ -80,8 +81,8 @@ export function Characters({c, m}: QuizCardProps) {
     }
 
     // Subscribe to the keydown "r" while we can
-    useSubscription(m.inputManager.getKeyDownSubject('r'), tryAudio);
-    useSubscription(m.inputManager.getKeyDownSubject('e'), requestEditWord);
+    useSubscription(m.inputManager.getKeyDownSubject('r').pipe(filterTextInputEvents), tryAudio);
+    useSubscription(m.inputManager.getKeyDownSubject('e').pipe(filterTextInputEvents), requestEditWord);
 
     useEffect(() => {
         if (!c?.learningLanguage) return;

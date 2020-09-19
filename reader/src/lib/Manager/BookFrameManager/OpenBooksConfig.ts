@@ -8,7 +8,7 @@ import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharact
 
 export interface OpenBooksConfig {
     trie$: TrieObservable,
-    applyListeners: (b: HTMLBodyElement) => void,
+    applyListeners: (b: HTMLDocument) => void,
     bottomNavigationValue$: ReplaySubject<NavigationPages>,
     applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void
 }
