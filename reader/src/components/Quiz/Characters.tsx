@@ -81,7 +81,10 @@ export function Characters({c, m}: QuizCardProps) {
     }
 
     // Subscribe to the keydown "r" while we can
-    useSubscription(m.inputManager.getKeyDownSubject('r').pipe(filterTextInputEvents), tryAudio);
+    useSubscription(m.inputManager.getKeyDownSubject('r').pipe(filterTextInputEvents), e => {
+        e.preventDefault()
+        tryAudio();
+    });
     useSubscription(m.inputManager.getKeyDownSubject('e').pipe(filterTextInputEvents), requestEditWord);
 
     useEffect(() => {

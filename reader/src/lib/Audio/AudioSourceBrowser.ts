@@ -80,13 +80,17 @@ export class AudioSourceBrowser implements AudioSource {
 
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.recognizer$)
-        ).subscribe(([, recognizer]) => {
-            return new Promise((resolve, reject) => {
-                if (!this.recognizing && this.recognizer) {
-                    this.recognizer.startContinuousRecognitionAsync();
-                    this.recognizing = true;
-                }
-            })
+        ).subscribe(async ([, recognizer]) => {
+            if (this.recognizing) {
+                await new Promise(resolve => {
+                    this.recognizer?.stopContinuousRecognitionAsync(resolve, err => {
+                        this.error$.next(err);
+                        resolve();
+                    });
+                });
+            }
+            this.startRecognition();
+
         });
 
         this.loadToken();
@@ -99,17 +103,21 @@ export class AudioSourceBrowser implements AudioSource {
             switch (e.result.reason) {
                 case ResultReason.NoMatch:
                     this.error$.next(`Cannot understand`)
+                    this.isRecording$.next(false);
+                    this.recognizing = false;
+                    console.log(e);
+                    break;
                 case ResultReason.Canceled:
                     this.recognizing = false;
-                    this.recognizedText$.next('')
+                    this.recognizedText$.next('');
                     this.isRecording$.next(false);
+                    break;
                 case ResultReason.RecognizingSpeech:
                     // We don't care abou this event type
                     break;
                 case ResultReason.RecognizedSpeech:
                     this.recognizing = false;
                     this.recognizedText$.next(e.result.text)
-                    this.recognizer?.stopContinuousRecognitionAsync(() => this.isRecording$.next(false));
                     break;
                 case ResultReason.RecognizingIntent:
                 case ResultReason.RecognizedIntent:
@@ -122,7 +130,13 @@ export class AudioSourceBrowser implements AudioSource {
                     break;
             }
         };
-        this.recognizer.startContinuousRecognitionAsync(
+        this.startRecognition();
+        // Start continuous speech recognition
+        return this.recognizer;
+    }
+
+    private startRecognition() {
+        this.recognizer?.startContinuousRecognitionAsync(
             () => {
                 this.recognizing = true;
                 this.isRecording$.next(true);
@@ -133,8 +147,6 @@ export class AudioSourceBrowser implements AudioSource {
                 this.isRecording$.next(false);
             }
         );
-        // Start continuous speech recognition
-        return this.recognizer;
     }
 
     private loadToken() {

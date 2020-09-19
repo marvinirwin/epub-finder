@@ -35,7 +35,6 @@ export default function AudioRecorder({m}: { m: Manager }) {
     const classes = useStyles();
     const r = m.audioManager.audioRecorder;
     const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
-    const canvasRef = useRef<HTMLCanvasElement>();
     const recognizedText = useObservableState(r.audioSource.mostRecentRecognizedText$);
     const currentAudioRequest = useObservableState(r.recordRequest$)// Maybe pipe this to make it a replaySubject?
 

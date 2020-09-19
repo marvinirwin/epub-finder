@@ -23,7 +23,6 @@ export default function EditCardEnglish({e}: { e: EditingCard }) {
                 label="Multiline"
                 multiline
                 rows={4}
-                defaultValue="Default Value"
                 variant="outlined"
                 value={knownLanguage ? knownLanguage.join('\n') : ''}
                 onKeyDown={t => {
