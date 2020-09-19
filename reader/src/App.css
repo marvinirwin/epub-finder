@@ -181,3 +181,19 @@
     cursor: pointer;
 }
 
+.bookstats {
+    position: fixed;
+    width: 25vw;
+    bottom: -10vw;
+    z-index: 3;
+    transition: transform 0.5s;
+    background-color: white;
+    padding-left: 24px;
+    max-height: 20vw;
+    overflow: auto;
+}
+.bookstats:hover {
+    transform: translateY(-20vw);
+    cursor: pointer;
+}
+

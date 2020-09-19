@@ -1,12 +1,11 @@
 import {Manager} from "../../lib/Manager";
-import {Card, CardContent, Slide, Typography, Link, List, ListItemText, ListItem} from "@material-ui/core";
+import {Card, CardContent, Link, Slide, Typography} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
 import AudioRecorder, {SLIM_CARD_CONTENT} from "../AudioPopup/AudioRecorder";
 import {useObservableState} from "observable-hooks";
-import {ClassNameMap} from "@material-ui/core/styles/withStyles";
-import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
+import {LibrarySidebar} from "../LibrarySidebar";
 
 const useStyles = makeStyles((theme) => ({
     popup: {
@@ -69,21 +68,6 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     </div>;
 }
 
-
-export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const library = useObservableState(m.openedBooks.library$);
-    return <div className={'library'}>
-        <List dense={true}>
-            {
-                Object.values(library || {}).map(libraryBook => {
-                    return <ListItem key={libraryBook.name} className={'library-book'}>
-                        <ListItemText primary={libraryBook.name} onClick={() => m.openedBooks.readingBook$.next(libraryBook)} />
-                    </ListItem>;
-                })
-            }
-        </List>
-    </div>
-}
 
 export function ReadingPage({m}: { m: Manager }) {
     return <Fragment>

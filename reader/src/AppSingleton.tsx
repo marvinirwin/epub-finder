@@ -13,7 +13,7 @@ export function getManager(mode: string): Manager {
         websites.push('test.html');
     } else {
         websites.push(
-            'song_1.html',
+            'story_living_room.html',
         )
     }
     websites.forEach(filename => {

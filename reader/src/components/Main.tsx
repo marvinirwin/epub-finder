@@ -16,6 +16,7 @@ import {StaticFrame} from "./Frame/StaticFrame";
 import {OpenedBook} from "../lib/Atomized/OpenedBook";
 import {Alert} from "@material-ui/lab";
 import {Snackbar} from "@material-ui/core";
+import {BookStats} from "./BookStats";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -94,6 +95,7 @@ export function Main({m}: { m: Manager }) {
         >
             <OpenedBook openedBook={readingBook}/>
         </StaticFrame>
+        {readingBook && <BookStats m={m} b={readingBook}/>}
         <ImageSelectPopup m={m}/>
         <div style={{
             overflow: 'auto',
