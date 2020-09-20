@@ -1,5 +1,6 @@
 import React, {FunctionComponent, useEffect, useState} from "react";
 
+/*
 export const Carousel: FunctionComponent<{currentIndex: number}> = ({ currentIndex, children}) => {
     const [offsets, setOffsets] = useState<number[]>([]);
     const [ref, setRef] = useState();
@@ -7,6 +8,7 @@ export const Carousel: FunctionComponent<{currentIndex: number}> = ({ currentInd
         if (ref) {
             // @ts-ignore
             const newOffsets = Array(children.length).fill(0);
+            // @ts-ignore
             const width = ref.clientWidth;
             newOffsets.forEach((_, childIndex) => {
                 newOffsets[childIndex] = (currentIndex - childIndex) * width;
@@ -40,5 +42,6 @@ export const Carousel: FunctionComponent<{currentIndex: number}> = ({ currentInd
         </div>
     );
 }
+*/
 
 

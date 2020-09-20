@@ -8,10 +8,10 @@ blue() {
   echo '\0[33m'$1'\e[0m'
 }
 
-symlink_env() {
+symlink-env() {
   # What happens if the symlink already exists?
-  ln -s .env reader/.env
-  ln -s .env server/.env
+  ln -sf .env reader/.env
+  ln -sf .env server/.env
 }
 
 build-mandarin-trainer() {

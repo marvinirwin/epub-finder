@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
 
 dotenv.config({path: ".env"});
-console.log(process.env);
+import {createConnection} from "typeorm";
 import morgan from "morgan";
 import logger from "morgan";
 import express from "express";
-import compression from "compression"; // compresses requests
+import compression from "compression";
 import bodyParser from "body-parser";
 import path from "path";
 import * as synthesisController from "./controllers/Speech";
@@ -14,9 +14,6 @@ import {imageSearchFunc} from "./controllers/ImageSearch";
 import {translateFunc} from "./controllers/Translate";
 import session from "express-session";
 import * as chalk from "chalk";
-import connectMongo from "connect-mongo";
-
-const MongoStore = connectMongo(session);
 import flash from "express-flash";
 import mongoose from "mongoose";
 import passport from "passport";
@@ -34,236 +31,242 @@ import * as contactController from "./controllers/contact";
  */
 import passportConfig from "./config/passport";
 import {enforceBudget} from "./controllers/budget";
+import {TypeormStore} from "connect-typeorm";
+import {Session} from "./entities/Session";
 
 
 /*
 // @ts-ignore
 const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 */
+async function connectedApp() {
+    const app = express();
+    const connection = await
+        // TODO use the values in the .env file
+        createConnection();
 
-const app = express();
-
-app.set("port", process.env.SERVER_PORT || 3002);
-app.set("views", path.join(__dirname, "../views"));
-app.set("view engine", "pug");
-app.use(compression());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(morgan("combined"));
-/*
-app.use(lusca.xframe("SAMEORIGIN"));
-app.use(lusca.xssProtection(true));
-*/
-app.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
-});
-
-
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
-mongoose.set("useNewUrlParser", true);
-mongoose.set("useUnifiedTopology", true);
-// @ts-ignore
-mongoose.connect(process.env.MONGODB_URI);
-mongoose.connection.on("error", (err) => {
-    console.error(err);
-    console.log("%s MongoDB connection error. Please make sure MongoDB is running.", chalk.red("✗"));
-    process.exit();
-});
-
-/**
- * Express configuration.
- */
-app.set("host", process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
-app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-app.use(expressStatusMonitor());
-app.use(compression());
-app.use(sass({
-    src: path.join(__dirname, "public"),
-    dest: path.join(__dirname, "public")
-}));
-app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-// @ts-ignore
-app.use(session({
-    resave: true,
-    saveUninitialized: true,
-    // What is the session_secret?
-    // @ts-ignore
-    secret: process.env.SESSION_SECRET,
-    cookie: {maxAge: 1209600000}, // two weeks in milliseconds
-    // @ts-ignore
-    store: new MongoStore({
-        // @ts-ignore
-        url: process.env.MONGODB_URI,
-        // @ts-ignore
-        autoReconnect: true,
-    })
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
-/*
-app.use((req, res, next) => {
-    if (req.path === "/api/upload") {
-        // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
+    app.set("port", process.env.SERVER_PORT || 3002);
+    app.set("views", path.join(__dirname, "../views"));
+    app.set("view engine", "pug");
+    app.use(compression());
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(morgan("combined"));
+    /*
+    app.use(lusca.xframe("SAMEORIGIN"));
+    app.use(lusca.xssProtection(true));
+    */
+    app.use((req, res, next) => {
+        res.locals.user = req.user;
         next();
-    } else {
-        lusca.csrf()(req, res, next);
-    }
-});
-*/
-/*
-app.use(lusca.xframe("SAMEORIGIN"));
-app.use(lusca.xssProtection(true));
-*/
-app.disable("x-powered-by");
-app.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
-});
-/*
-app.use((req, res, next) => {
-    // After successful login, redirect back to the intended page
-    if (!req.user
-        && req.path !== "/login"
-        && req.path !== "/signup"
-        && !req.path.match(/^\/auth/)
-        && !req.path.match(/\./)) {
-        // @ts-ignore
-        req.session.returnTo = req.originalUrl;
-    } else if (req.user
-        && (req.path === "/account" || req.path.match(/^\/api/))) {
-        // @ts-ignore
-        req.session.returnTo = req.originalUrl;
-    }
-    next();
-});
-*/
-app.use("/", express.static(path.join(__dirname, "public"), {maxAge: 31557600000}));
-app.use("/js/lib", express.static(path.join(__dirname, "node_modules/chart.js/dist"), {maxAge: 31557600000}));
-app.use("/js/lib", express.static(path.join(__dirname, "node_modules/popper.js/dist/umd"), {maxAge: 31557600000}));
-app.use("/js/lib", express.static(path.join(__dirname, "node_modules/bootstrap/dist/js"), {maxAge: 31557600000}));
-app.use("/js/lib", express.static(path.join(__dirname, "node_modules/jquery/dist"), {maxAge: 31557600000}));
-app.use("/webfonts", express.static(path.join(__dirname, "node_modules/@fortawesome/fontawesome-free/webfonts"), {maxAge: 31557600000}));
+    });
 
-/**
- * Primary app routes.
- */
-app.get("/", homeController.index);
-app.get("/login", userController.getLogin);
-app.post("/login", userController.postLogin);
-app.get("/logout", userController.logout);
-app.get("/forgot", userController.getForgot);
-app.post("/forgot", userController.postForgot);
-app.get("/reset/:token", userController.getReset);
-app.post("/reset/:token", userController.postReset);
-app.get("/signup", userController.getSignup);
-app.post("/signup", userController.postSignup);
-app.get("/contact", contactController.getContact);
-app.post("/contact", contactController.postContact);
-app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);
-app.get("/account/verify/:token", passportConfig.isAuthenticated, userController.getVerifyEmailToken);
-app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
-app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
-app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get("/profile", passportConfig.isAuthenticated, userController.getProfile);
-
-/**
- * API examples routes.
- */
-app.get("/api", apiController.getApi);
-
-/**
- * OAuth authentication routes. (Sign in)
- */
-app.get("/auth/instagram", passport.authenticate("instagram", {scope: ["basic", "public_content"]}));
-app.get("/auth/instagram/callback", passport.authenticate("instagram", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/snapchat", passport.authenticate("snapchat"));
-app.get("/auth/snapchat/callback", passport.authenticate("snapchat", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/facebook", passport.authenticate("facebook", {scope: ["email", "public_profile"]}));
-app.get("/auth/facebook/callback", passport.authenticate("facebook", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/github", passport.authenticate("github"));
-app.get("/auth/github/callback", passport.authenticate("github", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
+    mongoose.set("useFindAndModify", false);
+    mongoose.set("useCreateIndex", true);
+    mongoose.set("useNewUrlParser", true);
+    mongoose.set("useUnifiedTopology", true);
 // @ts-ignore
-app.get("/auth/google", passport.authenticate("google", {
-    scope: ["profile", "email", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets.readonly"],
-    accessType: "offline",
-    prompt: "consent"
-}));
-app.get("/auth/google/callback", passport.authenticate("google", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/twitter", passport.authenticate("twitter"));
-app.get("/auth/twitter/callback", passport.authenticate("twitter", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/linkedin", passport.authenticate("linkedin", {state: "SOME STATE"}));
-app.get("/auth/linkedin/callback", passport.authenticate("linkedin", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
-app.get("/auth/twitch", passport.authenticate("twitch", {}));
-app.get("/auth/twitch/callback", passport.authenticate("twitch", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo || "/");
-});
+    mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connection.on("error", (err) => {
+        console.error(err);
+        console.log("%s MongoDB connection error. Please make sure MongoDB is running.", chalk.red("✗"));
+        process.exit();
+    });
 
-/**
- * OAuth authorization routes. (API examples)
- */
-app.get("/auth/foursquare", passport.authorize("foursquare"));
-app.get("/auth/foursquare/callback", passport.authorize("foursquare", {failureRedirect: "/api"}), (req, res) => {
-    res.redirect("/api/foursquare");
-});
-app.get("/auth/tumblr", passport.authorize("tumblr"));
-app.get("/auth/tumblr/callback", passport.authorize("tumblr", {failureRedirect: "/api"}), (req, res) => {
-    res.redirect("/api/tumblr");
-});
-app.get("/auth/steam", passport.authorize("openid", {state: "SOME STATE"}));
-app.get("/auth/steam/callback", passport.authorize("openid", {failureRedirect: "/api"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo);
-});
-app.get("/auth/pinterest", passport.authorize("pinterest", {scope: "read_public write_public"}));
-app.get("/auth/pinterest/callback", passport.authorize("pinterest", {failureRedirect: "/login"}), (req, res) => {
-    res.redirect("/api/pinterest");
-});
-app.get("/auth/quickbooks", passport.authorize("quickbooks", {
-    scope: ["com.intuit.quickbooks.accounting"],
-    state: "SOME STATE"
-}));
-app.get("/auth/quickbooks/callback", passport.authorize("quickbooks", {failureRedirect: "/login"}), (req, res) => {
-    // @ts-ignore
-    res.redirect(req.session.returnTo);
-});
+    /**
+     * Express configuration.
+     */
+    app.set("host", process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
+    app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
+    app.set("views", path.join(__dirname, "views"));
+    app.set("view engine", "pug");
+    app.use(expressStatusMonitor());
+    app.use(compression());
+    app.use(sass({
+        src: path.join(__dirname, "public"),
+        dest: path.join(__dirname, "public")
+    }));
+    app.use(logger("dev"));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: true}));
+// @ts-ignore
+    app.use(session({
+        resave: true,
+        saveUninitialized: true,
+        // What is the session_secret?
+        // @ts-ignore
+        secret: process.env.SESSION_SECRET,
+        cookie: {maxAge: 1209600000}, // two weeks in milliseconds
+        // @ts-ignore
+        store: new TypeormStore({
+            cleanupLimit: 2,
+            limitSubquery: false, // If using MariaDB.
+            ttl: 86400
+        }).connect(connection.getRepository(Session)),
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(flash());
+    /*
+    app.use((req, res, next) => {
+        if (req.path === "/api/upload") {
+            // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
+            next();
+        } else {
+            lusca.csrf()(req, res, next);
+        }
+    });
+    */
+    /*
+    app.use(lusca.xframe("SAMEORIGIN"));
+    app.use(lusca.xssProtection(true));
+    */
+    app.disable("x-powered-by");
+    app.use((req, res, next) => {
+        res.locals.user = req.user;
+        next();
+    });
+    /*
+    app.use((req, res, next) => {
+        // After successful login, redirect back to the intended page
+        if (!req.user
+            && req.path !== "/login"
+            && req.path !== "/signup"
+            && !req.path.match(/^\/auth/)
+            && !req.path.match(/\./)) {
+            // @ts-ignore
+            req.session.returnTo = req.originalUrl;
+        } else if (req.user
+            && (req.path === "/account" || req.path.match(/^\/api/))) {
+            // @ts-ignore
+            req.session.returnTo = req.originalUrl;
+        }
+        next();
+    });
+    */
+    app.use("/", express.static(path.join(__dirname, "public"), {maxAge: 31557600000}));
+    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/chart.js/dist"), {maxAge: 31557600000}));
+    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/popper.js/dist/umd"), {maxAge: 31557600000}));
+    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/bootstrap/dist/js"), {maxAge: 31557600000}));
+    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/jquery/dist"), {maxAge: 31557600000}));
+    app.use("/webfonts", express.static(path.join(__dirname, "node_modules/@fortawesome/fontawesome-free/webfonts"), {maxAge: 31557600000}));
 
-app.post("/translate", passportConfig.isAuthenticated, enforceBudget, translateFunc);
-app.post("/image-search", passportConfig.isAuthenticated, enforceBudget, imageSearchFunc);
-app.post("/trend-locations", passportConfig.isAuthenticated, enforceBudget, getLocations);
-app.post("/trends", passportConfig.isAuthenticated, enforceBudget, getTrendForLocation);
-app.post("/get-speech", passportConfig.isAuthenticated, enforceBudget, synthesisController.TextToSpeech);
-app.post("/speech-recognition-token", passportConfig.isAuthenticated, enforceBudget, synthesisController.GetSpeechRecognitionToken);
+    /**
+     * Primary app routes.
+     */
+    app.get("/", homeController.index);
+    app.get("/login", userController.getLogin);
+    app.post("/login", userController.postLogin);
+    app.get("/logout", userController.logout);
+    app.get("/forgot", userController.getForgot);
+    app.post("/forgot", userController.postForgot);
+    app.get("/reset/:token", userController.getReset);
+    app.post("/reset/:token", userController.postReset);
+    app.get("/signup", userController.getSignup);
+    app.post("/signup", userController.postSignup);
+    app.get("/contact", contactController.getContact);
+    app.post("/contact", contactController.postContact);
+    app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);
+    app.get("/account/verify/:token", passportConfig.isAuthenticated, userController.getVerifyEmailToken);
+    app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
+    app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
+    app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
+    app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
+    app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
+    app.get("/profile", passportConfig.isAuthenticated, userController.getProfile);
+
+    /**
+     * API examples routes.
+     */
+    app.get("/api", apiController.getApi);
+
+    /**
+     * OAuth authentication routes. (Sign in)
+     */
+    app.get("/auth/instagram", passport.authenticate("instagram", {scope: ["basic", "public_content"]}));
+    app.get("/auth/instagram/callback", passport.authenticate("instagram", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/snapchat", passport.authenticate("snapchat"));
+    app.get("/auth/snapchat/callback", passport.authenticate("snapchat", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/facebook", passport.authenticate("facebook", {scope: ["email", "public_profile"]}));
+    app.get("/auth/facebook/callback", passport.authenticate("facebook", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/github", passport.authenticate("github"));
+    app.get("/auth/github/callback", passport.authenticate("github", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+// @ts-ignore
+    app.get("/auth/google", passport.authenticate("google", {
+        scope: ["profile", "email", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets.readonly"],
+        accessType: "offline",
+        prompt: "consent"
+    }));
+    app.get("/auth/google/callback", passport.authenticate("google", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/twitter", passport.authenticate("twitter"));
+    app.get("/auth/twitter/callback", passport.authenticate("twitter", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/linkedin", passport.authenticate("linkedin", {state: "SOME STATE"}));
+    app.get("/auth/linkedin/callback", passport.authenticate("linkedin", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+    app.get("/auth/twitch", passport.authenticate("twitch", {}));
+    app.get("/auth/twitch/callback", passport.authenticate("twitch", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo || "/");
+    });
+
+    /**
+     * OAuth authorization routes. (API examples)
+     */
+    app.get("/auth/foursquare", passport.authorize("foursquare"));
+    app.get("/auth/foursquare/callback", passport.authorize("foursquare", {failureRedirect: "/api"}), (req, res) => {
+        res.redirect("/api/foursquare");
+    });
+    app.get("/auth/tumblr", passport.authorize("tumblr"));
+    app.get("/auth/tumblr/callback", passport.authorize("tumblr", {failureRedirect: "/api"}), (req, res) => {
+        res.redirect("/api/tumblr");
+    });
+    app.get("/auth/steam", passport.authorize("openid", {state: "SOME STATE"}));
+    app.get("/auth/steam/callback", passport.authorize("openid", {failureRedirect: "/api"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo);
+    });
+    app.get("/auth/pinterest", passport.authorize("pinterest", {scope: "read_public write_public"}));
+    app.get("/auth/pinterest/callback", passport.authorize("pinterest", {failureRedirect: "/login"}), (req, res) => {
+        res.redirect("/api/pinterest");
+    });
+    app.get("/auth/quickbooks", passport.authorize("quickbooks", {
+        scope: ["com.intuit.quickbooks.accounting"],
+        state: "SOME STATE"
+    }));
+    app.get("/auth/quickbooks/callback", passport.authorize("quickbooks", {failureRedirect: "/login"}), (req, res) => {
+        // @ts-ignore
+        res.redirect(req.session.returnTo);
+    });
+
+    app.post("/translate", passportConfig.isAuthenticated, enforceBudget, translateFunc);
+    app.post("/image-search", passportConfig.isAuthenticated, enforceBudget, imageSearchFunc);
+    app.post("/trend-locations", passportConfig.isAuthenticated, enforceBudget, getLocations);
+    app.post("/trends", passportConfig.isAuthenticated, enforceBudget, getTrendForLocation);
+    app.post("/get-speech", passportConfig.isAuthenticated, enforceBudget, synthesisController.TextToSpeech);
+    app.post("/speech-recognition-token", passportConfig.isAuthenticated, enforceBudget, synthesisController.GetSpeechRecognitionToken);
+
+    return app;
+}
 
 /*
 app.get("/api/lastfm", apiController.getLastfm);
@@ -299,4 +302,4 @@ app.get("/api/chart", apiController.getChart);
 app.get("/api/google/sheets", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getGoogleSheets);
 app.get("/api/quickbooks", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getQuickbooks);
 */
-export default app;
+export default connectedApp;
