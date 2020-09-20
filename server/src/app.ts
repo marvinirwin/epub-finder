@@ -25,14 +25,14 @@ import sass from "node-sass-middleware";
 /**
  * Controllers (route handlers).
  */
-import * as homeController from "../controllers/home";
-import * as userController from "../controllers/user";
-import * as apiController from "../controllers/api";
-import * as contactController from "../controllers/contact";
+import * as homeController from "./controllers/home";
+import * as userController from "./controllers/user";
+import * as apiController from "./controllers/api";
+import * as contactController from "./controllers/contact";
 /**
  * API keys and Passport configuration.
  */
-import passportConfig from "../config/passport";
+import passportConfig from "./config/passport";
 import {enforceBudget} from "./controllers/budget";
 
 
@@ -43,7 +43,7 @@ const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 
 const app = express();
 
-app.set("port", process.env.PORT || 3002);
+app.set("port", process.env.SERVER_PORT || 3002);
 app.set("views", path.join(__dirname, "../views"));
 app.set("view engine", "pug");
 app.use(compression());

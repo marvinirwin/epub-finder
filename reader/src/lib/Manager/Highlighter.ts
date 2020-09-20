@@ -19,6 +19,8 @@ function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => Time
     };
 }
 
+const CORRECT_RECOGNITION_SCORE = 2;
+
 /**
  * TODO probably execute all these things in a try since elements may disappear
  */
@@ -83,7 +85,16 @@ export class Highlighter {
                 for (let word in indexedScheduleRows) {
                     const row = indexedScheduleRows[word];
                     if (row.wordRecognitionRecords.length) {
-                        highlights[word] = colorForPercentage(getDatePercentage(dueDate(indexedScheduleRows[word])));
+                        let correct = 0;
+                        for (let i = row.wordRecognitionRecords.length - 1; i >= 0; i--) {
+                            const wordRecognitionRecord = row.wordRecognitionRecords[i];
+                            if (wordRecognitionRecord.recognitionScore >= CORRECT_RECOGNITION_SCORE) {
+                                correct++;
+                            } else {
+                                break;
+                            }
+                        }
+                        highlights[word] = colorForPercentage(clamp(0.001, correct * 25, 100));
                     }
                 }
                 return highlights;
