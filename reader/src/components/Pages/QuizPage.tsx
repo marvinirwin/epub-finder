@@ -14,7 +14,7 @@ const componentMap: { [key: string]: React.FunctionComponent<QuizCardProps> } = 
 }
 
 export function QuizPage({m}: { m: Manager }) {
-    const c = useObservableState(m.quizManager.quizzingComponent$);
+    const quizStage = useObservableState(m.quizManager.quizStage);
     const quizzingCard = useObservableState(m.quizManager.quizzingCard$);
 
     return <Fragment>
@@ -25,8 +25,8 @@ export function QuizPage({m}: { m: Manager }) {
                 width: '100%',
                 position: 'absolute',
             }}>
-                {c === "Conclusion" && <Conclusion c={quizzingCard} m={m}/>}
-                {c === "Characters" || !c && <Characters c={quizzingCard} m={m}/>}
+                {quizStage === "Conclusion" && <Conclusion c={quizzingCard} m={m}/>}
+                {(quizStage === "Characters" || !quizStage) && <Characters c={quizzingCard} m={m}/>}
             </div>
         </div>
     </Fragment>

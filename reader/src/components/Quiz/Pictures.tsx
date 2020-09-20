@@ -8,7 +8,7 @@ import {quizStyles} from "./QuizStyles";
 
 export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    const advance = () => m.quizManager.quizzingComponent$.next("Conclusion");
+    const advance = () => m.quizManager.quizStage.next("Conclusion");
     return <Card className={classes.card}>
 {/*
         <CardContent className={classes.cardContent}>

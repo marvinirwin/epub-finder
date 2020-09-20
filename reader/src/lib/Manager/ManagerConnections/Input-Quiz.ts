@@ -11,7 +11,7 @@ export function InputQuiz(i: BrowserInputs, q: QuizManager) {
     const advanceSet = new Set<QuizComponent>(["Characters", "Pictures"]);
     const conclusionSet = new Set<QuizComponent>(["Conclusion"]);
     const componentFilterPipe = (set: Set<QuizComponent>) => (o1$: Observable<any>): Observable<[KeyboardEvent, QuizComponent]> => o1$.pipe(
-        withLatestFrom(q.quizzingComponent$),
+        withLatestFrom(q.quizStage),
         filter(([keydownEvent, component]) => {
             return set.has(component);
         }),

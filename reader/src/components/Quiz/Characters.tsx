@@ -26,7 +26,7 @@ export function Characters({c, m}: QuizCardProps) {
     const [error, setError] = useState('');
     const requestEditWord = () => c && m.editingCardManager.requestEditWord$.next(c.learningLanguage);
     const advance = () => {
-        m.quizManager.quizzingComponent$.next("Conclusion");
+        m.quizManager.quizStage.next("Conclusion");
     };
 
     useEffect(() => {

@@ -2,7 +2,6 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Characters} from "../../components/Quiz/Characters";
 import { startWith, withLatestFrom} from "rxjs/operators";
-import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
 import {sleep} from "../Util/Util";
 
@@ -20,7 +19,7 @@ export interface QuizManagerParams {
 
 export class QuizManager {
     quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
-    quizzingComponent$ = new ReplaySubject<QuizComponent>(1);
+    quizStage = new ReplaySubject<QuizComponent>(1);
     quizResult$ = new Subject<QuizResult>();
     advanceQuizStage$ = new Subject();
 
@@ -47,7 +46,7 @@ export class QuizManager {
         ).subscribe(async ([_, scheduledCards]) => {
             let iCard = scheduledCards[0];
             this.quizzingCard$.next(iCard);
-            this.quizzingComponent$.next("Characters");
+            this.quizStage.next("Characters");
             await sleep(1000);
             requestHighlightedWord(iCard.learningLanguage)
         })
@@ -65,14 +64,11 @@ export class QuizManager {
         })
 
         this.advanceQuizStage$.pipe(
-            withLatestFrom(this.quizzingComponent$)
+            withLatestFrom(this.quizStage)
         ).subscribe(([, currentDialogComponent]) => {
             switch (currentDialogComponent) {
                 case "Characters":
-                    this.quizzingComponent$.next("Pictures")
-                    break;
-                case "Pictures":
-                    this.quizzingComponent$.next("Conclusion")
+                    this.quizStage.next("Conclusion")
                     break;
             }
         })
@@ -80,7 +76,7 @@ export class QuizManager {
 
     setQuizCard(icard: ICard | undefined) {
         this.quizzingCard$.next(icard);
-        this.quizzingComponent$.next("Characters")
+        this.quizStage.next("Characters")
     }
 
     completeQuiz(word: string, recognitionScore: number) {
