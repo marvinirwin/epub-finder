@@ -30,7 +30,7 @@ export async function getTranslation<A>(learningText: A) {
         to: 'en',
         text: learningText
     })
-    return result.data.translation;
+    return result?.data?.translation || '';
 }
 
 async function getAllLocations(): Promise<ITrendLocation[]> {

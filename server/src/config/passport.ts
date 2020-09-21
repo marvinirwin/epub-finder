@@ -74,6 +74,26 @@ export default function (repo: Repository<User>) {
      *       - Else create a new account.
      */
 
+
+    const strategy = (mutateUser: (u: User, profile: any) => User, tokenKind: string) =>
+        async (req: Express.Request, accessToken: string, profile: any, done: (err: any, user: User | undefined) => void) => {
+            const linkUser = (userId: any) => {
+                const alreadyAssociatedUser = repo.findOne({[tokenKind]: profile.id});
+                if (alreadyAssociatedUser) {
+                    throw new Error(`There is already a user associated with this ${tokenKind} account`);
+                }
+                const userToLink = repo.findOne(userId);
+                if (!userToLink) {
+                    throw new Error(`Could not find user with id ${userId}`);
+                }
+                mutateUser(userToLink, profile);
+            };
+            const createUser = () => {
+
+            };
+        }
+
+
     /**
      * Sign in with Snapchat.
      */

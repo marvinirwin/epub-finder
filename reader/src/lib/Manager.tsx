@@ -26,7 +26,6 @@ import {SentenceManager} from "./Manager/SentenceManager";
 import {BookWordData, mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
-import pinyin from "pinyin";
 import EditingCardManager from "./Manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
 import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";

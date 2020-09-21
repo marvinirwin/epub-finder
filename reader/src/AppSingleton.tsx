@@ -13,7 +13,12 @@ export function getManager(mode: string): Manager {
         websites.push('test.html');
     } else {
         websites.push(
-            'guardian_angel.html',
+            'why_i_left_china.html',
+            'generals.html',
+            'zhou_enlai.html',
+            'party_1.html',
+            '4_modernizations.html',
+            'smes.html',
         )
     }
     websites.forEach(filename => {
