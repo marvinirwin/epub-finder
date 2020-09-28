@@ -1,14 +1,22 @@
-import {fromEvent, merge, Subject} from "rxjs";
+import {fromEvent, merge, ReplaySubject, Subject} from "rxjs";
 import { Dictionary } from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {getTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 
+
+export interface BrowserInputsConfig {
+
+}
+
 export class BrowserInputs {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     selectedText$: Subject<string> = new Subject<string>();
+    hoveredSentence$ = new ReplaySubject<string | undefined>(1);
+    hoveredCharacterIndex$ = new ReplaySubject<number | undefined>(1);
+
     constructor() {}
 
     applyDocumentListeners(root: HTMLDocument) {
@@ -18,8 +26,10 @@ export class BrowserInputs {
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
 
         const checkForSelectedText = () => {
+            // @ts-ignore
             const activeEl = root.ownerDocument?.activeElement;
             if (activeEl) {
+                // @ts-ignore
                 const selObj = root.ownerDocument?.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
@@ -43,7 +53,7 @@ export class BrowserInputs {
     }
 
 
-    public static applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
+    public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
         atomizedSentences.forEach(atomizedSentence => {
             atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
                 atomizedSentence.getTranslation();
@@ -66,10 +76,11 @@ export class BrowserInputs {
             }
 
             const show = () => {
+                this.hoveredSentence$.next(atomizedSentence.translatableText);
                 popperHTMLElement.setAttribute('data-show', '');
             }
             const hide = () => {
-                (popperHTMLElement as unknown as HTMLElement).removeAttribute('data-show');
+                popperHTMLElement.removeAttribute('data-show');
             }
 
             showEvents.forEach(event => {
@@ -81,6 +92,7 @@ export class BrowserInputs {
             });
         });
     }
+
 }
 
 export const filterTextInputEvents = filter((ev: KeyboardEvent) => {

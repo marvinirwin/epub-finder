@@ -172,12 +172,38 @@
     position: fixed;
     width: 25vw;
     right: -20vw;
-    margin-top: 25vh;
     z-index: 3;
     transition: transform 0.5s;
+    /* TODO add scss so I can use variables for my widths and stuff  */
+    overflow: auto;
+    height: 40vh;
+    bottom: 10vh;
 }
 .library:hover {
     transform: translateX(-10vw);
+    cursor: pointer;
+}
+
+.video {
+    position: fixed;
+    width: 30vw;
+    z-index: 3;
+    transition: transform 0.5s;
+    /* TODO add scss so I can use variables for my widths and stuff  */
+    top: 10vh;
+    height: 40vh;
+    overflow: auto;
+    /* right: -250px; */
+    right: 0;
+    background-color: white;
+}
+.video > video {
+    width: 533px;
+    height: 300px;
+}
+
+.video:hover {
+    /* transform: translateX(-250px); */
     cursor: pointer;
 }
 

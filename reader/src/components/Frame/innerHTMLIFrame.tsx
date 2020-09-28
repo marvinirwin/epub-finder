@@ -2,15 +2,15 @@ import React, {useEffect, useState, Fragment} from 'react'
 import {Iframe} from './iframe'
 import {BodyStyle} from "../../lib/BookFrame/AppendBookStyle";
 
-export type IFrameRenderHandler = (head: HTMLHeadElement, body: HTMLBodyElement) => void;
+export type IFrameRenderHandler = (head: HTMLTitleElement, body: HTMLDivElement) => void;
 
 export const InnerHTMLIFrame: React.FunctionComponent<{
     headText: string,
     bodyText: string,
     renderHandler: IFrameRenderHandler
 }> = ({headText, bodyText, renderHandler}) => {
-    const [headRef, setHeadRef] = useState();
-    const [bodyRef, setBodyRef] = useState();
+    const [headRef, setHeadRef] = useState<HTMLTitleElement | null>();
+    const [bodyRef, setBodyRef] = useState<HTMLDivElement | null>();
     useEffect(() => {
         if (headRef && bodyRef) {
             renderHandler(headRef, bodyRef);

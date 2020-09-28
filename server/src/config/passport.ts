@@ -1,27 +1,20 @@
 import {Repository} from "typeorm";
 import {User} from "../entities/User";
-
-const passport = require("passport");
-const refresh = require("passport-oauth2-refresh");
-const axios = require("axios");
-const {Strategy: InstagramStrategy} = require("passport-instagram");
-const {Strategy: LocalStrategy} = require("passport-local");
-const {Strategy: FacebookStrategy} = require("passport-facebook");
-const {Strategy: SnapchatStrategy} = require("passport-snapchat");
-const {Strategy: TwitterStrategy} = require("passport-twitter");
-const {Strategy: TwitchStrategy} = require("passport-twitch-new");
-const {Strategy: GitHubStrategy} = require("passport-github2");
-const {OAuth2Strategy: GoogleStrategy} = require("passport-google-oauth");
-const {Strategy: LinkedInStrategy} = require("passport-linkedin-oauth2");
-const {Strategy: OpenIDStrategy} = require("passport-openid");
-const {OAuthStrategy} = require("passport-oauth");
-const {OAuth2Strategy} = require("passport-oauth");
-const _ = require("lodash");
-const moment = require("moment");
+import passport from "passport";
+import refresh from "passport-oauth2-refresh";
+import axios from "axios";
+import '../types/passport-github2';
+// @ts-ignore
+import PassportGithub from "passport-github2";
+// @ts-ignore
+import PassportGoogle from "passport-google-oauth";
+import _ from "lodash";
+import moment from "moment";
 
 export default function (repo: Repository<User>) {
 // @ts-ignore
     passport.serializeUser((user, done) => {
+        // @ts-ignore
         done(null, user.id);
     });
 
@@ -77,8 +70,8 @@ export default function (repo: Repository<User>) {
 
     const strategy = (mutateUser: (u: User, profile: any) => User, tokenKind: string) =>
         async (req: Express.Request, accessToken: string, profile: any, done: (err: any, user: User | undefined) => void) => {
-            const linkUser = (userId: any) => {
-                const alreadyAssociatedUser = repo.findOne({[tokenKind]: profile.id});
+            const linkUser = async (userId: any) => {
+                const alreadyAssociatedUser = await repo.findOne({[tokenKind]: profile.id});
                 if (alreadyAssociatedUser) {
                     throw new Error(`There is already a user associated with this ${tokenKind} account`);
                 }
@@ -86,11 +79,37 @@ export default function (repo: Repository<User>) {
                 if (!userToLink) {
                     throw new Error(`Could not find user with id ${userId}`);
                 }
+                // @ts-ignore
                 mutateUser(userToLink, profile);
+                // @ts-ignore
+                await repo.save(userToLink);
+                return userToLink;
             };
-            const createUser = () => {
-
+            const createUser = async () => {
+                const newUser = new User();
+                mutateUser(newUser, profile);
+                await repo.save(newUser);
+                done(null, newUser)
             };
+            try {
+                // @ts-ignore
+                const id: number = req.user.id;
+                if (id) {
+                    const existingUser = await repo.findOne({[tokenKind]: profile.id});
+                    if (existingUser) {
+                        throw new Error(`There is already a ${tokenKind} account that belongs to this user.  Sign in with that account or delete it to link it to this user`);
+                    }
+                    return linkUser(id);
+                } else {
+                    const existingUser = await repo.findOne({[tokenKind]: profile.id});
+                    if (existingUser) {
+                        return existingUser;
+                    }
+                    return createUser();
+                }
+            } catch (e) {
+                done(e, undefined);
+            }
         }
 
 
@@ -214,7 +233,8 @@ export default function (repo: Repository<User>) {
     /**
      * Sign in with GitHub.
      */
-    passport.use(new GitHubStrategy({
+/*
+    passport.use(new PassportGoogle.GitHubStrategy({
         clientID: process.env.GITHUB_ID,
         clientSecret: process.env.GITHUB_SECRET,
         callbackURL: `${process.env.BASE_URL}/auth/github/callback`,
@@ -264,6 +284,7 @@ export default function (repo: Repository<User>) {
             }
         }
     }));
+*/
 
     /**
      * Sign in with Twitter.
@@ -324,6 +345,7 @@ export default function (repo: Repository<User>) {
     /**
      * Sign in with Google.
      */
+/*
     const googleStrategyConfig = new GoogleStrategy({
         clientID: process.env.GOOGLE_ID,
         clientSecret: process.env.GOOGLE_SECRET,
@@ -376,8 +398,11 @@ export default function (repo: Repository<User>) {
         repo.save(user)
         done(null, user)
     });
+*/
+/*
     passport.use("google", googleStrategyConfig);
     refresh.use("google", googleStrategyConfig);
+*/
 
     /**
      * Sign in with LinkedIn.
@@ -775,6 +800,7 @@ export default function (repo: Repository<User>) {
                         res.redirect(`/auth/${provider}`);
                     } else {
                         refresh.requestNewAccessToken(`${provider}`, token.refreshToken, (err, accessToken, refreshToken, params) => {
+                            // @ts-ignore
                             User.findById(req.user.id, (err, user) => {
                                 user.tokens.some((tokenObject) => {
                                     if (tokenObject.kind === provider) {

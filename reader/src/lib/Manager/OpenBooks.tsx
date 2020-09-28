@@ -30,6 +30,7 @@ export class OpenBooks {
     sourceBooks$: Observable<ds_Dict<OpenBook>>;
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
+    // renderedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
 
     constructor(
         private config: OpenBooksConfig
@@ -37,7 +38,7 @@ export class OpenBooks {
         this.addOpenBook$
             .pipe(
                 map(page => {
-                    const b = new OpenBook(page.name, config.trie$);
+                    const b = new OpenBook(page.name, config.trie$, undefined, undefined, config.applyAtomizedSentencesListener);
                     b.url$.next(page.url)
                     return b;
                 }),
@@ -208,7 +209,9 @@ export class OpenBooks {
         this.readingBook = new OpenBook(
             "Reading Book",
             config.trie$,
-            this.readingDocument$
+            this.readingDocument$,
+            undefined,
+            config.applyAtomizedSentencesListener
         );
         this.openedBooks.appendDelta$.next(
             {

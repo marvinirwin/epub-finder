@@ -66,7 +66,6 @@ Table of Contents
 - [Cheatsheets](#cheatsheets)
     - [ES6](#-es6-cheatsheet)
     - [JavaScript Date](#-javascript-date-cheatsheet)
-    - [Mongoose Cheatsheet](#mongoose-cheatsheet)
 - [Deployment](#deployment)
 - [Docker](#docker)
 - [Production](#production)
@@ -454,7 +453,6 @@ List of Packages
 | mailchecker                     | Verifies that an email address is valid and not a disposable address.   |
 | mocha                           | Test framework.                                                         |
 | moment                          | Parse, validate, compute dates and times.                               |
-| mongoose                        | MongoDB ODM.                                                            |
 | morgan                          | HTTP request logger middleware for node.js.                             |
 | multer                          | Node.js middleware for handling `multipart/form-data`.                  |
 | node-foursquare                 | Foursquare API library.                                                 |
@@ -570,11 +568,6 @@ That's a custom error message defined in `app.js` to indicate that there was a
 problem connecting to MongoDB:
 
 ```js
-mongoose.connection.on('error', (err) => {
-  console.error(err);
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
-  process.exit();
-});
 ```
 You need to have a MongoDB server running before launching `app.js`. You can
 download MongoDB [here](https://www.mongodb.com/download-center/community), or install it via a package manager.
@@ -818,14 +811,7 @@ Use whichever style that makes sense to you. Either one is acceptable. I think t
 
 **Step 2.** Create a new schema and a model `Book.js` inside the *models* directory.
 ```js
-const mongoose = require('mongoose');
 
-const bookSchema = new mongoose.Schema({
-  name: String
-});
-
-const Book = mongoose.model('Book', bookSchema);
-module.exports = Book;
 ```
 
 **Step 3.** Create a new controller file called `book.js` inside the *controllers* directory.
@@ -879,7 +865,6 @@ If you are the only developer, then it's okay. But as I said, once it gets up to
 
 That's all there is to it. Express.js is super simple to use.
 Most of the time you will be dealing with other APIs to do the real work:
-[Mongoose](http://mongoosejs.com/docs/guide.html) for querying database, socket.io for sending and receiving messages over websockets,
 sending emails via [Nodemailer](http://nodemailer.com/), form validation using [express-validator](https://github.com/ctavan/express-validator) library,
 parsing websites using [Cheerio](https://github.com/cheeriojs/cheerio), etc.
 

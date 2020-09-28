@@ -1,6 +1,5 @@
 import {Manager} from "../../lib/Manager";
 import React from "react";
-import {useObs} from "../../lib/UseObs";
 import {Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {dueDate, wordCount} from "../../lib/ReactiveClasses/ScheduleRow";

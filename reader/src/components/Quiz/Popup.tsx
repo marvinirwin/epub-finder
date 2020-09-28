@@ -2,7 +2,6 @@ import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import {ICard} from "../../lib/Interfaces/ICard";
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../lib/UseObs";
 import {useObservableState} from "observable-hooks";
 
 export type QuizCardProps = { c: ICard | undefined, m: Manager};

@@ -1,14 +1,13 @@
-import {Website} from "../../Website/Website";
-import {Observable, ReplaySubject} from "rxjs";
-import {OpenBook} from "../../BookFrame/OpenBook";
-import {TrieWrapper} from "../../TrieWrapper";
-import {TrieObservable} from "../../AppContext/NewOpenBook";
+import { ReplaySubject} from "rxjs";
 import {NavigationPages} from "../../Util/Util";
 import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharacter";
+import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
+import {TrieObservable} from "../QuizCharacter";
 
 export interface OpenBooksConfig {
     trie$: TrieObservable,
     applyListeners: (b: HTMLDocument) => void,
     bottomNavigationValue$: ReplaySubject<NavigationPages>,
-    applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void
+    applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
+    applyAtomizedSentencesListener: (sentences: AtomizedSentence[]) => void;
 }

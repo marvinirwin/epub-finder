@@ -7,7 +7,6 @@
 - Fix navbar rendering issues when using themes (thanks to @peterblazejewicz)
 - Fix button formatting issues when applying themes (thanks to @peterblazejewicz)
 - Fixed drop down menu to show correct formatting from the theme (thanks to @jonasroslund)
-- Config mongoose to use the new Server Discovery and Monitoring
 - Fix validation bug in Twitter, Pinterest, and Twilio API examples
 - Fix HERE icon in the API examples
 - Fix minor issues in Stripe and Lob API examples
@@ -103,7 +102,6 @@
 - Security improvement by removing X-Powered-By header
 - Express errorhandler will only be used in development to match its documentation
 - Removed deprecated Instagram popular images API call from the Instagram example (@nacimgoura)
-- Removed `mongoose global.Promise` as it is no longer needed (@nacimgoura)
 - Refactoring of GitHub, last.fm api, twitter examples and code improvements to use ES6/ES7 features (@nacimgoura)
 - Add NodeJS 10 in travis.yml (@nacimgoura)
 - Improvements to the Steam API example (@nacimgoura)

@@ -15,12 +15,16 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react",
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "typeRoots": [
+      "src/types",
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "src/**/*"

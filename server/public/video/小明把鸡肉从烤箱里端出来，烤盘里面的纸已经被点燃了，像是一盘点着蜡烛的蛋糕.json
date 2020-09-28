@@ -1,0 +1,155 @@
+﻿{
+    "timeScale":  0.25,
+    "sentence":  "小明把鸡肉从烤箱里端出来，烤盘里面的纸已经被点燃了，像是一盘点着蜡烛的蛋糕",
+    "characters":  [
+                       {
+                           "timestamp":  6187.5081,
+                           "character":  "小"
+                       },
+                       {
+                           "timestamp":  7289.2194,
+                           "character":  "明"
+                       },
+                       {
+                           "timestamp":  8003.818,
+                           "character":  "把"
+                       },
+                       {
+                           "timestamp":  9155.2505,
+                           "character":  "鸡"
+                       },
+                       {
+                           "timestamp":  10962.375600000001,
+                           "character":  "肉"
+                       },
+                       {
+                           "timestamp":  12242.8443,
+                           "character":  "从"
+                       },
+                       {
+                           "timestamp":  12758.9842,
+                           "character":  "烤"
+                       },
+                       {
+                           "timestamp":  13155.9889,
+                           "character":  "箱"
+                       },
+                       {
+                           "timestamp":  13751.7708,
+                           "character":  "里"
+                       },
+                       {
+                           "timestamp":  14595.565200000001,
+                           "character":  "端"
+                       },
+                       {
+                           "timestamp":  15776.4529,
+                           "character":  "出"
+                       },
+                       {
+                           "timestamp":  19370.357200000002,
+                           "character":  "来"
+                       },
+                       {
+                           "timestamp":  19370.430200000003,
+                           "character":  "，"
+                       },
+                       {
+                           "timestamp":  21038.1345,
+                           "character":  "烤"
+                       },
+                       {
+                           "timestamp":  21831.804900000003,
+                           "character":  "盘"
+                       },
+                       {
+                           "timestamp":  22586.7863,
+                           "character":  "里"
+                       },
+                       {
+                           "timestamp":  23251.4667,
+                           "character":  "面"
+                       },
+                       {
+                           "timestamp":  24055.7266,
+                           "character":  "的"
+                       },
+                       {
+                           "timestamp":  26090.6166,
+                           "character":  "纸"
+                       },
+                       {
+                           "timestamp":  26656.6431,
+                           "character":  "已"
+                       },
+                       {
+                           "timestamp":  27877.670400000003,
+                           "character":  "经"
+                       },
+                       {
+                           "timestamp":  29485.462000000003,
+                           "character":  "被"
+                       },
+                       {
+                           "timestamp":  30369.095400000002,
+                           "character":  "点"
+                       },
+                       {
+                           "timestamp":  31341.665200000003,
+                           "character":  "燃"
+                       },
+                       {
+                           "timestamp":  34151.2797,
+                           "character":  "了"
+                       },
+                       {
+                           "timestamp":  34151.336500000005,
+                           "character":  "，"
+                       },
+                       {
+                           "timestamp":  35233.4775,
+                           "character":  "像"
+                       },
+                       {
+                           "timestamp":  36564.1603,
+                           "character":  "是"
+                       },
+                       {
+                           "timestamp":  37119.9516,
+                           "character":  "一"
+                       },
+                       {
+                           "timestamp":  39413.105800000005,
+                           "character":  "盘"
+                       },
+                       {
+                           "timestamp":  39859.9652,
+                           "character":  "点"
+                       },
+                       {
+                           "timestamp":  40336.2398,
+                           "character":  "着"
+                       },
+                       {
+                           "timestamp":  41001.4126,
+                           "character":  "蜡"
+                       },
+                       {
+                           "timestamp":  42183.036100000005,
+                           "character":  "烛"
+                       },
+                       {
+                           "timestamp":  43612.6207,
+                           "character":  "的"
+                       },
+                       {
+                           "timestamp":  46938.562600000005,
+                           "character":  "蛋"
+                       },
+                       {
+                           "timestamp":  50691.657,
+                           "character":  "糕"
+                       }
+                   ],
+    "filename":  "小明把鸡肉从烤箱里端出来，烤盘里面的纸已经被点燃了，像是一盘点着蜡烛的蛋糕.mp4"
+}

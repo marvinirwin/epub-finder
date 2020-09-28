@@ -10,8 +10,8 @@ blue() {
 
 symlink-env() {
   # What happens if the symlink already exists?
-  ln -sf .env reader/.env
-  ln -sf .env server/.env
+  ln -f .env reader/.env
+  ln -f .env server/.env
 }
 
 build-mandarin-trainer() {

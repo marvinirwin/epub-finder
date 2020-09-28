@@ -5,8 +5,8 @@ import trie from "trie-prefix-tree";
 import {flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
-import {TrieObservable} from "../AppContext/NewOpenBook";
 import {TrieWrapper} from "../TrieWrapper";
+import {TrieObservable} from "./QuizCharacter";
 
 export default class CardManager {
     deleteCards$: Subject<string[]> = new Subject<string[]>();

@@ -17,6 +17,7 @@ import {OpenedBook} from "../lib/Atomized/OpenedBook";
 import {Alert} from "@material-ui/lab";
 import {Snackbar} from "@material-ui/core";
 import {BookStats} from "./BookStats";
+import { Video } from "./Video";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -93,7 +94,6 @@ export function Main({m}: { m: Manager }) {
         >
             <OpenedBook openedBook={readingBook}/>
         </StaticFrame>
-        {readingBook && <BookStats m={m} b={readingBook}/>}
         <ImageSelectPopup m={m}/>
         <div style={{
             overflow: 'auto',
@@ -104,6 +104,7 @@ export function Main({m}: { m: Manager }) {
             {(currentPage === NavigationPages.READING_PAGE || !currentPage) && <ReadingPage m={m}/>}
             {currentPage === NavigationPages.SETTINGS_PAGE && <SettingsPage m={m}/>}
         </div>
+        <Video m={m}/>
         <Snackbar
             open={alertMessagesVisible}
             autoHideDuration={6000}

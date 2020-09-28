@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction,  } from "express";
+// @ts-ignore
 import User from '../models/User';
-import * as Mongoose from "mongoose";
 
-export interface ExpressUser extends Mongoose.Document {
+export interface ExpressUser {
     email: string,
     password: string,
     passwordResetToken: string,
@@ -45,7 +45,9 @@ export const enforceBudget = (req: Request, res: Response, next: NextFunction) =
         res.status(402).send(`You have used your entire "budget" of services, email marvin@marvinirwin.com if you would like some more`)
     } else {
         user.usedBudget += cost;
+/*
         (User as Mongoose.Model<ExpressUser>).findByIdAndUpdate(user.id, user)
+*/
         next();
     }
 }

@@ -6,12 +6,11 @@ import {TrieWrapper} from "../TrieWrapper";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {AtomizedDocumentBookStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
-import {IFrameBookRenderer} from "./Renderer/IFrameBookRenderer";
 import {ds_Dict} from "../Util/DeltaScanner";
-import {BrowserInputs} from "../Manager/BrowserInputs";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
-import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../Atomized/AtomizedDocument";
+import { AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
+import { rehydratePage } from "../Atomized/OpenedBook";
 import { flatten } from "lodash";
 
 export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentBookStats {
@@ -54,7 +53,9 @@ export class OpenBook {
     constructor(
         public name: string,
         public trie: Observable<TrieWrapper>,
-        atomizedDocuments$?: Observable<AtomizedDocument>
+        atomizedDocuments$: Observable<AtomizedDocument> | undefined,
+        public parent: OpenBook | undefined,
+        public applySentenceListeners: (s: AtomizedSentence[]) => void
     ) {
         this.id = name;
         this.atomizedSrcDocStrings$ = merge(
@@ -99,7 +100,7 @@ export class OpenBook {
         );
 
         this.renderedSentences$.subscribe(sentences => {
-            BrowserInputs.applyAtomizedSentenceListeners(flatten(Object.values(sentences)));
+            applySentenceListeners(flatten(Object.values(sentences)));
         })
 
         this.htmlElementIndex$ = combineLatest([
@@ -122,7 +123,7 @@ export class OpenBook {
                             const childDoc = of(args)
                             return [
                                 childName,
-                                new OpenBook(childName, trie, childDoc)
+                                new OpenBook(childName, trie, childDoc, this, this.applySentenceListeners),
                             ];
                         })
                     );
@@ -134,7 +135,7 @@ export class OpenBook {
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
         const sentences = printExecTime("Rehydration", () => {
-            return IFrameBookRenderer.rehydratePage(body.ownerDocument as HTMLDocument);
+            return rehydratePage(body.ownerDocument as HTMLDocument);
         });
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSentences$.next(sentences);

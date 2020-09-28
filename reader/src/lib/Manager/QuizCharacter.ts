@@ -4,16 +4,20 @@ import {OpenBook} from "../BookFrame/OpenBook";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map, switchMap} from "rxjs/operators";
-import {TrieObservable} from "../AppContext/NewOpenBook";
 import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {ITrie} from "../Interfaces/Trie";
+import {TrieWrapper} from "../TrieWrapper";
+
+export type TrieObservable = Observable<TrieWrapper>;
 
 export interface QuizCharacterManagerParams {
     exampleSentences$: Observable<AtomizedSentence[]>,
     quizzingCard$: Observable<ICard | undefined>;
     trie$: TrieObservable;
-    requestPlayAudio: (sentence: string) => void
+    requestPlayAudio: (sentence: string) => void;
+    applyAtomizedSentenceListeners: (s: AtomizedSentence[]) => void
 }
 
 export class QuizCharacter {
@@ -28,7 +32,8 @@ export class QuizCharacter {
                     exampleSentences$,
                     quizzingCard$,
                     trie$,
-                    requestPlayAudio
+                    requestPlayAudio,
+                    applyAtomizedSentenceListeners
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
@@ -42,8 +47,10 @@ export class QuizCharacter {
                     }).concat(Array(10).fill('_')));
                 }),
                 AtomizedStringsForRawHTML,
-                map(atomizedStrings => AtomizedDocument.fromAtomizedString(atomizedStrings[0]))
-            )
+                map(atomizedStrings => AtomizedDocument.fromAtomizedString(atomizedStrings[0])),
+            ),
+            undefined,
+            applyAtomizedSentenceListeners
         );
 
         this.quizzingCard$.pipe(

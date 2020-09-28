@@ -1,11 +1,12 @@
 import {Manager} from "../../lib/Manager";
-import {useObs, usePipe} from "../../lib/UseObs";
 import React from "react";
 import {debounceTime, map, scan} from "rxjs/operators";
-import {useObservableState} from "observable-hooks";
+import {useObservable, useObservableState} from "observable-hooks";
 
 export function SettingsPage({m}: { m: Manager }) {
-    const scheduleRows = usePipe(m.scheduleManager.sortedScheduleRows$, o => o.pipe(map(rows => rows.map(row => row.word).join(', '))));
+    const scheduleRows = useObservable(
+        () => m.scheduleManager.sortedScheduleRows$.pipe(map(rows => rows.map(row => row.word).join(', '))),
+    );
     const quizCard = useObservableState(m.quizManager.quizzingCard$)
     const nextQuizWord = useObservableState(m.scheduleManager.wordQuizList$)
     const quizComponent = useObservableState(m.quizManager.quizStage);

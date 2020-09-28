@@ -9,13 +9,11 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import path from "path";
 import * as synthesisController from "./controllers/Speech";
-import {getLocations, getTrendForLocation} from "./controllers/Twitter";
 import {imageSearchFunc} from "./controllers/ImageSearch";
 import {translateFunc} from "./controllers/Translate";
 import session from "express-session";
 import * as chalk from "chalk";
 import flash from "express-flash";
-import mongoose from "mongoose";
 import passport from "passport";
 import expressStatusMonitor from "express-status-monitor";
 import sass from "node-sass-middleware";
@@ -41,9 +39,11 @@ const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 */
 async function connectedApp() {
     const app = express();
+/*
     const connection = await
         // TODO use the values in the .env file
         createConnection();
+*/
 
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
@@ -61,23 +61,12 @@ async function connectedApp() {
         next();
     });
 
-    mongoose.set("useFindAndModify", false);
-    mongoose.set("useCreateIndex", true);
-    mongoose.set("useNewUrlParser", true);
-    mongoose.set("useUnifiedTopology", true);
 // @ts-ignore
-    mongoose.connect(process.env.MONGODB_URI);
-    mongoose.connection.on("error", (err) => {
-        console.error(err);
-        console.log("%s MongoDB connection error. Please make sure MongoDB is running.", chalk.red("✗"));
-        process.exit();
-    });
 
     /**
      * Express configuration.
      */
     app.set("host", process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
-    app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
     app.set("views", path.join(__dirname, "views"));
     app.set("view engine", "pug");
     app.use(expressStatusMonitor());
@@ -90,6 +79,7 @@ async function connectedApp() {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
 // @ts-ignore
+/*
     app.use(session({
         resave: true,
         saveUninitialized: true,
@@ -104,6 +94,7 @@ async function connectedApp() {
             ttl: 86400
         }).connect(connection.getRepository(Session)),
     }));
+*/
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(flash());
@@ -145,6 +136,7 @@ async function connectedApp() {
     });
     */
     app.use("/", express.static(path.join(__dirname, "public"), {maxAge: 31557600000}));
+    app.use("/video", express.static('public/video'));
     app.use("/js/lib", express.static(path.join(__dirname, "node_modules/chart.js/dist"), {maxAge: 31557600000}));
     app.use("/js/lib", express.static(path.join(__dirname, "node_modules/popper.js/dist/umd"), {maxAge: 31557600000}));
     app.use("/js/lib", express.static(path.join(__dirname, "node_modules/bootstrap/dist/js"), {maxAge: 31557600000}));
@@ -166,6 +158,7 @@ async function connectedApp() {
     app.post("/signup", userController.postSignup);
     app.get("/contact", contactController.getContact);
     app.post("/contact", contactController.postContact);
+/*
     app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);
     app.get("/account/verify/:token", passportConfig.isAuthenticated, userController.getVerifyEmailToken);
     app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
@@ -174,6 +167,7 @@ async function connectedApp() {
     app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
     app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
     app.get("/profile", passportConfig.isAuthenticated, userController.getProfile);
+*/
 
     /**
      * API examples routes.
@@ -258,12 +252,10 @@ async function connectedApp() {
         res.redirect(req.session.returnTo);
     });
 
-    app.post("/translate", passportConfig.isAuthenticated, enforceBudget, translateFunc);
-    app.post("/image-search", passportConfig.isAuthenticated, enforceBudget, imageSearchFunc);
-    app.post("/trend-locations", passportConfig.isAuthenticated, enforceBudget, getLocations);
-    app.post("/trends", passportConfig.isAuthenticated, enforceBudget, getTrendForLocation);
-    app.post("/get-speech", passportConfig.isAuthenticated, enforceBudget, synthesisController.TextToSpeech);
-    app.post("/speech-recognition-token", passportConfig.isAuthenticated, enforceBudget, synthesisController.GetSpeechRecognitionToken);
+    app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc);
+    app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc);
+    app.post("/get-speech", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.TextToSpeech);
+    app.post("/speech-recognition-token", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.GetSpeechRecognitionToken);
 
     return app;
 }

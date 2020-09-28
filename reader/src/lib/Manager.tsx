@@ -47,6 +47,7 @@ export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
+const addMousedOverIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
 
 function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
@@ -80,6 +81,7 @@ export class Manager {
     public authenticationMonitor = new AuthenticationMonitor();
     public highlighter: Highlighter;
     public highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
+    public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
@@ -119,7 +121,8 @@ export class Manager {
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
-            applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement)
+            applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
+            applyAtomizedSentencesListener: sentences => this.inputManager.applyAtomizedSentenceListeners(sentences)
         });
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -194,7 +197,8 @@ export class Manager {
                 requestPlayAudio: sentence => {
                     this.highlighter.mouseoverHighlightedSentences$.next(sentence);
                     this.audioManager.queSynthesizedSpeechRequest$.next(sentence);
-                }
+                },
+                applyAtomizedSentenceListeners: s => this.inputManager.applyAtomizedSentenceListeners(s)
             }
         )
 
@@ -209,8 +213,8 @@ export class Manager {
         merge(
             this.openedBooks.renderedAtomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$
-        ).subscribe(atomizedSentenceList => {
-                Object.values(atomizedSentenceList).map(BrowserInputs.applyAtomizedSentenceListeners)
+        ).subscribe(indexedSentences => {
+                Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );
 
@@ -316,6 +320,7 @@ export class Manager {
             if (maxWord) {
                 addHighlightedPinyin(this.highlightedPinyin$, lookupPinyin(maxWord.word).join(''));
                 addHighlightedWord(this.highlighter.mouseoverHighlightedWords$, maxWord?.word);
+                addMousedOverIndex(this.inputManager.hoveredCharacterIndex$, i);
             }
             if (ev.shiftKey) {
                 /**

@@ -8,7 +8,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {Manager} from "../../lib/Manager";
-import {useObs} from "../../lib/UseObs";
 import {WordCountRow} from "./ScheduleTableRow";
 import {useObservableState} from "observable-hooks";
 
