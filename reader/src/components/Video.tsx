@@ -1,6 +1,7 @@
 import {Manager} from "../lib/Manager";
 import React, {useEffect, useState} from "react";
 import {useObservableState} from "observable-hooks";
+import {Card} from "@material-ui/core";
 
 
 export interface VideoMetaData {
@@ -58,11 +59,11 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
 
         }
     }, [videoElementRef])
-    return <div className={'video'}>
+    return <Card className={'video'} elevation={3}>
         <video
             ref={setVideoElementRef}
             src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}
             autoPlay
         />
-    </div>
+    </Card>
 }

@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {Card, CardContent, Link, Slide, Typography} from "@material-ui/core";
+import {Card, CardContent, Link, Paper, Slide, Typography} from "@material-ui/core";
 import React, {Fragment} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
@@ -34,7 +34,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const highlightedPinyin = useObservableState(m.highlightedPinyin$);
     const user = useObservableState(m.authenticationMonitor.user$);
     const classes = useStyles();
-    return <div className={classes.popup}>
+    return <Paper className={classes.popup}>
         {
             <Slide direction="down" in={!!showEditingCard}>
                 <div>
@@ -47,25 +47,29 @@ export function SlidingTopWindows({m}: { m: Manager }) {
             <AudioRecorder m={m}/>
         </div>
         <div style={{display: 'flex', flexFlow: 'row nowrap'}}>
-            <Card style={{width: '50%'}}>
+            <div style={{...SLIM_CARD_CONTENT, width: '50%'}}>
+                <Typography variant="h6">
+                    {highlightedPinyin}
+                </Typography>
+{/*
                 <CardContent style={SLIM_CARD_CONTENT}>
-                    <Typography variant="h6">
-                        {highlightedPinyin}
-                    </Typography>
                 </CardContent>
-            </Card>
-            <Card style={{width: '50%'}}>
-                <CardContent style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh'}}>
-                    {user?.profile.name ? <Typography variant="subtitle2">
-                            {user?.profile.name}
-                        </Typography> :
-                        <Link href={`${process.env.PUBLIC_URL}/login`}>Please Log In</Link>
-                    }
-                    <img style={{maxHeight: '100%', width: 'auto'}} src={user?.profile.picture}/>
+*/}
+            </div>
+            <div style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh', width: '50%'}}>
+                {user?.profile.name ? <Typography variant="subtitle2">
+                        {user?.profile.name}
+                    </Typography> :
+                    <Link href={`${process.env.PUBLIC_URL}/login`}>Please Log In</Link>
+                }
+                <img style={{maxHeight: '100%', width: 'auto'}} src={user?.profile.picture}/>
+{/*
+                <CardContent >
                 </CardContent>
-            </Card>
+*/}
+            </div>
         </div>
-    </div>;
+    </Paper>;
 }
 
 

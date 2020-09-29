@@ -92,7 +92,7 @@ export function Characters({c, m}: QuizCardProps) {
         tryAudio();
     }, [c?.learningLanguage])
 
-    return <div style={{
+    return <Card style={{
         marginTop: '50px',
         height: '25vh',
         padding: 0,
@@ -128,5 +128,5 @@ export function Characters({c, m}: QuizCardProps) {
             <Button onClick={advance}>Next</Button>
         </div>
 */}
-    </div>
+    </Card>
 }

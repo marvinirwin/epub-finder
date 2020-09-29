@@ -1,4 +1,4 @@
-import {Card, CardActions, CardContent, GridList, Typography} from "@material-ui/core";
+import {Card, CardActions, CardContent, GridList, Paper, Typography} from "@material-ui/core";
 import GridListTile from "@material-ui/core/GridListTile";
 import Button from "@material-ui/core/Button";
 import React from "react";
@@ -8,8 +8,7 @@ import {quizStyles} from "./QuizStyles";
 
 export function Pictures({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    const advance = () => m.quizManager.quizStage.next("Conclusion");
-    return <Card className={classes.card}>
+    return <Paper className={classes.card}>
 {/*
         <CardContent className={classes.cardContent}>
             {c?.photos.length &&
@@ -25,5 +24,5 @@ export function Pictures({c, m}: QuizCardProps) {
             <Typography variant="subtitle1">No pictures were provided for {c?.learningLanguage}</Typography>}
         </CardContent>
 */}
-    </Card>;
+    </Paper>;
 }

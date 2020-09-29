@@ -5,6 +5,7 @@ import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import {Paper} from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -20,7 +21,7 @@ export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => 
     const library = useObservableState(m.openedBooks.library$);
     const classes = useStyles();
 
-    return <div className={`library ${classes.root}`}>
+    return <Paper className={`library ${classes.root}`} elevation={3}>
         <List dense={true} component="nav" aria-label="main mailbox folders">
             {
                 Object.values(library || {}).map(libraryBook => {
@@ -31,5 +32,5 @@ export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => 
                 })
             }
         </List>
-    </div>
+    </Paper>
 }

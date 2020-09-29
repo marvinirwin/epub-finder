@@ -12,11 +12,13 @@ export function SettingsPage({m}: { m: Manager }) {
     const quizComponent = useObservableState(m.quizManager.quizStage);
     const user = useObservableState(m.authenticationMonitor.user$);
     return <div>
+{/*
         <div>Budget: {user?.profile.usedBudget} / {user?.profile.maxBudget}</div>
         <div>Schedule Rows: {scheduleRows}</div>
         <div>Current Quiz Word: {quizCard?.learningLanguage}</div>
         <div>Next Quiz Word: {nextQuizWord?.join(', ')}</div>
         <div>QuizzingComponent: {quizComponent}</div>
+*/}
 {/*
         <div>Card Map key count: {cardMap ? Object.values(cardMap).length : 'undefined'}</div>
         <div>Card Map Characters: {cardMap ? Object.entries(cardMap).map(([k, v]) => `${k}: ${v.length}`).join(',') : ''}</div>
