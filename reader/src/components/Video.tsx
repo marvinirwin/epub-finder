@@ -44,8 +44,10 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             && videoMetaData) {
             let time = videoMetaData?.characters[currentSentenceCharacterIndex].timestamp;
             let timeScale = videoMetaData?.timeScale;
-            videoElementRef.currentTime = (time * timeScale) / 1000;
-            videoElementRef.play();
+            if (time && timeScale) {
+                videoElementRef.currentTime = (time * timeScale) / 1000;
+                videoElementRef.play();
+            }
         }
     }, [currentSentenceCharacterIndex, currentSentence, videoElementRef, videoMetaData])
 

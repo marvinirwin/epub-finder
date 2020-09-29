@@ -1,5 +1,11 @@
 import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
-import {AudioConfig, ResultReason, SpeechConfig, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
+import {
+    AudioConfig, CancellationDetails, NoMatchDetails,
+    NoMatchReason,
+    ResultReason,
+    SpeechConfig,
+    SpeechRecognizer
+} from "microsoft-cognitiveservices-speech-sdk";
 import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
@@ -19,10 +25,9 @@ export class AudioSourceBrowser implements AudioSource {
     private mediaSource$: Observable<MediaStream>;
     private audioConfig$: Observable<AudioConfig>;
     private recognizer: SpeechRecognizer | undefined;
-    private recognizing: boolean = false;
+    private recognizerStarted: boolean = false;
     private mediaDevices = new ReplaySubject<MediaDevices>(1)
     recognizer$: Observable<SpeechRecognizer>;
-
 
     constructor() {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
@@ -81,7 +86,7 @@ export class AudioSourceBrowser implements AudioSource {
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.recognizer$)
         ).subscribe(async ([, recognizer]) => {
-            if (this.recognizing) {
+            if (this.recognizerStarted) {
                 await new Promise(resolve => {
                     this.recognizer?.stopContinuousRecognitionAsync(resolve, err => {
                         this.error$.next(err);
@@ -96,28 +101,22 @@ export class AudioSourceBrowser implements AudioSource {
         this.loadToken();
     }
 
-
     private getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): SpeechRecognizer {
         this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
         this.recognizer.recognized = (s, e) => {
             switch (e.result.reason) {
                 case ResultReason.NoMatch:
-                    this.error$.next(`Cannot understand`)
-                    this.isRecording$.next(false);
-                    this.recognizing = false;
-                    console.log(e);
+                    const noMatchDetails = NoMatchDetails.fromResult(e.result);
+                    this.error$.next(JSON.stringify(noMatchDetails))
                     break;
                 case ResultReason.Canceled:
-                    this.recognizing = false;
-                    this.recognizedText$.next('');
-                    this.isRecording$.next(false);
+                    const cancellationDetails = CancellationDetails.fromResult(e.result);
+                    this.error$.next(JSON.stringify(cancellationDetails))
                     break;
                 case ResultReason.RecognizingSpeech:
-                    // We don't care abou this event type
                     break;
                 case ResultReason.RecognizedSpeech:
-                    this.recognizing = false;
-                    this.recognizedText$.next(e.result.text)
+                    this.recognizedText$.next(e.result.text);
                     break;
                 case ResultReason.RecognizingIntent:
                 case ResultReason.RecognizedIntent:
@@ -138,10 +137,11 @@ export class AudioSourceBrowser implements AudioSource {
     private startRecognition() {
         this.recognizer?.startContinuousRecognitionAsync(
             () => {
-                this.recognizing = true;
+                this.recognizerStarted = true;
                 this.isRecording$.next(true);
             },
             (error: string) => {
+                this.recognizerStarted = false;
                 console.error(error);
                 this.error$.next(error);
                 this.isRecording$.next(false);
