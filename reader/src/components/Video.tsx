@@ -50,7 +50,10 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                 videoElementRef.play();
             }
         }
-    }, [currentSentenceCharacterIndex, currentSentence, videoElementRef, videoMetaData])
+    }, [currentSentenceCharacterIndex, currentSentence, videoElementRef, videoMetaData]);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const canvases = [...Array(5)].map((_, i) => useState<null | HTMLCanvasElement>());
 
     useEffect(() => {
         if (videoElementRef) {
@@ -65,5 +68,9 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}
             autoPlay
         />
+        {
+            // [canvas, setCanvas] = useState();
+            canvases.map(([canvas, setCanvas]) => <canvas ref={setCanvas}> </canvas>)
+        }
     </Card>
 }
