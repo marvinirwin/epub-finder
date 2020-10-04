@@ -186,40 +186,26 @@
 
 .video {
     position: fixed;
-    width: 30vw;
     z-index: 3;
     transition: transform 0.5s;
     /* TODO add scss so I can use variables for my widths and stuff  */
     top: 10vh;
     height: 40vh;
     overflow: auto;
-    /* right: -250px; */
-    right: 0;
+    right: 0px;
+    display: flex;
+    flex-flow: column nowrap;
+
+
     background-color: white;
 }
 .video > video {
-    width: 533px;
-    height: 300px;
+    max-width: 533px;
+    max-height: 300px;
 }
 
 .video:hover {
-    /* transform: translateX(-250px); */
-    cursor: pointer;
-}
-
-.bookstats {
-    position: fixed;
-    width: 25vw;
-    bottom: -10vw;
-    z-index: 3;
-    transition: transform 0.5s;
-    background-color: white;
-    padding-left: 24px;
-    max-height: 20vw;
-    overflow: auto;
-}
-.bookstats:hover {
-    transform: translateY(-20vw);
+    transform: translateX(-250px);
     cursor: pointer;
 }
 

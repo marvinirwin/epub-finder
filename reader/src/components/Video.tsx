@@ -43,7 +43,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             && currentSentence
             && (currentSentenceCharacterIndex === 0 || currentSentenceCharacterIndex)
             && videoMetaData) {
-            let time = videoMetaData?.characters[currentSentenceCharacterIndex].timestamp;
+            let time = videoMetaData?.characters[currentSentenceCharacterIndex]?.timestamp;
             let timeScale = videoMetaData?.timeScale;
             if (time && timeScale) {
                 videoElementRef.currentTime = (time * timeScale) / 1000;
@@ -55,6 +55,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const canvases = [...Array(5)].map((_, i) => useState<null | HTMLCanvasElement>());
 
+
     useEffect(() => {
         if (videoElementRef) {
             videoElementRef.defaultPlaybackRate = 0.25;
@@ -62,7 +63,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
 
         }
     }, [videoElementRef])
-    return <Card className={'video'} elevation={3}>
+    return videoMetaData ? <Card className={'video'} elevation={3}>
         <video
             ref={setVideoElementRef}
             src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}
@@ -72,5 +73,5 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             // [canvas, setCanvas] = useState();
             canvases.map(([canvas, setCanvas]) => <canvas ref={setCanvas}> </canvas>)
         }
-    </Card>
+    </Card> : <span></span>
 }

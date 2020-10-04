@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary} from "lodash";
-import {debounceTime, map, shareReplay, startWith, withLatestFrom} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -13,7 +13,7 @@ import CardManager from "./Manager/CardManager";
 import {CHARACTER_BOOK_NODE_LABEL, OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
-import {QuizManager} from "./Manager/QuizManager";
+import {QuizComponent, QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs, filterTextInputEvents} from "./Manager/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
@@ -22,7 +22,6 @@ import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
-import {SentenceManager} from "./Manager/SentenceManager";
 import {BookWordData, mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
@@ -73,7 +72,6 @@ export class Manager {
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
     public inputManager = new BrowserInputs();
-    public sentenceManager = new SentenceManager();
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
@@ -165,7 +163,7 @@ export class Manager {
             }
         });
 
-        const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
+        // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
         this.quizCharacterManager = new QuizCharacter(
             {
                 exampleSentences$: combineLatest([
@@ -255,7 +253,6 @@ export class Manager {
             this.editingCardManager.requestEditWord$.next(word);
         });
 
-        let even = 1;
         combineLatest([
             this.highlightAllWithDifficultySignal$,
             this.scheduleManager.indexedScheduleRows$,
@@ -291,6 +288,17 @@ export class Manager {
         this.audioManager.audioRecorder.audioSource.error$.subscribe(error =>
             this.appendAlertMessage(error)
         )
+
+        this.quizManager.quizStage$.subscribe(stage => {
+            switch(stage) {
+                case QuizComponent.Characters:
+                    this.editingCardManager.showEditingCardPopup$.next(false)
+                    break;
+                case QuizComponent.Conclusion:
+                    this.editingCardManager.showEditingCardPopup$.next(true)
+                    break;
+            }
+        })
 
         this.openedBooks.openedBooks.appendDelta$.next({
             nodeLabel: 'root',

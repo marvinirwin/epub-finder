@@ -58,42 +58,5 @@ export class QuizCharacter {
         ).subscribe(() => {
             this.sentenceCache.clear();
         })
-        /**
-         * If we have a learningLanguage, and have less than 10 sentences
-         * I want to hear about deltas in the sentenceMap about my word to see if there are new ones
-         */
-        /*
-                obs$.subscribe(args => {
-                    console.log();
-                })
-        */
-        /*
-                this.exampleSentences$.obs$.pipe(
-                    withLatestFrom(
-                        this.bookFrame.frame.iframe$,
-                        this.atomizedSentenceMap$
-                    ),
-                    scan((
-                        currentExampleSentenceElements: ds_Dict<string>,
-                        [{ delta}, {body, iframe}, atomizedSentenceMap],
-                    ) => {
-                        const doc = new AtomizedDocument(body.ownerDocument as XMLDocument);
-                        const v = getDeletedValues(delta);
-                        Object.keys(delta.remove || {}).forEach(sentenceToRemove => {
-                            atomizedSentenceMap[sentenceToRemove].destroy();
-                            delete atomizedSentenceMap[sentenceToRemove];
-                        })
-                        Object.keys(delta.set || {}).forEach((sentenceToAdd: string) => {
-                            atomizedSentenceMap[sentenceToAdd] = new AtomizedSentence(
-                                doc.appendRehydratableText(sentenceToAdd)
-                            );
-                        });
-                        return currentExampleSentenceElements;
-                    }, {})
-                ).subscribe(() => {
-                    // HACK, because I want the side effects of my scan
-                });
-
-        */
     }
 }

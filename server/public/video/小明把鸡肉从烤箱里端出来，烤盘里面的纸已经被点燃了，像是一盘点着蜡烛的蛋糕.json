@@ -1,153 +1,153 @@
 ﻿{
-    "timeScale":  0.25,
+    "timeScale":  0.5,
     "sentence":  "小明把鸡肉从烤箱里端出来，烤盘里面的纸已经被点燃了，像是一盘点着蜡烛的蛋糕",
     "characters":  [
                        {
-                           "timestamp":  6187.5081,
+                           "timestamp":  3369.5149,
                            "character":  "小"
                        },
                        {
-                           "timestamp":  7289.2194,
+                           "timestamp":  3927.7334,
                            "character":  "明"
                        },
                        {
-                           "timestamp":  8003.818,
+                           "timestamp":  4398.5642,
                            "character":  "把"
                        },
                        {
-                           "timestamp":  9155.2505,
+                           "timestamp":  5410.2909,
                            "character":  "鸡"
                        },
                        {
-                           "timestamp":  10962.375600000001,
+                           "timestamp":  5751.0474,
                            "character":  "肉"
                        },
                        {
-                           "timestamp":  12242.8443,
+                           "timestamp":  7414.1307000000006,
                            "character":  "从"
                        },
                        {
-                           "timestamp":  12758.9842,
+                           "timestamp":  7786.1959000000006,
                            "character":  "烤"
                        },
                        {
-                           "timestamp":  13155.9889,
+                           "timestamp":  8295.9921000000013,
                            "character":  "箱"
                        },
                        {
-                           "timestamp":  13751.7708,
+                           "timestamp":  8817.1103,
                            "character":  "里"
                        },
                        {
-                           "timestamp":  14595.565200000001,
+                           "timestamp":  9247.8795000000009,
                            "character":  "端"
                        },
                        {
-                           "timestamp":  15776.4529,
+                           "timestamp":  9690.0600000000013,
                            "character":  "出"
                        },
                        {
-                           "timestamp":  19370.357200000002,
+                           "timestamp":  11462.0781,
                            "character":  "来"
                        },
                        {
-                           "timestamp":  19370.430200000003,
+                           "timestamp":  11462.1514,
                            "character":  "，"
                        },
                        {
-                           "timestamp":  21038.1345,
+                           "timestamp":  11912.8327,
                            "character":  "烤"
                        },
                        {
-                           "timestamp":  21831.804900000003,
+                           "timestamp":  12354.0506,
                            "character":  "盘"
                        },
                        {
-                           "timestamp":  22586.7863,
+                           "timestamp":  12854.9842,
                            "character":  "里"
                        },
                        {
-                           "timestamp":  23251.4667,
+                           "timestamp":  13285.5699,
                            "character":  "面"
                        },
                        {
-                           "timestamp":  24055.7266,
+                           "timestamp":  13697.675000000001,
                            "character":  "的"
                        },
                        {
-                           "timestamp":  26090.6166,
+                           "timestamp":  15529.8925,
                            "character":  "纸"
                        },
                        {
-                           "timestamp":  26656.6431,
+                           "timestamp":  15860.8837,
                            "character":  "已"
                        },
                        {
-                           "timestamp":  27877.670400000003,
+                           "timestamp":  16392.219,
                            "character":  "经"
                        },
                        {
-                           "timestamp":  29485.462000000003,
+                           "timestamp":  16983.0497,
                            "character":  "被"
                        },
                        {
-                           "timestamp":  30369.095400000002,
+                           "timestamp":  17594.5705,
                            "character":  "点"
                        },
                        {
-                           "timestamp":  31341.665200000003,
+                           "timestamp":  18175.6405,
                            "character":  "燃"
                        },
                        {
-                           "timestamp":  34151.2797,
+                           "timestamp":  19919.1299,
                            "character":  "了"
                        },
                        {
-                           "timestamp":  34151.336500000005,
+                           "timestamp":  19919.183,
                            "character":  "，"
                        },
                        {
-                           "timestamp":  35233.4775,
+                           "timestamp":  20530.286900000003,
                            "character":  "像"
                        },
                        {
-                           "timestamp":  36564.1603,
+                           "timestamp":  21231.7677,
                            "character":  "是"
                        },
                        {
-                           "timestamp":  37119.9516,
+                           "timestamp":  21772.6235,
                            "character":  "一"
                        },
                        {
-                           "timestamp":  39413.105800000005,
+                           "timestamp":  22935.1849,
                            "character":  "盘"
                        },
                        {
-                           "timestamp":  39859.9652,
+                           "timestamp":  23376.3747,
                            "character":  "点"
                        },
                        {
-                           "timestamp":  40336.2398,
+                           "timestamp":  23897.1796,
                            "character":  "着"
                        },
                        {
-                           "timestamp":  41001.4126,
+                           "timestamp":  24508.1587,
                            "character":  "蜡"
                        },
                        {
-                           "timestamp":  42183.036100000005,
+                           "timestamp":  24959.4742,
                            "character":  "烛"
                        },
                        {
-                           "timestamp":  43612.6207,
+                           "timestamp":  25681.1807,
                            "character":  "的"
                        },
                        {
-                           "timestamp":  46938.562600000005,
+                           "timestamp":  26512.764300000003,
                            "character":  "蛋"
                        },
                        {
-                           "timestamp":  50691.657,
+                           "timestamp":  33046.3499,
                            "character":  "糕"
                        }
                    ],

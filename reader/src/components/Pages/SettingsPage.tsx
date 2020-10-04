@@ -9,7 +9,7 @@ export function SettingsPage({m}: { m: Manager }) {
     );
     const quizCard = useObservableState(m.quizManager.quizzingCard$)
     const nextQuizWord = useObservableState(m.scheduleManager.wordQuizList$)
-    const quizComponent = useObservableState(m.quizManager.quizStage);
+    const quizComponent = useObservableState(m.quizManager.quizStage$);
     const user = useObservableState(m.authenticationMonitor.user$);
     return <div>
 {/*

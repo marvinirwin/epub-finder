@@ -10,10 +10,10 @@ export default function QuizDialogContainer({m}: { m: Manager }) {
     const quizzingCard = useObservableState(m.quizManager.quizzingCard$);
 
     function close() {
-        m.quizManager.quizStage.next();
+        m.quizManager.quizStage$.next();
     }
 
-    const Component = useObservableState(m.quizManager.quizStage);
+    const Component = useObservableState(m.quizManager.quizStage$);
 
     return <Dialog fullScreen onClose={close} aria-labelledby="customized-dialog-title" open={!!Component}>
         {/*

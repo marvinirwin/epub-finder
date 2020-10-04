@@ -10,7 +10,10 @@ export interface QuizResult {
     score: number;
 }
 
-export type QuizComponent = string;
+export enum QuizComponent {
+    Conclusion = "Conclusion",
+    Characters = "Characters"
+}
 
 export interface QuizManagerParams {
     scheduledCards$: Observable<ICard[]>;
@@ -19,7 +22,7 @@ export interface QuizManagerParams {
 
 export class QuizManager {
     quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
-    quizStage = new ReplaySubject<QuizComponent>(1);
+    quizStage$ = new ReplaySubject<QuizComponent>(1);
     quizResult$ = new Subject<QuizResult>();
     advanceQuizStage$ = new Subject();
 
@@ -46,7 +49,7 @@ export class QuizManager {
         ).subscribe(async ([_, scheduledCards]) => {
             let iCard = scheduledCards[0];
             this.quizzingCard$.next(iCard);
-            this.quizStage.next("Characters");
+            this.quizStage$.next(QuizComponent.Characters);
             await sleep(1000);
             requestHighlightedWord(iCard.learningLanguage)
         })
@@ -64,11 +67,11 @@ export class QuizManager {
         })
 
         this.advanceQuizStage$.pipe(
-            withLatestFrom(this.quizStage)
+            withLatestFrom(this.quizStage$)
         ).subscribe(([, currentDialogComponent]) => {
             switch (currentDialogComponent) {
-                case "Characters":
-                    this.quizStage.next("Conclusion")
+                case QuizComponent.Characters:
+                    this.quizStage$.next(QuizComponent.Conclusion)
                     break;
             }
         })
@@ -76,7 +79,7 @@ export class QuizManager {
 
     setQuizCard(icard: ICard | undefined) {
         this.quizzingCard$.next(icard);
-        this.quizStage.next("Characters")
+        this.quizStage$.next(QuizComponent.Characters)
     }
 
     completeQuiz(word: string, recognitionScore: number) {

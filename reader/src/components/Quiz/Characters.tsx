@@ -1,14 +1,10 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 // @ts-ignore
-import AtomizeSrcdoc from 'Worker-loader?name=dist/[name].js!../../lib/Worker/AtomizeSrcdoc';
-import {Card, CardActions, CardContent} from "@material-ui/core";
+import {Card} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import React, {useEffect, useState} from "react";
 import {QuizCardProps} from "./Popup";
-import {Pictures} from "./Pictures";
 import {quizStyles} from "./QuizStyles";
-import {combineLatest, Observable, of} from "rxjs";
 import QuizStatsHeader from "./QuizStatsHeaders";
 import {take} from "rxjs/operators";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
@@ -17,6 +13,7 @@ import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {HotkeyWrapper} from "../HotkeyWrapper";
 import {useSubscription} from "observable-hooks";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
+import {QuizComponent} from "../../lib/Manager/QuizManager";
 
 const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
 const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
@@ -26,7 +23,7 @@ export function Characters({c, m}: QuizCardProps) {
     const [error, setError] = useState('');
     const requestEditWord = () => c && m.editingCardManager.requestEditWord$.next(c.learningLanguage);
     const advance = () => {
-        m.quizManager.quizStage.next("Conclusion");
+        m.quizManager.quizStage$.next(QuizComponent.Conclusion);
     };
 
     useEffect(() => {
@@ -53,7 +50,6 @@ export function Characters({c, m}: QuizCardProps) {
         })
     }, [c?.learningLanguage]);
 
-    const [recordRequest, setRecordRequest] = useState<RecordRequest>();
     const [recordingClass, setRecordingClass] = useState<string>('');
 
 

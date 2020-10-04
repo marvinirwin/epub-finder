@@ -14,7 +14,7 @@ const componentMap: { [key: string]: React.FunctionComponent<QuizCardProps> } = 
 }
 
 export function QuizPage({m}: { m: Manager }) {
-    const quizStage = useObservableState(m.quizManager.quizStage);
+    const quizStage = useObservableState(m.quizManager.quizStage$);
     const quizzingCard = useObservableState(m.quizManager.quizzingCard$);
 
     return <Fragment>

@@ -26,11 +26,10 @@ export class BrowserInputs {
         root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
 
         const checkForSelectedText = () => {
-            // @ts-ignore
-            const activeEl = root.ownerDocument?.activeElement;
+            const activeEl = root.activeElement;
             if (activeEl) {
                 // @ts-ignore
-                const selObj = root.ownerDocument?.getSelection();
+                const selObj = root.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
                     if (text) {

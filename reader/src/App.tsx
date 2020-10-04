@@ -9,6 +9,13 @@ import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {Manager} from "./lib/Manager";
 
+window.addEventListener("unhandledrejection", event => {
+    console.warn(`UNHANDLED PROMISE REJECTION: ${event.reason}`);
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+});
+
 const darkTheme = createMuiTheme({
     palette: {
         primary: {
