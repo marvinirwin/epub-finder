@@ -52,7 +52,8 @@ async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
  * @param filterFunc
  */
 export function splitPunctuation(threshhold: number, str: string, filterFunc: (char: string) => boolean): string[] {
-    return flatten(str.split('\n').map(str => str.split('。')));
+    return flatten(str.split('。').map(str => str + '。'));
+/*
     const splits = [];
     // Once the threshhold is reached, split on the next punctuation/line break
     let currentStart = 0;
@@ -67,6 +68,7 @@ export function splitPunctuation(threshhold: number, str: string, filterFunc: (c
     splits.push(str.substr(currentStart, str.length));
 
     return splits;
+*/
 }
 
 export const jestDetected = () => process.env.JEST_WORKER_ID !== undefined;

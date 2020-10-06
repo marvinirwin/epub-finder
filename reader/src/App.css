@@ -195,21 +195,25 @@
     right: 0px;
     display: flex;
     flex-flow: column nowrap;
-
-
     background-color: white;
 }
 .video > video {
     max-width: 533px;
     max-height: 300px;
+    /* This overflow auto line somehow makes the */
+    overflow: auto;
 }
 
+
 .video:hover {
-    transform: translateX(-250px);
     cursor: pointer;
 }
 
 *:focus {
     background-color: #3db5eb;
+}
+
+.recording-ctx {
+    border: solid;
 }
 
