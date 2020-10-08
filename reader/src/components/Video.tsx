@@ -4,7 +4,9 @@ import {useObservableState} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {timestamp} from "rxjs/operators";
 import {Characters} from "./Quiz/Characters";
+import {clearInterval} from "timers";
 
+const CANVAS_WIDTH = 500;
 
 export interface VideoMetaData {
     sentence: string;
@@ -23,6 +25,7 @@ export function sentenceToFilename(sentence: string) {
 }
 
 export const CHARACTER_DISPLAY_CHUNK_DURATION = 5000;
+export const CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS = CHARACTER_DISPLAY_CHUNK_DURATION / 1000;
 
 export const CharacterTimingDisplay: React.FunctionComponent<{
     characterTimings: VideoCharacter[],
@@ -35,7 +38,7 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
           v,
           duration,
           progressBarPosition,
-    onTimeSelected
+          onTimeSelected
       }) => {
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>()
     useEffect(() => {
@@ -51,31 +54,45 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
             }
         }
     }, [canvas, characterTimings]);
-    const [hoverBarPosition, setHoverBarPosition] = useState<number | null>();
-    return <div style={{position: 'relative'}} onMouseLeave={() => setHoverBarPosition(null)} onMouseMove={ev => {
-        /**
-         * To get where the hoverBar is supposed to be take the clientX and subtract the clientX of the canvas
-         */
-        if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            setHoverBarPosition(ev.clientX - rect.x)
-        }
-    }} >
+    const [hoverBarPosition, setHoverBarPosition] = useState<number | undefined>(undefined);
+    return <div style={{position: 'relative'}}
+                onMouseLeave={() => setHoverBarPosition(undefined)}
+                onMouseMove={ev => {
+                    /**
+                     * To get where the hoverBar is supposed to be take the clientX and subtract the clientX of the canvas
+                     */
+                    if (canvas) {
+                        const rect = canvas.getBoundingClientRect();
+                        setHoverBarPosition(ev.clientX - rect.x)
+                    }
+                }}
+                onClick={ev => {
+                    if (canvas) {
+                        const rect = canvas.getBoundingClientRect();
+                        onTimeSelected(((ev.clientX - rect.x) / CANVAS_WIDTH * 100))
+                    }
+                }}
+    >
         {progressBarPosition !== undefined && <div style={{
             position: 'absolute',
             backgroundColor: 'black',
             width: '1px',
             height: '100%',
-            left: progressBarPosition
+            left: progressBarPosition * CANVAS_WIDTH
         }}/>}
-        {hoverBarPosition !== null && <div style={{
+        {hoverBarPosition !== undefined && <div style={{
             position: 'absolute',
             backgroundColor: 'blue',
             width: '1px',
             height: '100%',
             left: hoverBarPosition
         }}/>}
-        <canvas width={"500px"} height={"50px"} className={'recording-ctx'} ref={setCanvas}/>
+        <canvas
+            width={`${CANVAS_WIDTH}px`}
+            height={"50px"}
+            className={'recording-ctx'}
+            ref={setCanvas}
+        />
     </div>
 }
 
@@ -85,6 +102,16 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
     const [videoMetaData, setVideoMetaData] = useState<VideoMetaData | undefined>();
     const [chunkedCharacterTimings, setChunkedCharacterTimings] = useState<VideoCharacter[][] | null>();
+    const [videoTime, setVideoTime] = useState<number | null>();
+    const [videoInterval, setVideoInterval] = useState<NodeJS.Timeout | null>();
+    useEffect(() => {
+        setVideoInterval(setInterval(() => {
+            videoElementRef && setVideoTime(videoElementRef.currentTime)
+        }, 100));
+        return () => {
+            videoInterval && clearInterval(videoInterval);
+        }
+    }, []);
     useEffect(() => {
         if (videoMetaData) {
             setChunkedCharacterTimings(videoMetaData.characters.reduce((chunks: VideoCharacter[][], character) => {
@@ -133,35 +160,54 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
         videoMetaData
     ]);
 
-
-
     useEffect(() => {
         if (videoElementRef) {
             videoElementRef.defaultPlaybackRate = 0.25;
             videoElementRef.volume = 0;
 
         }
-    }, [videoElementRef])
+    }, [videoElementRef]);
+
     return videoMetaData ? <Card className={'video'} elevation={3}>
         <video
             ref={setVideoElementRef}
             src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}
             autoPlay
+            controls
         />
         {
             (chunkedCharacterTimings && videoMetaData)
-            && chunkedCharacterTimings.map((chunkedCharacterTiming, i) => <CharacterTimingDisplay
-                key={i}
-                characterTimings={chunkedCharacterTiming}
-                v={videoMetaData}
-                duration={CHARACTER_DISPLAY_CHUNK_DURATION}
-                progressBarPosition={undefined}
-                onTimeSelected={percent => {
-                    if (videoElementRef) {
-                        videoElementRef.currentTime = i * CHARACTER_DISPLAY_CHUNK_DURATION + (CHARACTER_DISPLAY_CHUNK_DURATION * percent);
+            && chunkedCharacterTimings.map((chunkedCharacterTiming, chunkIndex) => {
+                let progressBarPosition = undefined;
+                if (videoTime) {
+                    const currentChunkIndex = Math.floor(videoTime / CHARACTER_DISPLAY_CHUNK_DURATION);
+                    if (currentChunkIndex === chunkIndex) {
+                        // If this is the one with the current playing index
+                        // The percetnage gets send to the component
+                        // Let it figure out its own width
+                        progressBarPosition = ((videoTime % CHARACTER_DISPLAY_CHUNK_DURATION) / CHARACTER_DISPLAY_CHUNK_DURATION) * 100;
                     }
-                }}
-            />)
+
+                }
+                return <CharacterTimingDisplay
+                    key={chunkIndex}
+                    characterTimings={chunkedCharacterTiming}
+                    v={videoMetaData}
+                    duration={CHARACTER_DISPLAY_CHUNK_DURATION}
+                    progressBarPosition={progressBarPosition}
+                    onTimeSelected={percent => {
+                        if (videoElementRef) {
+                            let currentTime = chunkIndex *
+                                CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS +
+                                (CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS * percent / 100);
+                            videoElementRef.currentTime = currentTime;
+                            if (videoElementRef.paused) {
+                                videoElementRef.play();
+                            }
+                        }
+                    }}
+                />;
+            })
         }
-    </Card> : <span></span>
+    </Card> : <span/>
 }
