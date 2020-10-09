@@ -47,7 +47,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
             <AudioRecorder m={m}/>
         </div>
         <div style={{display: 'flex', flexFlow: 'row nowrap'}}>
-            <div style={{...SLIM_CARD_CONTENT, width: '50%'}}>
+            <Paper style={{...SLIM_CARD_CONTENT, width: '50%'}}>
                 <Typography variant="h6">
                     {highlightedPinyin}
                 </Typography>
@@ -55,7 +55,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
                 <CardContent style={SLIM_CARD_CONTENT}>
                 </CardContent>
 */}
-            </div>
+            </Paper>
             <div style={{...SLIM_CARD_CONTENT, justifyContent: 'space-between', height: '5vh', width: '50%'}}>
                 {user?.profile.name ? <Typography variant="subtitle2">
                         {user?.profile.name}

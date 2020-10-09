@@ -56,8 +56,10 @@ export default function AudioRecorder({m}: { m: Manager }) {
                 <RecordingCircle r={r}/>
                 <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-around'}}>
                         <span style={{flexGrow: 1}}>
-                        <Typography variant="h6" className={classes.learningLanguage}
-                                    align="center">{currentAudioRequest?.label}</Typography>
+                        <Typography variant="h6"
+                                    className={classes.learningLanguage}
+                                    align="center"
+                        >{currentAudioRequest?.label}</Typography>
                         </span>
                     <audio style={{height: '24px', flexGrow: 1}} src={synthAudio?.url} controls/>
                 </div>
