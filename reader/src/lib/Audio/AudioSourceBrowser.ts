@@ -1,11 +1,13 @@
 import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {
-    AudioConfig, CancellationDetails, NoMatchDetails,
+    AudioConfig,
+    CancellationDetails,
+    NoMatchDetails,
     NoMatchReason,
     ResultReason,
     SpeechConfig,
     SpeechRecognizer
-} from "microsoft-cognitiveservices-speech-sdk";
+} from "cognitive-services-speech-sdk-js/distrib/lib/microsoft.cognitiveservices.speech.sdk";
 import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
@@ -24,8 +26,6 @@ export class AudioSourceBrowser implements AudioSource {
     private speechConfig$: Observable<SpeechConfig>;
     private mediaSource$: Observable<MediaStream>;
     private audioConfig$: Observable<AudioConfig>;
-    private recognizer: SpeechRecognizer | undefined;
-    private recognizerStarted: boolean = false;
     private mediaDevices = new ReplaySubject<MediaDevices>(1)
     recognizer$: Observable<SpeechRecognizer>;
 
@@ -78,7 +78,7 @@ export class AudioSourceBrowser implements AudioSource {
         );
         this.recognizer$ = combineLatest([this.audioConfig$, this.speechConfig$]).pipe(
             map(([audio, speech]) => {
-                return this.getNewRecognizer(speech, audio);
+                return new SpeechRecognizer(speech, audio);
             }),
             shareReplay(1)
         )
@@ -86,66 +86,21 @@ export class AudioSourceBrowser implements AudioSource {
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.recognizer$)
         ).subscribe(async ([, recognizer]) => {
-            if (this.recognizerStarted) {
-                await new Promise(resolve => {
-                    this.recognizer?.stopContinuousRecognitionAsync(resolve, err => {
-                        this.error$.next(err);
-                        resolve();
-                    });
-                });
-            }
-            this.startRecognition();
+            recognizer.recognizeOnceAsync(
+                result => {
+                    // One of the reasons text would be undefined is initialSilenceTimeout
+                    this.recognizedText$.next(result.text || '');
+                    this.isRecording$.next(false);
+                },
+                err => {
+                    // I assume this only happens when a new recording request happens
+                    this.recognizedText$.next(err)
+                    this.isRecording$.next(false);
+                }
+            )
         });
 
         this.loadToken();
-    }
-
-    private getNewRecognizer(speechConfig: SpeechConfig, audioConfig: AudioConfig): SpeechRecognizer {
-        this.recognizer = new SpeechRecognizer(speechConfig, audioConfig);
-        this.recognizer.recognized = (s, e) => {
-            switch (e.result.reason) {
-                case ResultReason.NoMatch:
-                    const noMatchDetails = NoMatchDetails.fromResult(e.result);
-                    this.error$.next(JSON.stringify(noMatchDetails))
-                    break;
-                case ResultReason.Canceled:
-                    const cancellationDetails = CancellationDetails.fromResult(e.result);
-                    this.error$.next(JSON.stringify(cancellationDetails))
-                    break;
-                case ResultReason.RecognizingSpeech:
-                    break;
-                case ResultReason.RecognizedSpeech:
-                    this.recognizedText$.next(e.result.text);
-                    break;
-                case ResultReason.RecognizingIntent:
-                case ResultReason.RecognizedIntent:
-                case ResultReason.TranslatingSpeech:
-                case ResultReason.SynthesizingAudio:
-                case ResultReason.SynthesizingAudioCompleted:
-                case ResultReason.TranslatedSpeech:
-                case ResultReason.SynthesizingAudioStarted:
-                    this.error$.next("Strange speech recognition result returned")
-                    break;
-            }
-        };
-        this.startRecognition();
-        // Start continuous speech recognition
-        return this.recognizer;
-    }
-
-    private startRecognition() {
-        this.recognizer?.startContinuousRecognitionAsync(
-            () => {
-                this.recognizerStarted = true;
-                this.isRecording$.next(true);
-            },
-            (error: string) => {
-                this.recognizerStarted = false;
-                console.error(error);
-                this.error$.next(error);
-                this.isRecording$.next(false);
-            }
-        );
     }
 
     private loadToken() {
