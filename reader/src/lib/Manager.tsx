@@ -41,6 +41,7 @@ import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Manager/Highlighter";
+import {Library} from "./Manager/Library";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -100,6 +101,7 @@ export class Manager {
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
+    library: Library;
 
 
 
@@ -153,6 +155,8 @@ export class Manager {
                 }
             },
         );
+
+        this.library = new Library({db});
 
         combineLatest([
             this.scheduleManager.indexedScheduleRows$,

@@ -95,7 +95,6 @@ export class AudioSourceBrowser implements AudioSource {
                 });
             }
             this.startRecognition();
-
         });
 
         this.loadToken();

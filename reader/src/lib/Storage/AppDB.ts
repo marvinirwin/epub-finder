@@ -2,8 +2,9 @@ import Dexie from "dexie";
 import {ReplaySubject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
-import {ISetting} from "../Interfaces/ISetting";
+import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
+import {CustomDocument} from "../Website/Website";
 
 
 export class MyAppDatabase extends Dexie {
@@ -12,7 +13,8 @@ export class MyAppDatabase extends Dexie {
     cards: Dexie.Table<ICard, number>;
     recognitionRecords: Dexie.Table<WordRecognitionRow, number>;
     createdSentences: Dexie.Table<CreatedSentence, number>;
-    settings: Dexie.Table<ISetting, string>;
+    settings: Dexie.Table<Setting, string>;
+    customDocuments: Dexie.Table<CustomDocument, string>;
 
     messages$: ReplaySubject<string> = new ReplaySubject<string>();
 
@@ -23,7 +25,8 @@ export class MyAppDatabase extends Dexie {
             cards: 'id++, learningLanguage, knownLanguage, deck',
             recognitionRecords: 'id++, word, timestamp',
             settings: 'key, value',
-            createdSentences: 'id++, learningLanguage'
+            createdSentences: 'id++, learningLanguage',
+            customDocuments: 'name, html'
         });
         this.messages$.next("Stores created, initializing AnkiPackageSQLiteTables")
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
@@ -31,6 +34,7 @@ export class MyAppDatabase extends Dexie {
         this.settings = this.table("settings");
         this.recognitionRecords = this.table("recognitionRecords");
         this.createdSentences = this.table("createdSentences");
+        this.customDocuments = this.table("customDocuments");
         this.messages$.next("Tables initialized")
     }
 

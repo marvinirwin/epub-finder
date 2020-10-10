@@ -10,6 +10,14 @@ export class Website {
     }
 }
 
+export class CustomDocument {
+    constructor(
+        public name: string,
+        public html: string,
+    ) {
+    }
+}
+
 export function getPageSrcHttp(url: string): Observable<string> {
     return from(new Promise<string>(resolve => {
         const oReq = new XMLHttpRequest();

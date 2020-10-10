@@ -1,7 +1,7 @@
 import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
-import {Website} from "../Website/Website";
+import {CustomDocument, Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
 import {Dictionary, flatten, flattenDeep} from "lodash";
@@ -20,7 +20,7 @@ export const READING_BOOK_NODE_LABEL = 'readingBook';
 export class OpenBooks {
     openedBooks = new DeltaScanner<OpenBook,  string>();
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    addOpenBook$ = new Subject<Website>();
+    addOpenBook$ = new Subject<Website | CustomDocument>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     renderedBookSentenceData$: Observable<BookWordData[]>;
@@ -38,9 +38,30 @@ export class OpenBooks {
         this.addOpenBook$
             .pipe(
                 map(page => {
-                    const b = new OpenBook(page.name, config.trie$, undefined, undefined, config.applyAtomizedSentencesListener);
-                    b.url$.next(page.url)
-                    return b;
+                    const isWebsite = (variableToCheck: any): variableToCheck is Website =>
+                        (variableToCheck as Website).url !== undefined;
+                    const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
+                        (variableToCheck as CustomDocument).html !== undefined;
+                    if (isCustomDocument(page)) {
+                        return new OpenBook(
+                            page.name,
+                            config.trie$,
+                            of(AtomizedDocument.atomizeDocument(page.html)),
+                            undefined,
+                            config.applyAtomizedSentencesListener
+                        );
+                    } else if (isWebsite(page)) {
+                        const b = new OpenBook(
+                            page.name,
+                            config.trie$,
+                            undefined,
+                            undefined,
+                            config.applyAtomizedSentencesListener
+                        );
+                        b.url$.next(page.url);
+                        return b;
+                    }
+                    throw new Error("Unknown addOpenBook ");
                 }),
             )
             .subscribe((openBook) => {
