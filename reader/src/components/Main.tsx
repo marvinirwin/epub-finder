@@ -6,18 +6,15 @@ import {ReadingPage} from "./Pages/ReadingPage";
 import {QuizPage} from "./Pages/QuizPage";
 import {SettingsPage} from "./Pages/SettingsPage";
 import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
-import {OpenBook} from "../lib/BookFrame/OpenBook";
 import {NavigationPages} from "../lib/Util/Util";
 import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
 import {useObservableState} from "observable-hooks";
-import {map} from "rxjs/operators";
-import {flattenTree} from "../lib/Util/DeltaScanner";
 import {StaticFrame} from "./Frame/StaticFrame";
 import {OpenedBook} from "../lib/Atomized/OpenedBook";
 import {Alert} from "@material-ui/lab";
 import {Snackbar} from "@material-ui/core";
-import {BookStats} from "./BookStats";
 import { Video } from "./Video";
+import {LibraryPage} from "./Pages/LibraryPage";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -103,6 +100,7 @@ export function Main({m}: { m: Manager }) {
             {currentPage === NavigationPages.TRENDS_PAGE && <ScheduleTablePage m={m}/>}
             {(currentPage === NavigationPages.READING_PAGE || !currentPage) && <ReadingPage m={m}/>}
             {currentPage === NavigationPages.SETTINGS_PAGE && <SettingsPage m={m}/>}
+            {currentPage === NavigationPages.LIBRARY_PAGE && <LibraryPage m={m}/>}
         </div>
         <Video m={m}/>
         <Snackbar

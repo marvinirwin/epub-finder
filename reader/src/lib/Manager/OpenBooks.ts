@@ -13,12 +13,31 @@ import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter"
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
+
+export type Named = {
+    name: string;
+}
+
+export const flattenNamedObject = (key: string) =>
+    <T extends Named, U extends string>(obs$: Observable<DeltaScan<T, U>>): Observable<ds_Dict<T>> => {
+        return obs$.pipe(
+            map(({sourced}) => {
+                const libraryBooks = sourced?.children?.[key];
+                return Object.fromEntries(
+                    libraryBooks ? flattenTree<T>(
+                        libraryBooks
+                    ).map(book => [book.name, book]) : []
+                );
+            })
+        );
+    }
+
 export const LIBRARY_BOOKS_NODE_LABEL = 'libraryBooks';
 export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';
 export const READING_BOOK_NODE_LABEL = 'readingBook';
 
 export class OpenBooks {
-    openedBooks = new DeltaScanner<OpenBook,  string>();
+    openedBooks = new DeltaScanner<OpenBook, string>();
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
     addOpenBook$ = new Subject<Website | CustomDocument>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
@@ -30,6 +49,7 @@ export class OpenBooks {
     sourceBooks$: Observable<ds_Dict<OpenBook>>;
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
+
     // renderedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
 
     constructor(
@@ -89,7 +109,8 @@ export class OpenBooks {
         this.renderedAtomizedSentences$ = this.openedBooks
             .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
                 switchMap(({sourced}) => {
-                    let sources = sourced ? flattenTree(sourced) : []; return combineLatest( sources );
+                    let sources = sourced ? flattenTree(sourced) : [];
+                    return combineLatest(sources);
                 }),
                 map((atomizedSentenceArrays) =>
                     mergeDictArrays(...atomizedSentenceArrays)
@@ -127,16 +148,9 @@ export class OpenBooks {
                 })
         });
 
-        this.sourceBooks$ = this.openedBooks.updates$.pipe(
-            map(({sourced}) => {
-                const libraryBooks = sourced?.children?.[LIBRARY_BOOKS_NODE_LABEL];
-                return Object.fromEntries(
-                    libraryBooks ? flattenTree<OpenBook>(
-                        libraryBooks
-                    ).map(book => [book.name, book]) : []
-                );
-            })
-        );
+
+
+        this.sourceBooks$ = this.openedBooks.updates$.pipe(flattenNamedObject(LIBRARY_BOOKS_NODE_LABEL));
 
         this.library$ = this.sourceBooks$.pipe(
             switchMap(sourceBooks =>

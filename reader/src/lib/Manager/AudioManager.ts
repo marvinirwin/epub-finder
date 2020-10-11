@@ -1,11 +1,7 @@
 import {AudioRecorder} from "../Audio/AudioRecorder";
-import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject, zip} from "rxjs";
+import {ReplaySubject} from "rxjs";
 import {WavAudio} from "../WavAudio";
-import {Manager} from "../Manager";
-import {debounceTime, filter, flatMap, map, shareReplay, switchMap, take} from "rxjs/operators";
-import {AudioConfig, SpeechConfig, SpeechSynthesizer, SpeechRecognizer} from "microsoft-cognitiveservices-speech-sdk";
-import axios from 'axios';
-import assert from "assert";
+import {flatMap, take} from "rxjs/operators";
 import {AudioSource} from "../Audio/AudioSource";
 import {fetchSynthesizedAudio} from "../Audio/FetchSynthesizedAudio";
 import {sleep} from "../Util/Util";
