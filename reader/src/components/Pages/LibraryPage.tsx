@@ -38,7 +38,6 @@ export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedO
 
 
 export function LibraryPage({m}: { m: Manager }) {
-    const openBooks = useObservableState(m.openedBooks.sourceBooks$);
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
     const simpleText = useObservableState(m.library.simpleBook$.text$) || '';
@@ -60,11 +59,17 @@ export function LibraryPage({m}: { m: Manager }) {
                 <Paper style={{width: '33%'}}>
                     Checked out
                     <NamedObjectList
-                        listObjects={openBooks || {}}
-                        onSelect={(b: OpenBook) => {
-                            m.db.openBooks$.next(
-                                {...m.db.openBooks$.getValue(), [b.name]: false}
+                        listObjects={
+                            Object.fromEntries(
+                                Object.keys(checkedOutTitles)
+                                    .map(title => [title, allBooks[title]])
+                                    .filter(([_, o]) => o)
                             )
+                        }
+                        onSelect={(b: OpenBook) => {
+                            let checkedOutBooks = {...m.db.openBooks$.getValue()};
+                            delete checkedOutBooks[b.name];
+                            m.db.openBooks$.next(checkedOutBooks)
                         }}
                     />
                 </Paper>
