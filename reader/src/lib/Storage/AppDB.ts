@@ -9,7 +9,7 @@ import {ds_Dict} from "../Util/DeltaScanner";
 
 
 export class MyAppDatabase extends Dexie {
-    static CURRENT_VERSION = 5;
+    static CURRENT_VERSION = 6;
 
     cards: Dexie.Table<ICard, number>;
     recognitionRecords: Dexie.Table<WordRecognitionRow, number>;
@@ -25,14 +25,14 @@ export class MyAppDatabase extends Dexie {
         this.version(MyAppDatabase.CURRENT_VERSION).stores({
             cards: 'id++, learningLanguage, knownLanguage, deck',
             recognitionRecords: 'id++, word, timestamp',
-            settings: 'key, value',
+            settings2: 'name, value',
             createdSentences: 'id++, learningLanguage',
             customDocuments: 'name, html'
         });
         this.messages$.next("Stores created, initializing AnkiPackageSQLiteTables")
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table("cards");
-        this.settings = this.table("settings");
+        this.settings = this.table("settings2");
         this.recognitionRecords = this.table("recognitionRecords");
         this.createdSentences = this.table("createdSentences");
         this.customDocuments = this.table("customDocuments");
@@ -81,22 +81,22 @@ export class MyAppDatabase extends Dexie {
         }
     }
 
-    async resolveSetting$<T>(settingName: string, defaultVal: T) {
+    resolveSetting$<T>(settingName: string, defaultVal: T) {
         if (!this.settingsListeners[settingName]) {
             const s = new BehaviorSubject<T>(defaultVal);
-            const row = await this.settings.where({name: settingName}).first();
-            if (row) {
-                // TODO verify that this is the expected type
-                s.next(JSON.parse(row.value))
-            }
+            this.settings.where({name: settingName}).first().then(row => {
+                if (row) {
+                    s.next(JSON.parse(row.value))
+                }
+            });
             s.subscribe(value => {
-                this.settings.put({name: settingName, value: JSON.stringify(value)})
+                this.settings.put({name: settingName, value: JSON.stringify(value)}, settingName)
             });
             this.settingsListeners[settingName] = s;
         }
         return this.settingsListeners[settingName];
     }
-    get openBooks$() {
+    get openBooks$(): BehaviorSubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {})
     }
 }

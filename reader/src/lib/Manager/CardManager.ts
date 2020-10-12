@@ -88,7 +88,7 @@ export default class CardManager {
     }
 
     private async getCardsFromDB() {
-        const priorityCards = await this.db.settings.where({key: Settings.MOST_POPULAR_WORDS}).first();
+        const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
         for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
             this.addPersistedCards$.next(cards);

@@ -42,6 +42,7 @@ import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Manager/Highlighter";
 import {Library} from "./Manager/Library";
+import {CustomDocument, Website} from "./Website/Website";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -116,12 +117,18 @@ export class Manager {
             }
         );
         this.cardManager = new CardManager(this.db);
+        this.library = new Library({db});
         this.openedBooks = new OpenBooks({
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
-            applyAtomizedSentencesListener: sentences => this.inputManager.applyAtomizedSentenceListeners(sentences)
+            applyAtomizedSentencesListener: sentences => this.inputManager.applyAtomizedSentenceListeners(sentences),
+            db,
+            library$: combineLatest([
+                this.library.builtInBooks$.dict$,
+                this.library.customBooks$.dict$
+            ]).pipe(map(([builtIn, custom]) => ({...builtIn, ...custom}))),
         });
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -155,7 +162,6 @@ export class Manager {
             },
         );
 
-        this.library = new Library({db});
 
         combineLatest([
             this.scheduleManager.indexedScheduleRows$,
@@ -313,16 +319,6 @@ export class Manager {
             }
         });
         this.cardManager.load();
-        this.db.openBooks$
-            .then(openBooks$ => {
-                combineLatest([
-                    openBooks$,
-                    this.library.customBooks$,
-                    this.library.builtInBooks$
-                ]).subscribe(([openBooks, customBooks, builtInBooks]) => {
-
-                })
-            })
     }
 
     private appendAlertMessage(error: string) {

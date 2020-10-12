@@ -41,7 +41,6 @@ export const READING_BOOK_NODE_LABEL = 'readingBook';
 export class OpenBooks {
     openedBooks = new NamedDeltaScanner<OpenBook, string>();
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    addOpenBook$ = new Subject<Website | CustomDocument>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     renderedBookSentenceData$: Observable<BookWordData[]>;
@@ -56,7 +55,6 @@ export class OpenBooks {
     constructor(
         private config: OpenBooksConfig
     ) {
-
         this.openBooks$ = combineLatest([
             config.library$.pipe(
                 map(libraryBooks => {
@@ -90,38 +88,36 @@ export class OpenBooks {
                     })) as ds_Dict<OpenBook>
                 })
             ),
-            config.openBookTitles$
+            config.db.openBooks$
         ]).pipe(map(([library, openBookTitles]) => {
             return Object.fromEntries(
                 Object.entries(library).filter(([title, book]) => openBookTitles[title])
             )
         }));
 
-        // TODO, now I have the books I've opened.  Do I need to add them to the tree?
-        this.addOpenBook$
-            .pipe(
-                map(page => {
-                }),
-            )
-            .subscribe((openBook) => {
-                this.openedBooks.appendDelta$.next(
-                    {
-                        nodeLabel: 'root',
-                        children: {
-                            [SOURCE_BOOKS_NODE_LABEL]: {
-                                nodeLabel: SOURCE_BOOKS_NODE_LABEL,
-                                children: {
-                                    [openBook.name]: {
-                                        nodeLabel: openBook.name,
-                                        value: openBook
-                                    }
-                                }
-                            }
+        this.openBooks$.subscribe(
+            openBooks => this.openedBooks.appendDelta$.next(
+                {
+                    nodeLabel: 'root',
+                    children: {
+                        [SOURCE_BOOKS_NODE_LABEL]: {
+                            nodeLabel: SOURCE_BOOKS_NODE_LABEL,
+                            children: Object.fromEntries(
+                                Object.entries(openBooks)
+                                    .map(([name, openBook]) => [
+                                            name,
+                                            {
+                                                value: openBook,
+                                                nodeLabel: name
+                                            }
+                                        ]
+                                    )
+                            )
                         }
-                    }
-                )
-            });
-
+                    },
+                }
+            )
+        )
 
         this.applyListenersToOpenedBookBodies();
 

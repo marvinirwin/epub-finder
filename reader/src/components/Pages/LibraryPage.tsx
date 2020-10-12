@@ -12,7 +12,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import {ds_Dict} from "../../lib/Util/DeltaScanner";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
-import {CustomDocument} from "../../lib/Website/Website";
+import {CustomDocument, Website} from "../../lib/Website/Website";
 import {interpolateSimpleCustomDoc} from "../../lib/Manager/Library";
 
 export interface NamedObjectParams<T extends Named> {
@@ -20,8 +20,9 @@ export interface NamedObjectParams<T extends Named> {
     onSelect: (v: T) => void
 }
 
-export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedObjectParams<T>) =>
-    <List dense={true}>
+export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedObjectParams<T>) => {
+    debugger;console.log();
+    return <List dense={true}>
         {
             Object.values(listObjects).map(libraryBook => {
                 return <ListItem
@@ -32,38 +33,49 @@ export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedO
                 </ListItem>;
             })
         }
-    </List>
+    </List>;
+}
 
 
 export function LibraryPage({m}: { m: Manager }) {
     const openBooks = useObservableState(m.openedBooks.sourceBooks$);
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
-    const availableStories = Object.fromEntries(
-        difference(Object.keys(builtInBooks || {}), Object.keys(openBooks || {}))
-            .map(story => [story, customBooks[story]])
-    );
-
-
     const simpleText = useObservableState(m.library.simpleBook$.text$) || '';
     const simpleName = useObservableState(m.library.simpleBook$.name$) || '';
     const rawText = useObservableState(m.library.rawBook$.text$) || '';
     const rawName = useObservableState(m.library.rawBook$.name$) || '';
+    const checkedOutTitles = useObservableState(m.db.openBooks$) || {};
+
+    const allBooks = {...builtInBooks, ...customBooks};
+
+    const booksAvailableForCheckOut: ds_Dict<Website | CustomDocument> = Object.fromEntries(
+        difference(Object.keys(allBooks), Object.keys(checkedOutTitles))
+            .map(story => [story, allBooks[story]])
+    );
 
     return <Paper>
         <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
             <Paper style={{flexGrow: 1, maxHeight: '25%'}}>
-                <Paper style={{width: '50%'}}>
+                <Paper style={{width: '33%'}}>
+                    Checked out
                     <NamedObjectList
                         listObjects={openBooks || {}}
                         onSelect={(b: OpenBook) => {
+                            m.db.openBooks$.next(
+                                {...m.db.openBooks$.getValue(), [b.name]: false}
+                            )
                         }}
                     />
                 </Paper>
-                <Paper style={{width: '50%'}}>
+                <Paper style={{width: '33%'}}>
+                    To check out
                     <NamedObjectList
-                        listObjects={availableStories}
-                        onSelect={(b: CustomDocument) => {
+                        listObjects={booksAvailableForCheckOut}
+                        onSelect={(b) => {
+                            m.db.openBooks$.next(
+                                {...m.db.openBooks$.getValue(), [b.name]: true}
+                            )
                         }}
                     />
                 </Paper>

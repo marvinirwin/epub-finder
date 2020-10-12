@@ -6,7 +6,6 @@ it("Generates wordCountRecords for a page", () => {
         {
             manager: {
                 openedBooks: {
-                    addOpenBook$
                 },
             },
             scheduler,
@@ -15,7 +14,6 @@ it("Generates wordCountRecords for a page", () => {
         scheduler
             .expectOrderings(
                 {
-                    addOpenBook$,
                 },
                 CausalTree.init(`
           sentences
@@ -36,7 +34,6 @@ it("Generates wordCountRecords for a page", () => {
                     mainPage: {
                         name: "Basic Doc"
                     },
-                    addOpenBook$
                 })
             )
     });

@@ -15,5 +15,4 @@ export interface OpenBooksConfig {
     applyAtomizedSentencesListener: (sentences: AtomizedSentence[]) => void;
     db: MyAppDatabase;
     library$: Observable<ds_Dict<CustomDocument | Website>>
-    openBookTitles$: Observable<ds_Dict<string>>
 }
