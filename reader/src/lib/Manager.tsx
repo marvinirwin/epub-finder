@@ -104,7 +104,6 @@ export class Manager {
     library: Library;
 
 
-
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
             response => response,
@@ -294,7 +293,7 @@ export class Manager {
         )
 
         this.quizManager.quizStage$.subscribe(stage => {
-            switch(stage) {
+            switch (stage) {
                 case QuizComponent.Characters:
                     this.editingCardManager.showEditingCardPopup$.next(false)
                     break;
@@ -314,6 +313,16 @@ export class Manager {
             }
         });
         this.cardManager.load();
+        this.db.resolveSetting$<string[]>('openBooks', [])
+            .then(openBooks$ => {
+                combineLatest([
+                    openBooks$,
+                    this.library.customBooks$,
+                    this.library.builtInBooks$
+                ]).subscribe(([openBooks, customBooks, builtInBooks]) => {
+
+                })
+            })
     }
 
     private appendAlertMessage(error: string) {

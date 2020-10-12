@@ -1,6 +1,7 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {scan, shareReplay} from "rxjs/operators";
 import {uniq} from "lodash";
+import {flattenNamedObject, Named} from "../Manager/OpenBooks";
 
 export type ds_Dict<T, U extends string = string> = {
     [key in U]: T
@@ -73,13 +74,6 @@ export type DeltaScan<T, U extends string = string> = {
     previousTree: ds_Tree<T, U> | undefined,
     delta: ds_Tree<T, U>
 };
-
-export type InitDelta<T, U extends string = string> = {
-    sourced: ds_Tree<T, U> | undefined,
-    previousTree: ds_Tree<T, U> | undefined,
-    delta: ds_Tree<T, U>
-};
-
 export type DeltaScanMapFunc<T, U> = (v: T) => U;
 export type DeltaScanSubTreeFunc<T> = (v: ds_Tree<T>) => ds_Tree<T> | undefined;
 
@@ -136,6 +130,10 @@ export class DeltaScanner<T, U extends string = string> {
         })
         return derivedTree;
     }
+}
+
+export class NamedDeltaScanner<T extends Named, U extends string = string> extends DeltaScanner<T, U> {
+    this.dict = this.updates$.pipe(flattenNamedObject('root'))
 }
 
 function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tree<U> {

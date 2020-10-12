@@ -1,5 +1,5 @@
 import Dexie from "dexie";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Setting} from "../Interfaces/Setting";
@@ -15,8 +15,8 @@ export class MyAppDatabase extends Dexie {
     createdSentences: Dexie.Table<CreatedSentence, number>;
     settings: Dexie.Table<Setting, string>;
     customDocuments: Dexie.Table<CustomDocument, string>;
-
     messages$: ReplaySubject<string> = new ReplaySubject<string>();
+    private settingsListeners: {[setting: string]: ReplaySubject<any>} = {};
 
     constructor() {
         super("MyAppDatabase");
@@ -78,5 +78,23 @@ export class MyAppDatabase extends Dexie {
             yield chunkedRecognitionRows;
             offset += chunkSize;
         }
+    }
+
+    async resolveSetting$<T>(settingName: string, defaultVal: T) {
+        if (!this.settingsListeners[settingName]) {
+            const s = new ReplaySubject<T>();
+            const row = await this.settings.where({name: settingName}).first();
+            if (row) {
+                // TODO verify that this is the expected type
+                s.next(JSON.parse(row.value))
+            } else {
+                s.next(defaultVal)
+            }
+            s.subscribe(value => {
+                this.settings.put({name: settingName, value: JSON.stringify(value)})
+            });
+            this.settingsListeners[settingName] = s;
+        }
+        return this.settingsListeners[settingName];
     }
 }

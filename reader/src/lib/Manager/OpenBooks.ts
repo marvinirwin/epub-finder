@@ -22,7 +22,9 @@ export const flattenNamedObject = (key: string) =>
     <T extends Named, U extends string>(obs$: Observable<DeltaScan<T, U>>): Observable<ds_Dict<T>> => {
         return obs$.pipe(
             map(({sourced}) => {
-                const libraryBooks = sourced?.children?.[key];
+                const libraryBooks = key === undefined ?
+                    sourced :
+                    sourced?.children?.[key];
                 return Object.fromEntries(
                     libraryBooks ? flattenTree<T>(
                         libraryBooks
@@ -263,7 +265,8 @@ export class OpenBooks {
                     }
                 }
             }
-        )
+        );
+
 
     }
 

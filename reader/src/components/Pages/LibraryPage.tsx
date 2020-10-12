@@ -4,7 +4,7 @@ import React, {Fragment} from "react";
 import {SlidingTopWindows} from "./ReadingPage";
 import {Conclusion} from "../Quiz/Conclusion";
 import {Characters} from "../Quiz/Characters";
-import {Paper} from "@material-ui/core";
+import {Paper, Button, Input, TextField} from "@material-ui/core";
 import {flattenNamedObject, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
 import List from "@material-ui/core/List";
@@ -43,6 +43,7 @@ export function LibraryPage({m}: { m: Manager }) {
             .map(story => [story, customBooks[story]])
     );
 
+
     const simpleText = useObservableState(m.library.simpleBook$.text$);
     const rawText = useObservableState(m.library.rawBook$.text$);
 
@@ -65,11 +66,22 @@ export function LibraryPage({m}: { m: Manager }) {
                 </Paper>
             </Paper>
             <Paper>
-                <Paper>
-                    <textarea onChange={e => m.library.rawBook$.text$.next(e.target.value)} value={rawText}>
+                <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
+                    <div>
+                        <TextField label="Raw story name" />
+                        <Button onClick={() => {
+                            m.library.putStory()
+                        }
+                        }>Save</Button>
+                    </div>
+                    <textarea
+                        onChange={e => m.library.rawBook$.text$.next(e.target.value)}
+                        value={rawText}
+                    >
                     </textarea>
                 </Paper>
                 <Paper>
+
                     <textarea onChange={e => m.library.simpleBook$.text$.next(e.target.value)} value={simpleText}>
                     </textarea>
                 </Paper>
