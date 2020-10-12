@@ -37,6 +37,7 @@ export class Library {
 
         saveEvent(this.rawBook$).subscribe(async ([_, name, text]) => {
             // Put into the database, and then put it into the tree
+            debugger;
             await this.db.customDocuments.put({
                 name,
                 html: text
@@ -46,7 +47,8 @@ export class Library {
 
         saveEvent(this.simpleBook$).subscribe(async ([_, name, text]) => {
             // Put into the database, and then put it into the tree
-            let html = interpolateSimpleCustomDoc(text);
+            const html = interpolateSimpleCustomDoc(text);
+            debugger;
             await this.db.customDocuments.put({
                 name,
                 html
@@ -62,10 +64,7 @@ export class Library {
         this.appendCustomDocuments(customDocuments);
 
         const builtInDocuments = [
-            "4_modernizations.html",
-            "butter_pancake.html",
             "generals.html",
-            "guardian_angel.html",
             "mango.html",
             'party_1.html',
             'smes.html',
@@ -73,7 +72,6 @@ export class Library {
             'stories.html',
             'story_2.html',
             'story_living_room.html',
-            'why_i_left_china.html',
             'zhou_enlai.html'
         ].map(websiteFromFilename);
         this.appendBuiltInDocuments(builtInDocuments);

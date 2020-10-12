@@ -104,7 +104,6 @@ export class Manager {
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: Library;
 
-
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         axios.interceptors.response.use(
             response => response,
@@ -327,7 +326,6 @@ export class Manager {
         const sliceStart = messages.length - MAX_MESSAGES > 0 ? messages.length - MAX_MESSAGES : 0;
         this.alertMessages$.next(messages.concat(error).slice(sliceStart, sliceStart + MAX_MESSAGES));
     }
-
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;

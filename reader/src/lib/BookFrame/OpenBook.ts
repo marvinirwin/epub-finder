@@ -39,7 +39,7 @@ export class OpenBook {
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence[]>>(1)
     public bookStats$: Observable<AtomizedDocumentBookStats>;
 
-    public unAtomizedSrcDoc$: Observable<string> = new ReplaySubject<string>(1);
+    public unAtomizedSrcDoc$= new ReplaySubject<string>(1);
     public url$ = new ReplaySubject<string>(1)
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
@@ -116,6 +116,7 @@ export class OpenBook {
 
         this.children$ = this.atomizedSrcDocStrings$.pipe(
             map(([originalDoc, ...documentChunks]) => {
+                debugger;
                     return Object.fromEntries(
                         documentChunks.map((childDocStr, index) => {
                             let childName = `${this.name}_${index}`;

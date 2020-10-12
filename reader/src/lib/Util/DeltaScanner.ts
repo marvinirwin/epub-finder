@@ -1,5 +1,5 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
-import {scan, shareReplay} from "rxjs/operators";
+import {map, scan, shareReplay} from "rxjs/operators";
 import {uniq} from "lodash";
 import {flattenTreeIntoDict, Named} from "../Manager/OpenBooks";
 
@@ -82,6 +82,7 @@ export class DeltaScanner<T, U extends string = string> {
     // I dont think this needs to be a replaySubject, but lets see if this works
     appendDelta$ = new ReplaySubject<ds_Tree<T, U> | undefined>(1);
     updates$: Observable<DeltaScan<T, U>>;
+    private newValues$: Observable<T[]>;
 
     constructor() {
         // @ts-ignore
@@ -102,6 +103,13 @@ export class DeltaScanner<T, U extends string = string> {
                 },
                 undefined
             ),
+            shareReplay(1)
+        );
+
+        this.newValues$ = this.updates$.pipe(
+            map(({sourced, delta}) => {
+                return flattenTree(delta, [], n => !n.delete);
+            }),
             shareReplay(1)
         )
     }
@@ -134,9 +142,13 @@ export class DeltaScanner<T, U extends string = string> {
 
 export class NamedDeltaScanner<T extends Named, U extends string = string> extends DeltaScanner<T, U> {
     dict$: Observable<ds_Dict<T>>
+
     constructor() {
         super();
-        this.dict$ = this.updates$.pipe(flattenTreeIntoDict(undefined))
+        this.dict$ = this.updates$.pipe(
+            flattenTreeIntoDict(undefined),
+            shareReplay(1)
+        )
     }
 }
 
@@ -168,9 +180,16 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
     }
 }
 
-export function flattenTree<T, U extends string = string>(tree: ds_Tree<T, U>, a: T[] = []): T[] {
+export function flattenTree<T, U extends string = string>(
+    tree: ds_Tree<T, U> | undefined,
+    a: T[] = [],
+    filter?: (v: ds_Tree<T, U>) => boolean
+): T[] {
     if (!tree) {
-        throw new Error("Tree is undefined")
+        return a;
+    }
+    if (filter && !filter(tree)) {
+        return a;
     }
     if (tree.hasOwnProperty('value')) {
         if (!tree.value) {
@@ -178,7 +197,7 @@ export function flattenTree<T, U extends string = string>(tree: ds_Tree<T, U>, a
         }
         a.push(tree.value as T);
     }
-    Object.values(tree.children || {}).forEach(child => flattenTree(child, a))
+    Object.values(tree.children || {}).forEach(child => flattenTree(child, a, filter))
     return a;
 }
 

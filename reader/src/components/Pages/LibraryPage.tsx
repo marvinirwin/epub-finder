@@ -49,10 +49,10 @@ export function LibraryPage({m}: { m: Manager }) {
             .map(story => [story, allBooks[story]])
     );
 
-    return <Paper>
-        <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
-            <Paper style={{flexGrow: 1, maxHeight: '25%'}}>
-                <Paper style={{width: '33%'}}>
+    return <Paper style={{height: '90vh'}}>
+        <Paper style={{display: 'flex', flexFlow: 'row nowrap', height: '100%'}}>
+            <Paper style={{flexGrow: 1}}>
+                <Paper>
                     Checked out
                     <NamedObjectList
                         listObjects={
@@ -69,7 +69,7 @@ export function LibraryPage({m}: { m: Manager }) {
                         }}
                     />
                 </Paper>
-                <Paper style={{width: '33%'}}>
+                <Paper>
                     To check out
                     <NamedObjectList
                         listObjects={booksAvailableForCheckOut}
@@ -81,28 +81,47 @@ export function LibraryPage({m}: { m: Manager }) {
                     />
                 </Paper>
             </Paper>
-            <Paper>
-                <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
+            <Paper style={{flexGrow: 4}}>
+                <Paper style={{display: 'flex', flexFlow: 'column nowrap', height: '50%'}}>
                     <div>
-                        <TextField label="Raw story name" />
                         <Button onClick={() => {
+                            m.library.rawBook$.saveSignal$.next()
+/*
                             m.library.appendCustomDocuments([new CustomDocument(rawName, rawText)])
+*/
                         } }>Save</Button>
+                        <TextField
+                            label="Raw story name"
+                            onChange={(ev) => m.library.rawBook$.name$.next(ev.target.value)}
+                            value={rawName}
+                        />
                     </div>
                     <textarea
+                        style={{flexGrow: 1}}
                         onChange={e => m.library.rawBook$.text$.next(e.target.value)}
                         value={rawText}
                     >
                     </textarea>
                 </Paper>
-                <Paper>
+                <Paper style={{display: 'flex', flexFlow: 'column nowrap', height: '50%'}}>
                     <div>
-                        <TextField label="Simple story name" />
                         <Button onClick={() => {
-                            m.library.appendCustomDocuments([new CustomDocument(simpleName, interpolateSimpleCustomDoc(simpleText))])
+                            m.library.simpleBook$.saveSignal$.next();
+/*
+                            m.library.appendCustomDocuments(
+                                [new CustomDocument(simpleName, interpolateSimpleCustomDoc(simpleText))]
+                            )
+*/
                         } }>Save</Button>
+                        <TextField
+                            style={{flexGrow: 1}}
+                            label="Simple story name"
+                            onChange={(ev) => m.library.simpleBook$.name$.next(ev.target.value)}
+                            value={simpleName}
+                        />
                     </div>
                     <textarea
+                        style={{flexGrow: 1}}
                         onChange={e => m.library.simpleBook$.text$.next(e.target.value)}
                         value={simpleText}>
                     </textarea>
