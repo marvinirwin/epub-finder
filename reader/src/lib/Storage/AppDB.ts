@@ -1,10 +1,11 @@
 import Dexie from "dexie";
-import {ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
+import {ds_Dict} from "../Util/DeltaScanner";
 
 
 export class MyAppDatabase extends Dexie {
@@ -16,7 +17,7 @@ export class MyAppDatabase extends Dexie {
     settings: Dexie.Table<Setting, string>;
     customDocuments: Dexie.Table<CustomDocument, string>;
     messages$: ReplaySubject<string> = new ReplaySubject<string>();
-    private settingsListeners: {[setting: string]: ReplaySubject<any>} = {};
+    private settingsListeners: {[setting: string]: BehaviorSubject<any>} = {};
 
     constructor() {
         super("MyAppDatabase");
@@ -82,13 +83,11 @@ export class MyAppDatabase extends Dexie {
 
     async resolveSetting$<T>(settingName: string, defaultVal: T) {
         if (!this.settingsListeners[settingName]) {
-            const s = new ReplaySubject<T>();
+            const s = new BehaviorSubject<T>(defaultVal);
             const row = await this.settings.where({name: settingName}).first();
             if (row) {
                 // TODO verify that this is the expected type
                 s.next(JSON.parse(row.value))
-            } else {
-                s.next(defaultVal)
             }
             s.subscribe(value => {
                 this.settings.put({name: settingName, value: JSON.stringify(value)})
@@ -96,5 +95,8 @@ export class MyAppDatabase extends Dexie {
             this.settingsListeners[settingName] = s;
         }
         return this.settingsListeners[settingName];
+    }
+    get openBooks$() {
+        return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {})
     }
 }

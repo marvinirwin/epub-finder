@@ -313,7 +313,7 @@ export class Manager {
             }
         });
         this.cardManager.load();
-        this.db.resolveSetting$<string[]>('openBooks', [])
+        this.db.openBooks$
             .then(openBooks$ => {
                 combineLatest([
                     openBooks$,

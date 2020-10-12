@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {scan, shareReplay} from "rxjs/operators";
 import {uniq} from "lodash";
-import {flattenNamedObject, Named} from "../Manager/OpenBooks";
+import {flattenTreeIntoDict, Named} from "../Manager/OpenBooks";
 
 export type ds_Dict<T, U extends string = string> = {
     [key in U]: T
@@ -133,7 +133,11 @@ export class DeltaScanner<T, U extends string = string> {
 }
 
 export class NamedDeltaScanner<T extends Named, U extends string = string> extends DeltaScanner<T, U> {
-    this.dict = this.updates$.pipe(flattenNamedObject('root'))
+    dict$: Observable<ds_Dict<T>>
+    constructor() {
+        super();
+        this.dict$ = this.updates$.pipe(flattenTreeIntoDict(undefined))
+    }
 }
 
 function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tree<U> {

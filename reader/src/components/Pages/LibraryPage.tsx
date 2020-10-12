@@ -5,7 +5,7 @@ import {SlidingTopWindows} from "./ReadingPage";
 import {Conclusion} from "../Quiz/Conclusion";
 import {Characters} from "../Quiz/Characters";
 import {Paper, Button, Input, TextField} from "@material-ui/core";
-import {flattenNamedObject, Named} from "../../lib/Manager/OpenBooks";
+import {flattenTreeIntoDict, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -13,6 +13,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {ds_Dict} from "../../lib/Util/DeltaScanner";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
 import {CustomDocument} from "../../lib/Website/Website";
+import {interpolateSimpleCustomDoc} from "../../lib/Manager/Library";
 
 export interface NamedObjectParams<T extends Named> {
     listObjects: T[] | ds_Dict<T>;
@@ -36,16 +37,18 @@ export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedO
 
 export function LibraryPage({m}: { m: Manager }) {
     const openBooks = useObservableState(m.openedBooks.sourceBooks$);
-    const builtInBooks = useObservableState(m.library.builtInBooks$.updates$.pipe(flattenNamedObject('root')));
-    const customBooks = useObservableState(m.library.customBooks$.updates$.pipe(flattenNamedObject('root'))) || {};
+    const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
+    const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
     const availableStories = Object.fromEntries(
         difference(Object.keys(builtInBooks || {}), Object.keys(openBooks || {}))
             .map(story => [story, customBooks[story]])
     );
 
 
-    const simpleText = useObservableState(m.library.simpleBook$.text$);
-    const rawText = useObservableState(m.library.rawBook$.text$);
+    const simpleText = useObservableState(m.library.simpleBook$.text$) || '';
+    const simpleName = useObservableState(m.library.simpleBook$.name$) || '';
+    const rawText = useObservableState(m.library.rawBook$.text$) || '';
+    const rawName = useObservableState(m.library.rawBook$.name$) || '';
 
     return <Paper>
         <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
@@ -70,9 +73,8 @@ export function LibraryPage({m}: { m: Manager }) {
                     <div>
                         <TextField label="Raw story name" />
                         <Button onClick={() => {
-                            m.library.putStory()
-                        }
-                        }>Save</Button>
+                            m.library.appendCustomDocuments([new CustomDocument(rawName, rawText)])
+                        } }>Save</Button>
                     </div>
                     <textarea
                         onChange={e => m.library.rawBook$.text$.next(e.target.value)}
@@ -81,8 +83,15 @@ export function LibraryPage({m}: { m: Manager }) {
                     </textarea>
                 </Paper>
                 <Paper>
-
-                    <textarea onChange={e => m.library.simpleBook$.text$.next(e.target.value)} value={simpleText}>
+                    <div>
+                        <TextField label="Simple story name" />
+                        <Button onClick={() => {
+                            m.library.appendCustomDocuments([new CustomDocument(simpleName, interpolateSimpleCustomDoc(simpleText))])
+                        } }>Save</Button>
+                    </div>
+                    <textarea
+                        onChange={e => m.library.simpleBook$.text$.next(e.target.value)}
+                        value={simpleText}>
                     </textarea>
                 </Paper>
             </Paper>

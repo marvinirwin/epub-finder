@@ -5,7 +5,7 @@ import {CustomDocument, Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
 import {Dictionary, flatten, flattenDeep} from "lodash";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Util/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -18,7 +18,7 @@ export type Named = {
     name: string;
 }
 
-export const flattenNamedObject = (key: string) =>
+export const flattenTreeIntoDict = (key: string | undefined) =>
     <T extends Named, U extends string>(obs$: Observable<DeltaScan<T, U>>): Observable<ds_Dict<T>> => {
         return obs$.pipe(
             map(({sourced}) => {
@@ -34,12 +34,12 @@ export const flattenNamedObject = (key: string) =>
         );
     }
 
-export const LIBRARY_BOOKS_NODE_LABEL = 'libraryBooks';
+export const SOURCE_BOOKS_NODE_LABEL = 'libraryBooks';
 export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';
 export const READING_BOOK_NODE_LABEL = 'readingBook';
 
 export class OpenBooks {
-    openedBooks = new DeltaScanner<OpenBook, string>();
+    openedBooks = new NamedDeltaScanner<OpenBook, string>();
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
     addOpenBook$ = new Subject<Website | CustomDocument>();
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
@@ -51,39 +51,56 @@ export class OpenBooks {
     sourceBooks$: Observable<ds_Dict<OpenBook>>;
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
-
-    // renderedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
+    openBooks$: Observable<ds_Dict<OpenBook>>
 
     constructor(
         private config: OpenBooksConfig
     ) {
+
+        this.openBooks$ = combineLatest([
+            config.library$.pipe(
+                map(libraryBooks => {
+                    return Object.fromEntries(Object.entries(libraryBooks).map(([name, page]) => {
+                        const isWebsite = (variableToCheck: any): variableToCheck is Website =>
+                            (variableToCheck as Website).url !== undefined;
+                        const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
+                            (variableToCheck as CustomDocument).html !== undefined;
+                        if (isCustomDocument(page)) {
+                            return [
+                                name, new OpenBook(
+                                    page.name,
+                                    config.trie$,
+                                    of(AtomizedDocument.atomizeDocument(page.html)),
+                                    undefined,
+                                    config.applyAtomizedSentencesListener
+                                )
+                            ];
+                        } else if (isWebsite(page)) {
+                            const b = new OpenBook(
+                                page.name,
+                                config.trie$,
+                                undefined,
+                                undefined,
+                                config.applyAtomizedSentencesListener
+                            );
+                            b.url$.next(page.url);
+                            return [name, b];
+                        }
+                        throw new Error("Unknown addOpenBook ");
+                    })) as ds_Dict<OpenBook>
+                })
+            ),
+            config.openBookTitles$
+        ]).pipe(map(([library, openBookTitles]) => {
+            return Object.fromEntries(
+                Object.entries(library).filter(([title, book]) => openBookTitles[title])
+            )
+        }));
+
+        // TODO, now I have the books I've opened.  Do I need to add them to the tree?
         this.addOpenBook$
             .pipe(
                 map(page => {
-                    const isWebsite = (variableToCheck: any): variableToCheck is Website =>
-                        (variableToCheck as Website).url !== undefined;
-                    const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
-                        (variableToCheck as CustomDocument).html !== undefined;
-                    if (isCustomDocument(page)) {
-                        return new OpenBook(
-                            page.name,
-                            config.trie$,
-                            of(AtomizedDocument.atomizeDocument(page.html)),
-                            undefined,
-                            config.applyAtomizedSentencesListener
-                        );
-                    } else if (isWebsite(page)) {
-                        const b = new OpenBook(
-                            page.name,
-                            config.trie$,
-                            undefined,
-                            undefined,
-                            config.applyAtomizedSentencesListener
-                        );
-                        b.url$.next(page.url);
-                        return b;
-                    }
-                    throw new Error("Unknown addOpenBook ");
                 }),
             )
             .subscribe((openBook) => {
@@ -91,8 +108,8 @@ export class OpenBooks {
                     {
                         nodeLabel: 'root',
                         children: {
-                            [LIBRARY_BOOKS_NODE_LABEL]: {
-                                nodeLabel: LIBRARY_BOOKS_NODE_LABEL,
+                            [SOURCE_BOOKS_NODE_LABEL]: {
+                                nodeLabel: SOURCE_BOOKS_NODE_LABEL,
                                 children: {
                                     [openBook.name]: {
                                         nodeLabel: openBook.name,
@@ -151,8 +168,7 @@ export class OpenBooks {
         });
 
 
-
-        this.sourceBooks$ = this.openedBooks.updates$.pipe(flattenNamedObject(LIBRARY_BOOKS_NODE_LABEL));
+        this.sourceBooks$ = this.openedBooks.updates$.pipe(flattenTreeIntoDict(SOURCE_BOOKS_NODE_LABEL));
 
         this.library$ = this.sourceBooks$.pipe(
             switchMap(sourceBooks =>

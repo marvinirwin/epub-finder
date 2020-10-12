@@ -1,5 +1,5 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
-import {DeltaScanner, ds_Dict} from "../Util/DeltaScanner";
+import {DeltaScanner, ds_Dict, NamedDeltaScanner} from "../Util/DeltaScanner";
 import {CustomDocument, Website} from "../Website/Website";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {websiteFromFilename} from "../../AppSingleton";
@@ -16,8 +16,8 @@ interface LibraryParams {
 }
 
 export class Library {
-    builtInBooks$ = new DeltaScanner<Website>();
-    customBooks$ = new DeltaScanner<CustomDocument>();
+    builtInBooks$ = new NamedDeltaScanner<Website>();
+    customBooks$ = new NamedDeltaScanner<CustomDocument>();
 
     rawBook$ = new EditingBook();
     simpleBook$ = new EditingBook();
@@ -79,7 +79,7 @@ export class Library {
         this.appendBuiltInDocuments(builtInDocuments);
     }
 
-    private appendBuiltInDocuments(builtInDocuments: Website[]) {
+    appendBuiltInDocuments(builtInDocuments: Website[]) {
         this.builtInBooks$.appendDelta$.next({
             nodeLabel: 'root',
             children: Object.fromEntries(
@@ -94,7 +94,7 @@ export class Library {
         })
     }
 
-    private appendCustomDocuments(customDocuments: Array<CustomDocument>) {
+    appendCustomDocuments(customDocuments: Array<CustomDocument>) {
         this.customBooks$.appendDelta$.next({
             nodeLabel: "root",
             children: Object.fromEntries(
@@ -107,6 +107,22 @@ export class Library {
                 ])
             )
         });
+    }
+
+    async putCustomDocument(name: string, html: string) {
+        const customDocument = new CustomDocument(name, html);
+        this.customBooks$.appendDelta$.next({
+            nodeLabel: "root",
+            children: {
+                [name]: {
+                    nodeLabel: name,
+                    value: customDocument
+                }
+            }
+        })
+        const setting$ = await this.db.openBooks$;
+        // Automatically add an open book once a custom document is added
+        setting$.next({...setting$.getValue(), [name]: true});
     }
 }
 
