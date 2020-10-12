@@ -120,7 +120,7 @@ export class Library {
                 }
             }
         })
-        const setting$ = await this.db.openBooks$;
+        const setting$ = await this.db.checkedOutBooks$;
         // Automatically add an open book once a custom document is added
         setting$.next({...setting$.getValue(), [name]: true});
     }

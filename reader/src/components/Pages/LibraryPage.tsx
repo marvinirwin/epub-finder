@@ -1,9 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import React, {Fragment} from "react";
-import {SlidingTopWindows} from "./ReadingPage";
-import {Conclusion} from "../Quiz/Conclusion";
-import {Characters} from "../Quiz/Characters";
 import {Paper, Button, Input, TextField} from "@material-ui/core";
 import {flattenTreeIntoDict, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
@@ -21,7 +18,6 @@ export interface NamedObjectParams<T extends Named> {
 }
 
 export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedObjectParams<T>) => {
-    debugger;console.log();
     return <List dense={true}>
         {
             Object.values(listObjects).map(libraryBook => {
@@ -44,7 +40,7 @@ export function LibraryPage({m}: { m: Manager }) {
     const simpleName = useObservableState(m.library.simpleBook$.name$) || '';
     const rawText = useObservableState(m.library.rawBook$.text$) || '';
     const rawName = useObservableState(m.library.rawBook$.name$) || '';
-    const checkedOutTitles = useObservableState(m.db.openBooks$) || {};
+    const checkedOutTitles = useObservableState(m.db.checkedOutBooks$) || {};
 
     const allBooks = {...builtInBooks, ...customBooks};
 
@@ -67,9 +63,9 @@ export function LibraryPage({m}: { m: Manager }) {
                             )
                         }
                         onSelect={(b: OpenBook) => {
-                            let checkedOutBooks = {...m.db.openBooks$.getValue()};
+                            let checkedOutBooks = {...m.db.checkedOutBooks$.getValue()};
                             delete checkedOutBooks[b.name];
-                            m.db.openBooks$.next(checkedOutBooks)
+                            m.db.checkedOutBooks$.next(checkedOutBooks)
                         }}
                     />
                 </Paper>
@@ -78,8 +74,8 @@ export function LibraryPage({m}: { m: Manager }) {
                     <NamedObjectList
                         listObjects={booksAvailableForCheckOut}
                         onSelect={(b) => {
-                            m.db.openBooks$.next(
-                                {...m.db.openBooks$.getValue(), [b.name]: true}
+                            m.db.checkedOutBooks$.next(
+                                {...m.db.checkedOutBooks$.getValue(), [b.name]: true}
                             )
                         }}
                     />

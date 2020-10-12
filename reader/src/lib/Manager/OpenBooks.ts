@@ -88,7 +88,7 @@ export class OpenBooks {
                     })) as ds_Dict<OpenBook>
                 })
             ),
-            config.db.openBooks$
+            config.db.checkedOutBooks$
         ]).pipe(map(([library, openBookTitles]) => {
             return Object.fromEntries(
                 Object.entries(library).filter(([title, book]) => openBookTitles[title])

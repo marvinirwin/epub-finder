@@ -83,20 +83,20 @@ export class MyAppDatabase extends Dexie {
 
     resolveSetting$<T>(settingName: string, defaultVal: T) {
         if (!this.settingsListeners[settingName]) {
-            const s = new BehaviorSubject<T>(defaultVal);
+            const behaviourSubject = new BehaviorSubject<T>(defaultVal);
             this.settings.where({name: settingName}).first().then(row => {
                 if (row) {
-                    s.next(JSON.parse(row.value))
+                    behaviourSubject.next(JSON.parse(row.value))
                 }
             });
-            s.subscribe(value => {
+            behaviourSubject.subscribe(value => {
                 this.settings.put({name: settingName, value: JSON.stringify(value)}, settingName)
             });
-            this.settingsListeners[settingName] = s;
+            this.settingsListeners[settingName] = behaviourSubject;
         }
         return this.settingsListeners[settingName];
     }
-    get openBooks$(): BehaviorSubject<ds_Dict<boolean>> {
+    get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {})
     }
 }
