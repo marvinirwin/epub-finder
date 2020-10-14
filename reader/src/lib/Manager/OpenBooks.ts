@@ -37,6 +37,10 @@ export const flattenTreeIntoDict = (key: string | undefined) =>
 export const SOURCE_BOOKS_NODE_LABEL = 'libraryBooks';
 export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';
 export const READING_BOOK_NODE_LABEL = 'readingBook';
+export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
+    (variableToCheck as Website).url !== undefined;
+export const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
+    (variableToCheck as CustomDocument).html !== undefined;
 
 export class OpenBooks {
     openedBooks = new NamedDeltaScanner<OpenBook, string>();
@@ -49,7 +53,7 @@ export class OpenBooks {
     readingBook: OpenBook;
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
-    checkedOutBooks$: Observable<ds_Dict<OpenBook>>
+    checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
 
     constructor(
         private config: OpenBooksConfig
@@ -58,14 +62,7 @@ export class OpenBooks {
             config.library$.pipe(
                 map(libraryBooks => {
                     return Object.fromEntries(Object.entries(libraryBooks).map(([name, page]) => {
-                        const isWebsite = (variableToCheck: any): variableToCheck is Website =>
-                            (variableToCheck as Website).url !== undefined;
-                        const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
-                            (variableToCheck as CustomDocument).html !== undefined;
                         if (isCustomDocument(page)) {
-                            /**
-                             * of(AtomizedDocument.atomizeDocument(page.html)),
-                             */
                             const openBook = new OpenBook(
                                 page.name,
                                 config.trie$,
@@ -140,25 +137,29 @@ export class OpenBooks {
                 shareReplay(1)
             );
 
+
+        function getMapFunc() {
+            return (bookFrame: OpenBook) => {
+                return combineLatest([
+                    bookFrame.renderedSentences$,
+                    config.trie$
+                ]).pipe(
+                    map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
+                            return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
+                                sentences.map(sentence =>
+                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
+                                )
+                            ));
+                        }
+                    ),
+                    shareReplay(1)
+                );
+            };
+        }
+
         this.renderedSentenceTextDataTree$ = this
             .openedBooks
-            .mapWith(bookFrame => {
-                    return combineLatest([
-                        bookFrame.renderedSentences$,
-                        config.trie$
-                    ]).pipe(
-                        map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
-                                return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
-                                    sentences.map(sentence =>
-                                        getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
-                                    )
-                                ));
-                            }
-                        ),
-                        shareReplay(1)
-                    );
-                }
-            );
+            .mapWith(getMapFunc());
         this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
             combineLatest(flattenTree(delta))
                 .subscribe(bookStats => {
@@ -170,13 +171,11 @@ export class OpenBooks {
                 })
         });
 
-
         this.library$ = this.checkedOutBooks$.pipe(
             switchMap(sourceBooks =>
                 combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))
             ),
             map(bookChildrenList => {
-                    debugger;
                     return Object.fromEntries(
                         flatten(
                             bookChildrenList.map(
@@ -248,7 +247,6 @@ export class OpenBooks {
             switchMap(sourceBooks => combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))),
             withLatestFrom(this.readingBook$.pipe(startWith(undefined)))
         ).subscribe(([openSourceBooks, readingBook]) => {
-            debugger;
             let openBooks = flatten(openSourceBooks.map(openSourceBookChildren => Object.values(openSourceBookChildren)));
             if (!readingBook && openBooks.length) {
                 this.readingBook$.next(openBooks[0]);

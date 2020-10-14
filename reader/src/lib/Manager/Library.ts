@@ -37,7 +37,6 @@ export class Library {
 
         saveEvent(this.rawBook$).subscribe(async ([_, name, text]) => {
             // Put into the database, and then put it into the tree
-            debugger;
             await this.db.customDocuments.put({
                 name,
                 html: text
@@ -48,7 +47,6 @@ export class Library {
         saveEvent(this.simpleBook$).subscribe(async ([_, name, text]) => {
             // Put into the database, and then put it into the tree
             const html = interpolateSimpleCustomDoc(text);
-            debugger;
             await this.db.customDocuments.put({
                 name,
                 html
@@ -121,6 +119,19 @@ export class Library {
         const setting$ = await this.db.checkedOutBooks$;
         // Automatically add an open book once a custom document is added
         setting$.next({...setting$.getValue(), [name]: true});
+    }
+
+    async deleteCustomDocument(b: CustomDocument) {
+        await this.db.customDocuments.delete(b.name);
+        this.customBooks$.appendDelta$.next({
+            nodeLabel: 'root',
+            children: {
+                [b.name]: {
+                    delete: true,
+                    nodeLabel: b.name
+                }
+            }
+        })
     }
 }
 

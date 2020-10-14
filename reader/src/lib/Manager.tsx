@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary} from "lodash";
-import {debounceTime, map, shareReplay, startWith} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -43,6 +43,7 @@ import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Manager/Highlighter";
 import {Library} from "./Manager/Library";
 import {CustomDocument, Website} from "./Website/Website";
+import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -175,10 +176,20 @@ export class Manager {
         this.quizCharacterManager = new QuizCharacter(
             {
                 exampleSentences$: combineLatest([
-                    this.openedBooks.renderedBookSentenceData$,
+                    this.openedBooks.checkedOutBooks$
+                        .pipe(
+                            switchMap(books =>
+                                combineLatest(
+                                    Object.values(books)
+                                        .map(book =>
+                                            book.bookStats$
+                                        )
+                                )
+                            )
+                        ),
                     this.quizManager.quizzingCard$
                 ]).pipe(
-                    map(([textWordData, quizzingCard]: [TextWordData[], ICard | undefined]) => {
+                    map(([textWordData, quizzingCard]: [AtomizedDocumentBookStats[], ICard | undefined]) => {
                         if (!quizzingCard) return [];
                         const limit = 10;
                         let count = 0;

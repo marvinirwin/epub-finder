@@ -1,8 +1,8 @@
 import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
-import React, {Fragment} from "react";
-import {Paper, Button, Input, TextField} from "@material-ui/core";
-import {flattenTreeIntoDict, Named} from "../../lib/Manager/OpenBooks";
+import React, {Fragment, ReactNode} from "react";
+import {Paper, Button, Input, TextField, ListItemIcon, IconButton} from "@material-ui/core";
+import {flattenTreeIntoDict, isCustomDocument, isWebsite, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -10,14 +10,15 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {ds_Dict} from "../../lib/Util/DeltaScanner";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
 import {CustomDocument, Website} from "../../lib/Website/Website";
-import {interpolateSimpleCustomDoc} from "../../lib/Manager/Library";
+import DeleteIcon from '@material-ui/icons/Delete';
+
 
 export interface NamedObjectParams<T extends Named> {
     listObjects: T[] | ds_Dict<T>;
-    onSelect: (v: T) => void
+    onSelect: (v: T) => void;
+    onDelete?: (v: T) => void;
 }
-
-export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedObjectParams<T>) => {
+export const BookList = <T extends Named>({listObjects, onSelect, onDelete}: NamedObjectParams<T>) => {
     return <List dense={true}>
         {
             Object.values(listObjects).map(libraryBook => {
@@ -25,7 +26,13 @@ export const NamedObjectList = <T extends Named>({listObjects, onSelect}: NamedO
                     key={libraryBook.name}
                     button>
                     <ListItemText primary={libraryBook.name}
-                                  onClick={() => onSelect(libraryBook)}/>
+                                  onClick={() => onSelect(libraryBook)}
+                    />
+                    {
+                        onDelete && <IconButton onClick={() => onDelete(libraryBook)}>
+                            <DeleteIcon />
+                        </IconButton>
+                    }
                 </ListItem>;
             })
         }
@@ -54,7 +61,7 @@ export function LibraryPage({m}: { m: Manager }) {
             <Paper style={{flexGrow: 1}}>
                 <Paper>
                     Checked out
-                    <NamedObjectList
+                    <BookList
                         listObjects={
                             Object.fromEntries(
                                 Object.keys(checkedOutTitles)
@@ -71,12 +78,17 @@ export function LibraryPage({m}: { m: Manager }) {
                 </Paper>
                 <Paper>
                     To check out
-                    <NamedObjectList
+                    <BookList
                         listObjects={booksAvailableForCheckOut}
                         onSelect={(b) => {
                             m.db.checkedOutBooks$.next(
                                 {...m.db.checkedOutBooks$.getValue(), [b.name]: true}
                             )
+                        }}
+                        onDelete={(b) => {
+                            if (isCustomDocument(b)) {
+                                m.library.deleteCustomDocument(b);
+                            }
                         }}
                     />
                 </Paper>

@@ -116,7 +116,6 @@ export class OpenBook {
 
         this.children$ = this.atomizedSrcDocStrings$.pipe(
             map(([originalDoc, ...documentChunks]) => {
-                debugger;
                     return Object.fromEntries(
                         documentChunks.map((childDocStr, index) => {
                             let childName = `${this.name}_${index}`;
