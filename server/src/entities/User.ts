@@ -1,9 +1,14 @@
-import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, AfterLoad, BeforeUpdate, BeforeInsert} from "typeorm";
+
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import {UsageEvent} from "./UsageEvent";
+import {JsonValueTransformer} from "../util/JsonValueTransformer";
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number | undefined;
     @Column({unique: true})
     email!: string; // { type: String, unique: true },
     @Column()
@@ -37,12 +42,8 @@ export class User {
     @Column()
     quickbooks!: string;
     // I wonder what the ORM will do with this?
-    @Column()
+    @Column({type: String, transformer: new JsonValueTransformer<string[]>()})
     tokens!: string[];
-    @Column()
-    usedBudget!: number;
-    @Column()
-    maxBudget!: number;
     @Column()
     profile_name!: string;
     @Column()
@@ -53,64 +54,36 @@ export class User {
     profile_website!: string;
     @Column()
     profile_picture!: string
+
+    private _loadedPassword: string;
+    usageEvents: UsageEvent[];
+
+    @AfterLoad()
+    private storeInitialPassword(): void {
+        this._loadedPassword = this.password;
+    }
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    private async encryptPassword(): Promise<void> {
+        if (this._loadedPassword !== this.password) {
+            const salt = await bcrypt.getSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
+        }
+    }
+
+    public gravatar(size) {
+        if (!size) {
+            size = 200;
+        }
+        if (!this.email) {
+            return `https://gravatar.com/avatar/?s=${size}&d=retro`;
+        }
+        const md5 = crypto.createHash("md5").update(this.email).digest("hex");
+        return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
+    }
 }
 
-/**
- * Password hash middleware.
- */
-/*
-userSchema.pre("save", function save(next) {
-  const user = this;
-  if (!user.isModified("password")) { return next(); }
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) { return next(err); }
-    bcrypt.hash(user.password, salt, (err, hash) => {
-      if (err) { return next(err); }
-      user.password = hash;
-      next();
-    });
-  });
-});
-*/
-
-/**
- * Set the budget TODO not hardcode this
- */
-/*
-userSchema.pre("save", function save(next) {
-  const user = this;
-  if (!user.usedBudget || !user.maxBudget) {
-    user.usedBudget = 0;
-    user.maxBudget = 250000; // About 5 dollars worth of google translated characters
-  }
-});
-*/
-
-/**
- * Helper method for validating user's password.
- */
-/*
-userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    cb(err, isMatch);
-  });
-};
-*/
-
-/**
- * Helper method for getting user's gravatar.
- */
-/*
-userSchema.methods.gravatar = function gravatar(size) {
-  if (!size) {
-    size = 200;
-  }
-  if (!this.email) {
-    return `https://gravatar.com/avatar/?s=${size}&d=retro`;
-  }
-  const md5 = crypto.createHash("md5").update(this.email).digest("hex");
-  return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
-};
-*/
-
-module.exports = User;
+// TODO do I need to do this so that it can load entities by scanning the directory?
+// module.exports = User;
+// export default User;

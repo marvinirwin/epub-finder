@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 
 dotenv.config({path: ".env"});
-import {createConnection} from "typeorm";
 import morgan from "morgan";
 import logger from "morgan";
 import express from "express";
@@ -31,6 +30,9 @@ import passportConfig from "./config/passport";
 import {enforceBudget} from "./controllers/budget";
 import {TypeormStore} from "connect-typeorm";
 import {Session} from "./entities/Session";
+import {createConnection} from "typeorm";
+import DatabaseConfig from "./config/database.config"
+import {MysqlConnectionOptions} from "typeorm/driver/mysql/MysqlConnectionOptions";
 
 
 /*
@@ -39,11 +41,8 @@ const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 */
 async function connectedApp() {
     const app = express();
-/*
-    const connection = await
-        // TODO use the values in the .env file
-        createConnection();
-*/
+
+    const connection = await createConnection(DatabaseConfig as MysqlConnectionOptions);
 
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
