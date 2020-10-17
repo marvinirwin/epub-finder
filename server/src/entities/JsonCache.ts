@@ -11,5 +11,5 @@ export class JsonCache {
     @Column("text")
     value: string;
     @Column()
-    key!: string;
+    key: string;
 }

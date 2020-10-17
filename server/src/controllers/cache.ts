@@ -20,7 +20,7 @@ export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string
         if (connection) {
             rows = await repo.find({
                 service: serviceKey,
-                value: sha1Hex
+                key_hash: sha1Hex
             })
         }
 
@@ -32,7 +32,11 @@ export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string
                 jsonCache.key = stringifiedArgs;
                 jsonCache.key_hash = sha1Hex;
                 jsonCache.value = JSON.stringify(result);
-                await repo.save(jsonCache)
+                try {
+                    await repo.save(jsonCache)
+                } catch(e) {
+                    console.warn(e);
+                }
             }
             return result;
         }
