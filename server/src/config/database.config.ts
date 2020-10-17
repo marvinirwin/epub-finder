@@ -19,4 +19,5 @@ export default {
         migrationsDir: 'src/db/migrations',
         entitiesDir: 'src/db/entities',
     },
+    synchronize: true
 };

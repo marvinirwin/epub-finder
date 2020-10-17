@@ -11,6 +11,6 @@ export class UsageEvent {
     public description: {[key: string]: any};
     @Column("int")
     public cost: number;
-    @ManyToOne(() => User, user => user.usageEvents)
+    @ManyToOne(() => User, user => user.id)
     public userId: number;
 }

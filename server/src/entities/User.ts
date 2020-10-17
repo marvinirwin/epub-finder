@@ -1,9 +1,19 @@
-import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, AfterLoad, BeforeUpdate, BeforeInsert} from "typeorm";
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    AfterLoad,
+    BeforeUpdate,
+    BeforeInsert,
+    OneToMany, Repository
+} from "typeorm";
 
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import {UsageEvent} from "./UsageEvent";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
+import {Usage} from "./Usage";
 
 @Entity()
 export class User {
@@ -56,6 +66,8 @@ export class User {
     profile_picture!: string
 
     private _loadedPassword: string;
+
+    @OneToMany(type => UsageEvent, usageEvent => usageEvent.userId)
     usageEvents: UsageEvent[];
 
     @AfterLoad()
@@ -82,8 +94,9 @@ export class User {
         const md5 = crypto.createHash("md5").update(this.email).digest("hex");
         return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
     }
+
+    public async usageStat(r: Repository<Usage>): Promise<Usage> {
+        return r.findOne({userId: this.id})
+    }
 }
 
-// TODO do I need to do this so that it can load entities by scanning the directory?
-// module.exports = User;
-// export default User;

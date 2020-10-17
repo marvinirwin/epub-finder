@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+import {expect} from 'chai';
 const sinon = require("sinon");
 
 const User = require("../src/models/User");

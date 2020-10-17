@@ -2,7 +2,6 @@ import request = require("supertest");
 import app from "../src/app";
 import {getConnection, query} from "../src/util/mysql";
 import {getSha1} from "../src/util/sha1";
-import {TranslationRequest} from "../src/controllers/Translate";
 import {ImageSearchRequest} from "../src/controllers/ImageSearch";
 
 const connection = getConnection();

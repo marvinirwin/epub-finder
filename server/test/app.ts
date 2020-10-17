@@ -1,5 +1,12 @@
-const request = require("supertest");
-const app = require("../app.js");
+import request from 'supertest';
+import app from '../src/app';
+
+
+describe("Logging in and out", () => {
+  beforeEach(async () => {
+    // Destroy and remake each user
+  })
+})
 
 describe("GET /", () => {
   it("should return 200 OK", (done) => {

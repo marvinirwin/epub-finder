@@ -1,44 +1,11 @@
 import { Request, Response, NextFunction,  } from "express";
 // @ts-ignore
-import User from '../models/User';
+import User from '../entities/User';
+import {Connection} from "typeorm";
 
-export interface ExpressUser {
-    email: string,
-    password: string,
-    passwordResetToken: string,
-    passwordResetExpires: Date,
-    emailVerificationToken: string,
-    emailVerified: boolean,
-
-    snapchat: string,
-    facebook: string,
-    twitter: string,
-    google: string,
-    github: string,
-    instagram: string,
-    linkedin: string,
-    steam: string,
-    twitch: string,
-    quickbooks: string,
-    tokens: string[],
-
-    usedBudget: number,
-    maxBudget: number,
-
-
-    profile: {
-        name: string,
-        gender: string,
-        location: string,
-        website: string,
-        picture: string
-    }
-
-}
-
-export const enforceBudget = (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as ExpressUser ;
-    const usedBudget = user.usedBudget;
+export const enforceBudget = (connection: Connection) => (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as User;
+    const usedBudget = user;
     const maxBudget = user.maxBudget;
     const cost = JSON.stringify(req.body).length;
     if ((usedBudget + cost) > maxBudget) {
