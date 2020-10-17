@@ -4,6 +4,7 @@ import connectionPromise from './connection';
 import {Connection} from "typeorm";
 import {User} from "../src/entities/User";
 
+
 let connection: Connection;
 describe('logging in and out', () => {
     beforeEach(async () => {
@@ -11,14 +12,14 @@ describe('logging in and out', () => {
         const userRepo = connection.getRepository(User);
         // Create a test user
         const testUser = new User();
-        testUser.password = 'test';
         testUser.email = 'test@test.com';
+        testUser.password = 'password';
         await userRepo.delete({email: 'test@test.com'});
         await userRepo.save(testUser);
     });
 
     it('Should be able to login', async () => {
-        // Gotta get that passport login thing ready
+
     })
 })
 describe("GET /", () => {

@@ -95,6 +95,16 @@ export class User {
         return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
     }
 
+    public comparePassword(password: string) {
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, this.password, (err, res) => {
+                if (err) reject(err);
+                if (res) resolve(true);
+                resolve(false);
+            })
+        });
+    }
+
     public async usageStat(r: Repository<Usage>): Promise<Usage> {
         return r.findOne({userId: this.id})
     }
