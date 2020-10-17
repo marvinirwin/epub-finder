@@ -3,7 +3,7 @@ import {Dictionary, uniqueId} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
 import {AtomizedSentence} from "./AtomizedSentence";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {splitPunctuation} from "../Util/Util";
+import {splitKeepDelim, splitPunctuation} from "../Util/Util";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
@@ -192,12 +192,7 @@ export class AtomizedDocument {
 
     splitLongTextElements(textElements: Element[]) {
         textElements.forEach(textNode => {
-            const split = splitPunctuation(
-                20,
-                textNode.nodeValue as string,
-                (char: string) => !isChineseCharacter(char)
-            );
-
+            const split =  splitKeepDelim('。')(textNode.nodeValue as string);
             if (split.length > 1) {
                 this.replaceTextNodeWithSubTextNode(
                     textNode,

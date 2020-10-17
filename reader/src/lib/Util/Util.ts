@@ -70,6 +70,12 @@ export function splitPunctuation(threshhold: number, str: string, filterFunc: (c
     return splits;
 */
 }
+export const splitKeepDelim = (delim: string) => (...strings: string[]): string[] => {
+    return flatten(
+        strings.map(string => string.split(delim).map(splitString => splitString + delim))
+    )
+}
+
 
 export const jestDetected = () => process.env.JEST_WORKER_ID !== undefined;
 

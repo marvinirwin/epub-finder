@@ -40,7 +40,7 @@ export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string
             }
             return result;
         }
-        return rows[0].value;
+        return JSON.parse(rows[0].value);
     };
 }
 
