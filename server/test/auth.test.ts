@@ -6,20 +6,26 @@ import {User} from "../src/entities/User";
 
 
 let connection: Connection;
+const email = 'test@test.com';
+const password = 'password';
+
 describe('logging in and out', () => {
     beforeEach(async () => {
         connection = await connectionPromise;
         const userRepo = connection.getRepository(User);
         // Create a test user
         const testUser = new User();
-        testUser.email = 'test@test.com';
-        testUser.password = 'password';
-        await userRepo.delete({email: 'test@test.com'});
+        testUser.email = email;
+        testUser.password = password;
+        await userRepo.delete({email: email});
         await userRepo.save(testUser);
     });
 
     it('Should be able to login', async () => {
-
+        request(app)
+            .get('/login')
+            .auth(email, password)
+            .expect(200)
     })
 })
 describe("GET /", () => {

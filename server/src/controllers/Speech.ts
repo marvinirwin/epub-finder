@@ -37,6 +37,7 @@ function downloadSynthesizedSpeech(filename: string, ssml1: string) {
 const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string;
 
 export async function TextToSpeech(req: Request, res: Response) {
+    // @ts-ignore
     const {text} = req.body;
     const ssml = `
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="string">
@@ -52,7 +53,9 @@ export async function TextToSpeech(req: Request, res: Response) {
     if (!audioFileExists) {
         await downloadSynthesizedSpeech(filename, ssml);
     }
+    // @ts-ignore
     res.setHeader("content-type", "audio/wav");
+    // @ts-ignore
     fs.createReadStream(filename).pipe(res);
 }
 
@@ -67,6 +70,7 @@ export async function GetSpeechRecognitionToken(req: Request, res: Response) {
             }
         }
     );
+    // @ts-ignore
     res.send(result.data);
 }
 

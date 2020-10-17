@@ -33,6 +33,7 @@
         "@google-cloud/translate": "^6.0.0",
         "@ladjs/bootstrap-social": "^7.0.2",
         "@octokit/rest": "^18.0.0",
+        "@types/bcrypt": "^3.0.0",
         "@types/mysql2": "github:types/mysql2",
         "async": "^3.1.0",
         "axios": "^0.19.2",

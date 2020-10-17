@@ -47,9 +47,13 @@ async function connectedApp() {
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
     app.set("view engine", "pug");
+    // @ts-ignore
     app.use(compression());
+    // @ts-ignore
     app.use(bodyParser.json());
+    // @ts-ignore
     app.use(bodyParser.urlencoded({extended: true}));
+    // @ts-ignore
     app.use(morgan("combined"));
     /*
     app.use(lusca.xframe("SAMEORIGIN"));
@@ -68,14 +72,18 @@ async function connectedApp() {
     app.set("host", process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
     app.set("views", path.join(__dirname, "views"));
     app.set("view engine", "pug");
+    // @ts-ignore
     app.use(expressStatusMonitor());
+    // @ts-ignore
     app.use(compression());
+    // @ts-ignore
     app.use(sass({
         src: path.join(__dirname, "public"),
         dest: path.join(__dirname, "public")
     }));
+    // @ts-ignore
     app.use(logger("dev"));
-    app.use(bodyParser.json());
+    // @ts-ignore
     app.use(bodyParser.urlencoded({extended: true}));
 // @ts-ignore
 /*
@@ -145,17 +153,15 @@ async function connectedApp() {
     /**
      * Primary app routes.
      */
-    app.get("/", homeController.index);
-    app.get("/login", userController.getLogin);
     app.post("/login", userController.postLogin);
     app.get("/logout", userController.logout);
-    app.get("/forgot", userController.getForgot);
-    app.post("/forgot", userController.postForgot);
+/*
     app.get("/reset/:token", userController.getReset);
+*/
+/*
     app.post("/reset/:token", userController.postReset);
-    app.get("/signup", userController.getSignup);
+*/
     app.post("/signup", userController.postSignup);
-    app.get("/contact", contactController.getContact);
     app.post("/contact", contactController.postContact);
 /*
     app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);

@@ -18,5 +18,6 @@ export const translateFuncF = memoWithMySQL("GOOGLE_TRANSLATIONS", async functio
     return {translation};
 });
 export const translateFunc = async (req: Request, res: Response) => {
+    // @ts-ignore
     return res.send(JSON.stringify(await translateFuncF(req.body)));
 };

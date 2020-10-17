@@ -1,5 +1,7 @@
 import {getSha1} from "../util/sha1";
-import {getConnection, query} from "../util/mysql";
+import connectionPromise from '../../test/connection';
+import {Repository} from "typeorm";
+import {JsonCache} from "../entities/JsonCache";
 
 interface JsonCacheRow {
     service: string;
@@ -8,34 +10,29 @@ interface JsonCacheRow {
     key_hash: string;
 }
 
-export function memoWithMySQL<T>(serviceKey: string, f: (...a: any[]) => T) {
-    const conPromise = getConnection().catch(e => console.error(e));
+export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string, f: (...a: any[]) => T) {
+    const conPromise = connectionPromise.catch(e => console.error(e));
     return async function (...args: any[]) {
         const stringifiedArgs = JSON.stringify(args);
         const connection = await conPromise;
         let sha1Hex = getSha1(stringifiedArgs);
         let rows = [];
         if (connection) {
-            rows = await query<JsonCacheRow>(connection,
-                'SELECT `value` FROM `json_cache` WHERE `service` = ? AND `key_hash` = ?',
-                [
-                    serviceKey,
-                    sha1Hex
-                ])
+            rows = await repo.find({
+                service: serviceKey,
+                value: sha1Hex
+            })
         }
 
         if (!rows.length) {
             const result = await f(...args);
             if (connection) {
-                await query<JsonCacheRow>(connection,
-                    'INSERT INTO `json_cache` (`service`, `key`, `key_hash`, `value`) VALUES (?, ?, ?, ?)',
-                    [
-                        serviceKey,
-                        stringifiedArgs,
-                        sha1Hex,
-                        JSON.stringify(result)
-                    ]
-                )
+                let jsonCache = new JsonCache();
+                jsonCache.service = serviceKey;
+                jsonCache.key = stringifiedArgs;
+                jsonCache.key_hash = sha1Hex;
+                jsonCache.value = JSON.stringify(result);
+                await repo.save(jsonCache)
             }
             return result;
         }

@@ -24,46 +24,46 @@ export class User {
     @Column()
     password!: string;
     @Column()
-    passwordResetToken!: string;
+    passwordResetToken: string = '';
     @Column()
-    passwordResetExpires!: Date;
+    passwordResetExpires: Date = new Date(); // I have no idea if this will break anything
     @Column()
-    emailVerificationToken!: string;
+    emailVerificationToken: string = '';
     @Column()
-    emailVerified!: boolean;
+    emailVerified: boolean = false;
     @Column()
-    snapchat!: string;
+    snapchat: string = '';
     @Column()
-    facebook!: string;
+    facebook: string = '';
     @Column()
-    twitter!: string;
+    twitter: string = '';
     @Column()
-    google!: string;
+    google: string = '';
     @Column()
-    github!: string;
+    github: string = '';
     @Column()
-    instagram!: string;
+    instagram: string = '';
     @Column()
-    linkedin!: string;
+    linkedin: string = '';
     @Column()
-    steam!: string;
+    steam: string = '';
     @Column()
-    twitch!: string;
+    twitch: string = '';
     @Column()
-    quickbooks!: string;
+    quickbooks: string = '';
     // I wonder what the ORM will do with this?
     @Column({type: String, transformer: new JsonValueTransformer<string[]>()})
-    tokens!: string[];
+    tokens: string[] = [];
     @Column()
-    profile_name!: string;
+    profile_name: string = '';
     @Column()
-    profile_gender!: string;
+    profile_gender: string = '';
     @Column()
-    profile_location!: string;
+    profile_location: string = '';
     @Column()
-    profile_website!: string;
+    profile_website: string = '';
     @Column()
-    profile_picture!: string
+    profile_picture: string = '';
 
     private _loadedPassword: string;
 
@@ -79,7 +79,7 @@ export class User {
     @BeforeUpdate()
     private async encryptPassword(): Promise<void> {
         if (this._loadedPassword !== this.password) {
-            const salt = await bcrypt.getSalt(10);
+            const salt = await bcrypt.genSalt(10);
             this.password = await bcrypt.hash(this.password, salt);
         }
     }

@@ -69,15 +69,7 @@ export default function (repo: Repository<User>) {
         async (
             args: AuthArgs<T>
         ) => {
-            const {
-                req,
-                user,
-                accessToken,
-                refreshToken,
-                identified,
-                profile,
-                done,
-            } = args;
+            const { req, user, accessToken, refreshToken, identified, profile, done, } = args;
             const linkUser = async (userId: number) => {
                 const alreadyAssociatedUser = await repo.findOne({[tokenKind]: profile.id});
                 if (alreadyAssociatedUser) {

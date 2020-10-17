@@ -32,5 +32,6 @@ export const imageSearchFuncF = memoWithMySQL("AZURE_IMAGE_SEARCH", async functi
     return sendQuery(args.term);
 });
 export const imageSearchFunc = async (req: Request, res: Response) => {
+    // @ts-ignore
     return res.send(JSON.stringify({images: await imageSearchFuncF(req.body)}));
 };
