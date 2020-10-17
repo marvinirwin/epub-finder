@@ -7,8 +7,8 @@ export class JsonCache {
     @Column()
     service: string;
     @Column()
-    key_hash!: string;
-    @Column()
+    key_hash: string;
+    @Column("text")
     value: string;
     @Column()
     key!: string;

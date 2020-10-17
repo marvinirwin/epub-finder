@@ -127,6 +127,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     }, [videoMetaData])
 
     useEffect(() => {
+        return;
         (async () => {
             if (currentSentence) {
                 setVideoMetaData(undefined);

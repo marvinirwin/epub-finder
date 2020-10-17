@@ -49,7 +49,7 @@ export async function TextToSpeech(req: Request, res: Response) {
 </speak>`;
     const hash = getSha1(ssml);
     const filename = join(wavRoot, `${hash}.wav`);
-    const audioFileExists = await fs.pathExists(hash);
+    const audioFileExists = await fs.pathExists(filename);
     if (!audioFileExists) {
         await downloadSynthesizedSpeech(filename, ssml);
     }

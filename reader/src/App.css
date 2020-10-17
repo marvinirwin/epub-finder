@@ -218,8 +218,21 @@
 }
 
 .hotkey-active {
+    /*
+    position: absolute;
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+    width: 10px;
+    height: 10px;
+    */
     border-radius: 50%;
-    box-shadow: inset 10px 20px #e79b00;
+    background-color: #b8f28b;
+    box-shadow:
+            /*
+            0 0 60px 30px #fff,
+            */
+            0 0 10px 6px #b8f28b,
+            0 0 14px 9px #58a700;
 }
 
 .hotkey-inactive {

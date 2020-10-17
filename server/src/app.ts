@@ -33,6 +33,7 @@ import {Session} from "./entities/Session";
 import {createConnection} from "typeorm";
 import DatabaseConfig from "./config/database.config"
 import {MysqlConnectionOptions} from "typeorm/driver/mysql/MysqlConnectionOptions";
+import {JsonCache} from "./entities/JsonCache";
 
 
 /*
@@ -43,6 +44,7 @@ async function connectedApp() {
     const app = express();
 
     const connection = await createConnection(DatabaseConfig as MysqlConnectionOptions);
+    const repo = connection.getRepository(JsonCache);
 
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
@@ -257,8 +259,8 @@ async function connectedApp() {
         res.redirect(req.session.returnTo);
     });
 
-    app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc);
-    app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc);
+    app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc(repo));
+    app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc(repo));
     app.post("/get-speech", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.TextToSpeech);
     app.post("/speech-recognition-token", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.GetSpeechRecognitionToken);
 
