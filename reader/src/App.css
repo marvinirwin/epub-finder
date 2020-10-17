@@ -217,3 +217,12 @@
     border: solid;
 }
 
+.hotkey-active {
+    border-radius: 50%;
+    box-shadow: inset 10px 20px #e79b00;
+}
+
+.hotkey-inactive {
+
+}
+

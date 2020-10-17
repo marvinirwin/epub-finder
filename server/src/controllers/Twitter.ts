@@ -28,6 +28,7 @@ export interface LocationsRequest {
     cb: (str: string) => void;
 }
 
+/*
 export const getLocationsF = memoWithMySQL("TWITTER_TREND_LOCATIONS", async function (args: LocationsRequest) {
     return await (await twitterInstance).get("trends/available");
 });
@@ -46,3 +47,4 @@ export const getTrendForLocationF = memoWithMySQL("TWITTER_TRENDS", async functi
 export const getTrendForLocation = async (req: Request, res: Response) => {
     return res.send(JSON.stringify(await getTrendForLocationF(req.body)));
 };
+*/

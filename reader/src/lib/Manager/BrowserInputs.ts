@@ -10,12 +10,54 @@ export interface BrowserInputsConfig {
 
 }
 
+
+export enum HotkeyModes  {
+    TextInput="TextInput",
+    Reading="Reading"
+}
+
+export function isDocument(t: HTMLElement | Document): t is Document  {
+    return !t.hasOwnProperty('tagName');
+}
+
+export function hotkeyMode(t: HTMLElement | Document | null): HotkeyModes {
+    if (!t) return HotkeyModes.Reading;
+
+    if (isDocument(t)) {
+        return HotkeyModes.Reading;
+    }
+
+    switch(t.tagName) {
+        case "INPUT":
+        case "TEXTAREA":
+            return HotkeyModes.TextInput;
+        default:
+            return HotkeyModes.Reading;
+    }
+}
+
+
+export function isListening(keyMode: HotkeyModes, keyListeningFor: string) {
+    switch(keyMode) {
+        case HotkeyModes.TextInput:
+            return keyListeningFor === 'Escape';
+        case HotkeyModes.Reading:
+            return true;
+    }
+}
+
+
+/**
+ * If the key you're listening for is
+ */
+
 export class BrowserInputs {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     selectedText$: Subject<string> = new Subject<string>();
     hoveredSentence$ = new ReplaySubject<string | undefined>(1);
     hoveredCharacterIndex$ = new ReplaySubject<number | undefined>(1);
+    hotkeyHandler$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
     constructor() {}
 
@@ -39,8 +81,14 @@ export class BrowserInputs {
                 }
             }
         };
-        root.onmouseup = checkForSelectedText
-        this.getKeyUpSubject("Shift").subscribe(checkForSelectedText)
+        root.onmouseup = checkForSelectedText;
+
+        // @ts-ignore
+        root.onfocus = ev => this.hotkeyHandler$.next(ev.target);
+        // @ts-ignore
+        root.onmousedown = ev => this.hotkeyHandler$.next(ev.target);
+
+        this.getKeyUpSubject("Shift").subscribe(checkForSelectedText);
     }
     getKeyDownSubject(key: string): Subject<KeyboardEvent> {
         if (!this.keydownMap[key]) this.keydownMap[key] = new Subject<KeyboardEvent>()

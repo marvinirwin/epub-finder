@@ -4,6 +4,7 @@ import initializedApp from "./app";
  * Error Handler. Provides full stack - remove for production
  */
 const server = initializedApp().then(app => {
+    // @ts-ignore
     app.use(errorHandler());
     /**
      * Start Express server.

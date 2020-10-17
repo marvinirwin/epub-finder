@@ -28,10 +28,13 @@ export interface ImageSearchRequest {
     term: string;
 }
 
-export const imageSearchFuncF = memoWithMySQL("AZURE_IMAGE_SEARCH", async function (args: ImageSearchRequest) {
+export const imageSearchFuncF = repo => memoWithMySQL(
+    repo,
+    "AZURE_IMAGE_SEARCH",
+    async function (args: ImageSearchRequest) {
     return sendQuery(args.term);
 });
-export const imageSearchFunc = async (req: Request, res: Response) => {
+export const imageSearchFunc = repo => async (req: Request, res: Response) => {
     // @ts-ignore
-    return res.send(JSON.stringify({images: await imageSearchFuncF(req.body)}));
+    return res.send(JSON.stringify({images: await imageSearchFuncF(repo)(req.body)}));
 };

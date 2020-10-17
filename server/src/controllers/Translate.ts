@@ -13,11 +13,16 @@ export interface TranslationRequest {
     text: string;
 }
 
-export const translateFuncF = memoWithMySQL("GOOGLE_TRANSLATIONS", async function (args: TranslationRequest) {
-    const [translation] = await translate.translate(args.text, args.to);
-    return {translation};
-});
-export const translateFunc = async (req: Request, res: Response) => {
+export const translateFuncF = repo =>
+    memoWithMySQL(
+        repo,
+        "GOOGLE_TRANSLATIONS",
+        async function (args: TranslationRequest) {
+            const [translation] = await translate.translate(args.text, args.to);
+            return {translation};
+        }
+    );
+export const translateFunc = repo => async (req: Request, res: Response) => {
     // @ts-ignore
-    return res.send(JSON.stringify(await translateFuncF(req.body)));
+    return res.send(JSON.stringify(await translateFuncF(repo)(req.body)));
 };

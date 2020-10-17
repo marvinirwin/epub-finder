@@ -52,7 +52,10 @@ export class User {
     @Column()
     quickbooks: string = '';
     // I wonder what the ORM will do with this?
-    @Column({type: String, transformer: new JsonValueTransformer<string[]>()})
+    @Column({
+        type: String,
+        transformer: new JsonValueTransformer<string[]>()
+    })
     tokens: string[] = [];
     @Column()
     profile_name: string = '';
