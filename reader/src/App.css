@@ -104,16 +104,16 @@
 }
 .led-green {
     background-color: #ABFF00;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px/*, #89FF00 0 2px 12px*/;
 }
 .led-off {
     background-color: #c6c6c6;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #6d6d6d 0 2px 12px;
+    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px/*, #6d6d6d 0 2px 12px*/;
 }
 .led-box {
     height: 12px;
     width: 12px;
-    margin: 10px 0;
+    margin: 4px 4px 4px 4px;
     float: left;
 }
 
@@ -129,15 +129,39 @@
 }
 
 
-
-
-.grow-from-one-line {
+.recognized-text {
     height: fit-content;
-    max-height: 74px;
-    transition: max-height 0.5s;
     overflow: hidden;
+    position: absolute;
+    animation-duration: 5s;
+    animation-name: slideinout;
+    animation-fill-mode: forwards;
+    padding: 5px;
+    z-index: 1;
 }
-.grow-from-one-line:hover {
+
+@keyframes slideinout {
+    from {
+        margin-top: -74px;
+    }
+    15% {
+        margin-top: 0;
+    }
+
+    50% {
+        margin-top: 0;
+    }
+
+    85% {
+        margin-top: 0;
+    }
+
+    to {
+        margin-top: -74px;
+    }
+}
+
+.recognized-text:hover {
     height: fit-content;
     max-height: none;
 }
