@@ -3,11 +3,10 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
-import {distinct, map, switchMap} from "rxjs/operators";
+import {distinct, map} from "rxjs/operators";
 import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {ITrie} from "../Interfaces/Trie";
 import {TrieWrapper} from "../TrieWrapper";
 
 export type TrieObservable = Observable<TrieWrapper>;

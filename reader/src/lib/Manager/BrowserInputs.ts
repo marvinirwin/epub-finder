@@ -83,10 +83,16 @@ export class BrowserInputs {
         };
         root.onmouseup = checkForSelectedText;
 
-        // @ts-ignore
-        root.onfocus = ev => this.hotkeyHandler$.next(ev.target);
-        // @ts-ignore
-        root.onmousedown = ev => this.hotkeyHandler$.next(ev.target);
+/*
+        root.onfocus = ev => {
+            this.hotkeyHandler$.next(ev.target as HTMLElement);
+            return true;
+        };
+        root.onmousedown = ev => {
+            this.hotkeyHandler$.next(ev.target as HTMLElement);
+            return true;
+        };
+*/
 
         this.getKeyUpSubject("Shift").subscribe(checkForSelectedText);
     }

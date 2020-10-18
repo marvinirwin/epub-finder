@@ -135,16 +135,22 @@ export function ImageSelectPopup({m}: { m: Manager }) {
 
     const SearchResults = () => sources.length ? <GridList cellHeight={160} className={classes.gridList} cols={12}>
         {sources.map((src, index) => {
-            return <GridListTile className={classes.tile} key={index}>
+            return <GridListTile
+                className={classes.tile}
+                key={index}
+            >
                 <img onClick={() => {
+                    debugger;
                     imageRequest?.cb(src.thumbnailUrl); // TODO download the thumbnail as base64
                     m.queryImageRequest$.next(undefined);
-                }} src={src.thumbnailUrl} alt={''}/>
+                }}
+                     src={src.thumbnailUrl}
+                     alt={''}/>
             </GridListTile>
         })}
     </GridList> : <div>`No results for found for ${searchTerm}, this should never happen, is it a bug?`</div>
 
-    let onClose = () => m.queryImageRequest$.next(undefined);
+    const onClose = () => m.queryImageRequest$.next(undefined);
     return <Dialog fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
             <Toolbar>

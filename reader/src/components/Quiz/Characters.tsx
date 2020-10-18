@@ -63,8 +63,7 @@ export function Characters({c, m}: QuizCardProps) {
         })
         newRecordRequest.sentence.then(sentence => {
             if (!c) return;
-            if (lookupPinyin(sentence.split('').filter(isChineseCharacter).join('')).join('')
-                === lookupPinyin(c.learningLanguage).join('')) {
+            if (sentence.includes(c.learningLanguage)) {
                 setRecordingClass(promptingRecordingRecordingSuccess);
                 setTimeout(() => {
                     advance();
@@ -82,11 +81,6 @@ export function Characters({c, m}: QuizCardProps) {
         tryAudio();
     });
     useSubscription(m.inputManager.getKeyDownSubject('e').pipe(filterTextInputEvents), requestEditWord);
-
-    useEffect(() => {
-        if (!c?.learningLanguage) return;
-        tryAudio();
-    }, [c?.learningLanguage])
 
     return <Card style={{
         marginTop: '50px',
@@ -108,7 +102,7 @@ export function Characters({c, m}: QuizCardProps) {
                 }
 */}
                 <div style={{width: '100%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'center'}}>
-                    <HotkeyWrapper shortcutKey={'e'}>
+                    <HotkeyWrapper shortcutKey={'r'}>
                         <div className={`${recordingClass} quiz-character`} onClick={requestEditWord}>
                             <Typography variant="h1" component="h1" className={classes.center}>
                                 {c?.learningLanguage}

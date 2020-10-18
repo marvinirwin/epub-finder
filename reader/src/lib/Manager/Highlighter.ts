@@ -135,7 +135,6 @@ function removeHighlightDelta(
     highlighterKey: string,
     highlightWordsToUpdate: Set<string>) {
     Object.entries(oldHighlightDelta).forEach(([word, colors]) => {
-        // TODO figure out if this is tolerant of nonexistant word keys
         delete currentHighlightMap[word][highlighterKey];
         highlightWordsToUpdate.add(word);
     });
@@ -268,6 +267,9 @@ function blendColors(args: RGBA[]) {
 function recomputeColor(h: HighlightDelta): string {
     const colors = Object.values(h);
     if (!colors.length) return `transparent`;
+    return `RGBA(${colors[0]})`
+/*
     return `RGBA(${blendColors(colors)})`
+*/
 }
 

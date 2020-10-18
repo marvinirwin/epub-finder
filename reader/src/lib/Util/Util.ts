@@ -72,7 +72,7 @@ export function splitPunctuation(threshhold: number, str: string, filterFunc: (c
 }
 export const splitKeepDelim = (delim: string) => (...strings: string[]): string[] => {
     return flatten(
-        strings.map(string => string.split(delim).map(splitString => splitString + delim))
+        strings.map(string => string.split(delim).filter(v => v).map(splitString => splitString + delim))
     )
 }
 
