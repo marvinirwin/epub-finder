@@ -3,7 +3,6 @@ import {User} from "../entities/User";
 import passport, {Profile, Strategy} from "passport";
 import refresh from "passport-oauth2-refresh";
 import axios from "axios";
-import '../types/passport-github2';
 import GithubStrategy from "passport-github2";
 import PassportGoogle from "passport-google-oauth";
 import _ from "lodash";
@@ -11,6 +10,7 @@ import moment from "moment";
 import TwitterStrategy from 'passport-twitter';
 import GoogleStrategy from 'passport-google-oauth20';
 import LocalStrategy from 'passport-local'
+import {Profiles} from "../types/custom";
 
 
 export interface AuthArgs<T> {
@@ -27,7 +27,7 @@ export interface AuthArgs<T> {
     done: (err: any, user: User | undefined) => void
 }
 
-export default function (repo: Repository<User>) {
+export const usePassportStrategies = (repo: Repository<User>) => {
     passport.serializeUser((user: User, done) => {
         done(null, user.id);
     });
@@ -114,7 +114,7 @@ export default function (repo: Repository<User>) {
     passport.use(
         new GithubStrategy.Strategy(
             {
-                clientId: process.env.GITHUB_ID,
+                clientID: process.env.GITHUB_ID,
                 clientSecret: process.env.GITHUB_SECRET,
                 callbackURL: `${process.env.BASE_URL}/auth/github/callback`,
                 passReqToCallback: true,
@@ -143,8 +143,8 @@ export default function (repo: Repository<User>) {
     );
     passport.use(
         new TwitterStrategy.Strategy({
-                consumerKey: process.env.TWITTER_KEY,
-                consumerSecret: process.env.TWITTER_SECRET,
+                consumerKey: process.env.TWITTER_API_KEY,
+                consumerSecret: process.env.TWITTER_API_KEY_SECRET,
                 callbackURL: `${process.env.BASE_URL}/auth/twitter/callback`,
                 passReqToCallback: true
             }, strategy<Profiles.TwitterProfile>(
@@ -880,60 +880,61 @@ export default function (repo: Repository<User>) {
     /**
      * Login Required middleware.
      */
-    exports.isAuthenticated = (req, res, next) => {
-        if (req.isAuthenticated()) {
-            return next();
-        }
-        res.redirect("/login");
-    };
+}
 
-    /**
-     * Authorization Required middleware.
-     */
-    exports.isAuthorized = (req, res, next) => {
-        const provider = req.path.split("/")[2];
-        const token = req.user.tokens.find((token) => token.kind === provider);
-        if (token) {
-            // Is there an access token expiration and access token expired?
-            // Yes: Is there a refresh token?
-            //     Yes: Does it have expiration and if so is it expired?
-            //       Yes, Quickbooks - We got nothing, redirect to res.redirect(`/auth/${provider}`);
-            //       No, Quickbooks and Google- refresh token and save, and then go to next();
-            //    No:  Treat it like we got nothing, redirect to res.redirect(`/auth/${provider}`);
-            // No: we are good, go to next():
-            if (token.accessTokenExpires && moment(token.accessTokenExpires).isBefore(moment().subtract(1, "minutes"))) {
-                if (token.refreshToken) {
-                    if (token.refreshTokenExpires && moment(token.refreshTokenExpires).isBefore(moment().subtract(1, "minutes"))) {
-                        res.redirect(`/auth/${provider}`);
-                    } else {
-                        refresh.requestNewAccessToken(`${provider}`, token.refreshToken, (err, accessToken, refreshToken, params) => {
-                            // @ts-ignore
-                            User.findById(req.user.id, (err, user) => {
-                                user.tokens.some((tokenObject) => {
-                                    if (tokenObject.kind === provider) {
-                                        tokenObject.accessToken = accessToken;
-                                        if (params.expires_in) tokenObject.accessTokenExpires = moment().add(params.expires_in, "seconds").format();
-                                        return true;
-                                    }
-                                    return false;
-                                });
-                                req.user = user;
-                                user.markModified("tokens");
-                                user.save((err) => {
-                                    if (err) console.log(err);
-                                    next();
-                                });
+export const isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+};
+
+/**
+ * Authorization Required middleware.
+ */
+export const isAuthorized = (req, res, next) => {
+    const provider = req.path.split("/")[2];
+    const token = req.user.tokens.find((token) => token.kind === provider);
+    if (token) {
+        // Is there an access token expiration and access token expired?
+        // Yes: Is there a refresh token?
+        //     Yes: Does it have expiration and if so is it expired?
+        //       Yes, Quickbooks - We got nothing, redirect to res.redirect(`/auth/${provider}`);
+        //       No, Quickbooks and Google- refresh token and save, and then go to next();
+        //    No:  Treat it like we got nothing, redirect to res.redirect(`/auth/${provider}`);
+        // No: we are good, go to next():
+        if (token.accessTokenExpires && moment(token.accessTokenExpires).isBefore(moment().subtract(1, "minutes"))) {
+            if (token.refreshToken) {
+                if (token.refreshTokenExpires && moment(token.refreshTokenExpires).isBefore(moment().subtract(1, "minutes"))) {
+                    res.redirect(`/auth/${provider}`);
+                } else {
+                    refresh.requestNewAccessToken(`${provider}`, token.refreshToken, (err, accessToken, refreshToken, params) => {
+                        // @ts-ignore
+                        User.findById(req.user.id, (err, user) => {
+                            user.tokens.some((tokenObject) => {
+                                if (tokenObject.kind === provider) {
+                                    tokenObject.accessToken = accessToken;
+                                    if (params.expires_in) tokenObject.accessTokenExpires = moment().add(params.expires_in, "seconds").format();
+                                    return true;
+                                }
+                                return false;
+                            });
+                            req.user = user;
+                            user.markModified("tokens");
+                            user.save((err) => {
+                                if (err) console.log(err);
+                                next();
                             });
                         });
-                    }
-                } else {
-                    res.redirect(`/auth/${provider}`);
+                    });
                 }
             } else {
-                next();
+                res.redirect(`/auth/${provider}`);
             }
         } else {
-            res.redirect(`/auth/${provider}`);
+            next();
         }
-    };
-}
+    } else {
+        res.redirect(`/auth/${provider}`);
+    }
+};

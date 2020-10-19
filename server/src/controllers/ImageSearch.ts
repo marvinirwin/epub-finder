@@ -34,7 +34,7 @@ export const imageSearchFuncF = repo => memoWithMySQL(
     async function (args: ImageSearchRequest) {
     return sendQuery(args.term);
 });
-export const imageSearchFunc = repo => async (req: Request, res: Response) => {
+export const imageSearchFunc = (repo) => async (req: Request, res: Response) => {
     // @ts-ignore
     return res.send(JSON.stringify({images: await imageSearchFuncF(repo)(req.body)}));
 };

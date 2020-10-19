@@ -10,30 +10,20 @@ import path from "path";
 import * as synthesisController from "./controllers/Speech";
 import {imageSearchFunc} from "./controllers/ImageSearch";
 import {translateFunc} from "./controllers/Translate";
-import session from "express-session";
-import * as chalk from "chalk";
 import flash from "express-flash";
 import passport from "passport";
 import expressStatusMonitor from "express-status-monitor";
 import sass from "node-sass-middleware";
-/**
- * Controllers (route handlers).
- */
-import * as homeController from "./controllers/home";
 import * as userController from "./controllers/user";
 import * as apiController from "./controllers/api";
 import * as contactController from "./controllers/contact";
-/**
- * API keys and Passport configuration.
- */
-import passportConfig from "./config/passport";
-import {enforceBudget} from "./controllers/budget";
-import {TypeormStore} from "connect-typeorm";
-import {Session} from "./entities/Session";
+import {isAuthenticated, isAuthorized, usePassportStrategies} from "./config/passport";
 import {createConnection} from "typeorm";
 import DatabaseConfig from "./config/database.config"
 import {MysqlConnectionOptions} from "typeorm/driver/mysql/MysqlConnectionOptions";
 import {JsonCache} from "./entities/JsonCache";
+import {User} from "./entities/User";
+import {UsageEvent} from "./entities/UsageEvent";
 
 
 /*
@@ -44,7 +34,10 @@ async function connectedApp() {
     const app = express();
 
     const connection = await createConnection(DatabaseConfig as MysqlConnectionOptions);
-    const repo = connection.getRepository(JsonCache);
+    const cacheRepo = connection.getRepository(JsonCache);
+    const usageRepo = connection.getRepository(UsageEvent);
+    const userRepo = connection.getRepository(User);
+    usePassportStrategies(userRepo);
 
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
@@ -173,8 +166,8 @@ async function connectedApp() {
     app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
     app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
     app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
-    app.get("/profile", passportConfig.isAuthenticated, userController.getProfile);
 */
+    app.get("/profile", isAuthenticated, userController.getProfile);
 
     /**
      * API examples routes.
@@ -259,8 +252,22 @@ async function connectedApp() {
         res.redirect(req.session.returnTo);
     });
 
-    app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc(repo));
-    app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc(repo));
+    app.get("/login-options", (req, res) => {
+        // Send back all supported auth strategies
+        res.send(
+            {
+                "google": "/auth/google",
+                "github": "/auth/github",
+                "twitter": "/auth/twitter",
+                "local": "/login"
+            },
+        )
+    });
+
+    app.get("/login", passport.authorize('local'))
+
+    app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc(cacheRepo, usageRepo));
+    app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc(cacheRepo));
     app.post("/get-speech", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.TextToSpeech);
     app.post("/speech-recognition-token", /*passportConfig.isAuthenticated, enforceBudget,*/ synthesisController.GetSpeechRecognitionToken);
 

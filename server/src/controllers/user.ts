@@ -580,5 +580,5 @@ export const postForgot = (repository: Repository<User>) => (req, res, next) => 
 */
 
 export const getProfile = (req, res, next) => {
-    res.json(req.user.profile);
+    res.json(req.user);
 }
