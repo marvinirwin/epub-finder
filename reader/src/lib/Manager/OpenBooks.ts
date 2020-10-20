@@ -12,6 +12,7 @@ import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
 
 
 export type Named = {
@@ -54,6 +55,7 @@ export class OpenBooks {
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
     checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
+    checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
 
     constructor(
         private config: OpenBooksConfig
@@ -138,7 +140,7 @@ export class OpenBooks {
             );
 
 
-        function getMapFunc() {
+        function bookDataMap() {
             return (bookFrame: OpenBook) => {
                 return combineLatest([
                     bookFrame.renderedSentences$,
@@ -157,9 +159,15 @@ export class OpenBooks {
             };
         }
 
+        this.checkedOutBooksData$ = this.checkedOutBooks$.pipe(
+            switchMap(openBooks =>
+                combineLatest(Object.values(openBooks).map(book => book.bookStats$))
+            )
+        )
+
         this.renderedSentenceTextDataTree$ = this
             .openedBooks
-            .mapWith(getMapFunc());
+            .mapWith(bookDataMap());
         this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
             combineLatest(flattenTree(delta))
                 .subscribe(bookStats => {

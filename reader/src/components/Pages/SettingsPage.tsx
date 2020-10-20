@@ -2,28 +2,16 @@ import {Manager} from "../../lib/Manager";
 import React from "react";
 import {debounceTime, map, scan} from "rxjs/operators";
 import {useObservable, useObservableState} from "observable-hooks";
+import {flatten, uniq} from "lodash";
 
 export function SettingsPage({m}: { m: Manager }) {
-    const scheduleRows = useObservable(
-        () => m.scheduleManager.sortedScheduleRows$.pipe(map(rows => rows.map(row => row.word).join(', '))),
-    );
-    const quizCard = useObservableState(m.quizManager.quizzingCard$)
-    const nextQuizWord = useObservableState(m.scheduleManager.wordQuizList$)
-    const quizComponent = useObservableState(m.quizManager.quizStage$);
-    const user = useObservableState(m.authenticationMonitor.user$);
+    const bookWordDatas = useObservableState(m.openedBooks.checkedOutBooksData$, []);
+    const sentenceSet = new Set<string>();
+
+    bookWordDatas.forEach(d => Object.values(d.wordSentenceMap).map(s => s.forEach(sentence => sentenceSet.add(sentence.translatableText))));
+    const a = Array.from(sentenceSet);
+
     return <div>
-{/*
-        <div>Budget: {user?.profile.usedBudget} / {user?.profile.maxBudget}</div>
-        <div>Schedule Rows: {scheduleRows}</div>
-        <div>Current Quiz Word: {quizCard?.learningLanguage}</div>
-        <div>Next Quiz Word: {nextQuizWord?.join(', ')}</div>
-        <div>QuizzingComponent: {quizComponent}</div>
-*/}
-{/*
-        <div>Card Map key count: {cardMap ? Object.values(cardMap).length : 'undefined'}</div>
-        <div>Card Map Characters: {cardMap ? Object.entries(cardMap).map(([k, v]) => `${k}: ${v.length}`).join(',') : ''}</div>
-        <div>Word Element Map: {wordElMap ? Object.entries(wordElMap).map(([k, v]) => `${k}: ${v.length}`).join(',') : ''}</div>
-        <div>Highlighted Word: {highlightedWord}</div>
-*/}
+        {a.map(sentence => <div>{sentence}</div>)}
     </div>
 }

@@ -68,6 +68,9 @@ export class User {
     @Column()
     profile_picture: string = '';
 
+    @Column()
+    ip: string = '';
+
     private _loadedPassword: string;
 
     @OneToMany(type => UsageEvent, usageEvent => usageEvent.userId)

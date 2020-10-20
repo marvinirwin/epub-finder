@@ -2,8 +2,6 @@ import {Manager} from "../lib/Manager";
 import React, {useEffect, useState} from "react";
 import {useObservableState} from "observable-hooks";
 import {Card} from "@material-ui/core";
-import {timestamp} from "rxjs/operators";
-import {Characters} from "./Quiz/Characters";
 import {clearInterval} from "timers";
 
 const CANVAS_WIDTH = 500;
@@ -20,8 +18,16 @@ export interface VideoCharacter {
     timestamp: number;
 }
 
-export function sentenceToFilename(sentence: string) {
-    return sentence.trim();
+export async function sentenceToFilename(sentence: string): Promise<string> {
+    return digestMessage(sentence.normalize().replace(/\s+/, ' '));
+}
+
+async function digestMessage(message: string): Promise<string> {
+    const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+     // convert bytes to hex string
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export const CHARACTER_DISPLAY_CHUNK_DURATION = 5000;
@@ -49,7 +55,7 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
                 ctx.font = '24px serif';
                 characterTimings.forEach(characterTiming => {
                     const x = ((characterTiming.timestamp * v.timeScale) % duration) / duration * canvas.width;
-                    ctx.strokeText(characterTiming.character, x, canvas.height / 2);
+                    ctx.fillText(characterTiming.character, x, canvas.height / 2);
                 })
             }
         }
@@ -127,13 +133,11 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     }, [videoMetaData])
 
     useEffect(() => {
-        return;
         (async () => {
             if (currentSentence) {
                 setVideoMetaData(undefined);
-                let input = `/video/${sentenceToFilename(currentSentence)}.json`;
                 try {
-                    const response = await fetch(input)
+                    const response = await fetch(`/video/${await sentenceToFilename(currentSentence)}.json`)
                     if (response.status === 200) {
                         setVideoMetaData(await response.json())
                     }
@@ -164,7 +168,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     useEffect(() => {
         if (videoElementRef) {
             videoElementRef.defaultPlaybackRate = 0.25;
-            videoElementRef.volume = 0;
+            videoElementRef.volume = 0.5;
 
         }
     }, [videoElementRef]);
@@ -184,7 +188,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                     const currentChunkIndex = Math.floor(videoTime / CHARACTER_DISPLAY_CHUNK_DURATION);
                     if (currentChunkIndex === chunkIndex) {
                         // If this is the one with the current playing index
-                        // The percetnage gets send to the component
+                        // The percentage gets send to the component
                         // Let it figure out its own width
                         progressBarPosition = ((videoTime % CHARACTER_DISPLAY_CHUNK_DURATION) / CHARACTER_DISPLAY_CHUNK_DURATION) * 100;
                     }
