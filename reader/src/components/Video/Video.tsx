@@ -50,8 +50,8 @@ async function digestMessage(message: string): Promise<string> {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export const CHARACTER_DISPLAY_CHUNK_DURATION = 5000;
-export const CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS = CHARACTER_DISPLAY_CHUNK_DURATION / 1000;
+export const MILLISECONDS_PER_CHARACTER_LINE = 5000;
+export const SECONDS_PER_CHARACTER_INE = MILLISECONDS_PER_CHARACTER_LINE / 1000;
 
 export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const currentSentence = useObservableState(m.inputManager.hoveredSentence$);
@@ -61,8 +61,9 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const [chunkedCharacterTimings, setChunkedCharacterTimings] = useState<VideoCharacter[][] | null>();
     const [videoInterval, setVideoInterval] = useState<NodeJS.Timeout | null>();
     const [videoTime, setVideoTime] = useState<undefined | number>(undefined);
-    const [highlightBarP1, setHighlightBarP1] = useState<number>();
-    const [highlightBarP2, setHighlightBarP2] = useState<number>();
+    const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
+    const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
+    const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
 
     useEffect(() => {
         setVideoInterval(setInterval(() => {
@@ -77,7 +78,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
         if (videoMetaData) {
             setChunkedCharacterTimings(videoMetaData.characters.reduce((chunks: VideoCharacter[][], character) => {
                 const time = videoMetaData.timeScale * character.timestamp;
-                const chunkIndex = Math.floor(time / CHARACTER_DISPLAY_CHUNK_DURATION);
+                const chunkIndex = Math.floor(time / MILLISECONDS_PER_CHARACTER_LINE);
                 if (!chunks[chunkIndex]) {
                     chunks[chunkIndex] = [];
                 }
@@ -135,26 +136,27 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     }, 100);
 
     useInterval(() => {
-        if (videoElementRef && highlightBarP1 && highlightBarP2) {
+        if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {
             // If the video is out of bounds, make it go back into bounds
-            if (videoElementRef.currentTime * 1000 > highlightBarP2) {
-                videoElementRef.currentTime = highlightBarP1 / 1000
+            if (videoElementRef.currentTime * 1000 > highlightBarPosition2Ms) {
+                videoElementRef.currentTime = highlightBarPosition1Ms / 1000
             }
         }
     }, 10)
 
-    const [p1, p2] = ((highlightBarP1 || 0) > (highlightBarP2 || 0)) ?
-        [highlightBarP2, highlightBarP1] :
-        [highlightBarP1, highlightBarP2];
+    const [highlightStartMs, highlightStopMs] = ((highlightBarPosition1Ms || 0) > (highlightBarPosition2Ms || 0)) ?
+        [highlightBarPosition2Ms, highlightBarPosition1Ms] :
+        [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
     function getBoundedPoints(p1: number, p2: number, min: number, max: number) {
+        const empty: never[] = [];
         let newp1 = undefined;
         let newp2 = undefined;
         if (p1 > min) {
             if (p1 < max) {
                 newp1 = p1;
             } else {
-                return []
+                return empty;
             }
         } else {
             newp1 = min;
@@ -163,7 +165,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             if (p2 > min) {
                 newp2 = p2;
             } else {
-                return []
+                return empty;
             }
         } else {
             newp2 = max;
@@ -189,35 +191,40 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
         />
         {
             (chunkedCharacterTimings && videoMetaData)
-            && chunkedCharacterTimings.map((chunkedCharacterTiming, chunkIndex) => {
-                const chunkStartTime = chunkIndex * CHARACTER_DISPLAY_CHUNK_DURATION;
-                const chunkEndTime = chunkStartTime + CHARACTER_DISPLAY_CHUNK_DURATION;
+            && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
+                const lineStartTime = lineIndex * MILLISECONDS_PER_CHARACTER_LINE;
+                const lineEndTime = lineStartTime + MILLISECONDS_PER_CHARACTER_LINE;
                 let progressBarPosition = undefined;
                 if (videoTime) {
-                    const currentChunkIndex = Math.floor(videoTime / CHARACTER_DISPLAY_CHUNK_DURATION);
-                    if (currentChunkIndex === chunkIndex) {
+                    const currentChunkIndex = Math.floor(videoTime / MILLISECONDS_PER_CHARACTER_LINE);
+                    if (currentChunkIndex === lineIndex) {
                         // If this is the one with the current playing index
                         // The percentage gets send to the component
                         // Let it figure out its own width
-                        progressBarPosition = ((videoTime % CHARACTER_DISPLAY_CHUNK_DURATION) / CHARACTER_DISPLAY_CHUNK_DURATION) * 100;
+                        progressBarPosition = ((videoTime % MILLISECONDS_PER_CHARACTER_LINE) / MILLISECONDS_PER_CHARACTER_LINE) * 100;
                     }
                 }
-                const hasPoints = p1 !== undefined && p2 !== undefined;
-                const points = hasPoints
-                    ? getBoundedPoints(p1 as number, p2 as number, chunkStartTime, chunkEndTime - 1).map(p => p && (p % CHARACTER_DISPLAY_CHUNK_DURATION) / CHARACTER_DISPLAY_CHUNK_DURATION) :
+                const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
+                const highlightBarPoints = hasPoints
+                    ? getBoundedPoints(
+                        highlightStartMs as number,
+                        highlightStopMs as number,
+                        lineStartTime,
+                        lineEndTime - 1
+                    ).map(p => p && (p - (MILLISECONDS_PER_CHARACTER_LINE * lineIndex)) / MILLISECONDS_PER_CHARACTER_LINE) :
                     [];
 
                 return <CharacterTimingDisplay
-                    key={chunkIndex}
+                    key={lineIndex}
                     characterTimings={chunkedCharacterTiming}
                     v={videoMetaData}
-                    duration={CHARACTER_DISPLAY_CHUNK_DURATION}
+                    duration={MILLISECONDS_PER_CHARACTER_LINE}
                     progressBarPosition={progressBarPosition}
                     onClick={percent => {
                         if (videoElementRef) {
-                            let currentTime = chunkIndex *
-                                CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS +
-                                (CHARACTER_DISPLAY_CHUNK_DURATION_SECONDS * percent);
+                            let currentTime = lineIndex *
+                                SECONDS_PER_CHARACTER_INE +
+                                (SECONDS_PER_CHARACTER_INE * percent);
                             videoElementRef.currentTime = currentTime;
                             if (videoElementRef.paused) {
                                 videoElementRef.play();
@@ -225,16 +232,20 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                         }
                     }}
                     onMouseOver={percentage => {
-                        setHighlightBarP2(chunkStartTime + (percentage * CHARACTER_DISPLAY_CHUNK_DURATION))
+                        if (replayDragInProgress) {
+                            setHighlightBarP2(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
+                        }
                     }}
                     onMouseDown={percentage => {
-                        setHighlightBarP1(chunkStartTime + (percentage * CHARACTER_DISPLAY_CHUNK_DURATION))
+                        setReplayDragInProgress(true)
+                        setHighlightBarP1(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
                     }}
                     onMouseUp={percentage => {
+                        setReplayDragInProgress(false)
                         // setHighlightBarP1(undefined)
                     }}
-                    highlightStartPosition={points[0]}
-                    highlightEndPosition={points[1]}
+                    highlightStartPosition={highlightBarPoints[0]}
+                    highlightEndPosition={highlightBarPoints[1]}
                 />;
             })
         }

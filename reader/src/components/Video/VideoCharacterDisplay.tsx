@@ -33,12 +33,22 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
     const [highlightBar, setHighlightBar] = useState<HTMLDivElement | null>();
     useEffect(() => {
         if (highlightBar) {
-            highlightBar.style.left = `${highlightStartPosition * CANVAS_WIDTH}px`;
+            if (highlightStartPosition === undefined || highlightEndPosition === undefined) {
+            } else {
+                highlightBar.style.left = `${highlightStartPosition * CANVAS_WIDTH}px`;
+            }
         }
-        if (highlightBar) {
-            highlightBar.style.width = `${(highlightEndPosition - highlightStartPosition) * CANVAS_WIDTH}px`;
-        }
+
     }, [highlightStartPosition, highlightEndPosition]);
+    useEffect(() => {
+        if (highlightBar) {
+            if (highlightEndPosition === undefined || highlightStartPosition === undefined) {
+                highlightBar.style.width = '0';
+            } else {
+                highlightBar.style.width = `${(highlightEndPosition - highlightStartPosition) * CANVAS_WIDTH}px`;
+            }
+        }
+    }, [highlightEndPosition])
 
     useEffect(() => {
         // Clear the canvas and draw the characters
