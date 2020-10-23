@@ -24,7 +24,14 @@ import {MysqlConnectionOptions} from "typeorm/driver/mysql/MysqlConnectionOption
 import {JsonCache} from "./entities/JsonCache";
 import {User} from "./entities/User";
 import {UsageEvent} from "./entities/UsageEvent";
+import {VisitorLog} from "./entities/VisitorLog";
+import {all} from "async";
+import {userInfo} from "os";
 
+
+function ip(req) {
+    return req.headers['x-forwarded-for'] || req?.connection?.remoteAddress;
+}
 
 /*
 // @ts-ignore
@@ -32,13 +39,12 @@ const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 */
 async function connectedApp() {
     const app = express();
-
     const connection = await createConnection(DatabaseConfig as MysqlConnectionOptions);
     const cacheRepo = connection.getRepository(JsonCache);
     const usageRepo = connection.getRepository(UsageEvent);
     const userRepo = connection.getRepository(User);
+    const visitRepo = connection.getRepository(VisitorLog);
     usePassportStrategies(userRepo);
-
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
     app.set("view engine", "pug");
@@ -80,26 +86,73 @@ async function connectedApp() {
     app.use(logger("dev"));
     // @ts-ignore
     app.use(bodyParser.urlencoded({extended: true}));
+    app.disable("x-powered-by");
 // @ts-ignore
-/*
-    app.use(session({
-        resave: true,
-        saveUninitialized: true,
-        // What is the session_secret?
+    /*
+        app.use(session({
+            resave: true,
+            saveUninitialized: true,
+            // What is the session_secret?
+            // @ts-ignore
+            secret: process.env.SESSION_SECRET,
+            cookie: {maxAge: 1209600000}, // two weeks in milliseconds
+            // @ts-ignore
+            store: new TypeormStore({
+                cleanupLimit: 2,
+                limitSubquery: false, // If using MariaDB.
+                ttl: 86400
+            }).connect(connection.getRepository(Session)),
+        }));
+    */
+    app.use(async (req, res, next) => {
+        if (!req.user) {
+            // See if this user has an ip associated with it
+            // @ts-ignore
+            const ipUser = await userRepo.findOne({
+                ip: ip(req),
+                // Make sure they have no other defining features
+                ...User.IpUserCriteria
+            });
+            if (ipUser) {
+                req.user = ipUser;
+                next();
+                return;
+            }
+
+            // If there is no ip user, see if we can create one
+            const latestIpEvent = await visitRepo.findOne({
+                ip: ip(req),
+            }, {
+                order: {
+                    id: "DESC"
+                }
+            });
+
+            const oneDay = 1000 * 60 * 60 * 24;
+            const oneDayAgo = new Date().getTime() - oneDay;
+            if (!latestIpEvent || latestIpEvent.timestamp.getTime() < oneDayAgo) {
+                // If this is older than 24 hours create an ip user
+                const newIpUser = new User();
+                newIpUser.ip = ip(req);
+                req.user = await userRepo.save(newIpUser);
+
+                const allowedUsage = new UsageEvent();
+                allowedUsage.label = 'IP_USER_CREATED';
+                allowedUsage.cost = -1000;
+                allowedUsage.userId = newIpUser.id;
+                await usageRepo.save(allowedUsage);
+            }
+            next();
+        }
+    });
+    app.use(async (req, res, next) => {
+        const l = new VisitorLog();
         // @ts-ignore
-        secret: process.env.SESSION_SECRET,
-        cookie: {maxAge: 1209600000}, // two weeks in milliseconds
-        // @ts-ignore
-        store: new TypeormStore({
-            cleanupLimit: 2,
-            limitSubquery: false, // If using MariaDB.
-            ttl: 86400
-        }).connect(connection.getRepository(Session)),
-    }));
-*/
+        l.ip = ip(req);
+        await visitRepo.save(l);
+    });
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(flash());
     /*
     app.use((req, res, next) => {
         if (req.path === "/api/upload") {
@@ -114,7 +167,6 @@ async function connectedApp() {
     app.use(lusca.xframe("SAMEORIGIN"));
     app.use(lusca.xssProtection(true));
     */
-    app.disable("x-powered-by");
     app.use((req, res, next) => {
         res.locals.user = req.user;
         next();
@@ -139,41 +191,30 @@ async function connectedApp() {
     */
     app.use("/", express.static(path.join(__dirname, "public"), {maxAge: 31557600000}));
     app.use("/video", express.static('public/video'));
-    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/chart.js/dist"), {maxAge: 31557600000}));
-    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/popper.js/dist/umd"), {maxAge: 31557600000}));
-    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/bootstrap/dist/js"), {maxAge: 31557600000}));
-    app.use("/js/lib", express.static(path.join(__dirname, "node_modules/jquery/dist"), {maxAge: 31557600000}));
-    app.use("/webfonts", express.static(path.join(__dirname, "node_modules/@fortawesome/fontawesome-free/webfonts"), {maxAge: 31557600000}));
-
-    /**
-     * Primary app routes.
-     */
     app.post("/login", userController.postLogin);
     app.get("/logout", userController.logout);
-/*
-    app.get("/reset/:token", userController.getReset);
-*/
-/*
-    app.post("/reset/:token", userController.postReset);
-*/
+    /*
+        app.get("/reset/:token", userController.getReset);
+    */
+    /*
+        app.post("/reset/:token", userController.postReset);
+    */
     app.post("/signup", userController.postSignup);
     app.post("/contact", contactController.postContact);
-/*
-    app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);
-    app.get("/account/verify/:token", passportConfig.isAuthenticated, userController.getVerifyEmailToken);
-    app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
-    app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
-    app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
-    app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
-    app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
-*/
+    /*
+        app.get("/account/verify", passportConfig.isAuthenticated, userController.getVerifyEmail);
+        app.get("/account/verify/:token", passportConfig.isAuthenticated, userController.getVerifyEmailToken);
+        app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
+        app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
+        app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
+        app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
+        app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
+    */
     app.get("/profile", isAuthenticated, userController.getProfile);
-
     /**
      * API examples routes.
      */
     app.get("/api", apiController.getApi);
-
     /**
      * OAuth authentication routes. (Sign in)
      */
@@ -197,7 +238,6 @@ async function connectedApp() {
         // @ts-ignore
         res.redirect(req.session.returnTo || "/");
     });
-// @ts-ignore
     app.get("/auth/google", passport.authenticate("google", {
         scope: ["profile", "email", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets.readonly"],
         accessType: "offline",
@@ -259,12 +299,12 @@ async function connectedApp() {
                 "google": "/auth/google",
                 "github": "/auth/github",
                 "twitter": "/auth/twitter",
-                "local": "/login"
+                "local": "/auth/local"
             },
         )
     });
 
-    app.get("/login", passport.authorize('local'))
+    app.post("/auth/local", passport.authorize('local'));
 
     app.post("/translate", /*passportConfig.isAuthenticated, enforceBudget,*/ translateFunc(cacheRepo, usageRepo));
     app.post("/image-search", /*passportConfig.isAuthenticated, enforceBudget,*/ imageSearchFunc(cacheRepo));

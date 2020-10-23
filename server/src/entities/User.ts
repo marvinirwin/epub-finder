@@ -17,12 +17,16 @@ import {Usage} from "./Usage";
 
 @Entity()
 export class User {
+    public static IpUserCriteria = {
+        email: '',
+        tokens: ''
+    };
     @PrimaryGeneratedColumn()
     id: number | undefined;
     @Column({unique: true})
-    email!: string; // { type: String, unique: true },
+    email: string = ''; // { type: String, unique: true },
     @Column()
-    password!: string;
+    password: string;
     @Column()
     passwordResetToken: string = '';
     @Column()

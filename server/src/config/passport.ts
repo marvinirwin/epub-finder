@@ -1,11 +1,8 @@
 import {Repository} from "typeorm";
 import {User} from "../entities/User";
-import passport, {Profile, Strategy} from "passport";
+import passport, {Profile} from "passport";
 import refresh from "passport-oauth2-refresh";
-import axios from "axios";
 import GithubStrategy from "passport-github2";
-import PassportGoogle from "passport-google-oauth";
-import _ from "lodash";
 import moment from "moment";
 import TwitterStrategy from 'passport-twitter';
 import GoogleStrategy from 'passport-google-oauth20';
@@ -208,10 +205,13 @@ export const usePassportStrategies = (repo: Repository<User>) => {
                         // @ts-ignore
                         return done(null, false, {msg: "Your account was registered using a sign-in provider. To enable password login, sign in using a provider, and then set a password under your user profile."});
                     }
-                    const passwordsMatch = await user.comparePassword(user.password);
-                    done(null, user);
-                    // @ts-ignore
-                    done(null, false, {msg: "Invalid email or password."});
+                    const passwordsMatch = await user.comparePassword(password);
+                    if (passwordsMatch) {
+                        done(null, user);
+                    } else {
+                        // @ts-ignore
+                        done(null, false, {msg: "Invalid email or password."});
+                    }
                 } catch (e) {
                     done(e);
                 }
