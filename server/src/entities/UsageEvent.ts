@@ -1,5 +1,8 @@
 import {Column, Entity, Index, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "./User";
+import {JsonValueTransformer} from "../util/JsonValueTransformer";
+
+type KeyValue = { [key: string]: any };
 
 @Entity()
 export class UsageEvent {
@@ -7,8 +10,11 @@ export class UsageEvent {
     public id: number | undefined;
     @Column()
     public label: string;
-    @Column("text")
-    public description: {[key: string]: any};
+    @Column({
+        type: String,
+        transformer: new JsonValueTransformer<KeyValue>()
+    })
+    public description: KeyValue = {};
     @Column("int")
     public cost: number;
     @ManyToOne(() => User, user => user.id)

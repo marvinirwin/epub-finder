@@ -144,6 +144,7 @@ async function connectedApp() {
             }
             next();
         }
+        next();
     });
     app.use(async (req, res, next) => {
         const l = new VisitorLog();

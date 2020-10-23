@@ -17,16 +17,17 @@ import {Usage} from "./Usage";
 
 @Entity()
 export class User {
+    // If a user has no tokens or emails, it's an ip user
     public static IpUserCriteria = {
-        email: '',
+        email: null,
         tokens: ''
     };
     @PrimaryGeneratedColumn()
     id: number | undefined;
-    @Column({unique: true})
-    email: string = ''; // { type: String, unique: true },
+    @Column({unique: true, default: null})
+    email: string | null; // { type: String, unique: true },
     @Column()
-    password: string;
+    password: string = '';
     @Column()
     passwordResetToken: string = '';
     @Column()

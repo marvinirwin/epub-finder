@@ -1,7 +1,7 @@
 import {fromEvent, merge, ReplaySubject, Subject} from "rxjs";
 import { Dictionary } from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {getTranslation} from "../Util/Util";
+import {fetchTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 

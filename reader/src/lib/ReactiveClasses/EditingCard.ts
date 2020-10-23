@@ -6,7 +6,7 @@ import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
 import {AudioManager} from "../Manager/AudioManager";
 import CardManager from "../Manager/CardManager";
-import {getTranslation} from "../Util/Util";
+import {fetchTranslation} from "../Util/Util";
 
 
 interface IDefinition {
@@ -39,7 +39,7 @@ export class EditingCard {
 
         this.translation$ = this.learningLanguage$.pipe(
             flatMap(async (learningLanguage) =>
-                learningLanguage ? await getTranslation(learningLanguage) : ''
+                learningLanguage ? await fetchTranslation(learningLanguage) : ''
             )
         )
         this.saveInProgress$.next(false);

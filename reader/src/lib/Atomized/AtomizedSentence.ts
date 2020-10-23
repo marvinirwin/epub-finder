@@ -7,7 +7,7 @@ import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
-import {getTranslation} from "../Util/Util";
+import {fetchTranslation} from "../Util/Util";
 import {ReplaySubject} from "rxjs";
 
 export class AtomizedSentence {
@@ -134,7 +134,7 @@ export class AtomizedSentence {
         if (this.translated) {
             return this._translation as string;
         } else {
-            const translatedText = await getTranslation(this.translatableText)
+            const translatedText = await fetchTranslation(this.translatableText)
             this.translated = true;
             this.popperElement.textContent = translatedText;
             return this.translatableText;

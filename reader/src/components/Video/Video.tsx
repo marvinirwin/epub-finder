@@ -222,10 +222,9 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                     progressBarPosition={progressBarPosition}
                     onClick={percent => {
                         if (videoElementRef) {
-                            let currentTime = lineIndex *
+                            videoElementRef.currentTime = lineIndex *
                                 SECONDS_PER_CHARACTER_INE +
                                 (SECONDS_PER_CHARACTER_INE * percent);
-                            videoElementRef.currentTime = currentTime;
                             if (videoElementRef.paused) {
                                 videoElementRef.play();
                             }

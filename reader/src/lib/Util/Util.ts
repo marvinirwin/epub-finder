@@ -24,7 +24,7 @@ export function getUniqueLengths(t: ITrie): number[] {
     return uniq(words.map(w => w.length));
 }
 
-export async function getTranslation<A>(learningText: A) {
+export async function fetchTranslation<A>(learningText: A) {
     const result = await axios.post(`${process.env.PUBLIC_URL}/translate`, {
         from: 'zh-CN',
         to: 'en',

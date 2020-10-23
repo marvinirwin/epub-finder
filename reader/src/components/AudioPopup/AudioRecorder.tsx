@@ -7,7 +7,7 @@ import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 import {switchMap} from "rxjs/operators";
-import {getTranslation} from "../../lib/Util/Util";
+import {fetchTranslation} from "../../lib/Util/Util";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -40,7 +40,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
     const recognizedText = useObservableState(r.currentRecognizedText$);
     const translatedText = useObservableState(
         () => r.currentRecognizedText$.pipe(
-            switchMap(text => text ? getTranslation(text) : Promise.resolve(''))
+            switchMap(text => text ? fetchTranslation(text) : Promise.resolve(''))
         ),
     )
     const currentAudioRequest = useObservableState(r.recordRequest$)// Maybe pipe this to make it a replaySubject?

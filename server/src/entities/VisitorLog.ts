@@ -12,7 +12,7 @@ export class VisitorLog {
     @Column()
     ip: string = '';
 
-    @Column()
+    @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
     timestamp: Date = new Date();
 }
 

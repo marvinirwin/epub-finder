@@ -11,7 +11,7 @@ interface JsonCacheRow {
 }
 
 export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string, f: (...a: any[]) => T) {
-    const conPromise = connectionPromise.catch(e => console.error(e));
+    const conPromise = connectionPromise(serviceKey).catch(e => console.error(e));
     return async function (...args: any[]) {
         const stringifiedArgs = JSON.stringify(args);
         const connection = await conPromise;
