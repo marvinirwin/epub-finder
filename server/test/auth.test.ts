@@ -1,4 +1,5 @@
-import request from 'supertest';
+import request, {SuperTest} from 'supertest';
+import session from 'supertest-session';
 import connectedApp from '../src/app'
 import connectionPromise from './connection';
 import {Connection, Repository} from "typeorm";
@@ -10,12 +11,14 @@ let connection: Connection;
 let app: Express;
 let userRepo: Repository<User>;
 let visitorRepo: Repository<VisitorLog>;
+let s;
 const email = 'test@test.com';
 const password = 'password';
 
 describe('logging in and out', () => {
     beforeAll(async () => {
         app = await connectedApp();
+        s = session(app)
     });
     beforeEach(async () => {
         connection = await connectionPromise('test');
@@ -31,13 +34,13 @@ describe('logging in and out', () => {
     });
 
     it('Should be able to login with a local user', done => {
-        request(app)
+        s
             .post('/auth/local')
             .send({email, password})
             .expect(200, done)
     });
 
-    it('Should be given an ip user if no ip events were present', done => {
+    it('Should be given an ip user there are no ip user sessions in progress', done => {
         const IP = '127.0.0.1';
         request(app)
             .post('/translate')
@@ -56,4 +59,8 @@ describe('logging in and out', () => {
                 done();
             });
     });
+
+    it("Should not give a user a session, if the ip user session limit has been reached", () => {
+
+    })
 })

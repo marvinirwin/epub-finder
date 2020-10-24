@@ -27,6 +27,9 @@ import {UsageEvent} from "./entities/UsageEvent";
 import {VisitorLog} from "./entities/VisitorLog";
 import {all} from "async";
 import {userInfo} from "os";
+import session from 'express-session';
+import {Session} from "./entities/Session";
+import {TypeormStore} from "typeorm-store";
 
 
 function ip(req) {
@@ -44,6 +47,7 @@ async function connectedApp() {
     const usageRepo = connection.getRepository(UsageEvent);
     const userRepo = connection.getRepository(User);
     const visitRepo = connection.getRepository(VisitorLog);
+    const sessionRepo = connection.getRepository(Session);
     usePassportStrategies(userRepo);
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
@@ -65,8 +69,6 @@ async function connectedApp() {
         next();
     });
 
-// @ts-ignore
-
     /**
      * Express configuration.
      */
@@ -87,6 +89,13 @@ async function connectedApp() {
     // @ts-ignore
     app.use(bodyParser.urlencoded({extended: true}));
     app.disable("x-powered-by");
+    // @ts-ignore
+    app.use(session({
+        secret: 'secret',
+        resave: false,
+        saveUninitialized: false,
+        store: new TypeormStore({ repository: sessionRepo})
+    }))
 // @ts-ignore
     /*
         app.use(session({
