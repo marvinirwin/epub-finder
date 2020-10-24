@@ -41,7 +41,6 @@ export class AtomizedSentence {
     getTextWordData(t: ITrie, uniqueLengths: number[]): TextWordData {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
-        const allWordCount: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
         const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
         const newWords = new Set<string>();

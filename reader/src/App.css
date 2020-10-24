@@ -223,9 +223,9 @@
     height: 90vh;
     overflow: auto;
     right: 0px;
+    background-color: white;
     display: flex;
     flex-flow: column nowrap;
-    background-color: white;
 }
 
 .video > video {
@@ -284,4 +284,8 @@
 .quiz-list {
     height: 2em;
     margin: 2px 0;
+}
+
+.hide-video-button {
+    position: absolute
 }

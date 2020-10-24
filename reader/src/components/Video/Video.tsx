@@ -1,10 +1,11 @@
 import {Manager} from "../../lib/Manager";
 import React, {useEffect, useRef, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
-import {Card} from "@material-ui/core";
+import {Card, IconButton} from "@material-ui/core";
 import {clearInterval} from "timers";
 import {CharacterTimingDisplay} from "./VideoCharacterDisplay";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
+import CancelPresentationButton from '@material-ui/icons/CancelPresentation';
 
 function useInterval(callback: () => void, delay: number) {
     const savedCallback = useRef<() => void>();
@@ -19,6 +20,7 @@ function useInterval(callback: () => void, delay: number) {
         function tick() {
             savedCallback.current && savedCallback.current();
         }
+
         if (delay !== null) {
             let id = setInterval(tick, delay);
             return () => clearInterval(id);
@@ -46,7 +48,7 @@ async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));
     const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-     // convert bytes to hex string
+    // convert bytes to hex string
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
