@@ -140,7 +140,6 @@ export function ImageSelectPopup({m}: { m: Manager }) {
                 key={index}
             >
                 <img onClick={() => {
-                    debugger;
                     imageRequest?.cb(src.thumbnailUrl); // TODO download the thumbnail as base64
                     m.queryImageRequest$.next(undefined);
                 }}

@@ -309,7 +309,6 @@ export class Manager {
         )
 
         this.quizManager.quizStage$.subscribe(stage => {
-            debugger;
             switch (stage) {
                 case QuizComponent.Characters:
                     this.editingCardManager.showEditingCardPopup$.next(false)
