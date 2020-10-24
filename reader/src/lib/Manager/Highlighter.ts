@@ -180,14 +180,17 @@ function updateHighlightBackgroundColors(
     // @ts-ignore
     for (var word of highlightWordsToUpdate) {
         const elements = wordElementMap[word];
+
         if (!elements) continue;
         const highestPriorityColors = currentHighlightMap[word].find(map => map && map.size);
         const backgroundColor = recomputeColor(
             highestPriorityColors
         );
 
-        // @ts-ignore
-        elements.forEach(element => element.element.style.backgroundColor = backgroundColor)
+        elements.forEach(element => {
+            // @ts-ignore
+            return element.element.style.backgroundColor = backgroundColor;
+        })
     }
 }
 
