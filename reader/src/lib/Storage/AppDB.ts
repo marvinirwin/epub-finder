@@ -76,6 +76,7 @@ export class MyAppDatabase extends Dexie {
         while (await this.recognitionRecords.offset(offset).first()) {
             this.messages$.next(`Querying cards in chunks ${offset}`)
             const chunkedRecognitionRows = await this.recognitionRecords.offset(offset).limit(chunkSize).toArray();
+            chunkedRecognitionRows.forEach(r => r.word = r.word.normalize())
             yield chunkedRecognitionRows;
             offset += chunkSize;
         }

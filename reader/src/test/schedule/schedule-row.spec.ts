@@ -84,7 +84,7 @@ it('Sorts cards into Learning and out of learning', () => {
         const scheduleManager = new ScheduleManager(db);
         const addQuizResultMarbles =
             Marbles.new<QuizResult, WordRecognitionRow[]>(helpers)
-                .setPipe(QuizResultToRecognitionRows(scheduleManager.wordScheduleRowDict$, scheduleManager.ms))
+                .setPipe(QuizResultToRecognitionRows(scheduleManager.wordScheduleRowDict$, scheduleManager.spacedRepitionManager))
                 .setTargetSubject(scheduleManager.addPersistedWordRecognitionRows$);
 
         const addCountMarbles = Marbles.new<BookWordCount[]>(helpers)

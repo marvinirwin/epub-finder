@@ -139,7 +139,7 @@ export class AtomizedDocument {
         let nodeValue = textNode.nodeValue as string;
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
-            nodeValue.trim().split(''),
+            nodeValue.normalize().trim().split(''),
             "mark"
         );
         const {popperEl, popperId} = createPopperElement(document1);

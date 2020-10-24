@@ -20,8 +20,8 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
 */}
 
             <ul>
-                {scheduledCards.slice(0, 5).map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
-                    {scheduledWord.word} {/*{ moment(dueDate(scheduledWord)).format('DD hh:mm') }*/} {wordCount(scheduledWord)}
+                {scheduledCards.map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
+                    {scheduledWord.word} {scheduledWord.sortString}
 {/*
                     <ul>
                         <li></li>

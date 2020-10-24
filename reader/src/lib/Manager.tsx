@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary} from "lodash";
 import {debounceTime, map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
@@ -147,7 +147,11 @@ export class Manager {
         this.readingWordElementMap = wordElementMap$;
         this.readingWordCounts$ = bookWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
-        this.scheduleManager = new ScheduleManager({db, wordCounts$: this.readingWordCounts$});
+        this.scheduleManager = new ScheduleManager({
+            db,
+            wordCounts$: this.readingWordCounts$,
+            sortMode$: of('').pipe(shareReplay(1))}
+        );
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();

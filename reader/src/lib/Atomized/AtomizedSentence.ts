@@ -77,7 +77,7 @@ export class AtomizedSentence {
                 return ({word, lengthRemaining: word.length});
             }))
 
-            let words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
+            const words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
                 let position = word.length - lengthRemaining;
                 let newPositionedWord: IPositionedWord = {
                     word,
@@ -90,8 +90,8 @@ export class AtomizedSentence {
                 return newPositionedWord;
             });
 
-            let maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
-            let annotationElement: IAnnotatedCharacter = {
+            const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
+            const annotationElement: IAnnotatedCharacter = {
                 char: (textContent as string)[i],
                 words: words,
                 element: currentMark,

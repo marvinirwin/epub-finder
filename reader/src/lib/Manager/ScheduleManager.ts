@@ -8,6 +8,7 @@ import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/ope
 import {SRM} from "../Scheduling/SRM";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {safePush} from "../../test/Util/GetGraphJson";
+import moment from "moment";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -34,7 +35,8 @@ function shuffle<T>(array: T[]): T[] {
 
 interface ScheduleManagerParams {
     wordCounts$: Observable<ds_Dict<BookWordCount[]>>,
-    db: MyAppDatabase
+    db: MyAppDatabase,
+    sortMode$: Observable<string>
 }
 
 export class ScheduleManager {
@@ -47,16 +49,16 @@ export class ScheduleManager {
 
     private today: number;
     private yesterday: number;
-    ms: SRM;
+    spacedRepitionManager: SRM;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
     private db: MyAppDatabase;
 
-    constructor({db, wordCounts$}: ScheduleManagerParams) {
+    constructor({db, wordCounts$, sortMode$: sortStrategy$}: ScheduleManagerParams) {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
-        this.ms = new SRM();
+        this.spacedRepitionManager = new SRM();
 
         this.addWordRecognitionRecords$.pipe(
             filter(rows => !!rows.length),
@@ -83,12 +85,14 @@ export class ScheduleManager {
         ]).pipe(
             map(([wordRecognition, wordCounts]) => {
                 const scheduleRows: ds_Dict<ScheduleRow> = {};
+
                 function ensureScheduleRow(word: string) {
                     if (!scheduleRows[word]) {
                         scheduleRows[word] = {wordRecognitionRecords: [], wordCountRecords: [], word};
                     }
                     return scheduleRows[word];
                 }
+
                 Object.entries(wordCounts).forEach(([word, wordCountRecords]) => {
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
                 });
@@ -100,11 +104,32 @@ export class ScheduleManager {
             shareReplay(1)
         );
 
-        this.sortedScheduleRows$ = this.indexedScheduleRows$.pipe(
-            map(dict => {
-                    return orderBy(Object.values(dict), ['dueDate', (row) => {
-                        return wordCount(row);
-                    }], ['asc', 'desc']);
+        this.sortedScheduleRows$ = combineLatest([
+            this.indexedScheduleRows$,
+            sortStrategy$
+        ]).pipe(
+            map(([indexedScheduleRows]) => {
+                    let maxDueDate = Number.MIN_SAFE_INTEGER;
+                    let minDueDate = Number.MAX_SAFE_INTEGER;
+                    for (let word in indexedScheduleRows) {
+                        debugger;
+                        const dd = dueDate(indexedScheduleRows[word]).getTime();
+                        if (maxDueDate < dd) {
+                            maxDueDate = dd;
+                        }
+                        if (minDueDate > dd) {
+                            minDueDate = dd;
+                        }
+                    }
+                    const dueDateSpread = maxDueDate - minDueDate;
+                    return orderBy(Object.values(indexedScheduleRows), [(row) => {
+                        const date = dueDate(row);
+                        const count = wordCount(row);
+                        const sortValue = count * (date.getTime() - minDueDate) / dueDateSpread;
+                        row.sortString = `${count} ${moment(date).format('MMM DD')} ${sortValue.toString().slice(0, 3)}`;
+                        debugger;
+                        return sortValue;
+                    }], ['desc']);
                 }
             ),
             shareReplay(1)
@@ -150,10 +175,10 @@ export class ScheduleManager {
                             return dueDate(r);
                         });
                     }
-                let collection = [...learningCards, ...toReviewCards, ...newCards];
-                return orderBy(collection, r => {
-                    return dueDate(r);
-                });
+                    let collection = [...learningCards, ...toReviewCards, ...newCards];
+                    return orderBy(collection, r => {
+                        return dueDate(r);
+                    });
                 }
             ),
             shareReplay(1)

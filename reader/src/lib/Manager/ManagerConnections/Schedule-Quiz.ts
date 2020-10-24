@@ -4,7 +4,7 @@ import {QuizResultToRecognitionRows} from "../../Pipes/QuizResultToRecognitionRo
 
 export function ScheduleQuiz(s: ScheduleManager, q: QuizManager) {
     q.quizResult$.pipe(
-        QuizResultToRecognitionRows(s.indexedScheduleRows$, s.ms)
+        QuizResultToRecognitionRows(s.indexedScheduleRows$, s.spacedRepitionManager)
     ).subscribe(record => {
         s.addWordRecognitionRecords$.next(record)
     });
