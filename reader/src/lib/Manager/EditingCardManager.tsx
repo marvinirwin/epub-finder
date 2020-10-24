@@ -54,7 +54,11 @@ export default class EditingCardManager {
                 if (!showEditingCardPopup && queuedEditingCard) {
                     this.showEditingCardPopup$.next(true);
                 }
-            })
+            });
+
+        this.showEditingCardPopup$.subscribe(v => {
+            // Why does this fix it??
+        })
     }
 }
 

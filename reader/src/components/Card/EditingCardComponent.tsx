@@ -18,8 +18,6 @@ import {map} from "rxjs/operators";
 import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
-
-
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: theme.palette.background.default,
@@ -43,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
         transform: 'rotate(180deg)',
     },
 }));
-
 
 const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Manager, className?: string}> = ({card, m, className}) => {
     const classes = useStyles();

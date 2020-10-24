@@ -70,6 +70,7 @@
     max-width: 100%;
     z-index: 1000;
 }
+
 .debug-menu {
     background: grey;
     opacity: 50%;
@@ -102,14 +103,17 @@
     height: 12px;
     border-radius: 50%;
 }
+
 .led-green {
     background-color: #ABFF00;
-    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px/*, #89FF00 0 2px 12px*/;
+    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px /*, #89FF00 0 2px 12px*/;
 }
+
 .led-off {
     background-color: #c6c6c6;
-    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px/*, #6d6d6d 0 2px 12px*/;
+    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px /*, #6d6d6d 0 2px 12px*/;
 }
+
 .led-box {
     height: 12px;
     width: 12px;
@@ -183,6 +187,7 @@
     background-color: #b8f28b;
     box-shadow: 0px 0px 0px 5px #58a700;
 }
+
 .recording-failed {
     background-color: #ffc1c1;
     box-shadow: 0px 0px 0px 5px #ea2b2b;
@@ -203,6 +208,7 @@
     height: 40vh;
     bottom: 10vh;
 }
+
 .library:hover {
     transform: translateX(-10vw);
     cursor: pointer;
@@ -221,6 +227,7 @@
     flex-flow: column nowrap;
     background-color: white;
 }
+
 .video > video {
     flex-grow: 1;
     /*
@@ -254,15 +261,27 @@
     */
     border-radius: 50%;
     background-color: #b8f28b;
-    box-shadow:
-            /*
+    box-shadow: /*
             0 0 60px 30px #fff,
-            */
-            0 0 10px 6px #b8f28b,
-            0 0 14px 9px #58a700;
+            */ 0 0 10px 6px #b8f28b,
+    0 0 14px 9px #58a700;
 }
 
 .hotkey-inactive {
 
 }
 
+.quiz-list {
+    list-style: none;
+    height: 0;
+    line-height: 2em;
+    margin: 0;
+    padding: 0 0.5em;
+    overflow: hidden;
+    width: 10em;
+}
+
+.quiz-list {
+    height: 2em;
+    margin: 2px 0;
+}

@@ -13,12 +13,15 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
 
     return <div style={{zIndex: 10, backgroundColor: 'white', width: 'fit-content'}}>
         <Typography variant="subtitle1">
+{/*
             <div>New: <span style={{color: '#00c0c9'}}>{newCards?.length}</span></div>
             <div>Learning: <span style={{color: '#c92800'}}>{learningCards?.length}</span></div>
             <div>To Review: <span style={{color: '#15d900'}}>{toReviewCards?.length}</span></div>
+*/}
+
             <ul>
-                {scheduledCards.slice(0, 5).map(scheduledWord => <li key={scheduledWord.word}>
-                    {scheduledWord.word} { moment(dueDate(scheduledWord)).format('DD hh:mm') } {wordCount(scheduledWord)}
+                {scheduledCards.slice(0, 5).map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
+                    {scheduledWord.word} {/*{ moment(dueDate(scheduledWord)).format('DD hh:mm') }*/} {wordCount(scheduledWord)}
 {/*
                     <ul>
                         <li></li>

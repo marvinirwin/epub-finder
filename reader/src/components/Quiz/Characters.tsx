@@ -83,7 +83,6 @@ export function Characters({c, m}: QuizCardProps) {
     useSubscription(m.inputManager.getKeyDownSubject('e').pipe(filterTextInputEvents), requestEditWord);
 
     return <Card style={{
-        marginTop: '50px',
         height: '25vh',
         padding: 0,
         backgroundColor: 'white',
