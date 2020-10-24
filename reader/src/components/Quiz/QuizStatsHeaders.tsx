@@ -11,29 +11,15 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
     const toReviewCards = useObservableState(m.scheduleManager.toReviewCards$, []);
     const scheduledCards = useObservableState(m.scheduleManager.wordQuizList$, []);
 
-    return <div style={{zIndex: 10, backgroundColor: 'white', width: 'fit-content'}}>
+    return <div style={{zIndex: 10, backgroundColor: 'white'}}>
         <Typography variant="subtitle1">
-{/*
-            <div>New: <span style={{color: '#00c0c9'}}>{newCards?.length}</span></div>
-            <div>Learning: <span style={{color: '#c92800'}}>{learningCards?.length}</span></div>
-            <div>To Review: <span style={{color: '#15d900'}}>{toReviewCards?.length}</span></div>
-*/}
-
             <ul>
-                {scheduledCards.map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
-                    {scheduledWord.word} {scheduledWord.sortString}
-{/*
-                    <ul>
-                        <li></li>
-                        {scheduledWord.wordRecognitionRecords.map(record =>
-                            <li key={record.timestamp.toISOString()}>
-                                {moment(record.nextDueDate).format('DD hh:mm')}
-                                {moment(record.timestamp).format('DD hh:mm')}
-                            </li>
-                        )}
-                    </ul>
-*/}
-                </li>)}
+                {
+                    scheduledCards.map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
+                            {scheduledWord.word} {scheduledWord.sortString}
+                        </li>
+                    )
+                }
             </ul>
         </Typography>
     </div>

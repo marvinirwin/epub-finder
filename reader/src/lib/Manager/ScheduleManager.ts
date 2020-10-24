@@ -9,6 +9,7 @@ import {SRM} from "../Scheduling/SRM";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {safePush} from "../../test/Util/GetGraphJson";
 import moment from "moment";
+import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -112,7 +113,6 @@ export class ScheduleManager {
                     let maxDueDate = Number.MIN_SAFE_INTEGER;
                     let minDueDate = Number.MAX_SAFE_INTEGER;
                     for (let word in indexedScheduleRows) {
-                        debugger;
                         const dd = dueDate(indexedScheduleRows[word]).getTime();
                         if (maxDueDate < dd) {
                             maxDueDate = dd;
@@ -125,10 +125,10 @@ export class ScheduleManager {
                     return orderBy(Object.values(indexedScheduleRows), [(row) => {
                         const date = dueDate(row);
                         const count = wordCount(row);
-                        const sortValue = count * (date.getTime() - minDueDate) / dueDateSpread;
-                        row.sortString = `${count} ${moment(date).format('MMM DD')} ${sortValue.toString().slice(0, 3)}`;
-                        debugger;
-                        return sortValue;
+                        const sortNumber = count * (date.getTime() - minDueDate) / dueDateSpread;
+                        row.sortString = `${count} ${moment(date).format('MMM DD')} ${sortNumber.toString().slice(0, 3)}`;
+                        row.sortNumber = sortNumber;
+                        return sortNumber;
                     }], ['desc']);
                 }
             ),
@@ -171,14 +171,14 @@ export class ScheduleManager {
                             ...toReviewCards,
                             ...(newCards.slice(0, learningCardsRequired) || [])
                         ];
-                        return orderBy(collection1, r => {
-                            return dueDate(r);
-                        });
+                        return orderBy(uniqueBy(collection1, w => w.word), r => {
+                            return r.sortNumber;
+                        }, 'desc');
                     }
                     let collection = [...learningCards, ...toReviewCards, ...newCards];
-                    return orderBy(collection, r => {
-                        return dueDate(r);
-                    });
+                    return orderBy(uniqueBy(collection, w => w.word), r => {
+                        return r.sortNumber;
+                    }, 'desc');
                 }
             ),
             shareReplay(1)

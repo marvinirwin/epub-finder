@@ -144,7 +144,7 @@ function singleHighlight(
     newHighlightDelta$: Observable<HighlightDelta | undefined>,
     highlightedWords$: Observable<HighlightMap>,
     wordElementMap$: Observable<ds_Dict<HasElement[]>>,
-    highlighterKey: string
+    highlighterKey: string,
 ) {
     let oldHighlightDelta: HighlightDelta | undefined;
     combineLatest([

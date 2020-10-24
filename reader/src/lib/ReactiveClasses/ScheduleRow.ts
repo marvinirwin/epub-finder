@@ -65,4 +65,5 @@ export interface ScheduleRow {
     wordRecognitionRecords: WordRecognitionRow[];
     word: string;
     sortString?: string;
+    sortNumber?: number;
 }
