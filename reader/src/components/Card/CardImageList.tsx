@@ -37,26 +37,24 @@ const useStylesGridListImages = makeStyles((theme) => ({
 export default function ({photos$, card, characters, m}: { photos$: Subject<string[]>, card: EditingCard, characters: string, m: Manager }) {
     const classes = useStylesGridListImages();
     const photos = useObservableState(photos$);
-    const openQueryImageRequest = () => m.queryImageRequest$.next({
-        term: characters,
-        cb: (s: string) => card.photos$.next(photos?.concat(s))
-    });
-    useSubscription(m.inputManager.getKeyDownSubject('s').pipe(filterTextInputEvents), openQueryImageRequest);
+    const hotkeyMap = useObservableState(m.db.hotkeys$, {});
+
+
 
     return photos?.length ?
-        <HotkeyWrapper shortcutKey={'s'}>
+        <HotkeyWrapper action={"OPEN_IMAGE_SEARCH"}>
             <GridList className={classes.gridList}>
                 {photos?.map((src, index) => {
                     return <EditingImage key={index} index={index} card={card} src={src}
                                          photos={photos} characters={characters}
-                                         addCb={index === photos?.length - 1 ? openQueryImageRequest : undefined}
+                                         addCb={index === photos?.length - 1 ? () => m.hotkeyEvents.openImageSearch$.next() : undefined}
                     />
                 })}
             </GridList>
         </HotkeyWrapper>
          : <div>
-            <HotkeyWrapper shortcutKey={'s'}>
-                <IconButton onClick={openQueryImageRequest}>
+            <HotkeyWrapper action={"OPEN_IMAGE_SEARCH"}>
+                <IconButton onClick={() => m.hotkeyEvents.openImageSearch$.next()}>
                     <LibraryAddIcon/>
                 </IconButton>
             </HotkeyWrapper>

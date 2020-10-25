@@ -59,7 +59,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
     const deleteCard = () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined);
-    const hideEditCard = () => m.editingCardManager.showEditingCardPopup$.next(false);
+    const hideEditCard = () => m.hotkeyEvents.hide$.next();
     useSubscription(m.inputManager.getKeyDownSubject('d').pipe(filterTextInputEvents), deleteCard);// Maybe I want to make this harder to do
     useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
 
@@ -67,23 +67,25 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     const scheduleRow = (cardIndex && characters) ? cardIndex[characters] : undefined;
     const score = scheduleRow ? wordRecognitionScore(scheduleRow) : undefined;
 
+    const hotkeyMap = useObservableState(m.db.hotkeys$, {});
+
     return <Card className={`${className || ''} ${classes.root}`}>
             <CardContent ref={setReferenceElement}>
                 <div className={classes.root}>
                     <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
-                        <HotkeyWrapper shortcutKey={"Esc"}>
+                        <HotkeyWrapper action={"HIDE"}>
                             <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
                                 <KeyboardArrowUp fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
-                        <HotkeyWrapper shortcutKey={"g"}>
+                        <HotkeyWrapper action={"MARK_AS_KNOWN"}>
                             <IconButton aria-label="done" onClick={() => characters && m.quizManager.quizResult$.next({word: characters, score: 2})}>
                                 <Done fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) ({score})</Typography>
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
-                        <HotkeyWrapper shortcutKey={"d"}>
+                        <HotkeyWrapper action={"DELETE_CARD"}>
                             <IconButton aria-label="delete" onClick={deleteCard}>
                                 <DeleteIcon fontSize="large" />
                             </IconButton>

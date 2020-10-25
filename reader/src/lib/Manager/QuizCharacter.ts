@@ -24,7 +24,7 @@ export class QuizCharacter {
     quizzingCard$: Observable<ICard | undefined>;
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
     public exampleSentencesBook: OpenBook;
-
+    public recordingClass$ = new ReplaySubject<string>(1);
     private sentenceCache = new Set<string>();
 
     constructor({

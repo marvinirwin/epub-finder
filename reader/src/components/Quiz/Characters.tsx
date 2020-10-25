@@ -8,26 +8,23 @@ import {quizStyles} from "./QuizStyles";
 import QuizStatsHeader from "./QuizStatsHeaders";
 import {take} from "rxjs/operators";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
-import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
-import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {HotkeyWrapper} from "../HotkeyWrapper";
-import {useSubscription} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
-import {QuizComponent} from "../../lib/Manager/QuizManager";
+import {Manager} from "../../lib/Manager";
 
-const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
-const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
+export const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
+export const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
+
 
 export function Characters({c, m}: QuizCardProps) {
     const classes = quizStyles();
-    const [error, setError] = useState('');
-    const requestEditWord = () => c && m.editingCardManager.requestEditWord$.next(c.learningLanguage);
-    const advance = () => {
-        m.quizManager.quizStage$.next(QuizComponent.Conclusion);
-    };
+
+    function advance() {
+        m.hotkeyEvents.advanceQuiz$.next();
+    }
 
     useEffect(() => {
-        setError('');// The card has changed, clear the error message
         if (!c?.learningLanguage) return;
         const r = new RecordRequest(`Please record sentence with the word ${c?.learningLanguage}`);
         r.sentence.then(async createdSentence => {
@@ -35,52 +32,28 @@ export function Characters({c, m}: QuizCardProps) {
                 return;
             }
             if (!createdSentence.includes(c.learningLanguage)) {
-                setError(`The synthesized sentence (${createdSentence}) does not contain ${c.learningLanguage}`)
+                console.log(`The synthesized sentence (${createdSentence}) does not contain ${c.learningLanguage}`)
             }
             const allPreviousCreatedSentence = await m.createdSentenceManager.allCreatedSentences$.pipe(
                 take(1),
             ).toPromise();
 
             if (allPreviousCreatedSentence[createdSentence]) {
-                setError(`You have already said ${createdSentence}`)
+                console.log(`You have already said ${createdSentence}`)
             } else {
-                setError(`Sentence "${createdSentence}" recorded`);
+                console.log(`Sentence "${createdSentence}" recorded`);
                 advance();
             }
         })
     }, [c?.learningLanguage]);
 
-    const [recordingClass, setRecordingClass] = useState<string>('');
-
-
-    function tryAudio() {
-        if (!c) return;
-        let newRecordRequest = new RecordRequest(c.learningLanguage);
-        newRecordRequest.recording$.subscribe(isRecording => {
-            if (isRecording) {
-                setRecordingClass('prompting-recording');
-            }
-        })
-        newRecordRequest.sentence.then(sentence => {
-            if (!c) return;
-            if (sentence.includes(c.learningLanguage)) {
-                setRecordingClass(promptingRecordingRecordingSuccess);
-                setTimeout(() => {
-                    advance();
-                }, 250);
-            } else {
-                setRecordingClass(promptingRecordingRecordingFailed);
-            }
-        });
-        m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
-    }
+    const recordingClass = useObservableState(m.quizCharacterManager.recordingClass$, '');
 
     // Subscribe to the keydown "r" while we can
     useSubscription(m.inputManager.getKeyDownSubject('r').pipe(filterTextInputEvents), e => {
         e.preventDefault()
-        tryAudio();
+        m.hotkeyEvents.recordQuizWord$.next()
     });
-    useSubscription(m.inputManager.getKeyDownSubject('e').pipe(filterTextInputEvents), requestEditWord);
 
     return <Card style={{
         height: '35vh',
@@ -101,8 +74,10 @@ export function Characters({c, m}: QuizCardProps) {
                 }
 */}
                 <div style={{width: '100%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'center'}}>
-                    <HotkeyWrapper shortcutKey={'r'}>
-                        <div className={`${recordingClass} quiz-character`} onClick={requestEditWord}>
+                    <HotkeyWrapper action={"RECORD_QUIZ_WORD"}>
+                        <div className={`${recordingClass} quiz-character`} onClick={
+                            () => m.editingCardManager.requestEditWord$.next(c?.learningLanguage)
+                        }>
                             <Typography variant="h1" component="h1" className={classes.center}>
                                 {c?.learningLanguage}
                             </Typography>

@@ -1,9 +1,11 @@
-import {fromEvent, merge, ReplaySubject, Subject} from "rxjs";
-import { Dictionary } from "lodash";
+import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {Dictionary} from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {fetchTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
+import {ds_Dict} from "../Util/DeltaScanner";
+import {Hotkeys} from "../HotKeyEvents";
 
 
 export interface BrowserInputsConfig {
@@ -11,12 +13,12 @@ export interface BrowserInputsConfig {
 }
 
 
-export enum HotkeyModes  {
-    TextInput="TextInput",
-    Reading="Reading"
+export enum HotkeyModes {
+    TextInput = "TextInput",
+    Reading = "Reading"
 }
 
-export function isDocument(t: HTMLElement | Document): t is Document  {
+export function isDocument(t: HTMLElement | Document): t is Document {
     return !t.hasOwnProperty('tagName');
 }
 
@@ -27,7 +29,7 @@ export function hotkeyMode(t: HTMLElement | Document | null): HotkeyModes {
         return HotkeyModes.Reading;
     }
 
-    switch(t.tagName) {
+    switch (t.tagName) {
         case "INPUT":
         case "TEXTAREA":
             return HotkeyModes.TextInput;
@@ -37,10 +39,10 @@ export function hotkeyMode(t: HTMLElement | Document | null): HotkeyModes {
 }
 
 
-export function isListening(keyMode: HotkeyModes, keyListeningFor: string) {
-    switch(keyMode) {
+export function isListening(keyMode: HotkeyModes, actionListeningFor: keyof Hotkeys<any>) {
+    switch (keyMode) {
         case HotkeyModes.TextInput:
-            return keyListeningFor === 'Escape';
+            return actionListeningFor === "HIDE";
         case HotkeyModes.Reading:
             return true;
     }
@@ -54,18 +56,36 @@ export function isListening(keyMode: HotkeyModes, keyListeningFor: string) {
 export class BrowserInputs {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
+    keysPressed$ = new BehaviorSubject<ds_Dict<boolean>>({});
     selectedText$: Subject<string> = new Subject<string>();
     hoveredSentence$ = new ReplaySubject<string | undefined>(1);
     hoveredCharacterIndex$ = new ReplaySubject<number | undefined>(1);
-    hotkeyHandler$ = new ReplaySubject<HTMLElement | Document | null>(1);
+    focusedElement$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
-    constructor() {}
+    constructor({hotkeys$}: {
+        hotkeys$: Observable<Map<string[], Subject<void>>>
+    }) {
+        combineLatest([
+                hotkeys$,
+                this.keysPressed$
+            ]
+        ).subscribe(([hotkeyMap, keysPressed]) => {
+            hotkeyMap.forEach((subject, keys) => {
+                keys.every(key => keysPressed[key]) && subject.next()
+            })
+        })
+    }
+
 
     applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
+            this.keysPressed$.next({...this.keysPressed$.getValue(), [ev.key]: true})
             return this.keydownMap[ev.key]?.next(ev);
         };
-        root.onkeyup = (ev) => this.keyupMap[ev.key]?.next(ev);
+        root.onkeyup = (ev) => {
+            this.keysPressed$.next({...this.keysPressed$.getValue(), [ev.key]: false})
+            return this.keyupMap[ev.key]?.next(ev);
+        };
 
         const checkForSelectedText = () => {
             const activeEl = root.activeElement;
@@ -83,23 +103,25 @@ export class BrowserInputs {
         };
         root.onmouseup = checkForSelectedText;
 
-/*
-        root.onfocus = ev => {
-            this.hotkeyHandler$.next(ev.target as HTMLElement);
-            return true;
-        };
-        root.onmousedown = ev => {
-            this.hotkeyHandler$.next(ev.target as HTMLElement);
-            return true;
-        };
-*/
+        /*
+                root.onfocus = ev => {
+                    this.hotkeyHandler$.next(ev.target as HTMLElement);
+                    return true;
+                };
+                root.onmousedown = ev => {
+                    this.hotkeyHandler$.next(ev.target as HTMLElement);
+                    return true;
+                };
+        */
 
         this.getKeyUpSubject("Shift").subscribe(checkForSelectedText);
     }
+
     getKeyDownSubject(key: string): Subject<KeyboardEvent> {
         if (!this.keydownMap[key]) this.keydownMap[key] = new Subject<KeyboardEvent>()
         return this.keydownMap[key];
     }
+
     getKeyUpSubject(key: string) {
         if (!this.keyupMap[key]) this.keyupMap[key] = new Subject<KeyboardEvent>()
         return this.keyupMap[key];

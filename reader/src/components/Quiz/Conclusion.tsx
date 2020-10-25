@@ -6,6 +6,7 @@ import {QuizCardProps} from "./Popup";
 import {quizStyles} from "./QuizStyles";
 import {RecognitionMap} from "../../lib/Scheduling/SRM";
 import {HotkeyWrapper} from "../HotkeyWrapper";
+import {useObservableState} from "observable-hooks";
 
 export function Conclusion({c, m}: QuizCardProps) {
     const classes = quizStyles();
@@ -17,7 +18,8 @@ export function Conclusion({c, m}: QuizCardProps) {
             m.cardDBManager,
             m.cardManager
         ) : null);
-    }, [c, m])
+    }, [c, m]);
+    const hotkeyMap = useObservableState(m.db.hotkeys$, {});
 
     return editingCard ? <Card className={classes.card}>
         <CardContent style={{height: '25vh', display: 'flex', flexFlow: "row nowrap", justifyContent: 'flex-end'}}>
@@ -26,13 +28,13 @@ export function Conclusion({c, m}: QuizCardProps) {
                     {
                         c &&
                         <Fragment>
-                            <HotkeyWrapper shortcutKey={'1'}>
+                            <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
                                 <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.hard)}>Hard</Button>
                             </HotkeyWrapper>
-                            <HotkeyWrapper shortcutKey={'2'}>
+                            <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
                                 <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.medium)}>Medium</Button>
                             </HotkeyWrapper>
-                            <HotkeyWrapper shortcutKey={'3'}>
+                            <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
                                 <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.easy)}>Easy</Button>
                             </HotkeyWrapper>
                         </Fragment>

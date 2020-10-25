@@ -22,7 +22,7 @@ import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
-import {BookWordData, mergeSentenceInfo, TextWordData} from "./Atomized/TextWordData";
+import {BookWordData, mergeSentenceInfo} from "./Atomized/TextWordData";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import EditingCardManager from "./Manager/EditingCardManager";
@@ -42,8 +42,8 @@ import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Manager/Highlighter";
 import {Library} from "./Manager/Library";
-import {CustomDocument, Website} from "./Website/Website";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
+import {HotKeyEvents} from "./HotKeyEvents";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -68,13 +68,14 @@ export class Manager {
         (c: ICard) => c.id,
         (i: number, c: ICard) => ({...c, id: i})
     );
+    public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
     public cardManager: CardManager;
     public openedBooks: OpenBooks;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
-    public inputManager = new BrowserInputs();
+    public inputManager: BrowserInputs;
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
@@ -105,7 +106,12 @@ export class Manager {
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: Library;
 
+
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
+        this.hotkeyEvents = new HotKeyEvents(this)
+        this.inputManager = new BrowserInputs({
+        });
+
         axios.interceptors.response.use(
             response => response,
             (error) => {
@@ -261,14 +267,15 @@ export class Manager {
             this.quizManager.setQuizCard(icard);
         })
 
-        merge(
-            this.inputManager.getKeyDownSubject("Escape"),
-            this.inputManager.getKeyDownSubject("q").pipe(filterTextInputEvents),
-        ).subscribe(() => this.editingCardManager.showEditingCardPopup$.next(false))
+        this.hotkeyEvents.hide$.subscribe(() => {
+            this.editingCardManager.showEditingCardPopup$.next(false)
+        });
 
+/*
         merge(
             this.inputManager.getKeyDownSubject("d").pipe(filterTextInputEvents),
         ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
+*/
 
         this.inputManager.selectedText$.subscribe(word => {
             this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));

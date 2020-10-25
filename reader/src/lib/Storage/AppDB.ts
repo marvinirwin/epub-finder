@@ -6,6 +6,7 @@ import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
 import {ds_Dict} from "../Util/DeltaScanner";
+import {Hotkeys} from "../HotKeyEvents";
 
 
 export class MyAppDatabase extends Dexie {
@@ -99,5 +100,9 @@ export class MyAppDatabase extends Dexie {
     }
     get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {})
+    }
+
+    get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {
+        return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
     }
 }
