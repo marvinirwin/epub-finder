@@ -1,5 +1,5 @@
 import Dexie from "dexie";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Setting} from "../Interfaces/Setting";
@@ -7,6 +7,7 @@ import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {Hotkeys} from "../HotKeyEvents";
+import {map} from "rxjs/operators";
 
 
 export class MyAppDatabase extends Dexie {
@@ -104,5 +105,31 @@ export class MyAppDatabase extends Dexie {
 
     get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
+    }
+
+    public mapWithDefault(
+        defaultHotkeys: Hotkeys<string[]>,
+        hotkeyActions: Hotkeys<Subject<void>>
+    ): Observable<Map<string[], Subject<void>>> {
+        return this.hotkeys$.pipe(
+            map((hotkeyConfig) => {
+                const keyMap = new Map<string[], Subject<void>>();
+                let action: keyof Hotkeys<any>;
+                // @ts-ignore
+                const allActions: Array<keyof Hotkeys<any>> = Object.keys(hotkeyActions);
+                const unsetActions = new Set<keyof Hotkeys<any>>(allActions);
+                for (action in hotkeyConfig) {
+                    if (!hotkeyActions[action]) {
+                        console.warn(`Unknown hotkey action ${action}`)
+                    }
+                    unsetActions.delete(action);
+                    keyMap.set(hotkeyConfig[action] || [], hotkeyActions[action])
+                }
+                unsetActions.forEach(unsetAction => {
+                    keyMap.set(defaultHotkeys[unsetAction], hotkeyActions[unsetAction])
+                })
+                return keyMap;
+            })
+        )
     }
 }

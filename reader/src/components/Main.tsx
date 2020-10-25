@@ -56,10 +56,11 @@ export function Main({m}: { m: Manager }) {
     const alertMessages = useObservableState(m.alertMessages$);
 
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
-    const hotkeySettings = useObservableState(m.db.hotkeys$, {})
+    const hotkeyConfig = useObservableState(m.db.hotkeys$, {});
+    const withDefaults = {...hotkeyConfig, ...m.hotkeyEvents.defaultHotkeys()};
 
     return <div style={{maxHeight: '100vh', maxWidth: '100vw', overflow: 'hidden'}}>
-        <HotkeyContext.Provider value={hotkeySettings}>
+        <HotkeyContext.Provider value={withDefaults}>
             <FocusedElement.Provider value={hotkeyHandler}>
                 <StaticFrame
                     visible={characterPageShows}
