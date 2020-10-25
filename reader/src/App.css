@@ -214,21 +214,21 @@
     cursor: pointer;
 }
 
-.video {
+#video {
     position: fixed;
     z-index: 3;
     transition: transform 0.5s;
     /* TODO add scss so I can use variables for my widths and stuff  */
     top: 10vh;
     height: 90vh;
-    overflow: auto;
+    overflow: visible;
     right: 0px;
-    background-color: white;
     display: flex;
     flex-flow: column nowrap;
+    background-color: white;
 }
 
-.video > video {
+#video > video {
     flex-grow: 1;
     /*
     max-width: 533px;
@@ -239,7 +239,7 @@
 }
 
 
-.video:hover {
+#video:hover {
     cursor: pointer;
 }
 

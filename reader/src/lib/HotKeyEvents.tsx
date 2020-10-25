@@ -17,7 +17,8 @@ export interface Hotkeys<T> {
     QUIZ_RESULT_HARD: T,
     RECORD_QUIZ_WORD: T,
     REQUEST_EDIT_WORD: T,
-    ADVANCE_QUIZ: T
+    ADVANCE_QUIZ: T,
+    HIDE_VIDEO: T
 }
 
 export class HotKeyEvents {
@@ -31,8 +32,13 @@ export class HotKeyEvents {
     public quizResultHard$ = new Subject<void>();
     public requestEditQuizWord$ = new Subject<void>();
     public advanceQuiz$ = new Subject<void>();
+    public hideVideo$ = new Subject<void>();
 
     constructor(public m: Manager) {
+    }
+
+    public startListeners() {
+        const m = this.m;
         this.openImageSearch$.pipe(
             withLatestFrom(m.editingCardManager.editingCard$)
         ).subscribe(async ([_, editingCard]) => {
@@ -54,9 +60,9 @@ export class HotKeyEvents {
 
 
         this.requestEditQuizWord$
-        .pipe(
-            withLatestFrom(m.quizCharacterManager.quizzingCard$)
-        ).subscribe(async ([_, card]) => {
+            .pipe(
+                withLatestFrom(m.quizCharacterManager.quizzingCard$)
+            ).subscribe(async ([_, card]) => {
             if (card) {
                 m.editingCardManager.requestEditWord$.next(card.learningLanguage);
             }
@@ -141,7 +147,23 @@ export class HotKeyEvents {
             QUIZ_RESULT_HARD: this.quizResultHard$,
             ADVANCE_QUIZ: this.advanceQuiz$,
             RECORD_QUIZ_WORD: this.recordQuizWord$,
-            REQUEST_EDIT_WORD: this.requestEditQuizWord$
+            REQUEST_EDIT_WORD: this.requestEditQuizWord$,
+            HIDE_VIDEO: this.hideVideo$
+        }
+    }
+    public defaultHotkeys(): Hotkeys<string[]> {
+        return {
+            OPEN_IMAGE_SEARCH: ['s'],
+            HIDE: ['Escape'],
+            MARK_AS_KNOWN: ['g'],
+            DELETE_CARD: ['d'],
+            QUIZ_RESULT_EASY: ['3'],
+            QUIZ_RESULT_MEDIUM: ['2'],
+            QUIZ_RESULT_HARD: ['1'],
+            ADVANCE_QUIZ: ['Space'],
+            RECORD_QUIZ_WORD: ['r'],
+            REQUEST_EDIT_WORD: ['e'],
+            HIDE_VIDEO: ['v']
         }
     }
 }

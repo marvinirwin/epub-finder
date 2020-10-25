@@ -63,7 +63,7 @@ export class BrowserInputs {
     focusedElement$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
     constructor({hotkeys$}: {
-        hotkeys$: Observable<Map<string[], Subject<void>>>
+        hotkeys$: Observable<Map<string[], Subject<void>>>,
     }) {
         combineLatest([
                 hotkeys$,

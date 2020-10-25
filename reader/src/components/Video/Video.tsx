@@ -5,7 +5,8 @@ import {Card, IconButton} from "@material-ui/core";
 import {clearInterval} from "timers";
 import {CharacterTimingDisplay} from "./VideoCharacterDisplay";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
-import CancelPresentationButton from '@material-ui/icons/CancelPresentation';
+import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
+import {HotkeyWrapper} from "../HotkeyWrapper";
 
 function useInterval(callback: () => void, delay: number) {
     const savedCallback = useRef<() => void>();
@@ -178,13 +179,18 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
         ];
     }
 
-    useSubscription(m.inputManager.getKeyDownSubject('v').pipe(filterTextInputEvents), e => {
-        e.preventDefault()
-        setHighlightBarP1(undefined);
-        setHighlightBarP2(undefined);
-    });
+    useSubscription(m.hotkeyEvents.hideVideo$, () => setVideoMetaData(undefined));
 
-    return videoMetaData ? <Card className={'video'} elevation={3}>
+    return videoMetaData ? <Card id={'video'} elevation={3}>
+        <div style={{position: 'absolute', top: 0, zIndex: 10}}>
+            <HotkeyWrapper action={"HIDE_VIDEO"}>
+                <IconButton
+                    onClick={() => m.hotkeyEvents.hideVideo$.next()}
+                >
+                    <CancelPresentationIcon/>
+                </IconButton>
+            </HotkeyWrapper>
+        </div>
         <video
             ref={setVideoElementRef}
             src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}

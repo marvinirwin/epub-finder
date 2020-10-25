@@ -43,7 +43,7 @@ import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Manager/Highlighter";
 import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
-import {HotKeyEvents} from "./HotKeyEvents";
+import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -110,6 +110,28 @@ export class Manager {
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         this.hotkeyEvents = new HotKeyEvents(this)
         this.inputManager = new BrowserInputs({
+            hotkeys$: this.db.hotkeys$.pipe(
+                map((hotkeyConfig) => {
+                    const keyMap = new Map<string[], Subject<void>>();
+                    let action: keyof Hotkeys<any>;
+                    const hotkeyActions: Hotkeys<Subject<void>> = this.hotkeyEvents.hotkeyActions();
+                    // @ts-ignore
+                    const allActions: Array<keyof Hotkeys<any>> = Object.keys(hotkeyActions);
+                    const unsetActions = new Set<keyof Hotkeys<any>>(allActions);
+                    for (action in hotkeyConfig) {
+                        if (!hotkeyActions[action]) {
+                            console.warn(`Unknown hotkey action ${action}`)
+                        }
+                        unsetActions.delete(action);
+                        keyMap.set(hotkeyConfig[action] || [], hotkeyActions[action])
+                    }
+                    const defaultHotkeys = this.hotkeyEvents.defaultHotkeys();
+                    unsetActions.forEach(unsetAction => {
+                        keyMap.set(defaultHotkeys[unsetAction], hotkeyActions[unsetAction])
+                    })
+                    return keyMap;
+                })
+            )
         });
 
         axios.interceptors.response.use(
@@ -339,6 +361,7 @@ export class Manager {
                 }
             }
         });
+        this.hotkeyEvents.startListeners();
         this.cardManager.load();
     }
 
