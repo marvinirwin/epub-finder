@@ -1,9 +1,11 @@
 import {Manager} from "./Manager";
-import {Subject} from "rxjs";
-import {withLatestFrom} from "rxjs/operators";
+import {of, Subject} from "rxjs";
+import {startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {promptingRecordingRecordingFailed, promptingRecordingRecordingSuccess} from "../components/Quiz/Characters";
 import {RecognitionMap} from "./Scheduling/SRM";
+import {useSubscription} from "observable-hooks";
+import {filterTextInputEvents} from "./Manager/BrowserInputs";
 
 export interface Hotkeys<T> {
     OPEN_IMAGE_SEARCH: T,
@@ -27,7 +29,7 @@ export class HotKeyEvents {
     public quizResultMedium$ = new Subject<void>();
     public recordQuizWord$ = new Subject<void>();
     public quizResultHard$ = new Subject<void>();
-    public requestEditWord$ = new Subject<void>();
+    public requestEditQuizWord$ = new Subject<void>();
     public advanceQuiz$ = new Subject<void>();
 
     constructor(public m: Manager) {
@@ -51,11 +53,12 @@ export class HotKeyEvents {
         });
 
 
-        this.requestEditWord$.subscribe(async () => {
-            const editingCard = await m.editingCardManager.editingCard$.toPromise();
-            const language = await editingCard?.learningLanguage$.toPromise();
-            if (editingCard && language) {
-                m.editingCardManager.requestEditWord$.next(language);
+        this.requestEditQuizWord$
+        .pipe(
+            withLatestFrom(m.quizCharacterManager.quizzingCard$)
+        ).subscribe(async ([_, card]) => {
+            if (card) {
+                m.editingCardManager.requestEditWord$.next(card.learningLanguage);
             }
         });
 
@@ -109,6 +112,21 @@ export class HotKeyEvents {
             } else if (showEditingCard) {
                 m.queryImageRequest$.next(undefined);
             }
+        });
+
+        this.deleteCard$.pipe(
+            withLatestFrom(m.editingCardManager.editingCard$.pipe(switchMap(e => {
+                if (e) {
+                    return e?.learningLanguage$;
+                } else {
+                    return of('')
+                }
+            })))
+        ).subscribe(([_, learningLanguage]) => {
+            if (learningLanguage) {
+                m.cardManager.deleteCards$.next([learningLanguage]);
+                m.editingCardManager.queEditingCard$.next(undefined)
+            }
         })
     }
 
@@ -123,7 +141,7 @@ export class HotKeyEvents {
             QUIZ_RESULT_HARD: this.quizResultHard$,
             ADVANCE_QUIZ: this.advanceQuiz$,
             RECORD_QUIZ_WORD: this.recordQuizWord$,
-            REQUEST_EDIT_WORD: this.requestEditWord$
+            REQUEST_EDIT_WORD: this.requestEditQuizWord$
         }
     }
 }

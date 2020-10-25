@@ -14,7 +14,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../HotkeyWrapper";
-import {map} from "rxjs/operators";
 import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
 import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
@@ -58,11 +57,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     const pinyin = useObservableState(card.pinyin$);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
-    const deleteCard = () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined);
-    const hideEditCard = () => m.hotkeyEvents.hide$.next();
-    useSubscription(m.inputManager.getKeyDownSubject('d').pipe(filterTextInputEvents), deleteCard);// Maybe I want to make this harder to do
-    useSubscription(m.inputManager.getKeyDownSubject('Esc'), hideEditCard);// Maybe I want to make this harder to do
-
+    useSubscription(m.inputManager.getKeyDownSubject('d').pipe(filterTextInputEvents), () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined));// Maybe I want to make this harder to do
     const cardIndex = useObservableState(m.scheduleManager.indexedScheduleRows$);
     const scheduleRow = (cardIndex && characters) ? cardIndex[characters] : undefined;
     const score = scheduleRow ? wordRecognitionScore(scheduleRow) : undefined;
@@ -74,7 +69,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                 <div className={classes.root}>
                     <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between'}}>
                         <HotkeyWrapper action={"HIDE"}>
-                            <IconButton aria-label="keyboard_arrow_up" onClick={hideEditCard}>
+                            <IconButton aria-label="keyboard_arrow_up" onClick={() => m.hotkeyEvents.hide$.next()}>
                                 <KeyboardArrowUp fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
@@ -86,7 +81,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) ({score})</Typography>
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
                         <HotkeyWrapper action={"DELETE_CARD"}>
-                            <IconButton aria-label="delete" onClick={deleteCard}>
+                            <IconButton aria-label="delete" onClick={() => m.hotkeyEvents.deleteCard$.next()}>
                                 <DeleteIcon fontSize="large" />
                             </IconButton>
                         </HotkeyWrapper>

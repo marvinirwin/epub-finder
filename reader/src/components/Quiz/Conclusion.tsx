@@ -29,13 +29,13 @@ export function Conclusion({c, m}: QuizCardProps) {
                         c &&
                         <Fragment>
                             <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
-                                <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.hard)}>Hard</Button>
+                                <Button onClick={() => m.hotkeyEvents.quizResultHard$.next()}>Hard</Button>
                             </HotkeyWrapper>
-                            <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
-                                <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.medium)}>Medium</Button>
+                            <HotkeyWrapper action={"QUIZ_RESULT_MEDIUM"}>
+                                <Button onClick={() => m.hotkeyEvents.quizResultMedium$.next()}>Medium</Button>
                             </HotkeyWrapper>
-                            <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
-                                <Button onClick={() => m.quizManager.completeQuiz(c.learningLanguage, RecognitionMap.easy)}>Easy</Button>
+                            <HotkeyWrapper action={"QUIZ_RESULT_EASY"}>
+                                <Button onClick={() => m.hotkeyEvents.quizResultEasy$.next()}>Easy</Button>
                             </HotkeyWrapper>
                         </Fragment>
                     }

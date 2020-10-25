@@ -49,12 +49,6 @@ export function Characters({c, m}: QuizCardProps) {
 
     const recordingClass = useObservableState(m.quizCharacterManager.recordingClass$, '');
 
-    // Subscribe to the keydown "r" while we can
-    useSubscription(m.inputManager.getKeyDownSubject('r').pipe(filterTextInputEvents), e => {
-        e.preventDefault()
-        m.hotkeyEvents.recordQuizWord$.next()
-    });
-
     return <Card style={{
         height: '35vh',
         padding: 0,
@@ -76,7 +70,7 @@ export function Characters({c, m}: QuizCardProps) {
                 <div style={{width: '100%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'center'}}>
                     <HotkeyWrapper action={"RECORD_QUIZ_WORD"}>
                         <div className={`${recordingClass} quiz-character`} onClick={
-                            () => m.editingCardManager.requestEditWord$.next(c?.learningLanguage)
+                            () => m.hotkeyEvents.requestEditQuizWord$.next()
                         }>
                             <Typography variant="h1" component="h1" className={classes.center}>
                                 {c?.learningLanguage}
