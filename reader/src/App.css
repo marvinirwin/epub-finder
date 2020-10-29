@@ -298,5 +298,9 @@
 
 .hotkey-config {
     display: flex;
-    flex-flow: column nowrap
+    flex-flow: row wrap;
+}
+
+.hotkey-config > div {
+    margin: 24px;
 }
