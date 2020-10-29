@@ -7,7 +7,7 @@ import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {Hotkeys} from "../HotKeyEvents";
-import {map} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 
 
 export class MyAppDatabase extends Dexie {
@@ -107,7 +107,7 @@ export class MyAppDatabase extends Dexie {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
     }
 
-    public mapWithDefault(
+    public mapHotkeysWithDefault(
         defaultHotkeys: Hotkeys<string[]>,
         hotkeyActions: Hotkeys<Subject<void>>
     ): Observable<Map<string[], Subject<void>>> {
@@ -129,7 +129,8 @@ export class MyAppDatabase extends Dexie {
                     keyMap.set(defaultHotkeys[unsetAction], hotkeyActions[unsetAction])
                 })
                 return keyMap;
-            })
+            }),
+            shareReplay(1)
         )
     }
 }

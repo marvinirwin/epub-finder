@@ -15,29 +15,8 @@ import {Alert} from "@material-ui/lab";
 import {Snackbar} from "@material-ui/core";
 import {Video} from "./Video/Video";
 import {LibraryPage} from "./Pages/LibraryPage";
-import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/HotKeyEvents";
 
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexFlow: 'column nowrap',
-        '& > *': {
-            borderRadius: 0
-        },
-        height: '100vh',
-        width: '100vw',
-        display: 'flex'
-    },
-    middle: {
-        flexGrow: 1
-    },
-    bookList: {
-        display: 'flex',
-        flexFlow: 'column nowrap',
-
-    },
-}));
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
@@ -57,7 +36,7 @@ export function Main({m}: { m: Manager }) {
 
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.db.hotkeys$, {});
-    const withDefaults = {...hotkeyConfig, ...m.hotkeyEvents.defaultHotkeys()};
+    const withDefaults = {...m.hotkeyEvents.defaultHotkeys(), ...hotkeyConfig};
 
     return <div style={{maxHeight: '100vh', maxWidth: '100vw', overflow: 'hidden'}}>
         <HotkeyContext.Provider value={withDefaults}>

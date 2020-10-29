@@ -72,29 +72,6 @@ export class HotKeyEvents {
             m.quizManager.advanceQuizStage$.next()
         });
 
-        this.recordQuizWord$.subscribe(async () => {
-            const c = await m.quizManager.quizzingCard$.toPromise();
-            if (!c) return;
-            let newRecordRequest = new RecordRequest(c.learningLanguage);
-            newRecordRequest.recording$.subscribe(isRecording => {
-                if (isRecording) {
-                    m.quizCharacterManager.recordingClass$.next('prompting-recording');
-                }
-            })
-            newRecordRequest.sentence.then(sentence => {
-                if (!c) return;
-                if (sentence.includes(c.learningLanguage)) {
-                    m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingSuccess);
-                    setTimeout(() => {
-                        this.advanceQuiz$.next();
-                    }, 250);
-                } else {
-                    m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingFailed);
-                }
-            });
-            m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
-        })
-
         function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: number) {
             quizResultEasy$2.pipe(
                 withLatestFrom(m.quizCharacterManager.quizzingCard$)

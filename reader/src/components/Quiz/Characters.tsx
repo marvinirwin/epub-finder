@@ -49,6 +49,34 @@ export function Characters({c, m}: QuizCardProps) {
 
     const recordingClass = useObservableState(m.quizCharacterManager.recordingClass$, '');
 
+    useSubscription(
+        m.hotkeyEvents.recordQuizWord$,
+        () => {
+            if (!c?.learningLanguage) {
+                return;
+            }
+            const newRecordRequest = new RecordRequest(c.learningLanguage);
+            // TODO should this take(1)?
+            newRecordRequest.recording$.subscribe(isRecording => {
+                if (isRecording) {
+                    m.quizCharacterManager.recordingClass$.next('prompting-recording');
+                }
+            })
+            newRecordRequest.sentence.then(sentence => {
+                if (!c) return;
+                if (sentence.includes(c.learningLanguage)) {
+                    m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingSuccess);
+                    setTimeout(() => {
+                        m.hotkeyEvents.advanceQuiz$.next();
+                    }, 250);
+                } else {
+                    m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingFailed);
+                }
+            });
+            m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
+        }
+    )
+
     return <Card style={{
         height: '35vh',
         padding: 0,

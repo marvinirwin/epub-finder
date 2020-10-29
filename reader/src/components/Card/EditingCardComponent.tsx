@@ -57,7 +57,15 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     const pinyin = useObservableState(card.pinyin$);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
-    useSubscription(m.inputManager.getKeyDownSubject('d').pipe(filterTextInputEvents), () => characters && m.cardManager.deleteCards$.next([characters]) && m.editingCardManager.queEditingCard$.next(undefined));// Maybe I want to make this harder to do
+    useSubscription(
+        m.hotkeyEvents.deleteCard$,
+        () => {
+            if (characters) {
+                m.cardManager.deleteCards$.next([characters])
+                m.editingCardManager.queEditingCard$.next(undefined);
+            }
+        }
+    )
     const cardIndex = useObservableState(m.scheduleManager.indexedScheduleRows$);
     const scheduleRow = (cardIndex && characters) ? cardIndex[characters] : undefined;
     const score = scheduleRow ? wordRecognitionScore(scheduleRow) : undefined;

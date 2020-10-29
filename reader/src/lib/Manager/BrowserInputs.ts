@@ -71,7 +71,9 @@ export class BrowserInputs {
             ]
         ).subscribe(([hotkeyMap, keysPressed]) => {
             hotkeyMap.forEach((subject, keys) => {
-                keys.every(key => keysPressed[key]) && subject.next()
+                if (keys.every(key => keysPressed[key])) {
+                    subject.next()
+                }
             })
         })
     }
@@ -80,11 +82,11 @@ export class BrowserInputs {
     applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
             this.keysPressed$.next({...this.keysPressed$.getValue(), [ev.key]: true})
-            return this.keydownMap[ev.key]?.next(ev);
+            this.keydownMap[ev.key]?.next(ev);
         };
         root.onkeyup = (ev) => {
             this.keysPressed$.next({...this.keysPressed$.getValue(), [ev.key]: false})
-            return this.keyupMap[ev.key]?.next(ev);
+            this.keyupMap[ev.key]?.next(ev);
         };
 
         const checkForSelectedText = () => {

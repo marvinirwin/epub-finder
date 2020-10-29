@@ -110,7 +110,10 @@ export class Manager {
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         this.hotkeyEvents = new HotKeyEvents(this)
         this.inputManager = new BrowserInputs({
-            hotkeys$: this.db.mapWithDefault(this.hotkeyEvents.defaultHotkeys(), this.hotkeyEvents.hotkeyActions())
+            hotkeys$: this.db.mapHotkeysWithDefault(
+                this.hotkeyEvents.defaultHotkeys(),
+                this.hotkeyEvents.hotkeyActions()
+            )
         });
 
         axios.interceptors.response.use(

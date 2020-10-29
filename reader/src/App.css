@@ -289,3 +289,14 @@
 .hide-video-button {
     position: absolute
 }
+
+.settings-page {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 24px;
+}
+
+.hotkey-config {
+    display: flex;
+    flex-flow: column nowrap
+}
