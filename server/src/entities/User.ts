@@ -14,6 +14,7 @@ import crypto from 'crypto';
 import {UsageEvent} from "./UsageEvent";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
 import {Usage} from "./Usage";
+import {Session} from "./Session";
 
 @Entity()
 export class User {
@@ -80,6 +81,9 @@ export class User {
 
     @OneToMany(type => UsageEvent, usageEvent => usageEvent.userId)
     usageEvents: UsageEvent[];
+
+    @OneToMany(type => Session, session => session.userId)
+    sessions: Session[];
 
     @AfterLoad()
     private storeInitialPassword(): void {

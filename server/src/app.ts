@@ -18,7 +18,7 @@ import * as userController from "./controllers/user";
 import * as apiController from "./controllers/api";
 import * as contactController from "./controllers/contact";
 import {isAuthenticated, isAuthorized, usePassportStrategies} from "./config/passport";
-import {createConnection} from "typeorm";
+import {Connection, createConnection, Repository} from "typeorm";
 import DatabaseConfig from "./config/database.config"
 import {MysqlConnectionOptions} from "typeorm/driver/mysql/MysqlConnectionOptions";
 import {JsonCache} from "./entities/JsonCache";
@@ -30,7 +30,22 @@ import {userInfo} from "os";
 import session from 'express-session';
 import {Session} from "./entities/Session";
 import {TypeormStore} from "typeorm-store";
+import AnonymousUsers from 'config/anonymous-users';
 
+export class Repositories {
+    jsonCache: Repository<JsonCache>;
+    session: Repository<Session>;
+    user: Repository<User>;
+    usageEvent: Repository<UsageEvent>;
+    private visitorLog: Repository<VisitorLog>;
+    constructor(public connection: Connection) {
+        this.jsonCache = connection.getRepository(JsonCache);
+        this.usageEvent = connection.getRepository(UsageEvent);
+        this.user = connection.getRepository(User);
+        this.visitorLog = connection.getRepository(VisitorLog);
+        this.session = connection.getRepository(Session);
+    }
+}
 
 function ip(req) {
     return req.headers['x-forwarded-for'] || req?.connection?.remoteAddress;
@@ -43,12 +58,8 @@ const upload = Multer.diskStorage({ dest: path.join(__dirname, "uploads") });
 async function connectedApp() {
     const app = express();
     const connection = await createConnection(DatabaseConfig as MysqlConnectionOptions);
-    const cacheRepo = connection.getRepository(JsonCache);
-    const usageRepo = connection.getRepository(UsageEvent);
-    const userRepo = connection.getRepository(User);
-    const visitRepo = connection.getRepository(VisitorLog);
-    const sessionRepo = connection.getRepository(Session);
-    usePassportStrategies(userRepo);
+    const repositories = new Repositories(connection);
+    usePassportStrategies(repositories);
     app.set("port", process.env.SERVER_PORT || 3002);
     app.set("views", path.join(__dirname, "../views"));
     app.set("view engine", "pug");
@@ -91,10 +102,10 @@ async function connectedApp() {
     app.disable("x-powered-by");
     // @ts-ignore
     app.use(session({
-        secret: 'secret',
+        secret: 'shhhhhh',
         resave: false,
         saveUninitialized: false,
-        store: new TypeormStore({ repository: sessionRepo})
+        store: new TypeormStore({repository: repositories.session})
     }))
 // @ts-ignore
     /*
@@ -113,48 +124,8 @@ async function connectedApp() {
             }).connect(connection.getRepository(Session)),
         }));
     */
-    app.use(async (req, res, next) => {
-        if (!req.user) {
-            // See if this user has an ip associated with it
-            // @ts-ignore
-            const ipUser = await userRepo.findOne({
-                ip: ip(req),
-                // Make sure they have no other defining features
-                ...User.IpUserCriteria
-            });
-            if (ipUser) {
-                req.user = ipUser;
-                next();
-                return;
-            }
-
-            // If there is no ip user, see if we can create one
-            const latestIpEvent = await visitRepo.findOne({
-                ip: ip(req),
-            }, {
-                order: {
-                    id: "DESC"
-                }
-            });
-
-            const oneDay = 1000 * 60 * 60 * 24;
-            const oneDayAgo = new Date().getTime() - oneDay;
-            if (!latestIpEvent || latestIpEvent.timestamp.getTime() < oneDayAgo) {
-                // If this is older than 24 hours create an ip user
-                const newIpUser = new User();
-                newIpUser.ip = ip(req);
-                req.user = await userRepo.save(newIpUser);
-
-                const allowedUsage = new UsageEvent();
-                allowedUsage.label = 'IP_USER_CREATED';
-                allowedUsage.cost = -1000;
-                allowedUsage.userId = newIpUser.id;
-                await usageRepo.save(allowedUsage);
-            }
-            next();
-        }
-        next();
-    });
+    // This wont work because of (this)
+    app.use(AnonymousUsers(repositories).assignAnonymousUser);
     app.use(async (req, res, next) => {
         const l = new VisitorLog();
         // @ts-ignore

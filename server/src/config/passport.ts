@@ -8,7 +8,7 @@ import TwitterStrategy from 'passport-twitter';
 import GoogleStrategy from 'passport-google-oauth20';
 import LocalStrategy from 'passport-local'
 import {Profiles} from "../types/custom";
-
+import {Repositories} from "../app";
 
 export interface AuthArgs<T> {
     req: Express.Request;
@@ -24,14 +24,14 @@ export interface AuthArgs<T> {
     done: (err: any, user: User | undefined) => void
 }
 
-export const usePassportStrategies = (repo: Repository<User>) => {
+export const usePassportStrategies = ({user: userRepo}: Repositories) => {
     passport.serializeUser((user: User, done) => {
         done(null, user.id);
     });
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await repo.findOne(id);
-            done(null, user);
+            const newUser = await userRepo.findOne(id);
+            done(null, newUser);
         } catch (e) {
             done(e, null);
         }
@@ -68,35 +68,35 @@ export const usePassportStrategies = (repo: Repository<User>) => {
         ) => {
             const { req, user, accessToken, refreshToken, identified, profile, done, } = args;
             const linkUser = async (userId: number) => {
-                const alreadyAssociatedUser = await repo.findOne({[tokenKind]: profile.id});
+                const alreadyAssociatedUser = await userRepo.findOne({[tokenKind]: profile.id});
                 if (alreadyAssociatedUser) {
                     throw new Error(`There is already a user associated with this ${tokenKind} account`);
                 }
-                const userToLink = await repo.findOne(userId);
+                const userToLink = await userRepo.findOne(userId);
                 if (!userToLink) {
                     throw new Error(`Could not find user with id ${userId}`);
                 }
                 mutateUser(args);
-                await repo.save(userToLink);
+                await userRepo.save(userToLink);
                 return userToLink;
             };
             const createUser = async () => {
                 const newUser = new User();
                 mutateUser(args);
-                await repo.save(newUser);
+                await userRepo.save(newUser);
                 done(null, newUser)
             };
             try {
                 // @ts-ignore
                 const id: number = req.user.id;
                 if (id) {
-                    const existingUser = await repo.findOne({[tokenKind]: profile.id});
+                    const existingUser = await userRepo.findOne({[tokenKind]: profile.id});
                     if (existingUser) {
                         throw new Error(`There is already a ${tokenKind} account that belongs to this user.  Sign in with that account or delete it to link it to this user`);
                     }
                     return linkUser(id);
                 } else {
-                    const existingUser = await repo.findOne({[tokenKind]: profile.id});
+                    const existingUser = await userRepo.findOne({[tokenKind]: profile.id});
                     if (existingUser) {
                         return existingUser;
                     }
@@ -196,7 +196,7 @@ export const usePassportStrategies = (repo: Repository<User>) => {
         new LocalStrategy.Strategy({usernameField: "email"},
             async (email, password, done) => {
                 try {
-                    const user = await repo.findOne({email: email.toLowerCase()});
+                    const user = await userRepo.findOne({email: email.toLowerCase()});
                     if (!user) {
                         // @ts-ignore
                         return done(null, false, {msg: `Email ${email} not found.`});
