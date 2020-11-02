@@ -4,7 +4,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {JsonCache} from "../entities/JsonCache";
 import {TranslateResponseDto} from "./translate-response-dto";
-import {getSha1} from "../util/sha1";
+import {sha1} from "../util/sha1";
 
 const {Translate} = require("@google-cloud/translate").v2;
 export const projectId = "mandarin-trainer";
@@ -26,18 +26,15 @@ export class TranslateService {
     private readonly _service = "GOOGLE_TRANSLATIONS";
 
     async lookupCacheEntry(translateRequestDto: TranslateRequestDto): Promise<TranslateResponseDto | undefined> {
-        const cacheEntry = await this.jsonCacheRepository.findOne({
+        const conditions = {
             service: this._service,
-            key_hash: this.translateHash(translateRequestDto)
-        });
+            key_hash: sha1([translateRequestDto])
+        };
+        const cacheEntry = await this.jsonCacheRepository.findOne(conditions);
         if (cacheEntry) {
             // Kind of inefficient, since it will probably be stringified again
             return JSON.parse(cacheEntry.value);
         }
-    }
-
-    private translateHash(translateRequestDto: TranslateRequestDto) {
-        return getSha1(JSON.stringify(translateRequestDto));
     }
 
     insertCacheEntry(translateRequestDto: TranslateRequestDto, translateResponseDto: TranslateResponseDto) {
@@ -46,8 +43,8 @@ export class TranslateService {
                 new JsonCache(),
                 {
                     service: this._service,
-                    key_hash: this.translateHash(translateRequestDto),
-                    key: JSON.stringify(translateRequestDto),
+                    key_hash: sha1([translateRequestDto]),
+                    key: JSON.stringify([translateRequestDto]),
                     value: JSON.stringify(translateResponseDto)
                 }
             )

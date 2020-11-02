@@ -11,9 +11,4 @@ export class UsersController {
     async create(createUserDto: CreateUserDto) {
         return this.usersService.createBasicUser(createUserDto);
     }
-
-    @Get()
-    async findAll(): Promise<User[]> {
-        return this.usersService.findAll();
-    }
 }

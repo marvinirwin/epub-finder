@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
-export function getSha1(key: string): string {
+export function sha1(key: any): string {
     const sha = crypto.createHash("sha1");
-    sha.update(key);
+    sha.update(JSON.stringify(key))
     return sha.digest("hex");
 }

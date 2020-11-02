@@ -33,18 +33,6 @@ export async function fetchTranslation<A>(learningText: A) {
     return result?.data?.translation || '';
 }
 
-async function getAllLocations(): Promise<ITrendLocation[]> {
-    const result = await axios.post('/trend-locations')
-    const d: ITrendLocation[] = result.data;
-    const filtered = d.filter(r => r.country === 'Singapore')
-    return result.data;
-}
-
-async function getAllTrendsForLocation(woeid: number): Promise<ITrend[]> {
-    const result = await axios.post('/trends', {id: woeid})
-    return result.data;
-}
-
 /**
  * Changed this to split on linebreak because I'm lazy for now
  * @param threshhold

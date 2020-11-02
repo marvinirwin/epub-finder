@@ -4,7 +4,7 @@ import {CognitiveServicesCredentials} from "@azure/ms-rest-azure-js";
 import {ImageSearchClient, ImageSearchModels} from "@azure/cognitiveservices-imagesearch";
 import {TranslateRequestDto} from "../translate/translate-request-dto";
 import {TranslateResponseDto} from "../translate/translate-response-dto";
-import {getSha1} from "../util/sha1";
+import {sha1} from "../util/sha1";
 import {InjectRepository} from "@nestjs/typeorm";
 import {JsonCache} from "../entities/JsonCache";
 import {Repository} from "typeorm";
@@ -38,17 +38,12 @@ export class ImageSearchService {
     async lookupCacheEntry(imageSearchRequestDto: ImageSearchRequestDto): Promise<ImageSearchRequestDto | undefined> {
         const cacheEntry = await this.jsonCacheRepository.findOne({
             service: "AZURE_IMAGE_SEARCH",
-            key_hash: getSha1(JSON.stringify(imageSearchRequestDto)
-            )
+            key_hash: sha1([imageSearchRequestDto])
         });
         if (cacheEntry) {
             // Kind of inefficient, since it will probably be stringified again again
             return JSON.parse(cacheEntry.value);
         }
-    }
-
-    private hash(translateRequestDto: any) {
-        return getSha1(JSON.stringify(translateRequestDto));
     }
 
     insertCacheEntry(imageSearchRequestDto: ImageSearchRequestDto, imageSearchResponseDto: any) {
@@ -57,8 +52,8 @@ export class ImageSearchService {
                 new JsonCache(),
                 {
                     service: this._service,
-                    key_hash: this.hash(imageSearchRequestDto),
-                    key: JSON.stringify(imageSearchRequestDto),
+                    key_hash: sha1([imageSearchRequestDto]),
+                    key: JSON.stringify([imageSearchRequestDto]),
                     value: JSON.stringify(imageSearchResponseDto)
                 }
             )

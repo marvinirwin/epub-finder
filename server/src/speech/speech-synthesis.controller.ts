@@ -15,6 +15,7 @@ export class SpeechSynthesisController {
         @Res() res,
     ) {
         if (await this.speechService.audioFileExists(speechSynthesisRequest)) {
+            console.log(`Cache hit ${JSON.stringify(speechSynthesisRequest)}`)
             return fs.createReadStream(this.speechService.audioFilePath(speechSynthesisRequest));
         }
 

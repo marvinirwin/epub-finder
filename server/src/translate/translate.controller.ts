@@ -9,7 +9,7 @@ export class TranslateController {
     ) {}
 
     @Post()
-    async translate(translateRequestDto: TranslateRequestDto) {
+    async translate(@Body() translateRequestDto: TranslateRequestDto) {
         const cacheResult = await this.translateService.lookupCacheEntry(translateRequestDto);
         if (cacheResult) {
             return cacheResult;

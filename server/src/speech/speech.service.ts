@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {AudioConfig, SpeechConfig, SpeechSynthesizer} from "microsoft-cognitiveservices-speech-sdk";
 import axios from "axios";
-import {getSha1} from "../util/sha1";
+import {sha1} from "../util/sha1";
 import {join} from "path";
 import fs, {pathExists} from "fs-extra";
 import {SpeechSynthesisRequestDto} from "./speech-synthesis-request-dto";
@@ -63,7 +63,7 @@ export class SpeechService {
 </prosody>
 </voice>
 </speak>`;
-        const hash = getSha1(ssml);
+        const hash = sha1(ssml);
         const filename = join(wavRoot, `${hash}.wav`);
         const audioFileExists = await fs.pathExists(filename);
         if (!audioFileExists) {
@@ -79,7 +79,7 @@ export class SpeechService {
     }
 
     audioFilePath(speechSynthesisRequestDto: SpeechSynthesisRequestDto) {
-        return getSha1(JSON.stringify(speechSynthesisRequestDto));
+        return sha1(JSON.stringify(speechSynthesisRequestDto));
     }
 
 }

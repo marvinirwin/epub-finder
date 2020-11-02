@@ -1,11 +1,11 @@
-import {Controller, Get} from "@nestjs/common";
+import {Controller, Get, Post} from "@nestjs/common";
 import {SpeechService} from "./speech.service";
 
-@Controller('speech-recognition')
+@Controller('speech-recognition-token')
 export class SpeechRecognitionController {
     constructor(private speechService: SpeechService) {}
 
-    @Get()
+    @Post()
     async token() {
         return this.speechService.speechRecognitionToken()
     }
