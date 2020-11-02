@@ -1,12 +1,13 @@
 import {User} from "../entities/User";
 import {Session} from "../entities/Session";
-import {Repositories} from "../app";
+import {Repositories} from "./repositories";
 export default ({ user, session }: Repositories) => ({
+/*
     async queryFreeSessionCount() {
         return await user.query(`
         SELECT COUNT(1) AS c
-        FROM user
-        JOIN session ON session.userId = user.id
+        FROM "user"
+        JOIN "session" ON session.userId = user.id
         WHERE 
             session.expiresAt < current_timestamp
             AND user.email = ''
@@ -51,5 +52,6 @@ export default ({ user, session }: Repositories) => ({
             next();
         };
     }
+*/
 })
 

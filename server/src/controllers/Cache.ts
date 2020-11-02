@@ -1,5 +1,7 @@
+export const foo = 0;
+
+/*
 import {getSha1} from "../util/sha1";
-import connectionPromise from '../../test/connection';
 import {Repository} from "typeorm";
 import {JsonCache} from "../entities/JsonCache";
 
@@ -45,3 +47,4 @@ export function memoWithMySQL<T>(repo: Repository<JsonCache>, serviceKey: string
 }
 
 
+*/

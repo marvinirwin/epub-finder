@@ -1,23 +1,7 @@
+/*
 const validator = require("validator");
 const nodemailer = require("nodemailer");
 
-/**
- * GET /contact
- * Contact form page.
- */
-exports.getContact = (req, res) => {
-  const unknownUser = !(req.user);
-
-  res.render("contact", {
-    title: "Contact",
-    unknownUser,
-  });
-};
-
-/**
- * POST /contact
- * Send a contact form via Nodemailer.
- */
 exports.postContact = (req, res) => {
   const validationErrors = [];
   let fromName;
@@ -91,3 +75,6 @@ exports.postContact = (req, res) => {
       return res.redirect("/contact");
     });
 };
+*/
+export const foo = 0;
+

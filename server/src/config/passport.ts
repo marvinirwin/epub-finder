@@ -1,4 +1,3 @@
-import {Repository} from "typeorm";
 import {User} from "../entities/User";
 import passport, {Profile} from "passport";
 import refresh from "passport-oauth2-refresh";
@@ -8,10 +7,10 @@ import TwitterStrategy from 'passport-twitter';
 import GoogleStrategy from 'passport-google-oauth20';
 import LocalStrategy from 'passport-local'
 import {Profiles} from "../types/custom";
-import {Repositories} from "../app";
+import {Repositories} from "./repositories";
 
 export interface AuthArgs<T> {
-    req: Express.Request;
+    req: Request;
     user: User;
     accessToken?: string;
     refreshToken?: string;
@@ -109,6 +108,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
 
 
     passport.use(
+        // @ts-ignore
         new GithubStrategy.Strategy(
             {
                 clientID: process.env.GITHUB_ID,
@@ -171,6 +171,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
                 callbackURL: "/auth/google/callback",
                 passReqToCallback: true
             },
+            // @ts-ignore
             strategy<Profiles.GoogleProfile>(
                 (req, accessToken, refreshToken, params, profile, done) =>
                     ({

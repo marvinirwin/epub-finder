@@ -1,10 +1,12 @@
 import * as path from 'path';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const baseDir = path.join(__dirname, '../');
 const entitiesPath = `${baseDir}${process.env.TYPEORM_ENTITIES}`;
 const migrationPath = `${baseDir}${process.env.TYPEORM_MIGRATIONS}`;
 
-export default {
+export const DatabaseModule = TypeOrmModule.forRoot({
+    // @ts-ignore
     type: process.env.TYPEORM_CONNECTION,
     host: process.env.TYPEORM_HOST,
     username: process.env.TYPEORM_USERNAME,
@@ -20,4 +22,4 @@ export default {
         entitiesDir: 'src/db/entities',
     },
     synchronize: true
-};
+});

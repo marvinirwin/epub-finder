@@ -1,5 +1,3 @@
-import {Request, Response} from "express";
-import {memoWithMySQL} from "./cache";
 import Twitter from "twitter-lite";
 
 export const getTwitter = async () => {
