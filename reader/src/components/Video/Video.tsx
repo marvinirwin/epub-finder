@@ -4,7 +4,6 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {Card, IconButton} from "@material-ui/core";
 import {clearInterval} from "timers";
 import {CharacterTimingDisplay} from "./VideoCharacterDisplay";
-import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import {HotkeyWrapper} from "../HotkeyWrapper";
 
@@ -96,7 +95,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             if (currentSentence) {
                 setVideoMetaData(undefined);
                 try {
-                    const response = await fetch(`/video/${await sentenceToFilename(currentSentence)}.json`)
+                    const response = await fetch(`${process.env.PUBLIC_URL}/video/${await sentenceToFilename(currentSentence)}.json`)
                     if (response.status === 200) {
                         setVideoMetaData(await response.json())
                     }
@@ -193,7 +192,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
         </div>
         <video
             ref={setVideoElementRef}
-            src={(currentSentence && videoMetaData) ? `/video/${videoMetaData.filename}` : ''}
+            src={(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
             autoPlay
             controls
         />

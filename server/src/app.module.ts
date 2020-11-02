@@ -8,7 +8,8 @@ import {TranslateModule} from "./translate/translate.module";
 import {SpeechModule} from "./speech/speech.module";
 import {ImageSearchModule} from "./image-search/image-search.module";
 import {UsersModule} from "./user/user.module";
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import {join} from "path";
 
 @Module({
     imports: [
@@ -20,7 +21,11 @@ import {UsersModule} from "./user/user.module";
         ImageSearchModule,
         ImageSearchHttpModule,
         UsersModule,
-        UsersHttpModule
+        UsersHttpModule,
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'public/video'),
+            serveRoot: '/video/',
+        }),
     ],
 })
 export class AppModule {}
