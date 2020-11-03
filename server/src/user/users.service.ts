@@ -38,4 +38,14 @@ export class UsersService {
     async remove(id: string): Promise<void> {
         await this.usersRepository.delete(id);
     }
+
+    async findForAuth(email, password) {
+        const userWithThisEmail = await this.findOne({email});
+        if (!userWithThisEmail) {
+            return userWithThisEmail;
+        }
+        if (await User.comparePassword(userWithThisEmail.password, password)) {
+            return userWithThisEmail;
+        }
+    }
 }

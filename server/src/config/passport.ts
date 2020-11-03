@@ -206,7 +206,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
                         // @ts-ignore
                         return done(null, false, {msg: "Your account was registered using a sign-in provider. To enable password login, sign in using a provider, and then set a password under your user profile."});
                     }
-                    const passwordsMatch = await user.comparePassword(password);
+                    const passwordsMatch = await User.comparePassword(user.password, password);
                     if (passwordsMatch) {
                         done(null, user);
                     } else {

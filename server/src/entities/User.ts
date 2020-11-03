@@ -110,9 +110,9 @@ export class User {
         return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
     }
 
-    public comparePassword(password: string) {
+    public static comparePassword(currentPassword: string, attemptingPassword: string) {
         return new Promise((resolve, reject) => {
-            bcrypt.compare(password, this.password, (err, res) => {
+            bcrypt.compare(attemptingPassword, currentPassword, (err, res) => {
                 if (err) reject(err);
                 if (res) resolve(true);
                 resolve(false);

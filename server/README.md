@@ -1214,7 +1214,7 @@ moment().add(-1, 'days');
 
 #### Find all users:
 ```js
-User.find((err, users) => {
+UserFromReq.find((err, users) => {
   console.log(users);
 });
 ```
@@ -1222,14 +1222,14 @@ User.find((err, users) => {
 #### Find a user by email:
 ```js
 let userEmail = 'example@gmail.com';
-User.findOne({ email: userEmail }, (err, user) => {
+UserFromReq.findOne({ email: userEmail }, (err, user) => {
   console.log(user);
 });
 ```
 
 #### Find 5 most recent user accounts:
 ```js
-User
+UserFromReq
   .find()
   .sort({ _id: -1 })
   .limit(5)
@@ -1245,7 +1245,7 @@ inefficient way would be to loop through each document and manually accumulate
 the count. Or you could use [MongoDB Aggregation Framework](https://docs.mongodb.org/manual/core/aggregation-introduction/) instead:
 
 ```js
-User.aggregate({ $group: { _id: null, total: { $sum: '$votes' } } }, (err, votesCount)  => {
+UserFromReq.aggregate({ $group: { _id: null, total: { $sum: '$votes' } } }, (err, votesCount)  => {
   console.log(votesCount.total);
 });
 ```

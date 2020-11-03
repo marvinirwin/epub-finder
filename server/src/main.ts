@@ -23,7 +23,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api', app, document);
     app.use(
-        session({
+        passport.session({
             // @ts-ignore
             cookie: {
                 path: "/",
@@ -43,7 +43,6 @@ async function bootstrap() {
     );
 
     app.use(passport.initialize());
-    app.use(passport.session());
 
     await app.listen(process.env.HTTP_PORT);
 }

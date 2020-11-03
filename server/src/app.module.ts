@@ -11,6 +11,10 @@ import {UsersModule} from "./user/user.module";
 import {ServeStaticModule} from '@nestjs/serve-static';
 import {join} from "path";
 import {SessionService} from "./session/session.service";
+import { AuthModule } from './auth/auth.module';
+import { UsersService } from './user/users.service';
+import {TypeOrmModule} from "@nestjs/typeorm";
+import {JsonCache} from "./entities/JsonCache";
 
 @Module({
     imports: [
@@ -27,8 +31,13 @@ import {SessionService} from "./session/session.service";
             rootPath: join(__dirname, '..', 'public/video'),
             serveRoot: '/video/',
         }),
+        AuthModule,
+        TypeOrmModule.forFeature([JsonCache])
     ],
-    providers: [SessionService],
+    providers: [
+        SessionService,
+        UsersService,
+    ],
 })
 export class AppModule {
 }
