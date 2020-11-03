@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import {Module} from '@nestjs/common';
 import {DatabaseModule} from "./config/database.module"
 import {ImageSearchHttpModule} from "./image-search/image-search-http.module";
 import {SpeechHttpModule} from "./speech/speech-http.module";
@@ -8,8 +8,9 @@ import {TranslateModule} from "./translate/translate.module";
 import {SpeechModule} from "./speech/speech.module";
 import {ImageSearchModule} from "./image-search/image-search.module";
 import {UsersModule} from "./user/user.module";
-import { ServeStaticModule } from '@nestjs/serve-static';
+import {ServeStaticModule} from '@nestjs/serve-static';
 import {join} from "path";
+import {SessionService} from "./session/session.service";
 
 @Module({
     imports: [
@@ -27,5 +28,7 @@ import {join} from "path";
             serveRoot: '/video/',
         }),
     ],
+    providers: [SessionService],
 })
-export class AppModule {}
+export class AppModule {
+}

@@ -31,8 +31,8 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
-    findOne(id: string): Promise<User> {
-        return this.usersRepository.findOne(id);
+    findOne(args): Promise<User> {
+        return this.usersRepository.findOne(args);
     }
 
     async remove(id: string): Promise<void> {
