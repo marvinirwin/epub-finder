@@ -6,12 +6,12 @@ export class Session extends BaseEntity implements SessionEntity {
     @PrimaryColumn()
     id: string;
 
-    @Column()
+    @Column({})
     expiresAt: number;
 
     @Column()
     data: string;
 
-    @Column()
-    userId: number | undefined;
+    @Column({default: null})
+    userId: number;
 }

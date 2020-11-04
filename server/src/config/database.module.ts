@@ -1,5 +1,8 @@
+import {config} from 'dotenv';
 import * as path from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+config({path: '.env'});
 
 const baseDir = path.join(__dirname, '../');
 const entitiesPath = `${baseDir}${process.env.TYPEORM_ENTITIES}`;

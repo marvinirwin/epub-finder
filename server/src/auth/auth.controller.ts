@@ -9,6 +9,7 @@ import {UserFromReq} from "../decorators/userFromReq";
 import {GoogleGuard, LoginGuard} from "../guards";
 import {GithubGuard} from "../guards/github";
 import {TwitterGuard} from "../guards/twitter";
+import {SignUpDto} from "./signup.dto";
 
 @Controller("/auth")
 export class AuthController {
@@ -62,8 +63,8 @@ export class AuthController {
   }
 
   @Public()
-  @Get("/signup")
-  public async signup(@Body() data: {email, password}, @Req() req: Request): Promise<User> {
+  @Post("/signup")
+  public async signup(@Body() data: SignUpDto, @Req() req: Request): Promise<User> {
     const user = await this.userService.createBasicUser(data);
     await promisify(req.logIn.bind(req))(user);
     return user;

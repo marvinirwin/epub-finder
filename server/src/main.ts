@@ -1,13 +1,15 @@
 import {config} from 'dotenv';
-config({path: '.env'});
 import {HttpAdapterHost, NestFactory} from '@nestjs/core';
-import { AppModule } from './app.module';
+import {AppModule} from './app.module';
 import {LoggingInterceptor} from "./interceptors/logging.interceptor";
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {AllExceptionsFilter} from "./filters/all-exceptions";
 import {TypeormStore} from "typeorm-store";
-import passport, { session } from "passport";
+import passport from "passport";
 import {SessionService} from "./session/session.service";
+import session from 'express-session';
+
+config({path: '.env'});
 
 
 async function bootstrap() {
@@ -23,8 +25,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api', app, document);
     app.use(
-        passport.session({
-            // @ts-ignore
+        session({
             cookie: {
                 path: "/",
                 httpOnly: true,
@@ -43,6 +44,7 @@ async function bootstrap() {
     );
 
     app.use(passport.initialize());
+    app.use(passport.session());
 
     await app.listen(process.env.HTTP_PORT);
 }

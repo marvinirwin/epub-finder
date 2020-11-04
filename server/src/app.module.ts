@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersService } from './user/users.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {JsonCache} from "./entities/JsonCache";
+import {Session} from "./entities/Session";
 
 @Module({
     imports: [
@@ -32,7 +33,7 @@ import {JsonCache} from "./entities/JsonCache";
             serveRoot: '/video/',
         }),
         AuthModule,
-        TypeOrmModule.forFeature([JsonCache])
+        TypeOrmModule.forFeature([JsonCache, Session])
     ],
     providers: [
         SessionService,

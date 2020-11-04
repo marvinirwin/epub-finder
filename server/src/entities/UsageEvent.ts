@@ -17,6 +17,8 @@ export class UsageEvent {
     public description: KeyValue = {};
     @Column("int")
     public cost: number;
+
+    @Column({default: null})
     @ManyToOne(() => User, user => user.id)
-    public userId: number;
+    public userId: number | undefined;
 }
