@@ -100,7 +100,7 @@ export class MyAppDatabase extends Dexie {
         return this.settingsListeners[settingName];
     }
     get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
-        return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {})
+        return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {'generals.html': true})
     }
 
     get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {

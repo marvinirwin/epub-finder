@@ -36,7 +36,7 @@ import {QuizCharacter} from "./Manager/QuizCharacter";
 import {ds_Dict, ds_Tree} from "./Util/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
-import {AuthenticationMonitor} from "./Manager/AuthenticationMonitor";
+import {AuthManager} from "./Manager/AuthManager";
 import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
@@ -80,7 +80,7 @@ export class Manager {
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
     public quizCharacterManager: QuizCharacter;
-    public authenticationMonitor = new AuthenticationMonitor();
+    public authManager = new AuthManager();
     public highlighter: Highlighter;
     public highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);

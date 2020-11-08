@@ -29,8 +29,8 @@ import {Session} from "./entities/Session";
         UsersModule,
         UsersHttpModule,
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'public/video'),
-            serveRoot: '/video/',
+            rootPath: 'public',
+            serveRoot: '/',
         }),
         AuthModule,
         TypeOrmModule.forFeature([JsonCache, Session])

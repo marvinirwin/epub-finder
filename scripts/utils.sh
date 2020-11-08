@@ -14,25 +14,68 @@ symlink-env() {
   ln -f .env server/.env
 }
 
-build-mandarin-trainer() {
-  # Clear the folder we're copying
-  rm -r dist;
+npm_version() {
+  node --eval="process.stdout.write(require('./package.json').version)";
+}
 
+
+deploy_language_trainer() {
+
+  local SSH_USER=root;
+  local SSH_HOST=marvinirwin.com;
+
+  local OPTIND o BUILD_CLIENT BUILD_SERVER;
+
+  while getopts ":cs:" o; do
+      case "${o}" in
+          s)
+              BUILD_CLIENT="${OPTARG:-1}"
+              ;;
+          c)
+              BUILD_CLIENT="${OPTARG:-1}"
+              ;;
+          *)
+            ;;
+      esac
+  done
+  shift $((OPTIND-1))
   # Build the server
-  pushd server;
-  npm run build;
-  popd;
-  mv server/dist dist;
+  pushd server || exit;
+  local SERVER_VERSION=$(npm_version);
+  [ -n "$BUILD_SERVER" ] && npm run build;
+  popd || exit;
   # Build the reader
-  pushd reader;
-  npm run build;
-  popd;
-  mv reader/build dist/public/reader;
+  pushd reader || exit;
+  local READER_VERSION=$(npm_version);
+  [ -n "$BUILD_CLIENT" ] && npm run build;
+  popd || exit;
 
-  mkdir dist/wav_cache; # Make the wav_cache
-  confirm-env-keys > dist/.env # Make the .env
+  cp -rf reader/build/* server/public;
+  pushd server || exit;
 
-  scp -r dist root@marvinirwin.com:/mandarin-trainer;
+  local FOLDER="/language-trainer-$READER_VERSION-$SERVER_VERSION";
+  local DEST="$SSH_USER@$SSH_HOST:$FOLDER";
+
+  rsync -a dist/ "$DEST";
+  rsync -a cache/ "$DEST/cache";
+  rsync -a public/ "$DEST/public";
+  rsync -a package.json "$DEST/package.json"
+
+  popd || exit;
+  ssh -t "$SSH_USER@$SSH_HOST" "
+  rm public/video;
+  if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
+    tmux attach -t \"language-trainer\";
+  else
+    tmux new-session -s \"language-trainer\";
+  fi
+  cd $FOLDER;
+  rm -rf video;
+  ln -s /video video;
+  npm install;
+  ln -s /.language-trainer-env .env;
+  node main.js
+  ";
 }
 
 

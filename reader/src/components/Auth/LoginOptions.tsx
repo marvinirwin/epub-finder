@@ -1,7 +1,10 @@
 import {Paper, TextField, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction} from "@material-ui/core";
 import React from "react";
+import {useObservableState} from "observable-hooks";
+import {Manager} from "../../lib/Manager";
 
-export const LoginOptions: React.FunctionComponent<any> = () => {
+export const LoginOptions: React.FunctionComponent<any> = ({m}: {m: Manager}) => {
+    const authOptions = useObservableState(m.authManager.authOptions$, []);
     return <Paper>
         <TextField
             id="email"
@@ -16,19 +19,22 @@ export const LoginOptions: React.FunctionComponent<any> = () => {
             autoComplete="current-password"
         />
         <List dense>
-            {['twitter', 'github', 'google'].map((strategy) => {
-                const labelId = `checkbox-list-secondary-label-${strategy}`;
+            {authOptions.map(({ label }) => {
+                const labelId = `checkbox-list-secondary-label-${label}`;
                 return (
-                    <ListItem key={strategy} button
-                              onClick={() => window.location = `${process.env.BASE_URL}/auth/${strategy}`}
+                    <ListItem key={label} button
+                              onClick={() => {
+                                  // @ts-ignore
+                                  return window.location = `${process.env.BASE_URL}/auth/${label}`;
+                              }}
                     >
                         <ListItemAvatar>
                             <Avatar
-                                alt={`Avatar n°${strategy + 1}`}
-                                src={`/static/images/avatar/${strategy + 1}.jpg`}
+                                alt={`Login Label Image`}
+                                src={`/static/images//${label}.jpg`}
                             />
                         </ListItemAvatar>
-                        <ListItemText id={labelId} primary={`Line item ${strategy + 1}`} />
+                        <ListItemText id={labelId} primary={`Line item ${label + 1}`} />
                     </ListItem>
                 );
             })}

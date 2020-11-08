@@ -38,8 +38,15 @@ export class User {
     }
 }
 
-export class AuthenticationMonitor {
+interface AuthOption {
+    url: string;
+    icon: string;
+    label: string;
+}
+
+export class AuthManager {
     user$ = new ReplaySubject<User>(1);
+    authOptions$ = new ReplaySubject<AuthOption[]>(1);
 
     constructor() {
         this.fetchProfileData();
@@ -53,6 +60,17 @@ export class AuthenticationMonitor {
     }
 
     private fetchProfileData() {
+        (async () => {
+            try {
+                const user = await User.FetchUserInfo();
+                this.user$.next(user);
+            } catch (e) {
+                console.warn(e);
+            }
+        })();
+    }
+
+    private fetchAuthOptions() {
         (async () => {
             try {
                 const user = await User.FetchUserInfo();

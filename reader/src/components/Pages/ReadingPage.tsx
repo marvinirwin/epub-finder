@@ -32,7 +32,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const editingCard = useObservableState(m.editingCardManager.editingCard$);
     const showEditingCard = useObservableState<boolean>(m.editingCardManager.showEditingCardPopup$);
     const highlightedPinyin = useObservableState(m.highlightedPinyin$);
-    const user = useObservableState(m.authenticationMonitor.user$);
+    const user = useObservableState(m.authManager.user$);
     const classes = useStyles();
     return <Paper className={classes.popup}>
         {
