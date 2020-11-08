@@ -1,11 +1,9 @@
 import {Manager} from "../../lib/Manager";
 import React, {useContext} from "react";
-import {debounceTime, map, scan} from "rxjs/operators";
-import {useObservable, useObservableState} from "observable-hooks";
-import {flatten, uniq, orderBy} from "lodash";
+import { useObservableState} from "observable-hooks";
+import {orderBy} from "lodash";
 import {HotkeyContext} from "../Main";
 import {TextField} from "@material-ui/core";
-import {Hotkeys} from "../../lib/HotKeyEvents";
 
 export function SettingsPage({m}: { m: Manager }) {
     const bookWordDatas = useObservableState(m.openedBooks.checkedOutBooksData$, []);

@@ -7,8 +7,9 @@ export type IFrameRenderHandler = (head: HTMLTitleElement, body: HTMLDivElement)
 export const InnerHTMLIFrame: React.FunctionComponent<{
     headText: string,
     bodyText: string,
-    renderHandler: IFrameRenderHandler
-}> = ({headText, bodyText, renderHandler}) => {
+    renderHandler: IFrameRenderHandler,
+    title: string
+}> = ({headText, bodyText, renderHandler, title}) => {
     const [headRef, setHeadRef] = useState<HTMLTitleElement | null>();
     const [bodyRef, setBodyRef] = useState<HTMLDivElement | null>();
     useEffect(() => {
@@ -16,7 +17,7 @@ export const InnerHTMLIFrame: React.FunctionComponent<{
             renderHandler(headRef, bodyRef);
         }
     }, [headText, bodyText, headRef, bodyRef]);
-    return <Iframe >
+    return <Iframe title={title}>
         <Fragment>
             <title ref={setHeadRef}>Ref</title>
             <style>{BodyStyle}</style>

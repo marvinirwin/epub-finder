@@ -1,8 +1,6 @@
 import {uniq, flatten} from "lodash";
 import {ITrie} from "../Interfaces/Trie";
 import axios from "axios";
-import {ITrendLocation} from "../Interfaces/ITrendLocation";
-import {ITrend} from "../Interfaces/ITwitterTrend";
 
 export function getNewICardForWord(word: string, deck: string ='') {
     return {
@@ -24,14 +22,6 @@ export function getUniqueLengths(t: ITrie): number[] {
     return uniq(words.map(w => w.length));
 }
 
-export async function fetchTranslation<A>(learningText: A) {
-    const result = await axios.post(`${process.env.PUBLIC_URL}/translate`, {
-        from: 'zh-CN',
-        to: 'en',
-        text: learningText
-    })
-    return result?.data?.translation || '';
-}
 
 /**
  * Changed this to split on linebreak because I'm lazy for now

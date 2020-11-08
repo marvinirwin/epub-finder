@@ -1,8 +1,8 @@
 import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
-import React, {Fragment, ReactNode} from "react";
-import {Paper, Button, Input, TextField, ListItemIcon, IconButton} from "@material-ui/core";
-import {flattenTreeIntoDict, isCustomDocument, isWebsite, Named} from "../../lib/Manager/OpenBooks";
+import React from "react";
+import {Paper, Button,  TextField,  IconButton} from "@material-ui/core";
+import { isCustomDocument, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -11,14 +11,10 @@ import {ds_Dict} from "../../lib/Util/DeltaScanner";
 import {OpenBook} from "../../lib/BookFrame/OpenBook";
 import {CustomDocument, Website} from "../../lib/Website/Website";
 import DeleteIcon from '@material-ui/icons/Delete';
+import {NamedObjectList} from "../../lib/Interfaces/named-object-list.interface";
 
 
-export interface NamedObjectParams<T extends Named> {
-    listObjects: T[] | ds_Dict<T>;
-    onSelect: (v: T) => void;
-    onDelete?: (v: T) => void;
-}
-export const BookList = <T extends Named>({listObjects, onSelect, onDelete}: NamedObjectParams<T>) => {
+export const BookList = <T extends Named>({listObjects, onSelect, onDelete}: NamedObjectList<T>) => {
     return <List dense={true}>
         {
             Object.values(listObjects).map(libraryBook => {
@@ -38,7 +34,6 @@ export const BookList = <T extends Named>({listObjects, onSelect, onDelete}: Nam
         }
     </List>;
 }
-
 
 export function LibraryPage({m}: { m: Manager }) {
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};

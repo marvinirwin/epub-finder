@@ -4,16 +4,10 @@ import {flatMap, map, mapTo, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
-import {AudioManager} from "../Manager/AudioManager";
 import CardManager from "../Manager/CardManager";
-import {fetchTranslation} from "../Util/Util";
+import {fetchTranslation} from "../../services/translate.service";
 
 
-interface IDefinition {
-    traditional: string;
-    simplified: string;
-    pinyin: string;
-}
 
 export const lookupPinyin: (s: string) => string[] = memoize(s => flatten(pinyin(s)))
 

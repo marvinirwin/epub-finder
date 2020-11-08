@@ -15,6 +15,7 @@ const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 const LEARNING_CARDS_LIMIT = 20;
 
+/*
 function shuffle<T>(array: T[]): T[] {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -33,6 +34,7 @@ function shuffle<T>(array: T[]): T[] {
 
     return array;
 }
+*/
 
 interface ScheduleManagerParams {
     wordCounts$: Observable<ds_Dict<BookWordCount[]>>,

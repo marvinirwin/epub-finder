@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {Manager} from "../../lib/Manager";
-import axios from 'axios';
 import Dialog from "@material-ui/core/Dialog";
 import CloseIcon from '@material-ui/icons/Close';
 import {
@@ -8,7 +7,7 @@ import {
     createStyles,
     fade,
     GridList,
-    GridListTile, IconButton, InputBase,
+    GridListTile, IconButton,
     Slide, TextField, Theme, Toolbar, Typography
 } from "@material-ui/core";
 import {TransitionProps} from "@material-ui/core/transitions";
@@ -16,11 +15,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import SearchIcon from '@material-ui/icons/Search';
 import {debounce} from 'lodash';
 import {useObservableState} from "observable-hooks";
-import {search} from "../../../../server/src/types/fbgraph";
+import {getImages} from "../../services/image-search.service";
 
-export const getImages = (term: string) => {
-    return axios.post(`${process.env.PUBLIC_URL}/image-search`, {term})
-}
 
 export interface ImageResult {
     contentUrl: string;

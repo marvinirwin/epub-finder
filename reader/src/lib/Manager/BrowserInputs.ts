@@ -1,16 +1,10 @@
-import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {fetchTranslation} from "../Util/Util";
 import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {Hotkeys} from "../HotKeyEvents";
-
-
-export interface BrowserInputsConfig {
-
-}
 
 
 export enum HotkeyModes {

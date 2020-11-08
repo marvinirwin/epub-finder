@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
-import {map, pluck, shareReplay} from "rxjs/operators";
+import {map,  shareReplay} from "rxjs/operators";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";

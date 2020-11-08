@@ -7,8 +7,8 @@ import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
-import {fetchTranslation} from "../Util/Util";
 import {ReplaySubject} from "rxjs";
+import {fetchTranslation} from "../../services/translate.service";
 
 export class AtomizedSentence {
     private _translation: string | undefined;

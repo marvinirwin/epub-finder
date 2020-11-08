@@ -1,13 +1,12 @@
 import './declaration.d';
 import "fontsource-noto-sans"
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-import {Manager} from "./lib/Manager";
 
 window.addEventListener("unhandledrejection", event => {
     console.warn(`UNHANDLED PROMISE REJECTION: ${event.reason}`);

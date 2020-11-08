@@ -1,13 +1,13 @@
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useRef, useState} from "react";
-import {Card, CardContent, Paper, Typography} from "@material-ui/core";
+import React, {useState} from "react";
+import {Paper, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import RecordingCircle from "./RecordingCircle";
 import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 import {switchMap} from "rxjs/operators";
-import {fetchTranslation} from "../../lib/Util/Util";
+import {fetchTranslation} from "../../services/translate.service";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {

@@ -1,6 +1,5 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {ICard} from "../Interfaces/ICard";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {QuizResult} from "../Manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";

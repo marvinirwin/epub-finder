@@ -15,7 +15,6 @@ import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../HotkeyWrapper";
 import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
-import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -69,8 +68,6 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     const cardIndex = useObservableState(m.scheduleManager.indexedScheduleRows$);
     const scheduleRow = (cardIndex && characters) ? cardIndex[characters] : undefined;
     const score = scheduleRow ? wordRecognitionScore(scheduleRow) : undefined;
-
-    const hotkeyMap = useObservableState(m.db.hotkeys$, {});
 
     return <Card className={`${className || ''} ${classes.root}`}>
             <CardContent ref={setReferenceElement}>

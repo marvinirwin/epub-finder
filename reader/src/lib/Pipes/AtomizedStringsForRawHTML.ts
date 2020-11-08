@@ -1,7 +1,6 @@
 import {Observable} from "rxjs";
 import {map, switchMap} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {DOMParser} from 'xmldom';
 import {jestDetected} from "../Util/Util";
 import {AtomizeSrcDoc} from "../Workers/WorkerHelpers";
 

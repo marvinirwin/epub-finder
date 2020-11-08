@@ -165,7 +165,10 @@ export class Manager {
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
-        this.progressManager = new ProgressManager();
+        this.progressManager = new ProgressManager({
+            wordRecognitionRows$: this.scheduleManager.wordRecognitionRecords$,
+            scheduleRows$: this.scheduleManager.indexedScheduleRows$
+        });
         this.quizManager = new QuizManager({
                 scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
                     map(rows => rows.map(row => row.word)),

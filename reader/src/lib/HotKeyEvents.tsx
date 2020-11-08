@@ -1,11 +1,7 @@
 import {Manager} from "./Manager";
 import {of, Subject} from "rxjs";
-import {startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {RecordRequest} from "./Interfaces/RecordRequest";
-import {promptingRecordingRecordingFailed, promptingRecordingRecordingSuccess} from "../components/Quiz/Characters";
+import { switchMap, withLatestFrom} from "rxjs/operators";
 import {RecognitionMap} from "./Scheduling/SRM";
-import {useSubscription} from "observable-hooks";
-import {filterTextInputEvents} from "./Manager/BrowserInputs";
 
 export interface Hotkeys<T> {
     OPEN_IMAGE_SEARCH: T,

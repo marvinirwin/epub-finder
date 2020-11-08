@@ -2,7 +2,7 @@
 // @ts-ignore
 import {Card} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {QuizCardProps} from "./Popup";
 import {quizStyles} from "./QuizStyles";
 import QuizStatsHeader from "./QuizStatsHeaders";
@@ -10,8 +10,6 @@ import {take} from "rxjs/operators";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 import {HotkeyWrapper} from "../HotkeyWrapper";
 import {useObservableState, useSubscription} from "observable-hooks";
-import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
-import {Manager} from "../../lib/Manager";
 
 export const promptingRecordingRecordingFailed = 'prompting-recording recording-failed';
 export const promptingRecordingRecordingSuccess = 'prompting-recording recording-success';
@@ -109,10 +107,5 @@ export function Characters({c, m}: QuizCardProps) {
             </div>
             {c?.photos[0] && <img src={c?.photos[0]} style={{height: '100%', width: 'auto'}}/>}
         </div>
-{/*
-        <div style={{width: '25%'}}>
-            <Button onClick={advance}>Next</Button>
-        </div>
-*/}
     </Card>
 }

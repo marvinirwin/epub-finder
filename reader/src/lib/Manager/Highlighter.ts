@@ -19,7 +19,7 @@ function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => Time
     };
 }
 
-const CORRECT_RECOGNITION_SCORE = 2;
+export const CORRECT_RECOGNITION_SCORE = 2;
 
 /**
  * TODO probably execute all these things in a try since elements may disappear

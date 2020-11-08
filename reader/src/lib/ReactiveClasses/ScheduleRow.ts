@@ -1,6 +1,6 @@
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
-import {orderBy, sumBy, sum} from "lodash";
+import {orderBy, sumBy} from "lodash";
 import moment from "moment";
 
 export function wordCount(s: ScheduleRow) {

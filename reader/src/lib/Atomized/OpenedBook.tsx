@@ -12,7 +12,7 @@ import {safePush} from "../../test/Util/GetGraphJson";
 
 export const OpenedBook: React.FunctionComponent<{openedBook: OpenBook}> = ({openedBook}) => {
     const bookStats = useObservableState<AtomizedDocumentStats>(openedBook.bookStats$)
-    return <InnerHTMLIFrame bodyText={bookStats?.body || ''} headText={bookStats?.head || ''}
+    return <InnerHTMLIFrame title={openedBook.name} bodyText={bookStats?.body || ''} headText={bookStats?.head || ''}
                             renderHandler={(head, body) =>
                                 // @ts-ignore
         openedBook.handleHTMLHasBeenRendered(head, body)}

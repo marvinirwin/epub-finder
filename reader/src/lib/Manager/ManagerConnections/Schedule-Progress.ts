@@ -6,6 +6,7 @@ import {ScheduleRow} from "../../ReactiveClasses/ScheduleRow";
 import {Dictionary} from "lodash";
 
 export function ScheduleProgress(s: ScheduleManager, p: ProgressManager) {
+/*
     let hsk1 = HSK1 as Array<HSKWord>;
     p.hsk1 = new HSKLevel(
         hsk1.map(w => w.hanzi),
@@ -18,4 +19,5 @@ export function ScheduleProgress(s: ScheduleManager, p: ProgressManager) {
             )
         )
     );
+*/
 }
