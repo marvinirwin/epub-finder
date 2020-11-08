@@ -10,6 +10,10 @@ const {Translate} = require("@google-cloud/translate").v2;
 export const projectId = "mandarin-trainer";
 export const translate = new Translate({projectId});
 
+import debug from 'debug'
+const d = debug('service:translate');
+
+
 @Injectable()
 export class TranslateService {
     constructor(
@@ -26,10 +30,11 @@ export class TranslateService {
     private readonly _service = "GOOGLE_TRANSLATIONS";
 
     async lookupCacheEntry(translateRequestDto: TranslateRequestDto): Promise<TranslateResponseDto | undefined> {
-        const conditions = {
+        const conditions: Partial<JsonCache> = {
             service: this._service,
             key_hash: sha1([translateRequestDto])
         };
+        d(conditions);
         const cacheEntry = await this.jsonCacheRepository.findOne(conditions);
         if (cacheEntry) {
             // Kind of inefficient, since it will probably be stringified again
@@ -38,15 +43,17 @@ export class TranslateService {
     }
 
     insertCacheEntry(translateRequestDto: TranslateRequestDto, translateResponseDto: TranslateResponseDto) {
+        const cacheEntry: Partial<JsonCache> = {
+            service: this._service,
+            key_hash: sha1([translateRequestDto]),
+            key: JSON.stringify([translateRequestDto]),
+            value: JSON.stringify(translateResponseDto)
+        };
+        d(cacheEntry);
         this.jsonCacheRepository.save(
             Object.assign(
                 new JsonCache(),
-                {
-                    service: this._service,
-                    key_hash: sha1([translateRequestDto]),
-                    key: JSON.stringify([translateRequestDto]),
-                    value: JSON.stringify(translateResponseDto)
-                }
+                cacheEntry
             )
         )
     }

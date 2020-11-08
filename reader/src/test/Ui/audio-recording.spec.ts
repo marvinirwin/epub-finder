@@ -8,7 +8,7 @@ import {convertGraphToOrderables} from "../Util/ConvertGraphToOrderables";
 
 
 // Can I have multiple instances of this, or can I get away with this here?
-const testScheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
+// const testScheduler = new MyTestScheduler(MyTestScheduler.orderingCompareFn);
 
 it('Can fulfill an Audio Recording request ', async () => {
     Run(({
@@ -73,6 +73,7 @@ it("Starts recording Audio when an editing card is selected", async () => {
         const recordRequest = new RecordRequest('test');
         const recordRequests$ = hot('a', {a: recordRequest});
         recordRequests$.subscribe(recordRequest$);
+/*
         scheduler.expectOrdering([
             ord(recordRequests$),
             ord(isRecording$)
@@ -80,5 +81,6 @@ it("Starts recording Audio when an editing card is selected", async () => {
             mv('a', {a: RecordRequest}),
             mv('-bc', {values: {b: true, c: false}}),
         ]);
+*/
     })
 });

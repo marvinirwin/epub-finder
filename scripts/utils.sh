@@ -56,24 +56,23 @@ deploy_language_trainer() {
   local FOLDER="/language-trainer-$READER_VERSION-$SERVER_VERSION";
   local DEST="$SSH_USER@$SSH_HOST:$FOLDER";
 
-  rsync -a dist/ "$DEST";
-  rsync -a cache/ "$DEST/cache";
-  rsync -a public/ "$DEST/public";
-  rsync -a package.json "$DEST/package.json"
+  rsync -va dist/ "$DEST";
+  rsync -va cache/ "$DEST/cache";
+  rsync -va public/ "$DEST/public";
+  rsync -va package.json "$DEST/package.json"
 
   popd || exit;
   ssh -t "$SSH_USER@$SSH_HOST" "
-  rm public/video;
   if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
     tmux attach -t \"language-trainer\";
   else
     tmux new-session -s \"language-trainer\";
   fi
   cd $FOLDER;
-  rm -rf video;
-  ln -s /video video;
+  rm -rf public/video;
+  ln -s /video public/video;
   npm install;
-  ln -s /.language-trainer-env .env;
+  ln -s /.language-trainer.env .env;
   node main.js
   ";
 }

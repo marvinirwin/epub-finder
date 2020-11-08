@@ -24,5 +24,6 @@ export const DatabaseModule = TypeOrmModule.forRoot({
         migrationsDir: 'src/db/migrations',
         entitiesDir: 'src/db/entities',
     },
-    synchronize: true
+    synchronize: true,
+    logging: !!process.env.TYPEORM_LOGGIN
 });
