@@ -37,7 +37,7 @@ export class EditingCard {
             )
         )
         this.saveInProgress$.next(false);
-        let saveData$ = this.saveDataObservable();
+        const saveData$ = this.saveDataObservable();
 
         saveData$.subscribe(() => {
             this.saveInProgress$.next(true);
@@ -87,7 +87,7 @@ export class EditingCard {
 
         this.pinyin$ = this.learningLanguage$.pipe(map(s => {
             return s.split('').map(char => {
-                let definitions = lookupPinyin(char);
+                const definitions = lookupPinyin(char);
                 if (definitions) return definitions.join('/')
                 return char;
             }).join(' ')

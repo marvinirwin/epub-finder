@@ -31,8 +31,8 @@ function applyTreeDiff<T>(oldTree: ds_Tree<T> | undefined, diffTree: ds_Tree<T> 
     const allChildKeys = uniq(Object.keys(oldTree.children || {}).concat(Object.keys(diffTree.children || {})))
     const newChildren = Object.fromEntries(
         allChildKeys.map(key => {
-                let oldTreeChild = oldTree.children?.[key];
-                let newTreeChild = diffTree.children?.[key];
+                const oldTreeChild = oldTree.children?.[key];
+                const newTreeChild = diffTree.children?.[key];
                 const childNode = applyTreeDiff(oldTreeChild, newTreeChild);
                 return [key, childNode];
             }
@@ -128,7 +128,7 @@ export class DeltaScanner<T, U extends string = string> {
         const derivedTree = new DeltaScanner<T>();
         this.updates$.subscribe(({sourced}) => {
             if (sourced) {
-                let newSubTree = subTreeFunc(sourced);
+                const newSubTree = subTreeFunc(sourced);
                 if (newSubTree) {
                     newSubTree.newTree = true;
                 }
@@ -165,11 +165,11 @@ function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tr
             )
     );
     if (node.hasOwnProperty('value')) {
-        let value = mapFunc(node.value as T);
+        const value = mapFunc(node.value as T);
         return {
             nodeLabel: node.nodeLabel,
             children: newChildren,
-            value: value
+            value
         }
     } else {
         // @ts-ignore
@@ -203,7 +203,7 @@ export function flattenTree<T, U extends string = string>(
 
 export function getElementByKeyPath<T, U extends string = string>(tree: ds_Tree<T, U>, keyPath: U[] = []): T {
     let n: ds_Tree<T> = tree;
-    let i = 0;
+    const i = 0;
     while (i < keyPath.length) {
         if (!n?.children) {
             throw new Error(`Could not follow keypath ${keyPath.join(',')}`)

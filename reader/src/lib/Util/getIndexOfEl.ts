@@ -1,4 +1,5 @@
 export function getIndexOfEl(textNode: Element): number {
-    for (var indexOfMe = 0; (textNode = <Element>textNode.previousSibling); indexOfMe++) ;
+    let indexOfMe = 0;
+    for (indexOfMe = 0; (textNode = (textNode.previousSibling as Element)); indexOfMe++) ;
     return indexOfMe;
 }

@@ -1,7 +1,7 @@
 import {Subject} from "rxjs";
 
 export function LocalStored<V, T extends Subject<V>>(t: T, key: string, defaultValue?: V): T {
-    let text = localStorage.getItem(key);
+    const text = localStorage.getItem(key);
     if (text) {
         t.next(JSON.parse(text))
     } else {

@@ -118,8 +118,8 @@ export class OpenBook {
             map(([originalDoc, ...documentChunks]) => {
                     return Object.fromEntries(
                         documentChunks.map((childDocStr, index) => {
-                            let childName = `${this.name}_${index}`;
-                            let args = AtomizedDocument.fromAtomizedString(childDocStr);
+                            const childName = `${this.name}_${index}`;
+                            const args = AtomizedDocument.fromAtomizedString(childDocStr);
                             const childDoc = of(args)
                             return [
                                 childName,

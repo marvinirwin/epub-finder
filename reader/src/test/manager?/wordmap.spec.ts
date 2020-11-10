@@ -12,5 +12,5 @@ it("Constructs the word element map from a bookIndex", async () => {
         uniq(t.getWords(false).map(v => v.length))
     );
     expect(Object.values(mappings.wordElementsMap)).toHaveLength(1);
-    expect(mappings.wordElementsMap['Test']).toHaveLength(12);
+    expect(mappings.wordElementsMap.Test).toHaveLength(12);
 });

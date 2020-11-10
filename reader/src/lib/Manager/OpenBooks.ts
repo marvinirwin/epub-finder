@@ -130,7 +130,7 @@ export class OpenBooks {
         this.renderedAtomizedSentences$ = this.openedBooks
             .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
                 switchMap(({sourced}) => {
-                    let sources = sourced ? flattenTree(sourced) : [];
+                    const sources = sourced ? flattenTree(sourced) : [];
                     return combineLatest(sources);
                 }),
                 map((atomizedSentenceArrays) =>
@@ -212,7 +212,7 @@ export class OpenBooks {
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
-                    let readingFrames = sourced?.children?.[CHARACTER_BOOK_NODE_LABEL];
+                    const readingFrames = sourced?.children?.[CHARACTER_BOOK_NODE_LABEL];
                     return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [])
                 }),
                 map((v: TextWordData[][]) => {
@@ -221,7 +221,7 @@ export class OpenBooks {
                 shareReplay(1)
             );
 
-        let visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
+        const visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
             this.renderedSentenceTextDataTree$.updates$,
             config.bottomNavigationValue$
         ]).pipe(
@@ -231,10 +231,10 @@ export class OpenBooks {
                 }
                 switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-                        let child = sourced.children[READING_BOOK_NODE_LABEL];
+                        const child = sourced.children[READING_BOOK_NODE_LABEL];
                         return combineLatest(child ? flattenTree(child) : []);
                     case NavigationPages.QUIZ_PAGE:
-                        let child1 = sourced.children[CHARACTER_BOOK_NODE_LABEL];
+                        const child1 = sourced.children[CHARACTER_BOOK_NODE_LABEL];
                         return combineLatest(child1 ? flattenTree(child1) : []);
                     default:
                         return combineLatest([]);
@@ -255,7 +255,7 @@ export class OpenBooks {
             switchMap(sourceBooks => combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))),
             withLatestFrom(this.readingBook$.pipe(startWith(undefined)))
         ).subscribe(([openSourceBooks, readingBook]) => {
-            let openBooks = flatten(openSourceBooks.map(openSourceBookChildren => Object.values(openSourceBookChildren)));
+            const openBooks = flatten(openSourceBooks.map(openSourceBookChildren => Object.values(openSourceBookChildren)));
             if (!readingBook && openBooks.length) {
                 this.readingBook$.next(openBooks[0]);
             }

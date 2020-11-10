@@ -18,7 +18,7 @@ export const BodyStyle = `
     }
     .annotated_and_translated {
         position: relative;
-        
+
     }
     .POPPER_ELEMENT {
         background-color: #333;

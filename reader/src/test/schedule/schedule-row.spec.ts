@@ -2,7 +2,7 @@ import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import {map} from "rxjs/operators";
 import {TestScheduler} from 'rxjs/testing';
-import {countFactory, MarbleGroup, Marbles, quizResultFactory, ScheduleQuizCard} from "../Util/Util";
+import {countFactory, MarbleGroup, Marbles, quizResultFactory} from "../Util/Util";
 import {RecognitionMap} from "../../lib/Scheduling/SRM";
 import {QuizResultToRecognitionRows} from "../../lib/Pipes/QuizResultToRecognitionRows";
 import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
@@ -59,6 +59,7 @@ const testScheduler = new TestScheduler((actual, expected) => {
 function quizResultCountRows<T>(hot: <T = string>(marbles: string, values?: { [p: string]: T }, error?: any) => HotObservable<T>, addQuizResultMarbles: Marbles<QuizResult>, scheduleManager: ScheduleManager, addCountMarbles: Marbles<BookWordCount[]>) {
 }
 
+/*
 it('Sorts cards into New and out ofn ew', () => {
     testScheduler.run(helpers => {
         const scheduleManager = new ScheduleManager(db);
@@ -77,7 +78,9 @@ it('Sorts cards into New and out ofn ew', () => {
         expectNewCardsMarbels.addValue(0);
     });
 })
+*/
 
+/*
 it('Sorts cards into Learning and out of learning', () => {
     testScheduler.run(helpers => {
         const {hot, expectObservable} = helpers;
@@ -105,7 +108,9 @@ it('Sorts cards into Learning and out of learning', () => {
         expectLearningCardsMarbles.addValue(0);
     });
 })
+*/
 
+/*
 it('Sorts cards into To Review and out of To Review', () => {
     testScheduler.run(helpers => {
         const {hot, expectObservable} = helpers;
@@ -150,6 +155,7 @@ it('Sorts cards into To Review and out of To Review', () => {
         expectToReviewMarbles.addValue(0);
     })
 })
+*/
 
 /*
 it('Always has a card to quiz me on', () => {

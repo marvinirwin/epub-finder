@@ -15,11 +15,11 @@ export class AsciiGraph {
     }
 
     private static neighborOffsets(): Neighbor[] {
-        let pipes: Neighbor[] = [[1, 0, /-/],
+        const pipes: Neighbor[] = [[1, 0, /-/],
             [-1, 0, /-/],
             [0, 1, /\|/],
             [0, -1, /\|/]];
-        let endMarkers: Neighbor[] = [
+        const endMarkers: Neighbor[] = [
             [1, 0, />/],
             [-1, 0, /</],
             [0, -1, /^/]];
@@ -127,10 +127,10 @@ export class AsciiGraph {
             s
         );
         neighbors.forEach((neighborPoint) => {
-            let charAtPoint = this.getCharAtPoint(neighborPoint);
+            const charAtPoint = this.getCharAtPoint(neighborPoint);
             if (AsciiGraph.isPartOfNode(charAtPoint as string)) {
                 if (!this.edges[node]) this.edges[node] = [];
-                let items = this.pointMap.get(neighborPoint);
+                const items = this.pointMap.get(neighborPoint);
                 this.edges[node].push(items);
                 return;
             }

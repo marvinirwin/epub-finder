@@ -33,7 +33,7 @@ export class CreatedSentenceManager {
 
     }
     async load() {
-        for await (let sentences of this.db.getCardsFromDB({}, 500)) {
+        for await (const sentences of this.db.getCardsFromDB({}, 500)) {
             this.addPersistedCreatedSentence$.next(sentences);
         }
     }

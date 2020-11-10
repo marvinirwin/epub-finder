@@ -1,4 +1,4 @@
-import {BrowserInputs} from "../BrowserInputs";
+import {BrowserInputs} from "../../Hotkeys/BrowserInputs";
 import {QuizComponent, QuizManager} from "../QuizManager";
 import {filter, withLatestFrom} from "rxjs/operators";
 import {Observable} from "rxjs";

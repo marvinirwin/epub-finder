@@ -8,7 +8,7 @@ export const AtomizedStringsForRawHTML = (rawHTML$: Observable<string>): Observa
     if (jestDetected()) {
         return rawHTML$.pipe(
             map(rawHTML => {
-                let atomizedDocument = AtomizedDocument.atomizeDocument(rawHTML);
+                const atomizedDocument = AtomizedDocument.atomizeDocument(rawHTML);
                 return [
                     atomizedDocument.toString(),
                     ...atomizedDocument.getChunkedDocuments().map(doc => doc.toString())

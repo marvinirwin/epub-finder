@@ -8,9 +8,9 @@ import {QuizCardProps} from "../Quiz/Popup";
 import {SlidingTopWindows} from "./ReadingPage";
 
 const componentMap: { [key: string]: React.FunctionComponent<QuizCardProps> } = {
-    Conclusion: Conclusion,
-    Pictures: Pictures,
-    Characters: Characters
+    Conclusion,
+    Pictures,
+    Characters
 }
 
 export function QuizPage({m}: { m: Manager }) {

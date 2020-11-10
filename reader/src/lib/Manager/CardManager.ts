@@ -18,7 +18,7 @@ export default class CardManager {
 
     static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
-        let presentCards = o[newICard.learningLanguage];
+        const presentCards = o[newICard.learningLanguage];
         if (presentCards) {
             const indexOfDuplicateCard = presentCards.findIndex(detectDuplicateCard);
             if (indexOfDuplicateCard >= 0) {
@@ -79,7 +79,7 @@ export default class CardManager {
 
     async load() {
         this.cardProcessingSignal$.next(true);
-        let unloadedCardCount = await this.db.getCardsInDatabaseCount()
+        const unloadedCardCount = await this.db.getCardsInDatabaseCount()
         if (unloadedCardCount) {
             await this.getCardsFromDB();
 
@@ -90,10 +90,10 @@ export default class CardManager {
     private async getCardsFromDB() {
         const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
-        for await (let cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
+        for await (const cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
             this.addPersistedCards$.next(cards);
         }
-        for await (let cards of this.db.getCardsFromDB({}, 500)) {
+        for await (const cards of this.db.getCardsFromDB({}, 500)) {
             this.addPersistedCards$.next(cards);
         }
     }

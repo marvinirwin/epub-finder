@@ -63,7 +63,7 @@ export class MyAppDatabase extends Dexie {
 
     async* getSentenceRowsFromDB(): AsyncGenerator<CreatedSentence[]>{
         let offset = 0;
-        let chunkSize = 500;
+        const chunkSize = 500;
         while (await this.createdSentences.offset(offset).first()) {
             this.messages$.next(`Querying cards in chunks ${offset}`)
             const chunkedCreatedSentences = await this.createdSentences.offset(offset).limit(chunkSize).toArray();
@@ -74,7 +74,7 @@ export class MyAppDatabase extends Dexie {
 
     async* getRecognitionRowsFromDB(): AsyncGenerator<WordRecognitionRow[]> {
         let offset = 0;
-        let chunkSize = 500;
+        const chunkSize = 500;
         while (await this.recognitionRecords.offset(offset).first()) {
             this.messages$.next(`Querying cards in chunks ${offset}`)
             const chunkedRecognitionRows = await this.recognitionRecords.offset(offset).limit(chunkSize).toArray();
@@ -116,7 +116,7 @@ export class MyAppDatabase extends Dexie {
                 const keyMap = new Map<string[], Subject<void>>();
                 let action: keyof Hotkeys<any>;
                 // @ts-ignore
-                const allActions: Array<keyof Hotkeys<any>> = Object.keys(hotkeyActions);
+                const allActions: (keyof Hotkeys<any>)[] = Object.keys(hotkeyActions);
                 const unsetActions = new Set<keyof Hotkeys<any>>(allActions);
                 for (action in hotkeyConfig) {
                     if (!hotkeyActions[action]) {

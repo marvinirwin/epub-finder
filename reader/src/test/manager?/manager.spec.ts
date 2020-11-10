@@ -61,23 +61,23 @@ it("Loads the manager without error", () => {
                     exampleSentences$: exampleSentences$.obs$,
                     recordRequest$,
                     bottomNavigationValue$,
-                    sourceBookSentenceData$: sourceBookSentenceData$,
+                    sourceBookSentenceData$,
                     addOpenBook$,
                 },
                 CausalTree.init(`
-                                         
+
                                         quizPageWordElements
                                         ^
                                         bottomNavigationValue$.next(QUIZ_PAGE)
                                         ^
                                         readingPageWordElements
-    exampleSentences                    ^          
-    ^                                   queEditingCard$.next(editingCard)        
+    exampleSentences                    ^
+    ^                                   queEditingCard$.next(editingCard)
     |                                   ^
     |                                   highlightedWord$.next(highlightedWord)
     |                                   ^
     readingPageAtomizedSentences---------
-    ^             
+    ^
     addOpenBook$.next(mainPage)
     `,
                     {

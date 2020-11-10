@@ -21,8 +21,8 @@ export interface UnserializedAnkiPackage {
 }
 
 export function UnserializeAnkiPackage(o: SerializedAnkiPackage): UnserializedAnkiPackage {
-    let entries = o.cardIndex ? Object.entries(o.cardIndex) : null;
-    let pairs = entries && entries.map(([k, v]) => [k, v.map(sc => Card.fromSerialized(sc))]);
+    const entries = o.cardIndex ? Object.entries(o.cardIndex) : null;
+    const pairs = entries && entries.map(([k, v]) => [k, v.map(sc => Card.fromSerialized(sc))]);
     const cIndex = o.cardIndex ? fromPairs(pairs) : null;
     return {
         name: o.name,

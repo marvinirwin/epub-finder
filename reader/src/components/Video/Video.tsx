@@ -3,9 +3,9 @@ import React, {useEffect, useRef, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card, IconButton} from "@material-ui/core";
 import {clearInterval} from "timers";
-import {CharacterTimingDisplay} from "./VideoCharacterDisplay";
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import {HotkeyWrapper} from "../HotkeyWrapper";
+import {CharacterTimingDisplay} from "./CharacterTimingDisplay";
 
 function useInterval(callback: () => void, delay: number) {
     const savedCallback = useRef<() => void>();
@@ -22,7 +22,7 @@ function useInterval(callback: () => void, delay: number) {
         }
 
         if (delay !== null) {
-            let id = setInterval(tick, delay);
+            const id = setInterval(tick, delay);
             return () => clearInterval(id);
         }
     }, [delay]);
@@ -110,8 +110,8 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             && currentSentence
             && (currentSentenceCharacterIndex === 0 || currentSentenceCharacterIndex)
             && videoMetaData) {
-            let time = videoMetaData?.characters[currentSentenceCharacterIndex]?.timestamp;
-            let timeScale = videoMetaData?.timeScale;
+            const time = videoMetaData?.characters[currentSentenceCharacterIndex]?.timestamp;
+            const timeScale = videoMetaData?.timeScale;
             if (time && timeScale) {
                 videoElementRef.currentTime = (time * timeScale) / 1000;
             }
@@ -152,8 +152,8 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
 
     function getBoundedPoints(p1: number, p2: number, min: number, max: number) {
         const empty: never[] = [];
-        let newp1 = undefined;
-        let newp2 = undefined;
+        let newp1;
+        let newp2;
         if (p1 > min) {
             if (p1 < max) {
                 newp1 = p1;
@@ -201,7 +201,7 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
             && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
                 const lineStartTime = lineIndex * MILLISECONDS_PER_CHARACTER_LINE;
                 const lineEndTime = lineStartTime + MILLISECONDS_PER_CHARACTER_LINE;
-                let progressBarPosition = undefined;
+                let progressBarPosition;
                 if (videoTime) {
                     const currentChunkIndex = Math.floor(videoTime / MILLISECONDS_PER_CHARACTER_LINE);
                     if (currentChunkIndex === lineIndex) {

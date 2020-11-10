@@ -5,12 +5,8 @@ import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {Hotkeys} from "../HotKeyEvents";
+import {HotkeyModes} from "./HotkeyModes";
 
-
-export enum HotkeyModes {
-    TextInput = "TextInput",
-    Reading = "Reading"
-}
 
 export function isDocument(t: HTMLElement | Document): t is Document {
     return !t.hasOwnProperty('tagName');
@@ -131,9 +127,9 @@ export class BrowserInputs {
             };
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
-            let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            const sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
             sentenceHTMLElement.classList.add('applied-sentence-listener');
-            let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
+            const popperHTMLElement = atomizedSentence.getPopperHTMLElement();
             if (!sentenceHTMLElement || !popperHTMLElement) {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
@@ -167,6 +163,6 @@ export class BrowserInputs {
 }
 
 export const filterTextInputEvents = filter((ev: KeyboardEvent) => {
-    let tagName = (ev.target as HTMLElement).tagName;
+    const tagName = (ev.target as HTMLElement).tagName;
     return !(tagName === 'INPUT' || tagName === "TEXTAREA")
 });

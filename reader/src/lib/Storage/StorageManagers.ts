@@ -5,7 +5,7 @@ export class LocalStorageManager {
     constructor(public localStorageKey: string) {
     }
 
-    getLocalStorageArray(): Array<any> {
+    getLocalStorageArray(): any[] {
 
         const a = this.tryParseLocalstorage();
         if (!Array.isArray(a)) {
@@ -76,8 +76,8 @@ export class IndexDBManager<T> {
                 const recordsWithAssignedIds = [];
                 for (let i = 0; i < recordsToPut.length; i++) {
                     // WHat's the difference between put and add
-                    let recordToInsert = recordsToPut[i];
-                    let id = this.getId(recordToInsert);
+                    const recordToInsert = recordsToPut[i];
+                    const id = this.getId(recordToInsert);
                     let newId;
                     if (id) {
                         newId = await this.table.put(recordToInsert, id);
@@ -100,7 +100,7 @@ export class IndexDBManager<T> {
     delete(isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>) {
         return this.db.transaction('rw', this.table, async () => {
             const presentRecords = await isMeWhere(this.table);
-            let keys: number[] = [];
+            const keys: number[] = [];
             presentRecords.map(this.getId).forEach(n => (n !== undefined) && keys.push(n));
             await this.table.bulkDelete(keys)
         })

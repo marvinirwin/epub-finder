@@ -24,9 +24,9 @@ function expectAndPush(
 }
 
 it("Schedules things correctly", async () => {
-    let now = new Date();
-    let tomorrow = moment(now).add(1, 'day');
-    let twoDaysNext = moment(now).add(2, 'day');
+    const now = new Date();
+    const tomorrow = moment(now).add(1, 'day');
+    const twoDaysNext = moment(now).add(2, 'day');
 
     const rows = [r1];
 

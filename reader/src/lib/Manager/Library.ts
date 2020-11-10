@@ -90,7 +90,7 @@ export class Library {
         })
     }
 
-    appendCustomDocuments(customDocuments: Array<CustomDocument>) {
+    appendCustomDocuments(customDocuments: CustomDocument[]) {
         this.customBooks$.appendDelta$.next({
             nodeLabel: "root",
             children: Object.fromEntries(

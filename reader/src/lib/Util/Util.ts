@@ -8,7 +8,7 @@ export function getNewICardForWord(word: string, deck: string ='') {
         photos: [],
         sounds: [],
         knownLanguage: [],
-        deck: deck,
+        deck,
         fields: [],
         illustrationPhotos: [],
         timestamp: new Date()

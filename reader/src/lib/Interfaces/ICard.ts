@@ -16,11 +16,11 @@ export async function resolveMediaSources(audio: (HTMLAudioElement | HTMLImageEl
     const sources = [];
     for (let i = 0; i < audio.length; i++) {
         const mediaTag = audio[i];
-        let attribute = mediaTag.getAttribute('src');
+        const attribute = mediaTag.getAttribute('src');
         if (!attribute) {
             throw new Error('image no source');
         }
-        let src = await resolveMediaSrc(attribute || '');
+        const src = await resolveMediaSrc(attribute || '');
         mediaTag.setAttribute('src', src);
         sources.push(src)
     }
@@ -40,7 +40,7 @@ export async function GetICard(
         photos: [],
         sounds: [],
         knownLanguage: [],
-        deck: deck,
+        deck,
         fields: [],
         illustrationPhotos: [],
         timestamp: Number.MIN_SAFE_INTEGER // Notes imported have the lowest timestamp because they're meant to be over-written
@@ -53,10 +53,10 @@ export async function GetICard(
             field = `<audio src="${(groups || [])[1]}"/>` // I dont know if this will work
         }
 
-        let parser = new DOMParser(
+        const parser = new DOMParser(
             {
                 errorHandler: {
-                    warning: function () {
+                    warning () {
                     }
                 },
             }
@@ -72,7 +72,7 @@ export async function GetICard(
         c.sounds.push(...audioSources);
         // For this current package, the photos will always be illustrationPhotos
         c.illustrationPhotos.push(...imageSources);
-        let innerHTML = new XMLSerializer().serializeToString(document);
+        const innerHTML = new XMLSerializer().serializeToString(document);
         if (!innerHTML || innerHTML === '??') {
             throw new Error("No innerHTML")
         }

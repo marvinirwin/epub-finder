@@ -132,7 +132,6 @@
     display: block;
 }
 
-
 .recognized-text {
     height: fit-content;
     overflow: hidden;
@@ -207,11 +206,11 @@
     overflow: auto;
     height: 40vh;
     bottom: 10vh;
-}
 
-.library:hover {
-    transform: translateX(-10vw);
-    cursor: pointer;
+    &:hover {
+        transform: translateX(-10vw);
+        cursor: pointer;
+    }
 }
 
 #video {
@@ -226,21 +225,20 @@
     display: flex;
     flex-flow: column nowrap;
     background-color: white;
-}
 
-#video > video {
-    flex-grow: 1;
-    /*
-    max-width: 533px;
-    max-height: 300px;
-    */
-    /* This overflow auto line somehow makes the */
-    overflow: auto;
-}
+    & > video {
+        flex-grow: 1;
+        /*
+        max-width: 533px;
+        max-height: 300px;
+        */
+        /* This overflow auto line somehow makes the */
+        overflow: auto;
+    }
 
-
-#video:hover {
-    cursor: pointer;
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 *:focus {
@@ -299,19 +297,21 @@
 .hotkey-config {
     display: flex;
     flex-flow: row wrap;
+
+    & > div {
+        margin: 24px;
+    }
 }
 
-.hotkey-config > div {
-    margin: 24px;
-}
 .bottom-nav {
     max-height: 10vh;
     min-height: 10vh;
     bottom: 0;
     display: flex;
     flex-flow: row nowrap;
+
+    & > .progress {
+        flex-grow: 1;
+    }
 }
 
-.bottom-nav > .progress {
-    flex-grow: 1;
-}

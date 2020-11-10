@@ -14,8 +14,8 @@ export const QuizResultToRecognitionRows =
             obs$.pipe(
                 withLatestFrom(scheduleRows$),
                 map(([scorePair, wordScheduleRowDict]) => {
-                    let previousRecords = wordScheduleRowDict[scorePair.word]?.wordRecognitionRecords || []
-                    let nextRecognitionRecord = ms.getNextRecognitionRecord(
+                    const previousRecords = wordScheduleRowDict[scorePair.word]?.wordRecognitionRecords || []
+                    const nextRecognitionRecord = ms.getNextRecognitionRecord(
                         previousRecords,
                         scorePair.score,
                         new Date()

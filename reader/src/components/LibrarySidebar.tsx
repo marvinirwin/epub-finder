@@ -27,7 +27,7 @@ export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => 
                 Object.values(library || {}).map(libraryBook => {
                     return <ListItem
                         key={libraryBook.name}
-                        className={'library-book'} 
+                        className={'library-book'}
                         button>
                         <ListItemText primary={libraryBook.name}
                                       onClick={() => m.openedBooks.readingBook$.next(libraryBook)}/>

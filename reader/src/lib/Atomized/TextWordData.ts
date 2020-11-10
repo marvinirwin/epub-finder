@@ -15,10 +15,10 @@ export interface BookWordData extends TextWordData {
 
 export function mergeSentenceInfo<T extends (BookWordData | TextWordData)>(...sentenceInfos: T[]): T {
     // @ts-ignore
-    let aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, bookWordCounts: {}};
+    const aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, bookWordCounts: {}};
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
-        for (let key in dict) {
+        for (const key in dict) {
             if (aggregateDict[key]) {
                 aggregateDict[key].push(...dict[key]);
             } else {

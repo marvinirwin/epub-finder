@@ -21,8 +21,8 @@ export function convertGraphToOrderables(
 
     if (next) {
         const [_, observableLabel, valueBeingEmittedLabel] = next;
-        let observable = safeGet(valueMap, observableLabel);
-        let valueBeingEmitted = safeGet(valueMap, valueBeingEmittedLabel, valueBeingEmittedLabel);
+        const observable = safeGet(valueMap, observableLabel);
+        const valueBeingEmitted = safeGet(valueMap, valueBeingEmittedLabel, valueBeingEmittedLabel);
         return {
             value: observable,
             next: valueBeingEmitted,

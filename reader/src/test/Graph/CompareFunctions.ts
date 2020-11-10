@@ -19,7 +19,7 @@ export function isSubObject(superObject: any, subObject: any, ignoreKeys = new S
 
 export function OrderingCompareFn(actualRoots: CausallyOrderable[], expectedRoots: CausallyOrderable[]) {
     expect(actualRoots.length).toBeGreaterThan(0);
-    let actual = expectedRoots
+    const actual = expectedRoots
         .every(expectedRoot => {
                 return actualRoots
                     .find(actualRoot => {
@@ -45,8 +45,8 @@ export function isSubTree(
     ignoreKeys: Set<string>)
     : boolean {
     if (!tree || !subTree) return false;
-    let treeContainsSubTree = treeSubSet(tree, subTree, compareFn);
-    let treeHasChildWhichIsEqual = tree.ancestors.find(ancestor => {
+    const treeContainsSubTree = treeSubSet(tree, subTree, compareFn);
+    const treeHasChildWhichIsEqual = tree.ancestors.find(ancestor => {
         return isSubTree(ancestor, subTree, compareFn, ignoreKeys);
     });
     return treeContainsSubTree ||

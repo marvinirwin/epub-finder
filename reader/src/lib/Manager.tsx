@@ -14,7 +14,7 @@ import {CHARACTER_BOOK_NODE_LABEL, OpenBooks} from "./Manager/OpenBooks";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
-import {BrowserInputs, filterTextInputEvents} from "./Manager/BrowserInputs";
+import {BrowserInputs, filterTextInputEvents} from "./Hotkeys/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
@@ -40,7 +40,7 @@ import {AuthManager} from "./Manager/AuthManager";
 import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
-import {Highlighter} from "./Manager/Highlighter";
+import {Highlighter} from "./Highlighting/Highlighter";
 import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
@@ -213,9 +213,9 @@ export class Manager {
                         const sentenceMatches: ds_Dict<AtomizedSentence> = {};
                         for (let i = 0; i < textWordData.length && count < limit; i++) {
                             const textData = textWordData[i];
-                            let wordSentenceMapElement = textData.wordSentenceMap[quizzingCard.learningLanguage];
+                            const wordSentenceMapElement = textData.wordSentenceMap[quizzingCard.learningLanguage];
                             if (wordSentenceMapElement) {
-                                let translatableText = wordSentenceMapElement[0].translatableText;
+                                const translatableText = wordSentenceMapElement[0].translatableText;
                                 if (!sentenceMatches[translatableText]) {
                                     sentenceMatches[translatableText] = wordSentenceMapElement[0];
                                     count++;
@@ -377,7 +377,7 @@ export class Manager {
                     selection.extend(child, 1);
                 } else {
                     selection?.removeAllRanges();
-                    let range = document.createRange();
+                    const range = document.createRange();
                     range.selectNode(child);
                     selection?.addRange(range);
                 }

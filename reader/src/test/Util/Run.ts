@@ -38,7 +38,7 @@ export function Run(cb: (r: RunArguments) => void) {
         );
 
         cb({
-            manager: manager,
+            manager,
             scheduler,
             helpers
         })

@@ -1,23 +1,23 @@
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {Dictionary} from "lodash";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {ReplaySubject} from "rxjs";
 import {map} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {colorForPercentage} from "../color/Range";
+import {HighlightDelta, HighlighterConfig, HighlightMap} from "./highlight.interface";
+import {HighlighterService} from "./highlighter.service";
 
-function timeWordsMap(timeout: number, numbers: RGBA): (words: string[]) => TimedHighlightDelta {
-    return (words: string[]) => {
+const s = new HighlighterService();
+
+export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
         const m = new Map<string, RGBA>();
         words.forEach(word => m.set(word, numbers))
         return ({
-            timeout: timeout,
+            timeout,
             delta: m
         });
     };
-}
+
 
 export const CORRECT_RECOGNITION_SCORE = 2;
 
@@ -40,7 +40,7 @@ export class Highlighter {
             }
             return m;
         }
-        singleHighlight(
+        s.singleHighlight(
             this.mouseoverHighlightedWords$.pipe(
                 map(wordToMap([160, 160, 160, 0.5]))
             ),
@@ -48,25 +48,25 @@ export class Highlighter {
             config.visibleElements$,
             [0, 'MOUSEOVER_CHARACTER_HIGHLIGHT']
         )
-        singleHighlight(
+        s.singleHighlight(
             this.mouseoverHighlightedSentences$.pipe(map(wordToMap([160, 160, 160, 0.5]))),
             this.highlightMap$,
             config.visibleElements$,
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
-        singleHighlight(
+        s.singleHighlight(
             config.quizWord$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
             this.highlightMap$,
             config.visibleElements$,
             [0, 'QUIZ_WORD_HIGHLIGHT']
         );
-        timedHighlight(
+        s.timedHighlight(
             this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
             this.highlightMap$,
             config.visibleElements$,
             [0, 'DELETED_CARDS_HIGHLIGHT']
         );
-        timedHighlight(
+        s.timedHighlight(
             this.createdCards$.pipe(map(timeWordsMap(500, [255, 215, 0, 0.5]))),
             this.highlightMap$,
             config.visibleElements$,
@@ -88,10 +88,10 @@ export class Highlighter {
             const percentage = clampedDate / fourteenDays * 100;
             return percentage;
         }
-        singleHighlight(
+        s.singleHighlight(
             this.highlightWithDifficulty$.pipe(map(indexedScheduleRows => {
                 const highlights: HighlightDelta = new Map<string, RGBA>();
-                for (let word in indexedScheduleRows) {
+                for (const word in indexedScheduleRows) {
                     const row = indexedScheduleRows[word];
                     if (row.wordRecognitionRecords.length) {
                         let correct = 0;
@@ -118,136 +118,14 @@ export class Highlighter {
     }
 }
 
-interface HighlighterConfig {
-    visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
-    visibleSentences$: Observable<Dictionary<AtomizedSentence[]>>;
-    quizWord$: Observable<string | undefined>;
-}
-
-/**
- * If I am a highlighter and I want something highlighted I submit an object of words and colors to highlight
- */
-export type HighlightDelta = Map<string, RGBA>
-
-export interface TimedHighlightDelta {
-    timeout: number;
-    delta: HighlightDelta;
-}
-
 export type RGBA = [number, number, number, number];
 export type HighlighterPath = [number, string];
-
-function removeHighlightDelta(
-    oldHighlightDelta: HighlightDelta,
-    currentHighlightMap: HighlightMap,
-    [highlightPriority, highlightKey]: HighlighterPath,
-    highlightWordsToUpdate: Set<string>) {
-    oldHighlightDelta.forEach((colors, word) => {
-        currentHighlightMap[word][highlightPriority].delete(highlightKey);
-        highlightWordsToUpdate.add(word);
-    })
-}
-
-function singleHighlight(
-    newHighlightDelta$: Observable<HighlightDelta | undefined>,
-    highlightedWords$: Observable<HighlightMap>,
-    wordElementMap$: Observable<ds_Dict<HasElement[]>>,
-    highlightPath: HighlighterPath,
-) {
-    let oldHighlightDelta: HighlightDelta | undefined;
-    combineLatest([
-        newHighlightDelta$, highlightedWords$, wordElementMap$
-    ]).subscribe(([newHighlightDelta, currentHighlightMap, wordElementMap]) => {
-        const highlightWordsToUpdate = new Set<string>();
-        if (oldHighlightDelta) {
-            /**
-             * For one-at-a-time highlighters delete all previous highlights whenever a new one appears
-             */
-            removeHighlightDelta(oldHighlightDelta, currentHighlightMap, highlightPath, highlightWordsToUpdate);
-        }
-        if (newHighlightDelta) {
-            oldHighlightDelta = newHighlightDelta;
-            addHighlightedDelta(newHighlightDelta, currentHighlightMap, highlightPath, highlightWordsToUpdate);
-        }
-        updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
-    })
-}
-
-function updateHighlightBackgroundColors(
-    highlightWordsToUpdate: Set<string>,
-    wordElementMap: ds_Dict<HasElement[]>,
-    currentHighlightMap: HighlightMap) {
-    // @ts-ignore
-    for (var word of highlightWordsToUpdate) {
-        const elements = wordElementMap[word];
-
-        if (!elements) continue;
-        const highestPriorityColors = currentHighlightMap[word].find(map => map && map.size);
-        const backgroundColor = recomputeColor(
-            highestPriorityColors
-        );
-
-        elements.forEach(element => {
-            // @ts-ignore
-            return element.element.style.backgroundColor = backgroundColor;
-        })
-    }
-}
-
-function addHighlightedDelta(
-    highlightDelta: HighlightDelta,
-    currentHighlightMap: HighlightMap,
-    [ highlightPriority, highlightKey ]: HighlighterPath,
-    highlightWordsToUpdate: Set<string>) {
-    highlightDelta.forEach((rgba, word) => {
-        if (!currentHighlightMap[word]) {
-            currentHighlightMap[word] = [];
-        }
-        if (!currentHighlightMap[word][highlightPriority]) {
-            currentHighlightMap[word][highlightPriority] = new Map();
-        }
-        currentHighlightMap[word][highlightPriority].set(highlightKey, rgba);
-        highlightWordsToUpdate.add(word);
-    })
-}
-
-function timedHighlight(
-    newHighlightDelta$: Observable<TimedHighlightDelta>,
-    highlightedWords$: Observable<HighlightMap>,
-    wordElementMap$: Observable<ds_Dict<HasElement[]>>,
-    highlighterPath: HighlighterPath
-) {
-    combineLatest([
-        newHighlightDelta$,
-        highlightedWords$,
-        wordElementMap$
-    ]).subscribe(([timedHighlightDelta, currentHighlightMap, wordElementMap]) => {
-        const highlightWordsToUpdate = new Set<string>();
-        let o = timedHighlightDelta.delta;
-        addHighlightedDelta(o, currentHighlightMap, highlighterPath, highlightWordsToUpdate);
-        // @ts-ignore
-        updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
-        setTimeout(() => {
-            removeHighlightDelta(timedHighlightDelta.delta, currentHighlightMap, highlighterPath, highlightWordsToUpdate);
-            updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
-        }, timedHighlightDelta.timeout)
-    })
-}
 
 export interface HasElement {
     element: HTMLElement | XMLDocumentNode;
 }
 
-export type HighlightMap = {
-    [key: string]: HighlightedWord[]
-}
-
-/**
- * A highlighted word has a list of Highlighters who have highlighted this word, and the colors they use
- */
-export type HighlightedWord = Map<string, RGBA>
-
-function blendColors(args: RGBA[]) {
+export const blendColors = (args: RGBA[]) => {
     args = args.slice();
     let base = [0, 0, 0, 0];
     let mix;
@@ -284,7 +162,7 @@ function blendColors(args: RGBA[]) {
  * That's too fancy for now
  * @param h
  */
-function recomputeColor(h: HighlightDelta | undefined): string {
+export const recomputeColor = (h: HighlightDelta | undefined): string => {
     if (!h) return `transparent`;
     // @ts-ignore
     const colors = [...h.values()];

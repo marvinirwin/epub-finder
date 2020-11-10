@@ -99,7 +99,7 @@ export class MyTestScheduler extends TestScheduler {
             Object.entries(observables).forEach(([observableLabel, observable], index) => {
             // We're assuming for now that everyone subscribes at the start and never unsubscribes
                 observable.subscribe(x => {
-                    let items = {
+                    const items = {
                         value: x,
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
                         emitterName: observableLabel
@@ -107,7 +107,7 @@ export class MyTestScheduler extends TestScheduler {
                     onValueEmitted(items);
                     emittedValues[index].push(items)
                 }, (error) => {
-                    let items = {
+                    const items = {
                         error,
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
                         emitterName: observableLabel
@@ -117,7 +117,7 @@ export class MyTestScheduler extends TestScheduler {
                         items
                     );
                 }, () => {
-                    let items = {
+                    const items = {
                         notification: "COMPLETE_NOTIFICATION",
                         ancestors: emittedValues.map(emittedValueList => emittedValueList[emittedValueList.length - 1]).filter(v => v),
                         emitterName: observableLabel

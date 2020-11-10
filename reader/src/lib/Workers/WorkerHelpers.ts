@@ -11,7 +11,7 @@ export const AtomizeSrcDoc: (s: string) => Promise<string[]> = async (HTMLString
 
 export const AtomizeUrl: (s: string) => Promise<string[]> =
     async (url: string) => {
-        let storedArray = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '[]');
+        const storedArray = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '[]');
         return storedArray.length ? storedArray :
             GetWorkerResults<string[]>(new AtomizeUrlWorker(), url);
     };

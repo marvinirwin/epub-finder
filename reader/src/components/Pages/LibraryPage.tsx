@@ -65,7 +65,7 @@ export function LibraryPage({m}: { m: Manager }) {
                             )
                         }
                         onSelect={(b: OpenBook) => {
-                            let checkedOutBooks = {...m.db.checkedOutBooks$.getValue()};
+                            const checkedOutBooks = {...m.db.checkedOutBooks$.getValue()};
                             delete checkedOutBooks[b.name];
                             m.db.checkedOutBooks$.next({...checkedOutBooks})
                         }}

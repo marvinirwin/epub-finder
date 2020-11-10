@@ -48,7 +48,7 @@ const expected2 = {
 
 
 it('Creates correct adjacency lists when initialzed alone, and compressing', () => {
-    let c1 = new CausalTree(
+    const c1 = new CausalTree(
         new AsciiGraph(graph1).edges,
         valueMap1
     );
@@ -56,7 +56,7 @@ it('Creates correct adjacency lists when initialzed alone, and compressing', () 
         c1.getAdjListThatMovesForwardsInTime()
     ).toEqual(expected1);
 
-    let c2 = new CausalTree(
+    const c2 = new CausalTree(
         new AsciiGraph(graph2).edges,
         valueMap2
     );

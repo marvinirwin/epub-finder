@@ -5,7 +5,7 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from 'xmldom';
 
 // @ts-ignore
-self["window"] = self;
+self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
 
@@ -15,7 +15,7 @@ ctx.onmessage = async (ev) => {
     const url = ev.data as string;
     const response = await fetch(url);
     const srcdoc = new TextDecoder().decode(await response.arrayBuffer());
-    let doc = AtomizedDocument.atomizeDocument(srcdoc);
+    const doc = AtomizedDocument.atomizeDocument(srcdoc);
     ctx.postMessage(
         [
             doc.toString(),

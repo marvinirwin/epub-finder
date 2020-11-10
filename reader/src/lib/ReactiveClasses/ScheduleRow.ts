@@ -20,7 +20,7 @@ export function isNew(s: ScheduleRow) {
 }
 
 export function isToReview(s: ScheduleRow) {
-    let learning = isLearning(s);
+    const learning = isLearning(s);
     if (learning) return false;
     const myDueDate = dueDate(s);
     return myDueDate.getTime() < (new Date().getTime());
@@ -33,7 +33,7 @@ export function isLearning(s: ScheduleRow) {
 
     // The "advance record" is a record which has a change in recognitionScore
     const mostRecentRecordsFirst = orderBy(s.wordRecognitionRecords, 'timestamp', 'desc');
-    let mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
+    const mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
     const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
         return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
     })

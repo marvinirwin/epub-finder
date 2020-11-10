@@ -114,7 +114,7 @@ export class ScheduleManager {
             map(([indexedScheduleRows]) => {
                     let maxDueDate = Number.MIN_SAFE_INTEGER;
                     let minDueDate = Number.MAX_SAFE_INTEGER;
-                    for (let word in indexedScheduleRows) {
+                    for (const word in indexedScheduleRows) {
                         const dd = dueDate(indexedScheduleRows[word]).getTime();
                         if (maxDueDate < dd) {
                             maxDueDate = dd;
@@ -168,7 +168,7 @@ export class ScheduleManager {
             map(([learningCards, toReviewCards, newCards]) => {
                     const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
                     if (learningCardsRequired > 0) {
-                        let collection1 = [
+                        const collection1 = [
                             ...learningCards,
                             ...toReviewCards,
                             ...(newCards.slice(0, learningCardsRequired) || [])
@@ -177,7 +177,7 @@ export class ScheduleManager {
                             return r.sortNumber;
                         }, 'desc');
                     }
-                    let collection = [...learningCards, ...toReviewCards, ...newCards];
+                    const collection = [...learningCards, ...toReviewCards, ...newCards];
                     return orderBy(uniqueBy(collection, w => w.word), r => {
                         return r.sortNumber;
                     }, 'desc');
@@ -191,7 +191,7 @@ export class ScheduleManager {
 
     private async loadRecognitionRows() {
         const generator = this.db.getRecognitionRowsFromDB();
-        for await (let rowChunk of generator) {
+        for await (const rowChunk of generator) {
             this.addWordRecognitionRecords$.next(rowChunk);
         }
     }

@@ -14,12 +14,12 @@ export function MakeQuerablePromise<T>(promise: Promise<T> | QueryablePromise<T>
     if (promise.hasOwnProperty('isResolved')) return promise as QueryablePromise<T>;
 
     // Set initial state
-    var isPending = true;
-    var isRejected = false;
-    var isFulfilled = false;
+    let isPending = true;
+    let isRejected = false;
+    let isFulfilled = false;
 
     // Observe the promise, saving the fulfillment in a closure scope.
-    var result = promise.then(
+    const result = promise.then(
         function (v) {
             isFulfilled = true;
             isPending = false;

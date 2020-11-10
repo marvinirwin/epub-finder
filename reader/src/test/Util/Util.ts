@@ -22,7 +22,7 @@ export interface TestMessage {
     isGhost?: boolean;
 }
 
-//import {Notification} from "rxjs/src/internal/Notification";
+// import {Notification} from "rxjs/src/internal/Notification";
 export class Notification<T> {
     hasValue: boolean;
 
@@ -78,10 +78,10 @@ export class Notification<T> {
      * @return {any}
      */
     accept(nextOrObserver: PartialObserver<T> | ((value: T) => void), error?: (err: any) => void, complete?: () => void) {
-        if (nextOrObserver && typeof (<PartialObserver<T>>nextOrObserver).next === 'function') {
-            return this.observe(<PartialObserver<T>>nextOrObserver);
+        if (nextOrObserver && typeof (nextOrObserver as PartialObserver<T>).next === 'function') {
+            return this.observe(nextOrObserver as PartialObserver<T>);
         } else {
-            return this.do(<(value: T) => void>nextOrObserver, error, complete);
+            return this.do(nextOrObserver as (value: T) => void, error, complete);
         }
     }
 
@@ -253,7 +253,7 @@ export function recognitionFactory(word: string, score?: number) {
 
 export function quizResultFactory(word: string, result: number): QuizResult {
     return {
-        word: word,
+        word,
         score: result
     }
 }
@@ -290,11 +290,11 @@ export class MarbleGroup<T extends (Dictionary<Marbles<any>> | Marbles<any>[])> 
         } else {
             const usedKeys = new Set<string>();
             const allKeys = new Set<string>(Object.keys(this.marbles));
-            let entries = Object.entries(args[0]);
+            const entries = Object.entries(args[0]);
             for (let i = 0; i < entries.length; i++) {
                 const [key, val] = entries[i];
                 usedKeys.add(key);
-                let marble = (this.marbles as Dictionary<Marbles<any>>)[key];
+                const marble = (this.marbles as Dictionary<Marbles<any>>)[key];
                 if (Array.isArray(val)) {
                     marble.addValue(...val);
                 } else {
@@ -322,7 +322,7 @@ export class MarbleGroup<T extends (Dictionary<Marbles<any>> | Marbles<any>[])> 
     }
 }
 
-export function swapIndexes(arr: Array<any>, i1:number, i2:number){
+export function swapIndexes(arr: any[], i1:number, i2:number){
     [arr[i1], arr[i2]] = [arr[i2], arr[i1]];
 }
 

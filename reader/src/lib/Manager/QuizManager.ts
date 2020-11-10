@@ -47,7 +47,7 @@ export class QuizManager {
         this.requestNextCard$.pipe(
             withLatestFrom(this.scheduledCards$)
         ).subscribe(async ([_, scheduledCards]) => {
-            let iCard = scheduledCards[0];
+            const iCard = scheduledCards[0];
             if (!iCard) return;
             this.quizzingCard$.next(iCard);
             this.quizStage$.next(QuizComponent.Characters);

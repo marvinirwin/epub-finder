@@ -4,7 +4,7 @@ import {Dictionary, sum} from 'lodash';
 import {map} from "rxjs/operators";
 import {ds_Dict} from "../Util/DeltaScanner";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {CORRECT_RECOGNITION_SCORE} from "./Highlighter";
+import {CORRECT_RECOGNITION_SCORE} from "../Highlighting/Highlighter";
 import HSK1 from '../HSK/hsk-level-1.json';
 
 export interface HSKWord {
@@ -14,7 +14,7 @@ export interface HSKWord {
 
 export class HSKLevel {
     protected getWordScore(word: string, wordScores: Dictionary<WordRecognitionRow>) {
-        let wordScore = wordScores[word];
+        const wordScore = wordScores[word];
         if (!wordScore) return 0;
         if (wordScore.recognitionScore > 10) return 10;
         return wordScore.recognitionScore;

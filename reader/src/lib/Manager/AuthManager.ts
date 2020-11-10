@@ -2,10 +2,10 @@ import {interval, Observable, ReplaySubject} from "rxjs";
 import {switchMap, withLatestFrom} from "rxjs/operators";
 import axios from 'axios';
 
-var getCookie = function (name: string) {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; ++i) {
-        var pair = cookies[i].trim().split('=');
+const getCookie = function (name: string) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; ++i) {
+        const pair = cookies[i].trim().split('=');
         if (pair[0] == name)
             return pair[1];
     }

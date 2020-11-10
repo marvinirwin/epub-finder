@@ -56,5 +56,5 @@ test('Persisted cards loaded produce new elements on the wordmap', async () => {
     const data = getWordElementMappings(atomizedSentences, trie)
 
     expect(getUniqueLengths(trie)).toHaveLength(1);
-    expect(data.wordElementsMap['Te']).toHaveLength(6);
+    expect(data.wordElementsMap.Te).toHaveLength(6);
 })

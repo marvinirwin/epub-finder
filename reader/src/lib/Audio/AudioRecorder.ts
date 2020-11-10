@@ -26,7 +26,7 @@ export class AudioRecorder {
                 ).pipe(
                     map((result: string | RecordRequest) => {
                         this.isRecording$.next(false);
-                        let resultArray: [string | RecordRequest, RecordRequest] = [result, request];
+                        const resultArray: [string | RecordRequest, RecordRequest] = [result, request];
                         return resultArray;
                     })
                 );
@@ -43,8 +43,8 @@ export class AudioRecorder {
     }
 
     private async countdown(duration: number) {
-        let countdownIncrement = 500;
-        let countdownStart = Math.floor((duration + countdownIncrement) / (countdownIncrement));
+        const countdownIncrement = 500;
+        const countdownStart = Math.floor((duration + countdownIncrement) / (countdownIncrement));
         for (let i = 0; i <= countdownStart; i++) {
             this.countdown$.next(countdownStart - i);
             await sleep(countdownIncrement)

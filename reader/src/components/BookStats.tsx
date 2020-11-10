@@ -9,7 +9,7 @@ import { flatten, orderBy } from "lodash";
 import {isChineseCharacter} from "../lib/Interfaces/OldAnkiClasses/Card";
 
 
-const hsk1Array = HSK1 as Array<HSKWord>;
+const hsk1Array = HSK1 as HSKWord[];
 const hsk1Words = hsk1Array.map(({hanzi}) => hanzi);
 const hsk1WordSet = new Set(hsk1Words);
 const hsk1Characters = new Set(flatten(hsk1Words))
@@ -18,7 +18,7 @@ const hsk1Characters = new Set(flatten(hsk1Words))
 
 export const BookStats: React.FunctionComponent<{m: Manager, b: OpenBook}> = ({children, m, b}) => {
     const stats = useObservableState(b.bookStats$)
-    let characterCounts: ds_Dict<number> = {};
+    const characterCounts: ds_Dict<number> = {};
     if (stats) {
         // This is probably normalized, right?
         for (let i = 0; i < stats.text.length; i++) {

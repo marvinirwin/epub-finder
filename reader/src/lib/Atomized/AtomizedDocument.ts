@@ -42,10 +42,10 @@ export class AtomizedDocument {
             if (cb(node)) {
                 return node;
             }
-            var child, next;
-            let TEXT_NODE = 3;
-            let ELEMENT_NODE = 1;
-            let DOCUMENT_NODE = 9;
+            let child, next;
+            const TEXT_NODE = 3;
+            const ELEMENT_NODE = 1;
+            const DOCUMENT_NODE = 9;
             switch (node.nodeType) {
                 case TEXT_NODE: // Text node
                     break;
@@ -58,7 +58,7 @@ export class AtomizedDocument {
                     child = node.firstChild;
                     while (child) {
                         next = child.nextSibling;
-                        let foundNode = walk(child, cb);
+                        const foundNode = walk(child, cb);
                         if (foundNode) {
                             return foundNode;
                         }
@@ -86,7 +86,7 @@ export class AtomizedDocument {
     }
 
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {
-        let currentSource = el.getAttribute(qualifiedName);
+        const currentSource = el.getAttribute(qualifiedName);
         if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
         }
@@ -96,7 +96,7 @@ export class AtomizedDocument {
         const leaves: Element[] = [];
 
         function walk(node: Node, cb: (n: Node) => any) {
-            var child, next;
+            let child, next;
             switch (node.nodeType) {
                 case 3: // Text node
                     cb(node);
@@ -118,7 +118,7 @@ export class AtomizedDocument {
         }
 
         walk(doc, (node: Node) => {
-            let text = (node.textContent as string).trim();
+            const text = (node.textContent as string).trim();
             if (text) {
                 leaves.push(node as Element);
             }
@@ -135,8 +135,8 @@ export class AtomizedDocument {
     }
 
     makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
-        let document1 = this.document;
-        let nodeValue = textNode.nodeValue as string;
+        const document1 = this.document;
+        const nodeValue = textNode.nodeValue as string;
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
             nodeValue.normalize().trim().split(''),
@@ -168,7 +168,7 @@ export class AtomizedDocument {
 
     replaceDocumentSources(doc: Document) {
         const walk = (node: Node) => {
-            var child, next;
+            let child, next;
             switch (node.nodeType) {
                 case 1: // Element node
                     const el = node as Element;
@@ -234,7 +234,7 @@ export class AtomizedDocument {
 
     headInnerHTML() {
         const head = this.findHead();
-        return (new XMLSerializer()).serializeToString(<Node>head)
+        return (new XMLSerializer()).serializeToString(head as Node)
     }
 
     private findHead() {
@@ -246,7 +246,7 @@ export class AtomizedDocument {
 
     bodyInnerHTML() {
         const body = this.findBody();
-        return (new XMLSerializer()).serializeToString(<Node>body)
+        return (new XMLSerializer()).serializeToString(body as Node)
     }
 
     private findBody(): Element {
@@ -277,7 +277,7 @@ export class AtomizedDocument {
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
-            let namedItem = n.attributes?.getNamedItem('class')?.nodeValue;
+            const namedItem = n.attributes?.getNamedItem('class')?.nodeValue;
             return namedItem === 'popper-container';
         });
     }

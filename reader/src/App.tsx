@@ -1,7 +1,7 @@
 import './declaration.d';
 import "fontsource-noto-sans"
 import React from 'react';
-import './App.css';
+import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";

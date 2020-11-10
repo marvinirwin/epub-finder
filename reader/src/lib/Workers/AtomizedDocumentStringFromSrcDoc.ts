@@ -6,14 +6,14 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {XMLSerializer} from 'xmldom';
 
 // @ts-ignore
-self["window"] = self;
+self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
 
 // Respond to message from parent thread
 ctx.onmessage = (ev) => {
     const srcdoc = ev.data as string;
-    let doc = AtomizedDocument.atomizeDocument(srcdoc);
+    const doc = AtomizedDocument.atomizeDocument(srcdoc);
     ctx.postMessage(
         [
             doc.toString(),

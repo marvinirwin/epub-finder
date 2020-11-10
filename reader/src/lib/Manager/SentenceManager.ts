@@ -20,7 +20,7 @@ export class SentenceManager {
                             if (!wordSentenceDictionary[word]) {
                                 wordSentenceDictionary[word] = new Set<string>(set);
                             } else {
-                                let sentenceSet = wordSentenceDictionary[word];
+                                const sentenceSet = wordSentenceDictionary[word];
                                 set.forEach(setSentence => sentenceSet.add(setSentence));
                             }
                         }))

@@ -84,7 +84,7 @@ export class CausalTree {
     }
 
     getCompressedTree(): CausalTree {
-        let myStartNodes = getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime());
+        const myStartNodes = getRootsFromAdjList(this.getAdjListThatMovesBackwardsInTime());
         /**
          * Our adj list going forwards in time will look like this
          *        a     b

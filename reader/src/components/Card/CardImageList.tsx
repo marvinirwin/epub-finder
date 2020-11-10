@@ -9,7 +9,7 @@ import {Manager} from "../../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../HotkeyWrapper";
-import {filterTextInputEvents} from "../../lib/Manager/BrowserInputs";
+import {filterTextInputEvents} from "../../lib/Hotkeys/BrowserInputs";
 
 const useStylesGridListImages = makeStyles((theme) => ({
     root: {

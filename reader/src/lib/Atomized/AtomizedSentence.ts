@@ -16,7 +16,7 @@ export class AtomizedSentence {
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
     public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
-        let textWordDataRecords = atomizedSentences.map(atomizedSentence =>
+        const textWordDataRecords = atomizedSentences.map(atomizedSentence =>
             atomizedSentence.getTextWordData(trie, trieElementSizes)
         );
         return mergeSentenceInfo(...textWordDataRecords);
@@ -45,8 +45,8 @@ export class AtomizedSentence {
         const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
         const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
-        let children = this.element.childNodes;
-        let textContent = this.element.textContent as string;
+        const children = this.element.childNodes;
+        const textContent = this.element.textContent as string;
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
@@ -87,7 +87,7 @@ export class AtomizedSentence {
                 const position = word.length - lengthRemaining;
                 const newPositionedWord: IPositionedWord = {
                     word,
-                    position: position
+                    position
                 };
                 if (!this._previousWords.has(word)) {
                     newWords.add(word);
@@ -102,7 +102,7 @@ export class AtomizedSentence {
             const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             const annotationElement: IAnnotatedCharacter = {
                 char: (textContent as string)[i],
-                words: words,
+                words,
                 element: currentMark,
                 maxWord,
                 i,

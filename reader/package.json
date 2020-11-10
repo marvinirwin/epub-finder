@@ -19,6 +19,7 @@
     "material-ui-popup-state": "^1.6.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.12.1",
     "moment": "^2.27.0",
+    "node-sass": "^4.14.1",
     "observable-hooks": "^3.0.0",
     "pinyin": "^2.9.1",
     "pinyin-converter": "^2.8.1",

@@ -32,8 +32,8 @@ it('Can fulfill an Audio Recording request ', async () => {
            c
            |
         ---b
-        |  
-        a   
+        |
+        a
         `, {
             a: recordRequest,
             b: true,

@@ -12,7 +12,7 @@ import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
 
-let AZURE_SPEECH_REGION = 'westus2' as string;
+const AZURE_SPEECH_REGION = 'westus2' as string;
 
 export class AudioSourceBrowser implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1);

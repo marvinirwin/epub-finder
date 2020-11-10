@@ -8,8 +8,8 @@ import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 
-let SuccessGreen = '#CCFCA7';
-let InProgressGold = '#FCD09A';
+const SuccessGreen = '#CCFCA7';
+const InProgressGold = '#FCD09A';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
