@@ -1,11 +1,11 @@
-import {combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {CustomDocument, Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
-import {Dictionary, flatten, flattenDeep} from "lodash";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Util/DeltaScanner";
+import {Dictionary, flatten} from "lodash";
+import {DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Util/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -18,22 +18,6 @@ import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
 export type Named = {
     name: string;
 }
-
-export const flattenTreeIntoDict = (key: string | undefined) =>
-    <T extends Named, U extends string>(obs$: Observable<DeltaScan<T, U>>): Observable<ds_Dict<T>> => {
-        return obs$.pipe(
-            map(({sourced}) => {
-                const libraryBooks = key === undefined ?
-                    sourced :
-                    sourced?.children?.[key];
-                return Object.fromEntries(
-                    libraryBooks ? flattenTree<T>(
-                        libraryBooks
-                    ).map(book => [book.name, book]) : []
-                );
-            })
-        );
-    }
 
 export const SOURCE_BOOKS_NODE_LABEL = 'libraryBooks';
 export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';

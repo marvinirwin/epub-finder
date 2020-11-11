@@ -1,72 +1,10 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {map, scan, shareReplay} from "rxjs/operators";
-import {uniq} from "lodash";
-import {flattenTreeIntoDict, Named} from "../Manager/OpenBooks";
+import {Named} from "../Manager/OpenBooks";
+import {applyTreeDiff, ds_Tree, flattenTreeIntoDict} from "../../services/tree.service";
 
 export type ds_Dict<T, U extends string = string> = {
     [key in U]: T
-}
-
-export type ds_Tree<T, U extends string = string> = {
-    value?: T;
-    children?: ds_Dict<ds_Tree<T, U>>
-    nodeLabel: U | 'root';
-    delete?: boolean;
-    // When applying a tree diff, you may want to say "Disregard all previous changes to this tree"
-    newTree?: boolean;
-}
-
-/**
- * Maybe I should return a tree of deltas once I apply
- * Not now though
- * @param oldTree
- * @param diffTree
- */
-function applyTreeDiff<T>(oldTree: ds_Tree<T> | undefined, diffTree: ds_Tree<T> | undefined): ds_Tree<T> | undefined {
-    if (!oldTree && !diffTree) return undefined;
-    if (!oldTree) return diffTree;
-    if (!diffTree) return oldTree;
-    if (diffTree?.delete) return undefined;
-    if (diffTree.newTree) return diffTree;
-    const allChildKeys = uniq(Object.keys(oldTree.children || {}).concat(Object.keys(diffTree.children || {})))
-    const newChildren = Object.fromEntries(
-        allChildKeys.map(key => {
-                const oldTreeChild = oldTree.children?.[key];
-                const newTreeChild = diffTree.children?.[key];
-                const childNode = applyTreeDiff(oldTreeChild, newTreeChild);
-                return [key, childNode];
-            }
-        ).filter(([key, childNode]) => childNode)
-    );
-
-    const ret: ds_Tree<T> = {
-        nodeLabel: diffTree.nodeLabel,
-        children: newChildren,
-    };
-
-    if (diffTree.hasOwnProperty('value')) {
-        ret.value = diffTree.value;
-    }
-    return ret;
-
-    /*
-        oldTree.value = diffTree.value;
-        // I could do it by returing new Nodes, but that might be slow?
-        // Either way is pretty easy
-        const newTreeChildren = diffTree.children || {};
-        const oldTreeChildren = oldTree.children || {};
-        Object.entries(newTreeChildren).forEach(([key, newNode]) => {
-            // Assert the child exists, this part wouldn't exist if we were doign the new instantiating way, but screw it
-            if (!oldTreeChildren[key]) {
-                oldTreeChildren[key] = {
-                    value: newNode.value,
-                    children: {},
-                    nodeLabel: newNode.nodeLabel
-                };
-            }
-            applyTreeDiff(oldTreeChildren[key], newTreeChildren[key])
-        })
-    */
 }
 
 export type DeltaScan<T, U extends string = string> = {

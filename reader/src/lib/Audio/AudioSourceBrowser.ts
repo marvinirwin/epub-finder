@@ -7,7 +7,7 @@ import {
     ResultReason,
     SpeechConfig,
     SpeechRecognizer
-} from "cognitive-services-speech-sdk-js/distrib/lib/microsoft.cognitiveservices.speech.sdk";
+} from "microsoft-cognitiveservices-speech-sdk/distrib/lib/microsoft.cognitiveservices.speech.sdk";
 import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";

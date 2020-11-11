@@ -33,7 +33,7 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacter} from "./Manager/QuizCharacter";
-import {ds_Dict, ds_Tree} from "./Util/DeltaScanner";
+import {ds_Dict} from "./Util/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {AuthManager} from "./Manager/AuthManager";
@@ -44,6 +44,7 @@ import {Highlighter} from "./Highlighting/Highlighter";
 import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
+import {ds_Tree} from "../services/tree.service";
 
 export type CardDB = IndexDBManager<ICard>;
 

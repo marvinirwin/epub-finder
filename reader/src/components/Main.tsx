@@ -1,5 +1,4 @@
 import React, {useEffect} from "react";
-import {makeStyles} from "@material-ui/core/styles";
 import {BottomNav} from "./Nav/BottomNav";
 import {Manager} from "../lib/Manager";
 import {ReadingPage} from "./Pages/ReadingPage";
@@ -16,10 +15,17 @@ import {Snackbar} from "@material-ui/core";
 import {Video} from "./Video/Video";
 import {LibraryPage} from "./Pages/LibraryPage";
 import {Hotkeys} from "../lib/HotKeyEvents";
+import {AppDirectoryService} from "../services/app-directory-service";
+import {AppContainer} from "./Containers/AppContainer";
+import {TreeMenuService} from "../services/tree-menu.service";
+import {MenuitemInterface} from "./DrawerMenu/SelectableMenuList";
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
+
+const treeMenuService = new TreeMenuService<MenuitemInterface, {value: MenuitemInterface}>();
+treeMenuService.tree.appendDelta$.next(AppDirectoryService());
 
 export function Main({m}: { m: Manager }) {
     const currentPage = useObservableState(m.bottomNavigationValue$);
@@ -38,9 +44,11 @@ export function Main({m}: { m: Manager }) {
     const hotkeyConfig = useObservableState(m.db.hotkeys$, {});
     const withDefaults = {...m.hotkeyEvents.defaultHotkeys(), ...hotkeyConfig};
 
-    return <div style={{maxHeight: '100vh', maxWidth: '100vw', overflow: 'hidden'}}>
-        <HotkeyContext.Provider value={withDefaults}>
-            <FocusedElement.Provider value={hotkeyHandler}>
+    return <HotkeyContext.Provider value={withDefaults}>
+        <FocusedElement.Provider value={hotkeyHandler}>
+            <AppContainer treeMenuService={treeMenuService}/>
+
+            {/*
                 <StaticFrame
                     visible={characterPageShows}
                     visibleStyle={{
@@ -93,7 +101,7 @@ export function Main({m}: { m: Manager }) {
                     </div>
                 </Snackbar>
                 <BottomNav m={m}/>
-            </FocusedElement.Provider>
-        </HotkeyContext.Provider>
-    </div>;
+*/}
+        </FocusedElement.Provider>
+    </HotkeyContext.Provider>
 }
