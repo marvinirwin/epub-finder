@@ -25,12 +25,12 @@ export const FocusedElement = React.createContext<HTMLElement | Document | null>
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
 
 const treeMenuService = new TreeMenuService<MenuitemInterface, {value: MenuitemInterface}>();
-treeMenuService.tree.appendDelta$.next(AppDirectoryService());
 
 export function Main({m}: { m: Manager }) {
     const currentPage = useObservableState(m.bottomNavigationValue$);
     useEffect(() => {
         m.inputManager.applyDocumentListeners(document);
+        treeMenuService.tree.appendDelta$.next(AppDirectoryService(m));
     }, [m]);
 
     const readingBook = m.openedBooks.readingBook;

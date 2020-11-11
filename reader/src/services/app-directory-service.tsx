@@ -2,20 +2,22 @@ import {constructTree, ds_Tree} from "./tree.service";
 import {TreeMenuNode} from "./tree-menu.service";
 import {MenuitemInterface} from "../components/DrawerMenu/SelectableMenuList";
 import React from "react";
+import {Manager} from "../lib/Manager";
+import {Reading} from "../components/Pages/Reading";
 
 
-export const AppDirectoryService = () => {
+export const AppDirectoryService = (m: Manager) => {
     const MainScreen = () => <div>Main</div>
     const LibraryScreen = () => <div>Library</div>;
     const HotkeyScreen = () => <div>Hotkey</div>;
 
     const main: TreeMenuNode<MenuitemInterface, any> = {
-        Component: MainScreen,
+        Component: () => <Reading m={m}/>,
         value: {
-            label: 'main',
-            key: 'main'
+            label: 'reading',
+            key: 'reading'
         },
-        name: 'main'
+        name: 'reading'
     };
 
     const library = {

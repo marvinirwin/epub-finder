@@ -17,7 +17,6 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                 pathChanged={newPath => treeMenuService.path$.next(newPath)}
             />
         }
-
         <div className={'all-items-container'}>
             {Object.values(allItems)
                 .map((item, index) => <div
