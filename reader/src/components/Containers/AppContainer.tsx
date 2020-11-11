@@ -14,6 +14,7 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                 title={'Mandarin Trainer'}
                 tree={menuItemTree.sourced}
                 path={path}
+                pathChanged={newPath => treeMenuService.path$.next(newPath)}
             />
         }
 
