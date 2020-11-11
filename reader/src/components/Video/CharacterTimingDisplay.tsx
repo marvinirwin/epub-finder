@@ -60,7 +60,7 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
             }
         }
     }, [canvas, characterTimings]);
-    return <div style={{position: 'relative'}}
+    return <div className={'character-timing-display-line-container'} style={{position: 'relative'}}
                 onMouseLeave={() => {
                     setHoverBarPosition(undefined);
                 }
@@ -119,7 +119,7 @@ export const CharacterTimingDisplay: React.FunctionComponent<{
         <canvas
             width={`${CANVAS_WIDTH}px`}
             height={"50px"}
-            className={'recording-ctx'}
+            className={'character-timing-display'}
             ref={setCanvas}
         />
     </div>

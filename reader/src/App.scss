@@ -1,80 +1,80 @@
 .text-display {
-    position: absolute;
-    top: 10vh;
-    left: 20vw;
-    height: 90vh;
-    width: 80vw;
-    border: 1px solid black;
+  position: absolute;
+  top: 10vh;
+  left: 20vw;
+  height: 90vh;
+  width: 80vw;
+  border: 1px solid black;
 }
 
 .card-tree-container {
-    position: fixed;
-    width: 20vw;
-    top: 10vh;
-    height: 89vh;
-    border: solid black 1px;
+  position: fixed;
+  width: 20vw;
+  top: 10vh;
+  height: 89vh;
+  border: solid black 1px;
 }
 
 .nav-bar {
-    position: fixed;
-    height: 10vh;
-    display: flex;
-    left: 0;
-    width: 100vw;
-    border: solid black 1px;
-    border-radius: 3px;
-    justify-content: space-around;
+  position: fixed;
+  height: 10vh;
+  display: flex;
+  left: 0;
+  width: 100vw;
+  border: solid black 1px;
+  border-radius: 3px;
+  justify-content: space-around;
 }
 
 .nav-bar > * {
-    position: relative;
+  position: relative;
 }
 
 .book-menu-container {
-    width: 10vw;
+  width: 10vw;
 }
 
 .spine-item-container {
-    width: 10vw;
+  width: 10vw;
 }
 
 .message-list-container {
-    min-width: 35vw;
+  min-width: 35vw;
 }
 
 .message-list {
-    width: 100%;
-    z-index: 101;
-    opacity: 1;
-    list-style-type: none;
+  width: 100%;
+  z-index: 101;
+  opacity: 1;
+  list-style-type: none;
 }
 
 .form-control {
-    margin: 5px;
-    min-width: 120px !important;
+  margin: 5px;
+  min-width: 120px !important;
 }
 
 .editing-card {
-    position: absolute;
-    background-color: white;
-    z-index: 100;
+  position: absolute;
+  background-color: white;
+  z-index: 100;
 }
 
 .debug-display-container {
-    position: fixed;
-    display: grid;
-    grid-template-columns: 50% 50%;
-    padding-left: 20px;
-    padding-right: 20px;
-    min-width: 100%;
-    max-width: 100%;
-    z-index: 1000;
+  position: fixed;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  padding-left: 20px;
+  padding-right: 20px;
+  min-width: 100%;
+  max-width: 100%;
+  z-index: 1000;
 }
 
 .debug-menu {
-    background: grey;
-    opacity: 50%;
-    text: black;
+  background: grey;
+  opacity: 50%;
+  text: black;
 }
 
 /* NEW CSS */
@@ -83,181 +83,156 @@
 
 /* HACK to make */
 .makeStyles-popup-18 > span > div > div {
-    background-color: white;
+  background-color: white;
 }
 
 .led-container {
-    height: 12px;
-    width: 12px;
-    margin-right: 10px;
+  height: 12px;
+  width: 12px;
+  margin-right: 10px;
 }
 
 .led {
-    margin: 0 auto;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+  margin: 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
 }
 
 .led-green {
-    background-color: #5dce05;
-    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px /*, #89FF00 0 2px 12px*/;
+  background-color: #5dce05;
+  box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/
+          inset #304701 0 -1px 9px /*, #89FF00 0 2px 12px*/
+;
 }
 
 .led-off {
-    background-color: #c6c6c6;
-    box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/ inset #304701 0 -1px 9px /*, #6d6d6d 0 2px 12px*/;
+  background-color: #c6c6c6;
+  box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/
+          inset #304701 0 -1px 9px /*, #6d6d6d 0 2px 12px*/
+;
 }
 
 .led-box {
-    height: 12px;
-    width: 12px;
-    margin: 4px 4px 4px 4px;
-    float: left;
+  height: 12px;
+  width: 12px;
+  margin: 4px 4px 4px 4px;
+  float: left;
 }
 
 .POPPER_ELEMENT {
-    background-color: #333;
-    color: white;
-    padding: 15px 15px;
-    border-radius: 4px;
-    font-size: 13px;
-    height: fit-content;
-    z-index: 9999;
-    display: block;
+  background-color: #333;
+  color: white;
+  padding: 15px 15px;
+  border-radius: 4px;
+  font-size: 13px;
+  height: fit-content;
+  z-index: 9999;
+  display: block;
 }
 
 .recognized-text {
-    height: fit-content;
-    overflow: hidden;
-    position: absolute;
-    animation-duration: 5s;
-    animation-name: slideinout;
-    animation-fill-mode: forwards;
-    padding: 5px;
-    z-index: 1;
+  height: fit-content;
+  overflow: hidden;
+  position: absolute;
+  animation-duration: 5s;
+  animation-name: slideinout;
+  animation-fill-mode: forwards;
+  padding: 5px;
+  z-index: 1;
 }
 
 @keyframes slideinout {
-    from {
-        margin-top: -74px;
-    }
-    15% {
-        margin-top: 0;
-    }
+  from {
+    margin-top: -74px;
+  }
+  15% {
+    margin-top: 0;
+  }
 
-    50% {
-        margin-top: 0;
-    }
+  50% {
+    margin-top: 0;
+  }
 
-    85% {
-        margin-top: 0;
-    }
+  85% {
+    margin-top: 0;
+  }
 
-    to {
-        margin-top: -74px;
-    }
+  to {
+    margin-top: -74px;
+  }
 }
 
 .recognized-text:hover {
-    height: fit-content;
-    max-height: none;
+  height: fit-content;
+  max-height: none;
 }
 
 .prompting-recording {
-    border-width: 2px 2px 4px;
-    border-bottom-width: 2px;
-    border-style: solid;
-    bottom: -2px !important;
+  border-width: 2px 2px 4px;
+  border-bottom-width: 2px;
+  border-style: solid;
+  bottom: -2px !important;
 
-    background-color: #ddf4ff;
-    border-radius: 16px;
-    box-shadow: 0px 0px 0px 5px rgb(28, 176, 246);
-    transition: box-shadow 0.6s linear;
-    margin: 0.5em; /* Increased margin since the box-shado expands outside the element, like outline */
+  background-color: #ddf4ff;
+  border-radius: 16px;
+  box-shadow: 0px 0px 0px 5px rgb(28, 176, 246);
+  transition: box-shadow 0.6s linear;
+  margin: 0.5em; /* Increased margin since the box-shado expands outside the element, like outline */
 }
 
 .recording-success {
-    background-color: #b8f28b;
-    box-shadow: 0px 0px 0px 5px #58a700;
+  background-color: #b8f28b;
+  box-shadow: 0px 0px 0px 5px #58a700;
 }
 
 .recording-failed {
-    background-color: #ffc1c1;
-    box-shadow: 0px 0px 0px 5px #ea2b2b;
+  background-color: #ffc1c1;
+  box-shadow: 0px 0px 0px 5px #ea2b2b;
 }
 
 .quiz-character:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .library {
-    position: fixed;
-    width: 25vw;
-    right: -20vw;
-    z-index: 3;
-    transition: transform 0.5s;
-    /* TODO add scss so I can use variables for my widths and stuff  */
-    overflow: auto;
-    height: 40vh;
-    bottom: 10vh;
+  position: fixed;
+  width: 25vw;
+  right: -20vw;
+  z-index: 3;
+  transition: transform 0.5s;
+  /* TODO add scss so I can use variables for my widths and stuff  */
+  overflow: auto;
+  height: 40vh;
+  bottom: 10vh;
 
-    &:hover {
-        transform: translateX(-10vw);
-        cursor: pointer;
-    }
+  &:hover {
+    transform: translateX(-10vw);
+    cursor: pointer;
+  }
 }
 
-#video {
-    position: fixed;
-    z-index: 3;
-    transition: transform 0.5s;
-    /* TODO add scss so I can use variables for my widths and stuff  */
-    top: 10vh;
-    height: 90vh;
-    overflow: visible;
-    right: 0px;
-    display: flex;
-    flex-flow: column nowrap;
-    background-color: white;
-
-    & > video {
-        flex-grow: 1;
-        /*
-        max-width: 533px;
-        max-height: 300px;
-        */
-        /* This overflow auto line somehow makes the */
-        overflow: auto;
-    }
-
-    &:hover {
-        cursor: pointer;
-    }
-}
 
 *:focus {
-    background-color: #3db5eb;
+  background-color: #3db5eb;
 }
 
-.recording-ctx {
-    border: solid;
-}
 
 .hotkey-active {
-    /*
-    position: absolute;
-    top: calc(50% - 20px);
-    left: calc(50% - 20px);
-    width: 10px;
-    height: 10px;
-    */
-    border-radius: 50%;
-    background-color: #b8f28b;
-    box-shadow: /*
+  /*
+  position: absolute;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+  width: 10px;
+  height: 10px;
+  */
+  border-radius: 50%;
+  background-color: #b8f28b;
+  box-shadow: /*
             0 0 60px 30px #fff,
-            */ 0 0 10px 6px #b8f28b,
-    0 0 14px 9px #58a700;
+            */
+          0 0 10px 6px #b8f28b,
+          0 0 14px 9px #58a700;
 }
 
 .hotkey-inactive {
@@ -265,100 +240,147 @@
 }
 
 .quiz-list {
-    list-style: none;
-    height: 0;
-    line-height: 2em;
-    margin: 0;
-    padding: 0 0.5em;
-    overflow: hidden;
-    width: 10em;
+  list-style: none;
+  height: 0;
+  line-height: 2em;
+  margin: 0;
+  padding: 0 0.5em;
+  overflow: hidden;
+  width: 10em;
 }
 
 .quiz-list {
-    height: 2em;
-    margin: 2px 0;
+  height: 2em;
+  margin: 2px 0;
 }
 
 .hide-video-button {
-    position: absolute
+  position: absolute
 }
 
 .settings-page {
-    display: flex;
-    flex-flow: column nowrap;
-    padding: 24px;
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 24px;
 }
 
 .hotkey-config {
-    display: flex;
-    flex-flow: row wrap;
+  display: flex;
+  flex-flow: row wrap;
 
-    & > div {
-        margin: 24px;
-    }
+  & > div {
+    margin: 24px;
+  }
 }
 
 .bottom-nav {
-    max-height: 10vh;
-    min-height: 10vh;
-    bottom: 0;
-    display: flex;
-    flex-flow: row nowrap;
+  max-height: 10vh;
+  min-height: 10vh;
+  bottom: 0;
+  display: flex;
+  flex-flow: row nowrap;
 
-    & > .progress {
-        flex-grow: 1;
-    }
+  & > .progress {
+    flex-grow: 1;
+  }
 }
 
 .app-container {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  display: flex;
+  flex-flow: row nowrap;
+
+  & > .selectable-menu-list {
+    flex-basis: 240px;
+  }
+
+  & > .all-items-container {
+    flex: 1;
     display: flex;
-    flex-flow: row nowrap;
+    position: relative;
+    height: 100%;
 
-    & > .selectable-menu-list {
-        flex-basis: 240px;
+    & > .directory-item {
+      background-color: white;
+      position: absolute;
+      flex: 1;
+      width: 100%;
+      height: 100%;
     }
-
-    & > .all-items-container {
-        flex:1;
-        display: flex;
-        position: relative;
-        height: 100%;
-        & > .directory-item {
-            background-color: white;
-            position: absolute;
-            flex: 1;
-            width: 100%;
-            height: 100%;
-        }
-    }
+  }
 }
 
 .reading-container {
-    position: relative;
-    display: flex;
-    flex-flow: column nowrap;
-    height: 100%;
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+  width: 100%;
+
+  & > * {
+    transition: all 1s;
+  }
+
+  /* Speech and Video queries always come from the top and take up space*/
+  & > .video-container {
     width: 100%;
 
-    & > * {
-        transition: all 1s;
-    }
-    /* Speech and Video queries always come from the top and take up space*/
     & > .video {
-    }
-    & > .speech {
-    }
-    /* Cards seem aboslute positioned */
-    & > .card {
-        position: absolute;
-    }
-    & > iframe {
+      flex-flow: column nowrap;
+      display: flex;
+      background-color: white;
+
+      & > video {
         flex-grow: 1;
+        /*
+        max-width: 533px;
+        max-height: 300px;
+        */
+        /* This overflow auto line somehow makes the */
+        overflow: auto;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
     }
+  }
+
+  & > .speech {
+  }
+
+  /* Cards seem aboslute positioned */
+  & > .card {
+    position: absolute;
+  }
+
+  & > iframe {
+    flex-grow: 1;
+  }
 }
 
+.video-container-card {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  & > .character-timing-display-container {
+    display: flex;
+    flex: 1;
+    flex-flow: column nowrap;
+
+    & > .character-timing-display-line-container {
+      & > .character-timing-display {
+        border: solid black;
+        height: 50px;
+        flex: 1;
+      }
+    }
+  }
+  & > video {
+    height: 360px;
+  }
+}
 

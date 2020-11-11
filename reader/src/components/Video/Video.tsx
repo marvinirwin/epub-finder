@@ -180,7 +180,8 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
 
     useSubscription(m.hotkeyEvents.hideVideo$, () => setVideoMetaData(undefined));
 
-    return videoMetaData ? <Card id={'video'} elevation={3}>
+    return videoMetaData ? <Card className={'video-container-card'} elevation={3}>
+{/*
         <div style={{position: 'absolute', top: 0, zIndex: 10}}>
             <HotkeyWrapper action={"HIDE_VIDEO"}>
                 <IconButton
@@ -190,70 +191,73 @@ export const Video: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                 </IconButton>
             </HotkeyWrapper>
         </div>
+*/}
+        <div className={'character-timing-display-container'}>
+            {
+                (chunkedCharacterTimings && videoMetaData)
+                && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
+                    const lineStartTime = lineIndex * MILLISECONDS_PER_CHARACTER_LINE;
+                    const lineEndTime = lineStartTime + MILLISECONDS_PER_CHARACTER_LINE;
+                    let progressBarPosition;
+                    if (videoTime) {
+                        const currentChunkIndex = Math.floor(videoTime / MILLISECONDS_PER_CHARACTER_LINE);
+                        if (currentChunkIndex === lineIndex) {
+                            // If this is the one with the current playing index
+                            // The percentage gets send to the component
+                            // Let it figure out its own width
+                            progressBarPosition = ((videoTime % MILLISECONDS_PER_CHARACTER_LINE) / MILLISECONDS_PER_CHARACTER_LINE) * 100;
+                        }
+                    }
+                    const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
+                    const highlightBarPoints = hasPoints
+                        ? getBoundedPoints(
+                            highlightStartMs as number,
+                            highlightStopMs as number,
+                            lineStartTime,
+                            lineEndTime - 1
+                        ).map(p => p && (p - (MILLISECONDS_PER_CHARACTER_LINE * lineIndex)) / MILLISECONDS_PER_CHARACTER_LINE) :
+                        [];
+
+                    return <CharacterTimingDisplay
+                        key={lineIndex}
+                        characterTimings={chunkedCharacterTiming}
+                        v={videoMetaData}
+                        duration={MILLISECONDS_PER_CHARACTER_LINE}
+                        progressBarPosition={progressBarPosition}
+                        onClick={percent => {
+                            if (videoElementRef) {
+                                videoElementRef.currentTime = lineIndex *
+                                    SECONDS_PER_CHARACTER_INE +
+                                    (SECONDS_PER_CHARACTER_INE * percent);
+                                if (videoElementRef.paused) {
+                                    videoElementRef.play();
+                                }
+                            }
+                        }}
+                        onMouseOver={percentage => {
+                            if (replayDragInProgress) {
+                                setHighlightBarP2(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
+                            }
+                        }}
+                        onMouseDown={percentage => {
+                            setReplayDragInProgress(true)
+                            setHighlightBarP1(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
+                        }}
+                        onMouseUp={percentage => {
+                            setReplayDragInProgress(false)
+                            // setHighlightBarP1(undefined)
+                        }}
+                        highlightStartPosition={highlightBarPoints[0]}
+                        highlightEndPosition={highlightBarPoints[1]}
+                    />;
+                })
+            }
+        </div>
         <video
             ref={setVideoElementRef}
             src={(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
             autoPlay
             controls
         />
-        {
-            (chunkedCharacterTimings && videoMetaData)
-            && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
-                const lineStartTime = lineIndex * MILLISECONDS_PER_CHARACTER_LINE;
-                const lineEndTime = lineStartTime + MILLISECONDS_PER_CHARACTER_LINE;
-                let progressBarPosition;
-                if (videoTime) {
-                    const currentChunkIndex = Math.floor(videoTime / MILLISECONDS_PER_CHARACTER_LINE);
-                    if (currentChunkIndex === lineIndex) {
-                        // If this is the one with the current playing index
-                        // The percentage gets send to the component
-                        // Let it figure out its own width
-                        progressBarPosition = ((videoTime % MILLISECONDS_PER_CHARACTER_LINE) / MILLISECONDS_PER_CHARACTER_LINE) * 100;
-                    }
-                }
-                const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
-                const highlightBarPoints = hasPoints
-                    ? getBoundedPoints(
-                        highlightStartMs as number,
-                        highlightStopMs as number,
-                        lineStartTime,
-                        lineEndTime - 1
-                    ).map(p => p && (p - (MILLISECONDS_PER_CHARACTER_LINE * lineIndex)) / MILLISECONDS_PER_CHARACTER_LINE) :
-                    [];
-
-                return <CharacterTimingDisplay
-                    key={lineIndex}
-                    characterTimings={chunkedCharacterTiming}
-                    v={videoMetaData}
-                    duration={MILLISECONDS_PER_CHARACTER_LINE}
-                    progressBarPosition={progressBarPosition}
-                    onClick={percent => {
-                        if (videoElementRef) {
-                            videoElementRef.currentTime = lineIndex *
-                                SECONDS_PER_CHARACTER_INE +
-                                (SECONDS_PER_CHARACTER_INE * percent);
-                            if (videoElementRef.paused) {
-                                videoElementRef.play();
-                            }
-                        }
-                    }}
-                    onMouseOver={percentage => {
-                        if (replayDragInProgress) {
-                            setHighlightBarP2(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
-                        }
-                    }}
-                    onMouseDown={percentage => {
-                        setReplayDragInProgress(true)
-                        setHighlightBarP1(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
-                    }}
-                    onMouseUp={percentage => {
-                        setReplayDragInProgress(false)
-                        // setHighlightBarP1(undefined)
-                    }}
-                    highlightStartPosition={highlightBarPoints[0]}
-                    highlightEndPosition={highlightBarPoints[1]}
-                />;
-            })
-        }
     </Card> : <span/>
 }
