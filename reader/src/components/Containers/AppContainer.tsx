@@ -1,31 +1,34 @@
 import {TreeMenuService} from "../../services/tree-menu.service";
 import {useObservableState} from "observable-hooks";
 import React from "react";
-import {SelectableMenuList} from "../DrawerMenu/SelectableMenuList";
-import {MenuitemInterface} from "../DrawerMenu/menu-item.interface";
+import {TreeMenu} from "../TreeMenu/TreeMenu";
 
-export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<MenuitemInterface, any> }> = ({treeMenuService}) => {
+export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
     const allItems = useObservableState(treeMenuService.allItems$) || {};
-    const selectedItem = useObservableState(treeMenuService.selectedItem$);
-    const currentComponent = useObservableState(treeMenuService.currentComponent$);
-    const menuItemTree = useObservableState(treeMenuService.menuItems.updates$);
-    const path = useObservableState(treeMenuService.path$) || []
+    const selectedComponent = useObservableState(treeMenuService.selectedComponent$)
+    const menuItemTree = useObservableState(treeMenuService.tree.updates$);
+    const directoryPath = useObservableState(treeMenuService.directoryPath$) || []
     return <div className={'app-container'}>
         {
-            menuItemTree?.sourced && <SelectableMenuList
+            menuItemTree?.sourced && <TreeMenu
                 title={'Mandarin Trainer'}
                 tree={menuItemTree.sourced}
-                path={path}
-                pathChanged={newPath => treeMenuService.path$.next(newPath)}
+                directoryPath={directoryPath}
+                directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}
+                componentChanged={componentPath => treeMenuService.componentPath$.next(componentPath)}
+                actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
             />
         }
         <div className={'all-items-container'}>
             {Object.values(allItems)
-                .map(({Component}, index) => <div
+                .map((item, index) => <div
                         key={index}
                         className={'directory-item'}
-                        style={{zIndex: Component === currentComponent ? 1 : 0}}>
-                    {Component}
+                        style={{zIndex: item.Component === selectedComponent?.Component ? 1 : 0}}>
+                    {
+                        // @ts-ignore
+                        <item.Component/>
+                    }
                     </div>
                 )}
         </div>

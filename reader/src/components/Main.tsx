@@ -17,13 +17,12 @@ import {Hotkeys} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "../services/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
 import {TreeMenuService} from "../services/tree-menu.service";
-import {MenuitemInterface} from "./DrawerMenu/menu-item.interface";
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
 
-const treeMenuService = new TreeMenuService<MenuitemInterface, {value: MenuitemInterface}>();
+const treeMenuService = new TreeMenuService<any, {value: any}>();
 
 export function Main({m}: { m: Manager }) {
     const currentPage = useObservableState(m.bottomNavigationValue$);

@@ -1,38 +1,40 @@
 import {constructTree, ds_Tree} from "./tree.service";
-import {TreeMenuNode} from "./tree-menu.service";
 import React from "react";
 import {Manager} from "../lib/Manager";
 import {Reading} from "../components/Reading/Reading";
 import {Library} from "../components/Library/Library";
-import {MenuitemInterface} from "../components/DrawerMenu/menu-item.interface";
 import {SignIn} from "../components/Authentication/SignIn";
 import {SignUp} from "../components/Authentication/SignUp";
+import {TreeMenuNode} from "./tree-menu-node.interface";
 
 
 export const AppDirectoryService = (m: Manager) => {
     const HotkeyScreen = () => <div>Hotkey</div>;
 
     const menuNodeFactory = (
-        Component: React.FunctionComponent<any>,
+        Component: React.FunctionComponent<{}>,
         label: string,
-        key: string
-    ): TreeMenuNode<MenuitemInterface, any> => ({
+        key: string,
+        moveDirectory: boolean,
+        leftIcon?: string,
+    ): TreeMenuNode<any, any> => ({
         Component,
-        value: {
-            label,
-            key
-        },
-        name: label
+        value: {},
+        name: label,
+        label,
+        key,
+        leftIcon,
+        moveDirectory
     })
     const ReadingComponent = () => <Reading m={m}/>;
-    const main = menuNodeFactory(ReadingComponent, 'main', 'main');
-    const library = menuNodeFactory(() => <Library m={m}/>, 'library', 'library');
-    const hotkey = menuNodeFactory(HotkeyScreen, 'hotkey', 'hotkey')
-    const reading = menuNodeFactory(ReadingComponent, 'reading', 'reading');
-    const signIn = menuNodeFactory(() => <SignIn/> ,'sign-in', 'sign-in');
-    const signUp = menuNodeFactory(() => <SignUp/> ,'sign-up', 'sign-up');
+    const main = menuNodeFactory(ReadingComponent, 'main', 'main', false);
+    const library = menuNodeFactory(() => <Library m={m}/>, 'library', 'library', false);
+    const hotkey = menuNodeFactory(HotkeyScreen, 'hotkey', 'hotkey', false)
+    const reading = menuNodeFactory(ReadingComponent, 'reading', 'reading', true);
+    const signIn = menuNodeFactory(() => <SignIn/> ,'sign-in', 'sign-in', true);
+    const signUp = menuNodeFactory(() => <SignUp/> ,'sign-up', 'sign-up', true);
 
-    return constructTree<TreeMenuNode<MenuitemInterface, any>>([
+    return constructTree<TreeMenuNode<any, any>>([
         'root',
         main,
         [

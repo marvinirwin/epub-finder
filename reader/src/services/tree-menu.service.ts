@@ -1,37 +1,72 @@
 // A tree menu is a path and a ds_Tree with a computed property selectdObject
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {DeltaScanner, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
-import React, {FunctionComponent} from "react";
-import {map, scan, shareReplay} from "rxjs/operators";
+import {DeltaScanner, ds_Dict} from "../lib/Tree/DeltaScanner";
+import {map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
+import {TreeMenuNode} from "./tree-menu-node.interface";
 
 export type TreeMenuProps<T> = { value: T };
 
-export interface TreeMenuNode<T, props extends TreeMenuProps<any>> {
-    Component?: React.FunctionComponent<props>;
-    Action?: () => void,
-    value: T;
-    name: string;
-}
-
 export class TreeMenuService<T, U extends TreeMenuProps<any>> {
-    path$ = new ReplaySubject<string[]>(1);
+    directoryPath$ = new ReplaySubject<string[]>(1);
+    componentPath$ = new ReplaySubject<string[] | undefined>(1);
+    selectedDirectory$: Observable<TreeMenuNode<T, U> | undefined>;
+    selectedComponent$: Observable<TreeMenuNode<T, U> | undefined>;
+    actionSelected$ = new ReplaySubject<string[]>(1);
     tree = new DeltaScanner<TreeMenuNode<T, U>>();
-    pathIsInvalid$: Observable<boolean>;
-    selectedItem$: Observable<TreeMenuNode<T, U> | undefined>;
+    directoryIsInvalid$: Observable<boolean>;
 
     allItems$: Observable<ds_Dict<TreeMenuNode<T, U>>>;
+/*
     menuItems: DeltaScanner<T>;
-    currentComponent$: Observable<React.FunctionComponent<U> | undefined>;
+*/
 
     constructor() {
-        this.path$.next([])
-        const itemAtPath$: Observable<ds_Tree<TreeMenuNode<T, U>> | undefined> = combineLatest([
-            this.path$,
+        this.directoryPath$.next([])
+        this.componentPath$.next([])
+        const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode<T, U>> | undefined> = this.itemAtPath$(this.directoryPath$);
+        const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode<T, U>> | undefined> = this.itemAtPath$(this.componentPath$);
+
+        this.directoryIsInvalid$ = combineLatest([
+            itemAtDirectoryPath$,
+            this.directoryPath$
+        ]).pipe(
+            map(([itemAtPath, path]) =>
+                !!itemAtPath && !!path.length
+            )
+        );
+
+        this.selectedComponent$ = componentAtActionPath$.pipe(map(itemAtPath => itemAtPath?.value));
+        this.selectedDirectory$ = itemAtDirectoryPath$.pipe(map(itemAtPath => itemAtPath?.value));
+
+        this.allItems$ = this.tree.updates$.pipe(
+            flattenTreeIntoDict()
+        );
+/*
+        this.menuItems = this.tree.mapWith(v => v.value);
+*/
+
+        this.actionSelected$.pipe(
+            withLatestFrom(this.tree.updates$)
+        ).subscribe(([actionPath, {sourced}]) => {
+            if (sourced) {
+                const action = walkTree<TreeMenuNode<T, U>>(sourced, ...actionPath)?.value?.action;
+                if (action) {
+                    action()
+                }
+            }
+        })
+    }
+
+    private itemAtPath$(path$:
+                        ReplaySubject<string[] | undefined>
+                        | ReplaySubject<string[]>) {
+    return combineLatest([
+            path$,
             this.tree.updates$
         ]).pipe(
             map(([path, {sourced}]) => {
-                if (!path.length) {
+                if (!path?.length) {
                     return sourced;
                 }
                 if (sourced) {
@@ -40,31 +75,6 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
             }),
             shareReplay(1)
         );
-
-        this.pathIsInvalid$ = combineLatest([
-            itemAtPath$,
-            this.path$
-        ]).pipe(
-            map(([itemAtPath, path]) =>
-                !!itemAtPath && !!path.length
-            )
-        );
-
-        this.selectedItem$ = itemAtPath$.pipe(
-            map((itemAtPath) => itemAtPath?.value)
-        );
-
-        this.allItems$ = this.tree.updates$.pipe(
-            flattenTreeIntoDict()
-        );
-
-        this.menuItems = this.tree.mapWith(v => v.value);
-
-        this.currentComponent$ = this.selectedItem$.pipe(
-            scan((acc: FunctionComponent<U> | undefined, curr ) => {
-                return curr?.Component || acc;
-            }, undefined),
-            shareReplay(1)
-        )
     }
+
 }
