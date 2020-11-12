@@ -3,40 +3,28 @@ import {TreeMenuNode} from "./tree-menu.service";
 import {MenuitemInterface} from "../components/DrawerMenu/SelectableMenuList";
 import React from "react";
 import {Manager} from "../lib/Manager";
-import {Reading} from "../components/Pages/Reading";
+import {Reading} from "../components/Reading/Reading";
+import {Library} from "../components/Library/Library";
 
 
 export const AppDirectoryService = (m: Manager) => {
-    const MainScreen = () => <div>Main</div>
-    const LibraryScreen = () => <div>Library</div>;
     const HotkeyScreen = () => <div>Hotkey</div>;
 
-    const main: TreeMenuNode<MenuitemInterface, any> = {
-        Component: () => <Reading m={m}/>,
+    const menuNodeFactory = (
+        Component: React.FunctionComponent<any>,
+        label: string,
+        key: string
+    ): TreeMenuNode<MenuitemInterface, any> => ({
+        Component,
         value: {
-            label: 'reading',
-            key: 'reading'
+            label,
+            key
         },
-        name: 'reading'
-    };
-
-    const library = {
-        Component: LibraryScreen,
-        value: {
-            label: 'library',
-            key: 'library',
-        },
-        name: 'library'
-    };
-
-    const hotkey = {
-        Component: HotkeyScreen,
-        value: {
-            label: 'hotkey',
-            key: 'hotkey',
-        },
-        name: 'hotkey'
-    };
+        name: label
+    })
+    const main = menuNodeFactory(() => <Reading m={m}/>, 'reading', 'reading');
+    const library = menuNodeFactory(() => <Library m={m}/>, 'library', 'library');
+    const hotkey = menuNodeFactory(HotkeyScreen, 'hotkey', 'hotkey')
 
     return constructTree<TreeMenuNode<MenuitemInterface, any>>([
         'root',
@@ -45,24 +33,12 @@ export const AppDirectoryService = (m: Manager) => {
             [
                 'library',
                 library,
-                [
-                    [
-                        'hotkey',
-                        hotkey,
-                        []
-                    ]
-                ]
+                []
             ],
             [
                 'hotkey',
                 hotkey,
-                [
-                    [
-                        'library',
-                        library,
-                        []
-                    ]
-                ]
+                []
             ]
         ]
     ]);

@@ -6,7 +6,7 @@ import {BookWordCount} from "../Interfaces/BookWordCount";
 import {dueDate, isLearning, isNew, isToReview, ScheduleRow, wordCount} from "../ReactiveClasses/ScheduleRow";
 import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {safePush} from "../../test/Util/GetGraphJson";
 import moment from "moment";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";

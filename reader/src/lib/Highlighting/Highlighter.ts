@@ -1,6 +1,6 @@
 import {ReplaySubject} from "rxjs";
 import {map} from "rxjs/operators";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {colorForPercentage} from "../color/Range";

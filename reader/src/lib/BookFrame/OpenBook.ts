@@ -6,7 +6,7 @@ import {TrieWrapper} from "../TrieWrapper";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {AtomizedDocumentBookStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import { AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";

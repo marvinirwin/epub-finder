@@ -1,6 +1,6 @@
 import {HighlightDelta, HighlightMap, TimedHighlightDelta} from "./highlight.interface";
 import {combineLatest, Observable} from "rxjs";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {HasElement, HighlighterPath, recomputeColor} from "./Highlighter";
 
 export class HighlighterService {

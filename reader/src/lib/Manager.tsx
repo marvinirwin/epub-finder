@@ -33,7 +33,7 @@ import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {OpenBook} from "./BookFrame/OpenBook";
 import {QuizCharacter} from "./Manager/QuizCharacter";
-import {ds_Dict} from "./Util/DeltaScanner";
+import {ds_Dict} from "./Tree/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {AuthManager} from "./Manager/AuthManager";

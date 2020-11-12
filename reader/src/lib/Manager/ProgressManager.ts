@@ -2,7 +2,7 @@ import {combineLatest, Observable} from "rxjs";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Dictionary, sum} from 'lodash';
 import {map} from "rxjs/operators";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {CORRECT_RECOGNITION_SCORE} from "../Highlighting/Highlighter";
 import HSK1 from '../HSK/hsk-level-1.json';

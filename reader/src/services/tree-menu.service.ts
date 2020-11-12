@@ -1,6 +1,6 @@
 // A tree menu is a path and a ds_Tree with a computed property selectdObject
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {DeltaScanner, ds_Dict, flattenTree} from "../lib/Util/DeltaScanner";
+import {DeltaScanner, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
 import React from "react";
 import {map, shareReplay} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";

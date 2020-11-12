@@ -5,7 +5,7 @@ import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {Hotkeys} from "../HotKeyEvents";
 import {map, shareReplay} from "rxjs/operators";
 
@@ -86,6 +86,7 @@ export class MyAppDatabase extends Dexie {
 
     resolveSetting$<T>(settingName: string, defaultVal: T) {
         if (!this.settingsListeners[settingName]) {
+            debugger;
             const behaviourSubject = new BehaviorSubject<T>(defaultVal);
             this.settings.where({name: settingName}).first().then(row => {
                 if (row) {
@@ -100,7 +101,7 @@ export class MyAppDatabase extends Dexie {
         return this.settingsListeners[settingName];
     }
     get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
-        return this.resolveSetting$<ds_Dict<boolean>>('openBooks', {'generals.html': true})
+        return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'generals.html': true})
     }
 
     get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {

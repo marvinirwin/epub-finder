@@ -1,9 +1,10 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
-import {DeltaScanner, ds_Dict, NamedDeltaScanner} from "../Util/DeltaScanner";
+import {ReplaySubject, Subject} from "rxjs";
+import {NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {CustomDocument, Website} from "../Website/Website";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {websiteFromFilename} from "../../AppSingleton";
 import {withLatestFrom} from "rxjs/operators";
+import {interpolateSimpleCustomDoc} from "../../services/simple-custom-doc.service";
 
 export class EditingBook {
     text$ = new ReplaySubject<string>(1);
@@ -135,19 +136,3 @@ export class Library {
     }
 }
 
-export function interpolateSimpleCustomDoc(text: string) {
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title/>
-</head>
-<body>
-<!--is this popper-container necessary?-->
-<div class="popper-container">
-${text}
-</div>
-</body>
-</html>`;
-}

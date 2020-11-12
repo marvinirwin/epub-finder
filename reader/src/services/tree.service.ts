@@ -1,7 +1,7 @@
 import {uniq} from "lodash";
-import {DeltaScan, ds_Dict, flattenTree} from "../lib/Util/DeltaScanner";
+import {DeltaScan, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
 import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 import {Named} from "../lib/Manager/OpenBooks";
 
 export type ds_Tree<T, U extends string = string> = {
@@ -90,7 +90,8 @@ export const flattenTreeIntoDict = (key?: string) =>
                         libraryBooks
                     ).map(book => [book.name, book]) : []
                 );
-            })
+            }),
+            shareReplay(1)
         );
     }
 

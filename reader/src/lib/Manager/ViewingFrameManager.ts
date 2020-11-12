@@ -2,7 +2,7 @@ import {combineLatest, Observable} from "rxjs";
 import {OpenBook} from "../BookFrame/OpenBook";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {map, switchMap} from "rxjs/operators";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Util/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Tree/DeltaScanner";
 import {flatten, Dictionary} from "lodash";
 
 

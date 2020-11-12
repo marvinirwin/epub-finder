@@ -1,5 +1,5 @@
 import {Named} from "../Manager/OpenBooks";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 
 export interface NamedObjectList<T extends Named> {
     listObjects: T[] | ds_Dict<T>;

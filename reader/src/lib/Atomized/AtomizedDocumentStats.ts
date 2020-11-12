@@ -1,6 +1,6 @@
 import {Dictionary} from "lodash";
 import {AtomizedSentence} from "./AtomizedSentence";
-import {ds_Dict} from "../Util/DeltaScanner";
+import {ds_Dict} from "../Tree/DeltaScanner";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 
 export interface AtomizedDocumentStats {

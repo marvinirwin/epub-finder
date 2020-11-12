@@ -4,7 +4,7 @@ import React from "react";
 import {useObservableState} from "observable-hooks";
 import HSK1 from "../lib/HSK/hsk-level-1.json";
 import {HSKWord} from "../lib/Manager/ProgressManager";
-import {ds_Dict} from "../lib/Util/DeltaScanner";
+import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import { flatten, orderBy } from "lodash";
 import {isChineseCharacter} from "../lib/Interfaces/OldAnkiClasses/Card";
 

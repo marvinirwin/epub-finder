@@ -4,7 +4,7 @@ import {IAnnotatedCharacter} from "../../Interfaces/Annotation/IAnnotatedCharact
 import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
 import {TrieObservable} from "../QuizCharacter";
 import {MyAppDatabase} from "../../Storage/AppDB";
-import {ds_Dict} from "../../Util/DeltaScanner";
+import {ds_Dict} from "../../Tree/DeltaScanner";
 import {CustomDocument, Website} from "../../Website/Website";
 
 export interface OpenBooksConfig {

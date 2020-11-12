@@ -1,5 +1,5 @@
 import React from 'react';
-import {Manager} from "../lib/Manager";
+import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export const LibrarySidebar: React.FunctionComponent<{ m: Manager }> = ({m}) => {
+export const BookSelectionMenu: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const library = useObservableState(m.openedBooks.library$);
     const classes = useStyles();
 

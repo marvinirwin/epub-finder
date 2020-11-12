@@ -5,7 +5,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import EditingCardComponent from "../Card/EditingCardComponent";
 import AudioRecorder, {SLIM_CARD_CONTENT} from "../AudioPopup/AudioRecorder";
 import {useObservableState} from "observable-hooks";
-import {LibrarySidebar} from "../LibrarySidebar";
 
 const useStyles = makeStyles((theme) => ({
     popup: {
@@ -72,10 +71,8 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     </Paper>;
 }
 
-
 export function ReadingPage({m}: { m: Manager }) {
     return <Fragment>
         <SlidingTopWindows m={m}/>
-        <LibrarySidebar m={m}/>
     </Fragment>
 }
