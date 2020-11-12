@@ -328,25 +328,6 @@
   & > .video-container {
     width: 100%;
 
-    & > .video {
-      flex-flow: column nowrap;
-      display: flex;
-      background-color: white;
-
-      & > video {
-        flex-grow: 1;
-        /*
-        max-width: 533px;
-        max-height: 300px;
-        */
-        /* This overflow auto line somehow makes the */
-        overflow: auto;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
   }
 
   & > .speech {
@@ -362,23 +343,41 @@
   }
 }
 
+.pronunciation-video-container {
+  & > .pronunciation-video-container-card {
+    display: flex;
+    flex-flow: row nowrap;
+    & > video {
+      width: 240px;
+    }
+    & > .pronunciation-sections-container {
+      display: flex;
+      flex: 1;
+      flex-flow: column nowrap;
+      & > .character-timing-section-container {
+        & > .character-timing-section {
+          position: relative;
+          border: solid black;
+          height: 50px;
+          flex: 1;
+          & > mark {
+            position: absolute;
+            background-color: transparent;
+            font-size: 200%;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 .video-container-card {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
-  & > .character-timing-display-container {
-    display: flex;
-    flex: 1;
-    flex-flow: column nowrap;
 
-    & > .character-timing-display-line-container {
-      & > .character-timing-display {
-        border: solid black;
-        height: 50px;
-        flex: 1;
-      }
-    }
-  }
+
   & > video {
     height: 360px;
   }

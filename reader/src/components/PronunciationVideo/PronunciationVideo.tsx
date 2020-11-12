@@ -169,7 +169,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     useSubscription(m.hotkeyEvents.hideVideo$, () => setVideoMetaData(undefined));
 
     return <div className={'pronunciation-video-container'}>
-        {videoMetaData ? <Card className={'video-container-card'}>
+        {videoMetaData ? <Card className={'pronunciation-video-container-card'}>
             {/*
         <div style={{position: 'absolute', top: 0, zIndex: 10}}>
             <HotkeyWrapper action={"HIDE_VIDEO"}>
