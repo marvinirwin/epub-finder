@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
 import {TemporalPositionBar} from "./TemporalPositionBar";
 import {HighlightBar} from "./HighlightBar";
-import {percentagePosition} from "./percentages.service";
+import {percentagePosition} from "./math.service";
 import {VideoMetaData} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
 import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";

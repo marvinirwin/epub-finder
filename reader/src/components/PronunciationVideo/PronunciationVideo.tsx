@@ -1,86 +1,32 @@
 import {Manager} from "../../lib/Manager";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
-import {clearInterval} from "timers";
 import {CharacterTimingSection} from "./CharacterTimingSection";
-import {VideoMetaData} from "./video-meta-data.interface";
-import {VideoCharacter} from "./video-character.interface";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
+import {boundedPoints} from "./math.service";
+import {useVideoTime} from "./useVideoTime";
+import {useVideoMetaData} from "./useVideoMetaData";
+import {useInterval} from "./useInterval";
 
-function useInterval(callback: () => void, delay: number) {
-    const savedCallback = useRef<() => void>();
-
-    // Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
-
-    // Set up the interval.
-    useEffect(() => {
-        function tick() {
-            savedCallback.current && savedCallback.current();
-        }
-
-        if (delay !== null) {
-            const id = setInterval(tick, delay);
-            return () => clearInterval(id);
-        }
-    }, [delay]);
-}
-
-export async function sentenceToFilename(sentence: string): Promise<string> {
-    return digestMessage(sentence.normalize().replace(/\s+/, ' '));
-}
-
-async function digestMessage(message: string): Promise<string> {
-    const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));
-    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    // convert bytes to hex string
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-export const MILLISECONDS_PER_CHARACTER_LINE = 5000;
-export const SECONDS_PER_CHARACTER_INE = MILLISECONDS_PER_CHARACTER_LINE / 1000;
 
 export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const currentSentence = useObservableState(m.inputManager.hoveredSentence$);
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.hoveredCharacterIndex$);
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
-    const [videoMetaData, setVideoMetaData] = useState<VideoMetaData | undefined>();
-    const [videoInterval, setVideoInterval] = useState<NodeJS.Timeout | null>();
-    const [videoTime, setVideoTime] = useState<undefined | number>(undefined);
     const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
     const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
     const [pronunciationSectionsContainer, setPronunciationSectionsContainer] = useState<HTMLDivElement | null>();
+    const [hidden, setHidden] = useState(true)
 
-    useEffect(() => {
-        setVideoInterval(setInterval(() => {
-            videoElementRef && setVideoTime(videoElementRef.currentTime)
-        }, 10));
-        return () => {
-            videoInterval && clearInterval(videoInterval);
-        }
-    }, []);
+    const sectionWidth = pronunciationSectionsContainer?.clientWidth;
+    const millisecondsPerSection = sectionWidth ? sectionWidth * 10 : undefined;
 
-    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, pronunciationSectionsContainer?.clientWidth);
+    const videoTime = useVideoTime(videoElementRef);
+    const videoMetaData = useVideoMetaData(currentSentence)
+    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, sectionWidth);
 
-    useEffect(() => {
-        (async () => {
-            if (currentSentence) {
-                setVideoMetaData(undefined);
-                try {
-                    const response = await fetch(`${process.env.PUBLIC_URL}/video/${await sentenceToFilename(currentSentence)}.json`)
-                    if (response.status === 200) {
-                        setVideoMetaData(await response.json())
-                    }
-                } catch (e) {
-                }
-            }
-        })()
-    }, [currentSentence]);
 
     useEffect(() => {
         if (videoElementRef
@@ -108,11 +54,6 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
         }
     }, [videoElementRef]);
 
-    useInterval(() => {
-        if (videoElementRef) {
-            setVideoTime(videoElementRef.currentTime * 1000)
-        }
-    }, 100);
 
     useInterval(() => {
         if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {
@@ -127,35 +68,8 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
         [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
-    function getBoundedPoints(p1: number, p2: number, min: number, max: number) {
-        const empty: never[] = [];
-        let newp1;
-        let newp2;
-        if (p1 > min) {
-            if (p1 < max) {
-                newp1 = p1;
-            } else {
-                return empty;
-            }
-        } else {
-            newp1 = min;
-        }
-        if (p2 < max) {
-            if (p2 > min) {
-                newp2 = p2;
-            } else {
-                return empty;
-            }
-        } else {
-            newp2 = max;
-        }
-        return [
-            newp1,
-            newp2
-        ];
-    }
 
-    useSubscription(m.hotkeyEvents.hideVideo$, () => setVideoMetaData(undefined));
+    useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
     return <div className={'pronunciation-video-container'}>
         {videoMetaData ? <Card className={'pronunciation-video-container-card'}>
@@ -172,41 +86,41 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 */}
             <div className={'pronunciation-sections-container'} ref={setPronunciationSectionsContainer}>
                 {
-                    (chunkedCharacterTimings && videoMetaData)
+                    (chunkedCharacterTimings && videoMetaData && millisecondsPerSection)
                     && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
-                        const lineStartTime = lineIndex * MILLISECONDS_PER_CHARACTER_LINE;
-                        const lineEndTime = lineStartTime + MILLISECONDS_PER_CHARACTER_LINE;
+                        const lineStartTime = lineIndex * millisecondsPerSection;
+                        const lineEndTime = lineStartTime + millisecondsPerSection;
                         let progressBarPosition;
                         if (videoTime) {
-                            const currentChunkIndex = Math.floor(videoTime / MILLISECONDS_PER_CHARACTER_LINE);
+                            const currentChunkIndex = Math.floor(videoTime / millisecondsPerSection);
                             if (currentChunkIndex === lineIndex) {
                                 // If this is the one with the current playing index
                                 // The percentage gets send to the component
                                 // Let it figure out its own width
-                                progressBarPosition = ((videoTime % MILLISECONDS_PER_CHARACTER_LINE) / MILLISECONDS_PER_CHARACTER_LINE) * 100;
+                                progressBarPosition = ((videoTime % millisecondsPerSection) / millisecondsPerSection) * 100;
                             }
                         }
                         const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
                         const highlightBarPoints = hasPoints
-                            ? getBoundedPoints(
+                            ? boundedPoints(
                                 highlightStartMs as number,
                                 highlightStopMs as number,
                                 lineStartTime,
                                 lineEndTime - 1
-                            ).map(p => p && (p - (MILLISECONDS_PER_CHARACTER_LINE * lineIndex)) / MILLISECONDS_PER_CHARACTER_LINE) :
+                            ).map(p => p && (p - (millisecondsPerSection * lineIndex)) / millisecondsPerSection) :
                             [];
 
                         return <CharacterTimingSection
                             key={lineIndex}
                             characterTimings={chunkedCharacterTiming}
                             videoMetaData={videoMetaData}
-                            sectionDuration={MILLISECONDS_PER_CHARACTER_LINE}
+                            sectionDuration={millisecondsPerSection}
                             progressBarPosition={progressBarPosition}
                             onClick={percent => {
                                 if (videoElementRef) {
                                     videoElementRef.currentTime = lineIndex *
-                                        SECONDS_PER_CHARACTER_INE +
-                                        (SECONDS_PER_CHARACTER_INE * percent);
+                                        millisecondsPerSection / 1000 +
+                                        (millisecondsPerSection / 1000 * percent);
                                     if (videoElementRef.paused) {
                                         videoElementRef.play();
                                     }
@@ -214,12 +128,12 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             }}
                             onMouseOver={percentage => {
                                 if (replayDragInProgress) {
-                                    setHighlightBarP2(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
+                                    setHighlightBarP2(lineStartTime + (percentage * millisecondsPerSection))
                                 }
                             }}
                             onMouseDown={percentage => {
                                 setReplayDragInProgress(true)
-                                setHighlightBarP1(lineStartTime + (percentage * MILLISECONDS_PER_CHARACTER_LINE))
+                                setHighlightBarP1(lineStartTime + (percentage * millisecondsPerSection))
                             }}
                             onMouseUp={percentage => {
                                 setReplayDragInProgress(false)

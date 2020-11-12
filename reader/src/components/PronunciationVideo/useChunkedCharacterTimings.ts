@@ -4,11 +4,10 @@ import {VideoMetaData} from "./video-meta-data.interface";
 
 const CHARACTER_TIMING_SECTION_PADDING = 24;
 
-export const useChunkedCharacterTimings = (videoMetaData: VideoMetaData | undefined, sectionWidthInPixels: number | undefined) => {
+export const useChunkedCharacterTimings = (videoMetaData: VideoMetaData | undefined, sectionWidthInMilliseconds: number | undefined) => {
     const [chunkedCharacterTimings, setChunkedCharacterTimings] = useState<VideoCharacter[][] | null>();
     useEffect(() => {
-        if (videoMetaData && sectionWidthInPixels) {
-            const sectionWidthInMilliseconds = (sectionWidthInPixels * 5);
+        if (videoMetaData && sectionWidthInMilliseconds) {
             setChunkedCharacterTimings(videoMetaData.characters.reduce((chunks: VideoCharacter[][], character) => {
                 const time = videoMetaData.timeScale * character.timestamp;
                 // pixels is too spread out, let's try * 100
@@ -20,6 +19,6 @@ export const useChunkedCharacterTimings = (videoMetaData: VideoMetaData | undefi
                 return chunks;
             }, []))
         }
-    }, [videoMetaData, sectionWidthInPixels])
+    }, [videoMetaData, sectionWidthInMilliseconds])
     return chunkedCharacterTimings;
 };
