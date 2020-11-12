@@ -59,19 +59,19 @@ export const CharacterTimingSection: React.FunctionComponent<{
                 onClick={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onClick(((ev.clientX - rect.x) / sectionContainer.clientWidth))
+                        onClick(((ev.clientX - rect.x) / sectionContainer.clientWidth) * 100)
                     }
                 }}
                 onMouseDown={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onMouseDown((ev.clientX - rect.x) / sectionContainer.clientWidth)
+                        onMouseDown((ev.clientX - rect.x) / sectionContainer.clientWidth * 100)
                     }
                 }}
                 onMouseUp={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onMouseUp((ev.clientX - rect.x) / sectionContainer.clientWidth)
+                        onMouseUp((ev.clientX - rect.x) / sectionContainer.clientWidth * 100)
                     }
                 }}
     >

@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
@@ -8,6 +8,8 @@ import {boundedPoints} from "./math.module";
 import {useVideoTime} from "./useVideoTime";
 import {useVideoMetaData} from "./useVideoMetaData";
 import {useInterval} from "./useInterval";
+import {useSetVideoTime} from "./useSetVideoTime";
+import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
 
 
 export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m}) => {
@@ -27,32 +29,8 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     const videoMetaData = useVideoMetaData(currentSentence)
     const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, millisecondsPerSection);
 
-
-    useEffect(() => {
-        if (videoElementRef
-            && currentSentence
-            && (currentSentenceCharacterIndex === 0 || currentSentenceCharacterIndex)
-            && videoMetaData) {
-            const time = videoMetaData?.characters[currentSentenceCharacterIndex]?.timestamp;
-            const timeScale = videoMetaData?.timeScale;
-            if (time && timeScale) {
-                videoElementRef.currentTime = (time * timeScale) / 1000;
-            }
-        }
-    }, [
-        currentSentenceCharacterIndex,
-        currentSentence,
-        videoElementRef,
-        videoMetaData
-    ]);
-
-    useEffect(() => {
-        if (videoElementRef) {
-            videoElementRef.playbackRate = 0.25;
-            videoElementRef.volume = 0.5;
-
-        }
-    }, [videoElementRef]);
+    useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetaData);
+    useSetVideoTime(videoElementRef);
 
 
     useInterval(() => {
@@ -94,9 +72,6 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                         if (videoTimeMs) {
                             const currentChunkIndex = Math.floor(videoTimeMs / millisecondsPerSection);
                             if (currentChunkIndex === lineIndex) {
-                                // If this is the one with the current playing index
-                                // The percentage gets send to the component
-                                // Let it figure out its own width
                                 progressBarPosition = ((videoTimeMs % millisecondsPerSection) / millisecondsPerSection) * 100;
                             }
                         }
@@ -121,7 +96,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                                 if (videoElementRef) {
                                     videoElementRef.currentTime = lineIndex *
                                         millisecondsPerSection / 1000 +
-                                        (millisecondsPerSection / 1000 * percent);
+                                        (millisecondsPerSection / 1000 * percent / 100);
                                     if (videoElementRef.paused) {
                                         videoElementRef.play();
                                     }
@@ -129,16 +104,15 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             }}
                             onMouseOver={percentage => {
                                 if (replayDragInProgress) {
-                                    setHighlightBarP2(lineStartTime + (percentage * millisecondsPerSection))
+                                    setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection))
                                 }
                             }}
                             onMouseDown={percentage => {
                                 setReplayDragInProgress(true)
-                                setHighlightBarP1(lineStartTime + (percentage * millisecondsPerSection))
+                                setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection))
                             }}
                             onMouseUp={percentage => {
                                 setReplayDragInProgress(false)
-                                // setHighlightBarP1(undefined)
                             }}
                             highlightStartPosition={highlightBarPoints[0]}
                             highlightEndPosition={highlightBarPoints[1]}
