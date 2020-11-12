@@ -104,12 +104,12 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             }}
                             onMouseOver={percentage => {
                                 if (replayDragInProgress) {
-                                    setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection))
+                                    setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection * .9))
                                 }
                             }}
                             onMouseDown={percentage => {
                                 setReplayDragInProgress(true)
-                                setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection))
+                                setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection * .9))
                             }}
                             onMouseUp={percentage => {
                                 setReplayDragInProgress(false)

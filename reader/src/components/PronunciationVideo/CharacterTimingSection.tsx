@@ -76,8 +76,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
                 }}
     >
         <HighlightBar setHighlightBar={setHighlightBar}/>
-        <TemporalPositionBar position={hoverBarPercentPosition ?  hoverBarPercentPosition / 100 * sectionWidthPx : undefined} color={'blue'}/>
-        <TemporalPositionBar position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx : undefined} color={'black'}/>
+        <TemporalPositionBar position={hoverBarPercentPosition ?  hoverBarPercentPosition / 100 * sectionWidthPx: undefined} color={'blue'}/>
+        <TemporalPositionBar position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx * .9 : undefined} color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
             {characterTimings.filter(characterTiming => isChineseCharacter(characterTiming.character)).map(characterTiming => <mark style={
                 {left: `${percentagePosition(sectionDurationMs, characterTiming.timestamp * videoMetaData.timeScale) * .9}%`}
