@@ -4,6 +4,8 @@ import {TreeMenuProps} from "./tree-menu.service";
 export interface TreeMenuNode<T, props extends TreeMenuProps<any>> {
     Component?: React.FunctionComponent;
     action?: () => void,
+    inlineComponent?: React.FunctionComponent;
+
     value: T;
     name: string;
 

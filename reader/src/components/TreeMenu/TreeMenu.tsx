@@ -86,7 +86,7 @@ export const TreeMenu: React.FunctionComponent<{
                     {treeMenuNode?.leftIcon && <ListItemIcon>{treeMenuNode.leftIcon}</ListItemIcon>}
                     {!useMinified && <ListItemText primary={treeMenuNode?.label}/>}
 
-                    {treeNode &&
+                    {treeMenuNode?.moveDirectory &&
                     <ListItemSecondaryAction
                     >
                         <IconButton

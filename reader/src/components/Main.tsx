@@ -28,7 +28,7 @@ export function Main({m}: { m: Manager }) {
     const currentPage = useObservableState(m.bottomNavigationValue$);
     useEffect(() => {
         m.inputManager.applyDocumentListeners(document);
-        treeMenuService.tree.appendDelta$.next(AppDirectoryService(m));
+        AppDirectoryService(m).subscribe(v => treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
     const readingBook = m.openedBooks.readingBook;
