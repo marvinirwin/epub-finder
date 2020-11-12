@@ -71,7 +71,7 @@ export const SelectableMenuList: React.FunctionComponent<{
                         child?.value?.key && pathChanged(path.concat(child.value.key))
                     }}
                 >
-                    <IconButton style={{/*marginRight: useMinified ? 150 : undefined*/}}>
+                    <IconButton style={{marginRight: useMinified ? 150 : undefined}} onClick={() => pathChanged(path.concat(child.value.key))}>
                         <KeyboardArrowRight color={'action'}/>
                     </IconButton>
                 </ListItemSecondaryAction>
