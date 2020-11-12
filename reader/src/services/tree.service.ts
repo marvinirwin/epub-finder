@@ -97,14 +97,14 @@ export const flattenTreeIntoDict = (key?: string) =>
 
 
 
-export type TreeConstructor<T> = [string, T, TreeConstructor<T>[]]
+export type TreeConstructor<T> = [string, T, TreeConstructor<T>[] | undefined]
 export const constructTree = <T>(t: TreeConstructor<T>): ds_Tree<T> => {
     const [nodeLabel, value, children] = t;
     return {
         nodeLabel,
         value,
         children: Object.fromEntries(
-            children.map(constructor => [constructor[0], constructTree(constructor)])
+            (children || []).map(constructor => [constructor[0], constructTree(constructor)])
         )
     };
 }

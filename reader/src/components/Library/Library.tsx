@@ -14,27 +14,6 @@ import {CheckedOutBooks} from "./CheckedOutBooks";
 import {AvailableBooks} from "./AvailableBooks";
 import {CustomBook} from "./CustomBook";
 
-export const BookList = <T extends Named>({listObjects, onSelect, onDelete}: NamedObjectList<T>) => {
-    return <List dense={true}>
-        {
-            Object.values(listObjects).map(libraryBook => {
-                return <ListItem
-                    key={libraryBook.name}
-                    button>
-                    <ListItemText primary={libraryBook.name}
-                                  onClick={() => onSelect(libraryBook)}
-                    />
-                    {
-                        onDelete && <IconButton onClick={() => onDelete(libraryBook)}>
-                            <DeleteIcon/>
-                        </IconButton>
-                    }
-                </ListItem>;
-            })
-        }
-    </List>;
-}
-
 export function Library({m}: { m: Manager }) {
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
