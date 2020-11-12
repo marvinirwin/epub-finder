@@ -6,7 +6,7 @@ import {
     ListItemIcon,
     ListItemSecondaryAction,
     ListItemText,
-    Theme,
+    Theme, Typography,
     withStyles,
     withTheme
 } from "@material-ui/core";
@@ -14,17 +14,15 @@ import React from "react";
 import {ArrowBack, KeyboardArrowRight} from "@material-ui/icons";
 import {ds_Tree, treeValue, walkTree} from "../../services/tree.service";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
+import {makeStyles} from "@material-ui/core/styles";
 
-const styles = (theme: Theme) => ({
-    root: {
-        width: '100%',
-        maxWidth: 360,
-        backgroundColor: theme.palette.background.paper
-    },
-    icon: {
-        color: theme.palette.primary.contrastText
+const useStyles = makeStyles((theme: Theme) => ({
+    title: {
+        padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(
+            3
+        )}px`,
     }
-})
+}))
 
 export const TreeMenu: React.FunctionComponent<{
     title: string,
@@ -43,6 +41,7 @@ export const TreeMenu: React.FunctionComponent<{
         actionSelected
     }
 ) => {
+    const classes = useStyles()
     const useMinified = false;
     return <List className={'selectable-menu-list'}>
         {directoryPath.length ?
@@ -60,7 +59,7 @@ export const TreeMenu: React.FunctionComponent<{
                 </ListItem>
                 <Divider/>
             </div> :
-            <div>{title}</div>
+            <Typography variant="h6" className={classes.title}>{title}</Typography>
         }
         {
             Object.values(walkTree(tree, ...directoryPath)?.children || {}).map((treeNode, index) => {

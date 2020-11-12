@@ -4,7 +4,7 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
-import {boundedPoints} from "./math.service";
+import {boundedPoints} from "./math.module";
 import {useVideoTime} from "./useVideoTime";
 import {useVideoMetaData} from "./useVideoMetaData";
 import {useInterval} from "./useInterval";
@@ -21,11 +21,11 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     const [hidden, setHidden] = useState(true)
 
     const sectionWidth = pronunciationSectionsContainer?.clientWidth;
-    const millisecondsPerSection = sectionWidth ? sectionWidth * 10 : undefined;
+    const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
 
-    const videoTime = useVideoTime(videoElementRef);
+    const videoTimeMs = useVideoTime(videoElementRef);
     const videoMetaData = useVideoMetaData(currentSentence)
-    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, sectionWidth);
+    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, millisecondsPerSection);
 
 
     useEffect(() => {
@@ -91,13 +91,13 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                         const lineStartTime = lineIndex * millisecondsPerSection;
                         const lineEndTime = lineStartTime + millisecondsPerSection;
                         let progressBarPosition;
-                        if (videoTime) {
-                            const currentChunkIndex = Math.floor(videoTime / millisecondsPerSection);
+                        if (videoTimeMs) {
+                            const currentChunkIndex = Math.floor(videoTimeMs / millisecondsPerSection);
                             if (currentChunkIndex === lineIndex) {
                                 // If this is the one with the current playing index
                                 // The percentage gets send to the component
                                 // Let it figure out its own width
-                                progressBarPosition = ((videoTime % millisecondsPerSection) / millisecondsPerSection) * 100;
+                                progressBarPosition = ((videoTimeMs % millisecondsPerSection) / millisecondsPerSection) * 100;
                             }
                         }
                         const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
@@ -114,8 +114,9 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             key={lineIndex}
                             characterTimings={chunkedCharacterTiming}
                             videoMetaData={videoMetaData}
-                            sectionDuration={millisecondsPerSection}
-                            progressBarPosition={progressBarPosition}
+                            sectionDurationMs={millisecondsPerSection}
+                            sectionWidthPx={sectionWidth || 0}
+                            progressBarPercentPosition={progressBarPosition}
                             onClick={percent => {
                                 if (videoElementRef) {
                                     videoElementRef.currentTime = lineIndex *

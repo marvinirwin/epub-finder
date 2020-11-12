@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
 import {TemporalPositionBar} from "./TemporalPositionBar";
 import {HighlightBar} from "./HighlightBar";
-import {percentagePosition} from "./math.service";
+import {percentagePosition} from "./math.module";
 import {VideoMetaData} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
 import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
@@ -12,8 +12,9 @@ export type Percentage = number;
 export const CharacterTimingSection: React.FunctionComponent<{
     characterTimings: VideoCharacter[],
     videoMetaData: VideoMetaData,
-    sectionDuration: number,
-    progressBarPosition: number | undefined,
+    sectionDurationMs: number,
+    sectionWidthPx: number,
+    progressBarPercentPosition: number | undefined,
     highlightStartPosition: number,
     highlightEndPosition: number,
     onClick: (p: Percentage) => void,
@@ -23,14 +24,15 @@ export const CharacterTimingSection: React.FunctionComponent<{
 }> = ({
           characterTimings,
           videoMetaData,
-          sectionDuration,
-          progressBarPosition,
+          sectionDurationMs,
+          progressBarPercentPosition,
           onClick,
           highlightStartPosition,
           highlightEndPosition,
           onMouseDown,
           onMouseOver,
-          onMouseUp
+          onMouseUp,
+            sectionWidthPx
       }) => {
     const [sectionContainer, setSectionContainer] = useState<HTMLDivElement | null>();
     const [hoverBarPercentPosition, setHoverBarPercentPosition] = useState<number | undefined>(undefined);
@@ -49,7 +51,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
                      */
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        const percentage = (ev.clientX - rect.x) / sectionContainer.clientWidth;
+                        const percentage = (ev.clientX - rect.x) / sectionContainer.clientWidth * 100;
                         setHoverBarPercentPosition(percentage);
                         onMouseOver(percentage);
                     }
@@ -74,11 +76,11 @@ export const CharacterTimingSection: React.FunctionComponent<{
                 }}
     >
         <HighlightBar setHighlightBar={setHighlightBar}/>
-        <TemporalPositionBar position={hoverBarPercentPosition} color={'blue'}/>
-        <TemporalPositionBar position={progressBarPosition} color={'black'}/>
+        <TemporalPositionBar position={hoverBarPercentPosition ?  hoverBarPercentPosition / 100 * sectionWidthPx : undefined} color={'blue'}/>
+        <TemporalPositionBar position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx : undefined} color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
             {characterTimings.filter(characterTiming => isChineseCharacter(characterTiming.character)).map(characterTiming => <mark style={
-                {left: `${percentagePosition(sectionDuration, characterTiming.timestamp * videoMetaData.timeScale) * .9}%`}
+                {left: `${percentagePosition(sectionDurationMs, characterTiming.timestamp * videoMetaData.timeScale) * .9}%`}
             }>{characterTiming.character}
             </mark>)}
         </div>

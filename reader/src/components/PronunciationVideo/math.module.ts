@@ -1,6 +1,7 @@
 export const percentagePosition = (sectionDuration: number, temporalPosition: number) => {
     return (temporalPosition % sectionDuration) / sectionDuration * 100;
 }
+
 export const boundedPoints = (p1: number, p2: number, min: number, max: number) => {
     const empty: never[] = [];
     let newp1;
@@ -28,3 +29,4 @@ export const boundedPoints = (p1: number, p2: number, min: number, max: number) 
         newp2
     ];
 }
+
