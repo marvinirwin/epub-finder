@@ -5,6 +5,7 @@ import {HighlightBar} from "./HighlightBar";
 import {percentagePosition} from "./percentages.service";
 import {VideoMetaData} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
+import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
 
 export type Percentage = number;
 
@@ -76,8 +77,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
         <TemporalPositionBar position={hoverBarPercentPosition} color={'blue'}/>
         <TemporalPositionBar position={progressBarPosition} color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
-            {characterTimings.map(characterTiming => <mark style={
-                {left: `${percentagePosition(sectionDuration, characterTiming.timestamp * videoMetaData.timeScale)}%`}
+            {characterTimings.filter(characterTiming => isChineseCharacter(characterTiming.character)).map(characterTiming => <mark style={
+                {left: `${percentagePosition(sectionDuration, characterTiming.timestamp * videoMetaData.timeScale) * .9}%`}
             }>{characterTiming.character}
             </mark>)}
         </div>

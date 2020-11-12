@@ -6,6 +6,7 @@ import {clearInterval} from "timers";
 import {CharacterTimingSection} from "./CharacterTimingSection";
 import {VideoMetaData} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
+import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 
 function useInterval(callback: () => void, delay: number) {
     const savedCallback = useRef<() => void>();
@@ -48,12 +49,12 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.hoveredCharacterIndex$);
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
     const [videoMetaData, setVideoMetaData] = useState<VideoMetaData | undefined>();
-    const [chunkedCharacterTimings, setChunkedCharacterTimings] = useState<VideoCharacter[][] | null>();
     const [videoInterval, setVideoInterval] = useState<NodeJS.Timeout | null>();
     const [videoTime, setVideoTime] = useState<undefined | number>(undefined);
     const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
     const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
+    const [pronunciationSectionsContainer, setPronunciationSectionsContainer] = useState<HTMLDivElement | null>();
 
     useEffect(() => {
         setVideoInterval(setInterval(() => {
@@ -64,19 +65,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
         }
     }, []);
 
-    useEffect(() => {
-        if (videoMetaData) {
-            setChunkedCharacterTimings(videoMetaData.characters.reduce((chunks: VideoCharacter[][], character) => {
-                const time = videoMetaData.timeScale * character.timestamp;
-                const chunkIndex = Math.floor(time / MILLISECONDS_PER_CHARACTER_LINE);
-                if (!chunks[chunkIndex]) {
-                    chunks[chunkIndex] = [];
-                }
-                chunks[chunkIndex].push(character)
-                return chunks;
-            }, []))
-        }
-    }, [videoMetaData])
+    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, pronunciationSectionsContainer?.clientWidth);
 
     useEffect(() => {
         (async () => {
@@ -181,7 +170,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
             </HotkeyWrapper>
         </div>
 */}
-            <div className={'pronunciation-sections-container'}>
+            <div className={'pronunciation-sections-container'} ref={setPronunciationSectionsContainer}>
                 {
                     (chunkedCharacterTimings && videoMetaData)
                     && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
