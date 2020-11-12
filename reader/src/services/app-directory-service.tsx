@@ -1,12 +1,12 @@
 import {constructTree, ds_Tree} from "./tree.service";
 import {TreeMenuNode} from "./tree-menu.service";
-import {MenuitemInterface} from "../components/DrawerMenu/SelectableMenuList";
 import React from "react";
 import {Manager} from "../lib/Manager";
 import {Reading} from "../components/Reading/Reading";
 import {Library} from "../components/Library/Library";
 import SignIn from "../components/Auth/SignIn";
 import SignUp from "../components/Auth/SignUp";
+import {MenuitemInterface} from "../components/DrawerMenu/menu-item.interface";
 
 
 export const AppDirectoryService = (m: Manager) => {

@@ -1,14 +1,9 @@
 import Button from '@material-ui/core/Button'
-import Page from 'material-ui-shell/lib/containers/Page'
 import Paper from '@material-ui/core/Paper'
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
-import { useAuth } from 'base-shell/lib/providers/Auth'
-import { useHistory } from 'react-router-dom'
-import { useIntl } from 'react-intl'
-import { useMenu } from 'material-ui-shell/lib/providers/Menu'
+import {makeStyles} from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,75 +44,48 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const SignUp = () => {
+export const SignUp = () => {
     const classes = useStyles()
-    const intl = useIntl()
-    const history = useHistory()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [userEmail, setUserEmail] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const { setAuthMenuOpen } = useMenu()
-    const { setAuth } = useAuth()
 
     function handleSubmit(event: Event) {
         event.preventDefault()
-        authenticate({
-            displayName: 'User',
-            email: username,
-        })
     }
 
-    const authenticate = (user) => {
-        setAuth({ isAuthenticated: true, ...user })
-
-        setAuthMenuOpen(false)
-        let _location = history.location
-
-        let _route = '/home'
-        if (_location.state && _location.state.from) {
-            _route = _location.state.from.pathname
-            history.push(_route)
-        } else {
-            history.push(_route)
-        }
+    const authenticate = () => {
     }
 
     return (
-        <Page
-            pageTitle={intl.formatMessage({
-                id: 'sign_up',
-                defaultMessage: ' Sign up',
-            })}
-            onBackClick={() => {
-                history.goBack()
-            }}
-        >
+        <Paper >
             <Paper className={classes.paper} elevation={6}>
                 <div className={classes.container}>
                     <Typography component="h1" variant="h5">
-                        {intl.formatMessage({ id: 'sign_up', defaultMessage: 'Sign up' })}
+                        {"Sign up"}
                     </Typography>
-                    <form className={classes.form} onSubmit={handleSubmit} noValidate>
+                    <form
+                        className={classes.form}
+                        onSubmit={() => { }}
+                        noValidate
+                    >
                         <TextField
                             value={username}
-                            onInput={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setUsername(e.target.value)}
                             variant="outlined"
                             margin="normal"
                             required
                             fullWidth
                             id="username"
-                            label={intl.formatMessage({
-                                id: 'username',
-                                defaultMessage: 'Username',
-                            })}
+                            label={"username"}
                             name="username"
                             autoComplete="username"
                             autoFocus
                         />
                         <TextField
                             value={userEmail}
-                            onInput={(e) => setUserEmail(e.target.value)}
+                            onChange={(e) => setUserEmail(e.target.value)}
                             variant="outlined"
                             margin="normal"
                             required
@@ -129,7 +97,7 @@ const SignUp = () => {
                         />
                         <TextField
                             value={password}
-                            onInput={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                             variant="outlined"
                             margin="normal"
                             required
@@ -142,7 +110,7 @@ const SignUp = () => {
                         />
                         <TextField
                             value={confirmPassword}
-                            onInput={(e) => setConfirmPassword(e.target.value)}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             variant="outlined"
                             margin="normal"
                             required
@@ -165,8 +133,8 @@ const SignUp = () => {
                     </form>
                 </div>
             </Paper>
-        </Page>
+        </Paper>
     )
 }
 
-export default SignUp
+

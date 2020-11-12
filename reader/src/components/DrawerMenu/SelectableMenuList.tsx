@@ -1,15 +1,19 @@
 import {
-    Divider, IconButton,
+    Divider,
+    IconButton,
     List,
     ListItem,
     ListItemIcon,
     ListItemSecondaryAction,
-    ListItemText, SvgIconTypeMap,
-    Theme, withStyles, withTheme
+    ListItemText,
+    Theme,
+    withStyles,
+    withTheme
 } from "@material-ui/core";
 import React from "react";
 import {ArrowBack, KeyboardArrowRight} from "@material-ui/icons";
 import {ds_Tree, treeValue, walkTree} from "../../services/tree.service";
+import {MenuitemInterface} from "./menu-item.interface";
 
 const styles = (theme: Theme) => ({
     root: {
@@ -21,8 +25,6 @@ const styles = (theme: Theme) => ({
         color: theme.palette.primary.contrastText
     }
 })
-
-export type MenuitemInterface = { label: string; key: string, leftIcon?: string }
 
 export const SelectableMenuList: React.FunctionComponent<{
     title: string,
@@ -71,7 +73,10 @@ export const SelectableMenuList: React.FunctionComponent<{
                         child?.value?.key && pathChanged(path.concat(child.value.key))
                     }}
                 >
-                    <IconButton style={{marginRight: useMinified ? 150 : undefined}} onClick={() => pathChanged(path.concat(child.value.key))}>
+                    <IconButton
+                        style={{marginRight: useMinified ? 150 : undefined}}
+                        onClick={() => child.value && pathChanged(path.concat(child.value.key))}
+                    >
                         <KeyboardArrowRight color={'action'}/>
                     </IconButton>
                 </ListItemSecondaryAction>

@@ -8,7 +8,8 @@ import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
 export type TreeMenuProps<T> = {value: T};
 
 export interface TreeMenuNode<T, props extends TreeMenuProps<any>> {
-    Component: React.FunctionComponent<props>;
+    Component?: React.FunctionComponent<props>;
+    Action?: () => void,
     value: T;
     name: string;
 }

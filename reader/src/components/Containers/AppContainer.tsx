@@ -1,7 +1,8 @@
 import {TreeMenuService} from "../../services/tree-menu.service";
 import {useObservableState} from "observable-hooks";
 import React from "react";
-import {MenuitemInterface, SelectableMenuList} from "../DrawerMenu/SelectableMenuList";
+import {SelectableMenuList} from "../DrawerMenu/SelectableMenuList";
+import {MenuitemInterface} from "../DrawerMenu/menu-item.interface";
 
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<MenuitemInterface, any> }> = ({treeMenuService}) => {
     const allItems = useObservableState(treeMenuService.allItems$) || {};

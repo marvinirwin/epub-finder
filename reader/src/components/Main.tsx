@@ -17,7 +17,7 @@ import {Hotkeys} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "../services/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
 import {TreeMenuService} from "../services/tree-menu.service";
-import {MenuitemInterface} from "./DrawerMenu/SelectableMenuList";
+import {MenuitemInterface} from "./DrawerMenu/menu-item.interface";
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
