@@ -86,7 +86,6 @@ export class MyAppDatabase extends Dexie {
 
     resolveSetting$<T>(settingName: string, defaultVal: T) {
         if (!this.settingsListeners[settingName]) {
-            debugger;
             const behaviourSubject = new BehaviorSubject<T>(defaultVal);
             this.settings.where({name: settingName}).first().then(row => {
                 if (row) {

@@ -1,11 +1,11 @@
 // A tree menu is a path and a ds_Tree with a computed property selectdObject
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {DeltaScanner, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
-import React from "react";
-import {map, shareReplay} from "rxjs/operators";
+import React, {FunctionComponent} from "react";
+import {map, scan, shareReplay} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
 
-export type TreeMenuProps<T> = {value: T};
+export type TreeMenuProps<T> = { value: T };
 
 export interface TreeMenuNode<T, props extends TreeMenuProps<any>> {
     Component?: React.FunctionComponent<props>;
@@ -19,8 +19,10 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     tree = new DeltaScanner<TreeMenuNode<T, U>>();
     pathIsInvalid$: Observable<boolean>;
     selectedItem$: Observable<TreeMenuNode<T, U> | undefined>;
+
     allItems$: Observable<ds_Dict<TreeMenuNode<T, U>>>;
     menuItems: DeltaScanner<T>;
+    currentComponent$: Observable<React.FunctionComponent<U> | undefined>;
 
     constructor() {
         this.path$.next([])
@@ -43,7 +45,9 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
             itemAtPath$,
             this.path$
         ]).pipe(
-            map(([ itemAtPath, path] ) => !!itemAtPath && !!path.length)
+            map(([itemAtPath, path]) =>
+                !!itemAtPath && !!path.length
+            )
         );
 
         this.selectedItem$ = itemAtPath$.pipe(
@@ -54,6 +58,13 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
             flattenTreeIntoDict()
         );
 
-        this.menuItems = this.tree.mapWith(v => v.value)
+        this.menuItems = this.tree.mapWith(v => v.value);
+
+        this.currentComponent$ = this.selectedItem$.pipe(
+            scan((acc: FunctionComponent<U> | undefined, curr ) => {
+                return curr?.Component || acc;
+            }, undefined),
+            shareReplay(1)
+        )
     }
 }

@@ -63,19 +63,21 @@ export const SelectableMenuList: React.FunctionComponent<{
                 key={index}
                 button
                 selected={false}
+                onClick={() => {
+                    child?.value?.key && pathChanged(path.concat(child.value.key))
+                }}
             >
                 {child?.value?.leftIcon && <ListItemIcon>{child?.value.leftIcon}</ListItemIcon>}
                 {!useMinified && <ListItemText primary={child?.value?.label}/>}
 
                 {child &&
                 <ListItemSecondaryAction
-                    onClick={() => {
-                        child?.value?.key && pathChanged(path.concat(child.value.key))
-                    }}
                 >
                     <IconButton
                         style={{marginRight: useMinified ? 150 : undefined}}
-                        onClick={() => child.value && pathChanged(path.concat(child.value.key))}
+                        onClick={() => {
+                            child.value && pathChanged(path.concat(child.value.key));
+                        }}
                     >
                         <KeyboardArrowRight color={'action'}/>
                     </IconButton>

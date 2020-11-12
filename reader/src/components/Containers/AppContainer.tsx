@@ -7,6 +7,7 @@ import {MenuitemInterface} from "../DrawerMenu/menu-item.interface";
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<MenuitemInterface, any> }> = ({treeMenuService}) => {
     const allItems = useObservableState(treeMenuService.allItems$) || {};
     const selectedItem = useObservableState(treeMenuService.selectedItem$);
+    const currentComponent = useObservableState(treeMenuService.currentComponent$);
     const menuItemTree = useObservableState(treeMenuService.menuItems.updates$);
     const path = useObservableState(treeMenuService.path$) || []
     return <div className={'app-container'}>
@@ -20,11 +21,11 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
         }
         <div className={'all-items-container'}>
             {Object.values(allItems)
-                .map((item, index) => <div
+                .map(({Component}, index) => <div
                         key={index}
                         className={'directory-item'}
-                        style={{zIndex: item === selectedItem ? 1 : 0}}>
-                        { <item.Component/> }
+                        style={{zIndex: Component === currentComponent ? 1 : 0}}>
+                    {Component}
                     </div>
                 )}
         </div>

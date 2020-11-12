@@ -4,9 +4,9 @@ import React from "react";
 import {Manager} from "../lib/Manager";
 import {Reading} from "../components/Reading/Reading";
 import {Library} from "../components/Library/Library";
-import SignIn from "../components/Auth/SignIn";
-import SignUp from "../components/Auth/SignUp";
 import {MenuitemInterface} from "../components/DrawerMenu/menu-item.interface";
+import {SignIn} from "../components/Authentication/SignIn";
+import {SignUp} from "../components/Authentication/SignUp";
 
 
 export const AppDirectoryService = (m: Manager) => {
