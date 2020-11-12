@@ -397,3 +397,8 @@ $character-timing-section-padding: 24px;
   }
 }
 
+.library-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}

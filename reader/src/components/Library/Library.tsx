@@ -1,15 +1,8 @@
 import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import React from "react";
-import {Paper, Button, TextField, IconButton} from "@material-ui/core";
-import {isCustomDocument, Named} from "../../lib/Manager/OpenBooks";
 import {difference} from 'lodash';
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import {ds_Dict} from "../../lib/Tree/DeltaScanner";
-import DeleteIcon from '@material-ui/icons/Delete';
-import {NamedObjectList} from "../../lib/Interfaces/named-object-list.interface";
 import {CheckedOutBooks} from "./CheckedOutBooks";
 import {AvailableBooks} from "./AvailableBooks";
 import {CustomBook} from "./CustomBook";
