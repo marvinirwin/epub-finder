@@ -104,7 +104,7 @@ export const constructTree = <T>(...t: TreeConstructor<T>): ds_Tree<T> => {
         nodeLabel,
         value,
         children: Object.fromEntries(
-            (children || []).map(constructor => [constructor[0], constructTree(constructor)])
+            (children || []).map(constructor => [constructor[0], constructTree(...constructor)])
         )
     };
 }

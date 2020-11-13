@@ -1,5 +1,4 @@
 import {useEffect, useRef} from "react";
-import {clearInterval} from "timers";
 
 export function useInterval(callback: () => void, delay: number) {
     const savedCallback = useRef<() => void>();

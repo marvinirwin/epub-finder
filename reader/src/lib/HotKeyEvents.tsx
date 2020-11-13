@@ -124,7 +124,7 @@ export class HotKeyEvents {
             HIDE_VIDEO: this.hideVideo$
         }
     }
-    public defaultHotkeys(): Hotkeys<string[]> {
+    public static defaultHotkeys(): Hotkeys<string[]> {
         return {
             OPEN_IMAGE_SEARCH: ['s'],
             HIDE: ['Escape'],

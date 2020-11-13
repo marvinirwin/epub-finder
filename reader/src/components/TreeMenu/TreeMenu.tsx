@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const TreeMenu: React.FunctionComponent<{
     title: string,
-    tree: ds_Tree<TreeMenuNode<any, any>>,
+    tree: ds_Tree<TreeMenuNode>,
     directoryPath: string[],
     directoryChanged: (s: string[]) => void,
     componentChanged: (s: string[]) => void,
@@ -70,7 +70,7 @@ export const TreeMenu: React.FunctionComponent<{
                     selected={false}
                     onClick={() => {
                         if (treeMenuNode) {
-                            const newPath = directoryPath.concat(treeMenuNode?.label);
+                            const newPath = directoryPath.concat(treeMenuNode?.name);
                             if (treeMenuNode.Component) {
                                 componentChanged(newPath);
                             }
@@ -84,15 +84,13 @@ export const TreeMenu: React.FunctionComponent<{
                     }}
                 >
                     {treeMenuNode?.leftIcon && <ListItemIcon>{treeMenuNode.leftIcon}</ListItemIcon>}
-                    {!useMinified && <ListItemText primary={treeMenuNode?.label}/>}
-
-                    {treeMenuNode?.moveDirectory &&
-                    <ListItemSecondaryAction
-                    >
+                    {!useMinified && !treeMenuNode?.InlineComponent && <ListItemText primary={treeMenuNode?.label}/>}
+                    {treeMenuNode?.InlineComponent && <treeMenuNode.InlineComponent/>}
+                    {treeMenuNode?.moveDirectory && <ListItemSecondaryAction>
                         <IconButton
                             style={{marginRight: useMinified ? 150 : undefined}}
                             onClick={() => {
-                                treeMenuNode && directoryChanged(directoryPath.concat(treeMenuNode.key))
+                                treeMenuNode && directoryChanged(directoryPath.concat(treeMenuNode.name))
                             }}
                         >
                             <KeyboardArrowRight color={'action'}/>

@@ -10,13 +10,13 @@ export type TreeMenuProps<T> = { value: T };
 export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     directoryPath$ = new ReplaySubject<string[]>(1);
     componentPath$ = new ReplaySubject<string[] | undefined>(1);
-    selectedDirectory$: Observable<TreeMenuNode<T, U> | undefined>;
-    selectedComponent$: Observable<TreeMenuNode<T, U> | undefined>;
+    selectedDirectory$: Observable<TreeMenuNode | undefined>;
+    selectedComponent$: Observable<TreeMenuNode | undefined>;
     actionSelected$ = new ReplaySubject<string[]>(1);
-    tree = new DeltaScanner<TreeMenuNode<T, U>>();
+    tree = new DeltaScanner<TreeMenuNode>();
     directoryIsInvalid$: Observable<boolean>;
 
-    allItems$: Observable<ds_Dict<TreeMenuNode<T, U>>>;
+    allItems$: Observable<ds_Dict<TreeMenuNode>>;
 /*
     menuItems: DeltaScanner<T>;
 */
@@ -24,8 +24,8 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     constructor() {
         this.directoryPath$.next([])
         this.componentPath$.next([])
-        const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode<T, U>> | undefined> = this.itemAtPath$(this.directoryPath$);
-        const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode<T, U>> | undefined> = this.itemAtPath$(this.componentPath$);
+        const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(this.directoryPath$);
+        const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(this.componentPath$);
 
         this.directoryIsInvalid$ = combineLatest([
             itemAtDirectoryPath$,
@@ -50,7 +50,7 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
             withLatestFrom(this.tree.updates$)
         ).subscribe(([actionPath, {sourced}]) => {
             if (sourced) {
-                const action = walkTree<TreeMenuNode<T, U>>(sourced, ...actionPath)?.value?.action;
+                const action = walkTree<TreeMenuNode>(sourced, ...actionPath)?.value?.action;
                 if (action) {
                     action()
                 }
@@ -70,7 +70,7 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
                     return sourced;
                 }
                 if (sourced) {
-                    return walkTree<TreeMenuNode<T, U>>(sourced, ...path)
+                    return walkTree<TreeMenuNode>(sourced, ...path)
                 }
             }),
             shareReplay(1)

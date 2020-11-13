@@ -1,9 +1,8 @@
 import {Manager} from "../../lib/Manager";
 import React, {useContext} from "react";
-import { useObservableState} from "observable-hooks";
-import {orderBy} from "lodash";
+import {useObservableState} from "observable-hooks";
 import {HotkeyContext} from "../Main";
-import {TextField} from "@material-ui/core";
+import {HotkeyConfig} from "../Hotkeys/HotkeyConfig";
 
 export function SettingsPage({m}: { m: Manager }) {
     const bookWordDatas = useObservableState(m.openedBooks.checkedOutBooksData$, []);
@@ -15,23 +14,7 @@ export function SettingsPage({m}: { m: Manager }) {
 
     return <div className="settings-page">
         <div className="hotkey-config">
-            {orderBy(Object.entries(hotkeyConfig), ([action]) => action).map(([action, arr]) => {
-                return <TextField
-                    label={action}
-                    placeholder={action}
-                    value={(arr || []).join('+')}
-                    onChange={e => {
-                        debugger;
-                        m.db.hotkeys$.next(
-                            {
-                                ...m.db.hotkeys$.getValue(),
-                                [action]: e.target.value.split('+')
-                            }
-                        );
-                    }
-                    }
-                />;
-            })}
+            <HotkeyConfig hotkeyConfig={hotkeyConfig} m={m}/>
         </div>
         <div>
             {sentences.map(sentence => <div>{sentence}</div>)}

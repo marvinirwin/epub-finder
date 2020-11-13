@@ -13,8 +13,8 @@ import {OpenedBook} from "../lib/Atomized/OpenedBook";
 import {Alert} from "@material-ui/lab";
 import {Snackbar} from "@material-ui/core";
 import {Library} from "./Library/Library";
-import {Hotkeys} from "../lib/HotKeyEvents";
-import {AppDirectoryService} from "../services/app-directory-service";
+import {HotKeyEvents, Hotkeys} from "../lib/HotKeyEvents";
+import {AppDirectoryService} from "./Directory/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
 import {TreeMenuService} from "../services/tree-menu.service";
 
@@ -40,7 +40,7 @@ export function Main({m}: { m: Manager }) {
 
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.db.hotkeys$, {});
-    const withDefaults = {...m.hotkeyEvents.defaultHotkeys(), ...hotkeyConfig};
+    const withDefaults = {...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig};
 
     return <HotkeyContext.Provider value={withDefaults}>
         <FocusedElement.Provider value={hotkeyHandler}>

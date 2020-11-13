@@ -26,8 +26,7 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                         className={'directory-item'}
                         style={{zIndex: item.Component === selectedComponent?.Component ? 1 : 0}}>
                     {
-                        // @ts-ignore
-                        <item.Component/>
+                        item.Component && <item.Component/>
                     }
                     </div>
                 )}

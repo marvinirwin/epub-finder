@@ -112,7 +112,7 @@ export class Manager {
         this.hotkeyEvents = new HotKeyEvents(this)
         this.inputManager = new BrowserInputs({
             hotkeys$: this.db.mapHotkeysWithDefault(
-                this.hotkeyEvents.defaultHotkeys(),
+                HotKeyEvents.defaultHotkeys(),
                 this.hotkeyEvents.hotkeyActions()
             )
         });

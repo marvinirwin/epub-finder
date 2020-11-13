@@ -6,7 +6,7 @@ import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {Hotkeys} from "../HotKeyEvents";
+import {HotKeyEvents, Hotkeys} from "../HotKeyEvents";
 import {map, shareReplay} from "rxjs/operators";
 
 
@@ -105,6 +105,10 @@ export class MyAppDatabase extends Dexie {
 
     get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
+    }
+
+    get hotkeysWithDefaults$(): Observable<Hotkeys<string[]>> {
+        return this.hotkeys$.pipe(map(hotkeys => ({...HotKeyEvents.defaultHotkeys(), ...hotkeys})))
     }
 
     public mapHotkeysWithDefault(

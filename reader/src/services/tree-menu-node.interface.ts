@@ -1,16 +1,14 @@
 import React from "react";
 import {TreeMenuProps} from "./tree-menu.service";
 
-export interface TreeMenuNode<T, props extends TreeMenuProps<any>> {
+export interface TreeMenuNode {
+    name: string;
+    label: string;
+
     Component?: React.FunctionComponent;
     action?: () => void,
-    inlineComponent?: React.FunctionComponent;
+    InlineComponent?: React.FunctionComponent;
 
-    value: T;
-    name: string;
-
-    label: string;
-    key: string;
     leftIcon?: string;
-    moveDirectory: boolean;
+    moveDirectory?: boolean;
 }
