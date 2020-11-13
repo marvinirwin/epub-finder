@@ -34,9 +34,8 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
         m.openedBooks.checkedOutBooks$,
-        m.db.hotkeysWithDefaults$
     ]).pipe(
-        map(([checkedOutBooks, hotkeys]) => {
+        map(([checkedOutBooks]) => {
             const ReadingComponent = () => <Reading m={m}/>;
             const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
             const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
@@ -62,7 +61,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                 reading: constructTree('reading', reading),
                 signIn: constructTree('sign-in', signIn),
                 library: constructTree('library', library),
-                hotkeys: HotkeyMenuTree(hotkeys, m)
+                hotkeys: HotkeyMenuTree(m)
             };
             return rootTree;
         })

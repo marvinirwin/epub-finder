@@ -1,30 +1,34 @@
-import {Hotkeys} from "../../lib/HotKeyEvents";
+import {HotKeyEvents, Hotkeys} from "../../lib/HotKeyEvents";
 import {TextField} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import {EditableHotkey} from "../Hotkeys/EditableHotkey";
-import React from "react";
+import React, {useContext} from "react";
 import {orderBy} from "lodash";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
+import {useObservableState} from "observable-hooks";
 
 
 const hotkeyMenuNodeFactory = (
     m: Manager,
-    action: string,
-    keys: string[]
+    action: keyof Hotkeys<any>,
 ) => ({
     name: action,
     label: action,
-    InlineComponent: () => <EditableHotkey action={action} keyCombo={keys} m={m}/>
+    InlineComponent: () => {
+        const hotkeys = useObservableState(m.db.hotkeysWithDefaults$);
+        const defaults = HotKeyEvents.defaultHotkeys();
+        return <EditableHotkey action={action} keyCombo={(hotkeys || defaults)[action]} m={m}/>;
+    }
 })
 
 export const EditableHotkeys = (hotkeys: Hotkeys<string[]>, m: Manager): TreeMenuNode[] => {
     return orderBy(Object.entries(hotkeys), ([action]) => action).map(([action, arr]) => {
-        return hotkeyMenuNodeFactory(m, action, arr);
+        return hotkeyMenuNodeFactory(m, action as keyof Hotkeys<any>);
     })
 }
 
-export const HotkeyMenuTree = (hotkeys: Hotkeys<string[]>, m: Manager): ds_Tree<TreeMenuNode> => {
+export const HotkeyMenuTree = (m: Manager): ds_Tree<TreeMenuNode> => {
     return {
         nodeLabel: 'hotkeys',
         value: {
@@ -33,7 +37,7 @@ export const HotkeyMenuTree = (hotkeys: Hotkeys<string[]>, m: Manager): ds_Tree<
             moveDirectory: true
         },
         children: Object.fromEntries(
-            EditableHotkeys(hotkeys, m).map(treeMenuNode => [
+            EditableHotkeys(HotKeyEvents.defaultHotkeys(), m).map(treeMenuNode => [
                 treeMenuNode.name,
                     {
                         nodeLabel: treeMenuNode.label,

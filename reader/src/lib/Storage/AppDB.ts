@@ -13,6 +13,8 @@ import {map, shareReplay} from "rxjs/operators";
 export class MyAppDatabase extends Dexie {
     static CURRENT_VERSION = 6;
 
+    public hotkeysWithDefaults$: Observable<Hotkeys<string[]>>;
+
     cards: Dexie.Table<ICard, number>;
     recognitionRecords: Dexie.Table<WordRecognitionRow, number>;
     createdSentences: Dexie.Table<CreatedSentence, number>;
@@ -38,7 +40,11 @@ export class MyAppDatabase extends Dexie {
         this.recognitionRecords = this.table("recognitionRecords");
         this.createdSentences = this.table("createdSentences");
         this.customDocuments = this.table("customDocuments");
-        this.messages$.next("Tables initialized")
+        this.messages$.next("Tables initialized");
+
+
+        this.hotkeysWithDefaults$ = this.hotkeys$
+            .pipe(map(hotkeys => ({...HotKeyEvents.defaultHotkeys(), ...hotkeys})))
     }
 
     async getCardsInDatabaseCount(): Promise<number> {
@@ -107,9 +113,6 @@ export class MyAppDatabase extends Dexie {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
     }
 
-    get hotkeysWithDefaults$(): Observable<Hotkeys<string[]>> {
-        return this.hotkeys$.pipe(map(hotkeys => ({...HotKeyEvents.defaultHotkeys(), ...hotkeys})))
-    }
 
     public mapHotkeysWithDefault(
         defaultHotkeys: Hotkeys<string[]>,
