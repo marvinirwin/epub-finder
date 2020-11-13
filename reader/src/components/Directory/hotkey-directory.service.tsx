@@ -28,7 +28,7 @@ export const EditableHotkeys = (hotkeys: Hotkeys<string[]>, m: Manager): TreeMen
     })
 }
 
-export const HotkeyMenuTree = (m: Manager): ds_Tree<TreeMenuNode> => {
+export const HotkeyDirectoryService = (m: Manager): ds_Tree<TreeMenuNode> => {
     return {
         nodeLabel: 'hotkeys',
         value: {

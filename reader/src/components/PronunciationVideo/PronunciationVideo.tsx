@@ -49,6 +49,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
+    const hasVideoSource = currentSentence && videoMetaData;
     return <div className={'pronunciation-video-container'}>
         {videoMetaData ? <Card className={'pronunciation-video-container-card'}>
             {/*
@@ -62,7 +63,9 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
             </HotkeyWrapper>
         </div>
 */}
-            <div className={'pronunciation-sections-container'} ref={setPronunciationSectionsContainer}>
+            <div
+                className={`pronunciation-sections-container ${hasVideoSource ? 'has-src' : ''}`}
+                ref={setPronunciationSectionsContainer}>
                 {
                     (chunkedCharacterTimings && videoMetaData && millisecondsPerSection)
                     && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
@@ -120,12 +123,14 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                     })
                 }
             </div>
+{/*
             <video
                 ref={setVideoElementRef}
-                src={(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
+                src={hasVideoSource ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
                 autoPlay
                 controls
             />
+*/}
         </Card> : <span/>
         }
     </div>

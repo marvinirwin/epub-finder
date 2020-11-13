@@ -347,6 +347,7 @@ $grid-color: rgba(150, 150, 150, 0.03);
 $character-timing-section-padding: 24px;
 
 .pronunciation-video-container {
+
   & > .pronunciation-video-container-card {
     display: flex;
     flex-flow: row nowrap;
@@ -357,6 +358,13 @@ $character-timing-section-padding: 24px;
       display: flex;
       flex: 1;
       flex-flow: column nowrap;
+      max-height: 0;
+      transition: all 1s;
+
+      &.has-src {
+        max-height: 360px;
+      }
+
       & > .character-timing-section-container {
         & > .character-timing-section {
           position: relative;
@@ -394,7 +402,7 @@ $character-timing-section-padding: 24px;
 
 
   & > video {
-    height: 360px;
+    display: none;
   }
 }
 

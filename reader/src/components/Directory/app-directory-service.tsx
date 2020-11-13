@@ -9,7 +9,7 @@ import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {hotkeyMode} from "../../lib/Hotkeys/BrowserInputs";
-import {HotkeyMenuTree} from "./hotkey-directory.service";
+import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
 
 export const menuNodeFactory = (
@@ -68,7 +68,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                 reading: constructTree('reading', reading),
                 signIn: constructTree('sign-in', signIn),
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
-                hotkeys: HotkeyMenuTree(m)
+                hotkeys: HotkeyDirectoryService(m)
             };
             return rootTree;
         })
