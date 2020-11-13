@@ -6,9 +6,11 @@ import {ds_Dict} from "../../lib/Tree/DeltaScanner";
 import {CheckedOutBooks} from "./CheckedOutBooks";
 import {AvailableBooks} from "./AvailableBooks";
 import {CustomBook} from "./CustomBook";
+import {checkoutBook, returnBook} from "./library.module";
 
 export function Library({m}: { m: Manager }) {
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
+
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
     const checkedOutTitles = useObservableState(m.db.checkedOutBooks$) || {};
 
@@ -24,17 +26,13 @@ export function Library({m}: { m: Manager }) {
             <CheckedOutBooks
                 checkedOutBooks={checkedOutTitles}
                 onReturn={(titleBeingReturned: string) => {
-                    const checkedOutBooks = {...m.db.checkedOutBooks$.getValue()};
-                    delete checkedOutBooks[titleBeingReturned];
-                    m.db.checkedOutBooks$.next(checkedOutBooks)
+                    returnBook(m, titleBeingReturned);
                 }}
             />
             <AvailableBooks
                 availableBooks={titlesAvailableForCheckout}
                 onCheckout={(titleBeingCheckedOut: string) => {
-                    const checkedOutBooks = {...m.db.checkedOutBooks$.getValue()};
-                    checkedOutBooks[titleBeingCheckedOut] = true;
-                    m.db.checkedOutBooks$.next(checkedOutBooks)
+                    checkoutBook(m, titleBeingCheckedOut);
                 }}
             />
         </div>

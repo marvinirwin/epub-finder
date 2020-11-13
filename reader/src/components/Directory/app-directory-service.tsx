@@ -10,20 +10,21 @@ import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {hotkeyMode} from "../../lib/Hotkeys/BrowserInputs";
 import {HotkeyMenuTree} from "./hotkey-directory.service";
+import {LibraryDirectoryService} from "./library-directory.service";
 
 export const menuNodeFactory = (
     Component: React.FunctionComponent<{}> | undefined,
     label: string,
     key: string,
     moveDirectory: boolean,
-    leftIcon?: string,
+    LeftIcon?: React.Component,
     inlineComponent?: React.FunctionComponent,
     action?: () => void
 ): TreeMenuNode => ({
     Component,
     name: key,
     label,
-    leftIcon,
+    LeftIcon: LeftIcon,
     moveDirectory,
     action
 });
@@ -33,9 +34,15 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // I should do selected components by path, that way their refs can change?
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
-        m.openedBooks.checkedOutBooks$,
+        m.library.customBooks$.dict$,
+        m.db.checkedOutBooks$,
+        m.library.builtInBooks$.dict$
     ]).pipe(
-        map(([checkedOutBooks]) => {
+        map(([
+                customBooks,
+                checkedOutBooks,
+                builtInBooks
+             ]) => {
             const ReadingComponent = () => <Reading m={m}/>;
             const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
             const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
@@ -60,7 +67,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
             rootTree.children = {
                 reading: constructTree('reading', reading),
                 signIn: constructTree('sign-in', signIn),
-                library: constructTree('library', library),
+                library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
                 hotkeys: HotkeyMenuTree(m)
             };
             return rootTree;

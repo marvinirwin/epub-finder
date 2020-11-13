@@ -9,6 +9,6 @@ export interface TreeMenuNode {
     action?: () => void,
     InlineComponent?: React.FunctionComponent;
 
-    leftIcon?: string;
+    LeftIcon?: React.Component;
     moveDirectory?: boolean;
 }
