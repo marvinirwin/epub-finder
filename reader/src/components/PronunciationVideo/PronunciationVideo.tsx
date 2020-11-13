@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import React, {useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
@@ -49,22 +49,34 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
-    const hasVideoSource = currentSentence && videoMetaData;
-    return <div className={'pronunciation-video-container'}>
-        {videoMetaData ? <Card className={'pronunciation-video-container-card'}>
+
+    const [videoCard, setVideoCard] = useState<HTMLDivElement>();
+    const [styles, setStyles] = useState({});
+    useEffect(() => {
+        setTimeout(() => {
+            if (videoCard) {
+                setStyles({
+                    height: videoCard.clientHeight,
+                    maxHeight: videoCard.clientHeight
+                });
+            }
+        }, 0);
+    }, [!!(currentSentence && videoMetaData), videoCard?.clientHeight]);
+
+
+    return <div className={`pronunciation-video-container`} style={styles}>
+        <Card className={'pronunciation-video-container-card'} ref={setVideoCard}>
             {/*
         <div style={{position: 'absolute', top: 0, zIndex: 10}}>
             <HotkeyWrapper action={"HIDE_VIDEO"}>
-                <IconButton
-                    onClick={() => m.hotkeyEvents.hideVideo$.next()}
-                >
+                <IconButton onClick={() => m.hotkeyEvents.hideVideo$.next()} >
                     <CancelPresentationIcon/>
                 </IconButton>
             </HotkeyWrapper>
         </div>
 */}
             <div
-                className={`pronunciation-sections-container ${hasVideoSource ? 'has-src' : ''}`}
+                className={`pronunciation-sections-container`}
                 ref={setPronunciationSectionsContainer}>
                 {
                     (chunkedCharacterTimings && videoMetaData && millisecondsPerSection)
@@ -107,12 +119,12 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             }}
                             onMouseOver={percentage => {
                                 if (replayDragInProgress) {
-                                    setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection * .9))
+                                    setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection))
                                 }
                             }}
                             onMouseDown={percentage => {
                                 setReplayDragInProgress(true)
-                                setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection * .9))
+                                setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection))
                             }}
                             onMouseUp={percentage => {
                                 setReplayDragInProgress(false)
@@ -123,15 +135,12 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                     })
                 }
             </div>
-{/*
             <video
                 ref={setVideoElementRef}
-                src={hasVideoSource ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
+                src={!!(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
                 autoPlay
                 controls
             />
-*/}
-        </Card> : <span/>
-        }
+        </Card>
     </div>
 }

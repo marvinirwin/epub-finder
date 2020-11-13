@@ -45,6 +45,7 @@ import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
+import {ModesService} from "./Modes/modes.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -106,6 +107,7 @@ export class Manager {
 
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: Library;
+    modes = new ModesService();
 
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {

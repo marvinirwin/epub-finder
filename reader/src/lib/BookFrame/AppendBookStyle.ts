@@ -5,7 +5,6 @@ export const BodyStyle = `
         z-index: 2;
     }
     body {
-        padding-top: 100px;
         font-size: 150%;
     }
     mark {

@@ -11,6 +11,7 @@ import {map} from "rxjs/operators";
 import {hotkeyMode} from "../../lib/Hotkeys/BrowserInputs";
 import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
+import {ModeDirectory} from "./mode-directory.service";
 
 export const menuNodeFactory = (
     Component: React.FunctionComponent<{}> | undefined,
@@ -65,10 +66,11 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
 
             const rootTree = constructTree('root', main);
             rootTree.children = {
+                ...ModeDirectory(m),
                 reading: constructTree('reading', reading),
                 signIn: constructTree('sign-in', signIn),
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
-                hotkeys: HotkeyDirectoryService(m)
+                hotkeys: HotkeyDirectoryService(m),
             };
             return rootTree;
         })
