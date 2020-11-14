@@ -1,0 +1,37 @@
+<mxfile host="app.diagrams.net" modified="2020-11-14T20:31:29.502Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36" etag="MIdrwqUMWOn1tF5tFOXt" version="13.9.7" type="github">
+  <diagram id="kRbp0JkO8dzGV5F8JkE1" name="Page-1">
+    <mxGraphModel dx="1026" dy="545" grid="1" gridSize="10" guides="1" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-13" value="" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="190" y="220" width="500" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-1" value="visibleElements$&lt;br&gt;: Observable&amp;lt;{[word: string]: IAnnotatedElements[]}&amp;gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="40" width="290" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-8" value="wordElementMap" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="200" y="280" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-12" value="wordHighlightMap" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="340" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-14" value="Update Background Colors" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="230" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-15" value="&lt;font size=&quot;1&quot;&gt;wordsToUpdate&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;align=center;" vertex="1" parent="1">
+          <mxGeometry x="470" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-18" value="&lt;pre style=&quot;font-size: 12px&quot;&gt;&lt;span&gt;const elementHighlightMap = computeElementHighlightMap(&lt;br&gt;  wordsToUpdate,&lt;br&gt;  wordElementMap,&lt;br&gt;  wordHighlightMap&lt;br&gt;);&lt;br&gt;for each word in wordsToUpdate:&lt;br&gt;  const elements = wordHighlightMap[word];&lt;br&gt;  for element in elements:&lt;br&gt;    updateElementBackgroundColor(element, elementHighlightMap)&lt;/span&gt;&lt;/pre&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="200" y="360" width="430" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="BrXm8QqmZ0831Upp8eZt-20" value="" style="endArrow=classic;html=1;fontSize=20;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="BrXm8QqmZ0831Upp8eZt-8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="233" y="80" as="sourcePoint" />
+            <mxPoint x="290" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
