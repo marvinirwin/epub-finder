@@ -14,7 +14,7 @@ export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
         <ExpandableContainer shouldShow={showPronunciationVideo}>
             <PronunciationVideo m={m}/>
         </ExpandableContainer>
-        <ExpandableContainer shouldShow={showRecording}>
+        <ExpandableContainer shouldShow={showRecording} hideDelay={5000}>
             <AudioRecorder m={m}/>
         </ExpandableContainer>
         <OpenedBook openedBook={openedBook}/>

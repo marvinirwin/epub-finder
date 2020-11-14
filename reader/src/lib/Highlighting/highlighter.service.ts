@@ -1,7 +1,20 @@
-import {HighlightDelta, HighlightMap, TimedHighlightDelta} from "./highlight.interface";
+import {
+    ElementHighlightMap,
+    HighlightDelta,
+    HighlightDeltaPriorityList,
+    HighlightedWord,
+    TimedHighlightDelta,
+    WordHighlightMap
+} from "./highlight.interface";
 import {combineLatest, Observable} from "rxjs";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {HasElement, HighlighterPath, recomputeColor} from "./Highlighter";
+import {ElementContainer} from "./Highlighter";
+import {safePushMap} from "../../test/Util/GetGraphJson";
+import {Dictionary} from "lodash";
+import {mixRGBA, RGBA} from "./color.service";
+
+
+export type HighlighterPath = [number, string];
 
 export class HighlighterService {
     // I'm going to need to maintain a map which contains maps from elements to highlights
@@ -10,7 +23,7 @@ export class HighlighterService {
 
     removeHighlightDelta(
         oldHighlightDelta: HighlightDelta,
-        currentHighlightMap: HighlightMap,
+        currentHighlightMap: WordHighlightMap,
         [highlightPriority, highlightKey]: HighlighterPath,
         highlightWordsToUpdate: Set<string>) {
         oldHighlightDelta.forEach((colors, word) => {
@@ -21,8 +34,8 @@ export class HighlighterService {
 
     singleHighlight(
         newHighlightDelta$: Observable<HighlightDelta | undefined>,
-        highlightedWords$: Observable<HighlightMap>,
-        wordElementMap$: Observable<ds_Dict<HasElement[]>>,
+        highlightedWords$: Observable<WordHighlightMap>,
+        wordElementMap$: Observable<ds_Dict<ElementContainer[]>>,
         highlightPath: HighlighterPath,
     ) {
         let oldHighlightDelta: HighlightDelta | undefined;
@@ -42,34 +55,18 @@ export class HighlighterService {
                 oldHighlightDelta = newHighlightDelta;
                 this.addHighlightedDelta(newHighlightDelta, currentHighlightMap, highlightPath, highlightWordsToUpdate);
             }
-            this.updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
+            this.updateHighlightBackgroundColors(
+                highlightWordsToUpdate,
+                wordElementMap,
+                currentHighlightMap
+            );
         })
     }
 
-    updateHighlightBackgroundColors(
-        highlightWordsToUpdate: Set<string>,
-        wordElementMap: ds_Dict<HasElement[]>,
-        currentHighlightMap: HighlightMap) {
-        // @ts-ignore
-        for (const word of highlightWordsToUpdate) {
-            const elements = wordElementMap[word];
-
-            if (!elements) continue;
-            const highestPriorityColors = currentHighlightMap[word].find(map => map && map.size);
-            const backgroundColor = recomputeColor(
-                highestPriorityColors
-            );
-
-            elements.forEach(element => {
-                // @ts-ignore
-                return element.element.style.backgroundColor = backgroundColor;
-            })
-        }
-    }
 
     addHighlightedDelta(
         highlightDelta: HighlightDelta,
-        currentHighlightMap: HighlightMap,
+        currentHighlightMap: WordHighlightMap,
         [highlightPriority, highlightKey]: HighlighterPath,
         highlightWordsToUpdate: Set<string>) {
         highlightDelta.forEach((rgba, word) => {
@@ -86,8 +83,8 @@ export class HighlighterService {
 
     timedHighlight(
         newHighlightDelta$: Observable<TimedHighlightDelta>,
-        highlightedWords$: Observable<HighlightMap>,
-        wordElementMap$: Observable<ds_Dict<HasElement[]>>,
+        highlightedWords$: Observable<WordHighlightMap>,
+        wordElementMap$: Observable<ds_Dict<ElementContainer[]>>,
         highlighterPath: HighlighterPath
     ) {
         combineLatest([
@@ -98,13 +95,73 @@ export class HighlighterService {
             const highlightWordsToUpdate = new Set<string>();
             const o = timedHighlightDelta.delta;
             this.addHighlightedDelta(o, currentHighlightMap, highlighterPath, highlightWordsToUpdate);
-            // @ts-ignore
-            updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
+            this.updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
             setTimeout(() => {
                 this.removeHighlightDelta(timedHighlightDelta.delta, currentHighlightMap, highlighterPath, highlightWordsToUpdate);
                 this.updateHighlightBackgroundColors(highlightWordsToUpdate, wordElementMap, currentHighlightMap);
             }, timedHighlightDelta.timeout)
         })
     }
+
+    updateHighlightBackgroundColors(
+        wordsToUpdate: Set<string>,
+        wordElementMap: Dictionary<ElementContainer[]>,
+        wordHighlightMap: WordHighlightMap) {
+        const elementHighlightMap = computeElementHighlightMap(wordElementMap, wordHighlightMap)
+        for (const word of wordsToUpdate) {
+            const elementsToHighlight = wordElementMap[word];
+            if (!elementsToHighlight) continue;
+            elementsToHighlight.forEach(elementToHighlight => {
+                updateElementBackgroundColor(elementToHighlight, elementHighlightMap);
+            })
+        }
+    }
 }
 
+function updateElementBackgroundColor(
+    elementToHighlight: ElementContainer,
+    elementHighlightMap: Map<HTMLElement, HighlightDeltaPriorityList[]>) {
+    // @ts-ignore
+    const priorityLists = elementHighlightMap.get(elementToHighlight.element);
+    const rgbas: RGBA[] = [];
+    if (priorityLists) {
+        let highestPriorityKeyValues: Array<[string, RGBA]> = [];
+        let highestPriority: number = Number.MAX_SAFE_INTEGER;
+        priorityLists.forEach(priorityList => {
+                const highestPriorityMapIndex = priorityList.findIndex(highlightDelta => highlightDelta && highlightDelta.size > 0);
+                if (highestPriorityMapIndex === highestPriority) {
+                    highestPriorityKeyValues.push(...priorityList[highestPriorityMapIndex]);
+                } else if (highestPriorityMapIndex !== -1 && highestPriorityMapIndex < highestPriority) {
+                    highestPriority = highestPriorityMapIndex;
+                    highestPriorityKeyValues = [...priorityList[highestPriorityMapIndex]];
+                }
+
+            }
+        );
+        (new Map(highestPriorityKeyValues)).forEach(rgba => rgbas.push(rgba));
+        if (elementToHighlight.element.textContent === '央') {
+            debugger;
+            console.log()
+        }
+    }
+    // @ts-ignore
+    return elementToHighlight.element.style.backgroundColor = mixRGBA(rgbas);
+}
+
+const computeElementHighlightMap = (
+    wordElementMap: { [word: string]: ElementContainer[] },
+    wordHighlightMap: WordHighlightMap): ElementHighlightMap => {
+    const elementHighlightMap: ElementHighlightMap = new Map();
+    Object.entries(wordElementMap).forEach(([wordToUpdate]) => {
+        (wordElementMap[wordToUpdate] || [])
+            .forEach(annotatedCharacters => {
+                const wordHighlightMapElement: HighlightedWord[] = wordHighlightMap[wordToUpdate] || [];
+                safePushMap(
+                    elementHighlightMap,
+                    annotatedCharacters.element as unknown as HTMLElement,
+                    wordHighlightMapElement
+                );
+            });
+    })
+    return elementHighlightMap;
+}

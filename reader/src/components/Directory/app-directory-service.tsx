@@ -8,7 +8,6 @@ import {SignUp} from "../Authentication/SignUp";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
-import {hotkeyMode} from "../../lib/Hotkeys/BrowserInputs";
 import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
 import {ModeDirectory} from "./mode-directory.service";

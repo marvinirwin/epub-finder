@@ -4,8 +4,9 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {colorForPercentage} from "../color/Range";
-import {HighlightDelta, HighlighterConfig, HighlightMap} from "./highlight.interface";
+import {HighlightDelta, HighlighterConfig, WordHighlightMap} from "./highlight.interface";
 import {HighlighterService} from "./highlighter.service";
+import {RGBA} from "./color.service";
 
 const s = new HighlighterService();
 
@@ -18,7 +19,6 @@ export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]
         });
     };
 
-
 export const CORRECT_RECOGNITION_SCORE = 2;
 
 /**
@@ -29,7 +29,7 @@ export class Highlighter {
     mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
-    highlightMap$ = new ReplaySubject<HighlightMap>(1);
+    highlightMap$ = new ReplaySubject<WordHighlightMap>(1);
     highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow>>(1);
 
     constructor(config: HighlighterConfig) {
@@ -118,10 +118,7 @@ export class Highlighter {
     }
 }
 
-export type RGBA = [number, number, number, number];
-export type HighlighterPath = [number, string];
-
-export interface HasElement {
+export interface ElementContainer {
     element: HTMLElement | XMLDocumentNode;
 }
 
@@ -155,18 +152,5 @@ export const blendColors = (args: RGBA[]) => {
     }
 
     return mix;
-}
-
-/**
- * This could be a generator
- * That's too fancy for now
- * @param h
- */
-export const recomputeColor = (h: HighlightDelta | undefined): string => {
-    if (!h) return `transparent`;
-    // @ts-ignore
-    const colors = [...h.values()];
-    if (!colors.length) return `transparent`;
-    return `RGBA(${blendColors(colors)})`
 }
 

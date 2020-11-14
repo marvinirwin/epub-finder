@@ -348,7 +348,6 @@ $character-timing-section-padding: 24px;
 
 .speech {
   transition: all 1s;
-
 }
 
 .expandable {
@@ -358,43 +357,44 @@ $character-timing-section-padding: 24px;
   overflow: hidden;
 }
 
-.pronunciation-video-container {
-  & > .pronunciation-video-container-card {
+.pronunciation-video-container-card {
+  display: flex;
+  flex-flow: row nowrap;
+
+  & > video {
+    max-height: 360px;
+  }
+
+  & > .pronunciation-sections-container {
     display: flex;
-    flex-flow: row nowrap;
-    & > video {
-      max-height: 360px;
-    }
-    & > .pronunciation-sections-container {
-      display: flex;
-      flex: 1;
-      flex-flow: column nowrap;
-      & > .character-timing-section-container {
+    flex: 1;
+    flex-flow: column nowrap;
+
+    & > .character-timing-section-container {
+      position: relative;
+
+      & > .character-timing-section {
         position: relative;
-        padding-right: 1em;
-        & > .character-timing-section {
-          position: relative;
-          border: solid black 1px;
-          padding-left: $character-timing-section-padding;
-          padding-right: $character-timing-section-padding;
-          height: 50px;
-          flex: 1;
-          background-color: rgba(#fff, .5);
+        border: solid black 1px;
+        padding-left: $character-timing-section-padding;
+        padding-right: $character-timing-section-padding;
+        height: 50px;
+        flex: 1;
+        background-color: rgba(#fff, .5);
 
-          background-image: linear-gradient($grid-color 2px, transparent 2px),
-          linear-gradient(90deg, $grid-color 2px, transparent 2px),
-          linear-gradient(rgba(150, 150, 150, .3) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(150, 150, 150, .3) 1px, transparent 1px);
+        background-image: linear-gradient($grid-color 2px, transparent 2px),
+        linear-gradient(90deg, $grid-color 2px, transparent 2px),
+        linear-gradient(rgba(150, 150, 150, .3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(150, 150, 150, .3) 1px, transparent 1px);
 
-          background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-          background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+        background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+        background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 
-          & > mark {
-            position: absolute;
-            background-color: transparent;
-            font-size: 200%;
-            user-select: none;
-          }
+        & > mark {
+          position: absolute;
+          background-color: transparent;
+          font-size: 200%;
+          user-select: none;
         }
       }
     }
