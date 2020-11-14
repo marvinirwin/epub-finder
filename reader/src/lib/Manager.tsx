@@ -366,27 +366,29 @@ export class Manager {
         const {maxWord, i, parent: sentence} = annotationElement;
         const child: HTMLElement = annotationElement.element as unknown as HTMLElement;
         child.classList.add("applied-word-element-listener");
-        child.onmouseenter = (ev) => {
-            if (maxWord) {
-                addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
-                addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
-            }
-            if (ev.shiftKey) {
-                /**
-                 * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
-                 * whereas other browsers will return a Selection object with Selection.type set to None.
-                 */
-                const selection = (annotationElement.element.ownerDocument as Document).getSelection();
-                if (selection?.anchorNode === child.parentElement) {
-                    selection.extend(child, 1);
-                } else {
-                    selection?.removeAllRanges();
-                    const range = document.createRange();
-                    range.selectNode(child);
-                    selection?.addRange(range);
+        fromEvent(child, 'mouseenter')
+            .pipe(withLatestFrom(this.modes.mode$))
+            .subscribe(([ev, mode]) => {
+                if (maxWord) {
+                    addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
+                    addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
                 }
-            }
-        };
+                if ((ev as MouseEvent).shiftKey || mode === Modes.HIGHLIGHT) {
+                    /**
+                     * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
+                     * whereas other browsers will return a Selection object with Selection.type set to None.
+                     */
+                    const selection = (annotationElement.element.ownerDocument as Document).getSelection();
+                    if (selection?.anchorNode === child.parentElement) {
+                        selection.extend(child, 1);
+                    } else {
+                        selection?.removeAllRanges();
+                        const range = document.createRange();
+                        range.selectNode(child);
+                        selection?.addRange(range);
+                    }
+                }
+            })
         child.onmouseleave = (ev) => {
             addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
         }

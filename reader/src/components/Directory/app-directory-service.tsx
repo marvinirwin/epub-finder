@@ -13,6 +13,7 @@ import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
 import {ModeDirectory} from "./mode-directory.service";
 
+
 export const menuNodeFactory = (
     Component: React.FunctionComponent<{}> | undefined,
     label: string,
@@ -47,19 +48,6 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
             const ReadingComponent = () => <Reading m={m}/>;
             const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
             const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
-            const getNewBooks = menuNodeFactory(() => <Library m={m}/>, 'Get new books', 'get-new-books', false);
-            const library = menuNodeFactory(undefined, 'Library', 'library', true);
-            const checkedOutBooksSelection = Object.keys(checkedOutBooks).map(
-                checkedOutBook => menuNodeFactory(
-                    undefined,
-                    checkedOutBook,
-                    checkedOutBook,
-                    false,
-                    undefined,
-                    undefined,
-                    () => m.openedBooks.checkedOutBooks$
-                )
-            );
 
             const signIn = menuNodeFactory(() => <SignIn/>, 'sign-in', 'sign-in', true);
             const signUp = menuNodeFactory(() => <SignUp/>, 'sign-up', 'sign-up', true);
