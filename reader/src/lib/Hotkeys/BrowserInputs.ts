@@ -48,8 +48,7 @@ export class BrowserInputs {
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     keysPressed$ = new BehaviorSubject<ds_Dict<boolean>>({});
     selectedText$: Subject<string> = new Subject<string>();
-    hoveredSentence$ = new ReplaySubject<string | undefined>(1);
-    hoveredCharacterIndex$ = new ReplaySubject<number | undefined>(1);
+    videoCharacterIndex$ = new ReplaySubject<number | undefined>(1);
     focusedElement$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
     constructor({hotkeys$}: {
@@ -143,7 +142,7 @@ export class BrowserInputs {
             }
 
             const show = () => {
-                this.hoveredSentence$.next(atomizedSentence.translatableText);
+                // this.videoSentence$.next(atomizedSentence.translatableText);
                 popperHTMLElement.setAttribute('data-show', '');
             }
             const hide = () => {

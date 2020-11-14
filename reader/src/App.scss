@@ -346,11 +346,19 @@
 $grid-color: rgba(150, 150, 150, 0.03);
 $character-timing-section-padding: 24px;
 
-.pronunciation-video-container {
+.speech {
+  transition: all 1s;
+
+}
+
+.expandable {
   transition: all 1s;
   max-height: 0;
   height: 0;
   overflow: hidden;
+}
+
+.pronunciation-video-container {
   & > .pronunciation-video-container-card {
     display: flex;
     flex-flow: row nowrap;
@@ -398,3 +406,4 @@ $character-timing-section-padding: 24px;
   width: 100%;
   overflow: auto;
 }
+

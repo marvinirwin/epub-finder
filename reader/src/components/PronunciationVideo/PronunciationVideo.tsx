@@ -13,8 +13,8 @@ import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
 
 
 export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const currentSentence = useObservableState(m.inputManager.hoveredSentence$);
-    const currentSentenceCharacterIndex = useObservableState(m.inputManager.hoveredCharacterIndex$);
+    const currentSentence = useObservableState(m.pronunciationVideoService.videoSentence$);
+    const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
     const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
     const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
@@ -31,7 +31,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 
     useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetaData);
     useSetVideoTime(videoElementRef);
-
+    useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
     useInterval(() => {
         if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {
@@ -46,26 +46,8 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
         [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
-
-    useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
-
-
-    const [videoCard, setVideoCard] = useState<HTMLDivElement>();
-    const [styles, setStyles] = useState({});
-    useEffect(() => {
-        setTimeout(() => {
-            if (videoCard) {
-                setStyles({
-                    height: videoCard.clientHeight,
-                    maxHeight: videoCard.clientHeight
-                });
-            }
-        }, 0);
-    }, [!!(currentSentence && videoMetaData), videoCard?.clientHeight]);
-
-
-    return <div className={`pronunciation-video-container`} style={styles}>
-        <Card className={'pronunciation-video-container-card'} ref={setVideoCard}>
+    const videoSource = !!(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : undefined;
+    return <Card className={'pronunciation-video-container-card'}>
             {/*
         <div style={{position: 'absolute', top: 0, zIndex: 10}}>
             <HotkeyWrapper action={"HIDE_VIDEO"}>
@@ -135,12 +117,11 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                     })
                 }
             </div>
-            <video
+            {videoSource && <video
                 ref={setVideoElementRef}
-                src={!!(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : ''}
+                src={videoSource}
                 autoPlay
                 controls
-            />
+            />}
         </Card>
-    </div>
 }

@@ -25,7 +25,7 @@ export const CORRECT_RECOGNITION_SCORE = 2;
  * TODO probably execute all these things in a try since elements may disappear
  */
 export class Highlighter {
-    mouseoverHighlightedWords$ = new ReplaySubject<string | undefined>(1);
+    mousedOverWord$ = new ReplaySubject<string | undefined>(1);
     mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
@@ -41,7 +41,7 @@ export class Highlighter {
             return m;
         }
         s.singleHighlight(
-            this.mouseoverHighlightedWords$.pipe(
+            this.mousedOverWord$.pipe(
                 map(wordToMap([160, 160, 160, 0.5]))
             ),
             this.highlightMap$,

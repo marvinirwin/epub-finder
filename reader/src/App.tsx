@@ -29,6 +29,7 @@ const darkTheme = createMuiTheme({
             dark: '#c7c7c7',
             contrastText: '#000000',
         },
+
     },
     typography: {
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif'

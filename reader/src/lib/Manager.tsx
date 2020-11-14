@@ -1,6 +1,6 @@
-import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
@@ -45,13 +45,14 @@ import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
-import {ModesService} from "./Modes/modes.service";
+import {Modes, ModesService} from "./Modes/modes.service";
+import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
-const addMousedOverIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
+const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
 
 function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
@@ -84,7 +85,7 @@ export class Manager {
     public quizCharacterManager: QuizCharacter;
     public authManager = new AuthManager();
     public highlighter: Highlighter;
-    public highlightedPinyin$ = new ReplaySubject<string | undefined>(1);
+    public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
@@ -108,6 +109,7 @@ export class Manager {
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: Library;
     modes = new ModesService();
+    pronunciationVideoService = new PronunciationVideoService();
 
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
@@ -366,9 +368,8 @@ export class Manager {
         child.classList.add("applied-word-element-listener");
         child.onmouseenter = (ev) => {
             if (maxWord) {
-                addHighlightedPinyin(this.highlightedPinyin$, lookupPinyin(maxWord.word).join(''));
-                addHighlightedWord(this.highlighter.mouseoverHighlightedWords$, maxWord?.word);
-                addMousedOverIndex(this.inputManager.hoveredCharacterIndex$, i);
+                addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
+                addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
             }
             if (ev.shiftKey) {
                 /**
@@ -387,15 +388,30 @@ export class Manager {
             }
         };
         child.onmouseleave = (ev) => {
-            addHighlightedWord(this.highlighter.mouseoverHighlightedWords$, maxWord?.word);
+            addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
         }
-        child.onclick = (ev) => {
-            const children = sentence.getSentenceHTMLElement().children;
-            for (let i = 0; i < children.length; i++) {
-                const child = children[i];
-                child.classList.remove('highlighted')
+        fromEvent(child, 'click').pipe(
+            withLatestFrom(this.modes.mode$)
+        ).subscribe(([event, mode]) => {
+            switch(mode) {
+                case Modes.VIDEO:
+                    this.inputManager.videoCharacterIndex$.next(i);
+                    this.pronunciationVideoService.videoSentence$.next(annotationElement.parent.translatableText);
+                    break;
+                default:
+/*
+TODO do I need this?  I thought highlights were only for mouseenter/mouseleave
+                    const children = sentence.getSentenceHTMLElement().children;
+                    for (let i = 0; i < children.length; i++) {
+                        const child = children[i];
+                        child.classList.remove('highlighted')
+                    }
+*/
+                    this.inputManager.selectedText$.next(maxWord?.word)
             }
-            this.inputManager.selectedText$.next(maxWord?.word)
+        })
+        child.onclick = (ev) => {
+
         };
         return i;
     }

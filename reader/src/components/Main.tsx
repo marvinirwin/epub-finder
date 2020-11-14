@@ -1,18 +1,7 @@
 import React, {useEffect} from "react";
-import {BottomNav} from "./Nav/BottomNav";
 import {Manager} from "../lib/Manager";
-import {ReadingPage} from "./Pages/ReadingPage";
-import {QuizPage} from "./Pages/QuizPage";
-import {SettingsPage} from "./Pages/SettingsPage";
-import {ImageSelectPopup} from "./ImageSearch/ImageSelectPopup";
 import {NavigationPages} from "../lib/Util/Util";
-import {ScheduleTablePage} from "./Pages/ScheduleTablePage";
 import {useObservableState} from "observable-hooks";
-import {StaticFrame} from "./Frame/StaticFrame";
-import {OpenedBook} from "../lib/Atomized/OpenedBook";
-import {Alert} from "@material-ui/lab";
-import {Snackbar} from "@material-ui/core";
-import {Library} from "./Library/Library";
 import {HotKeyEvents, Hotkeys} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "./Directory/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
