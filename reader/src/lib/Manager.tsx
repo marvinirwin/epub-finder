@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary} from "lodash";
+import {debounce, Dictionary, zip} from "lodash";
 import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {MyAppDatabase} from "./Storage/AppDB";
 import React from "react";
@@ -37,7 +37,7 @@ import {ds_Dict} from "./Tree/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {AuthManager} from "./Manager/AuthManager";
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Highlighting/Highlighter";
@@ -47,12 +47,18 @@ import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
+import {VideoMetaData} from "../components/PronunciationVideo/video-meta-data.interface";
+import {fetchVideoMetadata} from "../services/video.service";
+import {fromPromise} from "rxjs/internal-compatibility";
+import {VideoMetadataService} from "../services/video-metadata.service";
+import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
+
 
 function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
@@ -61,6 +67,11 @@ function splitTextDataStreams$(textData$: Observable<BookWordData>) {
         bookWordCounts: textData$.pipe(map(({bookWordCounts}) => bookWordCounts)),
         wordSentenceMap: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap)),
         sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
+    }
+}
+
+export class SentenceMetadata {
+    constructor(public sentence: string, public metadata: VideoMetaData | undefined) {
     }
 }
 
@@ -110,7 +121,7 @@ export class Manager {
     library: Library;
     modes = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
-
+    videoMetadataService: VideoMetadataService;
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         this.hotkeyEvents = new HotKeyEvents(this)
@@ -163,9 +174,10 @@ export class Manager {
         this.readingWordCounts$ = bookWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
         this.scheduleManager = new ScheduleManager({
-            db,
-            wordCounts$: this.readingWordCounts$,
-            sortMode$: of('').pipe(shareReplay(1))}
+                db,
+                wordCounts$: this.readingWordCounts$,
+                sortMode$: of('').pipe(shareReplay(1))
+            }
         );
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
@@ -283,11 +295,11 @@ export class Manager {
             this.editingCardManager.showEditingCardPopup$.next(false)
         });
 
-/*
-        merge(
-            this.inputManager.getKeyDownSubject("d").pipe(filterTextInputEvents),
-        ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
-*/
+        /*
+                merge(
+                    this.inputManager.getKeyDownSubject("d").pipe(filterTextInputEvents),
+                ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
+        */
 
         this.inputManager.selectedText$.subscribe(word => {
             this.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(word));
@@ -327,9 +339,25 @@ export class Manager {
                 }
             }
         );
+
+
         this.audioManager.audioRecorder.audioSource.error$.subscribe(error =>
             this.appendAlertMessage(error)
         )
+
+
+        this.videoMetadataService = new VideoMetadataService({
+                allSentences$: this.openedBooks.checkedOutBooksData$.pipe(
+                    switchMap(async bookWordDatas => {
+                        const sentenceSet = new Set<string>();
+                        bookWordDatas.forEach(d => Object.values(d.wordSentenceMap).map(s => s.forEach(sentence => sentenceSet.add(sentence.translatableText))));
+                        return sentenceSet;
+                    }),
+                    shareReplay(1)
+                )
+            }
+        )
+
 
         this.quizManager.quizStage$.subscribe(stage => {
             switch (stage) {
@@ -340,6 +368,10 @@ export class Manager {
                     this.editingCardManager.showEditingCardPopup$.next(true)
                     break;
             }
+        })
+
+        const v = new SentenceVideoHighlightService({
+            visibleAtomizedSentences$: this.openedBooks.visibleElements$
         })
 
         this.openedBooks.openedBooks.appendDelta$.next({
@@ -353,6 +385,7 @@ export class Manager {
         });
         this.hotkeyEvents.startListeners();
         this.cardManager.load();
+
     }
 
     private appendAlertMessage(error: string) {
@@ -395,20 +428,20 @@ export class Manager {
         fromEvent(child, 'click').pipe(
             withLatestFrom(this.modes.mode$)
         ).subscribe(([event, mode]) => {
-            switch(mode) {
+            switch (mode) {
                 case Modes.VIDEO:
                     this.inputManager.videoCharacterIndex$.next(i);
                     this.pronunciationVideoService.videoSentence$.next(annotationElement.parent.translatableText);
                     break;
                 default:
-/*
-TODO do I need this?  I thought highlights were only for mouseenter/mouseleave
-                    const children = sentence.getSentenceHTMLElement().children;
-                    for (let i = 0; i < children.length; i++) {
-                        const child = children[i];
-                        child.classList.remove('highlighted')
-                    }
-*/
+                    /*
+                    TODO do I need this?  I thought highlights were only for mouseenter/mouseleave
+                                        const children = sentence.getSentenceHTMLElement().children;
+                                        for (let i = 0; i < children.length; i++) {
+                                            const child = children[i];
+                                            child.classList.remove('highlighted')
+                                        }
+                    */
                     this.inputManager.selectedText$.next(maxWord?.word)
             }
         })

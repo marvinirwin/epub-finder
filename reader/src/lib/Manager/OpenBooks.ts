@@ -77,9 +77,9 @@ export class OpenBooks {
                 })
             ),
             config.db.checkedOutBooks$
-        ]).pipe(map(([library, openBookTitles]) => {
+        ]).pipe(map(([library, checkedOutBookTitles]) => {
                 return Object.fromEntries(
-                    Object.entries(library).filter(([title, book]) => openBookTitles[title])
+                    Object.entries(library).filter(([title, book]) => checkedOutBookTitles[title])
                 )
             }),
             shareReplay(1)

@@ -63,15 +63,9 @@ export class Library {
         this.appendCustomDocuments(customDocuments);
 
         const builtInDocuments = [
-            "generals.html",
-            "mango.html",
-            'party_1.html',
-            'smes.html',
-            'song_1.html',
-            'stories.html',
-            'story_2.html',
-            'story_living_room.html',
-            'zhou_enlai.html'
+            'TongueTwister.html',
+            'Story4.html',
+            'Story3.html',
         ].map(websiteFromFilename);
         this.appendBuiltInDocuments(builtInDocuments);
     }

@@ -5,7 +5,7 @@ import {Website} from "./lib/Website/Website";
 
 export function websiteFromFilename(filename: string) {
     return new Website(
-        filename,
+        filename.split('.')[0],
         `${process.env.PUBLIC_URL}/books/${filename}`
     );
 }

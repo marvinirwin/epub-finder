@@ -22,7 +22,7 @@ npm_version() {
 deploy_language_trainer() {
 
   local SSH_USER=root;
-  local SSH_HOST=marvinirwin.com;
+  local SSH_HOST="$marvinirwin";
 
   local OPTIND o BUILD_CLIENT BUILD_SERVER;
 
@@ -58,7 +58,7 @@ deploy_language_trainer() {
 
   rsync -va dist/ "$DEST";
   rsync -va cache/ "$DEST/cache";
-  rsync -va public/ "$DEST/public";
+  rsync -va --exclude video public/ "$DEST/public";
   rsync -va package.json "$DEST/package.json"
 
   popd || exit;

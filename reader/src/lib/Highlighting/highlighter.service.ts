@@ -139,10 +139,6 @@ function updateElementBackgroundColor(
             }
         );
         (new Map(highestPriorityKeyValues)).forEach(rgba => rgbas.push(rgba));
-        if (elementToHighlight.element.textContent === '央') {
-            debugger;
-            console.log()
-        }
     }
     // @ts-ignore
     return elementToHighlight.element.style.backgroundColor = mixRGBA(rgbas);

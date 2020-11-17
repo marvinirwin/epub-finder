@@ -1,6 +1,6 @@
 {
     "name": "express-typescript-starter",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "description": "A starting point for Node.js express apps with TypeScript",
     "repository": {
         "type": "git",

@@ -120,43 +120,6 @@ export class BrowserInputs {
 
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
-        atomizedSentences.forEach(atomizedSentence => {
-            atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
-                atomizedSentence.getTranslation();
-            };
-            const showEvents = ['mouseenter', 'focus'];
-            const hideEvents = ['mouseleave', 'blur'];
-            const sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
-            sentenceHTMLElement.classList.add('applied-sentence-listener');
-            const popperHTMLElement = atomizedSentence.getPopperHTMLElement();
-            if (!sentenceHTMLElement || !popperHTMLElement) {
-                throw new Error("Cannot find sentenceElement or popperElement")
-            }
-            try {
-                createPopper(sentenceHTMLElement, popperHTMLElement, {
-                    placement: 'top-start',
-                    // strategy: 'fixed'
-                });
-            } catch (e) {
-                console.error(e);
-            }
-
-            const show = () => {
-                // this.videoSentence$.next(atomizedSentence.translatableText);
-                popperHTMLElement.setAttribute('data-show', '');
-            }
-            const hide = () => {
-                popperHTMLElement.removeAttribute('data-show');
-            }
-
-            showEvents.forEach(event => {
-                sentenceHTMLElement.addEventListener(event, show);
-            });
-
-            hideEvents.forEach(event => {
-                sentenceHTMLElement.addEventListener(event, hide);
-            });
-        });
     }
 
 }
