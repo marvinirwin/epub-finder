@@ -242,7 +242,6 @@ export class OpenBooksService {
         ]).pipe(
             visibleOpenBook,
             map((atomizedSentenceDictionaries: ds_Dict<AtomizedSentence[]>[]) => {
-                debugger;
                 return mergeDictArrays(...atomizedSentenceDictionaries);
             })
         )

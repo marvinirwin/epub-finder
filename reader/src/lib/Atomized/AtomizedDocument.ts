@@ -32,7 +32,9 @@ export class AtomizedDocument {
         const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
         doc.replaceDocumentSources(doc.document);
+/*
         doc.splitLongTextElements(doc.getTextElements(doc.document));
+*/
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
         return doc;
     }

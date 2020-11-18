@@ -40,7 +40,7 @@ export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
     ])
 
     return <div className={'all-sentences'}>
-        {sorted.map(sentenceMetadata => <Sentence sentenceMetadata={sentenceMetadata}/>)}
+        {sorted.map(sentenceMetadata => <Sentence key={sentenceMetadata.name} sentenceMetadata={sentenceMetadata}/>)}
     </div>
 }
 

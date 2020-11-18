@@ -1,4 +1,4 @@
-import {VideoMetaData} from "../components/PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 
 async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));
@@ -12,11 +12,11 @@ export async function sentenceToFilename(sentence: string): Promise<string> {
     return digestMessage(sentence.normalize().replace(/\s+/, ' '));
 }
 
-export const fetchVideoMetadata = async (sentence: string): Promise<VideoMetaData | undefined> => {
+export const fetchVideoMetadata = async (sentence: string): Promise<VideoMetadata | undefined> => {
     try {
         const response = await fetch(`${process.env.PUBLIC_URL}/video/${await sentenceToFilename(sentence)}.json`)
         if (response.status === 200) {
-            return response.json() as unknown as VideoMetaData;
+            return response.json() as unknown as VideoMetadata;
         }
     } catch (e) {
     }

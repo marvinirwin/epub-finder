@@ -1,12 +1,12 @@
 import {useEffect} from "react";
-import {VideoMetaData} from "./video-meta-data.interface";
+import {VideoMetadata} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
 
 export function useSetTemporalPositionBar(
     videoElementRef: HTMLVideoElement | null | undefined,
     currentSentence: string | undefined,
     currentSentenceCharacterIndex: number | undefined,
-    videoMetaData: VideoMetaData | undefined |
+    videoMetaData: VideoMetadata | undefined |
         { sentence: string | undefined; timeScale: number | undefined; characters: VideoCharacter[] | undefined; filename?: string | undefined | undefined }) {
     useEffect(() => {
         if (videoElementRef

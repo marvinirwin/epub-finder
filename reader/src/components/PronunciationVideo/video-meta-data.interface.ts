@@ -1,6 +1,6 @@
 import {VideoCharacter} from "./video-character.interface";
 
-export interface VideoMetaData {
+export interface VideoMetadata {
     sentence: string;
     timeScale: number;
     characters: VideoCharacter[];

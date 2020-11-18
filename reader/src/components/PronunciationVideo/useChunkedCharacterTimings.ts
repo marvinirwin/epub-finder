@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {VideoCharacter} from "./video-character.interface";
-import {VideoMetaData} from "./video-meta-data.interface";
+import {VideoMetadata} from "./video-meta-data.interface";
 
 const CHARACTER_TIMING_SECTION_PADDING = 24;
 
-export const useChunkedCharacterTimings = (videoMetaData: VideoMetaData | undefined, sectionWidthInMilliseconds: number | undefined) => {
+export const useChunkedCharacterTimings = (videoMetaData: VideoMetadata | undefined, sectionWidthInMilliseconds: number | undefined) => {
     const [chunkedCharacterTimings, setChunkedCharacterTimings] = useState<VideoCharacter[][] | null>();
     useEffect(() => {
         if (videoMetaData && sectionWidthInMilliseconds) {

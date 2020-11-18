@@ -26,7 +26,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
 
     const videoTimeMs = useVideoTime(videoElementRef);
-    const videoMetaData = useVideoMetaData(currentSentence)
+    const videoMetaData = useVideoMetaData(currentSentence, m.videoMetadataService)
     const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, millisecondsPerSection);
 
     useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetaData);

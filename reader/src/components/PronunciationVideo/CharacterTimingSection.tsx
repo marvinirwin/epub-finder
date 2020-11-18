@@ -3,7 +3,7 @@ import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
 import {TemporalPositionBar} from "./TemporalPositionBar";
 import {HighlightBar} from "./HighlightBar";
 import {percentagePosition} from "./math.module";
-import {VideoMetaData} from "./video-meta-data.interface";
+import {VideoMetadata} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
 import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
 
@@ -11,7 +11,7 @@ export type Percentage = number;
 
 export const CharacterTimingSection: React.FunctionComponent<{
     characterTimings: VideoCharacter[],
-    videoMetaData: VideoMetaData,
+    videoMetaData: VideoMetadata,
     sectionDurationMs: number,
     sectionWidthPx: number,
     progressBarPercentPosition: number | undefined,

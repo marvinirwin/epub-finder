@@ -35,15 +35,16 @@ export const SLIM_CARD_CONTENT = {
 
 export default function AudioRecorder({m}: { m: Manager }) {
     const classes = useStyles();
-    const r = m.audioManager.audioRecorder;
+    const recorder = m.audioManager.audioRecorder;
     const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
-    const recognizedText = useObservableState(r.currentRecognizedText$);
+    const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
     const translatedText = useObservableState(
-        () => r.currentRecognizedText$.pipe(
+        () => recorder.currentRecognizedText$.pipe(
             switchMap(text => text ? fetchTranslation(text) : Promise.resolve(''))
         ),
+        ''
     )
-    const currentAudioRequest = useObservableState(r.recordRequest$)// Maybe pipe this to make it a replaySubject?
+    const currentAudioRequest = useObservableState(recorder.recordRequest$)// Maybe pipe this to make it a replaySubject?
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
@@ -62,7 +63,7 @@ export default function AudioRecorder({m}: { m: Manager }) {
                     recognized text should match the pinyin on the flashcard.</Typography>
             </TutorialPopper>
             <div style={{display: 'grid', gridTemplateColumns: '10% 90%'}}>
-                <RecordingCircle r={r}/>
+                <RecordingCircle r={recorder}/>
                 <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-around'}}>
                         <span style={{flexGrow: 1}}>
                         <Typography variant="h6"
@@ -78,8 +79,8 @@ export default function AudioRecorder({m}: { m: Manager }) {
         {
             recognizedText && <Paper className={'recognized-text'}>
                 <Typography variant="h6">{recognizedText}</Typography>
-                <Typography variant="h6">{lookupPinyin(recognizedText || '').join(' ')}</Typography>
-                <Typography variant="h6">{translatedText || ''}</Typography>
+                <Typography variant="h6">{lookupPinyin(recognizedText).join(' ')}</Typography>
+                <Typography variant="h6">{translatedText}</Typography>
             </Paper>
         }
     </div>

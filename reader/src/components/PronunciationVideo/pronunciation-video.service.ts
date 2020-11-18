@@ -1,9 +1,9 @@
 import {Observable, ReplaySubject} from "rxjs";
-import {VideoMetaData} from "./video-meta-data.interface";
+import {VideoMetadata} from "./video-meta-data.interface";
 import {fetchVideoMetadata} from "../../services/video.service";
 
 export class PronunciationVideoService {
-    videoMetaData$ = new ReplaySubject<VideoMetaData | undefined>(1);
+    videoMetaData$ = new ReplaySubject<VideoMetadata | undefined>(1);
     videoSentence$ = new ReplaySubject<string | undefined>(1);
 
     constructor() {

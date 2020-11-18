@@ -47,7 +47,7 @@ import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
-import {VideoMetaData} from "../components/PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 import {fetchVideoMetadata} from "../services/video.service";
 import {fromPromise} from "rxjs/internal-compatibility";
 import {VideoMetadataService} from "../services/video-metadata.service";
