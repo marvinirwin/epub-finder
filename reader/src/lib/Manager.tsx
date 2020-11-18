@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {CHARACTER_BOOK_NODE_LABEL, OpenBooks} from "./Manager/OpenBooks";
+import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/OpenBooksService";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
@@ -70,10 +70,6 @@ function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     }
 }
 
-export class SentenceMetadata {
-    constructor(public sentence: string, public metadata: VideoMetaData | undefined) {
-    }
-}
 
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
@@ -85,7 +81,7 @@ export class Manager {
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
     public cardManager: CardManager;
-    public openedBooks: OpenBooks;
+    public openedBooks: OpenBooksService;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
@@ -119,7 +115,7 @@ export class Manager {
 
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: Library;
-    modes = new ModesService();
+    modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
     videoMetadataService: VideoMetadataService;
 
@@ -144,7 +140,7 @@ export class Manager {
         );
         this.cardManager = new CardManager(this.db);
         this.library = new Library({db});
-        this.openedBooks = new OpenBooks({
+        this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
@@ -318,7 +314,7 @@ export class Manager {
 
         combineLatest([
             this.bottomNavigationValue$,
-            this.openedBooks.openedBooks.updates$,
+            this.openedBooks.openBookTree.updates$,
         ]).subscribe(
             ([bottomNavigationValue, {sourced}]) => {
                 if (!sourced) return;
@@ -370,11 +366,13 @@ export class Manager {
             }
         })
 
-        const v = new SentenceVideoHighlightService({
-            visibleAtomizedSentences$: this.openedBooks.visibleElements$
+        new SentenceVideoHighlightService({
+            visibleAtomizedSentences$: this.openedBooks.visibleAtomizedSentences$,
+            modesService: this.modesService,
+            videoMetadataService: this.videoMetadataService
         })
 
-        this.openedBooks.openedBooks.appendDelta$.next({
+        this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',
             children: {
                 [CHARACTER_BOOK_NODE_LABEL]: {
@@ -400,7 +398,7 @@ export class Manager {
         const child: HTMLElement = annotationElement.element as unknown as HTMLElement;
         child.classList.add("applied-word-element-listener");
         fromEvent(child, 'mouseenter')
-            .pipe(withLatestFrom(this.modes.mode$))
+            .pipe(withLatestFrom(this.modesService.mode$))
             .subscribe(([ev, mode]) => {
                 if (maxWord) {
                     addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
@@ -426,7 +424,7 @@ export class Manager {
             addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
         }
         fromEvent(child, 'click').pipe(
-            withLatestFrom(this.modes.mode$)
+            withLatestFrom(this.modesService.mode$)
         ).subscribe(([event, mode]) => {
             switch (mode) {
                 case Modes.VIDEO:

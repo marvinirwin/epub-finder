@@ -33,6 +33,14 @@ export const BodyStyle = `
             display: block;
         }
     }
+    
+    .has-metadata {
+        background-color: blue;
+    }
+    
+    .no-metadata {
+        background-color: pink;
+    }
 `;
 
 export const appendBookStyle = (d: Document) => {

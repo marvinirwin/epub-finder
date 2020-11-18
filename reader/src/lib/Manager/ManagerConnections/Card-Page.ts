@@ -1,5 +1,5 @@
-import {OpenBooks} from "../OpenBooks";
+import {OpenBooksService} from "../OpenBooksService";
 import CardManager from "../CardManager";
 
-export function CardPage(c: CardManager, p: OpenBooks) {
+export function CardPage(c: CardManager, p: OpenBooksService) {
 }

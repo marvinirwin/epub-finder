@@ -1,5 +1,5 @@
-import {OpenBooks} from "../OpenBooks";
+import {OpenBooksService} from "../OpenBooksService";
 import {BrowserInputs} from "../../Hotkeys/BrowserInputs";
 
-export function InputPage(u: BrowserInputs, p: OpenBooks) {
+export function InputPage(u: BrowserInputs, p: OpenBooksService) {
 }

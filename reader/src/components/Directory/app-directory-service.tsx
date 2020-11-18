@@ -1,6 +1,6 @@
 import {constructTree, ds_Tree} from "../../services/tree.service";
 import React from "react";
-import {Manager, SentenceMetadata} from "../../lib/Manager";
+import {Manager} from "../../lib/Manager";
 import {Reading} from "../Reading/Reading";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
@@ -10,6 +10,8 @@ import {LibraryDirectoryService} from "./library-directory.service";
 import {ModeDirectory} from "./mode-directory.service";
 import {useObservableState} from "observable-hooks";
 import {orderBy} from "lodash";
+import {ds_Dict} from "../../lib/Tree/DeltaScanner";
+import { SentenceMetadata } from "../../services/video-metadata.service";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -32,8 +34,8 @@ export const menuNodeFactory = (
 
 
 export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
-    const sentenceMetadata = useObservableState(m.allSentenceMetadata$, []);
-    const sorted = orderBy(sentenceMetadata, [
+    const sentenceMetadata = useObservableState(m.videoMetadataService.sentenceMetadata$, {});
+    const sorted = orderBy(Object.values(sentenceMetadata), [
         sentenceMetaData => sentenceMetaData.metadata,
     ])
 
@@ -44,7 +46,7 @@ export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
 
 export const Sentence: React.FC<{ sentenceMetadata: SentenceMetadata }> = ({sentenceMetadata}) => {
     return <div style={{backgroundColor: sentenceMetadata.metadata ? 'white' : 'pink'}}>
-        {sentenceMetadata.sentence}
+        {sentenceMetadata.name}
     </div>
 }
 

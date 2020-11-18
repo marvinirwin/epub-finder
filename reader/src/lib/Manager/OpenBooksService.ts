@@ -5,7 +5,7 @@ import {CustomDocument, Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
 import {Dictionary, flatten} from "lodash";
-import {DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -13,6 +13,7 @@ import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter"
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
+import {ds_Tree} from "../../services/tree.service";
 
 
 export type Named = {
@@ -27,19 +28,22 @@ export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
 export const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
     (variableToCheck as CustomDocument).html !== undefined;
 
-export class OpenBooks {
-    openedBooks = new NamedDeltaScanner<OpenBook, string>();
+export class OpenBooksService {
+    openBookTree = new NamedDeltaScanner<OpenBook, string>();
+    // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
-    exampleSentenceSentenceData$: Observable<TextWordData[]>;
     renderedBookSentenceData$: Observable<BookWordData[]>;
-    visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
+    exampleSentenceSentenceData$: Observable<TextWordData[]>;
     library$: Observable<ds_Dict<OpenBook>>;
     readingBook: OpenBook;
     readingDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
     checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
     checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
+    // Visible means inside of the viewport
+    visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
+    visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
 
     constructor(
         private config: OpenBooksConfig
@@ -86,7 +90,7 @@ export class OpenBooks {
         );
 
         this.checkedOutBooks$.subscribe(
-            openBooks => this.openedBooks.appendDelta$.next(
+            openBooks => this.openBookTree.appendDelta$.next(
                 {
                     nodeLabel: 'root',
                     children: {
@@ -111,7 +115,7 @@ export class OpenBooks {
 
         this.applyListenersToOpenedBookBodies();
 
-        this.renderedAtomizedSentences$ = this.openedBooks
+        this.renderedAtomizedSentences$ = this.openBookTree
             .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
                 switchMap(({sourced}) => {
                     const sources = sourced ? flattenTree(sourced) : [];
@@ -150,7 +154,7 @@ export class OpenBooks {
         )
 
         this.renderedSentenceTextDataTree$ = this
-            .openedBooks
+            .openBookTree
             .mapWith(bookDataMap());
         this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
             combineLatest(flattenTree(delta))
@@ -205,11 +209,8 @@ export class OpenBooks {
                 shareReplay(1)
             );
 
-        const visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
-            this.renderedSentenceTextDataTree$.updates$,
-            config.bottomNavigationValue$
-        ]).pipe(
-            switchMap(([{sourced}, bottomNavigationValue]) => {
+        const visibleOpenBook = <U, T extends Observable<U>>(o$: Observable<[DeltaScan<T>, NavigationPages]>): Observable<U[]> => {
+            return o$.pipe(switchMap(([{sourced}, bottomNavigationValue]) => {
                 if (!sourced?.children) {
                     throw new Error("OpenedBooks has no tree, this should not happen")
                 }
@@ -223,9 +224,29 @@ export class OpenBooks {
                     default:
                         return combineLatest([]);
                 }
-            }),
+            }));
+        }
+
+        const visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
+            this.renderedSentenceTextDataTree$.updates$,
+            config.bottomNavigationValue$
+        ]).pipe(
+            visibleOpenBook,
             shareReplay(1)
         );
+
+
+        this.visibleAtomizedSentences$ = combineLatest([
+            this.openBookTree.mapWith(openBook => openBook.renderedSentences$).updates$,
+            config.bottomNavigationValue$
+        ]).pipe(
+            visibleOpenBook,
+            map((atomizedSentenceDictionaries: ds_Dict<AtomizedSentence[]>[]) => {
+                debugger;
+                return mergeDictArrays(...atomizedSentenceDictionaries);
+            })
+        )
+
 
         this.visibleElements$ = visibleOpenedBookData$.pipe(
             map(flatten),
@@ -234,6 +255,7 @@ export class OpenBooks {
             ),
             shareReplay(1)
         );
+
 
         this.checkedOutBooks$.pipe(
             switchMap(sourceBooks => combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))),
@@ -259,7 +281,7 @@ export class OpenBooks {
             undefined,
             config.applyAtomizedSentencesListener
         );
-        this.openedBooks.appendDelta$.next(
+        this.openBookTree.appendDelta$.next(
             {
                 nodeLabel: 'root',
                 children: {
@@ -280,7 +302,7 @@ export class OpenBooks {
     }
 
     private applyListenersToOpenedBookBodies() {
-        this.openedBooks.updates$.subscribe(({delta}) => {
+        this.openBookTree.updates$.subscribe(({delta}) => {
             flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
         })
     }

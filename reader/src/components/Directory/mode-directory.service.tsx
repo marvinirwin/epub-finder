@@ -12,7 +12,7 @@ import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMenuNode> } => {
 
     const VideoSelect: React.FC = () =>  {
-        const mode = useObservableState(m.modes.mode$);
+        const mode = useObservableState(m.modesService.mode$);
         if (mode === Modes.VIDEO) {
             return <PlayArrow htmlColor={'#3d5afe'}/>;
         }
@@ -20,7 +20,7 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
     }
 
     const HighlightMode: React.FC = () => {
-        const mode = useObservableState(m.modes.mode$);
+        const mode = useObservableState(m.modesService.mode$);
         if (mode === Modes.HIGHLIGHT) {
             return <Highlight htmlColor={'#ccff00'}/>;
         }
@@ -39,10 +39,10 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
     return Object.fromEntries(
         [
             ['Video', () => {
-                m.modes.mode$.next(Modes.VIDEO);
+                m.modesService.mode$.next(Modes.VIDEO);
             }, "Watch sentence", <VideoSelect/>],
             ['Highlight', () => {
-                m.modes.mode$.next(Modes.HIGHLIGHT);
+                m.modesService.mode$.next(Modes.HIGHLIGHT);
             }, "Highlight words", <HighlightMode/>],
             ['Speaking', () => {
                 const recordRequest = new RecordRequest(``);

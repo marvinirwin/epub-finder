@@ -2,7 +2,7 @@ import {uniq} from "lodash";
 import {DeltaScan, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {Named} from "../lib/Manager/OpenBooks";
+import {Named} from "../lib/Manager/OpenBooksService";
 
 export type ds_Tree<T, U extends string = string> = {
     value?: T;
