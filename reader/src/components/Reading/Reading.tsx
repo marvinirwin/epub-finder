@@ -7,7 +7,7 @@ import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {useObservableState} from "observable-hooks";
 
 export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
-    const openedBook = m.openedBooks.readingBook;
+    const openedBook = m.openedBooks.displayBook;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetaData$);
     const showRecording = !!useObservableState(m.audioManager.audioRecorder.isRecording$);
     const [resizeCallback, setResizeCallback] = useState<() => void>(() => () => {});

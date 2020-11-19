@@ -20,7 +20,7 @@ export function Main({m}: { m: Manager }) {
         AppDirectoryService(m).subscribe(v => treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
-    const readingBook = m.openedBooks.readingBook;
+    const readingBook = m.openedBooks.displayBook;
     const iframeVisible = currentPage === NavigationPages.READING_PAGE;
     const characterPageShows = currentPage === NavigationPages.QUIZ_PAGE;
 

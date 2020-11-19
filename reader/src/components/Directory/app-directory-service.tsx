@@ -67,7 +67,9 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
              ]) => {
             const ReadingComponent = () => <Reading m={m}/>;
             const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
+/*
             const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
+*/
 
 
             const rootTree = constructTree('root', main);

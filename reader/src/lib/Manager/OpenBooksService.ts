@@ -36,8 +36,8 @@ export class OpenBooksService {
     renderedBookSentenceData$: Observable<BookWordData[]>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     library$: Observable<ds_Dict<OpenBook>>;
-    readingBook: OpenBook;
-    readingDocument$: Observable<AtomizedDocument>;
+    displayBook: OpenBook;
+    displayDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
     checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
     checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
@@ -266,17 +266,17 @@ export class OpenBooksService {
             }
         });
 
-        this.readingDocument$ = this.readingBook$.pipe(
+        this.displayDocument$ = this.readingBook$.pipe(
             switchMap(readingBook => {
                 if (!readingBook) return of<AtomizedDocument>();
                 return readingBook.atomizedDocument$;
             }),
             shareReplay(1)
         )
-        this.readingBook = new OpenBook(
+        this.displayBook = new OpenBook(
             "Reading Book",
             config.trie$,
-            this.readingDocument$,
+            this.displayDocument$,
             undefined,
             config.applyAtomizedSentencesListener
         );
@@ -287,9 +287,9 @@ export class OpenBooksService {
                     [READING_BOOK_NODE_LABEL]: {
                         nodeLabel: READING_BOOK_NODE_LABEL,
                         children: {
-                            [this.readingBook.name]: {
-                                nodeLabel: this.readingBook.name,
-                                value: this.readingBook
+                            [this.displayBook.name]: {
+                                nodeLabel: this.displayBook.name,
+                                value: this.displayBook
                             }
                         }
                     }
