@@ -75,7 +75,9 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
             const rootTree = constructTree('root', main);
             rootTree.children = {
                 ...ModeDirectory(m),
+/*
                 reading: constructTree('reading', reading),
+*/
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
                 hotkeys: HotkeyDirectoryService(m),
             };
