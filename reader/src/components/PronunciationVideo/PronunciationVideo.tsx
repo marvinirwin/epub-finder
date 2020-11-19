@@ -12,7 +12,7 @@ import {useSetVideoTime} from "./useSetVideoTime";
 import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
 
 
-export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m}) => {
+export const PronunciationVideo: React.FunctionComponent<{ m: Manager, onResized: () => void }> = ({m, onResized}) => {
     const currentSentence = useObservableState(m.pronunciationVideoService.videoSentence$);
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
@@ -48,15 +48,6 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 
     const videoSource = !!(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : undefined;
     return <Card className={'pronunciation-video-container-card'}>
-            {/*
-        <div style={{position: 'absolute', top: 0, zIndex: 10}}>
-            <HotkeyWrapper action={"HIDE_VIDEO"}>
-                <IconButton onClick={() => m.hotkeyEvents.hideVideo$.next()} >
-                    <CancelPresentationIcon/>
-                </IconButton>
-            </HotkeyWrapper>
-        </div>
-*/}
             <div
                 className={`pronunciation-sections-container`}
                 ref={setPronunciationSectionsContainer}>
@@ -122,6 +113,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                 src={videoSource}
                 autoPlay
                 controls
+                onPlay={onResized}
             />}
         </Card>
 }

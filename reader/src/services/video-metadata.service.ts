@@ -45,7 +45,6 @@ export class VideoMetadataService {
         )
         metadata.metadata$ = this.cachedMetadata[sentence] ?
             of(this.cachedMetadata[sentence]).pipe(
-                updateCacheTap,
                 shareReplay(1)
             ) : fromPromise(fetchVideoMetadata(sentence)).pipe(
                 updateCacheTap,

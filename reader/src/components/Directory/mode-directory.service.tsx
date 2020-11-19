@@ -41,9 +41,11 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
             ['Video', () => {
                 m.modesService.mode$.next(Modes.VIDEO);
             }, "Watch sentence", <VideoSelect/>],
+/*
             ['Highlight', () => {
                 m.modesService.mode$.next(Modes.HIGHLIGHT);
             }, "Highlight words", <HighlightMode/>],
+*/
             ['Speaking', () => {
                 const recordRequest = new RecordRequest(``);
                 recordRequest.sentence.then(recognizedSentence => {

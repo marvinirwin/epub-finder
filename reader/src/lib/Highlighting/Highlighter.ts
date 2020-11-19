@@ -54,12 +54,14 @@ export class Highlighter {
             config.visibleElements$,
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
+/*
         s.singleHighlight(
             config.quizWord$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
             this.highlightMap$,
             config.visibleElements$,
             [0, 'QUIZ_WORD_HIGHLIGHT']
         );
+*/
         s.timedHighlight(
             this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
             this.highlightMap$,

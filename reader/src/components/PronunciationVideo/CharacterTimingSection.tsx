@@ -86,7 +86,10 @@ export const CharacterTimingSection: React.FunctionComponent<{
             {characterTimings.filter(characterTiming => isChineseCharacter(characterTiming.character)).map(characterTiming =>
                 <mark
                     style={
-                        {left: `${percentagePosition(sectionDurationMs, characterTiming.timestamp * videoMetaData.timeScale) * .9}%`}
+                        {
+                            left: `${percentagePosition(sectionDurationMs, characterTiming.timestamp * videoMetaData.timeScale)}%`,
+                            bottom: 0
+                        }
                     }
                     key={characterTiming.timestamp}
                 >{characterTiming.character}

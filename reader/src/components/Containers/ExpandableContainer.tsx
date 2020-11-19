@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
+import {useConditionalTimeout, useResizeObserver} from 'beautiful-react-hooks';
 
 
 const setDimensions = (container: HTMLDivElement, setStyles: (p: React.CSSProperties) => void) => {
@@ -16,34 +17,37 @@ export const ExpandableContainer: React.FC<{ shouldShow: boolean, hideDelay?: nu
     {
         children,
         shouldShow,
-        hideDelay
+        hideDelay,
     }
-    ) => {
-    const [container, setContainer] = useState<HTMLDivElement | null>();
+) => {
+    const ref = useRef();
     const [styles, setStyles] = useState({});
-    useEffect(() => {
-        setTimeout(() => {
-            if (shouldShow && container) {
-                setDimensions(container, setStyles)
-            } else {
-                if (hideDelay !== undefined) {
-                    setTimeout(() => {
-                        setStyles({
-                            height: 0,
-                            maxHeight: 0
-                        })
-                    }, hideDelay)
-                } else {
-                    setStyles({
-                        height: 0,
-                        maxHeight: 0
-                    })
-                }
-            }
-        }, 10);
-    }, [shouldShow]);
+    // @ts-ignore
+    const DOMRect = useResizeObserver(ref);
 
-    return <div className={`expandable`} ref={setContainer} style={styles}>
+    const [isCleared, clearTimeoutRef] = useConditionalTimeout(()=>{
+       setStyles({
+           height: 0,
+           maxHeight: 0
+       })
+   }, hideDelay || 0, !shouldShow);
+
+    useEffect(() => {
+        shouldShow && clearTimeoutRef();
+        if (shouldShow && ref?.current) {
+            // @ts-ignore
+            setDimensions(ref?.current, setStyles)
+        } else {
+            if (hideDelay !== undefined) {
+                setTimeout(() => {
+                }, hideDelay)
+            } else {
+            }
+        }
+    }, [shouldShow, DOMRect?.height, DOMRect?.width]);
+
+    // @ts-ignore
+    return <div className={`expandable`} ref={ref} style={styles}>
         {children}
     </div>
 }
