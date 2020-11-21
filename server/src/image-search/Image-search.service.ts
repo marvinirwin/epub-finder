@@ -6,7 +6,7 @@ import {TranslateRequestDto} from "../translate/translate-request-dto";
 import {TranslateResponseDto} from "../translate/translate-response-dto";
 import {sha1} from "../util/sha1";
 import {InjectRepository} from "@nestjs/typeorm";
-import {JsonCache} from "../entities/JsonCache";
+import {JsonCacheEntity} from "../entities/json-cache.entity";
 import {Repository} from "typeorm";
 import debug from 'debug'
 const d = debug('service:image-search');
@@ -26,8 +26,8 @@ const client = new ImageSearchClient(cognitiveServiceCredentials, {
 export class ImageSearchService {
     private readonly _service = 'AZURE_IMAGE_SEARCH'
     constructor(
-        @InjectRepository(JsonCache)
-        private jsonCacheRepository: Repository<JsonCache>,
+        @InjectRepository(JsonCacheEntity)
+        private jsonCacheRepository: Repository<JsonCacheEntity>,
     ) { }
 
     async fetchSearchResults({term}: ImageSearchRequestDto) {
@@ -60,7 +60,7 @@ export class ImageSearchService {
         d(cacheEntry)
         this.jsonCacheRepository.save(
             Object.assign(
-                new JsonCache(),
+                new JsonCacheEntity(),
                 cacheEntry
             )
         )

@@ -5,7 +5,7 @@ import {
 } from "typeorm";
 
 @Entity()
-export class VisitorLog {
+export class VisitorLogEntity {
     @PrimaryGeneratedColumn()
     id: number | undefined;
 

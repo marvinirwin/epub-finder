@@ -14,8 +14,8 @@ import {SessionService} from "./session/session.service";
 import { AuthModule } from './auth/auth.module';
 import { UsersService } from './user/users.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {JsonCache} from "./entities/JsonCache";
-import {Session} from "./entities/Session";
+import {JsonCacheEntity} from "./entities/json-cache.entity";
+import {SessionEntity} from "./entities/session.entity";
 
 @Module({
     imports: [
@@ -33,7 +33,7 @@ import {Session} from "./entities/Session";
             serveRoot: '/',
         }),
         AuthModule,
-        TypeOrmModule.forFeature([JsonCache, Session])
+        TypeOrmModule.forFeature([JsonCacheEntity, SessionEntity])
     ],
     providers: [
         SessionService,

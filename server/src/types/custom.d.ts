@@ -1,6 +1,5 @@
 /// <reference types="express" />
 import {Profile} from "passport";
-import {User} from "../entities/User";
 
 /*
 export declare namespace Express {

@@ -1,5 +1,3 @@
-import {User} from "../entities/User";
-import {Session} from "../entities/Session";
 import {Repositories} from "./repositories";
 export default ({ user, session }: Repositories) => ({
 /*

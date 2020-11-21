@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {Body, Controller, Get, Post, Req, Res, HttpCode, UseGuards} from "@nestjs/common";
 import {promisify} from "util";
 
-import {User} from "../entities/User";
+import {UserEntity} from "../entities/user.entity";
 import {UsersService} from "../user/users.service";
 import { Public } from "src/decorators/public";
 import {UserFromReq} from "../decorators/userFromReq";
@@ -17,7 +17,7 @@ export class AuthController {
 
   @Public()
   @Get("/login")
-  public main(@UserFromReq() user: User): string {
+  public main(@UserFromReq() user: UserEntity): string {
     return `
       <html>
          <script>
@@ -47,7 +47,7 @@ export class AuthController {
   @Public()
   @UseGuards(LoginGuard)
   @Post("/login")
-  public login(@UserFromReq() user: User): User {
+  public login(@UserFromReq() user: UserEntity): UserEntity {
     return user;
   }
 
@@ -64,7 +64,7 @@ export class AuthController {
 
   @Public()
   @Post("/signup")
-  public async signup(@Body() data: SignUpDto, @Req() req: Request): Promise<User> {
+  public async signup(@Body() data: SignUpDto, @Req() req: Request): Promise<UserEntity> {
     const user = await this.userService.createBasicUser(data);
     await promisify(req.logIn.bind(req))(user);
     return user;
@@ -80,7 +80,7 @@ export class AuthController {
   @Public()
   @Get("/google/callback")
   @UseGuards(GoogleGuard)
-  public googleLoginCallback(@UserFromReq() user: User): string {
+  public googleLoginCallback(@UserFromReq() user: UserEntity): string {
     return `
       <html>
       	<script>
@@ -103,7 +103,7 @@ export class AuthController {
   @Public()
   @Get("/github/callback")
   @UseGuards(GithubGuard)
-  public githubLoginCallback(@UserFromReq() user: User): string {
+  public githubLoginCallback(@UserFromReq() user: UserEntity): string {
     return `
       <html>
       	<script>
@@ -126,7 +126,7 @@ export class AuthController {
   @Public()
   @Get("/twitter/callback")
   @UseGuards(TwitterGuard)
-  public twitterLoginCallback(@UserFromReq() user: User): string {
+  public twitterLoginCallback(@UserFromReq() user: UserEntity): string {
     return `
       <html>
       	<script>

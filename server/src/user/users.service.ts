@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {User} from '../entities/User';
+import {UserEntity} from '../entities/user.entity';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CreateUserDto} from "./create-user.dto";
@@ -7,18 +7,18 @@ import {CreateUserDto} from "./create-user.dto";
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User)
-        private usersRepository: Repository<User>,
+        @InjectRepository(UserEntity)
+        private usersRepository: Repository<UserEntity>,
     ) { }
 
 
     /**
      * Creates a user with a username and password
      */
-    async createBasicUser({email, password}: CreateUserDto): Promise<User> {
+    async createBasicUser({email, password}: CreateUserDto): Promise<UserEntity> {
         return this.usersRepository.create(
             Object.assign(
-                new User(),
+                new UserEntity(),
                 {
                     email,
                     password
@@ -27,11 +27,11 @@ export class UsersService {
         )
     }
 
-    findAll(): Promise<User[]> {
+    findAll(): Promise<UserEntity[]> {
         return this.usersRepository.find();
     }
 
-    findOne(args): Promise<User> {
+    findOne(args): Promise<UserEntity> {
         return this.usersRepository.findOne(args);
     }
 
@@ -44,7 +44,7 @@ export class UsersService {
         if (!userWithThisEmail) {
             return userWithThisEmail;
         }
-        if (await User.comparePassword(userWithThisEmail.password, password)) {
+        if (await UserEntity.comparePassword(userWithThisEmail.password, password)) {
             return userWithThisEmail;
         }
     }

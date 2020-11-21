@@ -12,7 +12,7 @@ import {Column, ViewColumn, ViewEntity} from "typeorm";
         GROUP BY \`user\`.id
     `
 })
-export class Usage {
+export class UsageEntity {
     @ViewColumn()
     usage: number;
     @ViewColumn()

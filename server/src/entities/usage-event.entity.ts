@@ -1,11 +1,11 @@
 import {Column, Entity, Index, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
-import {User} from "./User";
+import {UserEntity} from "./user.entity";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
 
 type KeyValue = { [key: string]: any };
 
 @Entity()
-export class UsageEvent {
+export class UsageEventEntity {
     @PrimaryGeneratedColumn()
     public id: number | undefined;
     @Column()
@@ -19,6 +19,6 @@ export class UsageEvent {
     public cost: number;
 
     @Column({default: null})
-    @ManyToOne(() => User, user => user.id)
+    @ManyToOne(() => UserEntity, user => user.id)
     public userId: number | undefined;
 }

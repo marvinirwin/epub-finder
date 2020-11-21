@@ -1,8 +1,8 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
-import { SessionEntity } from 'typeorm-store';
+import typeormStore from 'typeorm-store';
 
 @Entity()
-export class Session extends BaseEntity implements SessionEntity {
+export class SessionEntity extends BaseEntity implements typeormStore.SessionEntity {
     @PrimaryColumn()
     id: string;
 

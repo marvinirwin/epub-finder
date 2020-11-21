@@ -6,18 +6,20 @@ import {
     AfterLoad,
     BeforeUpdate,
     BeforeInsert,
-    OneToMany, Repository
+    OneToMany, Repository, ManyToOne, JoinTable
 } from "typeorm";
 
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import {UsageEvent} from "./UsageEvent";
+import {UsageEventEntity} from "./usage-event.entity";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
-import {Usage} from "./Usage";
-import {Session} from "./Session";
+import {UsageEntity} from "./usage.entity";
+import {SessionEntity} from "./session.entity";
+import {BookEntity} from "./book.entity";
+import {BookViewEntity} from "./book-view.entity";
 
 @Entity()
-export class User {
+export class UserEntity {
     // If a user has no tokens or emails, it's an ip user
     public static IpUserCriteria = {
         email: null,
@@ -79,11 +81,16 @@ export class User {
 
     private _loadedPassword: string;
 
-    @OneToMany(type => UsageEvent, usageEvent => usageEvent.userId)
-    usageEvents: UsageEvent[];
+    @OneToMany(() => BookViewEntity, (book: BookViewEntity) => book.creatorId)
+    @JoinTable()
+    books: Promise<BookViewEntity[]>;
 
-    @OneToMany(type => Session, session => session.userId)
-    sessions: Session[];
+
+    @OneToMany(type => UsageEventEntity, (usageEvent: UsageEventEntity) => usageEvent.userId)
+    usageEvents: UsageEventEntity[];
+
+    @OneToMany(type => SessionEntity, (session: SessionEntity) => session.userId)
+    sessions: SessionEntity[];
 
     @AfterLoad()
     private storeInitialPassword(): void {
@@ -120,8 +127,9 @@ export class User {
         });
     }
 
-    public async usageStat(r: Repository<Usage>): Promise<Usage> {
+    public async usageStat(r: Repository<UsageEntity>): Promise<UsageEntity> {
         return r.findOne({userId: this.id})
     }
+
 }
 
