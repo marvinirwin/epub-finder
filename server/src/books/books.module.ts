@@ -1,14 +1,19 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {VideoMetadataViewEntity} from "../entities/video-metadata-view.entity";
-import {VideoMetadataEntity} from "../entities/video-metadata.entity";
-import {BookEntity} from "../entities/book.entity";
+import {Book} from "../entities/book.entity";
 import {BookViewEntity} from "../entities/book-view.entity";
+import {BooksController} from "./books.controller";
+import {BooksService} from "./books.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([BookEntity, BookViewEntity])
+        TypeOrmModule.forFeature([Book, BookViewEntity])
     ],
-    providers: [ ]
+    controllers: [
+        BooksController
+    ],
+    providers: [
+        BooksService
+    ]
 })
 export class BooksModule {}

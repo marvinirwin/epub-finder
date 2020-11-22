@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import {startCase} from 'lodash';
 import {AvailableBooksDto} from "./available-books.dto";
 import {UserEntity} from "../entities/user.entity";
-import {BookEntity} from "../entities/book.entity";
+import {Book} from "../entities/book.entity";
 import {BookViewEntity} from "../entities/book-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
@@ -13,8 +13,8 @@ export class BooksService {
         @InjectRepository(BookViewEntity)
         private bookViewRepository: Repository<BookViewEntity>,
 
-        @InjectRepository(BookEntity)
-        private bookRepository: Repository<BookEntity>,
+        @InjectRepository(Book)
+        private bookRepository: Repository<Book>,
     ) {
     }
     private async booksInBookDir(): Promise<string[]> {
@@ -38,7 +38,7 @@ export class BooksService {
     }
 
 
-    private async queryCustomBooksAvailableToUser(user: UserEntity): Promise<BookEntity[]> {
+    private async queryCustomBooksAvailableToUser(user: UserEntity): Promise<Book[]> {
         return [... await this.queryGlobalCustomBooks(), ... await user.books];
     }
 
@@ -46,7 +46,7 @@ export class BooksService {
         return await this.bookViewRepository.find({global: true})
     }
 
-    public async saveBook(customBookDto: CustomBookDto): Promise<BookEntity> {
+    public async saveBook(customBookDto: CustomBookDto): Promise<Book> {
         return await this.bookRepository.save(customBookDto)
     }
 }

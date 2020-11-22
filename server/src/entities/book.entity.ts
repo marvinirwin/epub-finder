@@ -1,11 +1,12 @@
 import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn} from "typeorm";
 
 @Entity()
-export class BookEntity {
+export class Book {
     @PrimaryColumn()
     id: number;
 
     // Used for Groupwise Max
+    @Column()
     @Generated("uuid")
     bookId: number;
 

@@ -15,7 +15,6 @@ import {UsageEventEntity} from "./usage-event.entity";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
 import {UsageEntity} from "./usage.entity";
 import {SessionEntity} from "./session.entity";
-import {BookEntity} from "./book.entity";
 import {BookViewEntity} from "./book-view.entity";
 
 @Entity()

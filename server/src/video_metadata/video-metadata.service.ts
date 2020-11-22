@@ -1,7 +1,7 @@
 import {InjectRepository} from "@nestjs/typeorm";
 import {Column, Generated, Repository} from "typeorm";
 import {VideoMetadataViewEntity} from "../entities/video-metadata-view.entity";
-import {VideoMetadataEntity} from "../entities/video-metadata.entity";
+import {VideoMetadata} from "../entities/video.metadata";
 import {VideoMetadataDto} from "./video-metadata.dto";
 import {sha1} from "../util/sha1";
 import fs from 'fs-extra';
@@ -12,33 +12,36 @@ export class VideoMetadataService {
         @InjectRepository(VideoMetadataViewEntity)
         private videoMetadataViewEntityRepository: Repository<VideoMetadataViewEntity>,
 
-        @InjectRepository(VideoMetadataEntity)
-        private videoMetadataEntityRepository: Repository<VideoMetadataEntity>,
+        @InjectRepository(VideoMetadata)
+        private videoMetadataEntityRepository: Repository<VideoMetadata>,
     ) {
 
     }
-    public async resolveVideoMetadataBySentence(sentence: string): Promise<VideoMetadataEntity | undefined> {
-        const record = await this.videoMetadataViewEntityRepository.findOne({sentenceHash: sha1(sentence)});
+    public async resolveVideoMetadataByHash(hash: string): Promise<VideoMetadata | undefined> {
+        const record = await this.videoMetadataViewEntityRepository.findOne({sentenceHash: hash});
         if (record) {
             return record;
         }
-        const json = await this.checkForJson(sentence);
+        const json = await this.checkForJson(hash);
         if (json) {
             return json;
         }
     }
-    public async checkForJson(sentence: string): Promise<VideoMetadataEntity | undefined>{
-        const filename = `${sha1(sentence)}.json`;
-        if (await fs.pathExists(join(process.env.VIDEO_DIR, filename))) {
+    public async checkForJson(hash: string): Promise<VideoMetadata | undefined>{
+        const filename = `${hash}.json`;
+        const filePath = join(process.env.VIDEO_DIR, filename);
+        if (await fs.pathExists(filePath)) {
+            const metadata: {sentence: string} = await fs.readJson(filePath)
+            console.log(metadata);
             return await this.videoMetadataEntityRepository.save({
-                sentence,
-                sentenceHash: sha1(sentence),
-                metadata: (await fs.readFileSync(filename)).toString(),
+                sentence: metadata.sentence,
+                sentenceHash: hash,
+                metadata: JSON.stringify(metadata),
             })
         }
     }
 
-    public async saveVideoMetadata(videoMetadataDto: VideoMetadataDto): Promise<VideoMetadataEntity> {
+    public async saveVideoMetadata(videoMetadataDto: VideoMetadataDto): Promise<VideoMetadata> {
         return await this.videoMetadataEntityRepository.save(videoMetadataDto)
     }
 }

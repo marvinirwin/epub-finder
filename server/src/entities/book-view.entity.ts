@@ -1,4 +1,4 @@
-import {BookEntity} from "./book.entity";
+import {Book} from "./book.entity";
 import {Column, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
 
 @ViewEntity({
@@ -13,8 +13,8 @@ import {Column, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
         b.global
     FROM book b
     LEFT JOIN book book_max 
-        ON book_max.created_at > b.created_at
-        AND book_max.book_id = b.book_id
+        ON book_max.createdAt > b.createdAt
+        AND book_max.bookId = b.bookId
     WHERE book_max.id IS NULL
 `
 })

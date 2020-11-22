@@ -1,11 +1,12 @@
-import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
-export class VideoMetadataEntity {
-    @PrimaryColumn()
+export class VideoMetadata {
+    @PrimaryGeneratedColumn()
     id: number;
 
     // Used in groupwise max
+    @Column()
     @Generated("uuid")
     videoMetadataId: number;
 

@@ -6,9 +6,8 @@ import {UserEntity} from "../entities/user.entity";
 
 @Controller('books')
 export class BooksController {
-    constructor(
-        private booksService: BooksService
-    ) {
+    constructor( private booksService: BooksService ) {
+
     }
 
     @Get()
