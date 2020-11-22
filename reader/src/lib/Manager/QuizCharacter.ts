@@ -48,8 +48,6 @@ export class QuizCharacter {
                 AtomizedStringsForRawHTML,
                 map(atomizedStrings => AtomizedDocument.fromAtomizedString(atomizedStrings[0])),
             ),
-            undefined,
-            applyAtomizedSentenceListeners
         );
 
         this.quizzingCard$.pipe(

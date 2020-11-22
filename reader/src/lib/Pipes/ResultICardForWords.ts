@@ -8,6 +8,6 @@ export const resolveICardForWords = (icardMap$: Observable<Dictionary<ICard[]>>)
     obs$.pipe(
         withLatestFrom(icardMap$),
         map(([words, cardIndex]: [string[], Dictionary<ICard[]>]) => {
-            return words.map(word => cardIndex[word]?.length ? cardIndex[word][0] : cardForWord(word, ''))
+            return words.map(word => cardIndex[word]?.length ? cardIndex[word][0] : cardForWord(word))
         })
     );

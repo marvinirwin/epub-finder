@@ -1,4 +1,4 @@
-import {Observable, ReplaySubject} from "rxjs";
+import { ReplaySubject} from "rxjs";
 import {RGBA} from "./color.service";
 import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
@@ -11,15 +11,15 @@ export class TemporaryHighlightService {
 
     constructor(
         {
-            highlightService,
+            highlighterService,
             cardService
         }: {
-            highlightService: HighlighterService,
+            highlighterService: HighlighterService,
             cardService: CardService
         }
     ) {
         this.cardService = cardService;
-        highlightService.timedHighlight(
+        highlighterService.timedHighlight(
             this.temporaryHighlightRequests$.pipe(
                 map(({color, word, duration}) =>
                     (
@@ -30,7 +30,7 @@ export class TemporaryHighlightService {
                     )
                 )
             ),
-            highlightService.highlightMap$,
+            highlighterService.highlightMap$,
             [0, "TEMPORARY_HIGHLIGHT"] // This is a hack, this should be dynamic
             // so as many people can temp highlight as they want.
             // The highlight services need to be split up and done nicer

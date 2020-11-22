@@ -1,5 +1,5 @@
 import CardService from "../CardService";
-import {OpenBooksService} from "../OpenBooksService";
+import {OpenBooksService} from "../open-books.service";
 import EditingCardManager from "../EditingCardManager";
 import {resolveICardForWord} from "../../Pipes/ResolveICardForWord";
 import {ICard} from "../../Interfaces/ICard";

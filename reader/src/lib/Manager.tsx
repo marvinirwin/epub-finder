@@ -54,6 +54,8 @@ import {VideoMetadataService} from "../services/video-metadata.service";
 import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 import {ObservableService} from "../services/observable.service";
 import {HighlighterService} from "./Highlighting/highlighter.service";
+import {TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
+import {RGBA} from "./Highlighting/color.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -379,7 +381,15 @@ export class Manager {
             visibleAtomizedSentences$: this.openedBooks.visibleAtomizedSentences$,
             modesService: this.modesService,
             videoMetadataService: this.videoMetadataService
-        })
+        });
+
+        const temporaryHighlightService = new TemporaryHighlightService({
+            highlighterService: this.highlighterService,
+            cardService: this.cardManager
+        });
+        const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
+        this.audioManager.audioRecorder.currentRecognizedText$
+            .subscribe(text => temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',
