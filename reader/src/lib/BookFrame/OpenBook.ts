@@ -46,7 +46,9 @@ export class OpenBook {
     atomizedSrcDocString$: Observable<string>;
     atomizedDocument$: Observable<AtomizedDocument>;
 
+/*
     children$: Observable<ds_Dict<OpenBook>>;
+*/
     atomizedSrcDocStrings$: Observable<string[]>;
 
 
@@ -54,8 +56,6 @@ export class OpenBook {
         public name: string,
         public trie: Observable<TrieWrapper>,
         atomizedDocuments$: Observable<AtomizedDocument> | undefined,
-        public parent: OpenBook | undefined,
-        public applySentenceListeners: (s: AtomizedSentence[]) => void
     ) {
         this.id = name;
         this.atomizedSrcDocStrings$ = merge(
@@ -99,9 +99,6 @@ export class OpenBook {
             shareReplay(1)
         );
 
-        this.renderedSentences$.subscribe(sentences => {
-            applySentenceListeners(flatten(Object.values(sentences)));
-        })
 
         this.htmlElementIndex$ = combineLatest([
             this.trie,
@@ -114,6 +111,7 @@ export class OpenBook {
             shareReplay(1)
         )
 
+/*
         this.children$ = this.atomizedSrcDocStrings$.pipe(
             map(([originalDoc, ...documentChunks]) => {
                     return Object.fromEntries(
@@ -131,6 +129,7 @@ export class OpenBook {
             ),
             shareReplay(1)
         );
+*/
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {

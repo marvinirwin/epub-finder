@@ -3,7 +3,6 @@ import {map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/opera
 import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {CustomDocument, Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {OpenBooksConfig} from "./BookFrameManager/OpenBooksConfig";
 import {Dictionary, flatten} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
@@ -13,7 +12,9 @@ import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter"
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
-import {ds_Tree} from "../../services/tree.service";
+import {TrieObservable} from "./QuizCharacter";
+import {MyAppDatabase} from "../Storage/AppDB";
+import {ReadingBookService} from "./reading-book.service";
 
 
 export type Named = {
@@ -35,8 +36,6 @@ export class OpenBooksService {
     renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
     renderedBookSentenceData$: Observable<BookWordData[]>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
-    library$: Observable<ds_Dict<OpenBook>>;
-    displayBook: OpenBook;
     displayDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
     checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
@@ -44,10 +43,20 @@ export class OpenBooksService {
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
+    readingBookService: ReadingBookService;
 
     constructor(
-        private config: OpenBooksConfig
+        private config: {
+            trie$: TrieObservable,
+            applyListeners: (b: HTMLDocument) => void,
+            bottomNavigationValue$: ReplaySubject<NavigationPages>,
+            applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
+            applyAtomizedSentencesListener: (sentences: AtomizedSentence[]) => void;
+            db: MyAppDatabase;
+            library$: Observable<ds_Dict<CustomDocument | Website>>
+        }
     ) {
+
         this.checkedOutBooks$ = combineLatest([
             config.library$.pipe(
                 map(libraryBooks => {
@@ -57,8 +66,6 @@ export class OpenBooksService {
                                 page.name,
                                 config.trie$,
                                 undefined,
-                                undefined,
-                                config.applyAtomizedSentencesListener
                             );
                             openBook.unAtomizedSrcDoc$.next(page.html)
                             return [
@@ -70,8 +77,6 @@ export class OpenBooksService {
                                 page.name,
                                 config.trie$,
                                 undefined,
-                                undefined,
-                                config.applyAtomizedSentencesListener
                             );
                             b.url$.next(page.url);
                             return [name, b];
@@ -88,6 +93,12 @@ export class OpenBooksService {
             }),
             shareReplay(1)
         );
+
+        this.checkedOutBooks$.pipe(
+            switchMap(checkedOutBooksDict => combineLatest(Object.values(checkedOutBooksDict).map(b => b.renderedSentences$)))
+        ).subscribe((atomizedSentenceGroups) => {
+            atomizedSentenceGroups.forEach(sentences => config.applyAtomizedSentencesListener(flatten(Object.values(sentences))));
+        })
 
         this.checkedOutBooks$.subscribe(
             openBooks => this.openBookTree.appendDelta$.next(
@@ -167,21 +178,6 @@ export class OpenBooksService {
                 })
         });
 
-        this.library$ = this.checkedOutBooks$.pipe(
-            switchMap(sourceBooks =>
-                combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))
-            ),
-            map(bookChildrenList => {
-                    return Object.fromEntries(
-                        flatten(
-                            bookChildrenList.map(
-                                bookChildrenMap => Object.values(bookChildrenMap).map(bookChild => [bookChild.name, bookChild])
-                            )
-                        )
-                    );
-                }
-            )
-        )
 
         this.renderedBookSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
@@ -257,10 +253,11 @@ export class OpenBooksService {
 
 
         this.checkedOutBooks$.pipe(
-            switchMap(sourceBooks => combineLatest(Object.values(sourceBooks).map(sourceBook => sourceBook.children$))),
+            switchMap(checkedOutBooks => combineLatest(Object.values(checkedOutBooks))),
             withLatestFrom(this.readingBook$.pipe(startWith(undefined)))
         ).subscribe(([openSourceBooks, readingBook]) => {
-            const openBooks = flatten(openSourceBooks.map(openSourceBookChildren => Object.values(openSourceBookChildren)));
+            debugger;
+            const openBooks = flatten(openSourceBooks.map(openBook => Object.values(openBook)));
             if (!readingBook && openBooks.length) {
                 this.readingBook$.next(openBooks[0]);
             }
@@ -272,14 +269,12 @@ export class OpenBooksService {
                 return readingBook.atomizedDocument$;
             }),
             shareReplay(1)
-        )
-        this.displayBook = new OpenBook(
-            "Reading Book",
-            config.trie$,
-            this.displayDocument$,
-            undefined,
-            config.applyAtomizedSentencesListener
         );
+
+        this.readingBookService = new ReadingBookService({
+            trie$: config.trie$,
+            displayDocument$: this.displayDocument$
+        })
         this.openBookTree.appendDelta$.next(
             {
                 nodeLabel: 'root',
@@ -287,9 +282,9 @@ export class OpenBooksService {
                     [READING_BOOK_NODE_LABEL]: {
                         nodeLabel: READING_BOOK_NODE_LABEL,
                         children: {
-                            [this.displayBook.name]: {
-                                nodeLabel: this.displayBook.name,
-                                value: this.displayBook
+                            [this.readingBookService.displayBook.name]: {
+                                nodeLabel: this.readingBookService.displayBook.name,
+                                value: this.readingBookService.displayBook
                             }
                         }
                     }

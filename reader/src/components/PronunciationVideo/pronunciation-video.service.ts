@@ -6,8 +6,7 @@ export class PronunciationVideoService {
     videoMetaData$ = new ReplaySubject<VideoMetadata | undefined>(1);
     videoSentence$ = new ReplaySubject<string | undefined>(1);
 
-    constructor() {
-
+    constructor( ) {
         this.videoSentence$.subscribe(async sentence => {
             this.videoMetaData$.next();
             if (sentence) {

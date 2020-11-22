@@ -30,6 +30,13 @@ export class BooksService {
             custom: await this.queryCustomBooksAvailableToUser(user)
         }
     }
+    async getAvailableBooksForAnonymous(): Promise<AvailableBooksDto> {
+        return {
+            files: await this.booksInBookDir(),
+            custom: await this.queryGlobalCustomBooks()
+        }
+    }
+
 
     private async queryCustomBooksAvailableToUser(user: UserEntity): Promise<BookEntity[]> {
         return [... await this.queryGlobalCustomBooks(), ... await user.books];

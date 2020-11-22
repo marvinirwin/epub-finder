@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardManager from "./Manager/CardManager";
-import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/OpenBooksService";
+import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/open-books.service";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
@@ -52,6 +52,7 @@ import {fetchVideoMetadata} from "../services/video.service";
 import {fromPromise} from "rxjs/internal-compatibility";
 import {VideoMetadataService} from "../services/video-metadata.service";
 import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
+import {ObservableService} from "../services/observable.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -98,7 +99,9 @@ export class Manager {
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
 
-    queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
+    public observableService = new ObservableService();
+
+    public queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
@@ -202,6 +205,11 @@ export class Manager {
             }
         });
 
+
+        this.observableService.videoMetadata$
+            .subscribe(metadata => {
+                this.pronunciationVideoService.videoMetaData$.next(metadata);
+            })
         // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
         this.quizCharacterManager = new QuizCharacter(
             {

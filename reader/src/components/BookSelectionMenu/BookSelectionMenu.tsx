@@ -18,10 +18,13 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const BookSelectionMenu: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const library = useObservableState(m.openedBooks.library$);
+/*
+    const library = useObservableState(m.library.);
+*/
     const classes = useStyles();
 
     return <Paper className={`library ${classes.root}`} elevation={3}>
+{/*
         <List dense={true} component="nav">
             {
                 Object.values(library || {}).map(libraryBook => {
@@ -35,5 +38,6 @@ export const BookSelectionMenu: React.FunctionComponent<{ m: Manager }> = ({m}) 
                 })
             }
         </List>
+*/}
     </Paper>
 }

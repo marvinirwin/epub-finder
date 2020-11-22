@@ -10,7 +10,6 @@ import {LibraryDirectoryService} from "./library-directory.service";
 import {ModeDirectory} from "./mode-directory.service";
 import {useObservableState} from "observable-hooks";
 import {orderBy} from "lodash";
-import {ds_Dict} from "../../lib/Tree/DeltaScanner";
 import { SentenceMetadata } from "../../services/video-metadata.service";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
