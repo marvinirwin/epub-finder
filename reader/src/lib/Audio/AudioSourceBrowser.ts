@@ -1,9 +1,9 @@
-import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {
     AudioConfig,
     SpeechConfig,
     SpeechRecognizer
-} from "cognitive-services-speech-sdk-js/distrib/lib/microsoft.cognitiveservices.speech.sdk";
+} from "microsoft-cognitiveservices-speech-sdk";
 import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import axios from "axios";
 import {AudioSource} from "./AudioSource";
@@ -23,7 +23,6 @@ export class AudioSourceBrowser implements AudioSource {
     private mediaSource$: Observable<MediaStream>;
     private audioConfig$: Observable<AudioConfig>;
     private mediaDevices = new ReplaySubject<MediaDevices>(1)
-    recognizer$: Observable<SpeechRecognizer>;
 
     constructor() {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
@@ -64,7 +63,6 @@ export class AudioSourceBrowser implements AudioSource {
         this.audioConfig$ = this.mediaSource$.pipe(
             map(mediaSource => {
                 try {
-                    return AudioConfig.fromMicrophoneInput(mediaSource.id);
                 } catch (e) {
                     this.error$.next(e);
                     throw e;
@@ -72,16 +70,12 @@ export class AudioSourceBrowser implements AudioSource {
             }),
             shareReplay(1)
         );
-        this.recognizer$ = combineLatest([this.audioConfig$, this.speechConfig$]).pipe(
-            map(([audio, speech]) => {
-                return new SpeechRecognizer(speech, audio);
-            }),
-            shareReplay(1)
-        )
 
         this.beginRecordingSignal$.pipe(
-            withLatestFrom(this.recognizer$)
-        ).subscribe(async ([, recognizer]) => {
+            withLatestFrom(this.speechConfig$)
+        ).subscribe(async ([, speechConfig]) => {
+            const audioConfig = AudioConfig.fromMicrophoneInput(navigator.mediaDevices.getUserMedia({audio: true}));
+            const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
             recognizer.recognizeOnceAsync(
                 result => {
                     // One of the reasons text would be undefined is initialSilenceTimeout
@@ -89,7 +83,6 @@ export class AudioSourceBrowser implements AudioSource {
                     this.isRecording$.next(false);
                 },
                 err => {
-                    debugger;
                     // I assume this only happens when a new recording request happens
                     this.recognizedText$.next(err)
                     this.isRecording$.next(false);
