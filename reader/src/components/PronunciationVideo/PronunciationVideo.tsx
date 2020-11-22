@@ -12,7 +12,7 @@ import {useSetVideoTime} from "./useSetVideoTime";
 import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
 
 
-export const PronunciationVideo: React.FunctionComponent<{ m: Manager, onResized: () => void }> = ({m, onResized}) => {
+export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) => {
     const currentSentence = useObservableState(m.pronunciationVideoService.videoSentence$);
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
     const [videoElementRef, setVideoElementRef] = useState<HTMLVideoElement | null>();
@@ -113,7 +113,6 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager, onResized
                 src={videoSource}
                 autoPlay
                 controls
-                onPlay={onResized}
             />}
         </Card>
 }

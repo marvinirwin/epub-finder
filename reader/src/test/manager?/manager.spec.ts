@@ -1,7 +1,7 @@
 import {Run, UnitTestGetPageSrcText} from "../Util/Run";
 import {CausalTree} from "../Graph/CausalTree";
 import {Website} from "../../lib/Website/Website";
-import {getNewICardForWord, NavigationPages} from "../../lib/Util/Util";
+import {cardForWord, NavigationPages} from "../../lib/Util/Util";
 import {EditingCard} from "../../lib/ReactiveClasses/EditingCard";
 import {of} from "rxjs";
 
@@ -85,7 +85,7 @@ it("Loads the manager without error", () => {
                     bottomNavigationValue$, QUIZ_PAGE: NavigationPages.QUIZ_PAGE,
                     readingPageWordElements: {'一': [{el: {nodeValue: '一'}}]},
                     exampleSentences: [ { translatableText: `TODO` } ],
-                    queEditingCard$, editingCard:  EditingCard.fromICard(getNewICardForWord('一', ''), manager.cardDBManager, manager.audioManager, manager.cardManager ),
+                    queEditingCard$, editingCard:  EditingCard.fromICard(cardForWord('一', ''), manager.cardDBManager, manager.audioManager, manager.cardManager ),
                     highlightedWord$, highlightedWord: '一',
                     readingPageAtomizedSentences: { translatableText: `TODO` },
                     mainPage: new Website( "Basic Doc", "BasicDoc.html", (url: string) => of(

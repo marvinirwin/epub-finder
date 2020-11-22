@@ -4,7 +4,7 @@ import {flatMap, map, mapTo, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
-import CardManager from "../Manager/CardManager";
+import CardService from "../Manager/CardService";
 import {fetchTranslation} from "../../services/translate.service";
 
 
@@ -27,7 +27,7 @@ export class EditingCard {
 
     constructor(
         public persistor: IndexDBManager<ICard>,
-        private c: CardManager,
+        private c: CardService,
         public timestamp?: Date | number | undefined,
     ) {
 
@@ -108,7 +108,7 @@ export class EditingCard {
         ).pipe(skip(1));
     }
 
-    static fromICard( iCard: ICard, persistor: IndexDBManager<ICard>, c: CardManager): EditingCard {
+    static fromICard( iCard: ICard, persistor: IndexDBManager<ICard>, c: CardService): EditingCard {
         const e = new EditingCard(
             persistor,
             c

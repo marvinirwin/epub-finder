@@ -7,9 +7,11 @@ import {Settings} from "../Interfaces/Message";
 import {MyAppDatabase} from "../Storage/AppDB";
 import {TrieWrapper} from "../TrieWrapper";
 import {TrieObservable} from "./QuizCharacter";
+import {cardForWord} from "../Util/Util";
 
-export default class CardManager {
-    deleteCards$: Subject<string[]> = new Subject<string[]>();
+export default class CardService {
+    public deleteWords: Subject<string[]> = new Subject<string[]>();
+    public putWords$: Subject<string[]> = new Subject<string[]>();
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
@@ -38,9 +40,14 @@ export default class CardManager {
         this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
+        this.putWords$.subscribe(words => {
+            this.addUnpersistedCards$.next(
+                words.map(cardForWord)
+            )
+        })
         this.cardIndex$ = merge(
             this.addPersistedCards$.pipe(map(addCards => [addCards, []])),
-            this.deleteCards$.pipe(map(deleteCards => [[], deleteCards]))
+            this.deleteWords.pipe(map(deleteCards => [[], deleteCards]))
         )
             .pipe(
                 // @ts-ignore
@@ -54,7 +61,7 @@ export default class CardManager {
                     // TODO I dont think we need to shallow clone here
                     const newCardIndex = {...cardIndex};
                     newCards.forEach(newICard => {
-                        CardManager.mergeCardIntoCardDict(newICard, newCardIndex);
+                        CardService.mergeCardIntoCardDict(newICard, newCardIndex);
                     });
                     return newCardIndex;
                 }, {}),
@@ -69,7 +76,7 @@ export default class CardManager {
                 return cards;
             })
         ).subscribe(this.addPersistedCards$);
-        this.deleteCards$.subscribe(cards => {
+        this.deleteWords.subscribe(cards => {
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
                 this.db.cards.where({learningLanguage: card}).delete();

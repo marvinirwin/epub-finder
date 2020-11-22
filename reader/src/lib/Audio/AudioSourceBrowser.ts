@@ -1,10 +1,6 @@
 import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {
     AudioConfig,
-    CancellationDetails,
-    NoMatchDetails,
-    NoMatchReason,
-    ResultReason,
     SpeechConfig,
     SpeechRecognizer
 } from "cognitive-services-speech-sdk-js/distrib/lib/microsoft.cognitiveservices.speech.sdk";

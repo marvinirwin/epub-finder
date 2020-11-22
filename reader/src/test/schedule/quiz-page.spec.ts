@@ -3,7 +3,7 @@ import {TestScheduler} from "rxjs/testing";
 import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
 import {ICard} from "../../lib/Interfaces/ICard";
 import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
-import {getNewICardForWord} from "../../lib/Util/Util";
+import {cardForWord} from "../../lib/Util/Util";
 import {QuizComponent, QuizResult} from "../../lib/Manager/QuizManager";
 import {SubjectSubscriber} from "rxjs/internal/Subject";
 import {Characters} from "../../components/Quiz/Characters";
@@ -61,7 +61,7 @@ it('Uses schedule rows to continuously populate the current quiz item', () => {
         const word2 = '今天';
         m.tick({
             // Populate schedule rows
-            addPersistedCards: [[getNewICardForWord(word1)]],
+            addPersistedCards: [[cardForWord(word1)]],
             addCountRecords: [[countFactory(word1, 2), countFactory(word2)]],
             // Expect a quiz component to be there
             quizComponent: Characters,

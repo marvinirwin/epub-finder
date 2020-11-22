@@ -4,7 +4,7 @@ import {Manager} from "../../lib/Manager";
 import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
 import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
 import {ICard} from "../../lib/Interfaces/ICard";
-import {getNewICardForWord} from "../../lib/Util/Util";
+import {cardForWord} from "../../lib/Util/Util";
 
 require("fake-indexeddb/auto");
 const db = new MyAppDatabase();
@@ -29,9 +29,9 @@ it('Takes scheduleRows and puts them into the quizManager currentQuizItems', () 
             },
         );
         m.tick({
-            addPersistedCards: [[getNewICardForWord('你好')]],
+            addPersistedCards: [[cardForWord('你好')]],
             addCountRecords: [[countFactory('你好')]],
-            quizWord: getNewICardForWord('你好')
+            quizWord: cardForWord('你好')
         });
         m.done();
     })

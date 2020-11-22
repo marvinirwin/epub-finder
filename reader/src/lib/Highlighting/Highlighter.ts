@@ -8,8 +8,6 @@ import {HighlightDelta, HighlighterConfig, WordHighlightMap} from "./highlight.i
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
 
-const s = new HighlighterService();
-
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
         const m = new Map<string, RGBA>();
         words.forEach(word => m.set(word, numbers))
@@ -29,29 +27,21 @@ export class Highlighter {
     mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
-    highlightMap$ = new ReplaySubject<WordHighlightMap>(1);
     highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow>>(1);
 
-    constructor(config: HighlighterConfig) {
-        const wordToMap = (rgba: RGBA) => (word: string | undefined) => {
-            const m = new Map<string, RGBA>();
-            if (word) {
-                m.set(word, rgba)
-            }
-            return m;
-        }
+    constructor({highlighterService}: {highlighterService: HighlighterService}) {
+        const s = highlighterService;
+        const {wordToMap} = HighlighterService;
         s.singleHighlight(
             this.mousedOverWord$.pipe(
                 map(wordToMap([160, 160, 160, 0.5]))
             ),
-            this.highlightMap$,
-            config.visibleElements$,
+            s.highlightMap$,
             [0, 'MOUSEOVER_CHARACTER_HIGHLIGHT']
         )
         s.singleHighlight(
             this.mouseoverHighlightedSentences$.pipe(map(wordToMap([160, 160, 160, 0.5]))),
-            this.highlightMap$,
-            config.visibleElements$,
+            s.highlightMap$,
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
 /*
@@ -64,14 +54,12 @@ export class Highlighter {
 */
         s.timedHighlight(
             this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
-            this.highlightMap$,
-            config.visibleElements$,
+            s.highlightMap$,
             [0, 'DELETED_CARDS_HIGHLIGHT']
         );
         s.timedHighlight(
             this.createdCards$.pipe(map(timeWordsMap(500, [255, 215, 0, 0.5]))),
-            this.highlightMap$,
-            config.visibleElements$,
+            s.highlightMap$,
             [0, 'CREATED_CARDS_HIGHLIGHT']
         );
         const now = new Date();
@@ -110,14 +98,14 @@ export class Highlighter {
                 }
                 return highlights;
             })),
-            this.highlightMap$,
-            config.visibleElements$,
+            s.highlightMap$,
             [2, 'DIFFICULTY_HIGHLIGHT']
         )
 
 
-        this.highlightMap$.next({});
+        s.highlightMap$.next({});
     }
+
 }
 
 export interface ElementContainer {

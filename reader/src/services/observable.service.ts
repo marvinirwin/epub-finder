@@ -1,16 +1,20 @@
-import {fromEvent, merge, Observable} from "rxjs";
+import {fromEvent, merge, Observable, ReplaySubject} from "rxjs";
 import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
-import {mapTo, switchMap, tap} from "rxjs/operators";
-import {Socket} from 'socket.io-client';
+import {mapTo, shareReplay, switchMap, tap} from "rxjs/operators";
+import { io } from "socket.io-client";
 
 export class ObservableService {
     public videoMetadata$: Observable<VideoMetadata>;
+    public latestVideoMetadata$: Observable<VideoMetadata>;
     public connected$: Observable<boolean>;
-    private connection$: Observable<Socket>
+    private connection$ = new ReplaySubject<io>(1);
     constructor() {
         this.videoMetadata$ = this.connection$.pipe(
-            switchMap(connection => fromEvent(connection, 'videoMetadata'))
+            switchMap(connection => fromEvent(connection, 'videoMetadata') as Observable<VideoMetadata>)
         );
+        this.latestVideoMetadata$ = this.videoMetadata$.pipe(
+            shareReplay(1)
+        )
 
         this.connected$ = this.connection$.pipe(
             switchMap(connection => merge(
@@ -22,7 +26,7 @@ export class ObservableService {
     }
     attemptConnection() {
         this.connection$.next(
-            new Socket(`http://${process.env.PUBLIC_URL}/socket`)
+            new io( `http://${process.env.PUBLIC_URL}/socket` )
         )
     }
 }

@@ -282,9 +282,9 @@ export class OpenBooksService {
                     [READING_BOOK_NODE_LABEL]: {
                         nodeLabel: READING_BOOK_NODE_LABEL,
                         children: {
-                            [this.readingBookService.displayBook.name]: {
-                                nodeLabel: this.readingBookService.displayBook.name,
-                                value: this.readingBookService.displayBook
+                            [this.readingBookService.readingBook.name]: {
+                                nodeLabel: this.readingBookService.readingBook.name,
+                                value: this.readingBookService.readingBook
                             }
                         }
                     }

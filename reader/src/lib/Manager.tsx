@@ -9,7 +9,7 @@ import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
-import CardManager from "./Manager/CardManager";
+import CardService from "./Manager/CardService";
 import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/open-books.service";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
@@ -53,6 +53,7 @@ import {fromPromise} from "rxjs/internal-compatibility";
 import {VideoMetadataService} from "../services/video-metadata.service";
 import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 import {ObservableService} from "../services/observable.service";
+import {HighlighterService} from "./Highlighting/highlighter.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -81,7 +82,7 @@ export class Manager {
     );
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
-    public cardManager: CardManager;
+    public cardManager: CardService;
     public openedBooks: OpenBooksService;
     public scheduleManager: ScheduleManager;
     public quizManager: QuizManager;
@@ -121,6 +122,7 @@ export class Manager {
     modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
     videoMetadataService: VideoMetadataService;
+    private highlighterService: HighlighterService;
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
         this.hotkeyEvents = new HotKeyEvents(this)
@@ -141,7 +143,7 @@ export class Manager {
                 }
             }
         );
-        this.cardManager = new CardManager(this.db);
+        this.cardManager = new CardService(this.db);
         this.library = new Library({db});
         this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
@@ -272,11 +274,10 @@ export class Manager {
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );
+        this.highlighterService = new HighlighterService({wordElementMap$: this.openedBooks.visibleElements$})
 
         this.highlighter = new Highlighter({
-            visibleElements$: this.openedBooks.visibleElements$,
-            visibleSentences$: this.openedBooks.renderedAtomizedSentences$,
-            quizWord$: this.quizManager.quizzingCard$.pipe(map(c => c?.learningLanguage))
+            highlighterService: this.highlighterService
         })
 
         this.readingWordElementMap = combineLatest([

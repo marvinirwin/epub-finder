@@ -7,6 +7,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.54",
     "@popperjs/core": "^2.4.3",
+    "@types/socket.io-client": "^1.4.34",
     "axios": "^0.19.2",
     "base64-arraybuffer": "^0.2.0",
     "beautiful-react-hooks": "^0.31.0",

@@ -1,8 +1,8 @@
 import {ScheduleManager} from "../ScheduleManager";
 import {QuizManager} from "../QuizManager";
-import CardManager from "../CardManager";
+import CardService from "../CardService";
 
-export function CardScheduleQuiz(c: CardManager, s: ScheduleManager, q: QuizManager) {
+export function CardScheduleQuiz(c: CardService, s: ScheduleManager, q: QuizManager) {
 /*
     let nextCardToQuiz$ = s.nextWordToQuiz$.pipe(
         startWith(undefined),

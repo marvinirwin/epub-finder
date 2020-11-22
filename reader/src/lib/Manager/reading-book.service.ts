@@ -4,10 +4,10 @@ import {Observable} from "rxjs";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export class ReadingBookService {
-    public displayBook: OpenBook;
+    public readingBook: OpenBook;
 
     constructor({ trie$, displayDocument$, }: {trie$: TrieObservable, displayDocument$: Observable<AtomizedDocument> } ) {
-        this.displayBook = new OpenBook(
+        this.readingBook = new OpenBook(
             "Reading Book",
             trie$,
             displayDocument$,

@@ -2,13 +2,13 @@ import {uniq, flatten} from "lodash";
 import {ITrie} from "../Interfaces/Trie";
 import axios from "axios";
 
-export function getNewICardForWord(word: string, deck: string ='') {
+export function cardForWord(word: string) {
     return {
         learningLanguage: word,
         photos: [],
         sounds: [],
         knownLanguage: [],
-        deck,
+        deck: '',
         fields: [],
         illustrationPhotos: [],
         timestamp: new Date()

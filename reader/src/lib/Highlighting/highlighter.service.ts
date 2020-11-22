@@ -6,20 +6,37 @@ import {
     TimedHighlightDelta,
     WordHighlightMap
 } from "./highlight.interface";
-import {combineLatest, Observable} from "rxjs";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {ElementContainer} from "./Highlighter";
 import {safePushMap} from "../../test/Util/GetGraphJson";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
+import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 
 
 export type HighlighterPath = [number, string];
 
 export class HighlighterService {
-    // I'm going to need to maintain a map which contains maps from elements to highlights
-    // When all the highlights for that map are gone then I can delete the key too, to let the garbage collector konw its gone
-    // Wait do I have to do that?  Will javascript know if that key is gone?
+
+    public static wordToMap = (rgba: RGBA) => (word: string | undefined) => {
+        const m = new Map<string, RGBA>();
+        if (word) {
+            m.set(word, rgba)
+        }
+        return m;
+    }
+
+    public highlightMap$ = new ReplaySubject<WordHighlightMap>(1);
+    private wordElementMap$: Observable<Dictionary<IAnnotatedCharacter[]>>;
+
+    constructor({
+        wordElementMap$
+                }: {
+        wordElementMap$: Observable<Dictionary<IAnnotatedCharacter[]>>;
+    }) {
+        this.wordElementMap$ = wordElementMap$;
+    }
+
 
     removeHighlightDelta(
         oldHighlightDelta: HighlightDelta,
@@ -35,14 +52,13 @@ export class HighlighterService {
     singleHighlight(
         newHighlightDelta$: Observable<HighlightDelta | undefined>,
         highlightedWords$: Observable<WordHighlightMap>,
-        wordElementMap$: Observable<ds_Dict<ElementContainer[]>>,
         highlightPath: HighlighterPath,
     ) {
         let oldHighlightDelta: HighlightDelta | undefined;
         combineLatest([
             newHighlightDelta$,
             highlightedWords$,
-            wordElementMap$
+            this.wordElementMap$
         ]).subscribe(([newHighlightDelta, currentHighlightMap, wordElementMap]) => {
             const highlightWordsToUpdate = new Set<string>();
             if (oldHighlightDelta) {
@@ -84,13 +100,12 @@ export class HighlighterService {
     timedHighlight(
         newHighlightDelta$: Observable<TimedHighlightDelta>,
         highlightedWords$: Observable<WordHighlightMap>,
-        wordElementMap$: Observable<ds_Dict<ElementContainer[]>>,
         highlighterPath: HighlighterPath
     ) {
         combineLatest([
             newHighlightDelta$,
             highlightedWords$,
-            wordElementMap$
+            this.wordElementMap$
         ]).subscribe(([timedHighlightDelta, currentHighlightMap, wordElementMap]) => {
             const highlightWordsToUpdate = new Set<string>();
             const o = timedHighlightDelta.delta;

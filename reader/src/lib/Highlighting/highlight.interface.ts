@@ -7,7 +7,6 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {RGBA} from "./color.service";
 
 export interface HighlighterConfig {
-    visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleSentences$: Observable<Dictionary<AtomizedSentence[]>>;
     quizWord$: Observable<string | undefined>;
 }

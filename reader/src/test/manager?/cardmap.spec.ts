@@ -1,7 +1,7 @@
 import {getAtomizedSentences} from "../Util/Util";
-import CardManager from "../../lib/Manager/CardManager";
+import CardService from "../../lib/Manager/CardService";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
-import {getNewICardForWord, getUniqueLengths, sleep} from "../../lib/Util/Util";
+import {cardForWord, getUniqueLengths, sleep} from "../../lib/Util/Util";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {skip, take} from "rxjs/operators";
 import {ITrie} from "../../lib/Interfaces/Trie";
@@ -47,8 +47,8 @@ test('Unpersisted cards added produce new elemnents on the wordmap', async () =>
 
 
 test('Persisted cards loaded produce new elements on the wordmap', async () => {
-    await db.cards.add(getNewICardForWord("Te", ""));
-    const cardManager = new CardManager(db);
+    await db.cards.add(cardForWord("Te", ""));
+    const cardManager = new CardService(db);
     const atomizedSentences = getAtomizedSentences('BasicDoc.html');
     const triePromise: Promise<ITrie> = cardManager.trie$.pipe(take(1)).toPromise();
     await cardManager.load();

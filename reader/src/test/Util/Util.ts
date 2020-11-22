@@ -7,7 +7,7 @@ import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {Observable, PartialObserver, Subject} from "rxjs";
 import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
-import CardManager from "../../lib/Manager/CardManager";
+import CardService from "../../lib/Manager/CardService";
 import {MyAppDatabase} from "../../lib/Storage/AppDB";
 import {ScheduleQuiz} from "../../lib/Manager/ManagerConnections/Schedule-Quiz";
 import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
