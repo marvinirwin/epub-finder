@@ -25,6 +25,7 @@ export class AudioRecorder {
                     this.recordRequest$.pipe(take(1))
                 ).pipe(
                     map((result: string | RecordRequest) => {
+                        debugger;
                         this.isRecording$.next(false);
                         const resultArray: [string | RecordRequest, RecordRequest] = [result, request];
                         return resultArray;
@@ -32,6 +33,7 @@ export class AudioRecorder {
                 );
             })
         ).subscribe(async ([result, request]: [string | RecordRequest, RecordRequest]) => {
+            debugger;
             request.recording$.next(false);
             if (typeof result === 'object') {
                 request.rejectSentence(new Error("Audio recording not completed"))

@@ -252,16 +252,6 @@ export class OpenBooksService {
         );
 
 
-        this.checkedOutBooks$.pipe(
-            switchMap(checkedOutBooks => combineLatest(Object.values(checkedOutBooks))),
-            withLatestFrom(this.readingBook$.pipe(startWith(undefined)))
-        ).subscribe(([openSourceBooks, readingBook]) => {
-            debugger;
-            const openBooks = flatten(openSourceBooks.map(openBook => Object.values(openBook)));
-            if (!readingBook && openBooks.length) {
-                this.readingBook$.next(openBooks[0]);
-            }
-        });
 
         this.displayDocument$ = this.readingBook$.pipe(
             switchMap(readingBook => {
@@ -273,7 +263,13 @@ export class OpenBooksService {
 
         this.readingBookService = new ReadingBookService({
             trie$: config.trie$,
-            displayDocument$: this.displayDocument$
+            openBooks$: this.checkedOutBooks$,
+            // TODO make a variable which contains the current reading book,
+            //  right now I only have a list of checked out books (Which should be renamed openBooks)
+            selectedBook$: config.db.checkedOutBooks$.pipe(
+                map(checkedOutBooks => Object.keys(checkedOutBooks)[0]),
+                shareReplay(1)
+            )
         })
         this.openBookTree.appendDelta$.next(
             {

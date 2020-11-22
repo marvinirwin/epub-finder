@@ -38,6 +38,7 @@ export class TemporaryHighlightService {
     }
 
     public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
+        debugger;
         this.cardService.putWords$.next([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);

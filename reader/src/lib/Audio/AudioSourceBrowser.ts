@@ -89,6 +89,7 @@ export class AudioSourceBrowser implements AudioSource {
                     this.isRecording$.next(false);
                 },
                 err => {
+                    debugger;
                     // I assume this only happens when a new recording request happens
                     this.recognizedText$.next(err)
                     this.isRecording$.next(false);

@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
-import {map,  shareReplay} from "rxjs/operators";
+import {map, shareReplay, tap} from "rxjs/operators";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {TrieWrapper} from "../TrieWrapper";
@@ -12,6 +12,7 @@ import { AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
 import { rehydratePage } from "../Atomized/OpenedBook";
 import { flatten } from "lodash";
+import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
 
 export function getAtomizedDocumentBookStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentBookStats {
     return {
@@ -69,7 +70,7 @@ export class OpenBook {
 
         this.atomizedSrcDocString$ = this.atomizedSrcDocStrings$.pipe(
             map(strings => {
-                return strings[0];
+                return strings[0] || interpolateSourceDoc([ `Could not find ${this.name}` ]);
             }),
             shareReplay(1)
         );

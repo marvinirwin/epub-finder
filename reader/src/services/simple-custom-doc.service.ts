@@ -8,9 +8,9 @@ export function interpolateSimpleCustomDoc(text: string) {
 </head>
 <body>
 <!--is this popper-container necessary?-->
-<div class="popper-container">
+<article class="popper-container">
 ${text}
-</div>
+</article>
 </body>
 </html>`;
 }

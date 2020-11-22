@@ -3,6 +3,7 @@ export const BodyStyle = `
         /* Required to make the positioning of popper-elements nice */
         position: relative;
         z-index: 2;
+        max-width: 680px;
     }
     body {
         font-size: 150%;

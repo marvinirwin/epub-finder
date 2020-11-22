@@ -11,18 +11,4 @@ export const AtomizedStringsForURL = (rawHTML$: Observable<string>): Observable<
     return rawHTML$.pipe(
         switchMap(AtomizeUrl)
     )
-    /*
-        if (jestDetected()) {
-            return rawHTML$.pipe(
-                switchMap((url: string) => of(
-                    UnitTestGetPageSrcText(url)
-                )),
-                map(rawHTML => AtomizedDocument.atomizeDocument(rawHTML).toString())
-            )
-        } else {
-            return rawHTML$.pipe(
-                switchMap(AtomizeUrl),
-            )
-        }
-    */
 }

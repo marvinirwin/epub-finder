@@ -389,7 +389,7 @@ export class Manager {
         });
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioManager.audioRecorder.currentRecognizedText$
-            .subscribe(text => temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
+            .subscribe(text => text && temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',

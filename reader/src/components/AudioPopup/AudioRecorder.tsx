@@ -38,12 +38,14 @@ export default function AudioRecorder({m}: { m: Manager }) {
     const recorder = m.audioManager.audioRecorder;
     const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
+/*
     const translatedText = useObservableState(
-        () => recorder.currentRecognizedText$.pipe(
+        recorder.currentRecognizedText$.pipe(
             switchMap(text => text ? fetchTranslation(text) : Promise.resolve(''))
         ),
         ''
     )
+*/
     const currentAudioRequest = useObservableState(recorder.recordRequest$)// Maybe pipe this to make it a replaySubject?
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
@@ -80,7 +82,9 @@ export default function AudioRecorder({m}: { m: Manager }) {
             recognizedText && <Paper className={'recognized-text'}>
                 <Typography variant="h6">{recognizedText}</Typography>
                 <Typography variant="h6">{lookupPinyin(recognizedText).join(' ')}</Typography>
+{/*
                 <Typography variant="h6">{translatedText}</Typography>
+*/}
             </Paper>
         }
     </div>
