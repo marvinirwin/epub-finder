@@ -20,18 +20,15 @@ export class AudioSourceBrowser implements AudioSource {
 
     private speechRecognitionToken$ = new ReplaySubject<string>(1);
     private speechConfig$: Observable<SpeechConfig>;
-    private mediaSource$: Observable<MediaStream>;
-    private audioConfig$: Observable<AudioConfig>;
-    private mediaDevices = new ReplaySubject<MediaDevices>(1)
 
     constructor() {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
         if (navigator.mediaDevices) {
-            this.mediaDevices.next(navigator.mediaDevices);
         } else {
             this.error$.next(`navigator.mediaDevices not found, cannot use microphone`)
         }
 
+/*
         this.mediaSource$ = this.mediaDevices.pipe(
             flatMap(mediaDevices => {
                 try {
@@ -44,6 +41,7 @@ export class AudioSourceBrowser implements AudioSource {
             }),
             shareReplay(1)
         );
+*/
         this.speechConfig$ = this.speechRecognitionToken$.pipe(
             map(t => {
                     try {
@@ -60,21 +58,10 @@ export class AudioSourceBrowser implements AudioSource {
             shareReplay(1)
         );
 
-        this.audioConfig$ = this.mediaSource$.pipe(
-            map(mediaSource => {
-                try {
-                } catch (e) {
-                    this.error$.next(e);
-                    throw e;
-                }
-            }),
-            shareReplay(1)
-        );
-
         this.beginRecordingSignal$.pipe(
             withLatestFrom(this.speechConfig$)
         ).subscribe(async ([, speechConfig]) => {
-            const audioConfig = AudioConfig.fromMicrophoneInput(navigator.mediaDevices.getUserMedia({audio: true}));
+            const audioConfig = AudioConfig.fromMicrophoneInput((await navigator.mediaDevices.getUserMedia({audio: true})).id);
             const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
             recognizer.recognizeOnceAsync(
                 result => {

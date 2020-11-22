@@ -4,6 +4,7 @@ import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
 import CardService from "../Manager/CardService";
 import {sleep} from "../Util/Util";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 export class TemporaryHighlightService {
     private temporaryHighlightRequests$ = new ReplaySubject<{ word: string, color: RGBA, duration: number }>(1)
@@ -39,7 +40,7 @@ export class TemporaryHighlightService {
 
     public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
         debugger;
-        this.cardService.putWords$.next([word]);
+        this.cardService.putWords$.next([word.split('').filter(isChineseCharacter).join('')]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);
         this.cardService.deleteWords.next([word])

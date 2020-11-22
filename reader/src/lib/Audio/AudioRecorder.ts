@@ -1,5 +1,5 @@
 import {race, ReplaySubject, Subject} from "rxjs";
-import {map, switchMap, take} from "rxjs/operators";
+import {filter, map, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {RecordRequest} from "../Interfaces/RecordRequest";
 import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
@@ -7,6 +7,7 @@ import {AudioSource} from "./AudioSource";
 export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>();
     public currentRecognizedText$ = new ReplaySubject<string>(1);
+    public recentlyRecorded$ = new ReplaySubject<boolean>(1);
     private countdown$ = new Subject<number>();
 
     public get isRecording$() {
@@ -14,6 +15,20 @@ export class AudioRecorder {
     }
 
     constructor(public audioSource: AudioSource) {
+        this.isRecording$.subscribe(recordingNow => {
+            recordingNow && this.recentlyRecorded$.next(recordingNow);
+        });
+        this.isRecording$.pipe(
+            filter(v => !v),
+            switchMap(async () => {
+                await sleep(5000)
+            }),
+            withLatestFrom(this.isRecording$)
+        ).subscribe(([, isRecording]) => {
+            if (!isRecording) {
+                this.recentlyRecorded$.next(false);
+            }
+        })
         this.recordRequest$.pipe(
             switchMap((request: RecordRequest) => {
                 this.audioSource.beginRecordingSignal$.next();
@@ -25,7 +40,6 @@ export class AudioRecorder {
                     this.recordRequest$.pipe(take(1))
                 ).pipe(
                     map((result: string | RecordRequest) => {
-                        debugger;
                         this.isRecording$.next(false);
                         const resultArray: [string | RecordRequest, RecordRequest] = [result, request];
                         return resultArray;

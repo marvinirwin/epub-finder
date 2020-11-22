@@ -1,5 +1,5 @@
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Paper, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import RecordingCircle from "./RecordingCircle";
@@ -8,6 +8,8 @@ import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 import {switchMap} from "rxjs/operators";
 import {fetchTranslation} from "../../services/translate.service";
+import {ExpandableContainer} from "../Containers/ExpandableContainer";
+import {AudioRecorderResizedContext} from "../Main";
 
 const useStyles = makeStyles((theme) => ({
     popupParent: {
@@ -34,58 +36,31 @@ export const SLIM_CARD_CONTENT = {
 };
 
 export default function AudioRecorder({m}: { m: Manager }) {
-    const classes = useStyles();
     const recorder = m.audioManager.audioRecorder;
     const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
-/*
-    const translatedText = useObservableState(
-        recorder.currentRecognizedText$.pipe(
-            switchMap(text => text ? fetchTranslation(text) : Promise.resolve(''))
-        ),
-        ''
-    )
-*/
-    const currentAudioRequest = useObservableState(recorder.recordRequest$)// Maybe pipe this to make it a replaySubject?
+    const currentAudioRequest = useObservableState(recorder.recordRequest$);
+    const recentlyRecorded = useObservableState(recorder.recentlyRecorded$);
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
-    return <div className={classes.popupParent} ref={setReferenceElement}>
-        <Paper className={'audio-recorder-popup'} style={{
-            display: 'flex',
-            flexFlow: 'column nowrap',
-            paddingTop: '5px',
-            paddingBottom: 0,
-            paddingLeft: '5px',
-            position: 'relative',
-            zIndex: 2,
-        }}>
-            <TutorialPopper referenceElement={referenceElement} storageKey={'AUDIO_POPUP'} placement="top">
-                <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
-                    recognized text should match the pinyin on the flashcard.</Typography>
-            </TutorialPopper>
-            <div style={{display: 'grid', gridTemplateColumns: '10% 90%'}}>
-                <RecordingCircle r={recorder}/>
-                <div style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-around'}}>
-                        <span style={{flexGrow: 1}}>
-                        <Typography variant="h6"
-                                    className={classes.learningLanguage}
-                                    align="center"
-                        >{currentAudioRequest?.label}</Typography>
-                        </span>
-                    <audio style={{height: '24px', flexGrow: 1}} src={synthAudio?.url} controls/>
-                </div>
-            </div>
+    const audioRecorderResize = useContext(AudioRecorderResizedContext)
+    useEffect(() => {
+        audioRecorderResize.next()
+    }, [recognizedText])
 
-        </Paper>
-        {
-            recognizedText && <Paper className={'recognized-text'}>
-                <Typography variant="h6">{recognizedText}</Typography>
-                <Typography variant="h6">{lookupPinyin(recognizedText).join(' ')}</Typography>
-{/*
-                <Typography variant="h6">{translatedText}</Typography>
-*/}
-            </Paper>
-        }
+    return <div className={'audio-recorder-popup'}>
+        <TutorialPopper
+            referenceElement={referenceElement}
+            storageKey={'AUDIO_POPUP'}
+            placement="top"
+        >
+            <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
+                recognized text should match the pinyin on the flashcard.</Typography>
+        </TutorialPopper>
+        <RecordingCircle r={recorder}/>
+        <div>{currentAudioRequest?.label}</div>
+        <div>{recognizedText}</div>
+        <div>{lookupPinyin(recognizedText).join(' ')}</div>
     </div>
 }
