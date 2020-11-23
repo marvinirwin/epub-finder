@@ -6,7 +6,7 @@ import {percentagePosition} from "./math.module";
 import {VideoMetadata} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
 import {ManagerContext} from "../../App";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 
 export type Percentage = number;
 
@@ -40,7 +40,9 @@ export const CharacterTimingSection: React.FunctionComponent<{
     const [highlightBar, setHighlightBar] = useState<HTMLDivElement | null>();
     usePlaceHighlightBar(highlightBar, sectionContainer, highlightStartPosition, highlightEndPosition);
     const manager = useContext(ManagerContext);
-    const editingIndex = useObservableState(manager.editingVideoMetadataService.editingCharacterIndex$)
+    const editingIndex = useObservableState(manager.editingVideoMetadataService.editingCharacterIndex$);
+    useSubscription(manager.inputManager.getKeyDownSubject('d'), () => manager.editingVideoMetadataService.moveCharacter(5))
+    useSubscription(manager.inputManager.getKeyDownSubject('a'), () => manager.editingVideoMetadataService.moveCharacter(-5))
 
     return <div className={'character-timing-section-container'}
                 style={{position: 'relative'}}
