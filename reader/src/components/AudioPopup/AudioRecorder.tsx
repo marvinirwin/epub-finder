@@ -37,10 +37,8 @@ export const SLIM_CARD_CONTENT = {
 
 export default function AudioRecorder({m}: { m: Manager }) {
     const recorder = m.audioManager.audioRecorder;
-    const synthAudio = useObservableState(m.audioManager.currentSynthesizedAudio$);
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
     const currentAudioRequest = useObservableState(recorder.recordRequest$);
-    const recentlyRecorded = useObservableState(recorder.recentlyRecorded$);
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 

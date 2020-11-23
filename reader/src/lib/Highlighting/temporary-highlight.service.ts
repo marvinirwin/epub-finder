@@ -38,11 +38,15 @@ export class TemporaryHighlightService {
         )
     }
 
-    public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
-        debugger;
-        this.cardService.putWords$.next([word.split('').filter(isChineseCharacter).join('')]);
+    public async highlightTemporaryWord(withPunctuation: string, color: RGBA, duration: number) {
+        const word = withPunctuation.split('').filter(c => {
+            return isChineseCharacter(c) && !punctuation.has(c);
+        }).join('');
+        this.cardService.putWords$.next([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);
         this.cardService.deleteWords.next([word])
     }
 }
+
+const punctuation = new Set(['。',',','！'])
