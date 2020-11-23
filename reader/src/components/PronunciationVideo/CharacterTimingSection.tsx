@@ -1,11 +1,12 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
 import {TemporalPositionBar} from "./TemporalPositionBar";
 import {HighlightBar} from "./HighlightBar";
 import {percentagePosition} from "./math.module";
 import {VideoMetadata} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
-import {isChineseCharacter} from "../../lib/Interfaces/OldAnkiClasses/Card";
+import {ManagerContext} from "../../App";
+import {useObservableState} from "observable-hooks";
 
 export type Percentage = number;
 
@@ -37,8 +38,9 @@ export const CharacterTimingSection: React.FunctionComponent<{
     const [sectionContainer, setSectionContainer] = useState<HTMLDivElement | null>();
     const [hoverBarPercentPosition, setHoverBarPercentPosition] = useState<number | undefined>(undefined);
     const [highlightBar, setHighlightBar] = useState<HTMLDivElement | null>();
-
     usePlaceHighlightBar(highlightBar, sectionContainer, highlightStartPosition, highlightEndPosition);
+    const manager = useContext(ManagerContext);
+    const editingIndex = useObservableState(manager.editingVideoMetadataService.editingCharacterIndex$)
 
     return <div className={'character-timing-section-container'}
                 style={{position: 'relative'}}
@@ -83,16 +85,17 @@ export const CharacterTimingSection: React.FunctionComponent<{
             position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx * .9 : undefined}
             color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
-            {characterTimings.filter(characterTiming => isChineseCharacter(characterTiming.character)).map(characterTiming =>
+            {characterTimings.map((videoCharacter, index) =>
                 <mark
+                    className={`character-timing-mark ${editingIndex === index ? 'editing-character' : ''}`}
                     style={
                         {
-                            left: `${percentagePosition(sectionDurationMs, characterTiming.timestamp * videoMetaData.timeScale)}%`,
-                            bottom: 0
+                            left: `${percentagePosition(sectionDurationMs, videoCharacter.timestamp * videoMetaData.timeScale)}%`,
                         }
                     }
-                    key={characterTiming.timestamp}
-                >{characterTiming.character}
+                    key={index}
+                    onClick={() => manager.editingVideoMetadataService.editingCharacterIndex$.next(index)}
+                >{videoCharacter.character}
                 </mark>)}
         </div>
     </div>

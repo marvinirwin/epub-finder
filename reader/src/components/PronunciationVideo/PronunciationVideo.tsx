@@ -26,10 +26,10 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) 
     const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
 
     const videoTimeMs = useVideoTime(videoElementRef);
-    const videoMetaData = useVideoMetaData(currentSentence, m.videoMetadataService)
-    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetaData, millisecondsPerSection);
+    const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetaData$);
+    const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetadata, millisecondsPerSection);
 
-    useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetaData);
+    useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetadata);
     useSetVideoTime(videoElementRef);
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
@@ -46,13 +46,13 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) 
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
         [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
-    const videoSource = !!(currentSentence && videoMetaData) ? `${process.env.PUBLIC_URL}/video/${videoMetaData.filename}` : undefined;
+    const videoSource = !!(currentSentence && videoMetadata) ? `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}` : undefined;
     return <Card className={'pronunciation-video-container-card'}>
             <div
                 className={`pronunciation-sections-container`}
                 ref={setPronunciationSectionsContainer}>
                 {
-                    (chunkedCharacterTimings && videoMetaData && millisecondsPerSection)
+                    (chunkedCharacterTimings && videoMetadata && millisecondsPerSection)
                     && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
                         const lineStartTime = lineIndex * millisecondsPerSection;
                         const lineEndTime = lineStartTime + millisecondsPerSection;
@@ -76,7 +76,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) 
                         return <CharacterTimingSection
                             key={lineIndex}
                             characterTimings={chunkedCharacterTiming}
-                            videoMetaData={videoMetaData}
+                            videoMetaData={videoMetadata}
                             sectionDurationMs={millisecondsPerSection}
                             sectionWidthPx={sectionWidth || 0}
                             progressBarPercentPosition={progressBarPosition}

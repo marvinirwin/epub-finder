@@ -56,6 +56,7 @@ import {ObservableService} from "../services/observable.service";
 import {HighlighterService} from "./Highlighting/highlighter.service";
 import {TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
 import {RGBA} from "./Highlighting/color.service";
+import {EditingVideoMetadataService} from "../services/editing-video-metadata.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -124,6 +125,7 @@ export class Manager {
     modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
     videoMetadataService: VideoMetadataService;
+    public editingVideoMetadataService: EditingVideoMetadataService;
     private highlighterService: HighlighterService;
 
     constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
@@ -390,6 +392,10 @@ export class Manager {
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioManager.audioRecorder.currentRecognizedText$
             .subscribe(text => text && temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
+
+        this.editingVideoMetadataService = new EditingVideoMetadataService({
+            editingVideoMetadata$: this.pronunciationVideoService.videoMetaData$
+        })
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',

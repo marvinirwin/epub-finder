@@ -41,10 +41,13 @@ const urlParams = new URLSearchParams(window.location.search);
 urlParams.get('mode');
 
 const manager = getManager(urlParams.get('mode') || 'test')
+export const ManagerContext = React.createContext(manager)
 function App() {
     return <ThemeProvider theme={darkTheme}>
-        <CssBaseline/>
-        <Main m={manager}/>
+        <ManagerContext.Provider value={manager}>
+            <CssBaseline/>
+            <Main m={manager}/>
+        </ManagerContext.Provider>
     </ThemeProvider>;
 }
 
