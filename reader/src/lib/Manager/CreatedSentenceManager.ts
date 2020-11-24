@@ -1,4 +1,4 @@
-import {MyAppDatabase} from "../Storage/AppDB";
+import {DatabaseService} from "../Storage/database.service";
 import {Observable, Subject} from "rxjs";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {scan, shareReplay} from "rxjs/operators";
@@ -8,7 +8,7 @@ export class CreatedSentenceManager {
     addUnpersistedCreatedSentence$ = new Subject<CreatedSentence[]>();
     addPersistedCreatedSentence$ = new Subject<CreatedSentence[]>();
     allCreatedSentences$: Observable<Dictionary<CreatedSentence[]>>;
-    constructor(public db: MyAppDatabase) {
+    constructor(public db: DatabaseService) {
         this.addUnpersistedCreatedSentence$.subscribe(createdSentences => {
             createdSentences.forEach(createdSentence => {
                 this.db.createdSentences.add(createdSentence).then(id => {

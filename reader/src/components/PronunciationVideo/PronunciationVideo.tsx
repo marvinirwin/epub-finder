@@ -31,6 +31,11 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) 
 
     useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetadata);
     useSetVideoTime(videoElementRef);
+    useSubscription(m.pronunciationVideoService.setVideoCurrentTime$, currentTime => {
+        if (videoElementRef) {
+            videoElementRef.currentTime = currentTime;
+        }
+    });
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
 
     useInterval(() => {

@@ -9,7 +9,6 @@ import {Manager} from "../../lib/Manager";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../HotkeyWrapper";
-import {filterTextInputEvents} from "../../lib/Hotkeys/BrowserInputs";
 
 const useStylesGridListImages = makeStyles((theme) => ({
     root: {
@@ -37,9 +36,6 @@ const useStylesGridListImages = makeStyles((theme) => ({
 export default function ({photos$, card, characters, m}: { photos$: Subject<string[]>, card: EditingCard, characters: string, m: Manager }) {
     const classes = useStylesGridListImages();
     const photos = useObservableState(photos$);
-    const hotkeyMap = useObservableState(m.db.hotkeys$, {});
-
-
 
     return photos?.length ?
         <HotkeyWrapper action={"OPEN_IMAGE_SEARCH"}>

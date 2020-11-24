@@ -1,4 +1,4 @@
-import {MyAppDatabase} from "./AppDB";
+import {DatabaseService} from "./database.service";
 import Dexie from "dexie";
 
 export class LocalStorageManager {
@@ -55,7 +55,7 @@ export class LocalStorageManager {
 
 export class IndexDBManager<T> {
     constructor(
-        public db: MyAppDatabase,
+        public db: DatabaseService,
         public table: Dexie.Table<T, number>,
         public getId: (v: T) => number | undefined,
         public assignId: (newId: number, o: T) => T) {

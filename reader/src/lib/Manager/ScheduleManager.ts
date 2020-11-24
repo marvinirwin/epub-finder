@@ -1,6 +1,6 @@
 import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
-import {MyAppDatabase} from "../Storage/AppDB";
+import {DatabaseService} from "../Storage/database.service";
 import {orderBy} from "lodash";
 import {BookWordCount} from "../Interfaces/BookWordCount";
 import {dueDate, isLearning, isNew, isToReview, ScheduleRow, wordCount} from "../ReactiveClasses/ScheduleRow";
@@ -38,7 +38,7 @@ function shuffle<T>(array: T[]): T[] {
 
 interface ScheduleManagerParams {
     wordCounts$: Observable<ds_Dict<BookWordCount[]>>,
-    db: MyAppDatabase,
+    db: DatabaseService,
     sortMode$: Observable<string>
 }
 
@@ -55,7 +55,7 @@ export class ScheduleManager {
     spacedRepitionManager: SRM;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
-    private db: MyAppDatabase;
+    private db: DatabaseService;
 
     constructor({db, wordCounts$, sortMode$: sortStrategy$}: ScheduleManagerParams) {
         this.db = db;

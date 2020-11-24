@@ -4,7 +4,7 @@ import {Dictionary} from "lodash";
 import trie from "trie-prefix-tree";
 import {flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
-import {MyAppDatabase} from "../Storage/AppDB";
+import {DatabaseService} from "../Storage/database.service";
 import {TrieWrapper} from "../TrieWrapper";
 import {TrieObservable} from "./QuizCharacter";
 import {cardForWord} from "../Util/Util";
@@ -36,7 +36,7 @@ export default class CardService {
         }
     }
 
-    constructor(public db: MyAppDatabase) {
+    constructor(public db: DatabaseService) {
         this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;

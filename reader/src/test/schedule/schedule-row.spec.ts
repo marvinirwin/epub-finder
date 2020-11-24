@@ -1,4 +1,4 @@
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import {map} from "rxjs/operators";
 import {TestScheduler} from 'rxjs/testing';
@@ -12,7 +12,7 @@ import moment from "moment";
 import {WordRecognitionRow} from "../../lib/Scheduling/WordRecognitionRow";
 
 require("fake-indexeddb/auto");
-const db = new MyAppDatabase();
+const db = new DatabaseService();
 
 const testScheduler = new TestScheduler((actual, expected) => {
     // asserting the two objects are equal

@@ -12,7 +12,7 @@ export function Library({m}: { m: Manager }) {
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
 
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
-    const checkedOutTitles = useObservableState(m.db.checkedOutBooks$) || {};
+    const checkedOutTitles = useObservableState(m.settingsService.checkedOutBooks$) || {};
 
     const allBooks = {...builtInBooks, ...customBooks};
 

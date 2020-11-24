@@ -1,4 +1,4 @@
-import {ReplaySubject} from "rxjs";
+import {BehaviorSubject, ReplaySubject} from "rxjs";
 
 
 export enum Modes {
@@ -8,7 +8,7 @@ export enum Modes {
 }
 
 export class ModesService {
-     public mode$ = new ReplaySubject<Modes>(1);
+     public mode$ = new BehaviorSubject<Modes>(Modes.NORMAL);
      constructor() {
          this.mode$.next(Modes.NORMAL);
      }

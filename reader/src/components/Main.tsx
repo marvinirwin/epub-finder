@@ -3,7 +3,7 @@ import {Manager} from "../lib/Manager";
 import {NavigationPages} from "../lib/Util/Util";
 import {useObservableState} from "observable-hooks";
 import {HotKeyEvents, Hotkeys} from "../lib/HotKeyEvents";
-import {AppDirectoryService} from "./Directory/app-directory-service";
+import {AppDirectoryService} from "./directory/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
 import {TreeMenuService} from "../services/tree-menu.service";
 import {Subject} from "rxjs";
@@ -28,7 +28,7 @@ export function Main({m}: { m: Manager }) {
     const alertMessages = useObservableState(m.alertMessages$);
 
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
-    const hotkeyConfig = useObservableState(m.db.hotkeys$, {});
+    const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {});
     const withDefaults = {...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig};
 
     return <HotkeyContext.Provider value={withDefaults}>

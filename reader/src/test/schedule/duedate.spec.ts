@@ -1,4 +1,4 @@
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {ScheduleManager} from "../../lib/Manager/ScheduleManager";
 import {map, skip, take} from "rxjs/operators";
 import moment from "moment";
@@ -8,7 +8,7 @@ import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
 
 require("fake-indexeddb/auto");
 
-const db = new MyAppDatabase();
+const db = new DatabaseService();
 
 it('Creates a table row for an unpersisted recognitionRow and gives it a due date', async () => {
     const testScheduler = new TestScheduler((actual, expected) => {

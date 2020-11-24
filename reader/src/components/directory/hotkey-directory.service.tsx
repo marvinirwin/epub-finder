@@ -1,12 +1,10 @@
 import {HotKeyEvents, Hotkeys} from "../../lib/HotKeyEvents";
-import {TextField} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
-import {EditableHotkey} from "../Hotkeys/EditableHotkey";
 import React, {useContext} from "react";
 import {orderBy} from "lodash";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
-import {useObservableState} from "observable-hooks";
+import {HotkeyDirectoryComponent} from "./hotkey-directory.component";
 
 
 const hotkeyMenuNodeFactory = (
@@ -15,11 +13,7 @@ const hotkeyMenuNodeFactory = (
 ) => ({
     name: action,
     label: action,
-    InlineComponent: () => {
-        const hotkeys = useObservableState(m.db.hotkeysWithDefaults$);
-        const defaults = HotKeyEvents.defaultHotkeys();
-        return <EditableHotkey action={action} keyCombo={(hotkeys || defaults)[action]} m={m}/>;
-    }
+    InlineComponent: () => <HotkeyDirectoryComponent action={action} key={action}/>
 })
 
 export const EditableHotkeys = (hotkeys: Hotkeys<string[]>, m: Manager): TreeMenuNode[] => {

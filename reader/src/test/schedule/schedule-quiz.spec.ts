@@ -1,5 +1,5 @@
 import {TestScheduler} from "rxjs/testing";
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {Manager} from "../../lib/Manager";
 import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
 import {BookWordCount} from "../../lib/Interfaces/BookWordCount";
@@ -7,7 +7,7 @@ import {ICard} from "../../lib/Interfaces/ICard";
 import {cardForWord} from "../../lib/Util/Util";
 
 require("fake-indexeddb/auto");
-const db = new MyAppDatabase();
+const db = new DatabaseService();
 const testScheduler = new TestScheduler((actual, expected) => {
     expect(actual).toEqual(expected);
 });

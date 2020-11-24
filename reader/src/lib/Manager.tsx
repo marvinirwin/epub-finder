@@ -1,7 +1,7 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {debounce, Dictionary, zip} from "lodash";
 import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
-import {MyAppDatabase} from "./Storage/AppDB";
+import {DatabaseService} from "./Storage/database.service";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";
 import {IndexDBManager} from "./Storage/StorageManagers";
@@ -57,13 +57,14 @@ import {HighlighterService} from "./Highlighting/highlighter.service";
 import {TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
 import {RGBA} from "./Highlighting/color.service";
 import {EditingVideoMetadataService} from "../services/editing-video-metadata.service";
+import {SettingsService} from "../services/settings.service";
+import {HotkeysService} from "../services/hotkeys.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
-
 
 function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
@@ -74,7 +75,6 @@ function splitTextDataStreams$(textData$: Observable<BookWordData>) {
         sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
     }
 }
-
 
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
@@ -127,11 +127,15 @@ export class Manager {
     videoMetadataService: VideoMetadataService;
     public editingVideoMetadataService: EditingVideoMetadataService;
     private highlighterService: HighlighterService;
+    settingsService: SettingsService;
+    hotkeysService: HotkeysService
 
-    constructor(public db: MyAppDatabase, {audioSource}: AppContext) {
+    constructor(public db: DatabaseService, {audioSource}: AppContext) {
+        this.settingsService = new SettingsService({db: db})
+        this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
         this.inputManager = new BrowserInputs({
-            hotkeys$: this.db.mapHotkeysWithDefault(
+            hotkeys$: this.hotkeysService.mapHotkeysWithDefault(
                 HotKeyEvents.defaultHotkeys(),
                 this.hotkeyEvents.hotkeyActions()
             )
@@ -156,6 +160,7 @@ export class Manager {
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
             applyAtomizedSentencesListener: sentences => this.inputManager.applyAtomizedSentenceListeners(sentences),
             db,
+            settingsService: this.settingsService,
             library$: combineLatest([
                 this.library.builtInBooks$.dict$,
                 this.library.customBooks$.dict$
@@ -200,6 +205,7 @@ export class Manager {
                 }
             },
         );
+
 
 
         combineLatest([
@@ -394,7 +400,7 @@ export class Manager {
             .subscribe(text => text && temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
 
         this.editingVideoMetadataService = new EditingVideoMetadataService({
-            editingVideoMetadata$: this.pronunciationVideoService.videoMetaData$
+            pronunciationVideoService: this.pronunciationVideoService
         })
 
         this.openedBooks.openBookTree.appendDelta$.next({

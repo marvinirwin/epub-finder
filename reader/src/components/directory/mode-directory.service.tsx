@@ -11,7 +11,7 @@ import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 
 export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMenuNode> } => {
 
-    const VideoSelect: React.FC = () =>  {
+    const VideoSelect: React.FC = () => {
         const mode = useObservableState(m.modesService.mode$);
         if (mode === Modes.VIDEO) {
             return <PlayArrow htmlColor={'#3d5afe'}/>;
@@ -39,13 +39,17 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
     return Object.fromEntries(
         [
             ['Video', () => {
-                m.modesService.mode$.next(Modes.VIDEO);
+                m.modesService.mode$.next(
+                    m.modesService.mode$.getValue() === Modes.VIDEO ?
+                        Modes.NORMAL :
+                        Modes.VIDEO
+                );
             }, "Watch sentence", <VideoSelect/>],
-/*
-            ['Highlight', () => {
-                m.modesService.mode$.next(Modes.HIGHLIGHT);
-            }, "Highlight words", <HighlightMode/>],
-*/
+            /*
+                        ['Highlight', () => {
+                            m.modesService.mode$.next(Modes.HIGHLIGHT);
+                        }, "Highlight words", <HighlightMode/>],
+            */
             ['Speaking', () => {
                 const recordRequest = new RecordRequest(``);
                 recordRequest.sentence.then(recognizedSentence => {

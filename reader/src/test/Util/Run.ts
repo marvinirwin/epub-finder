@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {UnitTestAudio} from "../../lib/Audio/UnitTestAudio";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {of} from "rxjs";
@@ -31,7 +31,7 @@ export function Run(cb: (r: RunArguments) => void) {
     scheduler.run(helpers => {
         // Will I need to require the fake indexDB every time?
         const manager = new Manager(
-            new MyAppDatabase(),
+            new DatabaseService(),
             {
                 audioSource: new UnitTestAudio("YEET"),
             }

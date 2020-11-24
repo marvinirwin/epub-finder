@@ -1,4 +1,4 @@
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {TestScheduler} from "rxjs/testing";
 import {countFactory, MarbleGroup, Marbles, ScheduleQuizCard} from "../Util/Util";
 import {ICard} from "../../lib/Interfaces/ICard";
@@ -13,7 +13,7 @@ import {Pictures} from "../../components/Quiz/Pictures";
 import {Conclusion} from "../../components/Quiz/Conclusion";
 
 require("fake-indexeddb/auto");
-const db = new MyAppDatabase();
+const db = new DatabaseService();
 console.warn = function () {
 };
 

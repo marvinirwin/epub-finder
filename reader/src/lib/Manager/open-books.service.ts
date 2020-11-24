@@ -13,8 +13,9 @@ import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
-import {MyAppDatabase} from "../Storage/AppDB";
+import {DatabaseService} from "../Storage/database.service";
 import {ReadingBookService} from "./reading-book.service";
+import {SettingsService} from "../../services/settings.service";
 
 
 export type Named = {
@@ -52,7 +53,8 @@ export class OpenBooksService {
             bottomNavigationValue$: ReplaySubject<NavigationPages>,
             applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
             applyAtomizedSentencesListener: (sentences: AtomizedSentence[]) => void;
-            db: MyAppDatabase;
+            db: DatabaseService;
+            settingsService: SettingsService;
             library$: Observable<ds_Dict<CustomDocument | Website>>
         }
     ) {
@@ -85,7 +87,7 @@ export class OpenBooksService {
                     })) as ds_Dict<OpenBook>
                 })
             ),
-            config.db.checkedOutBooks$
+            config.settingsService.checkedOutBooks$
         ]).pipe(map(([library, checkedOutBookTitles]) => {
                 return Object.fromEntries(
                     Object.entries(library).filter(([title, book]) => checkedOutBookTitles[title])
@@ -266,7 +268,7 @@ export class OpenBooksService {
             openBooks$: this.checkedOutBooks$,
             // TODO make a variable which contains the current reading book,
             //  right now I only have a list of checked out books (Which should be renamed openBooks)
-            selectedBook$: config.db.checkedOutBooks$.pipe(
+            selectedBook$: config.settingsService.checkedOutBooks$.pipe(
                 map(checkedOutBooks => Object.keys(checkedOutBooks)[0]),
                 shareReplay(1)
             )

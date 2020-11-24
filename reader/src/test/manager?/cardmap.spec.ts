@@ -1,6 +1,6 @@
 import {getAtomizedSentences} from "../Util/Util";
 import CardService from "../../lib/Manager/CardService";
-import {MyAppDatabase} from "../../lib/Storage/AppDB";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import {cardForWord, getUniqueLengths, sleep} from "../../lib/Util/Util";
 import {AtomizedSentence} from "../../lib/Atomized/AtomizedSentence";
 import {skip, take} from "rxjs/operators";
@@ -8,7 +8,7 @@ import {ITrie} from "../../lib/Interfaces/Trie";
 import {TextWordData} from "../../lib/Atomized/TextWordData";
 
 require("fake-indexeddb/auto");
-const db = new MyAppDatabase();
+const db = new DatabaseService();
 /*
 request.onupgradeneeded = function () {
     var db = request.result;

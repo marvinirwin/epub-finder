@@ -5,12 +5,12 @@ import {Reading} from "../Reading/Reading";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
-import {HotkeyDirectoryService} from "./hotkey-directory.service";
-import {LibraryDirectoryService} from "./library-directory.service";
-import {ModeDirectory} from "./mode-directory.service";
 import {useObservableState} from "observable-hooks";
 import {orderBy} from "lodash";
 import { SentenceMetadata } from "../../services/video-metadata.service";
+import {ModeDirectory} from "./mode-directory.service";
+import {LibraryDirectoryService} from "./library-directory.service";
+import {HotkeyDirectoryService} from "./hotkey-directory.service";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -56,7 +56,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
         m.library.customBooks$.dict$,
-        m.db.checkedOutBooks$,
+        m.settingsService.checkedOutBooks$,
         m.library.builtInBooks$.dict$
     ]).pipe(
         map(([

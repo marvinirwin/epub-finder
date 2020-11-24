@@ -1,7 +1,7 @@
 import {ReplaySubject, Subject} from "rxjs";
 import {NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {CustomDocument, Website} from "../Website/Website";
-import {MyAppDatabase} from "../Storage/AppDB";
+import {DatabaseService} from "../Storage/database.service";
 import {websiteFromFilename} from "../../AppSingleton";
 import {withLatestFrom} from "rxjs/operators";
 import {interpolateSimpleCustomDoc} from "../../services/simple-custom-doc.service";
@@ -13,7 +13,7 @@ export class EditingBook {
 }
 
 interface LibraryParams {
-    db: MyAppDatabase
+    db: DatabaseService
 }
 
 export class Library {
@@ -22,7 +22,7 @@ export class Library {
 
     rawBook$ = new EditingBook();
     simpleBook$ = new EditingBook();
-    db: MyAppDatabase;
+    db: DatabaseService;
 
     constructor({db}: LibraryParams) {
         this.db = db;
@@ -111,9 +111,10 @@ export class Library {
                 }
             }
         })
-        const setting$ = await this.db.checkedOutBooks$;
+/*
         // Automatically add an open book once a custom document is added
         setting$.next({...setting$.getValue(), [name]: true});
+*/
     }
 
     async deleteCustomDocument(b: CustomDocument) {
