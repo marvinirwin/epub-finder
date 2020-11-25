@@ -1,0 +1,55 @@
+import {HighlighterService} from "../lib/Highlighting/highlighter.service";
+import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
+import {distinctUntilChanged, map, shareReplay, withLatestFrom} from "rxjs/operators";
+import {VisibleSentencesService} from "./visible-sentences.service";
+import {HighlightDelta} from "../lib/Highlighting/highlight.interface";
+
+export class HighlightPronunciationVideoService {
+    constructor({
+                    pronunciationVideoService,
+                    highlighterService,
+                    visibleSentencesService
+                }: {
+                    pronunciationVideoService: PronunciationVideoService,
+                    highlighterService: HighlighterService,
+                    visibleSentencesService: VisibleSentencesService
+                }
+    ) {
+
+        const elementsToHighlight$ = pronunciationVideoService.videoPlaybackTime$.pipe(
+            distinctUntilChanged(),
+            withLatestFrom(pronunciationVideoService.videoMetaData$),
+            map(([playbackTimeMs, metadata]) => {
+                if (!metadata) {
+                    return;
+                }
+                // TODO binary search
+                return metadata.characters.findIndex(char => playbackTimeMs < (char.timestamp * metadata.timeScale))
+            }),
+            distinctUntilChanged(),
+            withLatestFrom(visibleSentencesService.visibleSentences$, pronunciationVideoService.videoMetaData$),
+            map(([characterIndex, visibleSentences, videoMetadata]) => {
+                if (characterIndex === -1 || !characterIndex || !videoMetadata) {
+                    // Highlight nothing
+                    return;
+                }
+                const delta: HighlightDelta = new Map();
+                visibleSentences[videoMetadata.sentence]
+                    .forEach(atomizedSentence => {
+                            return delta.set(
+                                atomizedSentence.element.childNodes[characterIndex] as unknown as HTMLElement,
+                                [204, 255, 0, 1]
+                            );
+                        }
+                    )
+                return delta;
+            }),
+            shareReplay(1)
+        );
+        highlighterService.singleHighlight(
+            elementsToHighlight$,
+            highlighterService.highlightMap$,
+            [0, 'PRONUNCIATION_VIDEO_HIGHLIGHT']
+        )
+    }
+}

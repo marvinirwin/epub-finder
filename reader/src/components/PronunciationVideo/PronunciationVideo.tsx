@@ -25,15 +25,15 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager}> = ({m}) 
     const sectionWidth = pronunciationSectionsContainer?.clientWidth;
     const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
 
-    const videoTimeMs = useVideoTime(videoElementRef);
+    const videoTimeMs = useVideoTime(videoElementRef, m.pronunciationVideoService);
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetaData$);
     const chunkedCharacterTimings = useChunkedCharacterTimings(videoMetadata, millisecondsPerSection);
 
     useSetTemporalPositionBar(videoElementRef, currentSentence, currentSentenceCharacterIndex, videoMetadata);
     useSetVideoTime(videoElementRef);
-    useSubscription(m.pronunciationVideoService.setVideoCurrentTime$, currentTime => {
+    useSubscription(m.pronunciationVideoService.setVideoPlaybackTime$, currentTime => {
         if (videoElementRef) {
-            videoElementRef.currentTime = currentTime;
+            videoElementRef.currentTime = currentTime / 1000;
         }
     });
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));

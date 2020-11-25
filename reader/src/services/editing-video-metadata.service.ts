@@ -39,10 +39,10 @@ export class EditingVideoMetadataService {
         if (editingMetadata &&
             index !== undefined) {
             const clone = cloneDeep(this.normaliseTimestamps(editingMetadata));
-            clone.characters[index].timestamp += duration;
+            const videoCharacter = clone.characters[index];
+            videoCharacter.timestamp += duration;
             this.pronunciationVideoService.videoMetaData$.next(clone)
-            this.pronunciationVideoService.setVideoCurrentTime$.next()
+            this.pronunciationVideoService.setVideoPlaybackTime$.next(videoCharacter.timestamp * clone.timeScale)
         }
-
     }
 }

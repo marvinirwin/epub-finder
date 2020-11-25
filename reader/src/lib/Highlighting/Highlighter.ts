@@ -1,10 +1,10 @@
 import {ReplaySubject} from "rxjs";
-import {map} from "rxjs/operators";
+import {map, tap} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {colorForPercentage} from "../color/Range";
-import {HighlightDelta, HighlighterConfig, WordHighlightMap} from "./highlight.interface";
+import {HighlightDelta, HighlighterConfig, TargetHighlightPriorityList} from "./highlight.interface";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
 
@@ -40,7 +40,10 @@ export class Highlighter {
             [0, 'MOUSEOVER_CHARACTER_HIGHLIGHT']
         )
         s.singleHighlight(
-            this.mouseoverHighlightedSentences$.pipe(map(wordToMap([160, 160, 160, 0.5]))),
+            this.mouseoverHighlightedSentences$
+                .pipe(
+                    map(wordToMap([160, 160, 160, 0.5])),
+                ),
             s.highlightMap$,
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
@@ -103,7 +106,7 @@ export class Highlighter {
         )
 
 
-        s.highlightMap$.next({});
+        s.highlightMap$.next(new Map());
     }
 
 }

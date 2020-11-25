@@ -5,7 +5,9 @@ import {fetchVideoMetadata} from "../../services/video.service";
 export class PronunciationVideoService {
     public videoMetaData$ = new ReplaySubject<VideoMetadata | undefined>(1);
     public videoSentence$ = new ReplaySubject<string | undefined>(1);
-    public setVideoCurrentTime$ = new Subject<number>();
+    public setVideoPlaybackTime$ = new Subject<number>();
+    public videoPlaybackTime$ = new ReplaySubject<number>(1);
+    public playing$ = new ReplaySubject<boolean>(1);
 
     constructor( ) {
         this.videoSentence$.subscribe(async sentence => {

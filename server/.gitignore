@@ -40,3 +40,4 @@ dist/**/*
 # ignore yarn.lock
 yarn.lock
 /mandarin-trainer*.json
+/public/books/

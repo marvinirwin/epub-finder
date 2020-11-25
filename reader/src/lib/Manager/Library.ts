@@ -63,9 +63,10 @@ export class Library {
         this.appendCustomDocuments(customDocuments);
 
         const builtInDocuments = [
-            'TongueTwister.html',
-            'Story4.html',
-            'Story3.html',
+            'a-burning-oven.html',
+            'cat-likes-tea.html',
+            'city-and-village.html',
+            'watching-a-movie.html',
         ].map(websiteFromFilename);
         this.appendBuiltInDocuments(builtInDocuments);
     }

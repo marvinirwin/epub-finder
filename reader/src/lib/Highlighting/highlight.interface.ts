@@ -16,20 +16,20 @@ export interface TimedHighlightDelta {
     delta: HighlightDelta;
 }
 
-export interface WordHighlightMap {
-    [key: string]: HighlightedWord[]
-}
+export type TargetHighlightPriorityList = Map<HighlightTarget, HighlightDelta[]>;
+
+
 
 /**
- * If I am a highlighter and I want something highlighted I submit an object of words and colors to highlight
+ * If I am a highlighter and I want something highlighted I submit an object of elements/Words and colors to highlight
  */
-export type HighlightDelta = Map<string, RGBA>
+export type HighlightDelta = Map<HighlightTarget, RGBA>
 
+/**
+ * A bunch of highlight deltas where the first one is the highest priority and so on
+ */
 export type HighlightDeltaPriorityList = HighlightDelta[];
 
 export type ElementHighlightMap = Map<HTMLElement, HighlightDeltaPriorityList[]>;
 
-/**
- * A highlighted word has a list of Highlighters who have highlighted this word, and the colors they use
- */
-export type HighlightedWord = Map<string, RGBA>
+export type HighlightTarget = HTMLElement | string;

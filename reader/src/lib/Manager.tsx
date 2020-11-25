@@ -59,6 +59,8 @@ import {RGBA} from "./Highlighting/color.service";
 import {EditingVideoMetadataService} from "../services/editing-video-metadata.service";
 import {SettingsService} from "../services/settings.service";
 import {HotkeysService} from "../services/hotkeys.service";
+import {VisibleSentencesService} from "../services/visible-sentences.service";
+import {HighlightPronunciationVideoService} from "../services/highlight-pronunciation-video.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -129,6 +131,7 @@ export class Manager {
     private highlighterService: HighlighterService;
     settingsService: SettingsService;
     hotkeysService: HotkeysService
+    visibleSentencesService: VisibleSentencesService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db: db})
@@ -207,7 +210,6 @@ export class Manager {
         );
 
 
-
         combineLatest([
             this.scheduleManager.indexedScheduleRows$,
             this.quizManager.quizzingCard$
@@ -284,7 +286,13 @@ export class Manager {
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );
-        this.highlighterService = new HighlighterService({wordElementMap$: this.openedBooks.visibleElements$})
+        this.visibleSentencesService = new VisibleSentencesService({readingBookService: this.openedBooks.readingBookService})
+        this.highlighterService = new HighlighterService(
+            {
+                wordElementMap$: this.openedBooks.visibleElements$,
+                sentenceMap$: this.visibleSentencesService.visibleSentences$
+            }
+        )
 
         this.highlighter = new Highlighter({
             highlighterService: this.highlighterService
@@ -385,11 +393,18 @@ export class Manager {
             }
         })
 
+
         new SentenceVideoHighlightService({
             visibleAtomizedSentences$: this.openedBooks.visibleAtomizedSentences$,
             modesService: this.modesService,
             videoMetadataService: this.videoMetadataService
         });
+
+        new HighlightPronunciationVideoService({
+            pronunciationVideoService: this.pronunciationVideoService,
+            highlighterService: this.highlighterService,
+            visibleSentencesService: this.visibleSentencesService
+        })
 
         const temporaryHighlightService = new TemporaryHighlightService({
             highlighterService: this.highlighterService,

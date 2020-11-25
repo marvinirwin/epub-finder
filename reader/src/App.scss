@@ -409,7 +409,7 @@ $character-timing-section-padding: 24px;
   transition: box-shadow .3s;
   bottom: 0;
   &.editing-character, &:hover {
-    box-shadow: 0 0 11px rgba(50,50,50,.2);
+    box-shadow: 0 0 11px rgba(50,50,50,1);
   }
   &:hover {
     cursor: pointer;

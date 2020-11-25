@@ -28,7 +28,7 @@ export class SettingsService {
     }
 
     get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
-        return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'TongueTwister': true})
+        return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'cat-likes-tea': true})
     }
 
     get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {
