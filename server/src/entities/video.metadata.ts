@@ -1,6 +1,6 @@
 import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 
-@Entity()
+@Entity({name: 'video_metadata'})
 export class VideoMetadataEntity {
     @PrimaryGeneratedColumn()
     id: number;

@@ -1,4 +1,5 @@
-import {Column, CreateDateColumn, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
+import {VideoMetadataEntity} from "./video.metadata";
 
 @ViewEntity({
     expression: `
