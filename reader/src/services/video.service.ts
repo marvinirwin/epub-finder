@@ -8,13 +8,13 @@ async function digestMessage(message: string): Promise<string> {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function sentenceToFilename(sentence: string): Promise<string> {
+export async function sha1(sentence: string): Promise<string> {
     return digestMessage(sentence.normalize().replace(/\s+/, ' '));
 }
 
 export const fetchVideoMetadata = async (sentence: string): Promise<VideoMetadata | undefined> => {
     try {
-        const response = await fetch(`${process.env.PUBLIC_URL}/video/${await sentenceToFilename(sentence)}.json`)
+        const response = await fetch(`${process.env.PUBLIC_URL}/video_metadata/${await sha1(sentence)}`)
         if (response.status === 200) {
             return response.json() as unknown as VideoMetadata;
         }

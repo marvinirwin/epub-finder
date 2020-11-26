@@ -23,7 +23,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
     onMouseDown: (n: Percentage) => void,
     onMouseOver: (n: Percentage) => void,
     onMouseUp: (n: Percentage) => void,
-    sectionIndex: number
+    sectionIndex: number,
+    characterIndexStart: number
 }> = ({
           characterTimings,
           videoMetaData,
@@ -36,7 +37,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
           onMouseOver,
           onMouseUp,
           sectionWidthPx,
-        sectionIndex
+        sectionIndex,
+    characterIndexStart
       }) => {
     const [sectionContainer, setSectionContainer] = useState<HTMLDivElement | null>();
     const [hoverBarPercentPosition, setHoverBarPercentPosition] = useState<number | undefined>(undefined);
@@ -147,14 +149,14 @@ export const CharacterTimingSection: React.FunctionComponent<{
             {characterTimings.map((videoCharacter, index) =>
                 <PronunciationTimingCharacterComponent key={index}
                                                        editingIndex={editingIndex}
-                                                       index={index + sectionIndex}
+                                                       index={index + characterIndexStart}
                                                        sectionDuration={sectionDurationMs}
                                                        videoCharacter={videoCharacter}
                                                        timeScale={videoMetaData.timeScale}
                                                        onClick={ev => {
                                                            ev.preventDefault();
                                                            ev.stopPropagation();
-                                                           manager.editingVideoMetadataService.editingCharacterIndex$.next(index + sectionIndex);
+                                                           manager.editingVideoMetadataService.editingCharacterIndex$.next(index + characterIndexStart);
                                                        }}/>)}
         </div>
     </div>

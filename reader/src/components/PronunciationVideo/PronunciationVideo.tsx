@@ -67,6 +67,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
 
     const videoSource = !!(currentSentence && videoMetadata) ? `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}` : undefined;
     const resizeContext = useContext(AudioRecorderResizedContext);
+    let characterCounter = 0;
     return <Card className={'pronunciation-video-container-card'}>
         {videoSource && <video
             ref={setVideoElementRef}
@@ -99,6 +100,8 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                             lineEndTime - 1
                         ).map(p => p && (p - (millisecondsPerSection * lineIndex)) / millisecondsPerSection) :
                         [];
+                    const previousCharacterCount = characterCounter
+                    characterCounter += chunkedCharacterTiming.length;
 
                     return <CharacterTimingSection
                         key={lineIndex}
@@ -108,6 +111,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
                         sectionWidthPx={sectionWidth || 0}
                         progressBarPercentPosition={progressBarPosition}
                         sectionIndex={lineIndex}
+                        characterIndexStart={previousCharacterCount}
                         onClick={percent => {
                             if (videoElementRef) {
                                 videoElementRef.currentTime = lineIndex *

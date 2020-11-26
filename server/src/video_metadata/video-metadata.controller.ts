@@ -1,5 +1,5 @@
 import {VideoMetadataService} from "./video-metadata.service";
-import {Body, Controller, Get, Param, Put} from "@nestjs/common";
+import {Body, Controller, Get, Header, Param, Put} from "@nestjs/common";
 import {VideoMetadataDto} from "./video-metadata.dto";
 
 
@@ -9,8 +9,9 @@ export class VideoMetadataController {
     }
 
     @Get(":hash")
+    @Header('content-type', 'application/json')
     async metadata(@Param() {hash}) {
-        return this.videoMetadataService.resolveVideoMetadataByHash(hash)
+        return (await this.videoMetadataService.resolveVideoMetadataByHash(hash))?.metadata
     }
 
     @Put()
