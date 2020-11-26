@@ -1,4 +1,4 @@
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../types/";
 
 async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));

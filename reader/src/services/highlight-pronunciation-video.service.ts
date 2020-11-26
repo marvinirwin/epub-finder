@@ -18,7 +18,7 @@ export class HighlightPronunciationVideoService {
 
         const elementsToHighlight$ = pronunciationVideoService.videoPlaybackTime$.pipe(
             distinctUntilChanged(),
-            withLatestFrom(pronunciationVideoService.videoMetaData$),
+            withLatestFrom(pronunciationVideoService.videoMetadata$),
             map(([playbackTimeMs, metadata]) => {
                 if (!metadata) {
                     return;
@@ -27,7 +27,7 @@ export class HighlightPronunciationVideoService {
                 return metadata.characters.findIndex(char => playbackTimeMs < (char.timestamp * metadata.timeScale))
             }),
             distinctUntilChanged(),
-            withLatestFrom(visibleSentencesService.visibleSentences$, pronunciationVideoService.videoMetaData$),
+            withLatestFrom(visibleSentencesService.visibleSentences$, pronunciationVideoService.videoMetadata$),
             map(([characterIndex, visibleSentences, videoMetadata]) => {
                 if (characterIndex === -1 || !characterIndex || !videoMetadata) {
                     // Highlight nothing

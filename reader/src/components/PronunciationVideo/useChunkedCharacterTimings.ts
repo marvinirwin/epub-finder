@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {VideoCharacter} from "./video-character.interface";
-import {VideoMetadata} from "./video-meta-data.interface";
+import {VideoMetadata} from "../../types/";
 
 const CHARACTER_TIMING_SECTION_PADDING = 24;
 

@@ -1,10 +1,14 @@
 import {ReplaySubject} from "rxjs";
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 import {take} from "rxjs/operators";
 import {cloneDeep} from "lodash";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
+import {VideoMetadata} from "../types/index";
+import axios from 'axios';
+import {debounce} from 'lodash';
+import {VideoMetadataDto} from '@server/';
 
 export class EditingVideoMetadataService {
+    private debounceSaveMetadata: (metadata:VideoMetadataDto) => void;
     private normaliseTimestamps(m: VideoMetadata): VideoMetadata {
         if (m.timeScale === 1) {
             return m;
@@ -31,18 +35,30 @@ export class EditingVideoMetadataService {
         }
     ) {
         this.pronunciationVideoService = pronunciationVideoService;
+        this.debounceSaveMetadata = debounce(EditingVideoMetadataService.saveMetadata, 1000)
     }
 
-    public async moveCharacter(duration: number) {
-        const editingMetadata = await this.pronunciationVideoService.videoMetaData$.pipe(take(1)).toPromise();
-        const index = await this.editingCharacterIndex$.pipe(take(1)).toPromise();
-        if (editingMetadata &&
-            index !== undefined) {
-            const clone = cloneDeep(this.normaliseTimestamps(editingMetadata));
-            const videoCharacter = clone.characters[index];
-            videoCharacter.timestamp += duration;
-            this.pronunciationVideoService.videoMetaData$.next(clone)
-            this.pronunciationVideoService.setVideoPlaybackTime$.next(videoCharacter.timestamp * clone.timeScale)
-        }
+    public async moveCharacter(metadata: VideoMetadata, index: number, duration: number) {
+        const normalised = this.normaliseTimestamps(metadata);
+        const videoCharacter = normalised.characters[index];
+        videoCharacter.timestamp += (duration * normalised.timeScale) ;
+        return normalised;
+    }
+
+    public async setCharacterTimestamp(metadata: VideoMetadata, index: number, timestamp: number) {
+        const normalised = this.normaliseTimestamps(metadata);
+        const videoCharacter = normalised.characters[index];
+        videoCharacter.timestamp = timestamp * normalised.timeScale;
+        this.debounceSaveMetadata({
+            metadata: metadata,
+        });
+        return normalised;
+    }
+
+    private static async saveMetadata(metadata: VideoMetadataDto) {
+        await axios.put(
+            `${process.env.PUBLIC_URL}/video_metadata`,
+            metadata
+        );
     }
 }

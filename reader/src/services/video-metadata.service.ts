@@ -1,9 +1,9 @@
 import {Observable, of, ReplaySubject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {map, shareReplay, tap} from "rxjs/operators";
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 import {fetchVideoMetadata} from "./video.service";
 import {fromPromise} from "rxjs/internal-compatibility";
+import {VideoMetadata} from "../types/";
 
 /**
  * This is a terrible name an a terrible cache
@@ -17,7 +17,6 @@ export interface SentenceMetadata {
 
 export class VideoMetadataService {
     public sentenceMetadata$: Observable<ds_Dict<SentenceMetadata>>
-    public videoMetadata$ = new ReplaySubject<VideoMetadata | undefined>(1);
     private cachedMetadata: ds_Dict<VideoMetadata> = {};
 
 

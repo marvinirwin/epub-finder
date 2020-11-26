@@ -1,8 +1,8 @@
 import {fromEvent, merge, Observable, ReplaySubject} from "rxjs";
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 import {mapTo, shareReplay, switchMap, tap} from "rxjs/operators";
 // @ts-ignore
 import {io}  from "socket.io-client";
+import { VideoMetadata } from "src/components/PronunciationVideo/video-meta-data.interface";
 
 export class ObservableService {
     public videoMetadata$: Observable<VideoMetadata>;

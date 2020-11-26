@@ -12,7 +12,9 @@ import {Subject} from "rxjs";
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
 const audioRecorderResized$ = new Subject<void>();
+const pronunciationVideoResized$ = new Subject<void>();
 export const AudioRecorderResizedContext = React.createContext<Subject<void>>(audioRecorderResized$)
+export const PronunciationVideoResizedContext = React.createContext<Subject<void>>(pronunciationVideoResized$)
 
 const treeMenuService = new TreeMenuService<any, {value: any}>();
 
@@ -33,9 +35,11 @@ export function Main({m}: { m: Manager }) {
 
     return <HotkeyContext.Provider value={withDefaults}>
         <FocusedElement.Provider value={hotkeyHandler}>
-            <AudioRecorderResizedContext.Provider value={audioRecorderResized$}>
-                <AppContainer treeMenuService={treeMenuService}/>
-            </AudioRecorderResizedContext.Provider>
+            <PronunciationVideoResizedContext.Provider value={pronunciationVideoResized$}>
+                <AudioRecorderResizedContext.Provider value={audioRecorderResized$}>
+                    <AppContainer treeMenuService={treeMenuService}/>
+                </AudioRecorderResizedContext.Provider>
+            </PronunciationVideoResizedContext.Provider>
         </FocusedElement.Provider>
     </HotkeyContext.Provider>
 }

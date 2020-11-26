@@ -1,6 +1,6 @@
 import {useEffect} from "react";
-import {VideoMetadata} from "./video-meta-data.interface";
 import {VideoCharacter} from "./video-character.interface";
+import {VideoMetadata} from "../../types/";
 
 export function useSetTemporalPositionBar(
     videoElementRef: HTMLVideoElement | null | undefined,

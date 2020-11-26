@@ -1,4 +1,4 @@
-import {VideoMetadata} from "../entities/video.metadata";
+import {VideoMetadataEntity} from "../entities/video.metadata";
 import {BookViewEntity} from "../entities/book-view.entity";
 import {VideoMetadataViewEntity} from "../entities/video-metadata-view.entity";
 import {Subject} from "rxjs";

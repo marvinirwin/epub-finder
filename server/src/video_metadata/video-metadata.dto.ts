@@ -1,3 +1,5 @@
+import {VideoMetadata} from '@reader/'
+
 export interface VideoMetadataDto {
-    videoMetadataId: number;
+    metadata: VideoMetadata;
 }

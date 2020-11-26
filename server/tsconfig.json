@@ -24,7 +24,10 @@
     "typeRoots": [
       "./node_modules/@types",
       "src/types"
-    ]
+    ],
+    "paths": {
+      "@reader/*": ["../reader/src/types"]
+    }
   },
   "include": [
     "src/**/*"
