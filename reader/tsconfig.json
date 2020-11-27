@@ -18,13 +18,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "downlevelIteration": true,
-    "baseUrl": ".",
-    "paths": {
-      "@server/*": ["../server/src/types"]
-    }
+    "downlevelIteration": true
   },
   "include": [
     "src"
-  ]
+  ],
+  "extends": "./tsconfig.paths.json"
 }
