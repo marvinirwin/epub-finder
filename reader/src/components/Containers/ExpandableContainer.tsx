@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {useConditionalTimeout, useResizeObserver, useTimeout} from 'beautiful-react-hooks';
+import {useConditionalTimeout, useDebouncedFn, useResizeObserver, useTimeout} from 'beautiful-react-hooks';
 import {Observable, of} from "rxjs";
 import {useSubscription} from "observable-hooks";
 
@@ -32,28 +32,26 @@ export const ExpandableContainer: React.FC<{ shouldShow: boolean, hideDelay?: nu
     // @ts-ignore
     const DOMRect = useResizeObserver(ref);
 
-    const [isCleared, clearTimeoutRef] = useConditionalTimeout(()=>{
-       setStyles({
-           height: 0,
-           maxHeight: 0
-       })
-   }, hideDelay || 0, shouldShow);
+    const [isCleared, clearTimeoutRef] = useConditionalTimeout(() => {
+        setStyles({
+            height: 0,
+            maxHeight: 0
+        })
+    }, hideDelay || 0, shouldShow);
 
-
-    const setDims = () => {
+    const setDims = useDebouncedFn(() => {
         if (shouldShow) {
             clearTimeoutRef();
             setStyles(dimensions(ref?.current))
         }
-    }
+    })
 
-    useSubscription(resizeObservable$ || blankObs, () => setDims() )
-
+    useSubscription(resizeObservable$ || blankObs, () => setDims())
 
     useEffect(() => {
         setDims()
     }, [shouldShow, DOMRect]);
-        // @ts-ignore
+    // @ts-ignore
     return <div className={`expandable`} ref={ref} style={styles}>
         {children}
     </div>
