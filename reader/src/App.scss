@@ -77,48 +77,9 @@
   text: black;
 }
 
-/* NEW CSS */
-#root {
-}
 
-/* HACK to make */
-.makeStyles-popup-18 > span > div > div {
-  background-color: white;
-}
-
-.led-container {
-  height: 12px;
-  width: 12px;
-  margin-right: 10px;
-}
-
-.led {
-  margin: 0 auto;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.led-green {
-  background-color: #5dce05;
-  box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/
-          inset #304701 0 -1px 9px /*, #89FF00 0 2px 12px*/
-;
-}
-
-.led-off {
-  background-color: #c6c6c6;
-  box-shadow: /*rgba(0, 0, 0, 0.2) 0 -1px 7px 1px,*/
-          inset #304701 0 -1px 9px /*, #6d6d6d 0 2px 12px*/
-;
-}
-
-.led-box {
-  height: 12px;
-  width: 12px;
-  margin: 4px 4px 4px 4px;
-  float: left;
-}
+$led-green: #5dce05;
+$led-off: #c6c6c6;
 
 .POPPER_ELEMENT {
   background-color: #333;
@@ -353,6 +314,7 @@ $character-timing-section-padding: 24px;
 .expandable {
   transition: all 1s;
   overflow: hidden;
+  height: 0;
 }
 
 .pronunciation-video-container-card {
@@ -416,3 +378,7 @@ $character-timing-section-padding: 24px;
   }
 }
 
+
+.audio-recorder-popup {
+  height: 24px;
+}

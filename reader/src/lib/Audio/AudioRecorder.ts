@@ -1,5 +1,5 @@
 import {race, ReplaySubject, Subject} from "rxjs";
-import {filter, map, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {filter, map, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {RecordRequest} from "../Interfaces/RecordRequest";
 import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
@@ -23,8 +23,9 @@ export class AudioRecorder {
             switchMap(async () => {
                 await sleep(5000)
             }),
-            withLatestFrom(this.isRecording$)
+            withLatestFrom(this.isRecording$.pipe(startWith(false)))
         ).subscribe(([, isRecording]) => {
+            debugger;
             if (!isRecording) {
                 this.recentlyRecorded$.next(false);
             }

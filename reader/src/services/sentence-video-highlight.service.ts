@@ -34,7 +34,6 @@ export class SentenceVideoHighlightService {
             )
         ]).subscribe(([mode, visibleAtomizedSentences, sentenceMetadata]) => {
             previousHighlightedSentences = visibleAtomizedSentences;
-            debugger;
             const iterateAtomizedSentences = (s: ds_Dict<AtomizedSentence[]>, func: (atomizedSentence: AtomizedSentence) => void) => {
                 Object.values(s)
                     .forEach(atomizedSentences => atomizedSentences
