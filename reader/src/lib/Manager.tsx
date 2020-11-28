@@ -60,6 +60,8 @@ import {SettingsService} from "../services/settings.service";
 import {HotkeysService} from "../services/hotkeys.service";
 import {VisibleSentencesService} from "../services/visible-sentences.service";
 import {HighlightPronunciationVideoService} from "../services/highlight-pronunciation-video.service";
+import {RecognitionProgressService} from "./schedule/recognition-progress.service";
+import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -100,6 +102,8 @@ export class Manager {
     public highlighter: Highlighter;
     public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
+    public pronunciationProgressService: PronunciationProgressService;
+    public wordRecognitionProgressService: RecognitionProgressService;
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
@@ -185,17 +189,20 @@ export class Manager {
         this.readingWordElementMap = wordElementMap$;
         this.readingWordCounts$ = bookWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
+        this.pronunciationProgressService = new PronunciationProgressService({db});
+        this.wordRecognitionProgressService = new RecognitionProgressService({db});
         this.scheduleManager = new ScheduleManager({
                 db,
                 wordCounts$: this.readingWordCounts$,
-                sortMode$: of('').pipe(shareReplay(1))
+                sortMode$: of('').pipe(shareReplay(1)),
+                recognitionRecordsService: this.wordRecognitionProgressService
             }
         );
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
-            wordRecognitionRows$: this.scheduleManager.wordRecognitionRecords$,
+            wordRecognitionRows$: this.wordRecognitionProgressService.wordRecognitionRecords$,
             scheduleRows$: this.scheduleManager.indexedScheduleRows$
         });
         this.quizManager = new QuizManager({
@@ -477,15 +484,17 @@ export class Manager {
                     this.pronunciationVideoService.videoSentence$.next(annotationElement.parent.translatableText);
                     break;
                 default:
-                    /*
-                    TODO do I need this?  I thought highlights were only for mouseenter/mouseleave
-                                        const children = sentence.getSentenceHTMLElement().children;
-                                        for (let i = 0; i < children.length; i++) {
-                                            const child = children[i];
-                                            child.classList.remove('highlighted')
-                                        }
-                    */
-                    this.inputManager.selectedText$.next(maxWord?.word)
+                /*
+                TODO do I need this?  I thought highlights were only for mouseenter/mouseleave
+                                    const children = sentence.getSentenceHTMLElement().children;
+                                    for (let i = 0; i < children.length; i++) {
+                                        const child = children[i];
+                                        child.classList.remove('highlighted')
+                                    }
+                */
+                /*
+                                    this.inputManager.selectedText$.next(maxWord?.word)
+                */
             }
         })
         child.onclick = (ev) => {

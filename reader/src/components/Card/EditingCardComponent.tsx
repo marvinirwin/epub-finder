@@ -14,7 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../HotkeyWrapper";
-import {wordRecognitionScore} from "../../lib/ReactiveClasses/ScheduleRow";
+import {wordRecognitionScore} from "../../lib/schedule/ScheduleRow";
 
 const useStyles = makeStyles((theme) => ({
     root: {

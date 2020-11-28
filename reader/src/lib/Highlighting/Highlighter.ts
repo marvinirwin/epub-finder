@@ -2,11 +2,9 @@ import {ReplaySubject} from "rxjs";
 import {map, tap} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
-import {colorForPercentage} from "../color/Range";
-import {HighlightDelta, HighlighterConfig, TargetHighlightPriorityList} from "./highlight.interface";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
+import {ScheduleRow} from "../schedule/schedule-row.interface";
 
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
         const m = new Map<string, RGBA>();
@@ -65,45 +63,6 @@ export class Highlighter {
             s.highlightMap$,
             [0, 'CREATED_CARDS_HIGHLIGHT']
         );
-        const now = new Date();
-        function clamp(min: number, max: number, v: number) {
-            if (v < min) return min;
-            if (v > max) return max;
-            return v;
-        }
-        function getDatePercentage(d: Date): number {
-            const date = d.getTime();
-            const sevenDays = 86400000 * 7;
-            const SevenDaysAgo = now.getTime() - sevenDays;
-            const sevenDaysInTheFuture = now.getTime() + sevenDays;
-            const fourteenDays = sevenDays * 2;
-            const clampedDate = clamp(0.001, fourteenDays - 0.001 , date - SevenDaysAgo);
-            const percentage = clampedDate / fourteenDays * 100;
-            return percentage;
-        }
-        s.singleHighlight(
-            this.highlightWithDifficulty$.pipe(map(indexedScheduleRows => {
-                const highlights: HighlightDelta = new Map<string, RGBA>();
-                for (const word in indexedScheduleRows) {
-                    const row = indexedScheduleRows[word];
-                    if (row.wordRecognitionRecords.length) {
-                        let correct = 0;
-                        for (let i = row.wordRecognitionRecords.length - 1; i >= 0; i--) {
-                            const wordRecognitionRecord = row.wordRecognitionRecords[i];
-                            if (wordRecognitionRecord.recognitionScore >= CORRECT_RECOGNITION_SCORE) {
-                                correct++;
-                            } else {
-                                break;
-                            }
-                        }
-                        highlights.set(word, colorForPercentage(clamp(0.001, correct * 25, 100)))
-                    }
-                }
-                return highlights;
-            })),
-            s.highlightMap$,
-            [2, 'DIFFICULTY_HIGHLIGHT']
-        )
 
 
         s.highlightMap$.next(new Map());

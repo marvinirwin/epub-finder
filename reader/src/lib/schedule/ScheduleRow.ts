@@ -1,7 +1,7 @@
-import {BookWordCount} from "../Interfaces/BookWordCount";
-import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {orderBy, sumBy} from "lodash";
 import moment from "moment";
+import {ScheduleRow} from "./schedule-row.interface";
+import {WordRecognitionRow} from "./word-recognition-row";
 
 export function wordCount(s: ScheduleRow) {
     return sumBy(s.wordCountRecords, wordCountRow => wordCountRow.count)
@@ -60,10 +60,3 @@ export function isLearning(s: ScheduleRow) {
     return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
 }
 
-export interface ScheduleRow {
-    wordCountRecords: BookWordCount[];
-    wordRecognitionRecords: WordRecognitionRow[];
-    word: string;
-    sortString?: string;
-    sortNumber?: number;
-}

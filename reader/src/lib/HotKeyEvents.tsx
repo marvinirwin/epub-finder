@@ -1,7 +1,7 @@
 import {Manager} from "./Manager";
 import {of, Subject} from "rxjs";
 import { switchMap, withLatestFrom} from "rxjs/operators";
-import {RecognitionMap} from "./Scheduling/SRM";
+import {RecognitionMap} from "./srm/srm.service";
 
 export interface Hotkeys<T> {
     OPEN_IMAGE_SEARCH: T,

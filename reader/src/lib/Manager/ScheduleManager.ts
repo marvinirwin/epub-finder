@@ -1,15 +1,16 @@
-import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
-import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
+import {combineLatest, Observable} from "rxjs";
 import {DatabaseService} from "../Storage/database.service";
 import {orderBy} from "lodash";
 import {BookWordCount} from "../Interfaces/BookWordCount";
-import {dueDate, isLearning, isNew, isToReview, ScheduleRow, wordCount} from "../ReactiveClasses/ScheduleRow";
-import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
-import {SRM} from "../Scheduling/SRM";
+import {map, shareReplay, startWith} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {safePush} from "../../test/Util/GetGraphJson";
 import moment from "moment";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
+import {ProgressRowService} from "../schedule/progress-row.service";
+import {ScheduleRow} from "../schedule/schedule-row.interface";
+import {SrmService} from "../srm/srm.service";
+import {WordRecognitionRow} from "../schedule/word-recognition-row";
+import {dueDate, isLearning, isNew, isToReview, wordCount} from "../schedule/ScheduleRow";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -36,54 +37,38 @@ function shuffle<T>(array: T[]): T[] {
 }
 */
 
-interface ScheduleManagerParams {
-    wordCounts$: Observable<ds_Dict<BookWordCount[]>>,
-    db: DatabaseService,
-    sortMode$: Observable<string>
-}
-
 export class ScheduleManager {
     wordQuizList$: Observable<ScheduleRow[]>;
     sortedScheduleRows$: Observable<ScheduleRow[]>;
     indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;
     learningCards$: Observable<ScheduleRow[]>;
-    wordRecognitionRecords$: ReplaySubject<ds_Dict<WordRecognitionRow[]>> = new ReplaySubject<ds_Dict<WordRecognitionRow[]>>(1);
-    addWordRecognitionRecords$: Subject<WordRecognitionRow[]> = new Subject<WordRecognitionRow[]>();
 
     private today: number;
     private yesterday: number;
-    spacedRepitionManager: SRM;
+    spacedRepitionManager: SrmService;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
     private db: DatabaseService;
 
-    constructor({db, wordCounts$, sortMode$: sortStrategy$}: ScheduleManagerParams) {
+    constructor({
+                    db,
+                    wordCounts$,
+                    sortMode$: sortStrategy$,
+        recognitionRecordsService
+                }: {
+        wordCounts$: Observable<ds_Dict<BookWordCount[]>>,
+        db: DatabaseService,
+        sortMode$: Observable<string>,
+        recognitionRecordsService: ProgressRowService<WordRecognitionRow>
+    }) {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
-        this.spacedRepitionManager = new SRM();
+        this.spacedRepitionManager = new SrmService();
 
-        this.addWordRecognitionRecords$.pipe(
-            filter(rows => !!rows.length),
-            withLatestFrom(this.wordRecognitionRecords$.pipe(startWith({}))),
-            tap(([rows, wordRecognitionRecords]: [WordRecognitionRow[], ds_Dict<WordRecognitionRow[]>]) => {
-                rows.forEach(row => {
-                    safePush(wordRecognitionRecords, row.word, row);
-                    wordRecognitionRecords[row.word] = orderBy(wordRecognitionRecords[row.word], 'timestamp');
-                });
-                this.wordRecognitionRecords$.next(wordRecognitionRecords);
-            }),
-        ).subscribe((([rows]) => {
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row.id) {
-                    db.recognitionRecords.add(row).then(id => row.id = id);
-                }
-            }
-        }));
 
         this.indexedScheduleRows$ = combineLatest([
-            this.wordRecognitionRecords$.pipe(startWith({})),
+            recognitionRecordsService.wordRecognitionRecords$.pipe(startWith({})),
             wordCounts$.pipe(startWith({}))
         ]).pipe(
             map(([wordRecognition, wordCounts]) => {
@@ -186,13 +171,6 @@ export class ScheduleManager {
             shareReplay(1)
         );
 
-        this.loadRecognitionRows();
     }
 
-    private async loadRecognitionRows() {
-        const generator = this.db.getRecognitionRowsFromDB();
-        for await (const rowChunk of generator) {
-            this.addWordRecognitionRecords$.next(rowChunk);
-        }
-    }
 }

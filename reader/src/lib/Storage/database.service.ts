@@ -1,21 +1,21 @@
 import Dexie from "dexie";
 import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
 import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {CustomDocument} from "../Website/Website";
-import {ds_Dict} from "../Tree/DeltaScanner";
-import {HotKeyEvents, Hotkeys} from "../HotKeyEvents";
-import {map, shareReplay} from "rxjs/operators";
+import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.interface";
+import {WordRecognitionRow} from "../schedule/word-recognition-row";
 
 
 export class DatabaseService extends Dexie {
-    static CURRENT_VERSION = 6;
+    static CURRENT_VERSION = 7;
 
 
     public cards: Dexie.Table<ICard, number>;
-    public recognitionRecords: Dexie.Table<WordRecognitionRow, number>;
+    public wordRecognitionRecords: Dexie.Table<WordRecognitionRow, number>;
+    public pronunciationRecords: Dexie.Table<PronunciationProgressRow, number>
+
     public createdSentences: Dexie.Table<CreatedSentence, number>;
     public settings: Dexie.Table<Setting, string>;
     public customDocuments: Dexie.Table<CustomDocument, string>;
@@ -24,7 +24,8 @@ export class DatabaseService extends Dexie {
         super("DatabaseService");
         this.version(DatabaseService.CURRENT_VERSION).stores({
             cards: 'id++, learningLanguage, knownLanguage, deck',
-            recognitionRecords: 'id++, word, timestamp',
+            wordRecognitionRecords: 'id++, word, timestamp',
+            pronunciationRecords: 'id++, word, timestamp',
             settings2: 'name, value',
             createdSentences: 'id++, learningLanguage',
             customDocuments: 'name, html'
@@ -32,11 +33,10 @@ export class DatabaseService extends Dexie {
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table("cards");
         this.settings = this.table("settings2");
-        this.recognitionRecords = this.table("recognitionRecords");
+        this.wordRecognitionRecords = this.table("wordRecognitionRecords");
+        this.pronunciationRecords = this.table("pronunciationRecords");
         this.createdSentences = this.table("createdSentences");
         this.customDocuments = this.table("customDocuments");
-
-
     }
 
     async getCardsInDatabaseCount(): Promise<number> {
@@ -68,15 +68,14 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async* getRecognitionRowsFromDB(): AsyncGenerator<WordRecognitionRow[]> {
+    async* getWordRecordsGenerator<T extends {word: string}>(table: Dexie.Table<T>): AsyncGenerator<T[]> {
         let offset = 0;
         const chunkSize = 500;
-        while (await this.recognitionRecords.offset(offset).first()) {
-            const chunkedRecognitionRows = await this.recognitionRecords.offset(offset).limit(chunkSize).toArray();
+        while (await table.offset(offset).first()) {
+            const chunkedRecognitionRows = await table.offset(offset).limit(chunkSize).toArray();
             chunkedRecognitionRows.forEach(r => r.word = r.word.normalize())
             yield chunkedRecognitionRows;
             offset += chunkSize;
         }
     }
-
 }

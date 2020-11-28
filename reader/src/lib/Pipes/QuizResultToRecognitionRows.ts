@@ -1,9 +1,9 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {ScheduleRow} from "../ReactiveClasses/ScheduleRow";
 import {QuizResult} from "../Manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
 import {SRM} from "../Scheduling/SRM";
+import {ScheduleRow} from "../ReactiveClasses/schedule-row.interface";
 
 export const QuizResultToRecognitionRows =
     (

@@ -2,8 +2,8 @@ import {HSKLevel, HSKWord, ProgressManager} from "../ProgressManager";
 import {ScheduleManager} from "../ScheduleManager";
 import HSK1 from '../../HSK/hsk-level-1.json';
 import {map} from "rxjs/operators";
-import {ScheduleRow} from "../../ReactiveClasses/ScheduleRow";
 import {Dictionary} from "lodash";
+import {ScheduleRow} from "../../ReactiveClasses/schedule-row.interface";
 
 export function ScheduleProgress(s: ScheduleManager, p: ProgressManager) {
 /*

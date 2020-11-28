@@ -1,4 +1,4 @@
-import {WordRecognitionRow} from "./WordRecognitionRow";
+import {RecognitionRowService} from "./WordRecognitionRow";
 import moment from "moment";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -17,7 +17,7 @@ export interface Ret {
     nextDueDate: Date
 }
 
-export class SRM {
+export class SrmService {
     constructor(
         public intervals = [
             1 * DAY_IN_MILLISECONDS,
@@ -29,7 +29,7 @@ export class SRM {
         public scoreToProgressChange = [-3, -1, 1]
     ) {
     }
-    private static getProgressScore(rows: WordRecognitionRow[]): number {
+    private static getProgressScore(rows: RecognitionRowService[]): number {
         return rows[rows.length - 1]?.recognitionScore || 0;
     }
 
@@ -40,7 +40,7 @@ export class SRM {
         return this.scoreToProgressChange.length - 1;
     }
     getNextRecognitionRecord(
-        previousRows: WordRecognitionRow[],
+        previousRows: RecognitionRowService[],
         score: number,
         now: Date
     ): Ret {
@@ -48,7 +48,7 @@ export class SRM {
         if (score > (this.scoreToProgressChange.length - 1)) {
             throw new Error(`Invalid recognition score ${score}`)
         }
-        const previousProgress = SRM.getProgressScore(previousRows);
+        const previousProgress = SrmService.getProgressScore(previousRows);
         const newProgress = previousProgress + this.scoreToProgressChange[score];
         const FiveMinutes = 1000 * 60 * 4;
         const OneMinute = 1000 * 60 * 1;
