@@ -1,8 +1,8 @@
-import {DatabaseService} from "../lib/Storage/database.service";
 import {map, shareReplay} from "rxjs/operators";
-import {HotKeyEvents, Hotkeys} from "../lib/HotKeyEvents";
+import {HotKeyEvents} from "../lib/HotKeyEvents";
 import {Observable, Subject} from "rxjs";
 import {SettingsService} from "./settings.service";
+import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 
 export class HotkeysService {
     public hotkeysWithDefaults$: Observable<Hotkeys<string[]>>;

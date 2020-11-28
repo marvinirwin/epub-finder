@@ -17,7 +17,7 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
     }) {
         super({
             highlighterService,
-            rows$: pronunciationProgressService.wordRecognitionRecords$,
+            rows$: pronunciationProgressService.records$,
             getHighlightDelta: pronunciationRows => {
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in pronunciationRows) {
@@ -32,7 +32,7 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
                                 break;
                             }
                         }
-                        highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, correct * 25, 100)))
+                        highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, 1, correct / 10)))
                     }
                 }
                 return highlights;

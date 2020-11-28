@@ -8,6 +8,7 @@ import React from "react";
 import {PlayArrow} from "@material-ui/icons";
 import {useObservableState} from "observable-hooks";
 import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
+import {removePunctuation} from "../../lib/Highlighting/temporary-highlight.service";
 
 export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMenuNode> } => {
 
@@ -50,16 +51,23 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
                             m.modesService.mode$.next(Modes.HIGHLIGHT);
                         }, "Highlight words", <HighlightMode/>],
             */
-            ['Speaking', () => {
-                const recordRequest = new RecordRequest(``);
+            [
+                'Speaking', () => {
+                const recordRequest = new RecordRequest(`Try reading one of the sentences below`);
                 recordRequest.sentence.then(recognizedSentence => {
+                    const word = removePunctuation(recognizedSentence);
+                    m.pronunciationProgressService.addRecords$.next([{
+                        word: word,
+                        success: true
+                    }]);
                     // Add a highlight for each of these characters
-                    m.highlighter.createdCards$.next(recognizedSentence.split(' '));
+                    m.highlighter.createdCards$.next(word.split(' '));
                 })
-                m.audioManager.audioRecorder.recordRequest$.next(
-                    recordRequest
-                )
-            }, "Test Pronunciation", <SpeakMode/>]
+                m.audioManager.audioRecorder.recordRequest$.next(recordRequest)
+            },
+                "Test Pronunciation",
+                <SpeakMode/>
+            ]
         ].map(([name, action, label, LeftIcon]) => [
                 name, {
                     nodeLabel: name,

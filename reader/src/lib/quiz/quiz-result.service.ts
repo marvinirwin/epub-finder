@@ -9,7 +9,7 @@ export class QuizResultService {
         quizManager.quizResult$.pipe(
             QuizResultToRecognitionRows(scheduleManager.indexedScheduleRows$, srmService)
         ).subscribe(record => {
-            wordRecognitionProgressService.addWordRecognitionRecords$.next(record)
+            wordRecognitionProgressService.addRecords$.next(record)
         });
     }
 }

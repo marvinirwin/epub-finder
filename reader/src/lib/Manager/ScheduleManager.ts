@@ -68,7 +68,7 @@ export class ScheduleManager {
 
 
         this.indexedScheduleRows$ = combineLatest([
-            recognitionRecordsService.wordRecognitionRecords$.pipe(startWith({})),
+            recognitionRecordsService.records$.pipe(startWith({})),
             wordCounts$.pipe(startWith({}))
         ]).pipe(
             map(([wordRecognition, wordCounts]) => {

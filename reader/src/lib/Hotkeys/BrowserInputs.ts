@@ -4,8 +4,8 @@ import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {Hotkeys} from "../HotKeyEvents";
 import {HotkeyModes} from "./HotkeyModes";
+import {Hotkeys} from "./hotkeys.interface";
 
 
 export function isDocument(t: HTMLElement | Document): t is Document {

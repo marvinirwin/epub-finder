@@ -42,7 +42,7 @@ import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Highlighting/Highlighter";
 import {Library} from "./Manager/Library";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
-import {HotKeyEvents, Hotkeys} from "./HotKeyEvents";
+import {HotKeyEvents} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
@@ -64,6 +64,9 @@ import {PronunciationProgressService} from "./schedule/pronunciation-progress.se
 import {QuizResultService} from "./quiz/quiz-result.service";
 import {HighlightPronunciationDifficultyService} from "./Highlighting/highlight-pronunciation-difficulty.service";
 import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-recollection-difficulty.service";
+import {Hotkeys} from "./Hotkeys/hotkeys.interface";
+import {TestHotkeysService} from "./Hotkeys/test-hotkeys.service";
+import {CardCreationService} from "./card/card-creation.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -204,7 +207,7 @@ export class Manager {
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
-            wordRecognitionRows$: this.wordRecognitionProgressService.wordRecognitionRecords$,
+            wordRecognitionRows$: this.wordRecognitionProgressService.records$,
             scheduleRows$: this.scheduleManager.indexedScheduleRows$
         });
         this.quizManager = new QuizManager({
@@ -440,6 +443,17 @@ export class Manager {
             wordRecognitionRowService: this.wordRecognitionProgressService,
             highlighterService: this.highlighterService
         });
+
+        new TestHotkeysService({
+            hotkeyEvents: this.hotkeyEvents,
+            pronunciationProgressService: this.pronunciationProgressService
+        });
+
+        new CardCreationService({
+            cardService: this.cardManager,
+            pronunciationProgressService: this.pronunciationProgressService,
+            wordRecognitionService: this.wordRecognitionProgressService
+        })
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',

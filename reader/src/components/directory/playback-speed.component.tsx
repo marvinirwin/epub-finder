@@ -10,10 +10,8 @@ export function PlaybackSpeedComponent() {
     const playbackRate = useObservableState(m.settingsService.playbackSpeed$)
     return <Slider
         value={playbackRate}
-        onChange={e => {
-            debugger;
-            // @ts-ignore
-            m.settingsService.playbackSpeed$.next(e.target.value);
+        onChange={(_, value) => {
+            m.settingsService.playbackSpeed$.next(value as number);
         }}
         step={.1}
         marks

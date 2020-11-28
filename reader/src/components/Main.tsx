@@ -2,11 +2,12 @@ import React, {useEffect} from "react";
 import {Manager} from "../lib/Manager";
 import {NavigationPages} from "../lib/Util/Util";
 import {useObservableState} from "observable-hooks";
-import {HotKeyEvents, Hotkeys} from "../lib/HotKeyEvents";
+import {HotKeyEvents} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "./directory/app-directory-service";
 import {AppContainer} from "./Containers/AppContainer";
 import {TreeMenuService} from "../services/tree-menu.service";
 import {Subject} from "rxjs";
+import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 
 
 

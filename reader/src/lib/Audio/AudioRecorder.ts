@@ -25,7 +25,6 @@ export class AudioRecorder {
             }),
             withLatestFrom(this.isRecording$.pipe(startWith(false)))
         ).subscribe(([, isRecording]) => {
-            debugger;
             if (!isRecording) {
                 this.recentlyRecorded$.next(false);
             }
@@ -48,6 +47,7 @@ export class AudioRecorder {
                 );
             })
         ).subscribe(async ([result, request]: [string | RecordRequest, RecordRequest]) => {
+            debugger;
             request.recording$.next(false);
             if (typeof result === 'object') {
                 request.rejectSentence(new Error("Audio recording not completed"))

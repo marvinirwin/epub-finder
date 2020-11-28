@@ -6,8 +6,8 @@ import {orderBy} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
 
 export class ProgressRowService<T extends {word: string, id?: number}> {
-    wordRecognitionRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
-    addWordRecognitionRecords$: Subject<T[]> = new Subject<T[]>();
+    records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
+    addRecords$: Subject<T[]> = new Subject<T[]>();
     constructor({
                     db,
         load, add
@@ -16,15 +16,15 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
         load: () => AsyncGenerator<T[]>,
         add: (t: T) => Promise<number>
     }) {
-        this.addWordRecognitionRecords$.pipe(
+        this.addRecords$.pipe(
             filter(rows => !!rows.length),
-            withLatestFrom(this.wordRecognitionRecords$.pipe(startWith({}))),
+            withLatestFrom(this.records$.pipe(startWith({}))),
             tap(([rows, wordRecognitionRecords]: [T[], ds_Dict<T[]>]) => {
                 rows.forEach(row => {
                     safePush(wordRecognitionRecords, row.word, row);
                     wordRecognitionRecords[row.word] = orderBy(wordRecognitionRecords[row.word], 'timestamp');
                 });
-                this.wordRecognitionRecords$.next(wordRecognitionRecords);
+                this.records$.next(wordRecognitionRecords);
             }),
         ).subscribe((([rows]) => {
             for (let i = 0; i < rows.length; i++) {
@@ -40,7 +40,7 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
     private async loadGenerator(load: () => AsyncGenerator<T[]>) {
         const generator = load();
         for await (const rowChunk of generator) {
-            this.addWordRecognitionRecords$.next(rowChunk);
+            this.addRecords$.next(rowChunk);
         }
     }
 }

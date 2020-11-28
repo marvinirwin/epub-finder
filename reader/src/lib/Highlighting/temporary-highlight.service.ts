@@ -6,6 +6,13 @@ import CardService from "../Manager/CardService";
 import {sleep} from "../Util/Util";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
+export function removePunctuation(withPunctuation: string) {
+    const word = withPunctuation.split('').filter(c => {
+        return isChineseCharacter(c) && !punctuation.has(c);
+    }).join('');
+    return word;
+}
+
 export class TemporaryHighlightService {
     private temporaryHighlightRequests$ = new ReplaySubject<{ word: string, color: RGBA, duration: number }>(1)
     private cardService: CardService;
@@ -39,9 +46,7 @@ export class TemporaryHighlightService {
     }
 
     public async highlightTemporaryWord(withPunctuation: string, color: RGBA, duration: number) {
-        const word = withPunctuation.split('').filter(c => {
-            return isChineseCharacter(c) && !punctuation.has(c);
-        }).join('');
+        const word = removePunctuation(withPunctuation);
         this.cardService.putWords$.next([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);

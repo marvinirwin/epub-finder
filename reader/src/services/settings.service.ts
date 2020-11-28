@@ -1,7 +1,7 @@
 import {DatabaseService} from "../lib/Storage/database.service";
 import {BehaviorSubject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
-import {Hotkeys} from "../lib/HotKeyEvents";
+import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 
 export class SettingsService {
     private settingsListeners: { [setting: string]: BehaviorSubject<any> } = {};

@@ -6,7 +6,6 @@ import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {boundedPoints} from "./math.module";
 import {useVideoTime} from "./useVideoTime";
-import {useVideoMetaData} from "./useVideoMetaData";
 import {useInterval} from "./useInterval";
 import {useSetVideoTime} from "./useSetVideoTime";
 import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
@@ -24,6 +23,7 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     const [hidden, setHidden] = useState(true);
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
     const editing = editingIndex !== undefined && editingIndex >= 0;
+
 
     useEffect(() => {
         if (editing && replayDragInProgress) {
@@ -45,12 +45,16 @@ export const PronunciationVideo: React.FunctionComponent<{ m: Manager }> = ({m})
     useSubscription(
         m.pronunciationVideoService.distinctSetVideoPlaybackTime$,
         currentTime => {
-            console.log(currentTime);
             if (videoElementRef) {
                 videoElementRef.currentTime = currentTime / 1000;
             }
         });
     useSubscription(m.hotkeyEvents.hideVideo$, () => setHidden(true));
+    useSubscription(m.settingsService.playbackSpeed$, speed => {
+        if (videoElementRef) {
+            videoElementRef.playbackRate = speed;
+        }
+    })
 
     useInterval(() => {
         if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {

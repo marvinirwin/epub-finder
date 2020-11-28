@@ -48,25 +48,24 @@ export default class CardService {
         this.cardIndex$ = merge(
             this.addPersistedCards$.pipe(map(addCards => [addCards, []])),
             this.deleteWords.pipe(map(deleteCards => [[], deleteCards]))
-        )
-            .pipe(
-                // @ts-ignore
-                startWith([[], []]),
-                scan((cardIndex: Dictionary<ICard[]>, [newCards, cardsToDelete]: [ICard[], string[]]) => {
-                    t.removeWords(...cardsToDelete);
-                    t.addWords(...Object.values(newCards).map(card => card.learningLanguage))
-                    // TODO I think this is wrong because technically we can have more than 1 card per word
-                    // But its a hack that works for now
-                    cardsToDelete.forEach(cardToDelete => delete cardIndex[cardToDelete])
-                    // TODO I dont think we need to shallow clone here
-                    const newCardIndex = {...cardIndex};
-                    newCards.forEach(newICard => {
-                        CardService.mergeCardIntoCardDict(newICard, newCardIndex);
-                    });
-                    return newCardIndex;
-                }, {}),
-                shareReplay(1)
-            );
+        ).pipe(
+            // @ts-ignore
+            startWith([[], []]),
+            scan((cardIndex: Dictionary<ICard[]>, [newCards, cardsToDelete]: [ICard[], string[]]) => {
+                t.removeWords(...cardsToDelete);
+                t.addWords(...Object.values(newCards).map(card => card.learningLanguage))
+                // TODO I think this is wrong because technically we can have more than 1 card per word
+                // But its a hack that works for now
+                cardsToDelete.forEach(cardToDelete => delete cardIndex[cardToDelete])
+                // TODO I dont think we need to shallow clone here
+                const newCardIndex = {...cardIndex};
+                newCards.forEach(newICard => {
+                    CardService.mergeCardIntoCardDict(newICard, newCardIndex);
+                });
+                return newCardIndex;
+            }, {}),
+            shareReplay(1)
+        );
         this.addUnpersistedCards$.pipe(
             map((cards) => {
                 for (let i = 0; i < cards.length; i++) {

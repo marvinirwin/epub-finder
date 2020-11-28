@@ -18,7 +18,7 @@ export class HighlightRecollectionDifficultyService extends HighlightDifficultyS
     }) {
         super({
             highlighterService,
-            rows$: wordRecognitionRowService.wordRecognitionRecords$,
+            rows$: wordRecognitionRowService.records$,
             getHighlightDelta: wordRecognitionRows => {
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in wordRecognitionRows) {
@@ -33,7 +33,10 @@ export class HighlightRecollectionDifficultyService extends HighlightDifficultyS
                                 break;
                             }
                         }
-                        highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, correct * 25, 100)))
+                        highlights.set(
+                            word,
+                            colorForPercentage(HighlightDifficultyService.clamp(0.001, correct * 25, 100))
+                        )
                     }
                 }
                 return highlights;

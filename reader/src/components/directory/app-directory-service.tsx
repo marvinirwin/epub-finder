@@ -10,7 +10,9 @@ import {orderBy} from "lodash";
 import { SentenceMetadata } from "../../services/video-metadata.service";
 import {ModeDirectory} from "./mode-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
-import {HotkeyDirectoryService} from "./hotkey-directory.service";
+import {EditableHotkeys, HotkeyDirectoryService} from "./hotkey-directory.service";
+import {PlaybackSpeedComponent} from "./playback-speed.component";
+import {HotKeyEvents} from "../../lib/HotKeyEvents";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -79,6 +81,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
 */
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
                 hotkeys: HotkeyDirectoryService(m),
+                playbackSpeed: {
+                    nodeLabel: 'playbackSpeed',
+                    value: {
+                        name: 'playbackSpeed',
+                        label: 'playbackSpeed',
+                        InlineComponent: () => <PlaybackSpeedComponent/>
+                    },
+                }
             };
             if (DEVELOPER_MODE) {
                 rootTree.children.AllSentences = constructTree(

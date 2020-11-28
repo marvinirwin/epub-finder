@@ -2,7 +2,6 @@ import {AtomizedDocument} from "../../lib/Atomized/AtomizedDocument";
 import {readFileSync} from "fs-extra";
 import {join} from "path";
 import {Dictionary} from "lodash";
-import {RecognitionMap} from "../../lib/Scheduling/SRM";
 import {QuizManager, QuizResult} from "../../lib/Manager/QuizManager";
 import {RunHelpers} from "rxjs/internal/testing/TestScheduler";
 import {Observable, PartialObserver, Subject} from "rxjs";
@@ -11,6 +10,7 @@ import CardService from "../../lib/Manager/CardService";
 import {DatabaseService} from "../../lib/Storage/database.service";
 import {ScheduleQuiz} from "../../lib/Manager/ManagerConnections/Schedule-Quiz";
 import {CardScheduleQuiz} from "../../lib/Manager/ManagerConnections/Card-Schedule-Quiz";
+import {RecognitionMap} from "../../lib/srm/srm.service";
 
 export type ObsValuePair<T> = [Observable<T>, T];
 

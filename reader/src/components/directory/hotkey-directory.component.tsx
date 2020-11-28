@@ -1,8 +1,9 @@
 import {useObservableState} from "observable-hooks";
-import {HotKeyEvents, Hotkeys} from "../../lib/HotKeyEvents";
+import {HotKeyEvents} from "../../lib/HotKeyEvents";
 import {EditableHotkeyComponent} from "../Hotkeys/editable-hotkey.component";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../App";
+import {Hotkeys} from "../../lib/Hotkeys/hotkeys.interface";
 
 export const HotkeyDirectoryComponent = ({action}: {action: keyof Hotkeys<any>}) => {
     const m = useContext(ManagerContext);

@@ -1,10 +1,11 @@
-import {HotKeyEvents, Hotkeys} from "../../lib/HotKeyEvents";
+import {HotKeyEvents} from "../../lib/HotKeyEvents";
 import {Manager} from "../../lib/Manager";
 import React, {useContext} from "react";
 import {orderBy} from "lodash";
 import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
 import {HotkeyDirectoryComponent} from "./hotkey-directory.component";
+import {Hotkeys} from "../../lib/Hotkeys/hotkeys.interface";
 
 
 const hotkeyMenuNodeFactory = (

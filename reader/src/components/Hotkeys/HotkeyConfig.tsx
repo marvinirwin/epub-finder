@@ -1,8 +1,8 @@
-import {Hotkeys} from "../../lib/HotKeyEvents";
 import {Manager} from "../../lib/Manager";
 import {orderBy} from "lodash";
 import {EditableHotkeyComponent} from "./editable-hotkey.component";
 import React from "react";
+import {Hotkeys} from "../../lib/Hotkeys/hotkeys.interface";
 
 export function HotkeyConfig({hotkeyConfig, m}: { hotkeyConfig: Partial<Hotkeys<string[]>>, m: Manager }) {
     return <div>

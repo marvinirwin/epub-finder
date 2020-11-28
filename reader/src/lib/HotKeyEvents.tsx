@@ -1,34 +1,51 @@
 import {Manager} from "./Manager";
 import {of, Subject} from "rxjs";
-import { switchMap, withLatestFrom} from "rxjs/operators";
+import {switchMap, withLatestFrom} from "rxjs/operators";
 import {RecognitionMap} from "./srm/srm.service";
-
-export interface Hotkeys<T> {
-    OPEN_IMAGE_SEARCH: T,
-    HIDE: T,
-    MARK_AS_KNOWN: T,
-    DELETE_CARD: T,
-    QUIZ_RESULT_EASY: T,
-    QUIZ_RESULT_MEDIUM: T,
-    QUIZ_RESULT_HARD: T,
-    RECORD_QUIZ_WORD: T,
-    REQUEST_EDIT_WORD: T,
-    ADVANCE_QUIZ: T,
-    HIDE_VIDEO: T
-}
+import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 
 export class HotKeyEvents {
-    public openImageSearch$ = new Subject<void>();
-    public hide$ = new Subject<void>();
-    public markAsKnown$ = new Subject<void>();
-    public deleteCard$ = new Subject<void>();
-    public quizResultEasy$ = new Subject<void>();
-    public quizResultMedium$ = new Subject<void>();
-    public recordQuizWord$ = new Subject<void>();
-    public quizResultHard$ = new Subject<void>();
-    public requestEditQuizWord$ = new Subject<void>();
-    public advanceQuiz$ = new Subject<void>();
-    public hideVideo$ = new Subject<void>();
+
+    public get openImageSearch$() {
+        return this.subjects["OPEN_IMAGE_SEARCH"];
+    }
+    public get hide$() {
+        return this.subjects["HIDE"];
+    }
+    public get deleteCard$() {
+        return this.subjects["DELETE_CARD"];
+    }
+
+    public get quizResultEasy$() {
+        return this.subjects["QUIZ_RESULT_EASY"];
+    }
+    public get quizResultMedium$() {
+        return this.subjects["QUIZ_RESULT_MEDIUM"];
+    }
+    public get recordQuizWord$() {
+        return this.subjects["RECORD_QUIZ_WORD"];
+    }
+    public get quizResultHard$() {
+        return this.subjects["QUIZ_RESULT_HARD"];
+    }
+    public get requestEditQuizWord$() {
+        return this.subjects["REQUEST_EDIT_WORD"];
+    }
+    public get advanceQuiz$() {
+        return this.subjects["ADVANCE_QUIZ"];
+    }
+    public get hideVideo$() {
+        return this.subjects["HIDE_VIDEO"];
+    }
+    public get pronunciationRecordSuccess$() {
+        return this.subjects["PRONUNCIATION_RECORD_SUCCESS"];
+    }
+
+    public subjects: Hotkeys<Subject<void>> = Object.fromEntries(
+        Object.keys(HotKeyEvents.defaultHotkeys())
+            .map(action => [action, new Subject<void>()])
+    ) as unknown as Hotkeys<Subject<void>>
+
 
     constructor(public m: Manager) {
     }
@@ -110,19 +127,7 @@ export class HotKeyEvents {
     }
 
     public hotkeyActions(): Hotkeys<Subject<void>> {
-        return {
-            OPEN_IMAGE_SEARCH: this.openImageSearch$,
-            HIDE: this.hide$,
-            MARK_AS_KNOWN: this.markAsKnown$,
-            DELETE_CARD: this.deleteCard$,
-            QUIZ_RESULT_EASY: this.quizResultEasy$,
-            QUIZ_RESULT_MEDIUM: this.quizResultMedium$,
-            QUIZ_RESULT_HARD: this.quizResultHard$,
-            ADVANCE_QUIZ: this.advanceQuiz$,
-            RECORD_QUIZ_WORD: this.recordQuizWord$,
-            REQUEST_EDIT_WORD: this.requestEditQuizWord$,
-            HIDE_VIDEO: this.hideVideo$
-        }
+        return this.subjects;
     }
     public static defaultHotkeys(): Hotkeys<string[]> {
         return {
@@ -136,7 +141,8 @@ export class HotKeyEvents {
             ADVANCE_QUIZ: ['Space'],
             RECORD_QUIZ_WORD: ['r'],
             REQUEST_EDIT_WORD: ['e'],
-            HIDE_VIDEO: ['v']
+            HIDE_VIDEO: ['v'],
+            PRONUNCIATION_RECORD_SUCCESS: ['p']
         }
     }
 }
