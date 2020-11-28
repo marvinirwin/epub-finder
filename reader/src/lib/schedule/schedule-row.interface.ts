@@ -1,5 +1,5 @@
 import {BookWordCount} from "../Interfaces/BookWordCount";
-import {WordRecognitionRow} from "../Scheduling/WordRecognitionRow";
+import {WordRecognitionRow} from "./word-recognition-row";
 
 export interface ScheduleRow {
     wordCountRecords: BookWordCount[];

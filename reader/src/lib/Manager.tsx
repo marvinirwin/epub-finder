@@ -27,7 +27,6 @@ import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import EditingCardManager from "./Manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
-import {ScheduleProgress} from "./Manager/ManagerConnections/Schedule-Progress";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
@@ -60,8 +59,11 @@ import {SettingsService} from "../services/settings.service";
 import {HotkeysService} from "../services/hotkeys.service";
 import {VisibleSentencesService} from "../services/visible-sentences.service";
 import {HighlightPronunciationVideoService} from "../services/highlight-pronunciation-video.service";
-import {RecognitionProgressService} from "./schedule/recognition-progress.service";
+import {WordRecognitionProgressService} from "./schedule/word-recognition-progress.service";
 import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
+import {QuizResultService} from "./quiz/quiz-result.service";
+import {HighlightPronunciationDifficultyService} from "./Highlighting/highlight-pronunciation-difficulty.service";
+import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-recollection-difficulty.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -103,7 +105,7 @@ export class Manager {
     public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
     public pronunciationProgressService: PronunciationProgressService;
-    public wordRecognitionProgressService: RecognitionProgressService;
+    public wordRecognitionProgressService: WordRecognitionProgressService;
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
@@ -190,7 +192,7 @@ export class Manager {
         this.readingWordCounts$ = bookWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
         this.pronunciationProgressService = new PronunciationProgressService({db});
-        this.wordRecognitionProgressService = new RecognitionProgressService({db});
+        this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
         this.scheduleManager = new ScheduleManager({
                 db,
                 wordCounts$: this.readingWordCounts$,
@@ -214,6 +216,13 @@ export class Manager {
                 }
             },
         );
+
+        new QuizResultService({
+            srmService: this.scheduleManager.srmService,
+            quizManager: this.quizManager,
+            wordRecognitionProgressService: this.wordRecognitionProgressService,
+            scheduleManager: this.scheduleManager
+        })
 
 
         combineLatest([
@@ -283,7 +292,6 @@ export class Manager {
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardManager, this.openedBooks, this.editingCardManager, this.cardDBManager, this.audioManager)
-        ScheduleProgress(this.scheduleManager, this.progressManager);
 
         merge(
             this.openedBooks.renderedAtomizedSentences$,
@@ -423,6 +431,15 @@ export class Manager {
         this.editingVideoMetadataService = new EditingVideoMetadataService({
             pronunciationVideoService: this.pronunciationVideoService
         })
+
+        new HighlightPronunciationDifficultyService({
+            pronunciationProgressService: this.pronunciationProgressService,
+            highlighterService: this.highlighterService
+        });
+        new HighlightRecollectionDifficultyService({
+            wordRecognitionRowService: this.wordRecognitionProgressService,
+            highlighterService: this.highlighterService
+        });
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',

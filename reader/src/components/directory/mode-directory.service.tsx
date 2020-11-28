@@ -59,7 +59,7 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
                 m.audioManager.audioRecorder.recordRequest$.next(
                     recordRequest
                 )
-            }, "Speak", <SpeakMode/>]
+            }, "Test Pronunciation", <SpeakMode/>]
         ].map(([name, action, label, LeftIcon]) => [
                 name, {
                     nodeLabel: name,

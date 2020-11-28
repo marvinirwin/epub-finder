@@ -31,7 +31,6 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
                 const row = rows[i];
                 if (!row.id) {
                     add(row).then(id => row.id = id)
-                    db.wordRecognitionRecords.add(row).then(id => row.id = id);
                 }
             }
         }));

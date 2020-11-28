@@ -45,7 +45,7 @@ export class ScheduleManager {
 
     private today: number;
     private yesterday: number;
-    spacedRepitionManager: SrmService;
+    srmService: SrmService;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
     private db: DatabaseService;
@@ -64,7 +64,7 @@ export class ScheduleManager {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
-        this.spacedRepitionManager = new SrmService();
+        this.srmService = new SrmService();
 
 
         this.indexedScheduleRows$ = combineLatest([

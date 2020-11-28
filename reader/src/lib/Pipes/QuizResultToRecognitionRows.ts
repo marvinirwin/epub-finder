@@ -2,13 +2,13 @@ import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
 import {QuizResult} from "../Manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
-import {SRM} from "../Scheduling/SRM";
-import {ScheduleRow} from "../ReactiveClasses/schedule-row.interface";
+import {SrmService} from "../srm/srm.service";
+import {ScheduleRow} from "../schedule/schedule-row.interface";
 
 export const QuizResultToRecognitionRows =
     (
         scheduleRows$: Observable<Dictionary<ScheduleRow>>,
-        ms: SRM
+        ms: SrmService
     ) =>
         (obs$: Observable<QuizResult>) =>
             obs$.pipe(

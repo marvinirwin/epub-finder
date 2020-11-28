@@ -1,43 +1,28 @@
-import {CORRECT_RECOGNITION_SCORE, Highlighter} from "./Highlighter";
-import {ScheduleManager} from "../Manager/ScheduleManager";
 import {map} from "rxjs/operators";
 import {HighlightDelta} from "./highlight.interface";
-import {RGBA} from "./color.service";
-import {colorForPercentage} from "../color/Range";
-import {HighlighterService} from "./highlighter.service";
+import {HighlighterPath, HighlighterService} from "./highlighter.service";
+import {Observable} from "rxjs";
 
-export class HighlightDifficultyService {
+const highlightPath: HighlighterPath = [2, 'DIFFICULTY_HIGHLIGHT'];
+
+export class HighlightDifficultyService<T> {
     constructor(
         {
             highlighterService,
-            scheduleManager
+            getHighlightDelta,
+            rows$,
+            highlightPath
         }: {
             highlighterService: HighlighterService,
-            scheduleManager: ScheduleManager
+            rows$: Observable<T>,
+            getHighlightDelta: (t: T) => HighlightDelta,
+            highlightPath: HighlighterPath
         }) {
 
         highlighterService.singleHighlight(
-            scheduleManager.indexedScheduleRows$.pipe(map(indexedScheduleRows => {
-                const highlights: HighlightDelta = new Map<string, RGBA>();
-                for (const word in indexedScheduleRows) {
-                    const row = indexedScheduleRows[word];
-                    if (row.wordRecognitionRecords.length) {
-                        let correct = 0;
-                        for (let i = row.wordRecognitionRecords.length - 1; i >= 0; i--) {
-                            const wordRecognitionRecord = row.wordRecognitionRecords[i];
-                            if (wordRecognitionRecord.recognitionScore >= CORRECT_RECOGNITION_SCORE) {
-                                correct++;
-                            } else {
-                                break;
-                            }
-                        }
-                        highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, correct * 25, 100)))
-                    }
-                }
-                return highlights;
-            })),
+            rows$.pipe(map(getHighlightDelta)),
             highlighterService.highlightMap$,
-            [2, 'DIFFICULTY_HIGHLIGHT']
+            highlightPath
         );
         const now = new Date();
         function getDatePercentage(d: Date): number {
@@ -51,7 +36,8 @@ export class HighlightDifficultyService {
             return percentage;
         }
     };
-    private static clamp(min: number, max: number, v: number) {
+
+    static clamp(min: number, max: number, v: number) {
         if (v < min) return min;
         if (v > max) return max;
         return v;
