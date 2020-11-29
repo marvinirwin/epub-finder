@@ -8,6 +8,8 @@ import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
+const urlParams = new URLSearchParams(window.location.search);
+
 window.addEventListener("unhandledrejection", event => {
     console.warn(`UNHANDLED PROMISE REJECTION: ${event.reason}`);
     event.preventDefault();
@@ -36,9 +38,6 @@ const darkTheme = createMuiTheme({
     }
 });
 darkTheme.spacing(2);
-
-const urlParams = new URLSearchParams(window.location.search);
-urlParams.get('mode');
 
 const manager = getManager(urlParams.get('mode') || 'test')
 export const ManagerContext = React.createContext(manager)

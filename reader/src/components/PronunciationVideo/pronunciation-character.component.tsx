@@ -3,6 +3,10 @@ import {VideoCharacter} from "./video-character.interface";
 import {percentagePosition} from "./math.module";
 import {ManagerContext} from "../../App";
 
+const urlParams = new URLSearchParams(window.location.search);
+
+
+const editMode = !!urlParams.get('edit')
 export const PronunciationTimingCharacterComponent: React.FC<{
     editingIndex: number | undefined,
     index: number,
@@ -21,17 +25,17 @@ export const PronunciationTimingCharacterComponent: React.FC<{
      }) => {
     const manager = useContext(ManagerContext);
         return <mark
-            className={`character-timing-mark ${editingIndex === index ? "editing-character" : ""}`}
+            className={`character-timing-mark ${editingIndex === index ? "editing-character" : ""} ${editMode ? 'edit-mode' : ''}`}
             style={
                 {
                     left: `${percentagePosition(sectionDuration, videoCharacter.timestamp * timeScale)}%`,
                 }
             }
-            onClick={(ev: React.MouseEvent<HTMLElement>) => onClick(ev)}
+            onClick={(ev: React.MouseEvent<HTMLElement>) => editMode && onClick(ev)}
             onDragStart={() =>
-                manager.editingVideoMetadataService.editingCharacterIndex$.next(index)
+                editMode && manager.editingVideoMetadataService.editingCharacterIndex$.next(index)
             }
-            draggable
+            draggable={editMode}
 
         >{videoCharacter.character}
         </mark>;

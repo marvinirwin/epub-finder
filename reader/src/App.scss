@@ -379,9 +379,13 @@ $character-timing-section-padding: 24px;
 .character-timing-mark {
   transition: box-shadow .3s;
   bottom: 0;
+}
+
+.character-timing-mark.edit-mode {
   &.editing-character, &:hover {
-    box-shadow: 0 0 11px rgba(50,50,50,1);
+    box-shadow: 0 0 11px rgba(50, 50, 50, 1);
   }
+
   &:hover {
     cursor: pointer;
   }
