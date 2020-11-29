@@ -1,6 +1,6 @@
 import {combineLatest, fromEvent, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {fetchVideoMetadata, sha1} from "../../services/video.service";
-import {distinctUntilChanged, map, mapTo, switchMap} from "rxjs/operators";
+import {distinctUntilChanged, map, mapTo, shareReplay, switchMap} from "rxjs/operators";
 import {VideoMetadata} from "../../types";
 import Ciseaux, {Tape} from 'ciseaux/browser';
 
@@ -34,13 +34,14 @@ export class PronunciationVideoService {
                 }
             }
         )
-        this.distinctSetVideoPlaybackTime$ = this.setVideoPlaybackTime$.pipe(distinctUntilChanged());
+        this.distinctSetVideoPlaybackTime$ = this.setVideoPlaybackTime$.pipe(distinctUntilChanged(), shareReplay(1));
         this.tape$ = this.audioUrl$.pipe(
             switchMap(audioUrl => {
                     return Ciseaux.from(audioUrl)
                         .catch(e => console.warn(e));
                 }
-            )
+            ),
+            shareReplay(1)
         )
         this.chunkedAudioBuffers$ = combineLatest([
             this.tape$,
@@ -50,12 +51,13 @@ export class PronunciationVideoService {
                 if (!tape || !chunkSizeSeconds) return [];
                 const tapes = [];
                 let i = 0;
-                while (i < chunkSizeSeconds) {
+                while (i < tape.duration) {
                     tapes.push(tape.slice(i, i + chunkSizeSeconds))
                     i += chunkSizeSeconds;
                 }
                 return Promise.all(tapes.map(tape => tape.render()));
-            })
+            }),
+            shareReplay(1)
         )
     }
 }

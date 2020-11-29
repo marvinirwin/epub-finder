@@ -2,7 +2,7 @@ import {useEffect} from "react";
 import {VideoCharacter} from "./video-character.interface";
 import {VideoMetadata} from "../../types/";
 
-export function useSetTemporalPositionBar(
+export function useApplyTimeBySelectedCharacter(
     videoElementRef: HTMLVideoElement | null | undefined,
     currentSentence: string | undefined,
     currentSentenceCharacterIndex: number | undefined,

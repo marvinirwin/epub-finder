@@ -2,10 +2,10 @@ import {Card} from "@material-ui/core";
 import React, {useContext, useState} from "react";
 import {AudioRecorderResizedContext} from "../Main";
 import {ManagerContext} from "../../App";
-import {useRecordVideoTime} from "./useRecordVideoTime";
-import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
+import {useObserveVideoState} from "./useObserveVideoState";
+import {useApplyTimeBySelectedCharacter} from "./useApplyTimeBySelectedCharacter";
 import {useSetVideoTime} from "./useSetVideoTime";
-import {useRecordCurrentTime} from "./useRecordCurrentTime";
+import {useApplyBoundedTime} from "./useApplyBoundedTime";
 import {useApplyPlaybackSpeed} from "./useApplyPlaybackRate";
 import {useApplyPlaybackTime} from "./useApplyPlaybackTime";
 import {useObservableState} from "observable-hooks";
@@ -27,11 +27,11 @@ export const PronunciationVideo = (
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$)
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
 
-    useSetTemporalPositionBar(videoElementRef, videoMetadata?.sentence, currentSentenceCharacterIndex, videoMetadata);
-    useSetVideoTime(videoElementRef);
-    useRecordCurrentTime(videoElementRef, highlightBarPosition1Ms, highlightBarPosition2Ms)
+    useApplyTimeBySelectedCharacter(videoElementRef, videoMetadata?.sentence, currentSentenceCharacterIndex, videoMetadata);
+    useApplyBoundedTime(videoElementRef, highlightBarPosition1Ms, highlightBarPosition2Ms)
     useApplyPlaybackSpeed(videoElementRef);
     useApplyPlaybackTime(videoElementRef);
+    useObserveVideoState(videoElementRef, m.pronunciationVideoService)
 
     const videoSource = videoMetadata ?
         `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}`

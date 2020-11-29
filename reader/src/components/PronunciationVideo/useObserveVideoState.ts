@@ -1,7 +1,7 @@
 import {useInterval} from "./useInterval";
 import {PronunciationVideoService} from "./pronunciation-video.service";
 
-export const useRecordVideoTime = (
+export const useObserveVideoState = (
     videoElementRef: HTMLVideoElement | null | undefined,
     pronunciationVideoService: PronunciationVideoService
 ) => {

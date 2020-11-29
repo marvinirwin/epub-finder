@@ -90,10 +90,9 @@ export const CharacterTimingSection: React.FunctionComponent<{
 
     useEffect(() => {
         if (canvas && audioBuffer) {
-            debugger;
             canvas.width = canvas.parentElement?.clientWidth || 240;
             canvas.height = 50;
-            draw(normalizeData(filterData(audioBuffer, 100)), canvas)
+            draw(normalizeData(filterData(audioBuffer, 1000)), canvas)
         }
     }, [audioBuffer, canvas])
 
@@ -158,7 +157,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
             position={hoverBarPercentPosition ? hoverBarPercentPosition / 100 * sectionWidthPx : undefined}
             color={'blue'}/>
         <TemporalPositionBar
-            position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx * .9 : undefined}
+            position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx : undefined}
             color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
             {characterTimings.map((videoCharacter, index) =>

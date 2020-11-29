@@ -1,6 +1,6 @@
 import {useInterval} from "./useInterval";
 
-export const useRecordCurrentTime = (
+export const useApplyBoundedTime = (
     videoElementRef: HTMLVideoElement | undefined | null,
     highlightBarPosition1Ms: number | undefined,
     highlightBarPosition2Ms: number | undefined
