@@ -11,6 +11,7 @@
     "axios": "^0.19.2",
     "base64-arraybuffer": "^0.2.0",
     "beautiful-react-hooks": "^0.31.0",
+    "ciseaux": "^0.4.0",
     "collections": "^5.1.11",
     "dexie": "^3.0.1",
     "fontsource-noto-sans": "^2.1.3",

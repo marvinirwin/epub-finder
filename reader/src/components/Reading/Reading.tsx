@@ -1,11 +1,11 @@
 import React, {useContext, useState} from "react";
 import { Manager } from "../../lib/Manager";
 import {OpenedBook} from "../../lib/Atomized/OpenedBook";
-import { PronunciationVideo } from "../PronunciationVideo/PronunciationVideo";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
 import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
+import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
 
 export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
     const openedBook = m.openedBooks.readingBookService.readingBook;
@@ -16,7 +16,7 @@ export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
             <AudioRecorder m={m}/>
         </ExpandableContainer>
         <ExpandableContainer shouldShow={showPronunciationVideo} resizeObservable$={useContext(PronunciationVideoResizedContext)}>
-            <PronunciationVideo m={m}/>
+            <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
         <OpenedBook openedBook={openedBook}/>
     </div>

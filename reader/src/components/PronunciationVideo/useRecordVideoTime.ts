@@ -1,9 +1,7 @@
-import {useEffect, useState} from "react";
 import {useInterval} from "./useInterval";
 import {PronunciationVideoService} from "./pronunciation-video.service";
-import {useObservableState} from "observable-hooks";
 
-export const useVideoTime = (
+export const useRecordVideoTime = (
     videoElementRef: HTMLVideoElement | null | undefined,
     pronunciationVideoService: PronunciationVideoService
 ) => {
@@ -19,8 +17,4 @@ export const useVideoTime = (
         }
     }, 100);
 
-    const videoTime = useObservableState(pronunciationVideoService.videoPlaybackTime$);
-
-
-    return videoTime;
 }

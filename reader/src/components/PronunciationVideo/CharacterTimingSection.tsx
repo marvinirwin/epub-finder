@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
 import {TemporalPositionBar} from "./TemporalPositionBar";
 import {HighlightBar} from "./HighlightBar";
@@ -8,6 +8,8 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {PronunciationTimingCharacterComponent} from "./pronunciation-character.component";
 import {useDebouncedFn} from "beautiful-react-hooks";
 import {VideoMetadata} from "../../types/";
+import {draw} from "./draw-sine-wav";
+import {filterData, normalizeData} from "../../lib/Audio/AudioGraphing";
 
 export type Percentage = number;
 
@@ -24,7 +26,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
     onMouseOver: (n: Percentage) => void,
     onMouseUp: (n: Percentage) => void,
     sectionIndex: number,
-    characterIndexStart: number
+    characterIndexStart: number,
+    audioBuffer: AudioBuffer | undefined
 }> = ({
           characterTimings,
           videoMetaData,
@@ -37,9 +40,11 @@ export const CharacterTimingSection: React.FunctionComponent<{
           onMouseOver,
           onMouseUp,
           sectionWidthPx,
-        sectionIndex,
-    characterIndexStart
+          sectionIndex,
+          characterIndexStart,
+          audioBuffer
       }) => {
+    const [canvas, setCanvasRef] = useState<HTMLCanvasElement | null>();
     const [sectionContainer, setSectionContainer] = useState<HTMLDivElement | null>();
     const [hoverBarPercentPosition, setHoverBarPercentPosition] = useState<number | undefined>(undefined);
     const [highlightBar, setHighlightBar] = useState<HTMLDivElement | null>();
@@ -69,7 +74,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
     );
     const onDropOver = (dragClientX: number, containerLeft: number, containerWidth: number) => {
         if (editing) {
-            const positionFraction =  (dragClientX - containerLeft) / containerWidth;
+            const positionFraction = (dragClientX - containerLeft) / containerWidth;
             const newTimestamp = (positionFraction * sectionDurationMs) + sectionDurationMs * sectionIndex;
             manager.pronunciationVideoService.setVideoPlaybackTime$.next(newTimestamp);
             manager.editingVideoMetadataService.setCharacterTimestamp(
@@ -82,6 +87,10 @@ export const CharacterTimingSection: React.FunctionComponent<{
         }
     };
     const debouncedOnDropOver = useDebouncedFn(onDropOver, 250);
+
+    useEffect(() => {
+        canvas && audioBuffer && draw(normalizeData(filterData(audioBuffer, 100)), canvas)
+    }, [audioBuffer, canvas])
 
 
     return <div className={'character-timing-section-container'}
@@ -119,25 +128,26 @@ export const CharacterTimingSection: React.FunctionComponent<{
                 }}
                 onDragOver={ev => {
                     ev.dataTransfer.dropEffect = "move";
-/*
-                    if (sectionContainer && ev.clientX) {
-                        const bb = sectionContainer.getBoundingClientRect().x;
-                    }
-*/
+                    /*
+                                        if (sectionContainer && ev.clientX) {
+                                            const bb = sectionContainer.getBoundingClientRect().x;
+                                        }
+                    */
                     if (ev.clientX && sectionContainer?.clientWidth && sectionContainer.clientLeft) {
                         debouncedOnDropOver(ev.clientX, sectionContainer.getBoundingClientRect().x, sectionContainer.clientWidth)
                     }
                 }}
                 onDrop={(ev) => {
                     ev.preventDefault();
-/*
-                    if (ev.clientX && sectionContainer?.clientWidth && sectionContainer.clientLeft) {
-                        debouncedOnDropOver(ev.clientX, sectionContainer.clientLeft, sectionContainer.clientWidth)
-                    }
-*/
+                    /*
+                                        if (ev.clientX && sectionContainer?.clientWidth && sectionContainer.clientLeft) {
+                                            debouncedOnDropOver(ev.clientX, sectionContainer.clientLeft, sectionContainer.clientWidth)
+                                        }
+                    */
                 }}
 
     >
+        <canvas ref={setCanvasRef}/>
         <HighlightBar setHighlightBar={setHighlightBar}/>
         <TemporalPositionBar
             position={hoverBarPercentPosition ? hoverBarPercentPosition / 100 * sectionWidthPx : undefined}
@@ -147,17 +157,18 @@ export const CharacterTimingSection: React.FunctionComponent<{
             color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
             {characterTimings.map((videoCharacter, index) =>
-                <PronunciationTimingCharacterComponent key={index}
-                                                       editingIndex={editingIndex}
-                                                       index={index + characterIndexStart}
-                                                       sectionDuration={sectionDurationMs}
-                                                       videoCharacter={videoCharacter}
-                                                       timeScale={videoMetaData.timeScale}
-                                                       onClick={ev => {
-                                                           ev.preventDefault();
-                                                           ev.stopPropagation();
-                                                           manager.editingVideoMetadataService.editingCharacterIndex$.next(index + characterIndexStart);
-                                                       }}/>)}
+                <PronunciationTimingCharacterComponent
+                    key={index}
+                    editingIndex={editingIndex}
+                    index={index + characterIndexStart}
+                    sectionDuration={sectionDurationMs}
+                    videoCharacter={videoCharacter}
+                    timeScale={videoMetaData.timeScale}
+                    onClick={ev => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        manager.editingVideoMetadataService.editingCharacterIndex$.next(index + characterIndexStart);
+                    }}/>)}
         </div>
     </div>
 }

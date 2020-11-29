@@ -7,7 +7,7 @@ import {useObservableState} from "observable-hooks";
 
 export function PlaybackSpeedComponent() {
     const m = useContext(ManagerContext);
-    const playbackRate = useObservableState(m.settingsService.playbackSpeed$)
+    const playbackRate = useObservableState(m.settingsService.playbackSpeed$ || 0);
     return <Slider
         value={playbackRate}
         onChange={(_, value) => {

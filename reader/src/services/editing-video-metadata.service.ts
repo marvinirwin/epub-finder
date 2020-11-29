@@ -8,7 +8,10 @@ import {debounce} from 'lodash';
 import {VideoMetadataDto} from '@server/';
 
 export class EditingVideoMetadataService {
-    private debounceSaveMetadata: (metadata:VideoMetadataDto) => void;
+    public editingCharacterIndex$ = new ReplaySubject<number | undefined>(1);
+
+    private debounceSaveMetadata: (metadata: VideoMetadataDto) => void;
+
     private normaliseTimestamps(m: VideoMetadata): VideoMetadata {
         if (m.timeScale === 1) {
             return m;
@@ -22,8 +25,6 @@ export class EditingVideoMetadataService {
                 ({...character, timestamp: character.timestamp * previousTimescale}))
         }
     }
-
-    public editingCharacterIndex$ = new ReplaySubject<number | undefined>(1);
 
     private pronunciationVideoService: PronunciationVideoService;
 
@@ -41,7 +42,7 @@ export class EditingVideoMetadataService {
     public async moveCharacter(metadata: VideoMetadata, index: number, duration: number) {
         const normalised = this.normaliseTimestamps(metadata);
         const videoCharacter = normalised.characters[index];
-        videoCharacter.timestamp += (duration * normalised.timeScale) ;
+        videoCharacter.timestamp += (duration * normalised.timeScale);
         return normalised;
     }
 
@@ -50,7 +51,7 @@ export class EditingVideoMetadataService {
         const videoCharacter = normalised.characters[index];
         videoCharacter.timestamp = timestamp * normalised.timeScale;
         this.debounceSaveMetadata({
-            metadata: metadata,
+            metadata: normalised,
         });
         return normalised;
     }
