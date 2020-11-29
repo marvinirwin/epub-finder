@@ -22,6 +22,7 @@ const normalizeData = (filteredData: number[]) => {
 }
 
 export const draw = (normalizedData: number[], canvas: HTMLCanvasElement) => {
+    debugger;
     // set up the canvas
     const dpr = window.devicePixelRatio || 1;
     const padding = 20;

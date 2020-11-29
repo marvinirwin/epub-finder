@@ -2,7 +2,8 @@ import {combineLatest, fromEvent, Observable, of, ReplaySubject, Subject} from "
 import {fetchVideoMetadata, sha1} from "../../services/video.service";
 import {distinctUntilChanged, map, mapTo, switchMap} from "rxjs/operators";
 import {VideoMetadata} from "../../types";
-import Ciseaux, { Tape } from 'ciseaux/browser';
+import Ciseaux, {Tape} from 'ciseaux/browser';
+
 Ciseaux.context = new AudioContext();
 
 
@@ -19,25 +20,26 @@ export class PronunciationVideoService {
     public chunkSizeSeconds$ = new ReplaySubject<number | undefined>(1)
     public chunkedAudioBuffers$: Observable<AudioBuffer[]>
 
-    constructor( ) {
+    constructor() {
         this.videoSentence$.subscribe(async sentence => {
             this.videoMetadata$.next();
             if (sentence) {
                 this.videoMetadata$.next(await fetchVideoMetadata(sentence));
             }
         });
-        this.videoMetadata$.subscribe(v =>
-            {
+        this.videoMetadata$.subscribe(async v => {
                 if (v) {
-                    this.audioUrl$.next(`${process.env.PUBLIC_URL}/video/${v.audioFilename || `${sha1(v.sentence)}.wav`}`)
+                    const hash = await sha1(v.sentence);
+                    this.audioUrl$.next(`${process.env.PUBLIC_URL}/video/${ v.audioFilename || `${hash}.wav`} `)
                 }
             }
         )
         this.distinctSetVideoPlaybackTime$ = this.setVideoPlaybackTime$.pipe(distinctUntilChanged());
         this.tape$ = this.audioUrl$.pipe(
-            switchMap(audioUrl =>
-                Ciseaux.from(audioUrl)
-                    .catch(e => console.warn(e))
+            switchMap(audioUrl => {
+                    return Ciseaux.from(audioUrl)
+                        .catch(e => console.warn(e));
+                }
             )
         )
         this.chunkedAudioBuffers$ = combineLatest([
@@ -50,6 +52,7 @@ export class PronunciationVideoService {
                 let i = 0;
                 while (i < chunkSizeSeconds) {
                     tapes.push(tape.slice(i, i + chunkSizeSeconds))
+                    i += chunkSizeSeconds;
                 }
                 return Promise.all(tapes.map(tape => tape.render()));
             })

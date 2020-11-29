@@ -34,7 +34,7 @@ export const PronunciationVideo = (
     useApplyPlaybackTime(videoElementRef);
 
     const videoSource = videoMetadata ?
-        `${process.env.PUBLIC_URL}/video/${sha1(videoMetadata.sentence)}`
+        `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}`
         : undefined;
 
     return <video

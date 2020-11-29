@@ -89,10 +89,11 @@ export const CharacterTimingSection: React.FunctionComponent<{
     const debouncedOnDropOver = useDebouncedFn(onDropOver, 250);
 
     useEffect(() => {
-        if (canvas) {
+        if (canvas && audioBuffer) {
+            debugger;
             canvas.width = canvas.parentElement?.clientWidth || 240;
             canvas.height = 50;
-            audioBuffer && draw(normalizeData(filterData(audioBuffer, 100)), canvas)
+            draw(normalizeData(filterData(audioBuffer, 100)), canvas)
         }
     }, [audioBuffer, canvas])
 
