@@ -1,6 +1,6 @@
 import {ReplaySubject} from "rxjs";
 import {take} from "rxjs/operators";
-import {cloneDeep} from "lodash";
+import {cloneDeep, orderBy} from "lodash";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {VideoMetadata} from "../types/index";
 import axios from 'axios';
@@ -13,9 +13,6 @@ export class EditingVideoMetadataService {
     private debounceSaveMetadata: (metadata: VideoMetadataDto) => void;
 
     private normaliseTimestamps(m: VideoMetadata): VideoMetadata {
-        if (m.timeScale === 1) {
-            return m;
-        }
         const previousTimescale = m.timeScale;
         return {
             ...m,
@@ -39,17 +36,11 @@ export class EditingVideoMetadataService {
         this.debounceSaveMetadata = debounce(EditingVideoMetadataService.saveMetadata, 1000)
     }
 
-    public async moveCharacter(metadata: VideoMetadata, index: number, duration: number) {
-        const normalised = this.normaliseTimestamps(metadata);
-        const videoCharacter = normalised.characters[index];
-        videoCharacter.timestamp += (duration * normalised.timeScale);
-        return normalised;
-    }
-
     public async setCharacterTimestamp(metadata: VideoMetadata, index: number, timestamp: number) {
         const normalised = this.normaliseTimestamps(metadata);
         const videoCharacter = normalised.characters[index];
         videoCharacter.timestamp = timestamp * normalised.timeScale;
+        normalised.characters = orderBy(normalised.characters, 'timestamp')
         this.debounceSaveMetadata({
             metadata: normalised,
         });

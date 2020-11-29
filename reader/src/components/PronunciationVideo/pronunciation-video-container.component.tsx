@@ -15,6 +15,19 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
     const pronunciationSectionsContainer = useRef<HTMLDivElement>();
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
+    const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
+    const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
+    const chunkedAudioBuffers = useObservableState(m.pronunciationVideoService.chunkedAudioBuffers$, []);
+    const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
+    // @ts-ignore
+    const box = useResizeObserver(pronunciationSectionsContainer)
+    const sectionWidth = box?.width;
+    const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
+    const chunkedCharacterTimings = useChunkedCharacterTimings(
+        videoMetadata,
+        millisecondsPerSection
+    );
+
     const isEditing = editingIndex !== undefined && editingIndex >= 0;
 
     useEffect(() => {
@@ -25,24 +38,13 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         }
     }, [isEditing, replayDragInProgress])
 
-    // @ts-ignore
-    const box = useResizeObserver(pronunciationSectionsContainer)
-    const sectionWidth = box?.width;
-    const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
     useEffect(() => {
         m.pronunciationVideoService.chunkSizeSeconds$.next(
             millisecondsPerSection ? millisecondsPerSection / 1000 : undefined
         )
     }, [millisecondsPerSection]);
 
-    const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
-    const chunkedCharacterTimings = useChunkedCharacterTimings(
-        videoMetadata,
-        millisecondsPerSection
-    );
 
-    const chunkedAudioBuffers = useObservableState(m.pronunciationVideoService.chunkedAudioBuffers$, []);
-    const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
 
     const [highlightStartMs, highlightStopMs] = ((highlightBarPosition1Ms || 0) > (highlightBarPosition2Ms || 0)) ?
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
@@ -50,7 +52,6 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
 
     let characterCounter = 0;
 
-    const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
 
     return <Card className={'pronunciation-video-container-card'}>
         {/* @ts-ignore */}
