@@ -1,18 +1,10 @@
 import {Manager} from "../../lib/Manager";
-import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
-import {useObservableState, useSubscription} from "observable-hooks";
+import React, {useEffect, useState} from "react";
+import {useObservableState} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
-import {useChunkedAudioBuffer, useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
+import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {boundedPoints} from "./math.module";
-import {useRecordVideoTime} from "./useRecordVideoTime";
-import {useInterval} from "./useInterval";
-import {useSetVideoTime} from "./useSetVideoTime";
-import {useSetTemporalPositionBar} from "./useSetTemporalPositionbar";
-import {AudioRecorderResizedContext} from "../Main";
-import {useRecordCurrentTime} from "./useRecordCurrentTime";
-import {useApplyPlaybackTime} from "./useApplyPlaybackTime";
-import {useApplyPlaybackSpeed} from "./useApplyPlaybackRate";
 import {PronunciationVideo} from "./pronunciation-video.component";
 
 
@@ -34,6 +26,11 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
 
     const sectionWidth = pronunciationSectionsContainer?.clientWidth;
     const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
+    useEffect(() => {
+        m.pronunciationVideoService.chunkSizeSeconds$.next(
+            millisecondsPerSection ? millisecondsPerSection / 1000 : undefined
+        )
+    }, [millisecondsPerSection]);
 
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
     const chunkedCharacterTimings = useChunkedCharacterTimings(

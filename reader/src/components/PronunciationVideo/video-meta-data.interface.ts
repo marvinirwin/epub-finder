@@ -5,4 +5,5 @@ export interface VideoMetadata {
     timeScale: number;
     characters: VideoCharacter[];
     filename?: string;
+    audioFilename?: string;
 }
