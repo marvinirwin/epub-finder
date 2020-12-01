@@ -55,7 +55,7 @@ export class PronunciationVideoService {
                 const tapes = [];
                 let i = 0;
                 while (i < tape.duration) {
-                    tapes.push(tape.slice(i, i + chunkSizeSeconds))
+                    tapes.push(tape.slice(i, Math.min(i + chunkSizeSeconds, tape.duration)))
                     i += chunkSizeSeconds;
                 }
                 return Promise.all(tapes.map(tape => tape.render()));
@@ -64,3 +64,5 @@ export class PronunciationVideoService {
         )
     }
 }
+
+

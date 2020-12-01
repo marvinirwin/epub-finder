@@ -53,23 +53,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
     const editingIndex = useObservableState(manager.editingVideoMetadataService.editingCharacterIndex$);
     const editing = videoMetaData && editingIndex !== undefined && editingIndex >= 0;
 
-    function moveTimestamp(inc: number) {
-        if (editing) {
-            const newTimestamp = videoMetaData.characters[editingIndex as number].timestamp +
-                (inc * videoMetaData.timeScale);
-            manager.editingVideoMetadataService.setCharacterTimestamp(
-                videoMetaData,
-                editingIndex as number,
-                newTimestamp
-            ).then(metadata => {
-                manager.editingVideoMetadataService.editingCharacterIndex$.next(undefined);
-                manager.pronunciationVideoService.videoMetadata$.next(metadata);
-            });
-        }
-    }
 
-    useSubscription(manager.inputManager.getKeyDownSubject('s'), () => { moveTimestamp(sectionDurationMs)} )
-    useSubscription(manager.inputManager.getKeyDownSubject('w'), () => { moveTimestamp(-sectionDurationMs)} )
     const onDropOver = (dragClientX: number, containerLeft: number, containerWidth: number) => {
         if (editing) {
             const positionFraction = (dragClientX - containerLeft) / containerWidth;
@@ -81,6 +65,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
                 newTimestamp
             ).then(metadata => {
                 manager.pronunciationVideoService.videoMetadata$.next(metadata);
+                manager.pronunciationVideoService.setVideoPlaybackTime$.next(newTimestamp - 100);
             });
         }
     };
