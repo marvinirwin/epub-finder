@@ -15,4 +15,7 @@ export const AtomizeUrl: (s: string) => Promise<string[]> =
         return storedArray.length ? storedArray :
             GetWorkerResults<string[]>(new AtomizeUrlWorker(), url);
     };
+
+
 export const AtomizeUrlKey = (url: string) => `ATOMIZED_URL_${url}`;
+

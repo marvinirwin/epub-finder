@@ -2,10 +2,11 @@ import {combineLatest, fromEvent, Observable, of, ReplaySubject, Subject} from "
 import {fetchVideoMetadata, sha1} from "../../services/video.service";
 import {distinctUntilChanged, map, mapTo, shareReplay, switchMap} from "rxjs/operators";
 import {VideoMetadata} from "../../types";
-import Ciseaux, {Tape} from 'ciseaux/browser';
+import Ciseaux from '../../lib/ciseaux/browser';
+import {Tape} from "ciseaux/browser";
 
+// @ts-ignore
 Ciseaux.context = new AudioContext();
-
 
 export class PronunciationVideoService {
     public videoMetadata$ = new ReplaySubject<VideoMetadata | undefined>(1);
@@ -36,9 +37,10 @@ export class PronunciationVideoService {
         )
         this.distinctSetVideoPlaybackTime$ = this.setVideoPlaybackTime$.pipe(distinctUntilChanged(), shareReplay(1));
         this.tape$ = this.audioUrl$.pipe(
+            // @ts-ignore
             switchMap(audioUrl => {
-                    return Ciseaux.from(audioUrl)
-                        .catch(e => console.warn(e));
+                return Ciseaux.from(audioUrl)
+                        .catch((e: any) => console.warn(e));
                 }
             ),
             shareReplay(1)

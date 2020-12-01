@@ -56,9 +56,13 @@ deploy_language_trainer() {
   local FOLDER="/language-trainer-$READER_VERSION-$SERVER_VERSION";
   local DEST="$SSH_USER@$SSH_HOST:$FOLDER";
 
+  echo "rsyncing dist/"
   rsync -va dist/ "$DEST";
+  echo "rsyncing cache/ "
   rsync -va cache/ "$DEST/cache";
+  echo "rsyncing public/ without video"
   rsync -va --exclude video public/ "$DEST/public";
+  echo "rsyncing package.json"
   rsync -va package.json "$DEST/package.json"
 
   popd || exit;
