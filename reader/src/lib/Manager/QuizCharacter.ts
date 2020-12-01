@@ -15,8 +15,6 @@ export interface QuizCharacterManagerParams {
     exampleSentences$: Observable<AtomizedSentence[]>,
     quizzingCard$: Observable<ICard | undefined>;
     trie$: TrieObservable;
-    requestPlayAudio: (sentence: string) => void;
-    applyAtomizedSentenceListeners: (s: AtomizedSentence[]) => void
 }
 
 export class QuizCharacter {
@@ -31,8 +29,6 @@ export class QuizCharacter {
                     exampleSentences$,
                     quizzingCard$,
                     trie$,
-                    requestPlayAudio,
-                    applyAtomizedSentenceListeners
                 }: QuizCharacterManagerParams) {
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;

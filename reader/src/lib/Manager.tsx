@@ -281,11 +281,6 @@ export class Manager {
                 ),
                 quizzingCard$: this.quizManager.quizzingCard$,
                 trie$: this.cardManager.trie$,
-                requestPlayAudio: sentence => {
-                    this.highlighter.mouseoverHighlightedSentences$.next(sentence);
-                    this.audioManager.queSynthesizedSpeechRequest$.next(sentence);
-                },
-                applyAtomizedSentenceListeners: s => this.inputManager.applyAtomizedSentenceListeners(s)
             }
         )
 

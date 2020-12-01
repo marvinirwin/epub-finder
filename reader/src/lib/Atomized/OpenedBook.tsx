@@ -10,21 +10,26 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../test/Util/GetGraphJson";
 
 
-export const OpenedBook: React.FunctionComponent<{openedBook: OpenBook}> = ({openedBook}) => {
+export const OpenedBook: React.FunctionComponent<{ openedBook: OpenBook }> = ({openedBook, ...props}) => {
     const bookStats = useObservableState<AtomizedDocumentStats>(openedBook.bookStats$)
-    return <InnerHTMLIFrame title={openedBook.name} bodyText={bookStats?.body || ''} headText={bookStats?.head || ''}
-                            renderHandler={(head, body) =>
-                                // @ts-ignore
-        openedBook.handleHTMLHasBeenRendered(head, body)}
+    return <InnerHTMLIFrame
+        {...props}
+        title={openedBook.name}
+        bodyText={bookStats?.body || ''}
+        headText={bookStats?.head || ''}
+        renderHandler={(head, body) =>
+            // @ts-ignore
+            openedBook.handleHTMLHasBeenRendered(head, body)}
     />
 }
+
 export function rehydratePage(htmlDocument: HTMLDocument): ds_Dict<AtomizedSentence[]> {
     const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
     const annotatedElements: ds_Dict<AtomizedSentence[]> = {};
-for (let i = 0; i < elements.length; i++) {
-    const annotatedElement = elements[i];
-    const sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
-    safePush(annotatedElements, sentenceElement.translatableText, sentenceElement);
-}
-return annotatedElements;
+    for (let i = 0; i < elements.length; i++) {
+        const annotatedElement = elements[i];
+        const sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
+        safePush(annotatedElements, sentenceElement.translatableText, sentenceElement);
+    }
+    return annotatedElements;
 }

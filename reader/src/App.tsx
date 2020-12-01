@@ -7,6 +7,7 @@ import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
+import {green, indigo} from "@material-ui/core/colors";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -19,19 +20,8 @@ window.addEventListener("unhandledrejection", event => {
 
 const darkTheme = createMuiTheme({
     palette: {
-        primary: {
-            light: '#e6ffff',
-            main: '#b3e5fc',
-            dark: '#82b3c9',
-            contrastText: '#000000',
-        },
-        secondary: {
-            light: '#ffffff',
-            main: '#fafafa',
-            dark: '#c7c7c7',
-            contrastText: '#000000',
-        },
-
+        primary: indigo,
+        secondary: green,
     },
     typography: {
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif'

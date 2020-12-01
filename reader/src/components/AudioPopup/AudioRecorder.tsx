@@ -1,14 +1,10 @@
 import {makeStyles, createStyles, Theme} from "@material-ui/core/styles";
 import React, {useContext, useEffect, useState} from "react";
-import {CircularProgress, LinearProgress, Paper, Typography} from "@material-ui/core";
+import {LinearProgress, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
-import RecordingCircle from "./RecordingCircle";
 import {lookupPinyin} from "../../lib/ReactiveClasses/EditingCard";
 import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
-import {switchMap} from "rxjs/operators";
-import {fetchTranslation} from "../../services/translate.service";
-import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {AudioRecorderResizedContext} from "../Main";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -53,9 +49,9 @@ export default function AudioRecorder({m}: { m: Manager }) {
             <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
                 recognized text should match the pinyin on the flashcard.</Typography>
         </TutorialPopper>
-        {isRecording && <CircularProgress variant='indeterminate'/>}
-        <div>{currentAudioRequest?.label}</div>
-        <div>{recognizedText}</div>
-        <div>{lookupPinyin(recognizedText).join(' ')}</div>
+        <Typography variant="h6">{currentAudioRequest?.label}</Typography>
+        {isRecording && <LinearProgress variant='indeterminate'/>}
+        <Typography variant="h6">{recognizedText}</Typography>
+        <Typography variant="h6">{lookupPinyin(recognizedText).join(' ')}</Typography>
     </div>
 }

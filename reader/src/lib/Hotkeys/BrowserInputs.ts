@@ -120,8 +120,47 @@ export class BrowserInputs {
 
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
-    }
+        debugger;
+        atomizedSentences.forEach(atomizedSentence => {
+            atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
+                atomizedSentence.getTranslation();
+            };
+            const showEvents = ['mouseenter', 'focus'];
+            const hideEvents = ['mouseleave', 'blur'];
+            let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            sentenceHTMLElement.classList.add('applied-sentence-listener');
+            let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
+            if (!sentenceHTMLElement || !popperHTMLElement) {
+                throw new Error("Cannot find sentenceElement or popperElement")
+            }
+            try {
+                createPopper(sentenceHTMLElement, popperHTMLElement, {
+                    placement: 'bottom-start',
+                    // strategy: 'fixed'
+                });
+            } catch (e) {
+                console.error(e);
+            }
 
+            const show = () => {
+/*
+                this.hoveredSentence$.next(atomizedSentence.translatableText);
+*/
+                popperHTMLElement.setAttribute('data-show', '');
+            }
+            const hide = () => {
+                popperHTMLElement.removeAttribute('data-show');
+            }
+
+            showEvents.forEach(event => {
+                sentenceHTMLElement.addEventListener(event, show);
+            });
+
+            hideEvents.forEach(event => {
+                sentenceHTMLElement.addEventListener(event, hide);
+            });
+        })
+    }
 }
 
 export const filterTextInputEvents = filter((ev: KeyboardEvent) => {

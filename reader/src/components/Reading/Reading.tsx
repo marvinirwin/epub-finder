@@ -18,6 +18,6 @@ export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
         <ExpandableContainer shouldShow={showPronunciationVideo} resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        <OpenedBook openedBook={openedBook}/>
+        <OpenedBook openedBook={openedBook} data-step='1' data-intro=''/>
     </div>
 }
