@@ -8,6 +8,22 @@ export const BodyStyle = `
     body {
         font-size: 150%;
     }
+    @media only screen and (min-width: 903.99px) {
+        body > div {
+            margin: 0 48px;
+        }
+    }
+    @media only screen and (max-width: 903.98px) and (min-width: 728px) {
+        body > div {
+            margin: 0 48px;
+        }
+    }
+    @media only screen and (max-width: 727px) {
+        body > div {
+            margin: 0 24px;
+        }
+    }
+    
     mark {
         position: relative; /*  Required to keep our pseudo elements in check*/
         background-color: transparent;

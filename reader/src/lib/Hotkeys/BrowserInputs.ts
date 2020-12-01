@@ -120,7 +120,6 @@ export class BrowserInputs {
 
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
-        debugger;
         atomizedSentences.forEach(atomizedSentence => {
             atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
                 atomizedSentence.getTranslation();

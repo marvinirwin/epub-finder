@@ -52,7 +52,6 @@ export class OpenBooksService {
             applyListeners: (b: HTMLDocument) => void,
             bottomNavigationValue$: ReplaySubject<NavigationPages>,
             applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
-            applyAtomizedSentencesListener: (sentences: AtomizedSentence[]) => void;
             db: DatabaseService;
             settingsService: SettingsService;
             library$: Observable<ds_Dict<CustomDocument | Website>>
@@ -96,11 +95,13 @@ export class OpenBooksService {
             shareReplay(1)
         );
 
+/*
         this.checkedOutBooks$.pipe(
             switchMap(checkedOutBooksDict => combineLatest(Object.values(checkedOutBooksDict).map(b => b.renderedSentences$)))
         ).subscribe((atomizedSentenceGroups) => {
             atomizedSentenceGroups.forEach(sentences => config.applyAtomizedSentencesListener(flatten(Object.values(sentences))));
         })
+*/
 
         this.checkedOutBooks$.subscribe(
             openBooks => this.openBookTree.appendDelta$.next(

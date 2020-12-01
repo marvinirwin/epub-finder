@@ -30,6 +30,7 @@ export class QuizCharacter {
                     quizzingCard$,
                     trie$,
                 }: QuizCharacterManagerParams) {
+        this.atomizedSentenceMap$.next({})
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
         this.exampleSentencesBook = new OpenBook(

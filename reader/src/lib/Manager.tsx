@@ -169,7 +169,6 @@ export class Manager {
             applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
-            applyAtomizedSentencesListener: sentences => this.inputManager.applyAtomizedSentenceListeners(sentences),
             db,
             settingsService: this.settingsService,
             library$: combineLatest([
@@ -295,6 +294,7 @@ export class Manager {
             this.openedBooks.renderedAtomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$
         ).subscribe(indexedSentences => {
+            debugger;
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );
@@ -478,15 +478,19 @@ export class Manager {
         fromEvent(child, 'mouseenter')
             .pipe(withLatestFrom(this.modesService.mode$))
             .subscribe(([ev, mode]) => {
+                return;
+/*
                 if (maxWord) {
                     addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
                     addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
                 }
+*/
+                /**
+                 * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
+                 * whereas other browsers will return a Selection object with Selection.type set to None.
+                 */
+/*
                 if ((ev as MouseEvent).shiftKey || mode === Modes.HIGHLIGHT) {
-                    /**
-                     * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
-                     * whereas other browsers will return a Selection object with Selection.type set to None.
-                     */
                     const selection = (annotationElement.element.ownerDocument as Document).getSelection();
                     if (selection?.anchorNode === child.parentElement) {
                         selection.extend(child, 1);
@@ -497,6 +501,7 @@ export class Manager {
                         selection?.addRange(range);
                     }
                 }
+*/
             })
         child.onmouseleave = (ev) => {
             addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);

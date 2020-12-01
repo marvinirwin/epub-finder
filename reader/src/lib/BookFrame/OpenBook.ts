@@ -90,6 +90,7 @@ export class OpenBook {
             shareReplay(1)
         );
 
+
         this.text$ = this.bookStats$.pipe(map(bookStats => bookStats.text), shareReplay(1));
 
         this.wordCountRecords$ = this.bookStats$.pipe(
