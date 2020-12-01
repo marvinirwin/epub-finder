@@ -337,6 +337,7 @@ $character-timing-section-padding: 24px;
         position: absolute;
         z-index: 0;
         height: 50px;
+        left: $character-timing-section-padding;
       }
 
       & > .character-timing-section {

@@ -57,15 +57,16 @@ deploy_language_trainer() {
   local DEST="$SSH_USER@$SSH_HOST:$FOLDER";
 
   echo "rsyncing dist/"
-  rsync -va dist/ "$DEST";
+  rsync -vvv -a dist/ "$DEST";
   echo "rsyncing cache/ "
-  rsync -va cache/ "$DEST/cache";
+  rsync -vvv -a cache/ "$DEST/cache";
   echo "rsyncing public/ without video"
-  rsync -va --exclude video public/ "$DEST/public";
+  rsync -vvv -a --exclude video public/ "$DEST/public";
   echo "rsyncing package.json"
-  rsync -va package.json "$DEST/package.json"
+  rsync -vvv -a package.json "$DEST/package.json"
 
   popd || exit;
+  [ ! -n "$BUILD_SERVER" ] && return;
   ssh -t "$SSH_USER@$SSH_HOST" "
   if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
     tmux attach -t \"language-trainer\";

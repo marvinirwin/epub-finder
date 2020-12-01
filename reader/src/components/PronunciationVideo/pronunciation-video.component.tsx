@@ -4,12 +4,10 @@ import {AudioRecorderResizedContext} from "../Main";
 import {ManagerContext} from "../../App";
 import {useObserveVideoState} from "./useObserveVideoState";
 import {useApplyTimeBySelectedCharacter} from "./useApplyTimeBySelectedCharacter";
-import {useSetVideoTime} from "./useSetVideoTime";
 import {useApplyBoundedTime} from "./useApplyBoundedTime";
 import {useApplyPlaybackSpeed} from "./useApplyPlaybackRate";
 import {useApplyPlaybackTime} from "./useApplyPlaybackTime";
 import {useObservableState} from "observable-hooks";
-import {sha1} from "../../services/video.service";
 
 export const PronunciationVideo = (
     {
@@ -31,7 +29,8 @@ export const PronunciationVideo = (
     useApplyBoundedTime(videoElementRef, highlightBarPosition1Ms, highlightBarPosition2Ms)
     useApplyPlaybackSpeed(videoElementRef);
     useApplyPlaybackTime(videoElementRef);
-    useObserveVideoState(videoElementRef, m.pronunciationVideoService)
+    useObserveVideoState(videoElementRef, m.pronunciationVideoService);
+
 
     const videoSource = videoMetadata ?
         `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}`
@@ -42,6 +41,9 @@ export const PronunciationVideo = (
         src={videoSource}
         autoPlay
         controls
-        onCanPlay={() => resizeContext.next()}
+        onCanPlay={() => {
+            resizeContext.next();
+            m.pronunciationVideoService.canPlay$.next(true);
+        }}
     />
 }

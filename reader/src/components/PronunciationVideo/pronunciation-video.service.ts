@@ -15,11 +15,12 @@ export class PronunciationVideoService {
     public distinctSetVideoPlaybackTime$: Observable<number>;
     public videoPlaybackTime$ = new ReplaySubject<number>(1);
     public playing$ = new ReplaySubject<boolean>(1);
+    public canPlay$ = new ReplaySubject<boolean>(1);
     public videoRef$ = new ReplaySubject<HTMLVideoElement | null>(1)
     public audioUrl$ = new ReplaySubject<string>(1)
     public tape$: Observable<Tape | void>;
     public chunkSizeSeconds$ = new ReplaySubject<number | undefined>(1)
-    public chunkedAudioBuffers$: Observable<AudioBuffer[]>
+    public chunkedAudioBuffers$: Observable<AudioBuffer[]>;
 
     constructor() {
         this.videoSentence$.subscribe(async sentence => {

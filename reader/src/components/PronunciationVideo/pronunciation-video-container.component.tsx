@@ -1,6 +1,6 @@
 import {Manager} from "../../lib/Manager";
 import React, {useEffect, useRef, useState} from "react";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
@@ -43,6 +43,11 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
             millisecondsPerSection ? millisecondsPerSection / 1000 : undefined
         )
     }, [millisecondsPerSection]);
+
+    useSubscription(m.inputManager.getKeyDownSubject('q'), () => {
+        setHighlightBarP1(undefined);
+        setHighlightBarP2(undefined);
+    })
 
 
 
@@ -91,9 +96,10 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                         characterIndexStart={previousCharacterCount}
                         onClick={percent => {
                             m.editingVideoMetadataService.editingCharacterIndex$.next(undefined);
-                            m.pronunciationVideoService.setVideoPlaybackTime$.next(lineIndex *
-                                millisecondsPerSection / 1000 +
-                                (millisecondsPerSection / 1000 * percent / 100));
+                            const newTime = lineIndex * (millisecondsPerSection / 1000) +
+                                ((millisecondsPerSection / 1000) * percent / 100);
+                            m.pronunciationVideoService.setVideoPlaybackTime$.next(newTime * 1000);
+
                         }}
                         onMouseOver={percentage => {
                             if (replayDragInProgress) {

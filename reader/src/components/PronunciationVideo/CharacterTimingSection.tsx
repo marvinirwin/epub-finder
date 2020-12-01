@@ -88,7 +88,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
 
     useEffect(() => {
         if (canvas && audioBuffer) {
-            canvas.width = canvas.parentElement?.clientWidth || 240;
+            canvas.width = (canvas.parentElement?.clientWidth || 240) - 24; // This is the end of section padding
             canvas.height = 50;
             draw(normalizeData(filterData(audioBuffer, 1000)), canvas)
         }

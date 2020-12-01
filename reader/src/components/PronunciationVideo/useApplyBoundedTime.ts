@@ -1,15 +1,26 @@
 import {useInterval} from "./useInterval";
+import {useDebouncedFn} from "beautiful-react-hooks";
 
 export const useApplyBoundedTime = (
     videoElementRef: HTMLVideoElement | undefined | null,
     highlightBarPosition1Ms: number | undefined,
     highlightBarPosition2Ms: number | undefined
 ) => {
-    useInterval(() => {
+    const setVideoTime = useDebouncedFn(() => {
         if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {
+            videoElementRef.currentTime = highlightBarPosition1Ms / 1000;
             // If the video is out of bounds, make it go back into bounds
-            if (videoElementRef.currentTime * 1000 > highlightBarPosition2Ms) {
-                videoElementRef.currentTime = highlightBarPosition1Ms / 1000
+            videoElementRef.play();
+        }
+    }, 20);
+    useInterval(() => {
+        if (videoElementRef &&
+            highlightBarPosition1Ms &&
+            highlightBarPosition2Ms) {
+            const isOverLimit = videoElementRef.currentTime * 1000 > highlightBarPosition2Ms;
+            const isBeforeBeginning = videoElementRef.currentTime * 1000 < (highlightBarPosition1Ms - 100);
+            if ((isOverLimit || isBeforeBeginning)) {
+                setVideoTime()
             }
         }
     }, 10)
