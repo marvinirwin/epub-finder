@@ -19,7 +19,6 @@ export const OpenedBook: React.FunctionComponent<{ openedBook: OpenBook }> = ({o
         headText={bookStats?.head || ''}
         renderHandler={(head, body) => {
             // @ts-ignore
-            debugger;
             openedBook.handleHTMLHasBeenRendered(head, body);
         }}
     />

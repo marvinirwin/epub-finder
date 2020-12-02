@@ -93,18 +93,6 @@ export class BrowserInputs {
             }
         };
         root.onmouseup = checkForSelectedText;
-
-        /*
-                root.onfocus = ev => {
-                    this.hotkeyHandler$.next(ev.target as HTMLElement);
-                    return true;
-                };
-                root.onmousedown = ev => {
-                    this.hotkeyHandler$.next(ev.target as HTMLElement);
-                    return true;
-                };
-        */
-
         this.getKeyUpSubject("Shift").subscribe(checkForSelectedText);
     }
 
@@ -121,6 +109,7 @@ export class BrowserInputs {
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
         atomizedSentences.forEach(atomizedSentence => {
+            return;
             atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
                 atomizedSentence.getTranslation();
             };
@@ -133,18 +122,17 @@ export class BrowserInputs {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
             try {
+/*
                 createPopper(sentenceHTMLElement, popperHTMLElement, {
                     placement: 'bottom-start',
-                    // strategy: 'fixed'
+                    strategy: 'fixed'
                 });
+*/
             } catch (e) {
                 console.error(e);
             }
 
             const show = () => {
-/*
-                this.hoveredSentence$.next(atomizedSentence.translatableText);
-*/
                 popperHTMLElement.setAttribute('data-show', '');
             }
             const hide = () => {
@@ -152,11 +140,11 @@ export class BrowserInputs {
             }
 
             showEvents.forEach(event => {
-                sentenceHTMLElement.addEventListener(event, show);
+                // sentenceHTMLElement.addEventListener(event, show);
             });
 
             hideEvents.forEach(event => {
-                sentenceHTMLElement.addEventListener(event, hide);
+                // sentenceHTMLElement.addEventListener(event, hide);
             });
         })
     }

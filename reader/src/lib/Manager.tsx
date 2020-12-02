@@ -294,7 +294,6 @@ export class Manager {
             this.openedBooks.renderedAtomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$
         ).subscribe(indexedSentences => {
-            debugger;
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );

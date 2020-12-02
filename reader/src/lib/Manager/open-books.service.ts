@@ -95,14 +95,6 @@ export class OpenBooksService {
             shareReplay(1)
         );
 
-/*
-        this.checkedOutBooks$.pipe(
-            switchMap(checkedOutBooksDict => combineLatest(Object.values(checkedOutBooksDict).map(b => b.renderedSentences$)))
-        ).subscribe((atomizedSentenceGroups) => {
-            atomizedSentenceGroups.forEach(sentences => config.applyAtomizedSentencesListener(flatten(Object.values(sentences))));
-        })
-*/
-
         this.checkedOutBooks$.subscribe(
             openBooks => this.openBookTree.appendDelta$.next(
                 {
@@ -130,7 +122,7 @@ export class OpenBooksService {
         this.applyListenersToOpenedBookBodies();
 
         this.renderedAtomizedSentences$ = this.openBookTree
-            .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$).updates$.pipe(
+            .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
                 switchMap(({sourced}) => {
                     const sources = sourced ? flattenTree(sourced) : [];
                     return combineLatest(sources);

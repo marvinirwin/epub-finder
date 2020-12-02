@@ -36,7 +36,6 @@ export class OpenBook {
     public id: string;
     public text$: Observable<string>;
     public wordCountRecords$: Observable<BookWordCount[]>;
-    public htmlElementIndex$: Observable<TextWordData>;
     public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence[]>>(1)
     public bookStats$: Observable<AtomizedDocumentBookStats>;
 
@@ -101,17 +100,6 @@ export class OpenBook {
             shareReplay(1)
         );
 
-
-        this.htmlElementIndex$ = combineLatest([
-            this.trie,
-            this.renderedSentences$
-        ]).pipe(
-            map(([trie, sentences]) => {
-                    return AtomizedSentence.getTextWordData(flatten(Object.values(sentences)), trie.t, trie.getUniqueLengths());
-                },
-            ),
-            shareReplay(1)
-        )
 
 /*
         this.children$ = this.atomizedSrcDocStrings$.pipe(
