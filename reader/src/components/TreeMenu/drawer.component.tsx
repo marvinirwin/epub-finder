@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ResponsiveMenu: React.FunctionComponent<{width: number}> = ({ children, width }) => {
+const DrawerComponent: React.FunctionComponent<{width: number}> = ({ children, width }) => {
   const classes = useStyles()
   const theme = useTheme()
 
@@ -79,4 +79,4 @@ const ResponsiveMenu: React.FunctionComponent<{width: number}> = ({ children, wi
   )
 }
 
-export default ResponsiveMenu
+export default DrawerComponent

@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 export const TreeMenu: React.FunctionComponent<{
-    title: string,
+    title: string | React.FC,
     tree: ds_Tree<TreeMenuNode>,
     directoryPath: string[],
     directoryChanged: (s: string[]) => void,

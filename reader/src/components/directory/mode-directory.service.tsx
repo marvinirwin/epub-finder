@@ -11,7 +11,6 @@ import {RecordRequest} from "../../lib/Interfaces/RecordRequest";
 import {removePunctuation} from "../../lib/Highlighting/temporary-highlight.service";
 
 export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMenuNode> } => {
-
     const VideoSelect: React.FC = () => {
         const mode = useObservableState(m.modesService.mode$);
         if (mode === Modes.VIDEO) {
@@ -68,14 +67,13 @@ export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMe
                 "Test Pronunciation",
                 <SpeakMode/>
             ]
-        ].map(([name, action, label, LeftIcon]) => [
+        ].map(([name, label, Component]) => [
                 name, {
                     nodeLabel: name,
                     value: {
                         name,
                         label,
-                        LeftIcon,
-                        action
+                        Component
                     }
                 }
             ]

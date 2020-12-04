@@ -67,6 +67,7 @@ import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-r
 import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 import {TestHotkeysService} from "./Hotkeys/test-hotkeys.service";
 import {CardCreationService} from "./card/card-creation.service";
+import {IntroService} from "../services/intro.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -109,6 +110,7 @@ export class Manager {
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
     public pronunciationProgressService: PronunciationProgressService;
     public wordRecognitionProgressService: WordRecognitionProgressService;
+    public introService: IntroService;
 
     public alertMessages$ = new BehaviorSubject<string[]>([]);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
@@ -447,6 +449,12 @@ export class Manager {
             cardService: this.cardManager,
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionService: this.wordRecognitionProgressService
+        })
+
+
+        this.introService = new IntroService({
+            pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
+            settingsService: this.settingsService
         })
 
         this.openedBooks.openBookTree.appendDelta$.next({

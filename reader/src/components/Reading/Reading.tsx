@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import { Manager } from "../../lib/Manager";
+import {Manager} from "../../lib/Manager";
 import {OpenedBook} from "../../lib/Atomized/OpenedBook";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
 import {ExpandableContainer} from "../Containers/ExpandableContainer";
@@ -7,7 +7,7 @@ import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
 
-export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
+export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const openedBook = m.openedBooks.readingBookService.readingBook;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
@@ -15,9 +15,13 @@ export const Reading: React.FunctionComponent<{m: Manager}> = ({m}) => {
         <ExpandableContainer shouldShow={recentlyRecorded} resizeObservable$={useContext(AudioRecorderResizedContext)}>
             <AudioRecorder m={m}/>
         </ExpandableContainer>
-        <ExpandableContainer shouldShow={showPronunciationVideo} resizeObservable$={useContext(PronunciationVideoResizedContext)}>
+        <ExpandableContainer shouldShow={showPronunciationVideo}
+                             resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        <OpenedBook openedBook={openedBook} data-step='1' data-intro='This is the reading book'/>
+        {/* @ts-ignore */ }
+        <OpenedBook ref={ref => m.introService.readingFrameRef$.next(ref)}
+            openedBook={openedBook}
+        />
     </div>
 }
