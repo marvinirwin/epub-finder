@@ -67,7 +67,9 @@ import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-r
 import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 import {TestHotkeysService} from "./Hotkeys/test-hotkeys.service";
 import {CardCreationService} from "./card/card-creation.service";
-import {IntroService} from "../services/intro.service";
+import {IntroService} from "../lib/intro/intro.service";
+import {IntroSeriesService} from "./intro/intro-series.service";
+import {IntroHighlightService} from "./intro/intro-highlight.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -143,6 +145,8 @@ export class Manager {
     hotkeysService: HotkeysService
     visibleSentencesService: VisibleSentencesService;
     temporaryHighlightService: TemporaryHighlightService;
+    private introSeriesService: IntroSeriesService;
+    private introHighlightSeries: IntroHighlightService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db: db})
@@ -463,13 +467,18 @@ export class Manager {
                 }
             }
         });
+        this.introSeriesService = new IntroSeriesService({
+            settingsService: this.settingsService
+        });
+        this.introHighlightSeries = new IntroHighlightService({
+            temporaryHighlightService: this.temporaryHighlightService,
+            atomizedSentences$: this.openedBooks.renderedAtomizedSentences$
+        });
         this.introService = new IntroService({
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
-            settingsService: this.settingsService,
-            atomizedSentences$: this.openedBooks.renderedAtomizedSentences$,
-            temporaryHighlightService: this.temporaryHighlightService,
+            introSeriesService: new IntroSeriesService({settingsService: this.settingsService}),
             currentVideoMetadata$: this.pronunciationVideoService.videoMetadata$
-        })
+        });
         this.hotkeyEvents.startListeners();
         this.cardManager.load();
 

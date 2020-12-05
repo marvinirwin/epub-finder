@@ -39,7 +39,7 @@ export class SettingsService {
         return this.resolveSetting$('playbackSpeed', 0.5)
     }
 
-    get completedSteps$(): BehaviorSubject<number[]> {
-        return this.resolveSetting$('introStep', [])
+    get completedSteps$(): BehaviorSubject<string[]> {
+        return this.resolveSetting$('introStepsCompleted', [])
     }
 }

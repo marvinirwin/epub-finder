@@ -10,7 +10,7 @@ export const SpeakMode: React.FunctionComponent = ({...props}) => {
     const m = useContext(ManagerContext);
     const isRecording = useObservableState(m.audioManager.audioRecorder.isRecording$);
     const color = isRecording ?
-        'lightgreen' :
+        'green' :
         undefined
     return <ListItem {...props} button ref={ref => m.introService.trySpeakingRef$.next(ref)} onClick={() => {
         const recordRequest = new RecordRequest(`Try reading one of the sentences below`);
@@ -26,7 +26,7 @@ export const SpeakMode: React.FunctionComponent = ({...props}) => {
         m.audioManager.audioRecorder.recordRequest$.next(recordRequest)
     } }>
         <ListItemIcon>
-            <Mic  style={{backgroundColor: color}}/>
+            <Mic style={{color}}/>
         </ListItemIcon>
         <ListItemText>
             Test your Pronunciation

@@ -1,15 +1,7 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {debounceTime, filter, map, take} from "rxjs/operators";
-import introJs from 'intro.js';
-import {SettingsService} from "./settings.service";
-import {HighlighterService} from "../lib/Highlighting/highlighter.service";
-import {TemporaryHighlightService} from "../lib/Highlighting/temporary-highlight.service";
-import {sleep} from "../lib/Util/Util";
-import {ds_Dict} from "../lib/Tree/DeltaScanner";
-import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
-import {flatten} from "lodash";
-import {RandomColorsService} from "./random-colors.service";
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
+import {debounceTime, filter, map, mapTo, shareReplay, take} from "rxjs/operators";
+import {IntroSeriesService} from "./intro-series.service";
+import {VideoMetadata} from "../../components/PronunciationVideo/video-meta-data.interface";
 
 export class IntroService {
     titleRef$ = new ReplaySubject<HTMLSpanElement | null>(1);
@@ -21,44 +13,16 @@ export class IntroService {
 
     constructor({
                     pronunciationVideoRef$,
-                    settingsService,
-                    temporaryHighlightService,
-                    atomizedSentences$,
+                    introSeriesService,
                     currentVideoMetadata$
                 }: {
         pronunciationVideoRef$: Observable<HTMLVideoElement | null>,
-        settingsService: SettingsService,
-        temporaryHighlightService: TemporaryHighlightService,
-        atomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>,
+        introSeriesService: IntroSeriesService,
         currentVideoMetadata$: Observable<VideoMetadata | undefined>
     }) {
-        const randomRange = (min: number, max: number, maxRangeSize: number): [number, number] => {
-            const startRange = max - min;
-            const start = (Math.random() * startRange) + min;
-            const endRange = max - start;
-            return [start, Math.min(Math.floor(start + (Math.random() * endRange) + 1), start + maxRangeSize)]
-        }
-        const intro = introJs();
-        atomizedSentences$.pipe(
-            map(atomizedSentences => flatten(Object.values(atomizedSentences))),
-            filter(atomizedSentences => atomizedSentences.length >= 10),
-            take(1)
-        ).subscribe(async atomizedSentences => {
-            const allSentences = atomizedSentences.slice(0, 10).map(atomizedSentence => atomizedSentence.translatableText);
 
-            function getRandomWords() {
-                return allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length, 3)));
-            }
 
-            const randomWords = [...getRandomWords(), ...getRandomWords(), ...getRandomWords()]
-            for (let i = 0; i < randomWords.length; i++) {
-                const randomWord = randomWords[i];
-                temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
-                await sleep(10);
-            }
-        })
-
-        combineLatest([
+        const firstIntro$ = combineLatest([
             this.titleRef$,
             this.readingFrameRef$,
             this.trySpeakingRef$,
@@ -66,11 +30,12 @@ export class IntroService {
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
-            take(1)
-        ).subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
-            // Now do the intro if necessary
-            intro.setOptions({
-                steps: [
+            take(1),
+            shareReplay(1)
+        );
+        firstIntro$.subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
+            introSeriesService.addSteps(
+                [
                     {
                         element: titleRef as HTMLElement,
                         intro: `Welcome to Mandarin Trainer!`
@@ -86,27 +51,28 @@ export class IntroService {
                     },
                     {
                         element: watchSentenceRef as HTMLElement,
-                        intro: `Need help pronouncing something?  Click watch sentence and then click a highlighted sentence`,
+                        intro: `Need help pronouncing something?  Watch how a native speaker is by click then and then selecting a sentence.`,
                     },
 
-                ]
-            }).start();
+                ],
+                firstIntro$.pipe(mapTo(undefined))
+            )
         });
 
-        combineLatest([
+        const secondIntro$ = combineLatest([
             pronunciationVideoRef$,
             this.playbackSpeedRef$,
             this.sectionsRef$,
             currentVideoMetadata$
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
-            debounceTime(500),
+            debounceTime(1000),
             take(1)
-        ).subscribe(
+        );
+        secondIntro$.subscribe(
             ([pronunciationVideoRef, playbackSpeedRef, sectionsRef]) => {
-                // What happens if things are already started?
-                intro.setOptions({
-                    steps: [
+                introSeriesService.addSteps(
+                    [
                         {
                             element: pronunciationVideoRef as HTMLElement,
                             intro: `Watch how a native speaker speaks, if you're having difficulty try and imitate the way the mount moves from word to work `,
@@ -120,9 +86,11 @@ export class IntroService {
                             element: playbackSpeedRef as HTMLElement,
                             intro: `Use this to slow and and speed up the video playback`,
                         },
-                    ]
-                }).start()
-            })
+                    ],
+                    secondIntro$.pipe(mapTo(undefined))
+                )
+            });
+
     }
 
 }
