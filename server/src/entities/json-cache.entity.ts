@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
-export class JsonCacheEntity {
+export class JsonCache {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()

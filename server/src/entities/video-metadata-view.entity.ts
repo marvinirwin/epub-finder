@@ -1,39 +1,39 @@
 import {Column, CreateDateColumn, Entity, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
-import {VideoMetadataEntity} from "./video.metadata";
+import {VideoMetadata} from "./video.metadata";
 
 @ViewEntity({
     expression: `
         SELECT 
             v.id,
-            v.videoMetadataId,
+            v.video_metadata_id,
             v.sentence,
-            v.sentenceHash,
+            v.sentence_hash,
             v.metadata,
-            v.createdAt
+            v.created_at
         FROM video_metadata v
         LEFT JOIN video_metadata video_metadata_max 
-            ON video_metadata_max.createdAt > v.createdAt
-            AND video_metadata_max.videoMetadataId = v.videoMetadataId  
+            ON video_metadata_max.created_at > v.created_at
+            AND video_metadata_max.video_metadata_id = v.video_metadata_id  
         WHERE video_metadata_max.id IS NULL
     `
 })
-export class VideoMetadataViewEntity {
+export class VideoMetadataView {
     @ViewColumn()
     id: number;
 
     // Used in groupwise max
     @ViewColumn()
-    videoMetadataId: number;
+    video_metadata_id: number;
 
     @ViewColumn()
     sentence: string;
 
     @ViewColumn()
-    sentenceHash: string;
+    sentence_hash: string;
 
     @ViewColumn()
     metadata: string;
 
     @ViewColumn()
-    createdAt: Date;
+    created_at: Date;
 }

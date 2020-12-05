@@ -33,6 +33,7 @@ export class HighlighterService {
     // private wordElementMap$: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     private sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
+
     private highlightTargetMap$: Observable<Map<HighlightTarget, ElementContainer[]>>;
 
     constructor({wordElementMap$, sentenceMap$}: {

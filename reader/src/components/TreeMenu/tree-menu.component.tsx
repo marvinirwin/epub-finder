@@ -63,34 +63,38 @@ export const TreeMenu: React.FunctionComponent<{
         }
         {
             Object.values(walkTree(tree, ...directoryPath)?.children || {}).map((treeNode, index) => {
-                const treeMenuNode = treeNode?.value;
+                const TreeMenuNode = treeNode?.value;
+                if (TreeMenuNode?.ReplaceComponent) {
+                    return <TreeMenuNode.ReplaceComponent key={index}/>
+                }
+
                 return <ListItem
                     key={index}
                     button
                     selected={false}
                     onClick={() => {
-                        if (treeMenuNode) {
-                            const newPath = directoryPath.concat(treeMenuNode?.name);
-                            if (treeMenuNode.Component) {
+                        if (TreeMenuNode) {
+                            const newPath = directoryPath.concat(TreeMenuNode?.name);
+                            if (TreeMenuNode.Component) {
                                 componentChanged(newPath);
                             }
-                            if (treeMenuNode.action) {
+                            if (TreeMenuNode.action) {
                                 actionSelected(newPath);
                             }
-                            if (treeMenuNode.moveDirectory) {
+                            if (TreeMenuNode.moveDirectory) {
                                 directoryChanged(newPath);
                             }
                         }
                     }}
                 >
-                    {treeMenuNode?.LeftIcon && <ListItemIcon>{treeMenuNode.LeftIcon}</ListItemIcon>}
-                    {!useMinified && !treeMenuNode?.InlineComponent && <ListItemText primary={treeMenuNode?.label}/>}
-                    {treeMenuNode?.InlineComponent && <treeMenuNode.InlineComponent/>}
-                    {treeMenuNode?.moveDirectory && <ListItemSecondaryAction>
+                    {TreeMenuNode?.LeftIcon && <ListItemIcon>{TreeMenuNode.LeftIcon}</ListItemIcon>}
+                    {!useMinified && !TreeMenuNode?.InlineComponent && <ListItemText primary={TreeMenuNode?.label}/>}
+                    {TreeMenuNode?.InlineComponent && <TreeMenuNode.InlineComponent/>}
+                    {TreeMenuNode?.moveDirectory && <ListItemSecondaryAction>
                         <IconButton
                             style={{marginRight: useMinified ? 150 : undefined}}
                             onClick={() => {
-                                treeMenuNode && directoryChanged(directoryPath.concat(treeMenuNode.name))
+                                TreeMenuNode && directoryChanged(directoryPath.concat(TreeMenuNode.name))
                             }}
                         >
                             <KeyboardArrowRight color={'action'}/>

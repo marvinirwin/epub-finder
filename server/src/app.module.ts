@@ -14,8 +14,8 @@ import {SessionService} from "./session/session.service";
 import { AuthModule } from './auth/auth.module';
 import { UsersService } from './user/users.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {JsonCacheEntity} from "./entities/json-cache.entity";
-import {SessionEntity} from "./entities/session.entity";
+import {JsonCache} from "./entities/json-cache.entity";
+import {session} from "./entities/session.entity";
 import {ObservableModule} from "./observable/observable.module";
 import {BooksModule} from "./books/books.module";
 import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
@@ -36,7 +36,7 @@ import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
             serveRoot: '/',
         }),
         AuthModule,
-        TypeOrmModule.forFeature([JsonCacheEntity, SessionEntity]),
+        TypeOrmModule.forFeature([JsonCache, session]),
         ObservableModule,
         BooksModule,
         VideoMetadataModule

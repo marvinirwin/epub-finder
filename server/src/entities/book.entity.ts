@@ -8,7 +8,7 @@ export class Book {
     // Used for Groupwise Max
     @Column()
     @Generated("uuid")
-    bookId: number;
+    book_id: number;
 
     @Column("text")
     name: string;
@@ -16,11 +16,11 @@ export class Book {
     @Column('text')
     html: string;
 
-    @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
-    createdAt: Date;
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
+    created_at: Date;
 
     @Column()
-    creatorId: number;
+    creator_id: number;
 
     @Column()
     global: boolean;

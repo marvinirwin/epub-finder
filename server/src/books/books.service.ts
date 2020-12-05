@@ -1,17 +1,17 @@
 import fs from 'fs-extra';
 import {startCase} from 'lodash';
 import {AvailableBooksDto} from "./available-books.dto";
-import {UserEntity} from "../entities/user.entity";
+import {User} from "../entities/user.entity";
 import {Book} from "../entities/book.entity";
-import {BookViewEntity} from "../entities/book-view.entity";
+import {BookView} from "../entities/book-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CustomBookDto} from "./custom-book.dto";
 
 export class BooksService {
     constructor(
-        @InjectRepository(BookViewEntity)
-        private bookViewRepository: Repository<BookViewEntity>,
+        @InjectRepository(BookView)
+        private bookViewRepository: Repository<BookView>,
 
         @InjectRepository(Book)
         private bookRepository: Repository<Book>,
@@ -24,7 +24,7 @@ export class BooksService {
             )
     }
 
-    async getAvailableBooksForUser(user: UserEntity): Promise<AvailableBooksDto> {
+    async getAvailableBooksForUser(user: User): Promise<AvailableBooksDto> {
         return {
             files: await this.booksInBookDir(),
             custom: await this.queryCustomBooksAvailableToUser(user)
@@ -38,11 +38,11 @@ export class BooksService {
     }
 
 
-    private async queryCustomBooksAvailableToUser(user: UserEntity): Promise<Book[]> {
+    private async queryCustomBooksAvailableToUser(user: User): Promise<Book[]> {
         return [... await this.queryGlobalCustomBooks(), ... await user.books];
     }
 
-    private async queryGlobalCustomBooks(): Promise<BookViewEntity[]> {
+    private async queryGlobalCustomBooks(): Promise<BookView[]> {
         return await this.bookViewRepository.find({global: true})
     }
 

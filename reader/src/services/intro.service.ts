@@ -1,7 +1,14 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {filter} from "rxjs/operators";
+import {filter, map, take} from "rxjs/operators";
 import introJs from 'intro.js';
 import {SettingsService} from "./settings.service";
+import {HighlighterService} from "../lib/Highlighting/highlighter.service";
+import {TemporaryHighlightService} from "../lib/Highlighting/temporary-highlight.service";
+import {sleep} from "../lib/Util/Util";
+import {ds_Dict} from "../lib/Tree/DeltaScanner";
+import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
+import {flatten} from "lodash";
+import {RandomColorsService} from "./random-colors.service";
 
 export class IntroService {
     titleRef$ = new ReplaySubject<HTMLSpanElement | null>(1);
@@ -13,19 +20,46 @@ export class IntroService {
 
     constructor({
                     pronunciationVideoRef$,
-                    settingsService
+                    settingsService,
+                    temporaryHighlightService,
+                    atomizedSentences$
                 }: {
         pronunciationVideoRef$: Observable<HTMLVideoElement | null>,
-        settingsService: SettingsService
+        settingsService: SettingsService,
+        temporaryHighlightService: TemporaryHighlightService,
+        atomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>
     }) {
+
+
+        const randomRange = (min: number, max: number): [number, number] =>  {
+            const startRange = max - min;
+            const start = (Math.random() * startRange) + min;
+            const endRange = max - start;
+            return [start, (Math.random() * endRange) + start]
+        }
         const intro = introJs();
+        atomizedSentences$.pipe(
+            map(atomizedSentences => flatten(Object.values(atomizedSentences))),
+            filter(atomizedSentences => atomizedSentences.length >= 5),
+            take(1)
+        ).subscribe(async atomizedSentences => {
+            const allSentences = atomizedSentences.slice(0,5).map(atomizedSentence => atomizedSentence.translatableText);
+            // Now grab a random word from each
+            const randomWords = allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length)))
+            for (let i = 0; i < randomWords.length; i++) {
+                const randomWord = randomWords[i];
+                temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
+            }
+        })
+
+
         combineLatest([
             this.titleRef$,
             this.readingFrameRef$,
             this.trySpeakingRef$,
             this.watchSentencesRef$
         ]).pipe(filter(refs => refs.every(ref => ref)))
-            .subscribe(([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
+            .subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
                 // Now do the intro if necessary
                 intro.setOptions({
                     steps: [
@@ -64,7 +98,7 @@ export class IntroService {
                         },
                         {
                             element: sectionsRef as HTMLElement,
-                            intro: ``
+                            intro: `Click or highlight any of these sections to play parts of the video`
                         },
                         {
                             element: playbackSpeedRef as HTMLElement,

@@ -1,5 +1,5 @@
 export interface CustomBookDto {
     html: string;
     name: string;
-    bookId: number;
+    book_id: number;
 }

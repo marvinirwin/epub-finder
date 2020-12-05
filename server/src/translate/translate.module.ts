@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import {JsonCacheEntity} from "../entities/json-cache.entity";
+import {JsonCache} from "../entities/json-cache.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([JsonCacheEntity])
+        TypeOrmModule.forFeature([JsonCache])
     ],
 
 })

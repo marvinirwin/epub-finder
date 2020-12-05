@@ -1,6 +1,6 @@
 import {Manager} from "../../lib/Manager";
-import {Slider, TextField} from "@material-ui/core";
-import React, {useContext} from "react";
+import {Slider, TextField, Typography} from "@material-ui/core";
+import React, {useContext, Fragment} from "react";
 import {debounce} from 'lodash';
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
@@ -8,14 +8,19 @@ import {useObservableState} from "observable-hooks";
 export function PlaybackSpeedComponent() {
     const m = useContext(ManagerContext);
     const playbackRate = useObservableState(m.settingsService.playbackSpeed$, 0);
-    return <Slider
-        value={playbackRate}
-        onChange={(_, value) => {
-            m.settingsService.playbackSpeed$.next(value as number);
-        }}
-        step={.1}
-        marks
-        min={0.1}
-        max={1}
-    />
+    return <div>
+        <Typography gutterBottom>
+            Video playback speed
+        </Typography>
+        <Slider
+            value={playbackRate}
+            onChange={(_, value) => {
+                m.settingsService.playbackSpeed$.next(value as number);
+            }}
+            step={.1}
+            marks
+            min={0.1}
+            max={1}
+        />
+    </div>
 }

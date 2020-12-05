@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, CreateDateColumn} from "typeorm";
 
 @Entity()
-export class SubscriptionEventEntity {
+export class SubscriptionEvent {
     @PrimaryColumn()
     id: number;
 

@@ -78,6 +78,7 @@
         "passport-twitch-new": "^0.0.1",
         "passport-twitter": "^1.0.4",
         "paypal-rest-sdk": "^1.8.1",
+        "pg": "^8.5.1",
         "popper.js": "^1.16.1",
         "pug": "^3.0.0",
         "reflect-metadata": "^0.1.13",

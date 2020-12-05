@@ -23,6 +23,7 @@ export const menuNodeFactory = (
     moveDirectory: boolean,
     LeftIcon?: React.Component,
     inlineComponent?: React.FunctionComponent,
+    component?: React.FunctionComponent,
     action?: () => void
 ): TreeMenuNode => ({
     Component,

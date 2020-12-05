@@ -3,12 +3,12 @@ import { TranslateModule } from './translate.module';
 import { TranslateService } from './translate.service';
 import { TranslateController } from './translate.controller';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {JsonCacheEntity} from "../entities/json-cache.entity";
+import {JsonCache} from "../entities/json-cache.entity";
 
 @Module({
     imports: [
         TranslateModule,
-        TypeOrmModule.forFeature([JsonCacheEntity])
+        TypeOrmModule.forFeature([JsonCache])
     ],
     providers: [TranslateService],
     controllers: [TranslateController]

@@ -6,7 +6,7 @@ import validator from 'validator';
 import mailChecker from 'mailchecker';
 import {promisify} from "util";
 import {Repository} from "typeorm";
-import {UserEntity} from "../entities/user.entity";
+import {User} from "../entities/user.entity";
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
@@ -14,7 +14,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
  * POST /login
  * Sign in using email and password.
  */
-export const postLogin = (repository: Repository<UserEntity>) => (req, res, next) => {
+export const postLogin = (repository: Repository<User>) => (req, res, next) => {
     const validationErrors = [];
     if (!validator.isEmail(req.body.email)) validationErrors.push({msg: "Please enter a valid email address."});
     if (validator.isEmpty(req.body.password)) validationErrors.push({msg: "Password cannot be blank."});
@@ -47,7 +47,7 @@ export const postLogin = (repository: Repository<UserEntity>) => (req, res, next
  * GET /logout
  * Log out.
  */
-export const logout = (repository: Repository<UserEntity>) => (req, res) => {
+export const logout = (repository: Repository<User>) => (req, res) => {
     req.logout();
     req.session.destroy((err) => {
         if (err) console.log("Error : Failed to destroy the session during logout.", err);
@@ -60,7 +60,7 @@ export const logout = (repository: Repository<UserEntity>) => (req, res) => {
  * GET /signup
  * Signup page.
  */
-export const getSignup = (repository: Repository<UserEntity>) => (req, res) => {
+export const getSignup = (repository: Repository<User>) => (req, res) => {
     if (req.user) {
         return res.redirect("/");
     }
@@ -73,7 +73,7 @@ export const getSignup = (repository: Repository<UserEntity>) => (req, res) => {
  * POST /signup
  * Create a new local account.
  */
-export const postSignup = (repository: Repository<UserEntity>) => async (req, res, next) => {
+export const postSignup = (repository: Repository<User>) => async (req, res, next) => {
     const validationErrors = [];
     if (!validator.isEmail(req.body.email)) validationErrors.push({msg: "Please enter a valid email address."});
     if (!validator.isLength(req.body.password, {min: 8})) validationErrors.push({msg: "Password must be at least 8 characters long"});
@@ -85,7 +85,7 @@ export const postSignup = (repository: Repository<UserEntity>) => async (req, re
     }
     req.body.email = validator.normalizeEmail(req.body.email, {gmail_remove_dots: false});
 
-    const user = new UserEntity();
+    const user = new User();
     user.email = req.body.email;
     user.password = req.body.password;
     const existingUser = await repository.findOne({email: req.body.email});
@@ -153,7 +153,7 @@ export const postUpdateProfile = (repository: Repository<User>) => async (req, r
  * POST /account/password
  * Update current password.
  */
-export const postUpdatePassword = (repository: Repository<UserEntity>) => async (req, res, next) => {
+export const postUpdatePassword = (repository: Repository<User>) => async (req, res, next) => {
     const validationErrors = [];
     if (!validator.isLength(req.body.password, {min: 8})) validationErrors.push({msg: "Password must be at least 8 characters long"});
     if (req.body.password !== req.body.confirmPassword) validationErrors.push({msg: "Passwords do not match"});
@@ -189,7 +189,7 @@ export const postDeleteAccount = (repository: Repository<User>) => async (req, r
  * GET /account/unlink/:provider
  * Unlink OAuth provider.
  */
-export const getOauthUnlink = (repository: Repository<UserEntity>) => async (req, res, next) => {
+export const getOauthUnlink = (repository: Repository<User>) => async (req, res, next) => {
     const {provider} = req.params;
     const user = await repository.findOne(req.user.id);
     user[provider.toLowerCase()] = undefined;
@@ -266,7 +266,7 @@ export const getReset = (repository: Repository<User>) => async (req, res, next)
  * GET /account/verify/:token
  * Verify email address
  */
-export const getVerifyEmailToken = (repository: Repository<UserEntity>) => async (req, res, next) => {
+export const getVerifyEmailToken = (repository: Repository<User>) => async (req, res, next) => {
     if (req.user.emailVerified) {
         req.flash("info", {msg: "The email address has been verified."});
         return res.redirect("/account");
@@ -285,8 +285,8 @@ export const getVerifyEmailToken = (repository: Repository<UserEntity>) => async
             req.flash("errors", {msg: "There was an error in loading your profile."});
             return res.redirect("back");
         }
-        user.emailVerificationToken = "";
-        user.emailVerified = true;
+        user.email_verification_token = "";
+        user.email_verified = true;
         await repository.save(user);
         req.flash("info", {msg: "Thank you for verifying your email address."});
         return res.redirect("/account");
@@ -311,7 +311,7 @@ export const getVerifyEmailToken = (repository: Repository<UserEntity>) => async
  * GET /account/verify
  * Verify email address
  */
-export const getVerifyEmail = (repository: Repository<UserEntity>) => async (req, res, next) => {
+export const getVerifyEmail = (repository: Repository<User>) => async (req, res, next) => {
     if (req.user.emailVerified) {
         req.flash("info", {msg: "The email address has been verified."});
         return res.redirect("/account");
@@ -327,7 +327,7 @@ export const getVerifyEmail = (repository: Repository<UserEntity>) => async (req
 
     const setRandomToken = async (token) => {
         const user = await repository.findOne({email: req.user.email})
-        user.emailVerificationToken = token;
+        user.email_verification_token = token;
         await repository.save(user);
         return token;
     };

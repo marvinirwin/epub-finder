@@ -5,25 +5,25 @@ import {Column, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
     expression: `
     SELECT 
         b.id,
-        b.bookId,
+        b.book_id,
         b.name,
         b.html,
-        b.createdAt,
-        b.creatorId,
+        b.created_at,
+        b.creator_id,
         b.global
     FROM book b
     LEFT JOIN book book_max 
-        ON book_max.createdAt > b.createdAt
-        AND book_max.bookId = b.bookId
+        ON book_max.created_at > b.created_at
+        AND book_max.book_id = b.book_id
     WHERE book_max.id IS NULL
 `
 })
-export class BookViewEntity  {
+export class BookView  {
     @ViewColumn()
     id: number;
 
     @ViewColumn()
-    bookId: number;
+    book_id: number;
 
     @ViewColumn()
     name: string;
@@ -32,10 +32,10 @@ export class BookViewEntity  {
     html: string;
 
     @ViewColumn()
-    createdAt: Date;
+    created_at: Date;
 
     @ViewColumn()
-    creatorId: number;
+    creator_id: number;
 
     @ViewColumn()
     global: boolean;

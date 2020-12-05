@@ -1,13 +1,13 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {VideoMetadataViewEntity} from "../entities/video-metadata-view.entity";
-import {VideoMetadataEntity} from "../entities/video.metadata";
+import {VideoMetadataView} from "../entities/video-metadata-view.entity";
+import {VideoMetadata} from "../entities/video.metadata";
 import {VideoMetadataController} from "./video-metadata.controller";
 import {VideoMetadataService} from "./video-metadata.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([VideoMetadataViewEntity, VideoMetadataEntity])
+        TypeOrmModule.forFeature([VideoMetadataView, VideoMetadata])
     ],
     controllers: [
         VideoMetadataController

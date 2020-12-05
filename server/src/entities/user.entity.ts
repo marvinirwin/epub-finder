@@ -11,14 +11,14 @@ import {
 
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import {UsageEventEntity} from "./usage-event.entity";
+import {UsageEvent} from "./usage-event.entity";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
-import {UsageEntity} from "./usage.entity";
-import {SessionEntity} from "./session.entity";
-import {BookViewEntity} from "./book-view.entity";
+import {Usage} from "./usage.entity";
+import {session} from "./session.entity";
+import {BookView} from "./book-view.entity";
 
 @Entity()
-export class UserEntity {
+export class User {
     // If a user has no tokens or emails, it's an ip user
     public static IpUserCriteria = {
         email: null,
@@ -31,13 +31,13 @@ export class UserEntity {
     @Column()
     password: string = '';
     @Column()
-    passwordResetToken: string = '';
+    password_reset_token: string = '';
     @Column()
-    passwordResetExpires: Date = new Date(); // I have no idea if this will break anything
+    password_reset_expires: Date = new Date(); // I have no idea if this will break anything
     @Column()
-    emailVerificationToken: string = '';
+    email_verification_token: string = '';
     @Column()
-    emailVerified: boolean = false;
+    email_verified: boolean = false;
     @Column()
     snapchat: string = '';
     @Column()
@@ -80,16 +80,16 @@ export class UserEntity {
 
     private _loadedPassword: string;
 
-    @OneToMany(() => BookViewEntity, (book: BookViewEntity) => book.creatorId)
+    @OneToMany(() => BookView, (book: BookView) => book.creator_id)
     @JoinTable()
-    books: Promise<BookViewEntity[]>;
+    books: Promise<BookView[]>;
 
 
-    @OneToMany(type => UsageEventEntity, (usageEvent: UsageEventEntity) => usageEvent.userId)
-    usageEvents: UsageEventEntity[];
+    @OneToMany(type => UsageEvent, (usageEvent: UsageEvent) => usageEvent.user_id)
+    usageEvents: UsageEvent[];
 
-    @OneToMany(type => SessionEntity, (session: SessionEntity) => session.userId)
-    sessions: SessionEntity[];
+    @OneToMany(type => session, (session: session) => session.userId)
+    sessions: session[];
 
     @AfterLoad()
     private storeInitialPassword(): void {
@@ -126,8 +126,8 @@ export class UserEntity {
         });
     }
 
-    public async usageStat(r: Repository<UsageEntity>): Promise<UsageEntity> {
-        return r.findOne({userId: this.id})
+    public async usageStat(r: Repository<Usage>): Promise<Usage> {
+        return r.findOne({user_id: this.id})
     }
 
 }

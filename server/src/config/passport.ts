@@ -1,4 +1,4 @@
-import {UserEntity} from "../entities/user.entity";
+import {User} from "../entities/user.entity";
 import passport, {Profile} from "passport";
 import refresh from "passport-oauth2-refresh";
 import GithubStrategy from "passport-github2";
@@ -11,7 +11,7 @@ import {Repositories} from "./repositories";
 
 export interface AuthArgs<T> {
     req: Request;
-    user: UserEntity;
+    user: User;
     accessToken?: string;
     refreshToken?: string;
     tokenSecret?: string;
@@ -20,11 +20,11 @@ export interface AuthArgs<T> {
     email?: string;
     password?: string;
     profile: T;
-    done: (err: any, user: UserEntity | undefined) => void
+    done: (err: any, user: User | undefined) => void
 }
 
 export const usePassportStrategies = ({user: userRepo}: Repositories) => {
-    passport.serializeUser((user: UserEntity, done) => {
+    passport.serializeUser((user: User, done) => {
         done(null, user.id);
     });
     passport.deserializeUser(async (id, done) => {
@@ -59,7 +59,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
 
     const strategy = <T extends Profile>(
         constructArgs: (...args: any[]) => AuthArgs<T>,
-        mutateUser: (a: AuthArgs<T>) => UserEntity,
+        mutateUser: (a: AuthArgs<T>) => User,
         tokenKind: string
     ) =>
         async (
@@ -80,7 +80,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
                 return userToLink;
             };
             const createUser = async () => {
-                const newUser = new UserEntity();
+                const newUser = new User();
                 mutateUser(args);
                 await userRepo.save(newUser);
                 done(null, newUser)
@@ -206,7 +206,7 @@ export const usePassportStrategies = ({user: userRepo}: Repositories) => {
                         // @ts-ignore
                         return done(null, false, {msg: "Your account was registered using a sign-in provider. To enable password login, sign in using a provider, and then set a password under your user profile."});
                     }
-                    const passwordsMatch = await UserEntity.comparePassword(user.password, password);
+                    const passwordsMatch = await User.comparePassword(user.password, password);
                     if (passwordsMatch) {
                         done(null, user);
                     } else {
@@ -911,7 +911,7 @@ export const isAuthorized = (req, res, next) => {
                 } else {
                     refresh.requestNewAccessToken(`${provider}`, token.refreshToken, (err, accessToken, refreshToken, params) => {
                         // @ts-ignore
-                        UserEntity.findById(req.user.id, (err, user) => {
+                        User.findById(req.user.id, (err, user) => {
                             user.tokens.some((tokenObject) => {
                                 if (tokenObject.kind === provider) {
                                     tokenObject.accessToken = accessToken;
