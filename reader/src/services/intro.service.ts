@@ -31,24 +31,29 @@ export class IntroService {
     }) {
 
 
-        const randomRange = (min: number, max: number): [number, number] =>  {
+        const randomRange = (min: number, max: number, maxRangeSize: number): [number, number] =>  {
             const startRange = max - min;
             const start = (Math.random() * startRange) + min;
             const endRange = max - start;
-            return [start, (Math.random() * endRange) + start]
+            return [start, Math.min(Math.floor(start + (Math.random() * endRange) + 1), start + maxRangeSize)]
         }
         const intro = introJs();
         atomizedSentences$.pipe(
             map(atomizedSentences => flatten(Object.values(atomizedSentences))),
-            filter(atomizedSentences => atomizedSentences.length >= 5),
+            filter(atomizedSentences => atomizedSentences.length >= 10),
             take(1)
         ).subscribe(async atomizedSentences => {
-            const allSentences = atomizedSentences.slice(0,5).map(atomizedSentence => atomizedSentence.translatableText);
-            // Now grab a random word from each
-            const randomWords = allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length)))
+            const allSentences = atomizedSentences.slice(0,10).map(atomizedSentence => atomizedSentence.translatableText);
+
+            function getRandomWords() {
+                return allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length, 3)));
+            }
+
+            const randomWords = [...getRandomWords(), ...getRandomWords(), ...getRandomWords()]
             for (let i = 0; i < randomWords.length; i++) {
                 const randomWord = randomWords[i];
                 temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
+                await sleep (100);
             }
         })
 

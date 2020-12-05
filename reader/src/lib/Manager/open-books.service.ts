@@ -162,6 +162,7 @@ export class OpenBooksService {
         this.renderedSentenceTextDataTree$ = this
             .openBookTree
             .mapWith(bookDataMap());
+
         this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
             combineLatest(flattenTree(delta))
                 .subscribe(bookStats => {

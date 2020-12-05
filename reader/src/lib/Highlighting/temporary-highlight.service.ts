@@ -45,8 +45,7 @@ export class TemporaryHighlightService {
         )
     }
 
-    public async highlightTemporaryWord(withPunctuation: string, color: RGBA, duration: number) {
-        const word = removePunctuation(withPunctuation);
+    public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
         this.cardService.putWords$.next([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);

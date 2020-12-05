@@ -52,7 +52,7 @@ import {VideoMetadataService} from "../services/video-metadata.service";
 import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 import {ObservableService} from "../services/observable.service";
 import {HighlighterService} from "./Highlighting/highlighter.service";
-import {TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
+import {removePunctuation, TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
 import {RGBA} from "./Highlighting/color.service";
 import {EditingVideoMetadataService} from "../services/editing-video-metadata.service";
 import {SettingsService} from "../services/settings.service";
@@ -142,6 +142,7 @@ export class Manager {
     settingsService: SettingsService;
     hotkeysService: HotkeysService
     visibleSentencesService: VisibleSentencesService;
+    temporaryHighlightService: TemporaryHighlightService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db: db})
@@ -419,13 +420,13 @@ export class Manager {
             visibleSentencesService: this.visibleSentencesService
         })
 
-        const temporaryHighlightService = new TemporaryHighlightService({
+        this.temporaryHighlightService = new TemporaryHighlightService({
             highlighterService: this.highlighterService,
             cardService: this.cardManager
         });
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioManager.audioRecorder.currentRecognizedText$
-            .subscribe(text => text && temporaryHighlightService.highlightTemporaryWord(text, LEARNING_GREEN, 5000))
+            .subscribe(text => text && this.temporaryHighlightService.highlightTemporaryWord(removePunctuation(text), LEARNING_GREEN, 5000))
 
         this.editingVideoMetadataService = new EditingVideoMetadataService({
             pronunciationVideoService: this.pronunciationVideoService
@@ -452,10 +453,6 @@ export class Manager {
         })
 
 
-        this.introService = new IntroService({
-            pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
-            settingsService: this.settingsService
-        })
 
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',
@@ -466,6 +463,12 @@ export class Manager {
                 }
             }
         });
+        this.introService = new IntroService({
+            pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
+            settingsService: this.settingsService,
+            atomizedSentences$: this.openedBooks.renderedAtomizedSentences$,
+            temporaryHighlightService: this.temporaryHighlightService
+        })
         this.hotkeyEvents.startListeners();
         this.cardManager.load();
 
