@@ -53,7 +53,7 @@ export class IntroService {
             for (let i = 0; i < randomWords.length; i++) {
                 const randomWord = randomWords[i];
                 temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
-                await sleep (100);
+                await sleep (10);
             }
         })
 

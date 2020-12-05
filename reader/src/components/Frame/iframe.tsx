@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 
-export const Iframe: React.FunctionComponent<{title: string}> = ({ children,title, ...props }) => {
+export const Iframe = React.forwardRef<HTMLIFrameElement, {title: string} & React.HTMLProps<HTMLIFrameElement>>(({ children,title, ...props }, ref) => {
     const [contentRef, setContentRef] = useState<HTMLIFrameElement | null>()
     const head = contentRef?.contentWindow?.document.head;
     const body = contentRef?.contentWindow?.document.body;
@@ -10,9 +10,16 @@ export const Iframe: React.FunctionComponent<{title: string}> = ({ children,titl
     // @ts-ignore
     const bodyChild = children[1];
     return (
-        <iframe title={title}  {...props} ref={setContentRef} >
+        <iframe title={title}  {...props} ref={el => {
+            setContentRef(el);
+            if (typeof ref === 'function') {
+                ref(el)
+            } else if (ref) {
+                ref.current = el;
+            }
+        }} >
         {head && createPortal( headChild, head ) }
         {body && createPortal( bodyChild, body ) }
     </iframe>
 )
-}
+})

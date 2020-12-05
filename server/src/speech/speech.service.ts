@@ -5,32 +5,55 @@ import {sha1} from "../util/sha1";
 import {join} from "path";
 import fs, {pathExists} from "fs-extra";
 import {SpeechSynthesisRequestDto} from "./speech-synthesis-request-dto";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import {SpeechToken} from "../entities/speech-token.entity";
+import jwt_decode from "jwt-decode";
 
 const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string;
 const region = process.env.AZURE_SPEECH_LOCATION as string;
 const subscriptionKey = process.env.AZURE_SPEECH_KEY1 as string;
 const speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region);
+const MAX_SPEECH_TOKENS = 1000;
 
 speechConfig.speechRecognitionLanguage = "zh-CN";
 speechConfig.speechSynthesisLanguage = "zh-CN";
 
 @Injectable()
 export class SpeechService {
-    constructor() {
+    constructor(
+        @InjectRepository(SpeechToken)
+        private speechTokenRepository: Repository<SpeechToken>,
+    ) {
+    }
+
+
+    async areSpeechTokensAvailable() {
+        let speechTokenCount = await this.speechTokenRepository.createQueryBuilder()
+            .where("exp < extract(epoch from NOW())")
+            .getCount();
+        return {count: speechTokenCount, available: speechTokenCount < MAX_SPEECH_TOKENS, max: MAX_SPEECH_TOKENS};
     }
 
     async speechRecognitionToken() {
-        const result = await axios.post(
-            `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
-            {},
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Ocp-Apim-Subscription-Key": subscriptionKey
+        const {count, available, max} = await this.areSpeechTokensAvailable();
+        if (available) {
+            const result = await axios.post(
+                `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Ocp-Apim-Subscription-Key": subscriptionKey
+                    }
                 }
-            }
-        );
-        return result.data;
+            );
+            const decoded = jwt_decode(result.data) as {exp: number};
+            console.log(decoded);
+            await this.speechTokenRepository.save({exp: decoded.exp, token: result.data})
+            return result.data;
+        }
+        throw new Error(`Speech recognition overloaded (${count} / ${max} in use), please try again later`);
     }
 
     async downloadSynthesizedSpeech(filename: string, ssml1: string) {

@@ -10,19 +10,22 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../test/Util/GetGraphJson";
 
 
-export const OpenedBook: React.FunctionComponent<{ openedBook: OpenBook }> = ({openedBook, ...props}) => {
-    const bookStats = useObservableState<AtomizedDocumentStats>(openedBook.bookStats$)
-    return <InnerHTMLIFrame
-        {...props}
-        title={openedBook.name}
-        bodyText={bookStats?.body || ''}
-        headText={bookStats?.head || ''}
-        renderHandler={(head, body) => {
-            // @ts-ignore
-            openedBook.handleHTMLHasBeenRendered(head, body);
-        }}
-    />
-}
+export const OpenedBook =
+    React.forwardRef<HTMLIFrameElement,
+        { openedBook: OpenBook } & React.HTMLProps<HTMLIFrameElement>>(({openedBook, ...props}, ref) => {
+        const bookStats = useObservableState<AtomizedDocumentStats>(openedBook.bookStats$)
+        return <InnerHTMLIFrame
+            {...props}
+            title={openedBook.name}
+            bodyText={bookStats?.body || ''}
+            headText={bookStats?.head || ''}
+            renderHandler={(head, body) => {
+                // @ts-ignore
+                openedBook.handleHTMLHasBeenRendered(head, body);
+            }}
+            ref={ref}
+        />
+    })
 
 export function rehydratePage(htmlDocument: HTMLDocument): ds_Dict<AtomizedSentence[]> {
     const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);

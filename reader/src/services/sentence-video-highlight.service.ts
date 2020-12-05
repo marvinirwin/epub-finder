@@ -20,7 +20,7 @@ export class SentenceVideoHighlightService {
         combineLatest([
             modesService.mode$,
             visibleAtomizedSentences$,
-            videoMetadataService.sentenceMetadata$.pipe(
+            videoMetadataService.allSentenceMetadata$.pipe(
                 switchMap(sentenceMetadata =>
                     combineLatest(
                         Object.entries(sentenceMetadata)

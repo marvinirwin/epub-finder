@@ -1,4 +1,5 @@
 import {VideoMetadata} from "../types/";
+import axios from 'axios';
 
 async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize("NFC"));
@@ -23,3 +24,14 @@ export const fetchVideoMetadata = async (sentence: string): Promise<VideoMetadat
     }
 }
 
+type BulkMetadataDto = { [sentence: string]: VideoMetadata | undefined };
+export const fetchBulkMetadata = async (sentences: string[]): Promise<BulkMetadataDto | undefined> => {
+    try {
+        const response = await axios.post(`${process.env.PUBLIC_URL}/video_metadata/`, sentences);
+        if (response.status === 200) {
+            return await response.data as unknown as BulkMetadataDto;
+        }
+    } catch (e) {
+        console.warn(e);
+    }
+}

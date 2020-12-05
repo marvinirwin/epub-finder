@@ -4,7 +4,6 @@ import {of} from "rxjs";
 import {VideoMetadata} from "../../types/";
 
 export const useVideoMetaData = (sentence: string | undefined, videoMetadataService: VideoMetadataService): VideoMetadata | undefined => {
-    const allMetadata = useObservableState(videoMetadataService.sentenceMetadata$, {});
-    return useObservableState(sentence && allMetadata[sentence]?.metadata$ || of());
+    return useObservableState(sentence && videoMetadataService.resolveMetadataListener$(sentence) || of());
 }
 

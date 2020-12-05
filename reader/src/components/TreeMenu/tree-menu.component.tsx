@@ -41,8 +41,8 @@ export const TreeMenu: React.FunctionComponent<{
         actionSelected
     }
 ) => {
-    const classes = useStyles()
     const useMinified = false;
+    const Title = title;
     return <List className={'selectable-menu-list'}>
         {directoryPath.length ?
             <div>
@@ -59,7 +59,7 @@ export const TreeMenu: React.FunctionComponent<{
                 </ListItem>
                 <Divider/>
             </div> :
-            <Typography variant="h6" className={classes.title}>{title}</Typography>
+            <Title/>
         }
         {
             Object.values(walkTree(tree, ...directoryPath)?.children || {}).map((treeNode, index) => {

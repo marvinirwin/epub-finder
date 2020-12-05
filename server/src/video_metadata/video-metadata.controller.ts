@@ -1,6 +1,8 @@
 import {VideoMetadataService} from "./video-metadata.service";
-import {Body, Controller, Get, Header, Param, Put} from "@nestjs/common";
+import {Body, Controller, Get, Header, Param, Post, Put} from "@nestjs/common";
 import {VideoMetadataDto} from "./video-metadata.dto";
+import {sha1} from "../util/sha1";
+import {zip} from "lodash";
 
 
 @Controller('video_metadata')
@@ -17,5 +19,15 @@ export class VideoMetadataController {
     @Put()
     async put(@Body() videoMetadataDto: VideoMetadataDto) {
         return this.videoMetadataService.saveVideoMetadata(videoMetadataDto);
+    }
+
+    @Post()
+    async bulkMetadata(@Body() sentenceList: string[]) {
+        const allMetadata = await Promise.all(
+            sentenceList
+                .map(sentence => this.videoMetadataService.resolveVideoMetadataByHash(sha1(sentence))
+                    .then(metadataEntity => metadataEntity?.metadata))
+        );
+        return zip(sentenceList, allMetadata);
     }
 }

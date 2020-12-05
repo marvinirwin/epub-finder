@@ -12,16 +12,18 @@ export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
     return <div className={'reading-container'}>
-        <ExpandableContainer shouldShow={recentlyRecorded} resizeObservable$={useContext(AudioRecorderResizedContext)}>
+        <ExpandableContainer
+            shouldShow={recentlyRecorded}
+            resizeObservable$={useContext(AudioRecorderResizedContext)}
+        >
             <AudioRecorder m={m}/>
         </ExpandableContainer>
         <ExpandableContainer shouldShow={showPronunciationVideo}
                              resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        {/* @ts-ignore */ }
         <OpenedBook ref={ref => m.introService.readingFrameRef$.next(ref)}
-            openedBook={openedBook}
+                    openedBook={openedBook}
         />
     </div>
 }

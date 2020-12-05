@@ -7,12 +7,13 @@ import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
 import {orderBy} from "lodash";
-import { SentenceMetadata } from "../../services/video-metadata.service";
+import {SentenceMetadata} from "../../services/video-metadata.service";
 import {ModeDirectory} from "./mode-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
 import {EditableHotkeys, HotkeyDirectoryService} from "./hotkey-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {HotKeyEvents} from "../../lib/HotKeyEvents";
+import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -36,19 +37,19 @@ export const menuNodeFactory = (
 
 
 export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
-    const sentenceMetadata = useObservableState(m.videoMetadataService.sentenceMetadata$, {});
-    const sorted = orderBy(Object.values(sentenceMetadata), [
-        sentenceMetaData => sentenceMetaData.metadata,
-    ])
+    const allSentences = useObservableState(m.videoMetadataService.allSentenceMetadata$, []);
 
     return <div className={'all-sentences'}>
-        {sorted.map(sentenceMetadata => <Sentence key={sentenceMetadata.name} sentenceMetadata={sentenceMetadata}/>)}
+        {allSentences.map(sentenceMetadata => <Sentence key={sentenceMetadata.sentence}
+                                                        sentenceMetadata$={sentenceMetadata.metadata$}
+                                                        sentence={sentenceMetadata.sentence}/>)}
     </div>
 }
 
-export const Sentence: React.FC<{ sentenceMetadata: SentenceMetadata }> = ({sentenceMetadata}) => {
-    return <div style={{backgroundColor: sentenceMetadata.metadata ? 'white' : 'pink'}}>
-        {sentenceMetadata.name}
+export const Sentence: React.FC<{ sentenceMetadata$: Observable<VideoMetadata>, sentence: string }> = ({sentence, sentenceMetadata$}) => {
+    const metadata = useObservableState(sentenceMetadata$);
+    return <div style={{backgroundColor: metadata ? 'white' : 'pink'}}>
+        {sentence}
     </div>
 }
 
@@ -69,17 +70,17 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
              ]) => {
             const ReadingComponent = () => <Reading m={m}/>;
             const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
-/*
-            const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
-*/
+            /*
+                        const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
+            */
 
 
             const rootTree = constructTree('root', main);
             rootTree.children = {
                 ...ModeDirectory(m),
-/*
-                reading: constructTree('reading', reading),
-*/
+                /*
+                                reading: constructTree('reading', reading),
+                */
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
                 hotkeys: HotkeyDirectoryService(m),
                 playbackSpeed: {
