@@ -1,5 +1,5 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {filter, map, take} from "rxjs/operators";
+import {debounceTime, filter, map, take} from "rxjs/operators";
 import introJs from 'intro.js';
 import {SettingsService} from "./settings.service";
 import {HighlighterService} from "../lib/Highlighting/highlighter.service";
@@ -9,6 +9,7 @@ import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
 import {flatten} from "lodash";
 import {RandomColorsService} from "./random-colors.service";
+import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
 
 export class IntroService {
     titleRef$ = new ReplaySubject<HTMLSpanElement | null>(1);
@@ -22,16 +23,16 @@ export class IntroService {
                     pronunciationVideoRef$,
                     settingsService,
                     temporaryHighlightService,
-                    atomizedSentences$
+                    atomizedSentences$,
+                    currentVideoMetadata$
                 }: {
         pronunciationVideoRef$: Observable<HTMLVideoElement | null>,
         settingsService: SettingsService,
         temporaryHighlightService: TemporaryHighlightService,
-        atomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>
+        atomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>,
+        currentVideoMetadata$: Observable<VideoMetadata | undefined>
     }) {
-
-
-        const randomRange = (min: number, max: number, maxRangeSize: number): [number, number] =>  {
+        const randomRange = (min: number, max: number, maxRangeSize: number): [number, number] => {
             const startRange = max - min;
             const start = (Math.random() * startRange) + min;
             const endRange = max - start;
@@ -43,7 +44,7 @@ export class IntroService {
             filter(atomizedSentences => atomizedSentences.length >= 10),
             take(1)
         ).subscribe(async atomizedSentences => {
-            const allSentences = atomizedSentences.slice(0,10).map(atomizedSentence => atomizedSentence.translatableText);
+            const allSentences = atomizedSentences.slice(0, 10).map(atomizedSentence => atomizedSentence.translatableText);
 
             function getRandomWords() {
                 return allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length, 3)));
@@ -53,46 +54,55 @@ export class IntroService {
             for (let i = 0; i < randomWords.length; i++) {
                 const randomWord = randomWords[i];
                 temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
-                await sleep (10);
+                await sleep(10);
             }
         })
-
 
         combineLatest([
             this.titleRef$,
             this.readingFrameRef$,
             this.trySpeakingRef$,
             this.watchSentencesRef$
-        ]).pipe(filter(refs => refs.every(ref => ref)))
-            .subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
-                // Now do the intro if necessary
-                intro.setOptions({
-                    steps: [
-                        {
-                            element: titleRef as HTMLElement,
-                            intro: `Welcome to Mandarin Trainer!`
-                        },
-                        {
-                            element: readingFrameRef as HTMLElement,
-                            intro: "This is a story composed of exclusively HSK-1 words and a cluster of words related to kitchens.  Repeat words  are distributed evenly throughout the story for maximum retention.",
-                        },
-                        {
-                            element: trySpeakingRef as HTMLElement,
-                            intro: `Click this to test your pronunciation against voice-recognition.  If your words are understood your progress will be visually highlighted in the story`,
-                        },
-                        {
-                            element: watchSentenceRef as HTMLElement,
-                            intro: `Need help pronouncing something?  Click watch sentence and then click a highlighted sentence`,
-                        },
+        ]).pipe(
+            filter(refs => refs.every(ref => ref)),
+            debounceTime(1000),
+            take(1)
+        ).subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
+            // Now do the intro if necessary
+            intro.setOptions({
+                steps: [
+                    {
+                        element: titleRef as HTMLElement,
+                        intro: `Welcome to Mandarin Trainer!`
+                    },
+                    {
+                        element: readingFrameRef as HTMLElement,
+                        intro: `This is a story composed of exclusively HSK-1 words and kitchen words.  
+                            Words are repeated and distributed evenly throughout the story to aid memorization.`,
+                    },
+                    {
+                        element: trySpeakingRef as HTMLElement,
+                        intro: `Click this to test your pronunciation with voice-recognition.  If your words are understood your progress will be visually highlighted in the story`,
+                    },
+                    {
+                        element: watchSentenceRef as HTMLElement,
+                        intro: `Need help pronouncing something?  Click watch sentence and then click a highlighted sentence`,
+                    },
 
-                    ]
-                }).start();
-            });
+                ]
+            }).start();
+        });
+
         combineLatest([
             pronunciationVideoRef$,
             this.playbackSpeedRef$,
-            this.sectionsRef$
-        ]).pipe(filter(refs => refs.every(ref => ref))).subscribe(
+            this.sectionsRef$,
+            currentVideoMetadata$
+        ]).pipe(
+            filter(refs => refs.every(ref => ref)),
+            debounceTime(500),
+            take(1)
+        ).subscribe(
             ([pronunciationVideoRef, playbackSpeedRef, sectionsRef]) => {
                 // What happens if things are already started?
                 intro.setOptions({
@@ -100,6 +110,7 @@ export class IntroService {
                         {
                             element: pronunciationVideoRef as HTMLElement,
                             intro: `Watch how a native speaker speaks, if you're having difficulty try and imitate the way the mount moves from word to work `,
+                            position: 'left'
                         },
                         {
                             element: sectionsRef as HTMLElement,

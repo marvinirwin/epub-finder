@@ -16,8 +16,7 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
     return <div className={'app-container'}>
         {
             menuItemTree?.sourced && <TreeMenu
-                title={() => <Typography ref={ref => m.introService.titleRef$.next(ref)} variant='h6'>'Mandarin
-                    Trainer'</Typography>}
+                title={() => <Typography ref={ref => m.introService.titleRef$.next(ref)} variant='h6'>Mandarin Trainer</Typography>}
                 tree={menuItemTree.sourced}
                 directoryPath={directoryPath}
                 directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}

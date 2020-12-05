@@ -53,7 +53,6 @@ export const CharacterTimingSection: React.FunctionComponent<{
     const editingIndex = useObservableState(manager.editingVideoMetadataService.editingCharacterIndex$);
     const editing = videoMetaData && editingIndex !== undefined && editingIndex >= 0;
 
-
     const onDropOver = (dragClientX: number, containerLeft: number, containerWidth: number) => {
         if (editing) {
             const positionFraction = (dragClientX - containerLeft) / containerWidth;
@@ -81,6 +80,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
 
 
     return <div className={'character-timing-section-container'}
+                ref={el => manager.introService.sectionsRef$.next(el)}
                 onMouseLeave={() => {
                     setHoverBarPercentPosition(undefined);
                 }}

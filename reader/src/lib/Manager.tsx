@@ -467,7 +467,8 @@ export class Manager {
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
             settingsService: this.settingsService,
             atomizedSentences$: this.openedBooks.renderedAtomizedSentences$,
-            temporaryHighlightService: this.temporaryHighlightService
+            temporaryHighlightService: this.temporaryHighlightService,
+            currentVideoMetadata$: this.pronunciationVideoService.videoMetadata$
         })
         this.hotkeyEvents.startListeners();
         this.cardManager.load();

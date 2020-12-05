@@ -8,7 +8,7 @@ import {useObservableState} from "observable-hooks";
 export function PlaybackSpeedComponent() {
     const m = useContext(ManagerContext);
     const playbackRate = useObservableState(m.settingsService.playbackSpeed$, 0);
-    return <div>
+    return <div ref={el => m.introService.playbackSpeedRef$.next(el)}>
         <Typography gutterBottom>
             Video playback speed
         </Typography>

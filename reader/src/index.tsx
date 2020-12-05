@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import 'intro.js/introjs.css';
-import introJs from 'intro.js';
 
 ReactDOM.render(
   <React.StrictMode>
