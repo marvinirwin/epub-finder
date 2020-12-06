@@ -49,16 +49,18 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         setHighlightBarP2(undefined);
     })
 
-
-
     const [highlightStartMs, highlightStopMs] = ((highlightBarPosition1Ms || 0) > (highlightBarPosition2Ms || 0)) ?
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
         [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
     let characterCounter = 0;
 
-
     return <Card className={'pronunciation-video-container-card'}>
+        <PronunciationVideo
+            highlightBarPosition1Ms={highlightBarPosition1Ms}
+            highlightBarPosition2Ms={highlightBarPosition2Ms}
+            currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
+
         {/* @ts-ignore */}
         <div className={`pronunciation-sections-container`}  ref={pronunciationSectionsContainer}>
             {
@@ -120,9 +122,5 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                 })
             }
         </div>
-        <PronunciationVideo
-            highlightBarPosition1Ms={highlightBarPosition1Ms}
-            highlightBarPosition2Ms={highlightBarPosition2Ms}
-            currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
     </Card>
 }
