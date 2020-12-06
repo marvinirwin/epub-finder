@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
-import {debounceTime, filter, map, mapTo, shareReplay, take} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, take, distinct} from "rxjs/operators";
 import {IntroSeriesService} from "./intro-series.service";
 import {VideoMetadata} from "../../components/PronunciationVideo/video-meta-data.interface";
 
@@ -25,11 +25,11 @@ export class IntroService {
 
 
         const firstIntro$ = combineLatest([
-            this.titleRef$,
-            this.readingFrameRef$,
-            this.trySpeakingRef$,
-            this.watchSentencesRef$,
-            this.promptFirstIntro$
+            this.titleRef$.pipe(distinctUntilChanged()),
+            this.readingFrameRef$.pipe(distinctUntilChanged()),
+            this.trySpeakingRef$.pipe(distinctUntilChanged()),
+            this.watchSentencesRef$.pipe(distinctUntilChanged()),
+            this.promptFirstIntro$.pipe(distinctUntilChanged()),
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
@@ -63,11 +63,11 @@ export class IntroService {
         });
 
         const secondIntro$ = combineLatest([
-            pronunciationVideoRef$,
-            this.playbackSpeedRef$,
-            this.sectionsRef$,
-            currentVideoMetadata$,
-            this.promptSecondIntro$
+            pronunciationVideoRef$.pipe(distinctUntilChanged()),
+            this.playbackSpeedRef$.pipe(distinctUntilChanged()),
+            this.sectionsRef$.pipe(distinctUntilChanged()),
+            currentVideoMetadata$.pipe(distinctUntilChanged()),
+            this.promptSecondIntro$.pipe(distinctUntilChanged()),
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),

@@ -27,6 +27,10 @@ export class IntroSeriesService {
             if (lastStep) {
                 this.markStepCompleted(lastStep)
             }
+        });
+
+        this.intro.onexit(() => {
+            this.currentSteps.map(currentStep => this.markStepCompleted(currentStep));
         })
     }
 
