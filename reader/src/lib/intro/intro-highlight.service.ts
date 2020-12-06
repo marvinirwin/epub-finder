@@ -2,7 +2,7 @@ import {Observable} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, map, take} from "rxjs/operators";
-import {flatten} from "lodash";
+import {flatten, chunk} from "lodash";
 import {TemporaryHighlightService} from "../Highlighting/temporary-highlight.service";
 import {RandomColorsService} from "../../services/random-colors.service";
 import {sleep} from "../Util/Util";
@@ -23,12 +23,14 @@ export class IntroHighlightService {
                 return allSentences.map(sentence => sentence.slice(...randomRange(0, sentence.length, 3)));
             }
 
-            const randomWords = [...getRandomWords(), ...getRandomWords(), ...getRandomWords()]
-            for (let i = 0; i < randomWords.length; i++) {
-                const randomWord = randomWords[i];
-                temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000);
-                await sleep(10);
+/*
+            const randomWordChunks = chunk([...getRandomWords(), ...getRandomWords(), ...getRandomWords()], 3)
+            for (let i = 0; i < randomWordChunks.length; i++) {
+                const randomWords = randomWordChunks[i];
+                randomWords.map(randomWord => temporaryHighlightService.highlightTemporaryWord(randomWord, RandomColorsService.randomColor(), 1000));
+                await sleep(500);
             }
+*/
         })
     }
 }

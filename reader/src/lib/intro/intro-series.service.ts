@@ -24,13 +24,15 @@ export class IntroSeriesService {
         });
         this.intro.oncomplete(() => {
             const lastStep = this.currentSteps[this.currentSteps.length - 1];
+
             if (lastStep) {
                 this.markStepCompleted(lastStep)
             }
         });
+        // TODO these functions should be put into a que to prevent race conditions
 
         this.intro.onexit(() => {
-            this.currentSteps.map(currentStep => this.markStepCompleted(currentStep));
+            this.markStepCompleted(...this.currentSteps);
         })
     }
 
@@ -43,9 +45,9 @@ export class IntroSeriesService {
         this.intro.start();
     }
 
-    private async markStepCompleted(step: introJs.Step) {
+    private async markStepCompleted(...steps: introJs.Step[]) {
         const currentSteps = await this.settingsService.completedSteps$.pipe(take(1)).toPromise();
-        const uniqueSteps = new Set((currentSteps || []).concat(step.intro));
+        const uniqueSteps = new Set([...(currentSteps || []), ...steps.map(step => step.intro)]);
         this.settingsService.completedSteps$.next(Array.from(uniqueSteps));
     }
 
