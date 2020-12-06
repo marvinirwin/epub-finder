@@ -5,7 +5,6 @@ import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 import {skip, take} from "rxjs/operators";
 
 export class SettingsService {
-    private settingsBehaviourSubjects: { [setting: string]: BehaviorSubject<any> } = {};
     private settingsReplaySubjects: { [setting: string]: ReplaySubject<any> } = {};
     private db: DatabaseService;
 
@@ -16,11 +15,11 @@ export class SettingsService {
     public resolveSetting$<T>(
         settingName: string,
         defaultVal: T,
-    ): BehaviorSubject<T> {
-        return this._resolveSetting$<T, BehaviorSubject<T>>(
+    ): ReplaySubject<T> {
+        return this._resolveSetting$<T, ReplaySubject<T>>(
             settingName,
-            () => new BehaviorSubject<T>(defaultVal),
-            this.settingsBehaviourSubjects,
+            () => new ReplaySubject<T>(1),
+            this.settingsReplaySubjects,
             defaultVal
         )
     }
@@ -58,19 +57,22 @@ export class SettingsService {
         return dest[settingName];
     }
 
-    get checkedOutBooks$(): BehaviorSubject<ds_Dict<boolean>> {
+    get checkedOutBooks$(): ReplaySubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'cat-likes-tea': true})
     }
 
-    get hotkeys$(): BehaviorSubject<Partial<Hotkeys<string[]>>> {
+    get hotkeys$(): ReplaySubject<Partial<Hotkeys<string[]>>> {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {});
     }
 
-    get playbackSpeed$(): BehaviorSubject<number> {
+    get playbackSpeed$(): ReplaySubject<number> {
         return this.resolveSetting$('playbackSpeed', 0.5)
     }
 
     get completedSteps$(): ReplaySubject<string[]> {
         return this.resolveReplaySubject$<string[]>('introStepsCompleted', [])
     }
+}
+export const replaySubjectLastValue = <T>(r: ReplaySubject<T>): Promise<T> => {
+    return r.pipe(take(1)).toPromise();
 }

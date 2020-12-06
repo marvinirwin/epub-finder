@@ -21,6 +21,12 @@ export class IntroSeriesService {
                 // Previous step has been completed
                 this.markStepCompleted(this.currentSteps[index - 1]);
             }
+        });
+        this.intro.oncomplete(() => {
+            const lastStep = this.currentSteps[this.currentSteps.length - 1];
+            if (lastStep) {
+                this.markStepCompleted(lastStep)
+            }
         })
     }
 

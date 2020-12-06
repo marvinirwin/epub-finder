@@ -11,7 +11,7 @@ export const WatchMode = ({...props}) => {
     const color = mode === Modes.VIDEO ?
         '#3d5afe' :
         undefined
-    return <ListItem button {...props}  ref={ref => m.introService.watchSentencesRef$.next(ref)} onClick={() => {
+    return <ListItem button {...props}  ref={ref => m.introService.watchSentencesRef$.next(ref)} onClick={async () => {
         m.modesService.mode$.next(
             m.modesService.mode$.getValue() === Modes.VIDEO ?
                 Modes.NORMAL :
