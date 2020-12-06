@@ -3,8 +3,8 @@ import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/Modes/modes.service";
 import {VideoMetadataService} from "./video-metadata.service";
-import {debounceTime, map, shareReplay, switchMap} from "rxjs/operators";
-import {groupBy} from 'lodash';
+import {debounceTime, map, shareReplay, switchMap, startWith} from "rxjs/operators";
+import {keyBy} from 'lodash';
 
 export class SentenceVideoHighlightService {
     constructor({
@@ -21,13 +21,17 @@ export class SentenceVideoHighlightService {
             modesService.mode$,
             visibleAtomizedSentences$,
             videoMetadataService.allSentenceMetadata$.pipe(
-                switchMap(sentenceMetadata =>
-                    combineLatest(
-                        Object.entries(sentenceMetadata)
-                            .map(([sentence, {metadata$}]) => metadata$)
-                    ).pipe(
-                        map(sentenceMetadata => groupBy(sentenceMetadata, 'sentence'))
-                    )
+                switchMap(sentenceMetadata => {
+                        return combineLatest(
+                            Object.entries(sentenceMetadata)
+                                .map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)))
+                        ).pipe(
+                            map(videoMetadata => {
+                                debugger;
+                                return keyBy(videoMetadata, 'sentence');
+                            })
+                        );
+                    }
                 ),
                 debounceTime(1000),
                 shareReplay(1)
@@ -36,18 +40,21 @@ export class SentenceVideoHighlightService {
             previousHighlightedSentences = visibleAtomizedSentences;
             const iterateAtomizedSentences = (s: ds_Dict<AtomizedSentence[]>, func: (atomizedSentence: AtomizedSentence) => void) => {
                 Object.values(s)
-                    .forEach(atomizedSentences => atomizedSentences
-                        .forEach(func)
+                    .forEach(atomizedSentences => {
+                            atomizedSentences
+                                .forEach(func);
+                        }
                     )
             }
             switch (mode) {
                 case Modes.VIDEO:
-                    iterateAtomizedSentences(visibleAtomizedSentences, atomizedSentence =>
+                    iterateAtomizedSentences(visibleAtomizedSentences, atomizedSentence => {
                         atomizedSentence.getSentenceHTMLElement().classList.add(
                             sentenceMetadata[atomizedSentence.translatableText] ?
                                 'has-metadata' :
                                 'no-metadata'
-                        ));
+                        );
+                    });
                     break;
                 default:
                     iterateAtomizedSentences(previousHighlightedSentences, atomizedSentence =>

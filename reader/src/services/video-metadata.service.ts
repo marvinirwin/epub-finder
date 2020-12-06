@@ -25,16 +25,21 @@ export class VideoMetadataService {
         this.allSentences$.pipe(
         ).subscribe(async sentences => {
             const allMetadata = await fetchBulkMetadata(sentences);
+            debugger;
             if (allMetadata) {
                 Object.entries(allMetadata).forEach(([sentence, metadata]) => {
-                    if (metadata) {
-                        this.resolveMetadataListener$(sentence).next(metadata);
-                    }
+                    debugger;
+                    this.resolveMetadataListener$(sentence).next(metadata);
                 })
             }
         });
         this.allSentenceMetadata$ = this.allSentences$.pipe(
-            map(allSentences => allSentences.map(sentence => ({sentence, metadata$: this.resolveMetadataListener$(sentence)})))
+            map(allSentences => allSentences.map(sentence => ({
+                        sentence,
+                        metadata$: this.resolveMetadataListener$(sentence)
+                    }
+                ))
+            )
         )
     }
 

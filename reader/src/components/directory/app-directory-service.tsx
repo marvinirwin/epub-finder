@@ -6,13 +6,10 @@ import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
-import {orderBy} from "lodash";
-import {SentenceMetadata} from "../../services/video-metadata.service";
 import {ModeDirectory} from "./mode-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
-import {EditableHotkeys, HotkeyDirectoryService} from "./hotkey-directory.service";
+import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
-import {HotKeyEvents} from "../../lib/HotKeyEvents";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
@@ -82,7 +79,9 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                                 reading: constructTree('reading', reading),
                 */
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
+/*
                 hotkeys: HotkeyDirectoryService(m),
+*/
                 playbackSpeed: {
                     nodeLabel: 'playbackSpeed',
                     value: {

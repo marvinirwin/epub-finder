@@ -498,13 +498,11 @@ export class Manager {
         fromEvent(child, 'mouseenter')
             .pipe(withLatestFrom(this.modesService.mode$))
             .subscribe(([ev, mode]) => {
-                return;
-/*
                 if (maxWord) {
                     addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
                     addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
                 }
-*/
+                return;
                 /**
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
                  * whereas other browsers will return a Selection object with Selection.type set to None.
@@ -522,10 +520,14 @@ export class Manager {
                     }
                 }
 */
-            })
+            });
+
+
+
         child.onmouseleave = (ev) => {
             addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
         }
+
         fromEvent(child, 'click').pipe(
             withLatestFrom(this.modesService.mode$)
         ).subscribe(([event, mode]) => {
