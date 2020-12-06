@@ -1,7 +1,7 @@
 import introJs from "intro.js";
 import {SettingsService} from "../../services/settings.service";
-import {fromEvent, Observable} from "rxjs";
-import {filter, skip, take, withLatestFrom} from "rxjs/operators";
+import {combineLatest, fromEvent, Observable} from "rxjs";
+import {filter, take, withLatestFrom} from "rxjs/operators";
 
 
 export class IntroSeriesService {
@@ -33,20 +33,22 @@ export class IntroSeriesService {
         this.intro.start();
     }
 
-    private markStepCompleted(step: introJs.Step) {
-        const uniqueSteps = new Set(this.settingsService.completedSteps$.getValue().concat(step.intro));
+    private async markStepCompleted(step: introJs.Step) {
+        const currentSteps = await this.settingsService.completedSteps$.pipe(take(1)).toPromise();
+        const uniqueSteps = new Set((currentSteps || []).concat(step.intro));
         this.settingsService.completedSteps$.next(Array.from(uniqueSteps));
     }
 
     addSteps(steps: introJs.Step[], startSignal$: Observable<void>) {
-        startSignal$
-            .pipe(
-                // Skip the default value, it takes a while to load
-                withLatestFrom(this.settingsService.completedSteps$.pipe(skip(1)))
-            ).subscribe(([, completedSteps]) => {
-                const filteredSteps = steps.filter(step => !completedSteps.includes(step.intro));
-                if (filteredSteps.length) {
-                    this.executeSeries(filteredSteps);
+        combineLatest([
+            startSignal$,
+            this.settingsService.completedSteps$
+        ]).subscribe(([, completedSteps]) => {
+                if (completedSteps) {
+                    const filteredSteps = steps.filter(step => !completedSteps.includes(step.intro));
+                    if (filteredSteps.length) {
+                        this.executeSeries(filteredSteps);
+                    }
                 }
             }
         )

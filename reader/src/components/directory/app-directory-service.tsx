@@ -8,9 +8,9 @@ import {map} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
 import {ModeDirectory} from "./mode-directory.service";
 import {LibraryDirectoryService} from "./library-directory.service";
-import {HotkeyDirectoryService} from "./hotkey-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
+import {ListItem, Typography} from "@material-ui/core";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -79,9 +79,9 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                                 reading: constructTree('reading', reading),
                 */
                 library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
-/*
-                hotkeys: HotkeyDirectoryService(m),
-*/
+                /*
+                                hotkeys: HotkeyDirectoryService(m),
+                */
                 playbackSpeed: {
                     nodeLabel: 'playbackSpeed',
                     value: {
@@ -95,7 +95,19 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                 rootTree.children.AllSentences = constructTree(
                     'AllSentences',
                     menuNodeFactory(() => <AllSentences m={m}/>, 'AllSentences', 'AllSentences', false)
-                )
+                );
+                rootTree.children.resetIntro = {
+                    nodeLabel: 'resetIntro',
+                    value: {
+                        name: 'resetIntro',
+                        label: 'resetIntro',
+                        InlineComponent: () => <ListItem
+                            button
+                            onClick={() => m.settingsService.completedSteps$.next([])}
+                        >Reset tutorial
+                        </ListItem>,
+                    },
+                };
             }
             return rootTree;
         })

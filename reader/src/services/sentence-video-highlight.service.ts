@@ -27,7 +27,6 @@ export class SentenceVideoHighlightService {
                                 .map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)))
                         ).pipe(
                             map(videoMetadata => {
-                                debugger;
                                 return keyBy(videoMetadata, 'sentence');
                             })
                         );

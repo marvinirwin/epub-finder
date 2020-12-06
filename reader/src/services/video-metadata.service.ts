@@ -25,10 +25,8 @@ export class VideoMetadataService {
         this.allSentences$.pipe(
         ).subscribe(async sentences => {
             const allMetadata = await fetchBulkMetadata(sentences);
-            debugger;
             if (allMetadata) {
                 Object.entries(allMetadata).forEach(([sentence, metadata]) => {
-                    debugger;
                     this.resolveMetadataListener$(sentence).next(metadata);
                 })
             }

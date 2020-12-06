@@ -1,4 +1,4 @@
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounceTime, filter, map, mapTo, shareReplay, take} from "rxjs/operators";
 import {IntroSeriesService} from "./intro-series.service";
 import {VideoMetadata} from "../../components/PronunciationVideo/video-meta-data.interface";
@@ -10,6 +10,8 @@ export class IntroService {
     watchSentencesRef$ = new ReplaySubject<HTMLDivElement | null>(1);
     playbackSpeedRef$ = new ReplaySubject<HTMLDivElement | null>(1);
     sectionsRef$ = new ReplaySubject<HTMLDivElement | null>(1);
+    promptFirstIntro$ = new BehaviorSubject<any>(1);
+    promptSecondIntro$ = new BehaviorSubject<any>(1);
 
     constructor({
                     pronunciationVideoRef$,
@@ -26,7 +28,8 @@ export class IntroService {
             this.titleRef$,
             this.readingFrameRef$,
             this.trySpeakingRef$,
-            this.watchSentencesRef$
+            this.watchSentencesRef$,
+            this.promptFirstIntro$
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
@@ -63,7 +66,8 @@ export class IntroService {
             pronunciationVideoRef$,
             this.playbackSpeedRef$,
             this.sectionsRef$,
-            currentVideoMetadata$
+            currentVideoMetadata$,
+            this.promptSecondIntro$
         ]).pipe(
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
