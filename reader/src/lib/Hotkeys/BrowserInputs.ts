@@ -109,7 +109,6 @@ export class BrowserInputs {
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
         atomizedSentences.forEach(atomizedSentence => {
-            return;
             atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
                 atomizedSentence.getTranslation();
             };
@@ -122,12 +121,10 @@ export class BrowserInputs {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
             try {
-/*
                 createPopper(sentenceHTMLElement, popperHTMLElement, {
                     placement: 'bottom-start',
                     strategy: 'fixed'
                 });
-*/
             } catch (e) {
                 console.error(e);
             }
@@ -140,11 +137,11 @@ export class BrowserInputs {
             }
 
             showEvents.forEach(event => {
-                // sentenceHTMLElement.addEventListener(event, show);
+                sentenceHTMLElement.addEventListener(event, show);
             });
 
             hideEvents.forEach(event => {
-                // sentenceHTMLElement.addEventListener(event, hide);
+                sentenceHTMLElement.addEventListener(event, hide);
             });
         })
     }
