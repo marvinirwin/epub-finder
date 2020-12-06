@@ -18,9 +18,7 @@ npm_version() {
   node --eval="process.stdout.write(require('./package.json').version)";
 }
 
-
 deploy_language_trainer() {
-
   local SSH_USER=root;
   local SSH_HOST="$marvinirwin";
 
@@ -50,22 +48,25 @@ deploy_language_trainer() {
   [ -n "$BUILD_CLIENT" ] && npm run build;
   popd || exit;
 
-  cp -rf reader/build/* server/public;
-  pushd server || exit;
+  # cp -rf reader/build/* server/public;
 
   local FOLDER="/language-trainer-$READER_VERSION-$SERVER_VERSION";
   local DEST="$SSH_USER@$SSH_HOST:$FOLDER";
 
-  echo "rsyncing dist/"
-  rsync -vvv -a dist/ "$DEST";
-  echo "rsyncing cache/ "
-  rsync -vvv -a cache/ "$DEST/cache";
-  echo "rsyncing public/ without video"
-  rsync -vvv -a --exclude video public/ "$DEST/public";
-  echo "rsyncing package.json"
-  rsync -vvv -a package.json "$DEST/package.json"
+  echo "rsyncing server code"
+  rsync -v -a server/dist/* "$DEST";
 
-  popd || exit;
+  echo "rsyncing reader code"
+  rsync -v -a --exclude video --exclude books reader/build/*  "$DEST/public"
+
+  # echo "rsyncing books"
+  # TODO, how does this work?
+  # rsync -v -a reader/build/* "$DEST/public/dist"
+
+  echo "rsyncing server package.json"
+  rsync -v -a server/package.json "$DEST/package.json"
+
+  # popd || exit;
   [ ! -n "$BUILD_SERVER" ] && return;
   ssh -t "$SSH_USER@$SSH_HOST" "
   if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
@@ -73,6 +74,7 @@ deploy_language_trainer() {
   else
     tmux new-session -s \"language-trainer\";
   fi
+
   cd $FOLDER;
   rm -rf public/video;
   ln -s /video public/video;
