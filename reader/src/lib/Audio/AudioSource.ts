@@ -6,5 +6,5 @@ export interface AudioSource {
     stopRecordingSignal$: Subject<void>;
     recognizedText$: Observable<string>;
     mostRecentRecognizedText$: Observable<string>;
-    error$: Observable<string>;
+    errors$: Observable<string>;
 }

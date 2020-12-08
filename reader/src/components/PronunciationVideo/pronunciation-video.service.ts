@@ -23,7 +23,7 @@ export class PronunciationVideoService {
     public chunkedAudioBuffers$: Observable<AudioBuffer[]>;
 
     constructor() {
-        this.videoSentence$.subscribe(async sentence => {
+        this.videoSentence$.pipe(distinctUntilChanged()).subscribe(async sentence => {
             this.videoMetadata$.next();
             if (sentence) {
                 this.videoMetadata$.next(await fetchVideoMetadata(sentence));

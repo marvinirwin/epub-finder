@@ -1,4 +1,4 @@
-import {AudioRecorder} from "../../lib/Audio/AudioRecorder";
+import {AudioRecorder} from "../../lib/Audio/audio-recorder.service";
 import {Typography} from "@material-ui/core";
 import React from "react";
 import {useObservableState} from "observable-hooks";

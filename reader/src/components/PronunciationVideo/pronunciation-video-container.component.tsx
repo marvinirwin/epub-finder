@@ -6,13 +6,14 @@ import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {boundedPoints} from "./math.module";
 import {PronunciationVideo} from "./pronunciation-video.component";
-import {useResizeObserver} from "beautiful-react-hooks";
+import {useDebouncedFn, useResizeObserver} from "beautiful-react-hooks";
 
 
 export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
     const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
+    const [timeLastMouseDown, setTimeLastMouseDown] = useState();
     const pronunciationSectionsContainer = useRef<HTMLDivElement>();
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
     const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
@@ -53,6 +54,15 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         [highlightBarPosition2Ms, highlightBarPosition1Ms] :
         [highlightBarPosition1Ms, highlightBarPosition2Ms];
 
+    const startDrag = useDebouncedFn((lineStartTime: number , percentage: number) => {
+        setReplayDragInProgress(true)
+        setHighlightBarP1(lineStartTime + (percentage / 100 * (millisecondsPerSection || 0)))
+    });
+
+    useEffect(() => {
+        return () => startDrag.cancel();
+    }, [])
+
     let characterCounter = 0;
 
     return <Card className={'pronunciation-video-container-card'}>
@@ -87,6 +97,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                     const previousCharacterCount = characterCounter
                     characterCounter += chunkedCharacterTiming.length;
 
+
                     return <CharacterTimingSection
                         key={lineIndex}
                         characterTimings={chunkedCharacterTiming}
@@ -97,11 +108,11 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                         sectionIndex={lineIndex}
                         characterIndexStart={previousCharacterCount}
                         onClick={percent => {
+                            // If there
                             m.editingVideoMetadataService.editingCharacterIndex$.next(undefined);
                             const newTime = lineIndex * (millisecondsPerSection / 1000) +
                                 ((millisecondsPerSection / 1000) * percent / 100);
                             m.pronunciationVideoService.setVideoPlaybackTime$.next(newTime * 1000);
-
                         }}
                         onMouseOver={percentage => {
                             if (replayDragInProgress) {
@@ -109,11 +120,11 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                             }
                         }}
                         onMouseDown={percentage => {
-                            setReplayDragInProgress(true)
-                            setHighlightBarP1(lineStartTime + (percentage / 100 * millisecondsPerSection))
+                            startDrag(lineStartTime, percentage)
                         }}
                         onMouseUp={percentage => {
-                            setReplayDragInProgress(false)
+                            startDrag.cancel();
+                            setReplayDragInProgress(false);
                         }}
                         highlightStartPosition={highlightBarPoints[0]}
                         highlightEndPosition={highlightBarPoints[1]}

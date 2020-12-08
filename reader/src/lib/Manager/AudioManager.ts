@@ -1,4 +1,4 @@
-import {AudioRecorder} from "../Audio/AudioRecorder";
+import {AudioRecorder} from "../Audio/audio-recorder.service";
 import {ReplaySubject} from "rxjs";
 import {WavAudio} from "../WavAudio";
 import {flatMap, take} from "rxjs/operators";

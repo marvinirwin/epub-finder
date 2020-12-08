@@ -1,14 +1,13 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {
     AudioConfig,
     SpeechConfig,
     SpeechRecognizer
 } from "microsoft-cognitiveservices-speech-sdk";
-import {flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
-import axios from "axios";
+import {filter, flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {AudioSource} from "./AudioSource";
+import {SpeechRecognitionConfigService} from "./speech-recognition-config.service";
 
-const AZURE_SPEECH_REGION = 'westus2' as string;
 
 export class AudioSourceBrowser implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1);
@@ -16,16 +15,14 @@ export class AudioSourceBrowser implements AudioSource {
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
     public mostRecentRecognizedText$: Observable<string>;
-    public error$ = new ReplaySubject<string>(1)
-
-    private speechRecognitionToken$ = new ReplaySubject<string>(1);
-    private speechConfig$: Observable<SpeechConfig>;
+    public errors$ = new ReplaySubject<string>(1)
+    private speechRecognitionConfigService = new SpeechRecognitionConfigService();
 
     constructor() {
         this.mostRecentRecognizedText$ = this.recognizedText$.pipe(shareReplay(1));
         if (navigator.mediaDevices) {
         } else {
-            this.error$.next(`navigator.mediaDevices not found, cannot use microphone`)
+            this.errors$.next(`navigator.mediaDevices not found, cannot use microphone`)
         }
 
 /*
@@ -42,27 +39,10 @@ export class AudioSourceBrowser implements AudioSource {
             shareReplay(1)
         );
 */
-        this.speechConfig$ = this.speechRecognitionToken$.pipe(
-            map(t => {
-                    try {
-                        const speechConfig = SpeechConfig.fromAuthorizationToken(t, AZURE_SPEECH_REGION);
-                        speechConfig.speechRecognitionLanguage = "zh-CN";
-                        return speechConfig;
-                    } catch (e) {
-                        this.error$.next(e);
-                        console.error(e);
-                        throw e;
-                    }
-                }
-            ),
-            shareReplay(1)
-        );
 
-        this.beginRecordingSignal$.pipe(
-            withLatestFrom(this.speechConfig$)
-        ).subscribe(async ([, speechConfig]) => {
+        this.beginRecordingSignal$.subscribe(async () => {
             const audioConfig = AudioConfig.fromMicrophoneInput((await navigator.mediaDevices.getUserMedia({audio: true})).id);
-            const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+            const recognizer = new SpeechRecognizer(await this.speechRecognitionConfigService.config.get(), audioConfig);
             recognizer.recognizeOnceAsync(
                 result => {
                     // One of the reasons text would be undefined is initialSilenceTimeout
@@ -76,13 +56,5 @@ export class AudioSourceBrowser implements AudioSource {
                 }
             )
         });
-
-        this.loadToken();
-    }
-
-    private loadToken() {
-        axios.post(`${process.env.PUBLIC_URL}/speech-recognition-token`).then(result =>
-            this.speechRecognitionToken$.next(result.data as string)
-        );
     }
 }

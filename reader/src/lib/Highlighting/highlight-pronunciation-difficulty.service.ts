@@ -19,6 +19,7 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
             highlighterService,
             rows$: pronunciationProgressService.records$,
             getHighlightDelta: pronunciationRows => {
+                debugger;
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in pronunciationRows) {
                     const row = pronunciationRows[word];

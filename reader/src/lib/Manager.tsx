@@ -382,7 +382,7 @@ export class Manager {
         );
 
 
-        this.audioManager.audioRecorder.audioSource.error$.subscribe(error =>
+        this.audioManager.audioRecorder.audioSource.errors$.subscribe(error =>
             this.appendAlertMessage(error)
         )
 

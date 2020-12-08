@@ -10,7 +10,7 @@ export class UnitTestAudio implements AudioSource {
     public stopRecordingSignal$ = new Subject<void>();
     public recognizedText$ = new Subject<string>();
     public mostRecentRecognizedText$: Observable<string>;
-    public error$ = new ReplaySubject<string>(1);
+    public errors$ = new ReplaySubject<string>(1);
     constructor(public text: string) {
         this.beginRecordingSignal$.subscribe(async () => {
             this.isRecording$.next(true);

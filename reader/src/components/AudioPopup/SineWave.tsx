@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from "react";
-import {AudioRecorder} from "../../lib/Audio/AudioRecorder";
+import {AudioRecorder} from "../../lib/Audio/audio-recorder.service";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
