@@ -4,16 +4,15 @@ import {percentagePosition} from "./math.module";
 import {ManagerContext} from "../../App";
 
 const urlParams = new URLSearchParams(window.location.search);
-
-
 const editMode = !!urlParams.get('edit')
+
 export const PronunciationTimingCharacterComponent: React.FC<{
     editingIndex: number | undefined,
     index: number,
     sectionDuration: number,
     videoCharacter: VideoCharacter,
     timeScale: number,
-    onClick: (ev: React.MouseEvent<HTMLElement>) => void
+    onClick?: (ev: React.MouseEvent<HTMLElement>) => void
 }> =
     ({
          editingIndex,
@@ -31,7 +30,7 @@ export const PronunciationTimingCharacterComponent: React.FC<{
                     left: `${percentagePosition(sectionDuration, videoCharacter.timestamp * timeScale)}%`,
                 }
             }
-            onClick={(ev: React.MouseEvent<HTMLElement>) => editMode && onClick(ev)}
+            onClick={(ev: React.MouseEvent<HTMLElement>) => editMode && onClick?.(ev)}
             onDragStart={() =>
                 editMode && manager.editingVideoMetadataService.editingCharacterIndex$.next(index)
             }

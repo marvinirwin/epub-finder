@@ -6,14 +6,15 @@ import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {boundedPoints} from "./math.module";
 import {PronunciationVideo} from "./pronunciation-video.component";
-import {useDebouncedFn, useResizeObserver} from "beautiful-react-hooks";
+import {useDebouncedFn, useResizeObserver, useTimeout} from "beautiful-react-hooks";
+import {PronunciationSection} from "./pronunciation-section";
 
 
+const DRAG_TIMEOUT = 500;
 export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const [highlightBarPosition1Ms, setHighlightBarP1] = useState<number>();
-    const [highlightBarPosition2Ms, setHighlightBarP2] = useState<number>();
+    const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState<number>();
+    const [highlightBarPosition2Ms, setHighlightBarMsP2] = useState<number>();
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
-    const [timeLastMouseDown, setTimeLastMouseDown] = useState();
     const pronunciationSectionsContainer = useRef<HTMLDivElement>();
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
     const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
@@ -23,44 +24,52 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     // @ts-ignore
     const box = useResizeObserver(pronunciationSectionsContainer)
     const sectionWidth = box?.width;
-    const millisecondsPerSection = sectionWidth ? sectionWidth * 5 : undefined;
+    const sectionLengthMs = sectionWidth ? sectionWidth * 5 : undefined;
     const chunkedCharacterTimings = useChunkedCharacterTimings(
         videoMetadata,
-        millisecondsPerSection
+        sectionLengthMs
     );
 
     const isEditing = editingIndex !== undefined && editingIndex >= 0;
 
     useEffect(() => {
         if (isEditing && replayDragInProgress) {
-            setHighlightBarP1(undefined);
-            setHighlightBarP2(undefined);
+            setHighlightBarMsP1(undefined);
+            setHighlightBarMsP2(undefined);
             setReplayDragInProgress(false);
         }
     }, [isEditing, replayDragInProgress])
 
     useEffect(() => {
         m.pronunciationVideoService.chunkSizeSeconds$.next(
-            millisecondsPerSection ? millisecondsPerSection / 1000 : undefined
+            sectionLengthMs ? sectionLengthMs / 1000 : undefined
         )
-    }, [millisecondsPerSection]);
+    }, [sectionLengthMs]);
 
     useSubscription(m.inputManager.getKeyDownSubject('q'), () => {
-        setHighlightBarP1(undefined);
-        setHighlightBarP2(undefined);
+        setHighlightBarMsP1(undefined);
+        setHighlightBarMsP2(undefined);
     })
 
-    const [highlightStartMs, highlightStopMs] = ((highlightBarPosition1Ms || 0) > (highlightBarPosition2Ms || 0)) ?
-        [highlightBarPosition2Ms, highlightBarPosition1Ms] :
-        [highlightBarPosition1Ms, highlightBarPosition2Ms];
+    const startDrag = useDebouncedFn((
+        highlightBarMsP1: number,
+        setHighlightBarMsP1: (n: number) => void,
+        setReplayDragInProgress: (b: boolean) => void,
+    ) => {
+        debugger;
+        setHighlightBarMsP1(highlightBarMsP1);
+        setReplayDragInProgress(true);
+    }, DRAG_TIMEOUT, {leading: false, trailing: true});
 
-    const startDrag = useDebouncedFn((lineStartTime: number , percentage: number) => {
-        setReplayDragInProgress(true)
-        setHighlightBarP1(lineStartTime + (percentage / 100 * (millisecondsPerSection || 0)))
-    });
+    const stopDrag = () => {
+        startDrag.cancel();
+        setHighlightBarMsP1(undefined);
+        setHighlightBarMsP2(undefined);
+        setReplayDragInProgress(false);
+    };
 
     useEffect(() => {
-        return () => startDrag.cancel();
+        return () => startDrag.cancel()
     }, [])
 
     let characterCounter = 0;
@@ -74,60 +83,53 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         {/* @ts-ignore */}
         <div className={`pronunciation-sections-container`}  ref={pronunciationSectionsContainer}>
             {
-                (chunkedCharacterTimings && videoMetadata && millisecondsPerSection)
+                (chunkedCharacterTimings && videoMetadata && sectionLengthMs)
                 && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
-                    const lineStartTime = lineIndex * millisecondsPerSection;
-                    const lineEndTime = lineStartTime + millisecondsPerSection;
-                    let progressBarPosition;
-                    if (videoTimeMs) {
-                        const currentChunkIndex = Math.floor(videoTimeMs / millisecondsPerSection);
-                        if (currentChunkIndex === lineIndex) {
-                            progressBarPosition = ((videoTimeMs % millisecondsPerSection) / millisecondsPerSection) * 100;
+                    const section = new PronunciationSection(
+                        {
+                            sectionLengthMs,
+                            lineIndex,
+                            firstCharacterIndex: characterCounter,
+                            videoTimeMs: videoTimeMs,
+                            highlightBarStartMs: highlightBarPosition1Ms,
+                            highlightBarEndMs: highlightBarPosition2Ms
                         }
-                    }
-                    const hasPoints = highlightStartMs !== undefined && highlightStopMs !== undefined;
-                    const highlightBarPoints = hasPoints
-                        ? boundedPoints(
-                            highlightStartMs as number,
-                            highlightStopMs as number,
-                            lineStartTime,
-                            lineEndTime - 1
-                        ).map(p => p && (p - (millisecondsPerSection * lineIndex)) / millisecondsPerSection) :
-                        [];
+                    );
                     const previousCharacterCount = characterCounter
                     characterCounter += chunkedCharacterTiming.length;
 
+                    const highlightBarPoints = section.highlightBarPoints();
 
                     return <CharacterTimingSection
                         key={lineIndex}
                         characterTimings={chunkedCharacterTiming}
                         videoMetaData={videoMetadata}
-                        sectionDurationMs={millisecondsPerSection}
+                        sectionDurationMs={sectionLengthMs}
                         sectionWidthPx={sectionWidth || 0}
-                        progressBarPercentPosition={progressBarPosition}
+                        progressBarFraction={section.timeBarFraction()}
                         sectionIndex={lineIndex}
                         characterIndexStart={previousCharacterCount}
-                        onClick={percent => {
-                            // If there
-                            m.editingVideoMetadataService.editingCharacterIndex$.next(undefined);
-                            const newTime = lineIndex * (millisecondsPerSection / 1000) +
-                                ((millisecondsPerSection / 1000) * percent / 100);
-                            m.pronunciationVideoService.setVideoPlaybackTime$.next(newTime * 1000);
-                        }}
-                        onMouseOver={percentage => {
-                            if (replayDragInProgress) {
-                                setHighlightBarP2(lineStartTime + (percentage / 100 * millisecondsPerSection))
+                        onClick={fraction => {
+                            if (!replayDragInProgress) {
+                                stopDrag();
+                                m.pronunciationVideoService.setVideoPlaybackTime$.next(section.newVideoTimeMs(fraction));
                             }
                         }}
-                        onMouseDown={percentage => {
-                            startDrag(lineStartTime, percentage)
+                        onMouseOver={fraction => {
+                            if (replayDragInProgress) {
+                                setHighlightBarMsP2(section.highlightBarNewPosition(fraction));
+                            }
                         }}
-                        onMouseUp={percentage => {
-                            startDrag.cancel();
-                            setReplayDragInProgress(false);
+                        onMouseDown={fraction => {
+                            debugger;
+                            startDrag(
+                                section.highlightBarNewPosition(fraction),
+                                setHighlightBarMsP1,
+                                setReplayDragInProgress
+                            )
                         }}
-                        highlightStartPosition={highlightBarPoints[0]}
-                        highlightEndPosition={highlightBarPoints[1]}
+                        highlightStartPosition={highlightBarPoints?.[0] || 0}
+                        highlightEndPosition={highlightBarPoints?.[1] || 0}
                         audioBuffer={chunkedAudioBuffers?.[lineIndex]}
                     />;
                 })

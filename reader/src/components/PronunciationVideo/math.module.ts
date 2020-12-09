@@ -2,7 +2,7 @@ export const percentagePosition = (sectionDuration: number, temporalPosition: nu
     return (temporalPosition % sectionDuration) / sectionDuration * 100;
 }
 
-export const boundedPoints = (p1: number, p2: number, min: number, max: number) => {
+export const boundedPoints = (p1: number, p2: number, min: number, max: number): [number, number] | never[] => {
     const empty: never[] = [];
     let newp1;
     let newp2;
@@ -28,5 +28,11 @@ export const boundedPoints = (p1: number, p2: number, min: number, max: number) 
         newp1,
         newp2
     ];
+}
+
+export const orderedPoints = (p1: number, p2: number): [number, number] => {
+    return (p1 > p2) ?
+        [p2, p1] :
+        [p1, p2];
 }
 

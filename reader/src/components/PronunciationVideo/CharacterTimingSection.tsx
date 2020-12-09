@@ -12,19 +12,23 @@ import {draw} from "./draw-sine-wav";
 import {filterData, normalizeData} from "../../lib/Audio/AudioGraphing";
 
 export type Percentage = number;
+const urlParams = new URLSearchParams(window.location.search);
+const editMode = !!urlParams.get('edit')
 
 export const CharacterTimingSection: React.FunctionComponent<{
     characterTimings: VideoCharacter[],
     videoMetaData: VideoMetadata,
     sectionDurationMs: number,
     sectionWidthPx: number,
-    progressBarPercentPosition: number | undefined,
+    progressBarFraction: number | undefined,
     highlightStartPosition: number,
     highlightEndPosition: number,
     onClick: (p: Percentage) => void,
     onMouseDown: (n: Percentage) => void,
     onMouseOver: (n: Percentage) => void,
+/*
     onMouseUp: (n: Percentage) => void,
+*/
     sectionIndex: number,
     characterIndexStart: number,
     audioBuffer: AudioBuffer | undefined
@@ -32,13 +36,15 @@ export const CharacterTimingSection: React.FunctionComponent<{
           characterTimings,
           videoMetaData,
           sectionDurationMs,
-          progressBarPercentPosition,
+          progressBarFraction,
           onClick,
           highlightStartPosition,
           highlightEndPosition,
           onMouseDown,
           onMouseOver,
+/*
           onMouseUp,
+*/
           sectionWidthPx,
           sectionIndex,
           characterIndexStart,
@@ -46,7 +52,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
       }) => {
     const [canvas, setCanvasRef] = useState<HTMLCanvasElement | null>();
     const [sectionContainer, setSectionContainer] = useState<HTMLDivElement | null>();
-    const [hoverBarPercentPosition, setHoverBarPercentPosition] = useState<number | undefined>(undefined);
+    const [hoverBarFraction, setHoverBarFraction] = useState<number | undefined>(undefined);
     const [highlightBar, setHighlightBar] = useState<HTMLDivElement | null>();
     usePlaceHighlightBar(highlightBar, sectionContainer, highlightStartPosition, highlightEndPosition);
     const manager = useContext(ManagerContext);
@@ -82,7 +88,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
     return <div className={'character-timing-section-container'}
                 ref={el => manager.introService.sectionsRef$.next(el)}
                 onMouseLeave={() => {
-                    setHoverBarPercentPosition(undefined);
+                    setHoverBarFraction(undefined);
                 }}
                 onMouseMove={ev => {
                     /**
@@ -90,29 +96,31 @@ export const CharacterTimingSection: React.FunctionComponent<{
                      */
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        const percentage = (ev.clientX - rect.x) / sectionContainer.clientWidth * 100;
-                        setHoverBarPercentPosition(percentage);
-                        onMouseOver(percentage);
+                        const fraction = (ev.clientX - rect.x) / sectionContainer.clientWidth;
+                        setHoverBarFraction(fraction);
+                        onMouseOver(fraction);
                     }
                 }}
                 onClick={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onClick(((ev.clientX - rect.x) / sectionContainer.clientWidth) * 100)
+                        onClick(((ev.clientX - rect.x) / sectionContainer.clientWidth))
                     }
                 }}
                 onMouseDown={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onMouseDown((ev.clientX - rect.x) / sectionContainer.clientWidth * 100)
+                        onMouseDown((ev.clientX - rect.x) / sectionContainer.clientWidth)
                     }
                 }}
+/*
                 onMouseUp={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
-                        onMouseUp((ev.clientX - rect.x) / sectionContainer.clientWidth * 100)
+                        onMouseUp((ev.clientX - rect.x) / sectionContainer.clientWidth)
                     }
                 }}
+*/
                 onDragOver={ev => {
                     ev.dataTransfer.dropEffect = "move";
                     /*
@@ -137,25 +145,30 @@ export const CharacterTimingSection: React.FunctionComponent<{
         <canvas ref={setCanvasRef}/>
         <HighlightBar setHighlightBar={setHighlightBar}/>
         <TemporalPositionBar
-            position={hoverBarPercentPosition ? hoverBarPercentPosition / 100 * sectionWidthPx : undefined}
+            position={hoverBarFraction ? hoverBarFraction * sectionWidthPx : undefined}
             color={'blue'}/>
         <TemporalPositionBar
-            position={progressBarPercentPosition ? progressBarPercentPosition / 100 * sectionWidthPx : undefined}
+            position={progressBarFraction ? progressBarFraction * sectionWidthPx : undefined}
             color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>
-            {characterTimings.map((videoCharacter, index) =>
-                <PronunciationTimingCharacterComponent
+            {characterTimings.map((videoCharacter, index) => {
+                const props: {onClick?: (ev: React.MouseEvent<HTMLElement>) => void} = {};
+                if (editMode) {
+                    props.onClick = (ev: React.MouseEvent<HTMLElement>) => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        manager.editingVideoMetadataService.editingCharacterIndex$.next(index + characterIndexStart);
+                    }
+                }
+                return <PronunciationTimingCharacterComponent
                     key={index}
                     editingIndex={editingIndex}
                     index={index + characterIndexStart}
                     sectionDuration={sectionDurationMs}
                     videoCharacter={videoCharacter}
                     timeScale={videoMetaData.timeScale}
-                    onClick={ev => {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        manager.editingVideoMetadataService.editingCharacterIndex$.next(index + characterIndexStart);
-                    }}/>)}
+                    {...props} />;
+            })}
         </div>
     </div>
 }
