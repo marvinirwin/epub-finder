@@ -6,43 +6,13 @@ import {User} from "../entities/user.entity";
 import {UsersService} from "../user/users.service";
 import { Public } from "src/decorators/public";
 import {UserFromReq} from "../decorators/userFromReq";
-import {GoogleGuard, LoginGuard} from "../guards";
+import {FacebookGuard, GoogleGuard, LoginGuard} from "../guards";
 import {GithubGuard} from "../guards/github";
 import {TwitterGuard} from "../guards/twitter";
-import {SignUpDto} from "./signup.dto";
 
 @Controller("/auth")
 export class AuthController {
   constructor(private readonly userService: UsersService) {}
-
-  @Public()
-  @Get("/login")
-  public main(@UserFromReq() user: User): string {
-    return `
-      <html>
-         <script>
-					function handleclick(el) {
-            window.open(el.href, '_blank', 'height=600,width=800,top=0,left=0');
-            return false
-					}
-				</script>
-        <body>
-          <p>logged in as ${JSON.stringify(user)}</p>
-          <form action="/auth/login" method="post">
-            <input type="email" name="email" />
-            <input type="password" name="password" />
-            <input type="submit" />
-          </form>
-          <p>or login with other providers</p>
-          <ul>
-            <li><a href="/auth/google" onClick="return handleclick(this)">google</a></li>
-            <li><a href="/auth/facebook" onClick="return handleclick(this)">facebook</a></li>
-            <li><a href="/auth/onelogin" onClick="return handleclick(this)">onelogin</a></li>
-          </ul>
-        </body>
-      </html>
-    `;
-  }
 
   @Public()
   @UseGuards(LoginGuard)
@@ -63,14 +33,6 @@ export class AuthController {
   }
 
   @Public()
-  @Post("/signup")
-  public async signup(@Body() data: SignUpDto, @Req() req: Request): Promise<User> {
-    const user = await this.userService.createBasicUser(data);
-    await promisify(req.logIn.bind(req))(user);
-    return user;
-  }
-
-  @Public()
   @Get("/google")
   @UseGuards(GoogleGuard)
   public googleLogin(): void {
@@ -81,17 +43,7 @@ export class AuthController {
   @Get("/google/callback")
   @UseGuards(GoogleGuard)
   public googleLoginCallback(@UserFromReq() user: User): string {
-    return `
-      <html>
-      	<script>
-					function handleLoad() {
-					  alert('${JSON.stringify(user)}');
-						window.close();
-					}
-				</script>
-        <body onload="handleLoad()" />
-      </html>
-    `;
+      return '';
   }
   @Public()
   @Get("/github")
@@ -104,17 +56,7 @@ export class AuthController {
   @Get("/github/callback")
   @UseGuards(GithubGuard)
   public githubLoginCallback(@UserFromReq() user: User): string {
-    return `
-      <html>
-      	<script>
-					function handleLoad() {
-					  alert('${JSON.stringify(user)}');
-						window.close();
-					}
-				</script>
-        <body onload="handleLoad()" />
-      </html>
-    `;
+    return '';
   }
   @Public()
   @Get("/twitter")
@@ -127,16 +69,37 @@ export class AuthController {
   @Get("/twitter/callback")
   @UseGuards(TwitterGuard)
   public twitterLoginCallback(@UserFromReq() user: User): string {
-    return `
-      <html>
-      	<script>
-					function handleLoad() {
-					  alert('${JSON.stringify(user)}');
-						window.close();
-					}
-				</script>
-        <body onload="handleLoad()" />
-      </html>
-    `;
+    return '';
+  }
+  @Public()
+  @Get("/facebook")
+  @UseGuards(FacebookGuard)
+  public facebookLogin(): void {
+    // initiates the Facebook OAuth2 login flow
+  }
+
+  @Public()
+  @Get("/facebook/callback")
+  @UseGuards(FacebookGuard)
+  public facebookLoginCallback(@UserFromReq() user: User): string {
+    return '';
+  }
+
+  @Public()
+  @Get('third-party-logins')
+  public thirdPartyOptions() {
+    return {
+      settings: [
+        {
+          thirdPartyName: 'google',
+        },
+        {
+          thirdPartyName: 'facebook',
+        },
+        {
+          thirdPartyName: 'twitter',
+        }
+      ]
+    }
   }
 }

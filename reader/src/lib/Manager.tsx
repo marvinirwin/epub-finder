@@ -70,6 +70,7 @@ import {CardCreationService} from "./card/card-creation.service";
 import {IntroService} from "../lib/intro/intro.service";
 import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
+import {ThirdPartyLoginService} from "../services/third-party-login.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -147,6 +148,7 @@ export class Manager {
     temporaryHighlightService: TemporaryHighlightService;
     private introSeriesService: IntroSeriesService;
     private introHighlightSeries: IntroHighlightService;
+    thirdPartyLoginService = new ThirdPartyLoginService();
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db: db})

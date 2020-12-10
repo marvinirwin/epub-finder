@@ -11,6 +11,7 @@ import {LibraryDirectoryService} from "./library-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 import {ListItem, Typography} from "@material-ui/core";
+import {Login} from "../Authentication/login";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -89,6 +90,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
+                },
+                auth: {
+                    nodeLabel: 'auth',
+                    value: {
+                        name: 'auth',
+                        label: 'Accoutn',
+                        Component: () => <Login/>
+                    }
                 }
             };
             if (DEVELOPER_MODE) {
