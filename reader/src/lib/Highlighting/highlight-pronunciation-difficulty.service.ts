@@ -19,7 +19,6 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
             highlighterService,
             rows$: pronunciationProgressService.records$,
             getHighlightDelta: pronunciationRows => {
-                debugger;
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in pronunciationRows) {
                     const row = pronunciationRows[word];
@@ -35,10 +34,11 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
                         }
                         highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, 1, correct / 10)))
                     }
+                    alert(JSON.stringify(Object.fromEntries(highlights.entries())));
                 }
                 return highlights;
             },
             highlightPath: [0, 'HIGHLIGHT_PRONUNCIATION_DIFFICULTY']
-        })
+        });
     }
 }
