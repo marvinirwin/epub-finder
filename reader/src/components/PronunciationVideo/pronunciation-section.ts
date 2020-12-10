@@ -29,7 +29,7 @@ export class PronunciationSection {
 
     highlightBarPoints(): Array<number> | undefined {
         const start = this.highlightBarStartPositionFraction();
-        const end = this.highlightBarStartPositionFraction();
+        const end = this.highlightBarEndPositionFraction();
         // hasPoints
         if (start !== undefined && end !== undefined) {
             const ordered = orderedPoints(start, end);

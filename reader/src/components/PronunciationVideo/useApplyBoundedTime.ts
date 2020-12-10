@@ -1,5 +1,6 @@
 import {useInterval} from "./useInterval";
 import {useDebouncedFn} from "beautiful-react-hooks";
+import {orderedPoints} from "./math.module";
 
 export const useApplyBoundedTime = (
     videoElementRef: HTMLVideoElement | undefined | null,
@@ -8,7 +9,7 @@ export const useApplyBoundedTime = (
 ) => {
     const setVideoTime = useDebouncedFn(() => {
         if (videoElementRef && highlightBarPosition1Ms && highlightBarPosition2Ms) {
-            videoElementRef.currentTime = highlightBarPosition1Ms / 1000;
+            videoElementRef.currentTime = orderedPoints(highlightBarPosition1Ms, highlightBarPosition2Ms)[0] / 1000;
             // If the video is out of bounds, make it go back into bounds
             videoElementRef.play();
         }

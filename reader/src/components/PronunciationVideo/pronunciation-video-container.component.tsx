@@ -99,6 +99,9 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                         progressBarFraction={section.timeBarFraction()}
                         sectionIndex={lineIndex}
                         characterIndexStart={previousCharacterCount}
+                        highlightStartPosition={highlightBarPoints?.[0] || 0}
+                        highlightEndPosition={highlightBarPoints?.[1] || 0}
+                        audioBuffer={chunkedAudioBuffers?.[lineIndex]}
                         onClick={fraction => {
                             setReplayDragInProgress(false);
                             window.clearTimeout(startDragTimeout || undefined);
@@ -128,9 +131,6 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                                 )
                             }, DRAG_TIMEOUT))
                         }}
-                        highlightStartPosition={highlightBarPoints?.[0] || 0}
-                        highlightEndPosition={highlightBarPoints?.[1] || 0}
-                        audioBuffer={chunkedAudioBuffers?.[lineIndex]}
                     />;
                 })
             }
