@@ -4,9 +4,8 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
-import {boundedPoints} from "./math.module";
 import {PronunciationVideo} from "./pronunciation-video.component";
-import {useDebouncedFn, useResizeObserver, useTimeout} from "beautiful-react-hooks";
+import {useResizeObserver} from "beautiful-react-hooks";
 import {PronunciationSection} from "./pronunciation-section";
 
 
@@ -49,28 +48,19 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     useSubscription(m.inputManager.getKeyDownSubject('q'), () => {
         setHighlightBarMsP1(undefined);
         setHighlightBarMsP2(undefined);
-    })
+    });
 
-    const startDrag = useDebouncedFn((
+    const [startDragTimeout, setStartDragTimeout] = useState<number | null>()
+    const [mouseDownTime, setMouseDownTime] = useState<Date | null>();
+
+    const startDrag = (
         highlightBarMsP1: number,
         setHighlightBarMsP1: (n: number) => void,
         setReplayDragInProgress: (b: boolean) => void,
     ) => {
-        debugger;
         setHighlightBarMsP1(highlightBarMsP1);
         setReplayDragInProgress(true);
-    }, DRAG_TIMEOUT, {leading: false, trailing: true});
-
-    const stopDrag = () => {
-        startDrag.cancel();
-        setHighlightBarMsP1(undefined);
-        setHighlightBarMsP2(undefined);
-        setReplayDragInProgress(false);
     };
-
-    useEffect(() => {
-        return () => startDrag.cancel()
-    }, [])
 
     let characterCounter = 0;
 
@@ -110,8 +100,16 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                         sectionIndex={lineIndex}
                         characterIndexStart={previousCharacterCount}
                         onClick={fraction => {
+                            setReplayDragInProgress(false);
+                            window.clearTimeout(startDragTimeout || undefined);
+                            if (mouseDownTime) {
+                                // If the click was fast enough then clear the range
+                                if (new Date().getTime() - mouseDownTime.getTime() < DRAG_TIMEOUT) {
+                                    setHighlightBarMsP1(undefined);
+                                    setHighlightBarMsP2(undefined);
+                                }
+                            }
                             if (!replayDragInProgress) {
-                                stopDrag();
                                 m.pronunciationVideoService.setVideoPlaybackTime$.next(section.newVideoTimeMs(fraction));
                             }
                         }}
@@ -121,12 +119,14 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                             }
                         }}
                         onMouseDown={fraction => {
-                            debugger;
-                            startDrag(
-                                section.highlightBarNewPosition(fraction),
-                                setHighlightBarMsP1,
-                                setReplayDragInProgress
-                            )
+                            setMouseDownTime(new Date());
+                            setStartDragTimeout(window.setTimeout(() => {
+                                startDrag(
+                                    section.highlightBarNewPosition(fraction),
+                                    setHighlightBarMsP1,
+                                    setReplayDragInProgress
+                                )
+                            }, DRAG_TIMEOUT))
                         }}
                         highlightStartPosition={highlightBarPoints?.[0] || 0}
                         highlightEndPosition={highlightBarPoints?.[1] || 0}
