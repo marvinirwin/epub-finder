@@ -30,19 +30,18 @@ export class Highlighter {
     constructor({highlighterService}: {highlighterService: HighlighterService}) {
         const s = highlighterService;
         const {wordToMap} = HighlighterService;
+        const rgba: RGBA = [160, 160, 160, 0.5];
         s.singleHighlight(
             this.mousedOverWord$.pipe(
-                map(wordToMap([160, 160, 160, 0.5]))
+                map(wordToMap(rgba))
             ),
-            s.highlightMap$,
             [0, 'MOUSEOVER_CHARACTER_HIGHLIGHT']
-        )
+        );
         s.singleHighlight(
             this.mouseoverHighlightedSentences$
                 .pipe(
-                    map(wordToMap([160, 160, 160, 0.5])),
+                    map(wordToMap(rgba)),
                 ),
-            s.highlightMap$,
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
 /*

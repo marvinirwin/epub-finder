@@ -62,7 +62,7 @@ import {HighlightPronunciationVideoService} from "../services/highlight-pronunci
 import {WordRecognitionProgressService} from "./schedule/word-recognition-progress.service";
 import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
 import {QuizResultService} from "./quiz/quiz-result.service";
-import {HighlightPronunciationDifficultyService} from "./Highlighting/highlight-pronunciation-difficulty.service";
+import {HighlightPronunciationProgressService} from "./Highlighting/highlight-pronunciation-progress.service";
 import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-recollection-difficulty.service";
 import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 import {TestHotkeysService} from "./Hotkeys/test-hotkeys.service";
@@ -438,7 +438,7 @@ export class Manager {
             pronunciationVideoService: this.pronunciationVideoService
         })
 
-        new HighlightPronunciationDifficultyService({
+        new HighlightPronunciationProgressService({
             pronunciationProgressService: this.pronunciationProgressService,
             highlighterService: this.highlighterService
         });
