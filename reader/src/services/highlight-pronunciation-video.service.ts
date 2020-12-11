@@ -48,7 +48,6 @@ export class HighlightPronunciationVideoService {
         );
         highlighterService.singleHighlight(
             elementsToHighlight$,
-            highlighterService.highlightMap$,
             [0, 'PRONUNCIATION_VIDEO_HIGHLIGHT']
         )
     }

@@ -13,7 +13,8 @@ import {mixRGBA, RGBA} from "./color.service";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {map, shareReplay, tap} from "rxjs/operators";
-
+import debug from 'debug';
+const d = debug('highlight:highlighter');
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string];
@@ -29,8 +30,6 @@ export class HighlighterService {
     }
 
     public highlightMap$ = new ReplaySubject<TargetHighlightPriorityList>(1);
-
-    // private wordElementMap$: Observable<Dictionary<IAnnotatedCharacter[]>>;
 
     private sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
@@ -62,13 +61,12 @@ export class HighlighterService {
 
     public singleHighlight(
         newHighlightDelta$: Observable<HighlightDelta | undefined>,
-        highlightedWords$: Observable<TargetHighlightPriorityList>,
         highlightPath: HighlighterPath,
     ) {
         let oldHighlightDelta: HighlightDelta | undefined;
         combineLatest([
             newHighlightDelta$,
-            highlightedWords$,
+            this.highlightMap$,
             this.highlightTargetMap$
         ]).subscribe((
             [
@@ -76,6 +74,8 @@ export class HighlighterService {
                 currentHighlightMap,
                 targetElementMap
             ]) => {
+            d(highlightPath);
+            d(newHighlightDelta);
 
             const highlightWordsToUpdate = new Set<string | HTMLElement>();
             if (oldHighlightDelta) {
@@ -93,6 +93,7 @@ export class HighlighterService {
                     highlightWordsToUpdate
                 );
             }
+            d(highlightWordsToUpdate);
             this.updateHighlightBackgroundColors(
                 highlightWordsToUpdate,
                 targetElementMap,
@@ -147,13 +148,19 @@ export class HighlighterService {
             targetElementMap,
             wordHighlightMap,
         );
-        for (const word of targetsToUpdate) {
+        d(targetsToUpdate);
+        d(targetElementMap);
+        targetsToUpdate.forEach(word => {
             const elementsToHighlight = targetElementMap.get(word);
-            if (!elementsToHighlight) continue;
+            if (!elementsToHighlight) {
+                debug(`cannot find ${word} in target map`);
+                return;
+            }
             elementsToHighlight.forEach(elementToHighlight => {
                 updateElementBackgroundColor(elementToHighlight, computedElementHighlightMap);
             })
-        }
+        })
+        d(`Finished updating backgound colors`);
     }
 
     private removeHighlightDelta(
@@ -190,7 +197,10 @@ function updateElementBackgroundColor(
         (new Map(highestPriorityKeyValues)).forEach(rgba => rgbas.push(rgba));
     }
     // @ts-ignore
-    return elementToHighlight.element.style.backgroundColor = mixRGBA(rgbas);
+    const backgroundColor = mixRGBA(rgbas);
+    // @ts-ignore
+    elementToHighlight.element.style.backgroundColor = backgroundColor;
+    d(`updated highlight background key of ${elementToHighlight.element.textContent} to ${backgroundColor}`)
 }
 
 const computeElementHighlightMap = (

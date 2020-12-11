@@ -6,8 +6,10 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {HighlightDelta} from "./highlight.interface";
 import {RGBA} from "./color.service";
 import {colorForPercentage} from "../color/Range";
+import debug from 'debug';
+const d = debug('highlight:pronunciation');
 
-export class HighlightPronunciationDifficultyService extends HighlightDifficultyService<ds_Dict<PronunciationProgressRow[]>> {
+export class HighlightPronunciationProgressService extends HighlightDifficultyService<ds_Dict<PronunciationProgressRow[]>> {
     constructor({
                     pronunciationProgressService,
                     highlighterService
@@ -19,7 +21,6 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
             highlighterService,
             rows$: pronunciationProgressService.records$,
             getHighlightDelta: pronunciationRows => {
-                debugger;
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in pronunciationRows) {
                     const row = pronunciationRows[word];
@@ -36,6 +37,7 @@ export class HighlightPronunciationDifficultyService extends HighlightDifficulty
                         highlights.set(word, colorForPercentage(HighlightDifficultyService.clamp(0.001, 1, correct / 10)))
                     }
                 }
+                d(Object.fromEntries(highlights))
                 return highlights;
             },
             highlightPath: [0, 'HIGHLIGHT_PRONUNCIATION_DIFFICULTY']

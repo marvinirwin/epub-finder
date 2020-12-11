@@ -21,20 +21,8 @@ export class HighlightDifficultyService<T> {
 
         highlighterService.singleHighlight(
             rows$.pipe(map(getHighlightDelta)),
-            highlighterService.highlightMap$,
             highlightPath
         );
-        const now = new Date();
-        function getDatePercentage(d: Date): number {
-            const date = d.getTime();
-            const sevenDays = 86400000 * 7;
-            const SevenDaysAgo = now.getTime() - sevenDays;
-            const sevenDaysInTheFuture = now.getTime() + sevenDays;
-            const fourteenDays = sevenDays * 2;
-            const clampedDate = HighlightDifficultyService.clamp(0.001, fourteenDays - 0.001 , date - SevenDaysAgo);
-            const percentage = clampedDate / fourteenDays * 100;
-            return percentage;
-        }
     };
 
     static clamp(min: number, max: number, v: number) {

@@ -8,6 +8,8 @@ import {DatabaseService} from "../Storage/database.service";
 import {TrieWrapper} from "../TrieWrapper";
 import {TrieObservable} from "./QuizCharacter";
 import {cardForWord} from "../Util/Util";
+import debug from 'debug';
+const d = debug('carsd');
 
 export default class CardService {
     public deleteWords: Subject<string[]> = new Subject<string[]>();
