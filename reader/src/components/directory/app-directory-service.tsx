@@ -1,37 +1,24 @@
-import {constructTree, ds_Tree} from "../../services/tree.service";
+import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/Manager";
-import {Reading} from "../Reading/Reading";
-import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
-import {ModeDirectory} from "./mode-directory.service";
-import {LibraryDirectoryService} from "./library-directory.service";
+import {bookMenuNodeFactory} from "./library-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
-import {ListItem, Typography} from "@material-ui/core";
-import {Login} from "../Authentication/login";
+import {arrayToTreeRoot} from "./directory.factory";
+import {ReadingNode} from "./nodes/reading";
+import {WatchMode} from "./modes/watch-mode.component";
+import {SpeakMode} from "./modes/speak-mode.component";
+import {TreeMenuNode} from "./tree-menu-node.interface";
+import GoogleLogin from 'react-google-login';
+import TwitterLogin from 'react-twitter-login';
+import FacebookLogin from 'react-facebook-login';
+import {IconButton} from "@material-ui/core";
+import GoogleIcon from "../Icons/GoogleIcon";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
-
-export const menuNodeFactory = (
-    Component: React.FunctionComponent | undefined,
-    label: string,
-    key: string,
-    moveDirectory: boolean,
-    LeftIcon?: React.Component,
-    inlineComponent?: React.FunctionComponent,
-    component?: React.FunctionComponent,
-    action?: () => void
-): TreeMenuNode => ({
-    Component,
-    name: key,
-    label,
-    LeftIcon: LeftIcon,
-    moveDirectory,
-    action
-});
 
 
 export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
@@ -66,59 +53,103 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                  checkedOutBooks,
                  builtInBooks
              ]) => {
-            const ReadingComponent = () => <Reading m={m}/>;
-            const main = menuNodeFactory(ReadingComponent, 'Reading', 'root', false);
-            /*
-                        const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
-            */
-
-
-            const rootTree = constructTree('root', main);
-            rootTree.children = {
-                ...ModeDirectory(m),
-                /*
-                                reading: constructTree('reading', reading),
-                */
-                library: LibraryDirectoryService(m, checkedOutBooks, {...customBooks, ...builtInBooks}),
-                /*
-                                hotkeys: HotkeyDirectoryService(m),
-                */
-                playbackSpeed: {
-                    nodeLabel: 'playbackSpeed',
-                    value: {
+            return arrayToTreeRoot<TreeMenuNode>(
+                ReadingNode(m),
+                [
+                    {
+                        name: 'watchPronunciation',
+                        ReplaceComponent: WatchMode
+                    },
+                    {
+                        name: 'recognizeSpeech',
+                        ReplaceComponent: SpeakMode
+                    },
+                    {
+                        name: 'library',
+                        label: 'Library',
+                        moveDirectory: true,
+                    },
+                    // @ts-ignore
+                    [
+                        ...Object.keys(checkedOutBooks)
+                            .map(bookTitle => bookMenuNodeFactory(m, bookTitle, true)),
+                        ...Object.keys({...customBooks, ...builtInBooks})
+                            .filter(title => !checkedOutBooks[title])
+                            .map(bookTitle => bookMenuNodeFactory(m, bookTitle, false)),
+                    ] as TreeMenuNode[],
+                    {
                         name: 'playbackSpeed',
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
-                },
-                auth: {
-                    nodeLabel: 'auth',
-                    value: {
-                        name: 'auth',
-                        label: 'Accoutn',
-                        Component: () => <Login/>
-                    }
-                }
-            };
-            if (DEVELOPER_MODE) {
-                rootTree.children.AllSentences = constructTree(
-                    'AllSentences',
-                    menuNodeFactory(() => <AllSentences m={m}/>, 'AllSentences', 'AllSentences', false)
-                );
-                rootTree.children.resetIntro = {
-                    nodeLabel: 'resetIntro',
-                    value: {
-                        name: 'resetIntro',
-                        label: 'resetIntro',
-                        InlineComponent: () => <ListItem
-                            button
-                            onClick={() => m.settingsService.completedSteps$.next([])}
-                        >Reset tutorial
-                        </ListItem>,
+                    {
+                        name: 'signInWith',
+                        label: 'Sign In With',
+                        moveDirectory: true
                     },
-                };
-            }
-            return rootTree;
+                    [
+                        {
+                            name: 'google',
+                            ReplaceComponent: () => <IconButton
+                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/google`}>
+                                <GoogleIcon/>
+                            </IconButton>
+
+
+                            /*<GoogleLogin
+                                buttonText="Login"
+                                onSuccess={() => {}}
+                                onFailure={() => {}}
+                                clientId={process.env.GOOGLE_OAUTH_CLIENT_ID as string}
+                            />*/
+                        },
+                        {
+                            name: 'facebook',
+                            ReplaceComponent: () => <FacebookLogin
+                                appId={process.env.FACEBOOK_APP_ID as string}
+                                autoLoad={true}
+                                fields="name,email,picture"
+                                onClick={() => {
+                                }}
+                                callback={() => {
+                                }}/>,
+                        },
+                        {
+                            name: 'twitter',
+                            ReplaceComponent: () => <TwitterLogin
+                                authCallback={() => {
+                                }}
+                                consumerKey={process.env.TWITTER_CONSUMER_KEY as string}
+                                consumerSecret={process.env.TWITTER_CONSUMER_SECRET as string}
+                            />
+                        }
+                    ]
+                ]
+            );
+            /*
+                        const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
+            */
+            /*
+                        if (DEVELOPER_MODE) {
+                            rootTree.children.AllSentences = constructTree(
+                                'AllSentences',
+                                menuNodeFactory(() => <AllSentences m={m}/>, 'AllSentences', 'AllSentences', false)
+                            );
+                            rootTree.children.resetIntro = {
+                                nodeLabel: 'resetIntro',
+                                value: {
+                                    name: 'resetIntro',
+                                    label: 'resetIntro',
+                                    InlineComponent: () => <ListItem
+                                        button
+                                        onClick={() => m.settingsService.completedSteps$.next([])}
+                                    >Reset tutorial
+                                    </ListItem>,
+                                },
+                            };
+                        }
+            */
+            // return rootTree;
         })
     )
 }

@@ -1,17 +1,17 @@
 import {Manager} from "../../lib/Manager";
-import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
 import {checkoutBook, returnBook} from "../Library/library.module";
 import {ds_Dict} from "../../lib/Tree/DeltaScanner";
 import DeleteIcon from '@material-ui/icons/Delete';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import React from "react";
+import {TreeMenuNode} from "./tree-menu-node.interface";
 
-const bookMenuNodeFactory = (
+export const bookMenuNodeFactory = (
     m: Manager,
     name: string,
     checkedOut: boolean
-) => ({
+): TreeMenuNode => ({
     name: name,
     label: name,
     LeftIcon: checkedOut ? <DeleteIcon/> : <NoteAdd/>,

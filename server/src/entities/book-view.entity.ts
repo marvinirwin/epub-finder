@@ -1,5 +1,6 @@
 import {Book} from "./book.entity";
-import {Column, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
+import {Column, OneToOne, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
+import {User} from "./user.entity";
 
 @ViewEntity({
     expression: `
@@ -35,6 +36,7 @@ export class BookView  {
     created_at: Date;
 
     @ViewColumn()
+    @OneToOne(() => User, user => user.id)
     creator_id: number;
 
     @ViewColumn()

@@ -1,5 +1,4 @@
 import {Manager} from "../../lib/Manager";
-import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
 import Highlight from '@material-ui/icons/Highlight';
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver';
@@ -13,8 +12,6 @@ import {SpeakMode} from "./modes/speak-mode.component";
 export const ModeDirectory = (m: Manager): { [nodeLabel: string]: ds_Tree<TreeMenuNode> } => {
     return Object.fromEntries(
         [
-            ['Video', WatchMode],
-            ['SpeakMode', SpeakMode]
         ].map(([name, Component]) => [
                 name,
                 {

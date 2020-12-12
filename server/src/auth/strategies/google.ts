@@ -16,11 +16,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
         });
     }
 
-    public async validate(_accessToken: string, _refreshToken: string, profile: any): Promise<User> {
+    public async validate(request: any, accessToken: string, refreshToken: string, profile, done: Function): Promise<User> {
+        return await this.userService.upsertUserByEmail(profile.emails[0].value);
+/*
         const user = await this.userService.findOne({email: profile.emails[0].value});
         if (user) {
             return user;
         }
+        const newUser = this.userService.createBasicUser()
         throw new UnauthorizedException();
+*/
     }
 }

@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {Body, Controller, Get, Post, Req, Res, HttpCode, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Post, Req, Res, HttpCode, UseGuards, Redirect} from "@nestjs/common";
 import {promisify} from "util";
 
 import {User} from "../entities/user.entity";
@@ -14,12 +14,14 @@ import {TwitterGuard} from "../guards/twitter";
 export class AuthController {
   constructor(private readonly userService: UsersService) {}
 
+/*
   @Public()
   @UseGuards(LoginGuard)
   @Post("/login")
   public login(@UserFromReq() user: User): User {
     return user;
   }
+*/
 
   @Public()
   @HttpCode(204)
@@ -42,7 +44,9 @@ export class AuthController {
   @Public()
   @Get("/google/callback")
   @UseGuards(GoogleGuard)
+  @Redirect(process.env.BASE_URL)
   public googleLoginCallback(@UserFromReq() user: User): string {
+      // Redirect to index.html
       return '';
   }
   @Public()
@@ -55,6 +59,7 @@ export class AuthController {
   @Public()
   @Get("/github/callback")
   @UseGuards(GithubGuard)
+  @Redirect(process.env.BASE_URL)
   public githubLoginCallback(@UserFromReq() user: User): string {
     return '';
   }
@@ -68,6 +73,7 @@ export class AuthController {
   @Public()
   @Get("/twitter/callback")
   @UseGuards(TwitterGuard)
+  @Redirect(process.env.BASE_URL)
   public twitterLoginCallback(@UserFromReq() user: User): string {
     return '';
   }
@@ -81,10 +87,12 @@ export class AuthController {
   @Public()
   @Get("/facebook/callback")
   @UseGuards(FacebookGuard)
+  @Redirect(process.env.BASE_URL)
   public facebookLoginCallback(@UserFromReq() user: User): string {
     return '';
   }
 
+/*
   @Public()
   @Get('third-party-logins')
   public thirdPartyOptions() {
@@ -102,4 +110,5 @@ export class AuthController {
       ]
     }
   }
+*/
 }

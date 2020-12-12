@@ -1,5 +1,5 @@
 import React, {useContext} from "react"
-import GoogleLogin from "react-google-login";
+import GoogleLogin from 'react-google-login';
 /*
 import FacebookLogin from 'react-facebook-login';
 import TwitterLogin from 'react-twitter-auth';
@@ -8,7 +8,7 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {keyBy} from "lodash";
 
-export const Login = () => {
+export const LoginOptions = () => {
     const m = useContext(ManagerContext);
     const thirdPartyLogins = useObservableState(m.thirdPartyLoginService.thirdPartyLogins$, {settings: []});
     const regrouped = keyBy(thirdPartyLogins.settings, 'thirdPartyName');

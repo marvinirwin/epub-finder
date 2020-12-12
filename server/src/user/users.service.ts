@@ -3,6 +3,8 @@ import {User} from '../entities/user.entity';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CreateUserDto} from "./create-user.dto";
+import {Profiles} from "../types/custom";
+import GoogleProfile = Profiles.GoogleProfile;
 
 @Injectable()
 export class UsersService {
@@ -15,8 +17,9 @@ export class UsersService {
     /**
      * Creates a user with a username and password
      */
+/*
     async createBasicUser({email, password}: CreateUserDto): Promise<User> {
-        return this.usersRepository.create(
+        return this.usersRepository.save(
             Object.assign(
                 new User(),
                 {
@@ -26,6 +29,7 @@ export class UsersService {
             )
         )
     }
+*/
 
     findAll(): Promise<User[]> {
         return this.usersRepository.find();
@@ -39,13 +43,19 @@ export class UsersService {
         await this.usersRepository.delete(id);
     }
 
-    async findForAuth(email, password) {
-        const userWithThisEmail = await this.findOne({email});
-        if (!userWithThisEmail) {
-            return userWithThisEmail;
+    async upsertUserByEmail(email: string): Promise<User> {
+        const user = await this.findOne({email});
+        if (user) {
+            return user;
         }
-        if (await User.comparePassword(userWithThisEmail.password, password)) {
-            return userWithThisEmail;
-        }
+
+        return this.usersRepository.save(
+            Object.assign(
+                new User(),
+                {
+                    email
+                }
+            )
+        )
     }
 }

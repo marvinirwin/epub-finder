@@ -81,7 +81,6 @@ export class User {
     private _loadedPassword: string;
 
     @OneToMany(() => BookView, (book: BookView) => book.creator_id)
-    @JoinTable()
     books: Promise<BookView[]>;
 
 

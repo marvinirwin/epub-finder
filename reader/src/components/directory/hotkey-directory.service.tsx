@@ -2,10 +2,10 @@ import {HotKeyEvents} from "../../lib/HotKeyEvents";
 import {Manager} from "../../lib/Manager";
 import React, {useContext} from "react";
 import {orderBy} from "lodash";
-import {TreeMenuNode} from "../../services/tree-menu-node.interface";
 import {ds_Tree} from "../../services/tree.service";
 import {HotkeyDirectoryComponent} from "./hotkey-directory.component";
 import {Hotkeys} from "../../lib/Hotkeys/hotkeys.interface";
+import {TreeMenuNode} from "./tree-menu-node.interface";
 
 
 const hotkeyMenuNodeFactory = (
@@ -23,6 +23,12 @@ export const EditableHotkeys = (hotkeys: Hotkeys<string[]>, m: Manager): TreeMen
     })
 }
 
+
+
+
+
+
+/*
 export const HotkeyDirectoryService = (m: Manager): ds_Tree<TreeMenuNode> => {
     return {
         nodeLabel: 'hotkeys',
@@ -42,4 +48,4 @@ export const HotkeyDirectoryService = (m: Manager): ds_Tree<TreeMenuNode> => {
             )
         )
     }
-}
+}*/
