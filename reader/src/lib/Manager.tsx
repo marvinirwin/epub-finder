@@ -150,7 +150,7 @@ export class Manager {
     droppedFilesService: DroppedFilesService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
-        this.settingsService = new SettingsService({db: db})
+        this.settingsService = new SettingsService({db})
         this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
         this.inputManager = new BrowserInputs({

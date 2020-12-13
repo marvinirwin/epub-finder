@@ -114,9 +114,9 @@ export class BrowserInputs {
             };
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
-            let sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            const sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
             sentenceHTMLElement.classList.add('applied-sentence-listener');
-            let popperHTMLElement = atomizedSentence.getPopperHTMLElement();
+            const popperHTMLElement = atomizedSentence.getPopperHTMLElement();
             if (!sentenceHTMLElement || !popperHTMLElement) {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }

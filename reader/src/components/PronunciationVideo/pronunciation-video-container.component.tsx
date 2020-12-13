@@ -80,7 +80,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                             sectionLengthMs,
                             lineIndex,
                             firstCharacterIndex: characterCounter,
-                            videoTimeMs: videoTimeMs,
+                            videoTimeMs,
                             highlightBarStartMs: highlightBarPosition1Ms,
                             highlightBarEndMs: highlightBarPosition2Ms
                         }

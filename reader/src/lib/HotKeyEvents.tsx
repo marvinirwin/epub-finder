@@ -7,38 +7,38 @@ import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 export class HotKeyEvents {
 
     public get openImageSearch$() {
-        return this.subjects["OPEN_IMAGE_SEARCH"];
+        return this.subjects.OPEN_IMAGE_SEARCH;
     }
     public get hide$() {
-        return this.subjects["HIDE"];
+        return this.subjects.HIDE;
     }
     public get deleteCard$() {
-        return this.subjects["DELETE_CARD"];
+        return this.subjects.DELETE_CARD;
     }
 
     public get quizResultEasy$() {
-        return this.subjects["QUIZ_RESULT_EASY"];
+        return this.subjects.QUIZ_RESULT_EASY;
     }
     public get quizResultMedium$() {
-        return this.subjects["QUIZ_RESULT_MEDIUM"];
+        return this.subjects.QUIZ_RESULT_MEDIUM;
     }
     public get recordQuizWord$() {
-        return this.subjects["RECORD_QUIZ_WORD"];
+        return this.subjects.RECORD_QUIZ_WORD;
     }
     public get quizResultHard$() {
-        return this.subjects["QUIZ_RESULT_HARD"];
+        return this.subjects.QUIZ_RESULT_HARD;
     }
     public get requestEditQuizWord$() {
-        return this.subjects["REQUEST_EDIT_WORD"];
+        return this.subjects.REQUEST_EDIT_WORD;
     }
     public get advanceQuiz$() {
-        return this.subjects["ADVANCE_QUIZ"];
+        return this.subjects.ADVANCE_QUIZ;
     }
     public get hideVideo$() {
-        return this.subjects["HIDE_VIDEO"];
+        return this.subjects.HIDE_VIDEO;
     }
     public get pronunciationRecordSuccess$() {
-        return this.subjects["PRONUNCIATION_RECORD_SUCCESS"];
+        return this.subjects.PRONUNCIATION_RECORD_SUCCESS;
     }
 
     public subjects: Hotkeys<Subject<void>> = Object.fromEntries(

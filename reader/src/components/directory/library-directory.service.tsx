@@ -12,7 +12,7 @@ export const bookMenuNodeFactory = (
     name: string,
     checkedOut: boolean
 ): TreeMenuNode => ({
-    name: name,
+    name,
     label: name,
     LeftIcon: checkedOut ? () => <DeleteIcon/> : () => <NoteAdd/>,
     action: () => checkedOut ? returnBook(m, name) : checkoutBook(m, name)

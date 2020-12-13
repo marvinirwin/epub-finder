@@ -45,7 +45,7 @@ export class IntroService {
                     },
                     {
                         element: readingFrameRef as HTMLElement,
-                        intro: `This is a story composed of exclusively HSK-1 words and kitchen words.  
+                        intro: `This is a story composed of exclusively HSK-1 words and kitchen words.
                             Words are repeated and distributed evenly throughout the story to aid memorization.`,
                     },
                     {

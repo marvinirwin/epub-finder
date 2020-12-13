@@ -179,10 +179,10 @@ export class HighlighterService {
 function updateElementBackgroundColor(
     elementToHighlight: ElementContainer,
     elementHighlightMap: ElementHighlightMap) {
-    const priorityLists = elementHighlightMap.get(<HTMLElement>elementToHighlight.element);
+    const priorityLists = elementHighlightMap.get(elementToHighlight.element as HTMLElement);
     const rgbas: RGBA[] = [];
     if (priorityLists) {
-        let highestPriorityKeyValues: Array<[HighlightTarget, RGBA]> = [];
+        let highestPriorityKeyValues: [HighlightTarget, RGBA][] = [];
         let highestPriority: number = Number.MAX_SAFE_INTEGER;
         priorityLists.forEach(priorityList => {
                 const highestPriorityMapIndex = priorityList.findIndex(highlightDelta => highlightDelta && highlightDelta.size > 0);

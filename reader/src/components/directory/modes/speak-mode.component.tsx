@@ -17,7 +17,7 @@ export const SpeakMode: React.FunctionComponent = ({...props}) => {
         recordRequest.sentence.then(recognizedSentence => {
             const word = removePunctuation(recognizedSentence);
             m.pronunciationProgressService.addRecords$.next([{
-                word: word,
+                word,
                 success: true
             }]);
             // Add a highlight for each of these characters

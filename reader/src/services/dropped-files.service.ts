@@ -38,7 +38,7 @@ export class DroppedFilesService {
                 )
             }
         }
-        this.droppedFileMessages$.next(`File extension of ${droppedFile.name} not supported.  
+        this.droppedFileMessages$.next(`File extension of ${droppedFile.name} not supported.
         Current supported extensions: ${entries.map(([ext]) => ext).join(', ')}`);
     }
 }

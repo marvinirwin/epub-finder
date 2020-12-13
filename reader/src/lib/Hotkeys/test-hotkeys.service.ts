@@ -7,7 +7,7 @@ export class TestHotkeysService {
                     hotkeyEvents,
         pronunciationProgressService
     }:{hotkeyEvents: HotKeyEvents, pronunciationProgressService: PronunciationProgressService}) {
-        hotkeyEvents.subjects["PRONUNCIATION_RECORD_SUCCESS"].subscribe(() => {
+        hotkeyEvents.subjects.PRONUNCIATION_RECORD_SUCCESS.subscribe(() => {
             pronunciationProgressService.addRecords$.next([{
                 word: '大小姐',
                 success: true,

@@ -27,7 +27,7 @@ export class PronunciationSection {
         return this.positionFraction(videoTimeMs);
     }
 
-    highlightBarPoints(): Array<number> | undefined {
+    highlightBarPoints(): number[] | undefined {
         const start = this.highlightBarStartPositionFraction();
         const end = this.highlightBarEndPositionFraction();
         // hasPoints

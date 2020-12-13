@@ -23,7 +23,7 @@ export const BodyStyle = `
             margin: 0 24px;
         }
     }
-    
+
     mark {
         position: relative; /*  Required to keep our pseudo elements in check*/
         background-color: transparent;
@@ -49,11 +49,11 @@ export const BodyStyle = `
     .POPPER_ELEMENT[data-show] {
             display: block;
     }
-    
+
     .has-metadata {
         background-color: lightgreen;
     }
-    
+
     .no-metadata {
         background-color: pink;
     }

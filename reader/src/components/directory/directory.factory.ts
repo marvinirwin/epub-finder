@@ -20,7 +20,7 @@ import {Named} from "../../lib/Manager/open-books.service";
  *   ...signInOptions$
  * ]
  */
-type ArrayToTreeParams<T extends Named> = [T, ...Array<T | ArrayToTreeParams<T>>] | [];
+type ArrayToTreeParams<T extends Named> = [T, ...(T | ArrayToTreeParams<T>)[]] | [];
 export const arrayToTreeChildren = <T extends Named>(...array: ArrayToTreeParams<T>): {[key: string]: ds_Tree<T>} => {
     // The first item must be a root, the rest can either be adjacent roots or the children of the most recent one
     const [root, ...nextItems] = array;
@@ -41,7 +41,7 @@ export const arrayToTreeChildren = <T extends Named>(...array: ArrayToTreeParams
     return Object.fromEntries(entries);
 }
 
-export const arrayToTreeRoot = <T extends Named>(...array: [T, ...Array<T | ArrayToTreeParams<T>>]): ds_Tree<T> =>
+export const arrayToTreeRoot = <T extends Named>(...array: [T, ...(T | ArrayToTreeParams<T>)[]]): ds_Tree<T> =>
     Object.values(arrayToTreeChildren(...array))[0]
 
 

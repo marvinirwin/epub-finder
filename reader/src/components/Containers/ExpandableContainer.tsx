@@ -8,9 +8,9 @@ const dimensions = (container: HTMLElement | undefined): React.CSSProperties => 
     // TODO maybe handle lots of children and pick the largest?
     const child = container?.children?.[0];
     if (child) {
-        let height = child.clientHeight;
+        const height = child.clientHeight;
         return {
-            height: height,
+            height,
             maxHeight: height
         }
     }
