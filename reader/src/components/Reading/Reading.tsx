@@ -6,12 +6,15 @@ import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
+import {DropZoneContext} from "../../App";
 
 export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const openedBook = m.openedBooks.readingBookService.readingBook;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
-    return <div className={'reading-container'}>
+    const {getRootProps} = useContext(DropZoneContext) || {};
+    debugger;
+    return <div className={'reading-container'} {...getRootProps?.()}>
         <ExpandableContainer
             shouldShow={recentlyRecorded}
             resizeObservable$={useContext(AudioRecorderResizedContext)}

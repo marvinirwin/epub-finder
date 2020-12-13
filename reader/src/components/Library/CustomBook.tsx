@@ -1,4 +1,4 @@
-import {EditingBook} from "../../lib/Manager/Library";
+import {EditingBook} from "../../lib/Manager/LibraryService";
 import {Button, Paper, TextField} from "@material-ui/core";
 import React from "react";
 import {useObservableState} from "observable-hooks";

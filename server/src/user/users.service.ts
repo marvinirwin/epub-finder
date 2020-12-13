@@ -43,6 +43,11 @@ export class UsersService {
         await this.usersRepository.delete(id);
     }
 
+    /**
+     * TODO make this descriminate by email and throw an error if you attempt to use an email
+     *
+     * @param email
+     */
     async upsertUserByEmail(email: string): Promise<User> {
         const user = await this.findOne({email});
         if (user) {
@@ -57,5 +62,9 @@ export class UsersService {
                 }
             )
         )
+    }
+
+    async profile() {
+
     }
 }

@@ -275,6 +275,7 @@ $led-off: #c6c6c6;
 }
 
 .reading-container {
+  tab-index: -1;
   position: relative;
   display: flex;
   flex-flow: column nowrap;

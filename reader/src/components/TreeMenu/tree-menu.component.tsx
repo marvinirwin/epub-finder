@@ -6,23 +6,16 @@ import {
     ListItemIcon,
     ListItemSecondaryAction,
     ListItemText,
-    Theme, Typography,
+    Theme,
+    Typography,
     withStyles,
     withTheme
 } from "@material-ui/core";
 import React from "react";
 import {ArrowBack, KeyboardArrowRight} from "@material-ui/icons";
 import {ds_Tree, treeValue, walkTree} from "../../services/tree.service";
-import {TreeMenuNode} from "../../services/tree-menu-node.interface";
-import {makeStyles} from "@material-ui/core/styles";
+import {TreeMenuNode} from "../directory/tree-menu-node.interface";
 
-const useStyles = makeStyles((theme: Theme) => ({
-    title: {
-        padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(
-            3
-        )}px`,
-    }
-}))
 
 export const TreeMenu: React.FunctionComponent<{
     title: string | React.FC,

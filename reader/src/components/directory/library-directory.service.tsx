@@ -14,7 +14,7 @@ export const bookMenuNodeFactory = (
 ): TreeMenuNode => ({
     name: name,
     label: name,
-    LeftIcon: checkedOut ? <DeleteIcon/> : <NoteAdd/>,
+    LeftIcon: checkedOut ? () => <DeleteIcon/> : () => <NoteAdd/>,
     action: () => checkedOut ? returnBook(m, name) : checkoutBook(m, name)
 })
 

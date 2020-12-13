@@ -16,7 +16,7 @@ interface LibraryParams {
     db: DatabaseService
 }
 
-export class Library {
+export class LibraryService {
     builtInBooks$ = new NamedDeltaScanner<Website>();
     customBooks$ = new NamedDeltaScanner<CustomDocument>();
 

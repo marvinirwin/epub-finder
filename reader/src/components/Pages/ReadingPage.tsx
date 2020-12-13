@@ -31,7 +31,7 @@ export function SlidingTopWindows({m}: { m: Manager }) {
     const editingCard = useObservableState(m.editingCardManager.editingCard$);
     const showEditingCard = useObservableState<boolean>(m.editingCardManager.showEditingCardPopup$);
     const highlightedPinyin = useObservableState(m.mousedOverPinyin$);
-    const user = useObservableState(m.authManager.user$);
+    const user = useObservableState(m.authManager.profile$);
     const classes = useStyles();
     return <Paper className={classes.popup}>
         {
@@ -52,18 +52,6 @@ export function SlidingTopWindows({m}: { m: Manager }) {
                 </Typography>
 {/*
                 <CardContent style={SLIM_CARD_CONTENT}>
-                </CardContent>
-*/}
-            </Paper>
-            <Paper>
-                {user?.profile.name ? <Typography variant="h6">
-                        {user?.profile.name}
-                    </Typography> :
-                    <Link variant="h6" href={`${process.env.PUBLIC_URL}/login`}>Please Log In</Link>
-                }
-                <img style={{maxHeight: '100%', width: 'auto'}} src={user?.profile.picture}/>
-{/*
-                <CardContent >
                 </CardContent>
 */}
             </Paper>

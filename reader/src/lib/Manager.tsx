@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary, zip} from "lodash";
+import {debounce, Dictionary} from "lodash";
 import {debounceTime, map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {DatabaseService} from "./Storage/database.service";
 import React from "react";
@@ -14,7 +14,7 @@ import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/open-books.
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
-import {BrowserInputs, filterTextInputEvents} from "./Hotkeys/BrowserInputs";
+import {BrowserInputs} from "./Hotkeys/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
 import {InputPage} from "./Manager/ManagerConnections/Input-Page";
@@ -35,19 +35,16 @@ import {QuizCharacter} from "./Manager/QuizCharacter";
 import {ds_Dict} from "./Tree/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
-import {AuthManager} from "./Manager/AuthManager";
-import axios, {AxiosResponse} from 'axios';
+import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Highlighting/Highlighter";
-import {Library} from "./Manager/Library";
+import {LibraryService} from "./Manager/LibraryService";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
-import {fetchVideoMetadata} from "../services/video.service";
-import {fromPromise} from "rxjs/internal-compatibility";
 import {VideoMetadataService} from "../services/video-metadata.service";
 import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 import {ObservableService} from "../services/observable.service";
@@ -64,13 +61,14 @@ import {PronunciationProgressService} from "./schedule/pronunciation-progress.se
 import {QuizResultService} from "./quiz/quiz-result.service";
 import {HighlightPronunciationProgressService} from "./Highlighting/highlight-pronunciation-progress.service";
 import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-recollection-difficulty.service";
-import {Hotkeys} from "./Hotkeys/hotkeys.interface";
 import {TestHotkeysService} from "./Hotkeys/test-hotkeys.service";
 import {CardCreationService} from "./card/card-creation.service";
 import {IntroService} from "../lib/intro/intro.service";
 import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
 import {ThirdPartyLoginService} from "../services/third-party-login.service";
+import {AuthService} from "./Auth/auth.service";
+import {DroppedFilesService} from "../services/dropped-files.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -107,7 +105,7 @@ export class Manager {
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
     public quizCharacterManager: QuizCharacter;
-    public authManager = new AuthManager();
+    public authManager = new AuthService();
     public highlighter: Highlighter;
     public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
@@ -136,7 +134,7 @@ export class Manager {
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
 
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
-    library: Library;
+    library: LibraryService;
     modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
     videoMetadataService: VideoMetadataService;
@@ -149,6 +147,7 @@ export class Manager {
     private introSeriesService: IntroSeriesService;
     private introHighlightSeries: IntroHighlightService;
     thirdPartyLoginService = new ThirdPartyLoginService();
+    droppedFilesService: DroppedFilesService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db: db})
@@ -172,7 +171,8 @@ export class Manager {
             }
         );
         this.cardManager = new CardService(this.db);
-        this.library = new Library({db});
+        this.library = new LibraryService({db});
+        this.droppedFilesService = new DroppedFilesService({libraryService: this.library});
         this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyDocumentListeners(b),

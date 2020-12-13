@@ -12,11 +12,10 @@ import {ReadingNode} from "./nodes/reading";
 import {WatchMode} from "./modes/watch-mode.component";
 import {SpeakMode} from "./modes/speak-mode.component";
 import {TreeMenuNode} from "./tree-menu-node.interface";
-import GoogleLogin from 'react-google-login';
-import TwitterLogin from 'react-twitter-login';
-import FacebookLogin from 'react-facebook-login';
 import {IconButton} from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
+import TwitterIcon from "../Icons/TwitterIcon";
+import {FileChooser} from "./file-chooser.component";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -46,12 +45,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     return combineLatest([
         m.library.customBooks$.dict$,
         m.settingsService.checkedOutBooks$,
-        m.library.builtInBooks$.dict$
+        m.library.builtInBooks$.dict$,
+        m.authManager.profile$
     ]).pipe(
         map(([
                  customBooks,
                  checkedOutBooks,
-                 builtInBooks
+                 builtInBooks,
+            profile
              ]) => {
             return arrayToTreeRoot<TreeMenuNode>(
                 ReadingNode(m),
@@ -94,36 +95,23 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                                 onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/google`}>
                                 <GoogleIcon/>
                             </IconButton>
-
-
-                            /*<GoogleLogin
-                                buttonText="Login"
-                                onSuccess={() => {}}
-                                onFailure={() => {}}
-                                clientId={process.env.GOOGLE_OAUTH_CLIENT_ID as string}
-                            />*/
-                        },
-                        {
-                            name: 'facebook',
-                            ReplaceComponent: () => <FacebookLogin
-                                appId={process.env.FACEBOOK_APP_ID as string}
-                                autoLoad={true}
-                                fields="name,email,picture"
-                                onClick={() => {
-                                }}
-                                callback={() => {
-                                }}/>,
                         },
                         {
                             name: 'twitter',
-                            ReplaceComponent: () => <TwitterLogin
-                                authCallback={() => {
-                                }}
-                                consumerKey={process.env.TWITTER_CONSUMER_KEY as string}
-                                consumerSecret={process.env.TWITTER_CONSUMER_SECRET as string}
-                            />
+                            ReplaceComponent: () => <IconButton
+                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/twitter`}>
+                                <TwitterIcon/>
+                            </IconButton>
                         }
-                    ]
+                    ],
+                    {
+                        name: 'profile',
+                        label: profile.email
+                    },
+                    {
+                        name: 'customDocument',
+                        ReplaceComponent: () => <FileChooser/>
+                    }
                 ]
             );
             /*

@@ -3,7 +3,7 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {DeltaScanner, ds_Dict} from "../lib/Tree/DeltaScanner";
 import {map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
-import {TreeMenuNode} from "./tree-menu-node.interface";
+import {TreeMenuNode} from "../components/directory/tree-menu-node.interface";
 
 export type TreeMenuProps<T> = { value: T };
 
