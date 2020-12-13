@@ -37,7 +37,7 @@ export class BookView  {
 
     @ViewColumn()
     @OneToOne(() => User, user => user.id)
-    creator_id: number;
+    creator_id: number | undefined;
 
     @ViewColumn()
     global: boolean;

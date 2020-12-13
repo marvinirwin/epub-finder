@@ -23,7 +23,7 @@ export class AlertsService {
             response => response,
             (error) => {
                 // if has response show the error
-                const msg = error?.response?.data?.message;
+                const msg = error?.response?.data?.message || error?.response?.statusCode;
                 if (msg) {
                     this.newAlerts$.next({msg: msg, severity: 'error'})
                 }

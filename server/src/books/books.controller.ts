@@ -12,14 +12,11 @@ export class BooksController {
 
     }
 
-    @Get()
+    @Get('/available')
     async availableBooks(
         @UserFromReq() user: User | undefined
     ) {
-        if (user) {
-            return this.booksService.getAvailableBooksForUser(user)
-        }
-        return this.booksService.getAvailableBooksForAnonymous()
+        return this.booksService.queryAvailableBooks(user)
     }
 
     @Put()

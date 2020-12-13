@@ -1,8 +1,8 @@
-import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
 export class Book {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     // Used for Groupwise Max
@@ -16,11 +16,14 @@ export class Book {
     @Column('text')
     html: string;
 
+    @Column('text')
+    html_hash: string;
+
     @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     created_at: Date;
 
-    @Column()
-    creator_id: number;
+    @Column({default: null})
+    creator_id: number | null;
 
     @Column()
     global: boolean;
