@@ -7,7 +7,7 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedSentence} from "./AtomizedSentence";
 import {ANNOTATE_AND_TRANSLATE} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {safePush} from "../../test/Util/GetGraphJson";
+import {safePush} from "../../services/safe-push";
 
 
 export const OpenedBook =

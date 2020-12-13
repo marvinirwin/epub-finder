@@ -8,7 +8,8 @@ import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {green, indigo} from "@material-ui/core/colors";
-import {DropzoneState, useDropzone} from "react-dropzone";
+import {GlobalDragOver} from "./components/global-drag-over.component";
+import {AlertSnackbar} from "./components/alertSnackbar";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -32,23 +33,15 @@ darkTheme.spacing(2);
 
 const manager = getManager(urlParams.get('mode') || 'test')
 export const ManagerContext = React.createContext(manager)
-export const DropZoneContext = React.createContext<DropzoneState | undefined>(undefined);
 
 function App() {
-    const onDrop = useCallback(
-        acceptedFiles => manager.droppedFilesService.droppedFiles$.next(acceptedFiles),
-        []
-    )
-
-    const dropZone = useDropzone({onDrop});
-
     return <ThemeProvider theme={darkTheme}>
-        <DropZoneContext.Provider value={dropZone}>
             <ManagerContext.Provider value={manager}>
+                <AlertSnackbar/>
+                <GlobalDragOver/>
                 <CssBaseline/>
                 <Main m={manager}/>
             </ManagerContext.Provider>
-        </DropZoneContext.Provider>
     </ThemeProvider>;
 }
 

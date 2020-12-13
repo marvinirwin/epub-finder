@@ -7,17 +7,6 @@ import {TutorialPopper} from "../Popover/Tutorial";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext} from "../Main";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: '100%',
-            '& > * + *': {
-                marginTop: theme.spacing(2),
-            },
-        },
-    }),
-);
-
 export const SLIM_CARD_CONTENT = {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -31,7 +20,6 @@ export default function AudioRecorder({m}: { m: Manager }) {
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
     const currentAudioRequest = useObservableState(recorder.recordRequest$);
     const isRecording = useObservableState(recorder.isRecording$);
-    const classes = useStyles();
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 

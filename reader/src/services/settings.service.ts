@@ -1,8 +1,8 @@
 import {DatabaseService} from "../lib/Storage/database.service";
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
-import {skip, take} from "rxjs/operators";
+import { take} from "rxjs/operators";
 
 export class SettingsService {
     private settingsReplaySubjects: { [setting: string]: ReplaySubject<any> } = {};
@@ -38,27 +38,34 @@ export class SettingsService {
         settingName: string,
         constructor: () => U,
         dest: { [setting: string]: U },
-        defaultWhenNoRow: T
+        defaultWhenNotAvailable: T
     ): U {
         if (!dest[settingName]) {
-            const behaviourSubject = constructor();
+            const settingReplaySubject = constructor();
             this.db.settings.where({name: settingName}).first().then(row => {
                 if (row) {
-                    behaviourSubject.next(JSON.parse(row.value))
+                    try {
+                        settingReplaySubject.next(JSON.parse(row.value))
+                    } catch(e) {
+                        settingReplaySubject.next(defaultWhenNotAvailable)
+                    }
                 } else {
-                    behaviourSubject.next(defaultWhenNoRow);
+                    settingReplaySubject.next(defaultWhenNotAvailable);
                 }
             });
-            behaviourSubject.subscribe(value => {
+            settingReplaySubject.subscribe(value => {
                 this.db.settings.put({name: settingName, value: JSON.stringify(value)}, settingName)
             });
-            dest[settingName] = behaviourSubject;
+            dest[settingName] = settingReplaySubject;
         }
         return dest[settingName];
     }
 
     get checkedOutBooks$(): ReplaySubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'cat-likes-tea': true})
+    }
+    get readingBook$(): ReplaySubject<string | undefined> {
+        return this.resolveSetting$<string | undefined>('readingBook', undefined)
     }
 
     get hotkeys$(): ReplaySubject<Partial<Hotkeys<string[]>>> {
@@ -76,3 +83,4 @@ export class SettingsService {
 export const replaySubjectLastValue = <T>(r: ReplaySubject<T>): Promise<T> => {
     return r.pipe(take(1)).toPromise();
 }
+

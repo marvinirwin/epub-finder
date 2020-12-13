@@ -4,6 +4,7 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {filterMap, findMap, firstMap} from "../map.module";
 
 export class ReadingBookService {
     public readingBook: OpenBook;
@@ -17,8 +18,8 @@ export class ReadingBookService {
         }:
             {
                 trie$: TrieObservable,
-                openBooks$: Observable<ds_Dict<OpenBook>>,
-                selectedBook$: Observable<string>
+                openBooks$: Observable<Map<number, OpenBook>>,
+                selectedBook$: Observable<string | undefined>
             }
     ) {
         this.readingBook = new OpenBook(
@@ -42,12 +43,12 @@ export class ReadingBookService {
                          checkedOutBooks,
                          selectedBook,
                      ]) => {
-            const checkedOutBooksList = Object.values(checkedOutBooks);
-            if ((!selectedBook || !checkedOutBooks[selectedBook]) && checkedOutBooksList.length) {
-                this.displayDocument$.next(checkedOutBooksList[0].atomizedDocument$)
+            const foundBook = findMap(checkedOutBooks, (id, book) => book.name === selectedBook)
+            if ((!selectedBook || !foundBook) && checkedOutBooks.size) {
+                this.displayDocument$.next(firstMap(checkedOutBooks).atomizedDocument$)
             }
-            if (checkedOutBooks[selectedBook]) {
-                this.displayDocument$.next(checkedOutBooks[selectedBook].atomizedDocument$);
+            if (foundBook) {
+                this.displayDocument$.next(foundBook.atomizedDocument$);
             }
         })
     }

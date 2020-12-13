@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
 import {OpenedBook} from "../../lib/Atomized/OpenedBook";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
@@ -6,15 +6,13 @@ import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
-import {DropZoneContext} from "../../App";
 
 export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const openedBook = m.openedBooks.readingBookService.readingBook;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
-    const {getRootProps} = useContext(DropZoneContext) || {};
-    debugger;
-    return <div className={'reading-container'} {...getRootProps?.()}>
+
+    return <div className={'reading-container'}>
         <ExpandableContainer
             shouldShow={recentlyRecorded}
             resizeObservable$={useContext(AudioRecorderResizedContext)}

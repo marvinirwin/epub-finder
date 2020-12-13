@@ -6,6 +6,7 @@ import {applyTreeDiff, ds_Tree, flattenTreeIntoDict} from "../../services/tree.s
 export type ds_Dict<T, U extends string = string> = {
     [key in U]: T
 }
+export type IndexedByNumber<T> = Map<number, T>;
 
 export type DeltaScan<T, U extends string = string> = {
     sourced: ds_Tree<T, U> | undefined,

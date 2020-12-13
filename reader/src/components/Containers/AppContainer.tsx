@@ -11,12 +11,13 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
     const selectedComponent = useObservableState(treeMenuService.selectedComponent$)
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
     const directoryPath = useObservableState(treeMenuService.directoryPath$) || []
-    const m = useContext(ManagerContext)
+    const m = useContext(ManagerContext);
 
     return <div className={'app-container'}>
         {
             menuItemTree?.sourced && <TreeMenu
-                title={() => <Typography ref={ref => m.introService.titleRef$.next(ref)} variant='h6'>Mandarin Trainer</Typography>}
+                title={() => <Typography ref={ref => m.introService.titleRef$.next(ref)} variant='h6'>Mandarin
+                    Trainer</Typography>}
                 tree={menuItemTree.sourced}
                 directoryPath={directoryPath}
                 directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}

@@ -6,9 +6,9 @@ import {ds_Dict} from "../../lib/Tree/DeltaScanner";
 import {CheckedOutBooks} from "./CheckedOutBooks";
 import {AvailableBooks} from "./AvailableBooks";
 import {CustomBook} from "./CustomBook";
-import {checkoutBook, returnBook} from "./library.module";
 
 export function Library({m}: { m: Manager }) {
+/*
     const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
 
     const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
@@ -21,7 +21,9 @@ export function Library({m}: { m: Manager }) {
             .map(story => [story, true])
     );
 
+*/
     return <div className={'library-container'}>
+{/*
         <div className={'checked-out-books-container'}>
             <CheckedOutBooks
                 checkedOutBooks={checkedOutTitles}
@@ -40,6 +42,7 @@ export function Library({m}: { m: Manager }) {
             <CustomBook editingBook={m.library.simpleBook$}/>
             <CustomBook editingBook={m.library.rawBook$}/>
         </div>
+*/}
     </div>
 
 /*

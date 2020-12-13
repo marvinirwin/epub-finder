@@ -9,5 +9,4 @@ import {appendBookStyle} from "../AppendBookStyle";
 import {ds_Dict} from "../../Tree/DeltaScanner";
 import {DOMParser, XMLSerializer} from "xmldom";
 import {waitFor} from "../../Util/waitFor";
-import {safePush} from "../../../test/Util/GetGraphJson";
 

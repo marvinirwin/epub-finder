@@ -44,6 +44,7 @@
     "react-tooltip": "^4.2.6",
     "rxjs": "^6.5.5",
     "socket.io-client": "^3.0.3",
+    "trie-prefix-tree": "^1.5.1",
     "ts-jest": "^26.1.1",
     "typescript": "^3.7.5",
     "websocket": "^1.0.32",
@@ -58,7 +59,7 @@
     "eject": "react-scripts eject",
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build",
-    "lint-fix":  "tslint --fix tslint.json"
+    "lint-fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
   },
   "eslintConfig": {
     "extends": "react-app"

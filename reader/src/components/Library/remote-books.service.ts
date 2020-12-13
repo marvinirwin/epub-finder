@@ -8,7 +8,5 @@ export class RemoteBooksService {
         this.fetchRemoteBooks()
     }
     public async fetchRemoteBooks() {
-        const response = await axios.get(`${process.env.PUBLIC_URL}/books`);
-        this.remoteBooks$.next(response.data);
     }
 }

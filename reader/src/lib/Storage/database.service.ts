@@ -3,9 +3,9 @@ import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
-import {CustomDocument} from "../Website/Website";
 import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.interface";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
+import {BasicDocument} from "../../types";
 
 
 export class DatabaseService extends Dexie {
@@ -18,7 +18,7 @@ export class DatabaseService extends Dexie {
 
     public createdSentences: Dexie.Table<CreatedSentence, number>;
     public settings: Dexie.Table<Setting, string>;
-    public customDocuments: Dexie.Table<CustomDocument, string>;
+    public customDocuments: Dexie.Table<BasicDocument, string>;
 
     constructor() {
         super("DatabaseService");

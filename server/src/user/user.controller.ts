@@ -1,8 +1,9 @@
-import {Controller, Get, Post, Body} from '@nestjs/common';
+import {Controller, Get, Post, Body, UseGuards} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {CreateUserDto} from "./create-user.dto";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
+import {LoggedInGuard} from "../guards/logged-in.guard";
 
 @Controller('users')
 export class UsersController {
@@ -10,6 +11,7 @@ export class UsersController {
     }
 
     @Get('/profile')
+    @UseGuards(LoggedInGuard)
     async Profile(@UserFromReq() user: User) {
         return {
             email: user.email

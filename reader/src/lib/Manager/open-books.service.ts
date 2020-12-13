@@ -1,10 +1,10 @@
 import {combineLatest, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
-import {CustomDocument, Website} from "../Website/Website";
+import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, IndexedByNumber, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -16,6 +16,9 @@ import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
 import {ReadingBookService} from "./reading-book.service";
 import {SettingsService} from "../../services/settings.service";
+import {BasicDocument} from "../../types";
+import {BookViewDto} from "@server/*";
+import {filterMap, mapMap, mapToArray} from "../map.module";
 
 
 export type Named = {
@@ -27,8 +30,8 @@ export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';
 export const READING_BOOK_NODE_LABEL = 'readingBook';
 export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
     (variableToCheck as Website).url !== undefined;
-export const isCustomDocument = (variableToCheck: any): variableToCheck is CustomDocument =>
-    (variableToCheck as CustomDocument).html !== undefined;
+export const isCustomDocument = (variableToCheck: any): variableToCheck is BasicDocument =>
+    (variableToCheck as BasicDocument).html !== undefined;
 
 export class OpenBooksService {
     openBookTree = new NamedDeltaScanner<OpenBook, string>();
@@ -39,7 +42,7 @@ export class OpenBooksService {
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     displayDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
-    checkedOutBooks$: Observable<ds_Dict<OpenBook>>;
+    checkedOutBooks$: Observable<Map<number, OpenBook>>;
     checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
@@ -54,44 +57,34 @@ export class OpenBooksService {
             applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
             db: DatabaseService;
             settingsService: SettingsService;
-            library$: Observable<ds_Dict<CustomDocument | Website>>
+            library$: Observable<IndexedByNumber<BookViewDto>>
         }
     ) {
 
         this.checkedOutBooks$ = combineLatest([
             config.library$.pipe(
                 map(libraryBooks => {
-                    return Object.fromEntries(Object.entries(libraryBooks).map(([name, page]) => {
-                        if (isCustomDocument(page)) {
+                    return mapMap(
+                        libraryBooks,
+                        (id, bookViewDto) => {
                             const openBook = new OpenBook(
-                                page.name,
+                                bookViewDto.name,
                                 config.trie$,
                                 undefined,
                             );
-                            openBook.unAtomizedSrcDoc$.next(page.html)
+                            openBook.unAtomizedSrcDoc$.next(bookViewDto.html);
                             return [
-                                name,
+                                id,
                                 openBook
                             ];
-                        } else if (isWebsite(page)) {
-                            const b = new OpenBook(
-                                page.name,
-                                config.trie$,
-                                undefined,
-                            );
-                            b.url$.next(page.url);
-                            return [name, b];
                         }
-                        throw new Error("Unknown addOpenBook ");
-                    })) as ds_Dict<OpenBook>
+                    )
                 })
             ),
             config.settingsService.checkedOutBooks$
-        ]).pipe(map(([library, checkedOutBookTitles]) => {
-                return Object.fromEntries(
-                    Object.entries(library).filter(([title, book]) => checkedOutBookTitles[title])
-                )
-            }),
+        ]).pipe(map(([library, checkedOutBookTitles]) =>
+            filterMap(library, (id, openBook) => checkedOutBookTitles[openBook.name])
+            ),
             shareReplay(1)
         );
 
@@ -155,7 +148,7 @@ export class OpenBooksService {
 
         this.checkedOutBooksData$ = this.checkedOutBooks$.pipe(
             switchMap(openBooks =>
-                combineLatest(Object.values(openBooks).map(book => book.bookStats$))
+                combineLatest(mapToArray(openBooks, (id, book) => book.bookStats$))
             )
         )
 
@@ -248,7 +241,6 @@ export class OpenBooksService {
         );
 
 
-
         this.displayDocument$ = this.readingBook$.pipe(
             switchMap(readingBook => {
                 if (!readingBook) return of<AtomizedDocument>();
@@ -262,10 +254,7 @@ export class OpenBooksService {
             openBooks$: this.checkedOutBooks$,
             // TODO make a variable which contains the current reading book,
             //  right now I only have a list of checked out books (Which should be renamed openBooks)
-            selectedBook$: config.settingsService.checkedOutBooks$.pipe(
-                map(checkedOutBooks => Object.keys(checkedOutBooks)[0]),
-                shareReplay(1)
-            )
+            selectedBook$: config.settingsService.readingBook$
         })
         this.openBookTree.appendDelta$.next(
             {

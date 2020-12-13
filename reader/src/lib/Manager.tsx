@@ -39,7 +39,6 @@ import axios from 'axios';
 import {BookWordCount} from "./Interfaces/BookWordCount";
 import {lookupPinyin} from "./ReactiveClasses/EditingCard";
 import {Highlighter} from "./Highlighting/Highlighter";
-import {LibraryService} from "./Manager/LibraryService";
 import {AtomizedDocumentBookStats} from "./Atomized/AtomizedDocumentStats";
 import {HotKeyEvents} from "./HotKeyEvents";
 import {ds_Tree} from "../services/tree.service";
@@ -67,8 +66,16 @@ import {IntroService} from "../lib/intro/intro.service";
 import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
 import {ThirdPartyLoginService} from "../services/third-party-login.service";
-import {AuthService} from "./Auth/auth.service";
-import {DroppedFilesService} from "../services/dropped-files.service";
+import {LoggedInUserService} from "./Auth/loggedInUserService";
+import {BookCheckingOutService} from "../components/Library/book-checking-out.service";
+import {DocumentRepository} from "../services/document.repository";
+import {LibraryService} from "./Manager/library.service";
+import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
+import {mapToArray} from "./map.module";
+import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
+import {AvailableBooksService} from "./book-lists/available-books.service";
+import {BookSelectionService} from "./book-selection/book-selection.service";
+import {AlertsService} from "../services/alerts.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -105,16 +112,15 @@ export class Manager {
     public progressManager: ProgressManager;
     public viewingFrameManager = new ViewingFrameManager();
     public quizCharacterManager: QuizCharacter;
-    public authManager = new AuthService();
+    public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
     public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public highlightedSentence$ = new ReplaySubject<string | undefined>(1);
     public pronunciationProgressService: PronunciationProgressService;
     public wordRecognitionProgressService: WordRecognitionProgressService;
     public introService: IntroService;
+    public alertsService = new AlertsService();
 
-    public alertMessages$ = new BehaviorSubject<string[]>([]);
-    public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
 
     public observableService = new ObservableService();
 
@@ -125,14 +131,10 @@ export class Manager {
     );
 
     readingWordElementMap!: Observable<Dictionary<IAnnotatedCharacter[]>>;
-
     setQuizWord$: Subject<string> = new Subject<string>();
-
     characterPageWordElementMap$ = new Subject<Dictionary<IAnnotatedCharacter[]>>();
-
     readingWordCounts$: Observable<Dictionary<BookWordCount[]>>;
     readingWordSentenceMap: Observable<Dictionary<AtomizedSentence[]>>;
-
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: LibraryService;
     modesService = new ModesService();
@@ -146,8 +148,12 @@ export class Manager {
     temporaryHighlightService: TemporaryHighlightService;
     private introSeriesService: IntroSeriesService;
     private introHighlightSeries: IntroHighlightService;
-    thirdPartyLoginService = new ThirdPartyLoginService();
     droppedFilesService: DroppedFilesService;
+    bookCheckingOutService: BookCheckingOutService;
+    documentRepository: DocumentRepository;
+    uploadingDocumentsService: UploadingDocumentsService;
+    availableBooksService: AvailableBooksService;
+    bookSelectionService: BookSelectionService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db})
@@ -159,20 +165,12 @@ export class Manager {
                 this.hotkeyEvents.hotkeyActions()
             )
         });
+        this.documentRepository = new DocumentRepository({databaseService: this.db});
 
-        axios.interceptors.response.use(
-            response => response,
-            (error) => {
-                // if has response show the error
-                if (error.response) {
-                    this.alertMessagesVisible$.next(true);
-                    this.appendAlertMessage(JSON.stringify(error.response));
-                }
-            }
-        );
         this.cardManager = new CardService(this.db);
-        this.library = new LibraryService({db});
-        this.droppedFilesService = new DroppedFilesService({libraryService: this.library});
+        this.library = new LibraryService({db, documentRepository: this.documentRepository});
+        this.bookCheckingOutService = new BookCheckingOutService({settingsService: this.settingsService})
+        this.droppedFilesService = new DroppedFilesService();
         this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
             applyListeners: b => this.inputManager.applyDocumentListeners(b),
@@ -180,10 +178,13 @@ export class Manager {
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
             db,
             settingsService: this.settingsService,
-            library$: combineLatest([
-                this.library.builtInBooks$.dict$,
-                this.library.customBooks$.dict$
-            ]).pipe(map(([builtIn, custom]) => ({...builtIn, ...custom}))),
+            library$: this.library.documents$,
+        });
+        this.uploadingDocumentsService = new UploadingDocumentsService({
+            loggedInUserService: this.authManager,
+            bookCheckingOutService: this.bookCheckingOutService,
+            droppedFilesService: this.droppedFilesService,
+            libraryService: this.library
         });
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -258,10 +259,7 @@ export class Manager {
                         .pipe(
                             switchMap(books =>
                                 combineLatest(
-                                    Object.values(books)
-                                        .map(book =>
-                                            book.bookStats$
-                                        )
+                                    mapToArray(books, (id, book) => book.bookStats$)
                                 )
                             )
                         ),
@@ -384,9 +382,9 @@ export class Manager {
         );
 
 
-        this.audioManager.audioRecorder.audioSource.errors$.subscribe(error =>
-            this.appendAlertMessage(error)
-        )
+        this.audioManager.audioRecorder.audioSource
+            .errors$.pipe(AlertsService.pipeToColor('warning'))
+            .subscribe(alert => this.alertsService.newAlerts$.next(alert))
 
 
         this.videoMetadataService = new VideoMetadataService({
@@ -459,7 +457,6 @@ export class Manager {
         })
 
 
-
         this.openedBooks.openBookTree.appendDelta$.next({
             nodeLabel: 'root',
             children: {
@@ -481,17 +478,20 @@ export class Manager {
             introSeriesService: new IntroSeriesService({settingsService: this.settingsService}),
             currentVideoMetadata$: this.pronunciationVideoService.videoMetadata$
         });
+
+        this.bookCheckingOutService = new BookCheckingOutService({
+            settingsService: this.settingsService
+        })
+        this.availableBooksService = new AvailableBooksService()
+        this.bookSelectionService = new BookSelectionService({
+            availableBooksService: this.availableBooksService,
+            settingsService: this.settingsService
+        })
         this.hotkeyEvents.startListeners();
         this.cardManager.load();
 
     }
 
-    private appendAlertMessage(error: string) {
-        const messages = this.alertMessages$.getValue();
-        const MAX_MESSAGES = 10;
-        const sliceStart = messages.length - MAX_MESSAGES > 0 ? messages.length - MAX_MESSAGES : 0;
-        this.alertMessages$.next(messages.concat(error).slice(sliceStart, sliceStart + MAX_MESSAGES));
-    }
 
     applyWordElementListener(annotationElement: IAnnotatedCharacter) {
         const {maxWord, i, parent: sentence} = annotationElement;
@@ -509,21 +509,20 @@ export class Manager {
                  * When called on an <iframe> that is not displayed (eg. where display: none is set) Firefox will return null,
                  * whereas other browsers will return a Selection object with Selection.type set to None.
                  */
-/*
-                if ((ev as MouseEvent).shiftKey || mode === Modes.HIGHLIGHT) {
-                    const selection = (annotationElement.element.ownerDocument as Document).getSelection();
-                    if (selection?.anchorNode === child.parentElement) {
-                        selection.extend(child, 1);
-                    } else {
-                        selection?.removeAllRanges();
-                        const range = document.createRange();
-                        range.selectNode(child);
-                        selection?.addRange(range);
-                    }
-                }
-*/
+                /*
+                                if ((ev as MouseEvent).shiftKey || mode === Modes.HIGHLIGHT) {
+                                    const selection = (annotationElement.element.ownerDocument as Document).getSelection();
+                                    if (selection?.anchorNode === child.parentElement) {
+                                        selection.extend(child, 1);
+                                    } else {
+                                        selection?.removeAllRanges();
+                                        const range = document.createRange();
+                                        range.selectNode(child);
+                                        selection?.addRange(range);
+                                    }
+                                }
+                */
             });
-
 
 
         child.onmouseleave = (ev) => {

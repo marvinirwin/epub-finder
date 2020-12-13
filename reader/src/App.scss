@@ -253,6 +253,9 @@ $led-off: #c6c6c6;
   max-height: 100vh;
   display: flex;
   flex-flow: row nowrap;
+  position: relative;
+
+
 
   & > .selectable-menu-list {
     flex-basis: 240px;
@@ -394,4 +397,25 @@ $character-timing-section-padding: 24px;
 }
 
 .audio-recorder-popup {
+}
+.dropzone-container {
+  position: fixed;
+  pointer-events: none;
+  height: 100vh;
+  width: 100vw;
+  z-index:10;
+  transition: all 0.5s;
+  background-color: transparent;
+
+  &.files-being-dragged {
+    border: 1px dashed #ccc;
+    background-color: #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    opacity: 0.2;
+  }
+}
+
+.file-chooser {
+  padding-left: 20px;
 }

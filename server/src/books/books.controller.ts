@@ -1,8 +1,10 @@
-import {Body, Controller, Get, Post, Put} from "@nestjs/common";
+import {Body, Controller, Get, Post, Put, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
 import {BooksService} from "./books.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {CustomBookDto} from "./custom-book.dto";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {LoggedInGuard} from "../guards/logged-in.guard";
 
 @Controller('books')
 export class BooksController {
@@ -21,13 +23,18 @@ export class BooksController {
     }
 
     @Put()
+    @UseGuards(LoggedInGuard)
     async putBook(
-        @UserFromReq() user: User | undefined,
+        @UserFromReq() user: User,
         @Body() customBookDto: CustomBookDto
     ) {
-        if (!user) {
-            return undefined;
-        }
-        return this.booksService.saveBook(customBookDto)
+        return this.booksService.saveBookForUser(user, customBookDto)
     }
+
+/*
+    @Post('upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async putFile(@UserFromReq() user: User | undefined, @UploadedFile() file) {
+    }
+*/
 }

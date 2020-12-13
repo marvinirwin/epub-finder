@@ -4,7 +4,6 @@ import {Manager} from "../../lib/Manager";
 import {combineLatest, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
-import {bookMenuNodeFactory} from "./library-directory.service";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 import {arrayToTreeRoot} from "./directory.factory";
@@ -16,6 +15,7 @@ import {IconButton} from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
 import TwitterIcon from "../Icons/TwitterIcon";
 import {FileChooser} from "./file-chooser.component";
+import {toTreeMenuNode} from "../../lib/book-selection/book-selection-tree-menu-node";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -43,16 +43,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // I should do selected components by path, that way their refs can change?
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
-        m.library.customBooks$.dict$,
         m.settingsService.checkedOutBooks$,
-        m.library.builtInBooks$.dict$,
-        m.authManager.profile$
+        m.authManager.profile$,
+        m.bookSelectionService.bookSelectionRows$
     ]).pipe(
         map(([
                  customBooks,
-                 checkedOutBooks,
-                 builtInBooks,
-            profile
+                 profile,
+                 availableBooks,
              ]) => {
             return arrayToTreeRoot<TreeMenuNode>(
                 ReadingNode(m),
@@ -71,13 +69,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         moveDirectory: true,
                     },
                     // @ts-ignore
-                    [
-                        ...Object.keys(checkedOutBooks)
-                            .map(bookTitle => bookMenuNodeFactory(m, bookTitle, true)),
-                        ...Object.keys({...customBooks, ...builtInBooks})
-                            .filter(title => !checkedOutBooks[title])
-                            .map(bookTitle => bookMenuNodeFactory(m, bookTitle, false)),
-                    ] as TreeMenuNode[],
+                        availableBooks.map(toTreeMenuNode),
                     {
                         name: 'playbackSpeed',
                         label: 'playbackSpeed',
@@ -106,7 +98,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                     ],
                     {
                         name: 'profile',
-                        label: profile.email
+                        label: profile?.email
                     },
                     {
                         name: 'customDocument',

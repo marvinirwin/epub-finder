@@ -1,19 +1,9 @@
 import {from, Observable} from "rxjs";
-import {XMLSerializer} from "xmldom";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 export class Website {
     constructor(
         public name: string,
         public url: string,
-    ) {
-    }
-}
-
-export class CustomDocument {
-    constructor(
-        public name: string,
-        public html: string,
     ) {
     }
 }

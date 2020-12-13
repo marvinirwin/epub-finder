@@ -1,10 +1,9 @@
 import {ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, startWith, tap, withLatestFrom} from "rxjs/operators";
-import {safePush} from "../../test/Util/GetGraphJson";
 import {orderBy} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
-import CardService from "../Manager/CardService";
+import {safePush} from "../../services/safe-push";
 
 export class ProgressRowService<T extends {word: string, id?: number}> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);

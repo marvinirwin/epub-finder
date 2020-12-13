@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
 import {Manager} from "../lib/Manager";
-import {NavigationPages} from "../lib/Util/Util";
 import {useObservableState} from "observable-hooks";
 import {HotKeyEvents} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "./directory/app-directory-service";
@@ -21,19 +20,17 @@ export const PronunciationVideoResizedContext = React.createContext<Subject<void
 const treeMenuService = new TreeMenuService<any, {value: any}>();
 
 export function Main({m}: { m: Manager }) {
-    const currentPage = useObservableState(m.bottomNavigationValue$);
     useEffect(() => {
         m.inputManager.applyDocumentListeners(document);
         AppDirectoryService(m).subscribe(v => treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
 
-    const alertMessagesVisible = useObservableState(m.alertMessagesVisible$);
-    const alertMessages = useObservableState(m.alertMessages$);
 
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {});
     const withDefaults = {...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig};
+
 
     return <HotkeyContext.Provider value={withDefaults}>
         <FocusedElement.Provider value={hotkeyHandler}>

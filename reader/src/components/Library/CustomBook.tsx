@@ -1,9 +1,9 @@
-import {EditingBook} from "../../lib/Manager/LibraryService";
 import {Button, Paper, TextField} from "@material-ui/core";
 import React from "react";
 import {useObservableState} from "observable-hooks";
+import {EditingDocument} from "../../lib/editing-documents/editing-document";
 
-export const CustomBook: React.FunctionComponent<{ editingBook: EditingBook }> = ({editingBook}) => {
+export const CustomBook: React.FunctionComponent<{ editingBook: EditingDocument }> = ({editingBook}) => {
     const rawText = useObservableState(editingBook.text$) || '';
     const rawName = useObservableState(editingBook.name$) || '';
     return <Paper>

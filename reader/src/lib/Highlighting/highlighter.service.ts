@@ -7,13 +7,13 @@ import {
 } from "./highlight.interface";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {ElementContainer} from "./Highlighter";
-import {safePushMap} from "../../test/Util/GetGraphJson";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {map, shareReplay, tap} from "rxjs/operators";
 import debug from 'debug';
+import {safePushMap} from "../../services/safe-push";
 const d = debug('highlight:highlighter');
 
 // Priority, highlighterName
