@@ -8,7 +8,7 @@ import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
 
 export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const openedBook = m.openedBooks.readingBookService.readingBook;
+    const openedBook = m.readingBookService.readingBook;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
 

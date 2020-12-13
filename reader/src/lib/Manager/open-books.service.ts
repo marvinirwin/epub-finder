@@ -19,6 +19,7 @@ import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
 import {BookViewDto} from "@server/*";
 import {filterMap, mapMap, mapToArray} from "../map.module";
+import {LibraryService} from "./library.service";
 
 
 export type Named = {
@@ -42,12 +43,11 @@ export class OpenBooksService {
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     displayDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
-    checkedOutBooks$: Observable<Map<number, OpenBook>>;
+    allOpenBooks$: Observable<Map<number, OpenBook>>;
     checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    readingBookService: ReadingBookService;
 
     constructor(
         private config: {
@@ -57,12 +57,11 @@ export class OpenBooksService {
             applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
             db: DatabaseService;
             settingsService: SettingsService;
-            library$: Observable<IndexedByNumber<BookViewDto>>
+            libraryService: LibraryService;
         }
     ) {
 
-        this.checkedOutBooks$ = combineLatest([
-            config.library$.pipe(
+        this.allOpenBooks$ = config.libraryService.documents$.pipe(
                 map(libraryBooks => {
                     return mapMap(
                         libraryBooks,
@@ -80,15 +79,11 @@ export class OpenBooksService {
                         }
                     )
                 })
-            ),
-            config.settingsService.checkedOutBooks$
-        ]).pipe(map(([library, checkedOutBookTitles]) =>
-            filterMap(library, (id, openBook) => checkedOutBookTitles[openBook.name])
-            ),
-            shareReplay(1)
-        );
+            ).pipe(
+                shareReplay(1)
+            );
 
-        this.checkedOutBooks$.subscribe(
+        this.allOpenBooks$.subscribe(
             openBooks => this.openBookTree.appendDelta$.next(
                 {
                     nodeLabel: 'root',
@@ -146,7 +141,7 @@ export class OpenBooksService {
             };
         }
 
-        this.checkedOutBooksData$ = this.checkedOutBooks$.pipe(
+        this.checkedOutBooksData$ = this.allOpenBooks$.pipe(
             switchMap(openBooks =>
                 combineLatest(mapToArray(openBooks, (id, book) => book.bookStats$))
             )
@@ -247,30 +242,6 @@ export class OpenBooksService {
                 return readingBook.atomizedDocument$;
             }),
             shareReplay(1)
-        );
-
-        this.readingBookService = new ReadingBookService({
-            trie$: config.trie$,
-            openBooks$: this.checkedOutBooks$,
-            // TODO make a variable which contains the current reading book,
-            //  right now I only have a list of checked out books (Which should be renamed openBooks)
-            selectedBook$: config.settingsService.readingBook$
-        })
-        this.openBookTree.appendDelta$.next(
-            {
-                nodeLabel: 'root',
-                children: {
-                    [READING_BOOK_NODE_LABEL]: {
-                        nodeLabel: READING_BOOK_NODE_LABEL,
-                        children: {
-                            [this.readingBookService.readingBook.name]: {
-                                nodeLabel: this.readingBookService.readingBook.name,
-                                value: this.readingBookService.readingBook
-                            }
-                        }
-                    }
-                }
-            }
         );
 
 

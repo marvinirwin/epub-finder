@@ -1,11 +1,9 @@
-import {CheckedOutBooksService} from "../book-lists/checked-out-books.service";
 import {AvailableBooksService} from "../book-lists/available-books.service";
-import {OpenBooksService} from "../Manager/open-books.service";
 import {BookSelectionRowInterface} from "./book-selection-row.interface";
 import {combineLatest, Observable} from "rxjs";
 import {SettingsService} from "../../services/settings.service";
 import {map, shareReplay} from "rxjs/operators";
-import { keyBy } from "lodash";
+import {keyBy} from "lodash";
 
 export class BookSelectionService {
     bookSelectionRows$: Observable<BookSelectionRowInterface[]>;

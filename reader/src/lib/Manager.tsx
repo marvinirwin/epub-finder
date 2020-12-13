@@ -76,6 +76,7 @@ import {UploadingDocumentsService} from "./uploading-documents/uploading-documen
 import {AvailableBooksService} from "./book-lists/available-books.service";
 import {BookSelectionService} from "./book-selection/book-selection.service";
 import {AlertsService} from "../services/alerts.service";
+import {ReadingBookService} from "./Manager/reading-book.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -154,6 +155,7 @@ export class Manager {
     uploadingDocumentsService: UploadingDocumentsService;
     availableBooksService: AvailableBooksService;
     bookSelectionService: BookSelectionService;
+    readingBookService: ReadingBookService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db})
@@ -178,7 +180,7 @@ export class Manager {
             applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
             db,
             settingsService: this.settingsService,
-            library$: this.library.documents$,
+            libraryService: this.library
         });
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
@@ -255,7 +257,7 @@ export class Manager {
         this.quizCharacterManager = new QuizCharacter(
             {
                 exampleSentences$: combineLatest([
-                    this.openedBooks.checkedOutBooks$
+                    this.openedBooks.allOpenBooks$
                         .pipe(
                             switchMap(books =>
                                 combineLatest(
@@ -304,7 +306,12 @@ export class Manager {
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
             }
         );
-        this.visibleSentencesService = new VisibleSentencesService({readingBookService: this.openedBooks.readingBookService})
+        this.readingBookService = new ReadingBookService({
+            trie$: this.cardManager.trie$,
+            openBooksService: this.openedBooks,
+            settingsService: this.settingsService
+        });
+        this.visibleSentencesService = new VisibleSentencesService({readingBookService: this.readingBookService})
         this.highlighterService = new HighlighterService(
             {
                 wordElementMap$: this.openedBooks.visibleElements$,

@@ -8,21 +8,23 @@ import {ManagerContext} from "../../App";
 
 export const toTreeMenuNode = ({name, reading, open}: BookSelectionRowInterface): TreeMenuNode => ({
     name,
-    Component: () => {
+    ReplaceComponent: () => {
         const m = useContext(ManagerContext);
         // If we're reading, there's no button, just an icon
-        return <ListItem>
+        return <ListItem className={'book-selection-row'}>
             {name}
-            {reading && <LocalLibrary/>}
-            {/*
+            <div className={'book-selection-row-icon-container'}>
+                {reading && <IconButton><LocalLibrary/></IconButton>}
+                {/*
                     {open && <IconButton><LibraryAddCheck/></IconButton>}
     */}
-            {!reading &&
-            <IconButton onClick={() => m.settingsService.readingBook$.next(name)}><School/></IconButton>}
-            {/*
+                {!reading &&
+                <IconButton onClick={() => m.settingsService.readingBook$.next(name)}><School/></IconButton>}
+                {/*
                     {!open && <IconButton onClick={() => {
                     }}><LibraryAdd/></IconButton>}
     */}
+            </div>
         </ListItem>
     }
 });

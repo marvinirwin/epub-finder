@@ -2,9 +2,10 @@ import {OpenBook} from "../BookFrame/OpenBook";
 import {TrieObservable} from "./QuizCharacter";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {ds_Dict} from "../Tree/DeltaScanner";
 import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
+import {SettingsService} from "../../services/settings.service";
+import {OpenBooksService, READING_BOOK_NODE_LABEL} from "./open-books.service";
 
 export class ReadingBookService {
     public readingBook: OpenBook;
@@ -13,13 +14,13 @@ export class ReadingBookService {
     constructor(
         {
             trie$,
-            openBooks$,
-            selectedBook$
+            openBooksService,
+            settingsService
         }:
             {
                 trie$: TrieObservable,
-                openBooks$: Observable<Map<number, OpenBook>>,
-                selectedBook$: Observable<string | undefined>
+                openBooksService: OpenBooksService,
+                settingsService: SettingsService
             }
     ) {
         this.readingBook = new OpenBook(
@@ -32,12 +33,29 @@ export class ReadingBookService {
                 shareReplay(1)
             ),
         );
-        // TOOD if a book's atomzied document cannot be loaded, then it must removed from checkedOutBooks$
+
+        openBooksService.openBookTree.appendDelta$.next(
+            {
+                nodeLabel: 'root',
+                children: {
+                    [READING_BOOK_NODE_LABEL]: {
+                        nodeLabel: READING_BOOK_NODE_LABEL,
+                        children: {
+                            [this.readingBook.name]: {
+                                nodeLabel: this.readingBook.name,
+                                value: this.readingBook
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
 
         combineLatest(
             [
-                openBooks$,
-                selectedBook$,
+                openBooksService.allOpenBooks$,
+                settingsService.readingBook$
             ]
         ).subscribe(([
                          checkedOutBooks,

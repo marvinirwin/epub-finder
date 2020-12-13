@@ -15,7 +15,7 @@ export class DocumentRepository {
     }
 
     fetchRemoteDocuments(): Promise<BookViewDto[]> {
-        return axios.get(`${process.env.PUBLIC_URL}/books`)
+        return axios.get(`${process.env.PUBLIC_URL}/books/available`)
             .then(response => response.data as BookViewDto[])
     }
 }

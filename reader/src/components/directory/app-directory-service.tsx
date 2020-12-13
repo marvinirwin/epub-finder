@@ -43,12 +43,10 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // I should do selected components by path, that way their refs can change?
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
-        m.settingsService.checkedOutBooks$,
         m.authManager.profile$,
         m.bookSelectionService.bookSelectionRows$
     ]).pipe(
         map(([
-                 customBooks,
                  profile,
                  availableBooks,
              ]) => {

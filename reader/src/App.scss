@@ -419,3 +419,13 @@ $character-timing-section-padding: 24px;
 .file-chooser {
   padding-left: 20px;
 }
+
+.book-selection-row {
+  width: 100%;
+  .book-selection-row-icon-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
