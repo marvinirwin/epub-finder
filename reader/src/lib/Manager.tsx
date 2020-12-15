@@ -79,6 +79,7 @@ import {AlertsService} from "../services/alerts.service";
 import {ReadingBookService} from "./Manager/reading-book.service";
 import {RequestRecordingService} from "../components/PronunciationVideo/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
+import {IntersectionObserverService} from "../services/intersection-observer.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -159,6 +160,7 @@ export class Manager {
     availableBooksService: AvailableBooksService;
     bookSelectionService: BookSelectionService;
     readingBookService: ReadingBookService;
+    intersectionObserverService = new IntersectionObserverService();
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.settingsService = new SettingsService({db})
@@ -188,7 +190,12 @@ export class Manager {
                 .map(renderedCharacter =>
                     this.applyWordElementListener(renderedCharacter)
                 )
-            )
+            );
+        this.intersectionObserverService.newAtomizedSentenceVisible$.subscribe(element => {
+            //Now mark the element as visible
+        });
+        this.intersectionObserverService.newAtomizedSentenceHidden$.subscribe(element => {
+        });
         this.openedBooks.newOpenBookDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
