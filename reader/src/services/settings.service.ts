@@ -1,5 +1,5 @@
 import {DatabaseService} from "../lib/Storage/database.service";
-import {ReplaySubject, Subject} from "rxjs";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 import { take} from "rxjs/operators";
@@ -80,7 +80,7 @@ export class SettingsService {
         return this.resolveReplaySubject$<string[]>('introStepsCompleted', [])
     }
 }
-export const replaySubjectLastValue = <T>(r: ReplaySubject<T>): Promise<T> => {
+export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
     return r.pipe(take(1)).toPromise();
 }
 

@@ -14,5 +14,7 @@ export interface TreeMenuNode {
 
     LeftIcon?: React.FunctionComponent;
     moveDirectory?: boolean;
+
+    hidden?: boolean;
 }
 

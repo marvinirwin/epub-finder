@@ -19,6 +19,7 @@ import {session} from "./entities/session.entity";
 import {ObservableModule} from "./observable/observable.module";
 import {BooksModule} from "./books/books.module";
 import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
+import {RecordRequestModule} from "./record-request/record-request.module";
 
 @Module({
     imports: [
@@ -39,7 +40,8 @@ import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
         TypeOrmModule.forFeature([JsonCache, session]),
         ObservableModule,
         BooksModule,
-        VideoMetadataModule
+        VideoMetadataModule,
+        RecordRequestModule
     ],
     providers: [
         SessionService,

@@ -86,7 +86,9 @@ export class BrowserInputs {
                 if (selObj) {
                     const text = selObj.toString();
                     if (text) {
+/*
                         this.selectedText$.next(text);
+*/
                     }
                     return;
                 }

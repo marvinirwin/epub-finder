@@ -1,4 +1,6 @@
 export interface AvailableBookDto {
     name: string;
-    book_id: number;
+    id: number;
+    uploadDate: Date;
+    belongsToUser: boolean;
 }

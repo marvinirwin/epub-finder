@@ -1,5 +1,5 @@
 import {Manager} from "../../lib/Manager";
-import {replaySubjectLastValue, SettingsService} from "../../services/settings.service";
+import {observableLastValue, SettingsService} from "../../services/settings.service";
 
 export class BookCheckingOutService {
     private settingsService: SettingsService;
@@ -8,13 +8,13 @@ export class BookCheckingOutService {
     }
 
     async checkoutBook (titleBeingCheckedOut: string) {
-        const checkedOutBooks = {...await replaySubjectLastValue(this.settingsService.checkedOutBooks$)};
+        const checkedOutBooks = {...await observableLastValue(this.settingsService.checkedOutBooks$)};
         checkedOutBooks[titleBeingCheckedOut] = true;
         this.settingsService.readingBook$.next(titleBeingCheckedOut);
     }
 
     async returnBook (titleBeingReturned: string)  {
-        const checkedOutBooks = {...await replaySubjectLastValue(this.settingsService.checkedOutBooks$)};
+        const checkedOutBooks = {...await observableLastValue(this.settingsService.checkedOutBooks$)};
         delete checkedOutBooks[titleBeingReturned];
         this.settingsService.checkedOutBooks$.next(checkedOutBooks)
     }

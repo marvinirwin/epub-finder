@@ -11,7 +11,8 @@ import {User} from "./user.entity";
         b.html,
         b.created_at,
         b.creator_id,
-        b.global
+        b.global,
+        b.deleted
     FROM book b
     LEFT JOIN book book_max 
         ON book_max.created_at > b.created_at
@@ -41,4 +42,7 @@ export class BookView  {
 
     @ViewColumn()
     global: boolean;
+
+    @ViewColumn()
+    deleted: boolean;
 }

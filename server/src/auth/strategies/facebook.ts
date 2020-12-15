@@ -17,6 +17,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
   }
 
   public async validate(_accessToken: string, _refreshToken: string, profile: any, ...args: any[]): Promise<User> {
-    return await this.userService.upsertUserByEmail(profile.emails[0].value);
+    throw new Error("Not implemented");
+    return await this.userService.upsertUserByEmailAndProvider(profile.emails[0].value, 'twitter', profile.id as string);
   }
 }

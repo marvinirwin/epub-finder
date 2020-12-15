@@ -12,7 +12,9 @@ import {TwitterGuard} from "../guards/twitter";
 
 @Controller("/auth")
 export class AuthController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+      private readonly userService: UsersService
+  ) {}
 
 /*
   @Public()

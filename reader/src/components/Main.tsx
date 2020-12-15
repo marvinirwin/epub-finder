@@ -17,12 +17,11 @@ const pronunciationVideoResized$ = new Subject<void>();
 export const AudioRecorderResizedContext = React.createContext<Subject<void>>(audioRecorderResized$)
 export const PronunciationVideoResizedContext = React.createContext<Subject<void>>(pronunciationVideoResized$)
 
-const treeMenuService = new TreeMenuService<any, {value: any}>();
 
 export function Main({m}: { m: Manager }) {
     useEffect(() => {
         m.inputManager.applyDocumentListeners(document);
-        AppDirectoryService(m).subscribe(v => treeMenuService.tree.appendDelta$.next(v));
+        AppDirectoryService(m).subscribe(v => m.treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
 
@@ -36,7 +35,7 @@ export function Main({m}: { m: Manager }) {
         <FocusedElement.Provider value={hotkeyHandler}>
             <PronunciationVideoResizedContext.Provider value={pronunciationVideoResized$}>
                 <AudioRecorderResizedContext.Provider value={audioRecorderResized$}>
-                    <AppContainer treeMenuService={treeMenuService}/>
+                    <AppContainer treeMenuService={m.treeMenuService}/>
                 </AudioRecorderResizedContext.Provider>
             </PronunciationVideoResizedContext.Provider>
         </FocusedElement.Provider>

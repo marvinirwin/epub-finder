@@ -48,8 +48,8 @@ export class UsersService {
      *
      * @param email
      */
-    async upsertUserByEmail(email: string): Promise<User> {
-        const user = await this.findOne({email});
+    async upsertUserByEmailAndProvider(email: string, provider: 'google' | 'twitter', providerIdValue: string): Promise<User> {
+        const user = await this.findOne({email, [provider]: providerIdValue});
         if (user) {
             return user;
         }

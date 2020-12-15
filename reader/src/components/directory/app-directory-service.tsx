@@ -7,7 +7,7 @@ import {useObservableState} from "observable-hooks";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 import {arrayToTreeRoot} from "./directory.factory";
-import {ReadingNode} from "./nodes/reading";
+import {ReadingNode} from "./nodes/reading.component";
 import {WatchMode} from "./modes/watch-mode.component";
 import {SpeakMode} from "./modes/speak-mode.component";
 import {TreeMenuNode} from "./tree-menu-node.interface";
@@ -16,6 +16,7 @@ import GoogleIcon from "../Icons/GoogleIcon";
 import TwitterIcon from "../Icons/TwitterIcon";
 import {FileChooser} from "./file-chooser.component";
 import {toTreeMenuNode} from "../../lib/book-selection/book-selection-tree-menu-node";
+import {RequestRecordingSentences} from "./request-record-sentences.component";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -44,15 +45,18 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
         m.authManager.profile$,
-        m.bookSelectionService.bookSelectionRows$
+        m.bookSelectionService.bookSelectionRows$,
+        m.treeMenuService.selectedComponent$
     ]).pipe(
         map(([
                  profile,
                  availableBooks,
+            selectedComponent
              ]) => {
             return arrayToTreeRoot<TreeMenuNode>(
                 ReadingNode(m),
                 [
+                    ReadingNode(m, selectedComponent?.name === 'reading'),
                     {
                         name: 'watchPronunciation',
                         ReplaceComponent: WatchMode
@@ -62,21 +66,31 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         ReplaceComponent: SpeakMode
                     },
                     {
-                        name: 'library',
-                        label: 'Library',
-                        moveDirectory: true,
-                    },
-                    // @ts-ignore
-                        availableBooks.map(toTreeMenuNode),
-                    {
                         name: 'playbackSpeed',
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
                     {
+                        name: 'library',
+                        label: 'Library',
+                        moveDirectory: true,
+                    },
+                    // @ts-ignore
+                    availableBooks.map(toTreeMenuNode),
+                    {
+                        name: 'customDocument',
+                        ReplaceComponent: () => <FileChooser/>
+                    },
+                    {
+                        name: 'requestRecording',
+                        Component: () => <RequestRecordingSentences/>,
+                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings'
+                    },
+                    {
                         name: 'signInWith',
                         label: 'Sign In With',
-                        moveDirectory: true
+                        moveDirectory: true,
+                        hidden: !!profile?.email
                     },
                     [
                         {
@@ -91,17 +105,15 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                             ReplaceComponent: () => <IconButton
                                 onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/twitter`}>
                                 <TwitterIcon/>
-                            </IconButton>
+                            </IconButton>,
+                            hidden: true,
                         }
                     ],
                     {
                         name: 'profile',
-                        label: profile?.email
+                        label: profile?.email,
+                        hidden: !!profile
                     },
-                    {
-                        name: 'customDocument',
-                        ReplaceComponent: () => <FileChooser/>
-                    }
                 ]
             );
             /*

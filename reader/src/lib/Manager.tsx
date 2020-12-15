@@ -68,15 +68,17 @@ import {IntroHighlightService} from "./intro/intro-highlight.service";
 import {ThirdPartyLoginService} from "../services/third-party-login.service";
 import {LoggedInUserService} from "./Auth/loggedInUserService";
 import {BookCheckingOutService} from "../components/Library/book-checking-out.service";
-import {DocumentRepository} from "../services/document.repository";
+import {DocumentRepository} from "./documents/document.repository";
 import {LibraryService} from "./Manager/library.service";
 import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
 import {mapToArray} from "./map.module";
 import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
-import {AvailableBooksService} from "./book-lists/available-books.service";
-import {BookSelectionService} from "./book-selection/book-selection.service";
+import {AvailableBooksService} from "./documents/available-books.service";
+import {BookSelectionService} from "./document-selection/book-selection.service";
 import {AlertsService} from "../services/alerts.service";
 import {ReadingBookService} from "./Manager/reading-book.service";
+import {RequestRecordingService} from "../components/PronunciationVideo/request-recording.service";
+import {TreeMenuService} from "../services/tree-menu.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -121,7 +123,8 @@ export class Manager {
     public wordRecognitionProgressService: WordRecognitionProgressService;
     public introService: IntroService;
     public alertsService = new AlertsService();
-
+    public requestRecordingService: RequestRecordingService;
+    public treeMenuService = new TreeMenuService<any, {value: any}>();
 
     public observableService = new ObservableService();
 
@@ -493,7 +496,10 @@ export class Manager {
         this.bookSelectionService = new BookSelectionService({
             availableBooksService: this.availableBooksService,
             settingsService: this.settingsService
-        })
+        });
+        this.requestRecordingService = new RequestRecordingService({
+            readingBookService: this.readingBookService
+        });
         this.hotkeyEvents.startListeners();
         this.cardManager.load();
 

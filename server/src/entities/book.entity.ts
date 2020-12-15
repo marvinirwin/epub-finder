@@ -1,14 +1,17 @@
-import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    Generated,
+    PrimaryColumn,
+    PrimaryGeneratedColumn
+} from "typeorm";
 
 @Entity()
 export class Book {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: number;
-
-    // Used for Groupwise Max
-    @Column()
-    @Generated("uuid")
-    book_id: number;
 
     @Column("text")
     name: string;
@@ -19,12 +22,19 @@ export class Book {
     @Column('text')
     html_hash: string;
 
-    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
-    created_at: Date;
-
     @Column({default: null})
     creator_id: number | null;
 
     @Column()
     global: boolean;
+
+    // Used for Groupwise Max
+    @Column()
+    book_id: string;
+
+    @Column()
+    deleted: boolean = false;
+
+    @CreateDateColumn()
+    created_at: Date;
 }

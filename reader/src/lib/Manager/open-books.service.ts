@@ -62,6 +62,7 @@ export class OpenBooksService {
     ) {
 
         this.allOpenBooks$ = config.libraryService.documents$.pipe(
+            map(documents => filterMap(documents, (key, d) => !d.deleted)),
                 map(libraryBooks => {
                     return mapMap(
                         libraryBooks,

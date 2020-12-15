@@ -2,14 +2,10 @@
  * All books available remotely
  */
 import { ReplaySubject} from "rxjs";
-import { BookViewDto } from "@server/*";
+import { BookViewDto, AvailableBookDto } from "@server/*";
 import axios from "axios";
 
 
-export interface AvailableBookDto {
-    name: string;
-    id: number;
-}
 
 export class AvailableBooksService {
     available$ = new ReplaySubject<AvailableBookDto[]>(1)
@@ -24,11 +20,13 @@ export class AvailableBooksService {
          * TODO find a way to retrieve just their names, or their names + ids
          */
         // If there's no data there will be an error, which will appear in the toast
-        response?.data && this.available$.next(response.data as BookViewDto[]);
+        response?.data && this.available$.next(response.data as AvailableBookDto[]);
     }
 
+/*
     fetchBook(a: AvailableBookDto): Promise<BookViewDto> {
         return axios.get(`${process.env.PUBLIC_URL}/books/${a.id}`)
             .then(response => response.data);
     }
+*/
 }

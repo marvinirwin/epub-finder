@@ -2,9 +2,8 @@ import {Body, Controller, Get, Post, Put, UploadedFile, UseGuards, UseIntercepto
 import {BooksService} from "./books.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
-import {CustomBookDto} from "./custom-book.dto";
-import {FileInterceptor} from "@nestjs/platform-express";
 import {LoggedInGuard} from "../guards/logged-in.guard";
+import {BookToBeSavedDto} from "./book-to-be-saved.dto";
 
 @Controller('books')
 export class BooksController {
@@ -17,15 +16,27 @@ export class BooksController {
         @UserFromReq() user: User | undefined
     ) {
         return this.booksService.queryAvailableBooks(user)
+            .then(availableBooks => availableBooks.map(bookView => ({
+                name: bookView.name,
+                id: bookView.id,
+                lastModified: bookView.created_at,
+                belongsToUser: bookView.creator_id === user?.id
+            })))
+    }
+    @Get('/all')
+    async allBooks(
+        @UserFromReq() user: User | undefined
+    ) {
+        return this.booksService.queryAvailableBooks(user)
     }
 
     @Put()
     @UseGuards(LoggedInGuard)
     async putBook(
         @UserFromReq() user: User,
-        @Body() customBookDto: CustomBookDto
+        @Body() bookToBeSavedDto: BookToBeSavedDto
     ) {
-        return this.booksService.saveBookForUser(user, customBookDto)
+        return this.booksService.saveBookForUser(user, bookToBeSavedDto)
     }
 
 /*

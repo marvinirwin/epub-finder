@@ -2,7 +2,7 @@ import {Manager} from "../../lib/Manager";
 import {TextField} from "@material-ui/core";
 import React from "react";
 import {debounce} from 'lodash';
-import {replaySubjectLastValue} from "../../services/settings.service";
+import {observableLastValue} from "../../services/settings.service";
 
 export function EditableHotkeyComponent({action, keyCombo, m}: { action: string, keyCombo: string[] | undefined, m: Manager }) {
     return <TextField
@@ -12,7 +12,7 @@ export function EditableHotkeyComponent({action, keyCombo, m}: { action: string,
         onChange={async e => {
             m.settingsService.hotkeys$.next(
                 {
-                    ...await replaySubjectLastValue(m.settingsService.hotkeys$),
+                    ...await observableLastValue(m.settingsService.hotkeys$),
                     [action]: e.target.value.split('+')
                 }
             );

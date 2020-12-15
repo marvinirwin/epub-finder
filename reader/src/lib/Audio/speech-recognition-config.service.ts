@@ -3,7 +3,7 @@ import {map, mergeScan, shareReplay, take} from "rxjs/operators";
 import {SpeechConfig} from "microsoft-cognitiveservices-speech-sdk";
 import axios from "axios";
 import {subscribeToPromise} from "rxjs/internal-compatibility";
-import {replaySubjectLastValue} from "../../services/settings.service";
+import {observableLastValue} from "../../services/settings.service";
 import jwt_decode from "jwt-decode";
 import {RefreshableService} from "./refreshable.service";
 

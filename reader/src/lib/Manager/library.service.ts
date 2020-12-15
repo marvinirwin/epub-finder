@@ -1,9 +1,9 @@
 import {DatabaseService} from "../Storage/database.service";
-import {DocumentRepository} from "../../services/document.repository";
 import {ReplaySubject} from "rxjs";
 import { BookViewDto, BookToBeSavedDto } from "@server/*";
 import {mapFromId} from "../map.module";
-import {replaySubjectLastValue} from "../../services/settings.service";
+import {observableLastValue} from "../../services/settings.service";
+import {DocumentRepository} from "../documents/document.repository";
 
 export class LibraryService {
     documents$ = new ReplaySubject<Map<number, BookViewDto>>(1)
@@ -35,11 +35,13 @@ export class LibraryService {
     }
 
 
-    public async addAndPersistDocumentRevision(d: BookToBeSavedDto): Promise<BookViewDto> {
-        const latestDocuments = await replaySubjectLastValue(this.documents$);
+    public async addAndPersistDocumentRevision(d: BookToBeSavedDto): Promise<BookViewDto | undefined> {
+        const latestDocuments = await observableLastValue(this.documents$);
         const savedDocument = await this.documentRepository.persistDocument(d);
-        this.documents$.next(new Map(latestDocuments.set(savedDocument.id, savedDocument)))
-        return savedDocument;
+        if (savedDocument) {
+            this.documents$.next(new Map(latestDocuments.set(savedDocument.id, savedDocument)))
+            return savedDocument;
+        }
     }
 }
 

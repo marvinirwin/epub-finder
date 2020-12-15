@@ -16,8 +16,11 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
     return <div className={'app-container'}>
         {
             menuItemTree?.sourced && <TreeMenu
-                title={() => <Typography ref={ref => m.introService.titleRef$.next(ref)} variant='h6'>Mandarin
-                    Trainer</Typography>}
+                title={() => <Typography
+                    ref={ref => m.introService.titleRef$.next(ref)}
+                    variant='h6'>Mandarin Trainer
+                </Typography>
+                }
                 tree={menuItemTree.sourced}
                 directoryPath={directoryPath}
                 directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}
@@ -34,7 +37,10 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                 ).map((item, index) => <div
                         key={index}
                         className={'directory-item'}
-                        style={{zIndex: item.Component === selectedComponent?.Component ? 1 : 0}}>
+                        style={{
+                            zIndex: item.Component === selectedComponent?.Component ? 1 : 0,
+
+                        }}>
                         {
                             item.Component && <item.Component/>
                         }

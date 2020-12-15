@@ -1,7 +1,6 @@
-import {DatabaseService} from "../lib/Storage/database.service";
+import {DatabaseService} from "../../lib/Storage/database.service";
 import axios from 'axios';
 import {BookViewDto, BookToBeSavedDto} from '@server/'
-import {BasicDocument} from "../types";
 
 export class DocumentRepository {
     private databaseService: DatabaseService;
@@ -10,12 +9,14 @@ export class DocumentRepository {
     }
 
     persistDocument(bookToBeSaved: BookToBeSavedDto): Promise<BookViewDto> {
-        return axios.post(`${process.env.PUBLIC_URL}/books`, bookToBeSaved)
-            .then(response => response.data)
+        return axios.put(`${process.env.PUBLIC_URL}/books`, bookToBeSaved)
+            .then(response => {
+                return response?.data;
+            })
     }
 
     fetchRemoteDocuments(): Promise<BookViewDto[]> {
-        return axios.get(`${process.env.PUBLIC_URL}/books/available`)
+        return axios.get(`${process.env.PUBLIC_URL}/books/all`)
             .then(response => response.data as BookViewDto[])
     }
 }

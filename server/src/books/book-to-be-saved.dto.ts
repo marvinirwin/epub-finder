@@ -1,5 +1,6 @@
 export interface BookToBeSavedDto {
-    book_id?: number;
+    book_id?: string;
     name: string;
     html: string;
+    deleted?: boolean;
 }

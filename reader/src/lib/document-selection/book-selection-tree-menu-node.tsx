@@ -5,6 +5,7 @@ import {IconButton, ListItem} from "@material-ui/core";
 import LocalLibrary from '@material-ui/icons/LocalLibrary';
 import School from '@material-ui/icons/School';
 import {ManagerContext} from "../../App";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 export const toTreeMenuNode = ({name, reading, open}: BookSelectionRowInterface): TreeMenuNode => ({
     name,
@@ -20,6 +21,7 @@ export const toTreeMenuNode = ({name, reading, open}: BookSelectionRowInterface)
     */}
                 {!reading &&
                 <IconButton onClick={() => m.settingsService.readingBook$.next(name)}><School/></IconButton>}
+                <IconButton onClick={() => m.availableBooksService.}><DeleteIcon/></IconButton>}
                 {/*
                     {!open && <IconButton onClick={() => {
                     }}><LibraryAdd/></IconButton>}

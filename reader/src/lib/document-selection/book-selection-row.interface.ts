@@ -4,4 +4,9 @@ export interface BookSelectionRowInterface {
     reading?: boolean;
     // Open mean its stats are included in the list[
     open?: boolean;
+
+    belongsToCurrentUser?: boolean;
+    lastModified: Date;
+
+
 }
