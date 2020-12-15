@@ -124,7 +124,7 @@ export class Manager {
     public introService: IntroService;
     public alertsService = new AlertsService();
     public requestRecordingService: RequestRecordingService;
-    public treeMenuService = new TreeMenuService<any, {value: any}>();
+    public treeMenuService = new TreeMenuService<any, { value: any }>();
 
     public observableService = new ObservableService();
 
@@ -178,13 +178,18 @@ export class Manager {
         this.droppedFilesService = new DroppedFilesService();
         this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
-            applyListeners: b => this.inputManager.applyDocumentListeners(b),
             bottomNavigationValue$: this.bottomNavigationValue$,
-            applyWordElementListener: annotationElement => this.applyWordElementListener(annotationElement),
             db,
             settingsService: this.settingsService,
             libraryService: this.library
         });
+        this.openedBooks.renderedElements$
+            .subscribe(renderedCharacters => renderedCharacters
+                .map(renderedCharacter =>
+                    this.applyWordElementListener(renderedCharacter)
+                )
+            )
+        this.openedBooks.newOpenBookDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
             bookCheckingOutService: this.bookCheckingOutService,

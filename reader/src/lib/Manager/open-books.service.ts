@@ -1,5 +1,5 @@
-import {combineLatest, Observable, of, ReplaySubject} from "rxjs";
-import {map, shareReplay, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
+import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -48,13 +48,13 @@ export class OpenBooksService {
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
+    newOpenBookDocumentBodies$: Observable<HTMLBodyElement>;
+    renderedElements$: Observable<IAnnotatedCharacter[]>;
 
     constructor(
         private config: {
             trie$: TrieObservable,
-            applyListeners: (b: HTMLDocument) => void,
             bottomNavigationValue$: ReplaySubject<NavigationPages>,
-            applyWordElementListener: (annotationElement: IAnnotatedCharacter) => void;
             db: DatabaseService;
             settingsService: SettingsService;
             libraryService: LibraryService;
@@ -63,26 +63,26 @@ export class OpenBooksService {
 
         this.allOpenBooks$ = config.libraryService.documents$.pipe(
             map(documents => filterMap(documents, (key, d) => !d.deleted)),
-                map(libraryBooks => {
-                    return mapMap(
-                        libraryBooks,
-                        (id, bookViewDto) => {
-                            const openBook = new OpenBook(
-                                bookViewDto.name,
-                                config.trie$,
-                                undefined,
-                            );
-                            openBook.unAtomizedSrcDoc$.next(bookViewDto.html);
-                            return [
-                                id,
-                                openBook
-                            ];
-                        }
-                    )
-                })
-            ).pipe(
-                shareReplay(1)
-            );
+            map(libraryBooks => {
+                return mapMap(
+                    libraryBooks,
+                    (id, bookViewDto) => {
+                        const openBook = new OpenBook(
+                            bookViewDto.name,
+                            config.trie$,
+                            undefined,
+                        );
+                        openBook.unAtomizedSrcDoc$.next(bookViewDto.html);
+                        return [
+                            id,
+                            openBook
+                        ];
+                    }
+                )
+            })
+        ).pipe(
+            shareReplay(1)
+        );
 
         this.allOpenBooks$.subscribe(
             openBooks => this.openBookTree.appendDelta$.next(
@@ -152,16 +152,23 @@ export class OpenBooksService {
             .openBookTree
             .mapWith(bookDataMap());
 
-        this.renderedSentenceTextDataTree$.updates$.subscribe(({delta}) => {
-            combineLatest(flattenTree(delta))
-                .subscribe(bookStats => {
-                    bookStats.forEach(atomizedSentenceStats => {
-                        atomizedSentenceStats.forEach(sentenceStats => {
-                            flatten(Object.values(sentenceStats.wordElementsMap)).forEach(config.applyWordElementListener)
-                        })
-                    })
-                })
-        });
+
+        this.renderedElements$ = this.renderedSentenceTextDataTree$.updates$
+            .pipe(
+                switchMap(({delta}) => merge(...flattenTree(delta))),
+                map(bookWordDatas => Array.from(
+                    new Set(
+                        flatten(
+                            bookWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
+                        )
+                    ))
+                ),
+/*
+                map((annotatedCharacters: IAnnotatedCharacter[]) =>
+                    annotatedCharacters.map(({element}) => element as unknown as HTMLElement)
+                )
+*/
+            )
 
 
         this.renderedBookSentenceData$ = this.renderedSentenceTextDataTree$
@@ -246,11 +253,22 @@ export class OpenBooksService {
         );
 
 
+        this.newOpenBookDocumentBodies$ = this.openBookTree
+            .mapWith(r => r.renderRoot$)
+            .updates$
+            .pipe(
+                switchMap(({delta}) => merge(...flattenTree(delta))),
+                shareReplay(1)
+            )
+        /*
+                    .subscribe(({delta}) => {
+                    .
+                        forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
+                    })
+        */
+
     }
 
     private applyListenersToOpenedBookBodies() {
-        this.openBookTree.updates$.subscribe(({delta}) => {
-            flattenTree(delta).forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
-        })
     }
 }
