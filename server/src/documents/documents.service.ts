@@ -32,9 +32,9 @@ export class DocumentsService implements OnModuleInit {
     private async insertDocumentsInDocumentsDir() {
         // Get all the documents, get their hashes, compare with the current documents
         const documents = await Promise.all(
-            (await fs.readdir(process.env.DOCUMENTS_DIR))
+            (await fs.readdir(process.env.BUILT_IN_DOCUMENTS_DIR))
                 .filter(filename => filename.endsWith('.html'))
-                .map(filename => fs.readFile(join(process.env.DOCUMENTS_DIR, filename))
+                .map(filename => fs.readFile(join(process.env.BUILT_IN_DOCUMENTS_DIR, filename))
                     .then(content => ({filename, html: content.toString()}))// Do I have to add UTF-8 here?
                 )
         );

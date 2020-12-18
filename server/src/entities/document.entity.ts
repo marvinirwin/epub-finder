@@ -22,7 +22,7 @@ export class Document {
     @Column('text')
     html_hash: string;
 
-    @Column()
+    @Column({default: null})
     filename: string | null;
 
     @Column({default: null})
