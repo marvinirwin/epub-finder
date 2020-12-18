@@ -1,3 +1,3 @@
-export interface documentToBeDeletedDto {
+export interface DocumentToBeDeletedDto {
     document_id: string;
 }

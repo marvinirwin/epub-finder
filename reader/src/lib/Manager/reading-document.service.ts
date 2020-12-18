@@ -5,7 +5,7 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
-import {OpenDocumentsService, READING_BOOK_NODE_LABEL} from "./open-documents.service";
+import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;
@@ -38,12 +38,12 @@ export class ReadingDocumentService {
             {
                 nodeLabel: 'root',
                 children: {
-                    [READING_BOOK_NODE_LABEL]: {
-                        nodeLabel: READING_BOOK_NODE_LABEL,
+                    [READING_DOCUMENT_NODE_LABEL]: {
+                        nodeLabel: READING_DOCUMENT_NODE_LABEL,
                         children: {
                             [this.readingDocument.name]: {
-                                nodeLabel: this.readingBook.name,
-                                value: this.readingBook
+                                nodeLabel: this.readingDocument.name,
+                                value: this.readingDocument
                             }
                         }
                     }
@@ -54,19 +54,19 @@ export class ReadingDocumentService {
 
         combineLatest(
             [
-                openBooksService.allOpenBooks$,
-                settingsService.readingBook$
+                openDocumentsService.allOpenDocuments$,
+                settingsService.readingDocument$
             ]
         ).subscribe(([
-                         checkedOutBooks,
-                         selectedBook,
+                         checkedOutDocuments,
+                         selectedDocument,
                      ]) => {
-            const foundBook = findMap(checkedOutBooks, (id, document) => document.name === selectedBook)
-            if ((!selectedBook || !foundBook) && checkedOutBooks.size) {
-                this.displayDocument$.next(firstMap(checkedOutBooks).atomizedDocument$)
+            const foundDocument = findMap(checkedOutDocuments, (id, document) => document.name === selectedDocument)
+            if ((!selectedDocument || !foundDocument) && checkedOutDocuments.size) {
+                this.displayDocument$.next(firstMap(checkedOutDocuments).atomizedDocument$)
             }
-            if (foundBook) {
-                this.displayDocument$.next(foundBook.atomizedDocument$);
+            if (foundDocument) {
+                this.displayDocument$.next(foundDocument.atomizedDocument$);
             }
         })
     }

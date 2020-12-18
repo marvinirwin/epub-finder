@@ -1,6 +1,6 @@
 import React, {useEffect, useState, Fragment} from 'react'
 import {Iframe} from './iframe'
-import {BodyStyle} from "../../lib/BookFrame/AppendBookStyle";
+import {BodyStyle} from "../../lib/DocumentFrame/AppendDocumentStyle";
 
 export type IFrameRenderHandler = (head: HTMLTitleElement, body: HTMLDivElement) => void;
 

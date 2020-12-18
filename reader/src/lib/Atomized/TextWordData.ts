@@ -1,7 +1,7 @@
 import {Dictionary} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {AtomizedSentence} from "./AtomizedSentence";
-import {BookWordCount} from "../Interfaces/BookWordCount";
+import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
 
 export interface TextWordData {
     wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
@@ -9,11 +9,11 @@ export interface TextWordData {
     wordCounts: Dictionary<number>;
     sentenceMap: Dictionary<AtomizedSentence[]>;
 }
-export interface BookWordData extends TextWordData {
-    documentWordCounts: Dictionary<BookWordCount[]>;
+export interface DocumentWordData extends TextWordData {
+    documentWordCounts: Dictionary<DocumentWordCount[]>;
 }
 
-export function mergeSentenceInfo<T extends (BookWordData | TextWordData)>(...sentenceInfos: T[]): T {
+export function mergeSentenceInfo<T extends (DocumentWordData | TextWordData)>(...sentenceInfos: T[]): T {
     // @ts-ignore
     const aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, documentWordCounts: {}};
 

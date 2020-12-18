@@ -1,8 +1,8 @@
-import {BookWordCount} from "../Interfaces/BookWordCount";
+import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
 import {WordRecognitionRow} from "./word-recognition-row";
 
 export interface ScheduleRow {
-    wordCountRecords: BookWordCount[];
+    wordCountRecords: DocumentWordCount[];
     wordRecognitionRecords: WordRecognitionRow[];
     word: string;
     sortString?: string;

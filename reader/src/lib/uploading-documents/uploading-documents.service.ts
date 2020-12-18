@@ -1,8 +1,8 @@
 import {combineLatest, ReplaySubject} from "rxjs";
 import {DroppedFilesService} from "./dropped-files.service";
-import {BookCheckingOutService} from "../../components/Library/document-checking-out.service";
+import {DocumentCheckingOutService} from "../../components/Library/document-checking-out.service";
 import {LoggedInUserService} from "../Auth/loggedInUserService";
-import {BookViewDto} from "@server/*";
+import {DocumentViewDto} from "@server/*";
 import {last, map, startWith} from "rxjs/operators";
 import {LibraryService} from "../Manager/library.service";
 
@@ -24,7 +24,7 @@ export class UploadingDocumentsService {
                     libraryService,
                 }: {
         loggedInUserService: LoggedInUserService,
-        documentCheckingOutService: BookCheckingOutService,
+        documentCheckingOutService: DocumentCheckingOutService,
         droppedFilesService: DroppedFilesService,
         libraryService: LibraryService,
     }) {
@@ -48,7 +48,7 @@ export class UploadingDocumentsService {
                 await libraryService.addAndPersistDocumentRevision(basicDocument);
             }
             if (lastDocument) {
-                await documentCheckingOutService.checkoutBook(lastDocument);
+                await documentCheckingOutService.checkoutDocument(lastDocument);
             }
         })
     }

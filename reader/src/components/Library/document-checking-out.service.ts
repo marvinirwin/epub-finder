@@ -1,21 +1,21 @@
 import {Manager} from "../../lib/Manager";
 import {observableLastValue, SettingsService} from "../../services/settings.service";
 
-export class BookCheckingOutService {
+export class DocumentCheckingOutService {
     private settingsService: SettingsService;
     constructor({settingsService}: {settingsService: SettingsService}) {
         this.settingsService = settingsService;
     }
 
-    async checkoutBook (titleBeingCheckedOut: string) {
-        const checkedOutBooks = {...await observableLastValue(this.settingsService.checkedOutBooks$)};
-        checkedOutBooks[titleBeingCheckedOut] = true;
-        this.settingsService.readingBook$.next(titleBeingCheckedOut);
+    async checkoutDocument (titleBeingCheckedOut: string) {
+        const checkedOutDocuments = {...await observableLastValue(this.settingsService.checkedOutDocuments$)};
+        checkedOutDocuments[titleBeingCheckedOut] = true;
+        this.settingsService.readingDocument$.next(titleBeingCheckedOut);
     }
 
-    async returnBook (titleBeingReturned: string)  {
-        const checkedOutBooks = {...await observableLastValue(this.settingsService.checkedOutBooks$)};
-        delete checkedOutBooks[titleBeingReturned];
-        this.settingsService.checkedOutBooks$.next(checkedOutBooks)
+    async returnDocument (titleBeingReturned: string)  {
+        const checkedOutDocuments = {...await observableLastValue(this.settingsService.checkedOutDocuments$)};
+        delete checkedOutDocuments[titleBeingReturned];
+        this.settingsService.checkedOutDocuments$.next(checkedOutDocuments)
     }
 }

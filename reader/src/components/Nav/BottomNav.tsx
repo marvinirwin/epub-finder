@@ -4,7 +4,7 @@ import {Manager} from "../../lib/Manager";
 
 import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
 import School from '@material-ui/icons/School';
-import LibraryBooks from '@material-ui/icons/LibraryBooks';
+import LibraryDocuments from '@material-ui/icons/LibraryBooks';
 import LocalLibrary from '@material-ui/icons/LocalLibrary';
 import Settings from '@material-ui/icons/Settings';
 import {makeStyles} from "@material-ui/core/styles";

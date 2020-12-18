@@ -13,7 +13,7 @@ import {Named} from "../../lib/Manager/open-documents.service";
  * reader$
  * library$
  * [
- *   ...libraryBooks$
+ *   ...libraryDocuments$
  * ]
  * auth$
  * [

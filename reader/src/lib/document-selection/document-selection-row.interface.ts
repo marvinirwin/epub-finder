@@ -1,4 +1,4 @@
-export interface BookSelectionRowInterface {
+export interface DocumentSelectionRowInterface {
     name: string;
     // Reading means it's selected
     reading?: boolean;

@@ -1,23 +1,23 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
-import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
+import {getDocumentWordData, OpenDocument} from "../DocumentFrame/OpenDocument";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree,  NamedDeltaScanner} from "../Tree/DeltaScanner";
-import {BookWordData, TextWordData} from "../Atomized/TextWordData";
+import {DocumentWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
+import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
-import {ReadingBookService} from "./reading-document.service";
+import {ReadingDocumentService} from "./reading-document.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
-import {BookViewDto} from "@server/*";
+import {DocumentViewDto} from "@server/*";
 import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
 
@@ -26,29 +26,29 @@ export type Named = {
     name: string;
 }
 
-export const SOURCE_BOOKS_NODE_LABEL = 'libraryBooks';
-export const CHARACTER_BOOK_NODE_LABEL = 'CharacterPageBook';
-export const READING_BOOK_NODE_LABEL = 'readingBook';
+export const SOURCE_DOCUMENTS_NODE_LABEL = 'libraryDocuments';
+export const CHARACTER_DOCUMENT_NODE_LABEL = 'CharacterPageDocument';
+export const READING_DOCUMENT_NODE_LABEL = 'readingDocument';
 export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
     (variableToCheck as Website).url !== undefined;
 export const isCustomDocument = (variableToCheck: any): variableToCheck is BasicDocument =>
     (variableToCheck as BasicDocument).html !== undefined;
 
-export class OpenBooksService {
-    openBookTree = new NamedDeltaScanner<OpenBook, string>();
+export class OpenDocumentsService {
+    openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    renderedSentenceTextDataTree$: DeltaScanner<Observable<BookWordData[]>>;
-    renderedBookSentenceData$: Observable<BookWordData[]>;
+    renderedSentenceTextDataTree$: DeltaScanner<Observable<DocumentWordData[]>>;
+    renderedDocumentSentenceData$: Observable<DocumentWordData[]>;
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     displayDocument$: Observable<AtomizedDocument>;
-    readingBook$ = new ReplaySubject<OpenBook>(1);
-    allOpenBooks$: Observable<Map<string, OpenBook>>;
-    checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
+    readingDocument$ = new ReplaySubject<OpenDocument>(1);
+    allOpenDocuments$: Observable<Map<string, OpenDocument>>;
+    checkedOutDocumentsData$: Observable<AtomizedDocumentDocumentStats[]>;
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
     visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    newOpenBookDocumentBodies$: Observable<HTMLBodyElement>;
+    newOpenDocumentDocumentBodies$: Observable<HTMLBodyElement>;
     renderedElements$: Observable<IAnnotatedCharacter[]>;
 
     constructor(
@@ -61,21 +61,21 @@ export class OpenBooksService {
         }
     ) {
 
-        this.allOpenBooks$ = config.libraryService.documents$.pipe(
+        this.allOpenDocuments$ = config.libraryService.documents$.pipe(
             map(documents => filterMap(documents, (key, d) => !d.deleted)),
-            map(libraryBooks => {
+            map(libraryDocuments => {
                 return mapMap(
-                    libraryBooks,
+                    libraryDocuments,
                     (id, documentViewDto) => {
-                        const openBook = new OpenBook(
+                        const openDocument = new OpenDocument(
                             documentViewDto.name,
                             config.trie$,
                             undefined,
                         );
-                        openBook.unAtomizedSrcDoc$.next(documentViewDto.html);
+                        openDocument.unAtomizedSrcDoc$.next(documentViewDto.html);
                         return [
                             id,
-                            openBook
+                            openDocument
                         ];
                     }
                 )
@@ -84,19 +84,19 @@ export class OpenBooksService {
             shareReplay(1)
         );
 
-        this.allOpenBooks$.subscribe(
-            openBooks => this.openBookTree.appendDelta$.next(
+        this.allOpenDocuments$.subscribe(
+            openDocuments => this.openDocumentTree.appendDelta$.next(
                 {
                     nodeLabel: 'root',
                     children: {
-                        [SOURCE_BOOKS_NODE_LABEL]: {
-                            nodeLabel: SOURCE_BOOKS_NODE_LABEL,
+                        [SOURCE_DOCUMENTS_NODE_LABEL]: {
+                            nodeLabel: SOURCE_DOCUMENTS_NODE_LABEL,
                             children: Object.fromEntries(
-                                Object.entries(openBooks)
-                                    .map(([name, openBook]) => [
+                                Object.entries(openDocuments)
+                                    .map(([name, openDocument]) => [
                                             name,
                                             {
-                                                value: openBook,
+                                                value: openDocument,
                                                 nodeLabel: name
                                             }
                                         ]
@@ -108,10 +108,10 @@ export class OpenBooksService {
             )
         )
 
-        this.applyListenersToOpenedBookBodies();
+        this.applyListenersToOpenedDocumentBodies();
 
-        this.renderedAtomizedSentences$ = this.openBookTree
-            .mapWith((documentFrame: OpenBook) => documentFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
+        this.renderedAtomizedSentences$ = this.openDocumentTree
+            .mapWith((documentFrame: OpenDocument) => documentFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
                 switchMap(({sourced}) => {
                     const sources = sourced ? flattenTree(sourced) : [];
                     return combineLatest(sources);
@@ -124,7 +124,7 @@ export class OpenBooksService {
 
 
         function documentDataMap() {
-            return (documentFrame: OpenBook) => {
+            return (documentFrame: OpenDocument) => {
                 return combineLatest([
                     documentFrame.renderedSentences$,
                     config.trie$
@@ -132,7 +132,7 @@ export class OpenBooksService {
                     map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
                             return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
                                 sentences.map(sentence =>
-                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), documentFrame.name)
+                                    getDocumentWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), documentFrame.name)
                                 )
                             ));
                         }
@@ -142,14 +142,14 @@ export class OpenBooksService {
             };
         }
 
-        this.checkedOutBooksData$ = this.allOpenBooks$.pipe(
-            switchMap(openBooks =>
-                combineLatest(mapToArray(openBooks, (id, document) => document.documentStats$))
+        this.checkedOutDocumentsData$ = this.allOpenDocuments$.pipe(
+            switchMap(openDocuments =>
+                combineLatest(mapToArray(openDocuments, (id, document) => document.documentStats$))
             )
         )
 
         this.renderedSentenceTextDataTree$ = this
-            .openBookTree
+            .openDocumentTree
             .mapWith(documentDataMap());
 
 
@@ -171,14 +171,14 @@ export class OpenBooksService {
             )
 
 
-        this.renderedBookSentenceData$ = this.renderedSentenceTextDataTree$
+        this.renderedDocumentSentenceData$ = this.renderedSentenceTextDataTree$
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
-                    const readingFrames = sourced?.children?.[READING_BOOK_NODE_LABEL];
-                    return combineLatest(readingFrames ? flattenTree<Observable<BookWordData[]>>(readingFrames) : []);
+                    const readingFrames = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
+                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentWordData[]>>(readingFrames) : []);
                 }),
-                map((v: BookWordData[][]) => {
+                map((v: DocumentWordData[][]) => {
                     return flatten(v);
                 }),
                 shareReplay(1)
@@ -188,7 +188,7 @@ export class OpenBooksService {
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
-                    const readingFrames = sourced?.children?.[CHARACTER_BOOK_NODE_LABEL];
+                    const readingFrames = sourced?.children?.[CHARACTER_DOCUMENT_NODE_LABEL];
                     return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [])
                 }),
                 map((v: TextWordData[][]) => {
@@ -197,17 +197,17 @@ export class OpenBooksService {
                 shareReplay(1)
             );
 
-        const visibleOpenBook = <U, T extends Observable<U>>(o$: Observable<[DeltaScan<T>, NavigationPages]>): Observable<U[]> => {
+        const visibleOpenDocument = <U, T extends Observable<U>>(o$: Observable<[DeltaScan<T>, NavigationPages]>): Observable<U[]> => {
             return o$.pipe(switchMap(([{sourced}, bottomNavigationValue]) => {
                 if (!sourced?.children) {
-                    throw new Error("OpenedBooks has no tree, this should not happen")
+                    throw new Error("OpenedDocuments has no tree, this should not happen")
                 }
                 switch (bottomNavigationValue) {
                     case NavigationPages.READING_PAGE:
-                        const child = sourced.children[READING_BOOK_NODE_LABEL];
+                        const child = sourced.children[READING_DOCUMENT_NODE_LABEL];
                         return combineLatest(child ? flattenTree(child) : []);
                     case NavigationPages.QUIZ_PAGE:
-                        const child1 = sourced.children[CHARACTER_BOOK_NODE_LABEL];
+                        const child1 = sourced.children[CHARACTER_DOCUMENT_NODE_LABEL];
                         return combineLatest(child1 ? flattenTree(child1) : []);
                     default:
                         return combineLatest([]);
@@ -215,17 +215,17 @@ export class OpenBooksService {
             }));
         }
 
-        const visibleOpenedBookData$: Observable<TextWordData[][]> = combineLatest([
+        const visibleOpenedDocumentData$: Observable<TextWordData[][]> = combineLatest([
             this.renderedSentenceTextDataTree$.updates$,
             config.bottomNavigationValue$
         ]).pipe(
-            visibleOpenBook,
+            visibleOpenDocument,
             shareReplay(1)
         );
 
 
         this.visibleAtomizedSentences$ = combineLatest([
-            this.openBookTree.mapWith(openBook => openBook.renderedSentences$).updates$,
+            this.openDocumentTree.mapWith(openBook => openBook.renderedSentences$).updates$,
             config.bottomNavigationValue$
         ]).pipe(
             visibleOpenBook,

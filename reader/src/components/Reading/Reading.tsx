@@ -1,6 +1,6 @@
 import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
-import {OpenedBook} from "../../lib/Atomized/OpenedBook";
+import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
 import {ExpandableContainer} from "../Containers/ExpandableContainer";
 import {useObservableState} from "observable-hooks";
@@ -8,7 +8,7 @@ import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
 
 export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const openedBook = m.readingBookService.readingBook;
+    const openedDocument = m.readingDocumentService.readingDocument;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);
 
@@ -23,8 +23,8 @@ export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
                              resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        <OpenedBook ref={ref => m.introService.readingFrameRef$.next(ref)}
-                    openedBook={openedBook}
+        <OpenedDocument ref={ref => m.introService.readingFrameRef$.next(ref)}
+                    openedDocument={openedDocument}
         />
     </div>
 }

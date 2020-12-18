@@ -1,12 +1,12 @@
 import {DatabaseService} from "../Storage/database.service";
 import {ReplaySubject} from "rxjs";
-import {BookToBeSavedDto, BookViewDto} from "@server/*";
+import {DocumentToBeSavedDto, DocumentViewDto} from "@server/*";
 import {mapFromId} from "../map.module";
 import {observableLastValue} from "../../services/settings.service";
 import {DocumentRepository} from "../documents/document.repository";
 
 export class LibraryService {
-    documents$ = new ReplaySubject<Map<string, BookViewDto>>(1)
+    documents$ = new ReplaySubject<Map<string, DocumentViewDto>>(1)
 
     db: DatabaseService;
     private documentRepository: DocumentRepository;
@@ -23,7 +23,7 @@ export class LibraryService {
 
     private async loadDocuments() {
         this.documents$.next(
-            mapFromId<string, BookViewDto>(await this.documentRepository.fetchRemoteDocuments())
+            mapFromId<string, DocumentViewDto>(await this.documentRepository.queryAll())
         )
         /*
                 const builtInDocuments = [
@@ -37,21 +37,21 @@ export class LibraryService {
     }
 
 
-    public async addAndPersistDocumentRevision(d: BookToBeSavedDto): Promise<void> {
-        const savedDocument = await this.documentRepository.persistDocument(d);
+    public async addAndPersistDocumentRevision(d: DocumentToBeSavedDto): Promise<void> {
+        const savedDocument = await this.documentRepository.upsert(d);
         this.loadDocuments();
     }
 
     public async PersistFile(
         file: File,
-        b: BookToBeSavedDto
+        b: DocumentToBeSavedDto
     ): Promise<void> {
         // Uplaod the file with the headers
     }
 
     public async deleteDocument(instanceId: string, document_id: string): Promise<void> {
         await this.documentRepository
-            .persistDocument(
+            .upsert(
                 {
                     document_id,
                     deleted: true, html: '', name: ''

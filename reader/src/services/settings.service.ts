@@ -61,11 +61,11 @@ export class SettingsService {
         return dest[settingName];
     }
 
-    get checkedOutBooks$(): ReplaySubject<ds_Dict<boolean>> {
-        return this.resolveSetting$<ds_Dict<boolean>>('checkedOutBooks', {'cat-likes-tea': true})
+    get checkedOutDocuments$(): ReplaySubject<ds_Dict<boolean>> {
+        return this.resolveSetting$<ds_Dict<boolean>>('checkedOutDocuments', {'cat-likes-tea': true})
     }
-    get readingBook$(): ReplaySubject<string | undefined> {
-        return this.resolveSetting$<string | undefined>('readingBook', undefined)
+    get readingDocument$(): ReplaySubject<string | undefined> {
+        return this.resolveSetting$<string | undefined>('readingDocument', undefined)
     }
 
     get hotkeys$(): ReplaySubject<Partial<Hotkeys<string[]>>> {

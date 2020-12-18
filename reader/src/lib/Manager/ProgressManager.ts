@@ -61,7 +61,7 @@ export class ProgressManager {
         // Let's maintain some fractions
         // Ultimate Progress
         // HSK Progress
-        // Book-level progress
+        // Document-level progress
         // Each one of these progress' is available by time periods IE monthly/daily/hourly/minutely
     }
 

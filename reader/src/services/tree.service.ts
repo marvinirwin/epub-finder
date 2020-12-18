@@ -2,7 +2,7 @@ import {uniq} from "lodash";
 import {DeltaScan, ds_Dict, flattenTree} from "../lib/Tree/DeltaScanner";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {Named} from "../lib/Manager/open-books.service";
+import {Named} from "../lib/Manager/open-documents.service";
 
 export type ds_Tree<T, U extends string = string> = {
     value?: T;
@@ -82,12 +82,12 @@ export const flattenTreeIntoDict = (key?: string) =>
     <T extends Named, U extends string>(obs$: Observable<DeltaScan<T, U>>): Observable<ds_Dict<T>> => {
         return obs$.pipe(
             map(({sourced}) => {
-                const libraryBooks = key === undefined ?
+                const libraryDocuments = key === undefined ?
                     sourced :
                     sourced?.children?.[key];
                 return Object.fromEntries(
-                    libraryBooks ? flattenTree<T>(
-                        libraryBooks
+                    libraryDocuments ? flattenTree<T>(
+                        libraryDocuments
                     ).map(document => [document.name, document]) : []
                 );
             }),

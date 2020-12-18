@@ -1,12 +1,12 @@
 import {ReplaySubject} from "rxjs";
-import {LibraryBook} from "./library-document.class";
+import {LibraryDocument} from "./library-document.class";
 import axios from 'axios';
 
-export class RemoteBooksService {
-    remoteBooks$ = new ReplaySubject<LibraryBook[]>()
+export class RemoteDocumentsService {
+    remoteDocuments$ = new ReplaySubject<LibraryDocument[]>()
     constructor() {
-        this.fetchRemoteBooks()
+        this.fetchRemoteDocuments()
     }
-    public async fetchRemoteBooks() {
+    public async fetchRemoteDocuments() {
     }
 }

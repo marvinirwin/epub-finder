@@ -1,5 +1,5 @@
 import {combineLatest, Observable} from "rxjs";
-import {OpenBook} from "../BookFrame/OpenBook";
+import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {map, switchMap} from "rxjs/operators";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree} from "../Tree/DeltaScanner";
@@ -16,7 +16,7 @@ export function flattenTreeOfObservables<T extends Observable<U>, U>({sourced}: 
 }
 
 export class ViewingFrameManager {
-    framesInView = new DeltaScanner<OpenBook, 'root'>();
+    framesInView = new DeltaScanner<OpenDocument, 'root'>();
 
     constructor() {
 

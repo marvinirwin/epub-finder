@@ -1,4 +1,4 @@
-import {ReadingBookService} from "../../lib/Manager/reading-document.service";
+import {ReadingDocumentService} from "../../lib/Manager/reading-document.service";
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from "rxjs";
 import {distinctUntilChanged, map, shareReplay} from "rxjs/operators";
 import {observableLastValue} from "../../services/settings.service";
@@ -11,14 +11,14 @@ export class RequestRecordingService {
     allSentences$: Observable<string[]>;
     infoMessages$ = new ReplaySubject<string>(1);
 
-    constructor({readingBookService, loggedInUserService}: {
-        readingBookService: ReadingBookService,
+    constructor({readingDocumentService, loggedInUserService}: {
+        readingDocumentService: ReadingDocumentService,
         loggedInUserService: LoggedInUserService
     }) {
         this.allRecordRequestsSubmitted.next(new Set());
         this.recordRequestSentences$.next(new Map())
 
-        this.allSentences$ = readingBookService.readingBook.renderedSentences$.pipe(
+        this.allSentences$ = readingDocumentService.readingDocument.renderedSentences$.pipe(
             map(Object.keys),
             shareReplay(1)
         );
