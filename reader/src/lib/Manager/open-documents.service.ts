@@ -225,17 +225,17 @@ export class OpenDocumentsService {
 
 
         this.visibleAtomizedSentences$ = combineLatest([
-            this.openDocumentTree.mapWith(openBook => openBook.renderedSentences$).updates$,
+            this.openDocumentTree.mapWith(openDocument => openDocument.renderedSentences$).updates$,
             config.bottomNavigationValue$
         ]).pipe(
-            visibleOpenBook,
+            visibleOpenDocument,
             map((atomizedSentenceDictionaries: ds_Dict<AtomizedSentence[]>[]) => {
                 return mergeDictArrays(...atomizedSentenceDictionaries);
             })
         )
 
 
-        this.visibleElements$ = visibleOpenedBookData$.pipe(
+        this.visibleElements$ = visibleOpenedDocumentData$.pipe(
             map(flatten),
             map(sentenceData =>
                 mergeDictArrays(...sentenceData.map(sentenceDatum => sentenceDatum.wordElementsMap))
@@ -244,16 +244,16 @@ export class OpenDocumentsService {
         );
 
 
-        this.displayDocument$ = this.readingBook$.pipe(
-            switchMap(readingBook => {
-                if (!readingBook) return of<AtomizedDocument>();
-                return readingBook.atomizedDocument$;
+        this.displayDocument$ = this.readingDocument$.pipe(
+            switchMap(readingDocument => {
+                if (!readingDocument) return of<AtomizedDocument>();
+                return readingDocument.atomizedDocument$;
             }),
             shareReplay(1)
         );
 
 
-        this.newOpenBookDocumentBodies$ = this.openBookTree
+        this.newOpenDocumentDocumentBodies$ = this.openDocumentTree
             .mapWith(r => r.renderRoot$)
             .updates$
             .pipe(
@@ -263,12 +263,12 @@ export class OpenDocumentsService {
         /*
                     .subscribe(({delta}) => {
                     .
-                        forEach(newOpenedBook => newOpenedBook.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
+                        forEach(newOpenedDocument => newOpenedDocument.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
                     })
         */
 
     }
 
-    private applyListenersToOpenedBookBodies() {
+    private applyListenersToOpenedDocumentBodies() {
     }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import SvgIcon from '@material-ui/core/SvgIcon'
 
-const FacedocumentIcon: React.FC = props => {
+const FaceBookIcon: React.FC = props => {
   return (
     <SvgIcon width={22} height={22} viewBox="0 0 266.893 266.895" enableBackground="new 0 0 266.893 266.895" {...props}>
       <path
@@ -21,4 +21,4 @@ const FacedocumentIcon: React.FC = props => {
   )
 }
 
-export default FacebookIcon
+export default FaceBookIcon

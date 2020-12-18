@@ -35,7 +35,7 @@ export class DocumentsController {
             })))
     }
 
-    @Get('/all')
+    @Get('')
     async allDocuments(
         @UserFromReq() user: User | undefined
     ) {
@@ -51,7 +51,7 @@ export class DocumentsController {
         return this.documentsService.saveDocumentForUser(user, documentToBeSavedDto)
     }
 
-    @Put('file')
+    @Put('upload')
     @UseGuards(LoggedInGuard)
     @UseInterceptors(
         AnyFilesInterceptor({
@@ -63,12 +63,11 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string,
         @Headers('name') name: string,
-        @Headers('deleted') deleted: string,
     ) {
+        // TODO do some assertion here
         const documentToBeSavedDto: DocumentToBeSavedDto = {
             document_id,
             name,
-            deleted: deleted === 'true'
         };
     }
 
