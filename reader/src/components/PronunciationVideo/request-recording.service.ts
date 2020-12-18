@@ -1,9 +1,9 @@
-import {ReadingBookService} from "../../lib/Manager/reading-book.service";
+import {ReadingBookService} from "../../lib/Manager/reading-document.service";
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from "rxjs";
 import {distinctUntilChanged, map, shareReplay} from "rxjs/operators";
-import {RecordRequestSentence} from "./record-request.interface";
 import {observableLastValue} from "../../services/settings.service";
 import axios from "axios";
+import {LoggedInUserService} from "../../lib/Auth/loggedInUserService";
 
 export class RequestRecordingService {
     recordRequestSentences$ = new ReplaySubject<Map<string, boolean>>(1);
@@ -11,8 +11,9 @@ export class RequestRecordingService {
     allSentences$: Observable<string[]>;
     infoMessages$ = new ReplaySubject<string>(1);
 
-    constructor({readingBookService}: {
-        readingBookService: ReadingBookService
+    constructor({readingBookService, loggedInUserService}: {
+        readingBookService: ReadingBookService,
+        loggedInUserService: LoggedInUserService
     }) {
         this.allRecordRequestsSubmitted.next(new Set());
         this.recordRequestSentences$.next(new Map())
@@ -21,7 +22,11 @@ export class RequestRecordingService {
             map(Object.keys),
             shareReplay(1)
         );
-        this.fetchAllRecordRequests();
+        loggedInUserService.isLoggedIn$.subscribe(isLoggedIn => {
+            if (isLoggedIn) {
+                this.fetchAllRecordRequests();
+            }
+        })
     }
 
 

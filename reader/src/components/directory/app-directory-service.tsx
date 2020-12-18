@@ -2,7 +2,7 @@ import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/Manager";
 import {combineLatest, Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {distinctUntilChanged, map, startWith, tap} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
@@ -15,8 +15,8 @@ import {IconButton} from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
 import TwitterIcon from "../Icons/TwitterIcon";
 import {FileChooser} from "./file-chooser.component";
-import {toTreeMenuNode} from "../../lib/book-selection/book-selection-tree-menu-node";
 import {RequestRecordingSentences} from "./request-record-sentences.component";
+import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -44,19 +44,27 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
     // I should do selected components by path, that way their refs can change?
     // Also I gotta make sure all my values are unique in that loop
     return combineLatest([
-        m.authManager.profile$,
-        m.bookSelectionService.bookSelectionRows$,
-        m.treeMenuService.selectedComponent$
+        m.authManager.profile$.pipe(
+            startWith(undefined)
+        ),
+        m.documentSelectionService.documentSelectionRows$.pipe(
+            startWith([])
+        ),
+        m.treeMenuService.selectedComponent$.pipe(
+            startWith(undefined),
+            map(c => c?.name),
+            distinctUntilChanged(),
+        )
     ]).pipe(
         map(([
                  profile,
-                 availableBooks,
+                 availableDocuments,
             selectedComponent
              ]) => {
             return arrayToTreeRoot<TreeMenuNode>(
                 ReadingNode(m),
                 [
-                    ReadingNode(m, selectedComponent?.name === 'reading'),
+                    ReadingNode(m, selectedComponent === 'reading'),
                     {
                         name: 'watchPronunciation',
                         ReplaceComponent: WatchMode
@@ -76,15 +84,17 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         moveDirectory: true,
                     },
                     // @ts-ignore
-                    availableBooks.map(toTreeMenuNode),
+                    availableDocuments.map(toTreeMenuNode),
                     {
                         name: 'customDocument',
-                        ReplaceComponent: () => <FileChooser/>
+                        ReplaceComponent: () => <FileChooser/>,
+                        hidden: !profile?.email
                     },
                     {
                         name: 'requestRecording',
                         Component: () => <RequestRecordingSentences/>,
-                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings'
+                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
+                        hidden: !profile?.email
                     },
                     {
                         name: 'signInWith',

@@ -1,5 +1,5 @@
 import {ReplaySubject} from "rxjs";
-import {LibraryBook} from "./library-book.class";
+import {LibraryBook} from "./library-document.class";
 import axios from 'axios';
 
 export class RemoteBooksService {

@@ -1,6 +1,6 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {OpenBook} from "../BookFrame/OpenBook";
+import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map} from "rxjs/operators";
@@ -21,7 +21,7 @@ export class QuizCharacter {
     exampleSentences$: Observable<AtomizedSentence[]>;
     quizzingCard$: Observable<ICard | undefined>;
     atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
-    public exampleSentencesBook: OpenBook;
+    public exampleSentencesDocument: OpenDocument;
     public recordingClass$ = new ReplaySubject<string>(1);
     private sentenceCache = new Set<string>();
 
@@ -33,7 +33,7 @@ export class QuizCharacter {
         this.atomizedSentenceMap$.next({})
         this.exampleSentences$ = exampleSentences$;
         this.quizzingCard$ = quizzingCard$;
-        this.exampleSentencesBook = new OpenBook(
+        this.exampleSentencesDocument = new OpenDocument(
             'ExampleSentences',
             trie$,
             this.exampleSentences$.pipe(

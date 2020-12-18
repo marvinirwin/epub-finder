@@ -4,7 +4,7 @@ import { Dictionary } from "lodash";
 
 export class SentenceManager {
     /**
-     * [bookName: string]: {
+     * [documentName: string]: {
      *     [word: string]: Set<sentence>;
      * }
       */
@@ -12,9 +12,9 @@ export class SentenceManager {
     sentenceSet$: Observable<Dictionary<Set<string>>>;
     constructor() {
         this.sentenceSet$ = this.setenceSetIndex$.pipe(
-            map((bookDict: Dictionary<Dictionary<Set<string>>>) => {
+            map((documentDict: Dictionary<Dictionary<Set<string>>>) => {
                 const wordSentenceDictionary: Dictionary<Set<string>> = {};
-                Object.values(bookDict)
+                Object.values(documentDict)
                     .forEach(set => Object.entries(set)
                         .forEach(([word, set]) => {
                             if (!wordSentenceDictionary[word]) {

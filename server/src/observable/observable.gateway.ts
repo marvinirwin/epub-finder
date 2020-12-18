@@ -11,7 +11,7 @@ export class ObservableGateway implements OnGatewayConnection, OnGatewayDisconne
         this.observableService.videoMetadataEvents$.subscribe(v => this.server.emit('videoMetadata', v))
 /*
 TODO this will require verifying users
-        this.observableService.bookEvents$.subscribe(v => this.server.emit('book', v))
+        this.observableService.documentEvents$.subscribe(v => this.server.emit('document', v))
 */
     }
 

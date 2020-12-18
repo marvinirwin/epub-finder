@@ -16,7 +16,7 @@ export const findMap = <Key, Value>(m: Map<Key, Value>, fn: (key: Key, value: Va
 export const firstMap = <Key, Value>(m: Map<Key, Value>): Value => m.values().next().value
 
 
-export const mapFromId = <Value extends {id: number}>(values: Value[]): Map<number, Value> => {
+export const mapFromId = <IdType extends number | string, Value extends {id: IdType}>(values: Value[]): Map<IdType, Value> => {
     return new Map(values.map(value => [value.id, value]))
 }
 

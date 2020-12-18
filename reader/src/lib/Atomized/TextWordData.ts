@@ -10,12 +10,12 @@ export interface TextWordData {
     sentenceMap: Dictionary<AtomizedSentence[]>;
 }
 export interface BookWordData extends TextWordData {
-    bookWordCounts: Dictionary<BookWordCount[]>;
+    documentWordCounts: Dictionary<BookWordCount[]>;
 }
 
 export function mergeSentenceInfo<T extends (BookWordData | TextWordData)>(...sentenceInfos: T[]): T {
     // @ts-ignore
-    const aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, bookWordCounts: {}};
+    const aggregateSentenceInfo: T = {wordElementsMap: {}, wordSentenceMap: {}, wordCounts: {}, sentenceMap: {}, documentWordCounts: {}};
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
         for (const key in dict) {
@@ -39,9 +39,9 @@ export function mergeSentenceInfo<T extends (BookWordData | TextWordData)>(...se
         merge(newSentenceInfo.wordSentenceMap, aggregateSentenceInfo.wordSentenceMap);
         merge(newSentenceInfo.sentenceMap, aggregateSentenceInfo.sentenceMap)
         // @ts-ignore
-        if (newSentenceInfo.bookWordCounts) {
+        if (newSentenceInfo.documentWordCounts) {
             // @ts-ignore
-            merge(newSentenceInfo.bookWordCounts, aggregateSentenceInfo.bookWordCounts)
+            merge(newSentenceInfo.documentWordCounts, aggregateSentenceInfo.documentWordCounts)
         }
     }
     return aggregateSentenceInfo;

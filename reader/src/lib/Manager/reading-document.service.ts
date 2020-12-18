@@ -1,30 +1,30 @@
-import {OpenBook} from "../BookFrame/OpenBook";
+import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {TrieObservable} from "./QuizCharacter";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
-import {OpenBooksService, READING_BOOK_NODE_LABEL} from "./open-books.service";
+import {OpenDocumentsService, READING_BOOK_NODE_LABEL} from "./open-documents.service";
 
-export class ReadingBookService {
-    public readingBook: OpenBook;
+export class ReadingDocumentService {
+    public readingDocument: OpenDocument;
     private displayDocument$ = new ReplaySubject<Observable<AtomizedDocument>>(1)
 
     constructor(
         {
             trie$,
-            openBooksService,
+            openDocumentsService,
             settingsService
         }:
             {
                 trie$: TrieObservable,
-                openBooksService: OpenBooksService,
+                openDocumentsService: OpenDocumentsService,
                 settingsService: SettingsService
             }
     ) {
-        this.readingBook = new OpenBook(
-            "Reading Book",
+        this.readingDocument = new OpenDocument(
+            "Reading Document",
             trie$,
             this.displayDocument$.pipe(
                 switchMap(atomizedDocument => {
@@ -34,14 +34,14 @@ export class ReadingBookService {
             ),
         );
 
-        openBooksService.openBookTree.appendDelta$.next(
+        openDocumentsService.openDocumentTree.appendDelta$.next(
             {
                 nodeLabel: 'root',
                 children: {
                     [READING_BOOK_NODE_LABEL]: {
                         nodeLabel: READING_BOOK_NODE_LABEL,
                         children: {
-                            [this.readingBook.name]: {
+                            [this.readingDocument.name]: {
                                 nodeLabel: this.readingBook.name,
                                 value: this.readingBook
                             }
@@ -61,7 +61,7 @@ export class ReadingBookService {
                          checkedOutBooks,
                          selectedBook,
                      ]) => {
-            const foundBook = findMap(checkedOutBooks, (id, book) => book.name === selectedBook)
+            const foundBook = findMap(checkedOutBooks, (id, document) => document.name === selectedBook)
             if ((!selectedBook || !foundBook) && checkedOutBooks.size) {
                 this.displayDocument$.next(firstMap(checkedOutBooks).atomizedDocument$)
             }

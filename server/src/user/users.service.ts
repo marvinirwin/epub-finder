@@ -49,8 +49,12 @@ export class UsersService {
      * @param email
      */
     async upsertUserByEmailAndProvider(email: string, provider: 'google' | 'twitter', providerIdValue: string): Promise<User> {
-        const user = await this.findOne({email, [provider]: providerIdValue});
+        const user = await this.findOne({email});
         if (user) {
+            const providerMatches = user[provider] !== providerIdValue;
+            if (providerMatches) {
+                throw new Error("This email account has already been registered with a different provider")
+            }
             return user;
         }
 
@@ -58,7 +62,8 @@ export class UsersService {
             Object.assign(
                 new User(),
                 {
-                    email
+                    email,
+                    [provider]: providerIdValue
                 }
             )
         )

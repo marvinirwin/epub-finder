@@ -15,7 +15,7 @@ import {UsageEvent} from "./usage-event.entity";
 import {JsonValueTransformer} from "../util/JsonValueTransformer";
 import {Usage} from "./usage.entity";
 import {session} from "./session.entity";
-import {BookView} from "./book-view.entity";
+import {DocumentView} from "./document-view.entity";
 
 @Entity()
 export class User {
@@ -80,8 +80,8 @@ export class User {
 
     private _loadedPassword: string;
 
-    @OneToMany(() => BookView, (book: BookView) => book.creator_id)
-    books: Promise<BookView[]>;
+    @OneToMany(() => DocumentView, (document: DocumentView) => document.creator_id)
+    documents: Promise<DocumentView[]>;
 
 
     @OneToMany(type => UsageEvent, (usageEvent: UsageEvent) => usageEvent.user_id)

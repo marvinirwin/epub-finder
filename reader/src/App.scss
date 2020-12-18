@@ -30,7 +30,7 @@
   position: relative;
 }
 
-.book-menu-container {
+.document-menu-container {
   width: 10vw;
 }
 
@@ -421,9 +421,9 @@ $character-timing-section-padding: 24px;
   padding-left: 20px;
 }
 
-.book-selection-row {
+.document-selection-row {
   width: 100%;
-  .book-selection-row-icon-container {
+  .document-selection-row-icon-container {
     flex-grow: 1;
     display: flex;
     justify-content: flex-end;

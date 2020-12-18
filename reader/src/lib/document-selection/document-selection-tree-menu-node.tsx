@@ -1,4 +1,4 @@
-import {BookSelectionRowInterface} from "./book-selection-row.interface";
+import {BookSelectionRowInterface} from "./document-selection-row.interface";
 import {TreeMenuNode} from "../../components/directory/tree-menu-node.interface";
 import React, {useContext} from "react";
 import {IconButton, ListItem} from "@material-ui/core";
@@ -7,21 +7,21 @@ import School from '@material-ui/icons/School';
 import {ManagerContext} from "../../App";
 import DeleteIcon from "@material-ui/icons/Delete";
 
-export const toTreeMenuNode = ({name, reading, open}: BookSelectionRowInterface): TreeMenuNode => ({
+export const toTreeMenuNode = ({belongsToCurrentUser ,name, reading, document_id, id}: BookSelectionRowInterface): TreeMenuNode => ({
     name,
     ReplaceComponent: () => {
         const m = useContext(ManagerContext);
         // If we're reading, there's no button, just an icon
-        return <ListItem className={'book-selection-row'}>
+        return <ListItem className={'document-selection-row'}>
             {name}
-            <div className={'book-selection-row-icon-container'}>
+            <div className={'document-selection-row-icon-container'}>
                 {reading && <IconButton><LocalLibrary/></IconButton>}
                 {/*
                     {open && <IconButton><LibraryAddCheck/></IconButton>}
     */}
                 {!reading &&
                 <IconButton onClick={() => m.settingsService.readingBook$.next(name)}><School/></IconButton>}
-                <IconButton onClick={() => m.availableBooksService.}><DeleteIcon/></IconButton>}
+                {belongsToCurrentUser && <IconButton onClick={() => m.library.deleteDocument(id, document_id || id)}><DeleteIcon/></IconButton>}
                 {/*
                     {!open && <IconButton onClick={() => {
                     }}><LibraryAdd/></IconButton>}

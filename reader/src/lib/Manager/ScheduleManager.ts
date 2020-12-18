@@ -1,7 +1,7 @@
 import {combineLatest, Observable} from "rxjs";
 import {DatabaseService} from "../Storage/database.service";
 import {orderBy} from "lodash";
-import {BookWordCount} from "../Interfaces/BookWordCount";
+import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
 import {map, shareReplay, startWith} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import moment from "moment";
@@ -56,7 +56,7 @@ export class ScheduleManager {
                     sortMode$: sortStrategy$,
         recognitionRecordsService
                 }: {
-        wordCounts$: Observable<ds_Dict<BookWordCount[]>>,
+        wordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
         db: DatabaseService,
         sortMode$: Observable<string>,
         recognitionRecordsService: ProgressRowService<WordRecognitionRow>

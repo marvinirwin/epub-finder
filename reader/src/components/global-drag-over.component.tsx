@@ -18,7 +18,7 @@ export const GlobalDragOver = () => {
         document.body.ondrop = (e) => {
             e.preventDefault();
             filesDraggedOver(false);
-            e.dataTransfer && m.droppedFilesService.droppedFiles$.next(Array.from(e.dataTransfer.files))
+            e.dataTransfer && m.droppedFilesService.uploadFileRequests$.next(Array.from(e.dataTransfer.files))
         }
     }, [])
     return <div

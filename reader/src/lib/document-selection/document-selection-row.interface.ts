@@ -8,5 +8,6 @@ export interface BookSelectionRowInterface {
     belongsToCurrentUser?: boolean;
     lastModified: Date;
 
-
+    document_id: string | null;
+    id: string;
 }

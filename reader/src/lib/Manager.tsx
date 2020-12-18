@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {SelectImageRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardService from "./Manager/CardService";
-import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/open-books.service";
+import {CHARACTER_BOOK_NODE_LABEL, OpenBooksService} from "./Manager/open-documents.service";
 import {NavigationPages} from "./Util/Util";
 import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
@@ -67,16 +67,16 @@ import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
 import {ThirdPartyLoginService} from "../services/third-party-login.service";
 import {LoggedInUserService} from "./Auth/loggedInUserService";
-import {BookCheckingOutService} from "../components/Library/book-checking-out.service";
+import {BookCheckingOutService} from "../components/Library/document-checking-out.service";
 import {DocumentRepository} from "./documents/document.repository";
 import {LibraryService} from "./Manager/library.service";
 import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
 import {mapToArray} from "./map.module";
 import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
-import {AvailableBooksService} from "./documents/available-books.service";
-import {BookSelectionService} from "./document-selection/book-selection.service";
+import {AvailableBooksService} from "./documents/available-documents.service";
+import {BookSelectionService} from "./document-selection/document-selection.service";
 import {AlertsService} from "../services/alerts.service";
-import {ReadingBookService} from "./Manager/reading-book.service";
+import {ReadingBookService} from "./Manager/reading-document.service";
 import {RequestRecordingService} from "../components/PronunciationVideo/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
 
@@ -90,7 +90,7 @@ function splitTextDataStreams$(textData$: Observable<BookWordData>) {
     return {
         wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
         wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
-        bookWordCounts: textData$.pipe(map(({bookWordCounts}) => bookWordCounts)),
+        documentWordCounts: textData$.pipe(map(({documentWordCounts}) => documentWordCounts)),
         wordSentenceMap: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap)),
         sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
     }
@@ -153,11 +153,11 @@ export class Manager {
     private introSeriesService: IntroSeriesService;
     private introHighlightSeries: IntroHighlightService;
     droppedFilesService: DroppedFilesService;
-    bookCheckingOutService: BookCheckingOutService;
+    documentCheckingOutService: BookCheckingOutService;
     documentRepository: DocumentRepository;
     uploadingDocumentsService: UploadingDocumentsService;
     availableBooksService: AvailableBooksService;
-    bookSelectionService: BookSelectionService;
+    documentSelectionService: BookSelectionService;
     readingBookService: ReadingBookService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
@@ -174,7 +174,7 @@ export class Manager {
 
         this.cardManager = new CardService(this.db);
         this.library = new LibraryService({db, documentRepository: this.documentRepository});
-        this.bookCheckingOutService = new BookCheckingOutService({settingsService: this.settingsService})
+        this.documentCheckingOutService = new BookCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
         this.openedBooks = new OpenBooksService({
             trie$: this.cardManager.trie$,
@@ -192,7 +192,7 @@ export class Manager {
         this.openedBooks.newOpenBookDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
-            bookCheckingOutService: this.bookCheckingOutService,
+            documentCheckingOutService: this.documentCheckingOutService,
             droppedFilesService: this.droppedFilesService,
             libraryService: this.library
         });
@@ -202,7 +202,7 @@ export class Manager {
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-        const {wordElementMap$, sentenceMap$, bookWordCounts} = splitTextDataStreams$(
+        const {wordElementMap$, sentenceMap$, documentWordCounts} = splitTextDataStreams$(
             this.openedBooks.renderedBookSentenceData$.pipe(
                 map(textData => {
                         return mergeSentenceInfo(...textData);
@@ -211,7 +211,7 @@ export class Manager {
             )
         );
         this.readingWordElementMap = wordElementMap$;
-        this.readingWordCounts$ = bookWordCounts;
+        this.readingWordCounts$ = documentWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
         this.pronunciationProgressService = new PronunciationProgressService({db});
         this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
@@ -267,9 +267,9 @@ export class Manager {
                 exampleSentences$: combineLatest([
                     this.openedBooks.allOpenBooks$
                         .pipe(
-                            switchMap(books =>
+                            switchMap(documents =>
                                 combineLatest(
-                                    mapToArray(books, (id, book) => book.bookStats$)
+                                    mapToArray(documents, (id, document) => document.documentStats$)
                                 )
                             )
                         ),
@@ -404,9 +404,9 @@ export class Manager {
 
         this.videoMetadataService = new VideoMetadataService({
                 allSentences$: this.openedBooks.checkedOutBooksData$.pipe(
-                    switchMap(async bookWordDatas => {
+                    switchMap(async documentWordDatas => {
                         const sentenceSet = new Set<string>();
-                        bookWordDatas.forEach(d => Object.values(d.wordSentenceMap).map(s => s.forEach(sentence => sentenceSet.add(sentence.translatableText))));
+                        documentWordDatas.forEach(d => Object.values(d.wordSentenceMap).map(s => s.forEach(sentence => sentenceSet.add(sentence.translatableText))));
                         return sentenceSet;
                     }),
                     shareReplay(1)
@@ -494,16 +494,17 @@ export class Manager {
             currentVideoMetadata$: this.pronunciationVideoService.videoMetadata$
         });
 
-        this.bookCheckingOutService = new BookCheckingOutService({
+        this.documentCheckingOutService = new BookCheckingOutService({
             settingsService: this.settingsService
         })
         this.availableBooksService = new AvailableBooksService()
-        this.bookSelectionService = new BookSelectionService({
+        this.documentSelectionService = new BookSelectionService({
             availableBooksService: this.availableBooksService,
             settingsService: this.settingsService
         });
         this.requestRecordingService = new RequestRecordingService({
-            readingBookService: this.readingBookService
+            readingBookService: this.readingBookService,
+            loggedInUserService: this.authManager
         });
         this.hotkeyEvents.startListeners();
         this.cardManager.load();

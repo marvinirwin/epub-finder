@@ -2,7 +2,7 @@ import {Controller, Get, Post, Body, UseGuards} from '@nestjs/common';
 import {LoggedInGuard} from "../guards/logged-in.guard";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
-import {BooksService} from "../books/books.service";
+import {DocumentsService} from "../documents/documents.service";
 import {RecordRequestService} from "./record-request.service";
 
 export type RecordRequestDto = string[];

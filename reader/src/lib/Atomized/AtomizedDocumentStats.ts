@@ -12,5 +12,5 @@ export interface AtomizedDocumentStats {
 }
 
 export interface AtomizedDocumentBookStats extends AtomizedDocumentStats {
-    bookWordCounts: ds_Dict<BookWordCount>;
+    documentWordCounts: ds_Dict<BookWordCount>;
 }

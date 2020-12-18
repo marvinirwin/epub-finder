@@ -1,7 +1,7 @@
 import {Observable} from "rxjs";
-import {DocumentRepository} from "./document.repository";
 import {switchMap} from "rxjs/operators";
 import {EditingDocument} from "../lib/editing-documents/editing-document";
+import {DocumentRepository} from "../lib/documents/document.repository";
 
 export class SaveEditingDocumentsService {
     constructor(

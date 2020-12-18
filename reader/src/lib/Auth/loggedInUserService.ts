@@ -1,5 +1,6 @@
-import {ReplaySubject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import axios from 'axios';
+import {map, shareReplay} from "rxjs/operators";
 
 export interface Profile {
     email: string;
@@ -7,19 +8,23 @@ export interface Profile {
 
 export class LoggedInUserService {
     profile$ = new ReplaySubject<Profile | undefined>(1);
+    isLoggedIn$: Observable<boolean>;
 
-    public static async fetchLoggedInProfile(): Promise<Profile | undefined >{
+    public static async fetchLoggedInProfile(): Promise<Profile | undefined> {
         const response = await axios.get(`${process.env.PUBLIC_URL}/users/profile`);
         return response?.data as Profile;
     }
 
     constructor() {
+        this.isLoggedIn$ = this.profile$.pipe(
+            map(profile => !!profile), shareReplay(1)
+        );
         this.profile$.next(undefined)
         // Right now we only sign in with some
-        this.fetchProfileData();
+        this.fetchProfile();
     }
 
-    private fetchProfileData() {
+    private fetchProfile() {
         (async () => {
             try {
                 const user = await LoggedInUserService.fetchLoggedInProfile();

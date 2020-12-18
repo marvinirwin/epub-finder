@@ -4,7 +4,7 @@ import {getBookWordData, OpenBook} from "../BookFrame/OpenBook";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, IndexedByNumber, NamedDeltaScanner} from "../Tree/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree,  NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {BookWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -14,7 +14,7 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentBookStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
-import {ReadingBookService} from "./reading-book.service";
+import {ReadingBookService} from "./reading-document.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
 import {BookViewDto} from "@server/*";
@@ -43,7 +43,7 @@ export class OpenBooksService {
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     displayDocument$: Observable<AtomizedDocument>;
     readingBook$ = new ReplaySubject<OpenBook>(1);
-    allOpenBooks$: Observable<Map<number, OpenBook>>;
+    allOpenBooks$: Observable<Map<string, OpenBook>>;
     checkedOutBooksData$: Observable<AtomizedDocumentBookStats[]>;
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
@@ -66,13 +66,13 @@ export class OpenBooksService {
             map(libraryBooks => {
                 return mapMap(
                     libraryBooks,
-                    (id, bookViewDto) => {
+                    (id, documentViewDto) => {
                         const openBook = new OpenBook(
-                            bookViewDto.name,
+                            documentViewDto.name,
                             config.trie$,
                             undefined,
                         );
-                        openBook.unAtomizedSrcDoc$.next(bookViewDto.html);
+                        openBook.unAtomizedSrcDoc$.next(documentViewDto.html);
                         return [
                             id,
                             openBook
@@ -111,7 +111,7 @@ export class OpenBooksService {
         this.applyListenersToOpenedBookBodies();
 
         this.renderedAtomizedSentences$ = this.openBookTree
-            .mapWith((bookFrame: OpenBook) => bookFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
+            .mapWith((documentFrame: OpenBook) => documentFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
                 switchMap(({sourced}) => {
                     const sources = sourced ? flattenTree(sourced) : [];
                     return combineLatest(sources);
@@ -123,16 +123,16 @@ export class OpenBooksService {
             );
 
 
-        function bookDataMap() {
-            return (bookFrame: OpenBook) => {
+        function documentDataMap() {
+            return (documentFrame: OpenBook) => {
                 return combineLatest([
-                    bookFrame.renderedSentences$,
+                    documentFrame.renderedSentences$,
                     config.trie$
                 ]).pipe(
                     map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
                             return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
                                 sentences.map(sentence =>
-                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), bookFrame.name)
+                                    getBookWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), documentFrame.name)
                                 )
                             ));
                         }
@@ -144,22 +144,22 @@ export class OpenBooksService {
 
         this.checkedOutBooksData$ = this.allOpenBooks$.pipe(
             switchMap(openBooks =>
-                combineLatest(mapToArray(openBooks, (id, book) => book.bookStats$))
+                combineLatest(mapToArray(openBooks, (id, document) => document.documentStats$))
             )
         )
 
         this.renderedSentenceTextDataTree$ = this
             .openBookTree
-            .mapWith(bookDataMap());
+            .mapWith(documentDataMap());
 
 
         this.renderedElements$ = this.renderedSentenceTextDataTree$.updates$
             .pipe(
                 switchMap(({delta}) => merge(...flattenTree(delta))),
-                map(bookWordDatas => Array.from(
+                map(documentWordDatas => Array.from(
                     new Set(
                         flatten(
-                            bookWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
+                            documentWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
                         )
                     ))
                 ),

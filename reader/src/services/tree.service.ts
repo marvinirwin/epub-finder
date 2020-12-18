@@ -88,7 +88,7 @@ export const flattenTreeIntoDict = (key?: string) =>
                 return Object.fromEntries(
                     libraryBooks ? flattenTree<T>(
                         libraryBooks
-                    ).map(book => [book.name, book]) : []
+                    ).map(document => [document.name, document]) : []
                 );
             }),
             shareReplay(1)

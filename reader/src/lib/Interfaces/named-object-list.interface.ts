@@ -1,4 +1,4 @@
-import {Named} from "../Manager/open-books.service";
+import {Named} from "../Manager/open-documents.service";
 import {ds_Dict} from "../Tree/DeltaScanner";
 
 export interface NamedObjectList<T extends Named> {

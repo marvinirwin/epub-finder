@@ -3,44 +3,44 @@ import {useObservableState} from "observable-hooks";
 import React from "react";
 import {difference} from 'lodash';
 import {ds_Dict} from "../../lib/Tree/DeltaScanner";
-import {CheckedOutBooks} from "./CheckedOutBooks";
-import {AvailableBooks} from "./AvailableBooks";
-import {CustomBook} from "./CustomBook";
+import {CheckedOutDocuments} from "./CheckedOutDocuments";
+import {AvailableDocuments} from "./AvailableDocuments";
+import {CustomDocument} from "./CustomDocument";
 
 export function Library({m}: { m: Manager }) {
 /*
-    const builtInBooks = useObservableState(m.library.builtInBooks$.dict$) || {};
+    const builtInDocuments = useObservableState(m.library.builtInDocuments$.dict$) || {};
 
-    const customBooks = useObservableState(m.library.customBooks$.dict$) || {};
-    const checkedOutTitles = useObservableState(m.settingsService.checkedOutBooks$) || {};
+    const customDocuments = useObservableState(m.library.customDocuments$.dict$) || {};
+    const checkedOutTitles = useObservableState(m.settingsService.checkedOutDocuments$) || {};
 
-    const allBooks = {...builtInBooks, ...customBooks};
+    const allDocuments = {...builtInDocuments, ...customDocuments};
 
     const titlesAvailableForCheckout: ds_Dict<boolean> = Object.fromEntries(
-        difference(Object.keys(allBooks), Object.keys(checkedOutTitles))
+        difference(Object.keys(allDocuments), Object.keys(checkedOutTitles))
             .map(story => [story, true])
     );
 
 */
     return <div className={'library-container'}>
 {/*
-        <div className={'checked-out-books-container'}>
-            <CheckedOutBooks
-                checkedOutBooks={checkedOutTitles}
+        <div className={'checked-out-documents-container'}>
+            <CheckedOutDocuments
+                checkedOutDocuments={checkedOutTitles}
                 onReturn={(titleBeingReturned: string) => {
-                    returnBook(m, titleBeingReturned);
+                    returnDocument(m, titleBeingReturned);
                 }}
             />
-            <AvailableBooks
-                availableBooks={titlesAvailableForCheckout}
+            <AvailableDocuments
+                availableDocuments={titlesAvailableForCheckout}
                 onCheckout={(titleBeingCheckedOut: string) => {
-                    checkoutBook(m, titleBeingCheckedOut);
+                    checkoutDocument(m, titleBeingCheckedOut);
                 }}
             />
         </div>
-        <div className={'custom-books-container'}>
-            <CustomBook editingBook={m.library.simpleBook$}/>
-            <CustomBook editingBook={m.library.rawBook$}/>
+        <div className={'custom-documents-container'}>
+            <CustomDocument editingDocument={m.library.simpleDocument$}/>
+            <CustomDocument editingDocument={m.library.rawDocument$}/>
         </div>
 */}
     </div>
@@ -52,11 +52,11 @@ export function Library({m}: { m: Manager }) {
             <Paper style={{flexGrow: 1}}>
                 <Paper>
                     To check out
-                    <BookList
-                        listObjects={booksAvailableForCheckOut}
+                    <DocumentList
+                        listObjects={documentsAvailableForCheckOut}
                         onSelect={(b) => {
-                            m.db.checkedOutBooks$.next(
-                                {...m.db.checkedOutBooks$.getValue(), [b.name]: true}
+                            m.db.checkedOutDocuments$.next(
+                                {...m.db.checkedOutDocuments$.getValue(), [b.name]: true}
                             )
                         }}
                         onDelete={(b) => {

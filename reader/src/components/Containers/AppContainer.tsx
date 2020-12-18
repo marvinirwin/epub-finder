@@ -24,7 +24,9 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                 tree={menuItemTree.sourced}
                 directoryPath={directoryPath}
                 directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}
-                componentChanged={componentPath => treeMenuService.componentPath$.next(componentPath)}
+                componentChanged={componentPath => {
+                    treeMenuService.componentPath$.next(componentPath);
+                }}
                 actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
             />
         }
@@ -38,7 +40,7 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                         key={index}
                         className={'directory-item'}
                         style={{
-                            zIndex: item.Component === selectedComponent?.Component ? 1 : 0,
+                            zIndex: item.name === selectedComponent?.name ? 1 : 0,
 
                         }}>
                         {

@@ -1,8 +1,8 @@
 /**
- * All books available remotely
+ * All documents available remotely
  */
 import { ReplaySubject} from "rxjs";
-import { BookViewDto, AvailableBookDto } from "@server/*";
+import { DocumentViewDto, AvailableBookDto } from "@server/*";
 import axios from "axios";
 
 
@@ -15,7 +15,7 @@ export class AvailableBooksService {
     }
 
     async fetchAvailableBooks(): Promise<void> {
-        const response = await axios.get(`${process.env.PUBLIC_URL}/books/available`);
+        const response = await axios.get(`${process.env.PUBLIC_URL}/documents/available`);
         /**
          * TODO find a way to retrieve just their names, or their names + ids
          */
@@ -25,7 +25,7 @@ export class AvailableBooksService {
 
 /*
     fetchBook(a: AvailableBookDto): Promise<BookViewDto> {
-        return axios.get(`${process.env.PUBLIC_URL}/books/${a.id}`)
+        return axios.get(`${process.env.PUBLIC_URL}/documents/${a.id}`)
             .then(response => response.data);
     }
 */
