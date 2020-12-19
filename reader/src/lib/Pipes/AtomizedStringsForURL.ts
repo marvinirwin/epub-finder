@@ -4,7 +4,7 @@ import {map, switchMap} from "rxjs/operators";
 // @ts-ignore
 import {AtomizeUrl} from "../Workers/WorkerHelpers";
 
-export const AtomizedStringsForURL = (rawHTML$: Observable<string>): Observable<string[]> => {
+export const AtomizedStringsForURL = (rawHTML$: Observable<string>): Observable<string> => {
     return rawHTML$.pipe(
         switchMap(AtomizeUrl)
     )

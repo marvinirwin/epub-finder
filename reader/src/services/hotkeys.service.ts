@@ -40,4 +40,7 @@ export class HotkeysService {
             shareReplay(1)
         )
     }
+    public static test() {
+
+    }
 }

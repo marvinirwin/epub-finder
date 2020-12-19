@@ -17,7 +17,6 @@ ctx.onmessage = (ev) => {
     ctx.postMessage(
         [
             doc.toString(),
-            ...doc.getChunkedDocuments().map(doc => doc.toString())
         ]
     );
 };

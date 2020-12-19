@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "target": "es6",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": false,
+    "module": "CommonJS",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react",

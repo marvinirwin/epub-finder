@@ -1,4 +1,4 @@
-import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
+import {combineLatest, merge, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, tap} from "rxjs/operators";
 import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -11,8 +11,6 @@ import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import { AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
 import { rehydratePage } from "../Atomized/OpenedDocument";
-import { flatten } from "lodash";
-import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
 
 export function getAtomizedDocumentDocumentStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentDocumentStats {
     return {
@@ -49,7 +47,7 @@ export class OpenDocument {
 /*
     children$: Observable<ds_Dict<OpenDocument>>;
 */
-    atomizedSrcDocStrings$: Observable<string[]>;
+    atomizedDocumentString$: Observable<string>;
 
 
     constructor(
@@ -58,7 +56,7 @@ export class OpenDocument {
         atomizedDocuments$: Observable<AtomizedDocument> | undefined,
     ) {
         this.id = name;
-        this.atomizedSrcDocStrings$ = merge(
+        this.atomizedDocumentString$ = merge(
             this.unAtomizedSrcDoc$.pipe(
                 AtomizedStringsForRawHTML,
             ),
@@ -67,9 +65,9 @@ export class OpenDocument {
             )
         ).pipe(shareReplay(1));
 
-        this.atomizedSrcDocString$ = this.atomizedSrcDocStrings$.pipe(
+        this.atomizedSrcDocString$ = this.atomizedDocumentString$.pipe(
             map(strings => {
-                return strings[0] || interpolateSourceDoc([ `Could not find ${this.name}` ]);
+                return strings /*InterpolateService.text( `Could not find ${this.name}` );*/
             }),
             shareReplay(1)
         );

@@ -3,13 +3,10 @@ import {Dictionary, uniqueId} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
 import {AtomizedSentence} from "./AtomizedSentence";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {splitKeepDelim, splitPunctuation} from "../Util/Util";
-import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {splitKeepDelim} from "../Util/Util";
 import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {mergeSentenceInfo} from "./TextWordData";
-import {chunk} from 'lodash';
-import {InterpolateService} from "@shared/*";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -80,12 +77,6 @@ export class AtomizedDocument {
     constructor(public document: XMLDocument) {
     }
 
-    public getChunkedDocuments() {
-        return chunk(this.getAtomizedSentences(), 20)
-            .map(sentenceChunk => AtomizedDocument.atomizeDocument(
-                InterpolateService.sentences(sentenceChunk.map(sentence => sentence.translatableText)))
-            )
-    }
 
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {
         const currentSource = el.getAttribute(qualifiedName);

@@ -3,6 +3,7 @@ import pdftohtml from 'pdftohtmljs';
 import {dirname, extname, join, parse} from 'path';
 import {InterpolateService} from "../shared/interpolate.service";
 import fs from 'fs-extra';
+import {Subject} from "rxjs";
 
 export class UploadedFileService {
     public static async normalise(filepath: string) {
@@ -22,13 +23,16 @@ export class UploadedFileService {
     }
 
     private static handlePdf(filepath: string) {
-        return this.convertPdfToHtml(filepath);
+        return this.convertPdfToHtml(filepath, new Subject<string>());
     }
 
     private static handleDocx(filepath: string) {
-        return mammoth.convertToHtml({path: filepath})
-            .then(({value}) => {
-                return InterpolateService.html("", value);
+        return mammoth.convertToHtml({path: filepath, convertImage: false})
+            .then(async (o) => {
+                const html = InterpolateService.html("", o.value);
+                const newPath = this.replaceExtInPath(filepath, 'html');
+                await fs.writeFile(newPath, html);
+                return newPath;
             })
     }
 
@@ -40,35 +44,48 @@ export class UploadedFileService {
     }
 
     constructor() {
-        UploadedFileService.convertPdfToHtml(process.env.TEST_PDF_TO_HTML_FILE);
+        UploadedFileService.convertPdfToHtml(process.env.TEST_PDF_TO_HTML_FILE, new Subject<string>());
+        UploadedFileService.handleDocx(`docx/${process.env.TEST_DOCX_TO_HTML_FILE}`)
     }
 
-    private static async convertPdfToHtml(filepath: string) {
-        let newPath = this.replaceExtInPath(filepath, 'html');
+    private static async convertPdfToHtml(filepath: string, progress$: Subject<string>) {
+        const newPath = this.replaceExtInPath(filepath, 'html');
         const converter = new pdftohtml(
             filepath,
-            newPath
+            newPath,
+            {
+                bin: 'docker',
+                additional: [
+                    'run',
+                    '--rm',
+                    '-v',
+                    (`${join(process.cwd(), 'pdf')}:/pdf`),
+                    'iapain/pdf2htmlex',
+                    'pdf2htmlEX',
+                    '--process-nontext',
+                    '0',
+                    '--process-outline',
+                    '0',
+                    '--optimize-text',
+                    '1'
+                ]
+            }
         )
 
         // If you would like to tap into progress then create
         // progress handler
         converter.progress((ret) => {
-            const progress = (ret.current * 100.0) / ret.total
-            console.log(`${progress} %`)
+            const progress = (ret.current * 100.0) / ret.total;
+            progress$.next(`${progress} %`)
         })
 
-        try {
-            // convert() returns promise
-            await converter.convert()
-        } catch (err) {
-            console.error(`Psst! something went wrong: ${err.message}`)
-        }
+        await converter.convert();
 
         return newPath;
     }
 
     private static replaceExtInPath(filepath: string, ext: string) {
         let name = parse(filepath).name;
-        return join(dirname(filepath), `${name}${ext}`);
+        return join(dirname(filepath), `${name}.${ext}`);
     }
 }

@@ -4,10 +4,10 @@ import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map} from "rxjs/operators";
-import {interpolateSourceDoc} from "../Atomized/AtomizedDocumentFromSentences";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {TrieWrapper} from "../TrieWrapper";
+import { InterpolateService } from "@shared/";
 
 export type TrieObservable = Observable<TrieWrapper>;
 
@@ -38,7 +38,7 @@ export class QuizCharacter {
             trie$,
             this.exampleSentences$.pipe(
                 map(sentences => {
-                    return interpolateSourceDoc(sentences.map(sentence => {
+                    return InterpolateService.sentences(sentences.map(sentence => {
                         return sentence.translatableText;
                     }).concat(Array(10).fill('_')));
                 }),
