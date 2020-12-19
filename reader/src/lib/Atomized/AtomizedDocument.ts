@@ -73,9 +73,10 @@ export class AtomizedDocument {
     public static fromAtomizedString(atomizedString: string) {
         try {
             return new AtomizedDocument(
-                this.getDomParser().parseFromString(atomizedString)
+                AtomizedDocument.getDomParser().parseFromString(atomizedString)
             );
         } catch (e) {
+            debugger;
             return ERROR_DOCUMENT;
         }
     }

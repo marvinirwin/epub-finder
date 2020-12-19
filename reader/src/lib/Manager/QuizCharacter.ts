@@ -5,7 +5,7 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map} from "rxjs/operators";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
-import {AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {TrieWrapper} from "../TrieWrapper";
 import { InterpolateService } from "@shared/";
 

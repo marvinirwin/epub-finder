@@ -10,7 +10,7 @@ import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";

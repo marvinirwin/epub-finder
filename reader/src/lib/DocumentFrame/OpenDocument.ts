@@ -8,7 +8,7 @@ import {AtomizedDocumentDocumentStats, AtomizedDocumentStats} from "../Atomized/
 import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
-import { AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
+import { AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
 import { rehydratePage } from "../Atomized/OpenedDocument";
 
@@ -41,7 +41,6 @@ export class OpenDocument {
     public url$ = new ReplaySubject<string>(1)
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
-    atomizedSrcDocString$: Observable<string>;
     atomizedDocument$: Observable<AtomizedDocument>;
 
 /*
@@ -65,13 +64,7 @@ export class OpenDocument {
             )
         ).pipe(shareReplay(1));
 
-        this.atomizedSrcDocString$ = this.atomizedDocumentString$.pipe(
-            map(strings => {
-                return strings /*InterpolateService.text( `Could not find ${this.name}` );*/
-            }),
-            shareReplay(1)
-        );
-        this.atomizedDocument$ = atomizedDocuments$ || this.atomizedSrcDocString$.pipe(
+        this.atomizedDocument$ = atomizedDocuments$ || this.atomizedDocumentString$.pipe(
             map(AtomizedDocument.fromAtomizedString),
             shareReplay(1)
         );

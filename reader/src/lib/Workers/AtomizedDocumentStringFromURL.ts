@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
+import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 
 // @ts-ignore
 self.window = self;

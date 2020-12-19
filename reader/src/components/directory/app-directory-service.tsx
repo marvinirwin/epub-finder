@@ -6,7 +6,7 @@ import {distinctUntilChanged, map, startWith, tap} from "rxjs/operators";
 import {useObservableState} from "observable-hooks";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
-import {arrayToTreeRoot} from "./directory.factory";
+import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {ReadingNode} from "./nodes/reading.component";
 import {WatchMode} from "./modes/watch-mode.component";
 import {SpeakMode} from "./modes/speak-mode.component";
@@ -15,7 +15,6 @@ import {IconButton} from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
 import TwitterIcon from "../Icons/TwitterIcon";
 import {FileChooser} from "./file-chooser.component";
-import {RequestRecordingSentences} from "./request-record-sentences.component";
 import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
@@ -78,24 +77,11 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
+/*
                     {
                         name: 'library',
                         label: 'Library',
                         moveDirectory: true,
-                    },
-                    // @ts-ignore
-                    availableDocuments.map(toTreeMenuNode),
-                    {
-                        name: 'customDocument',
-                        ReplaceComponent: () => <FileChooser/>,
-                        hidden: !profile?.email
-                    },
-/*
-                    {
-                        name: 'requestRecording',
-                        Component: () => <RequestRecordingSentences/>,
-                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
-                        hidden: !profile?.email
                     },
 */
                     {
@@ -104,6 +90,20 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         moveDirectory: true,
                         hidden: !!profile?.email
                     },
+                    {
+                        name: 'customDocument',
+                        ReplaceComponent: () => <FileChooser/>,
+                    },
+                    // @ts-ignore
+                    ...availableDocuments.map(toTreeMenuNode),
+/*
+                    {
+                        name: 'requestRecording',
+                        Component: () => <RequestRecordingSentences/>,
+                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
+                        hidden: !profile?.email
+                    },
+*/
                     [
                         {
                             name: 'google',
@@ -126,7 +126,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         label: profile?.email,
                         hidden: !!profile
                     },
-                ]
+                ] as ArrayToTreeParams<TreeMenuNode>
             );
             /*
                         const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
