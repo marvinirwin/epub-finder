@@ -8,6 +8,10 @@ export class DocumentRepository {
     constructor({databaseService}: { databaseService: DatabaseService }) {
         this.databaseService = databaseService;
     }
+    all(): Promise<DocumentViewDto[]> {
+        return axios.get(`${process.env.PUBLIC_URL}/documents`)
+            .then(response => response.data as DocumentViewDto[])
+    }
 
     delete(document_id: string) {
         return axios.put(
@@ -18,10 +22,22 @@ export class DocumentRepository {
         })
     }
 
+    update(document_id: string, file: File) {
+        return DocumentRepository.uploadFile(file, document_id);
+    }
+
+    create(file: File) {
+        return DocumentRepository.uploadFile(file, undefined);
+    }
+
     upsert({file, document_id}: {
         document_id?: string,
         file: File
     }): Promise<DocumentViewDto> {
+        return DocumentRepository.uploadFile(file, document_id);
+    }
+
+    private static uploadFile(file: File, document_id: string | undefined) {
         const formData = new FormData();
         formData.append("file", file);
 
@@ -39,8 +55,4 @@ export class DocumentRepository {
         })
     }
 
-    queryAll(): Promise<DocumentViewDto[]> {
-        return axios.get(`${process.env.PUBLIC_URL}/documents`)
-            .then(response => response.data as DocumentViewDto[])
-    }
 }

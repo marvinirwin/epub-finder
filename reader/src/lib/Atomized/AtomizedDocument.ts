@@ -9,9 +9,10 @@ import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {mergeSentenceInfo} from "./TextWordData";
 import {chunk} from 'lodash';
-import {interpolateSourceDoc} from "./AtomizedDocumentFromSentences";
+import {InterpolateService} from "@shared/*";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
+
 
 export function createPopperElement(document1: XMLDocument) {
 
@@ -32,9 +33,6 @@ export class AtomizedDocument {
         const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
         doc.replaceDocumentSources(doc.document);
-/*
-        doc.splitLongTextElements(doc.getTextElements(doc.document));
-*/
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
         return doc;
     }
@@ -84,7 +82,9 @@ export class AtomizedDocument {
 
     public getChunkedDocuments() {
         return chunk(this.getAtomizedSentences(), 20)
-            .map(sentenceChunk => AtomizedDocument.atomizeDocument(interpolateSourceDoc(sentenceChunk.map(sentence => sentence.translatableText))))
+            .map(sentenceChunk => AtomizedDocument.atomizeDocument(
+                InterpolateService.sentences(sentenceChunk.map(sentence => sentence.translatableText)))
+            )
     }
 
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {

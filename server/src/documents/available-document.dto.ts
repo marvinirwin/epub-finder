@@ -1,6 +1,6 @@
 export interface AvailableDocumentDto {
     name: string;
-    id: number;
+    id: string;
     uploadDate: Date;
     belongsToUser: boolean;
 }

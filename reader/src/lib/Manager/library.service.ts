@@ -7,8 +7,8 @@ import {DocumentRepository} from "../documents/document.repository";
 
 export class LibraryService {
     documents$ = new ReplaySubject<Map<string, DocumentViewDto>>(1)
-
     db: DatabaseService;
+
     private documentRepository: DocumentRepository;
 
     constructor({db, documentRepository}: {
@@ -17,47 +17,23 @@ export class LibraryService {
     }) {
         this.documentRepository = documentRepository;
         this.db = db;
-        this.loadDocuments();
+        this.fetchDocuments();
     }
 
 
-    private async loadDocuments() {
-        this.documents$.next(
-            mapFromId<string, DocumentViewDto>(await this.documentRepository.queryAll())
-        )
-        /*
-                const builtInDocuments = [
-                    'a-burning-oven.html',
-                    'cat-likes-tea.html',
-                    'city-and-village.html',
-                    'watching-a-movie.html',
-                ].map(websiteFromFilename);
-                this.appendBuiltInDocuments(builtInDocuments);
-        */
+    private async fetchDocuments() {
+        this.documents$.next( mapFromId<string, DocumentViewDto>(await this.documentRepository.all()) )
     }
 
-
-    public async addAndPersistDocumentRevision(d: DocumentToBeSavedDto): Promise<void> {
-        const savedDocument = await this.documentRepository.upsert(d);
-        this.loadDocuments();
-    }
-
-    public async PersistFile(
-        file: File,
-        b: DocumentToBeSavedDto
-    ): Promise<void> {
-        // Uplaod the file with the headers
+    public async createDocument(f: File): Promise<void> {
+        // This is inefficient, we probably don't have to fetch everyone
+        await this.documentRepository.create(f);
+        this.fetchDocuments();
     }
 
     public async deleteDocument(instanceId: string, document_id: string): Promise<void> {
-        await this.documentRepository
-            .upsert(
-                {
-                    document_id,
-                    deleted: true, html: '', name: ''
-                }
-            );
-        this.loadDocuments();
+        await this.documentRepository .delete( document_id);
+        this.fetchDocuments();
     }
 }
 

@@ -8,5 +8,4 @@ import { DocumentViewDto } from "@server/*";
  */
 export class CheckedOutDocumentsService {
     checkedOutDocuments$ = new ReplaySubject<IndexedByNumber<DocumentViewDto>>(1);
-
 }

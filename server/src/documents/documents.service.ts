@@ -14,7 +14,7 @@ function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(`Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`);
 }
 
-export class DocumentsService implements OnModuleInit {
+export class DocumentsService {
     constructor(
         @InjectRepository(DocumentView)
         private documentViewRepository: Repository<DocumentView>,
@@ -25,45 +25,7 @@ export class DocumentsService implements OnModuleInit {
     ) {
     }
 
-    async onModuleInit() {
-        this.insertDocumentsInDocumentsDir();
-    }
 
-    private async insertDocumentsInDocumentsDir() {
-        // Get all the documents, get their hashes, compare with the current documents
-        const documents = await Promise.all(
-            (await fs.readdir(process.env.BUILT_IN_DOCUMENTS_DIR))
-                .filter(filename => filename.endsWith('.html'))
-                .map(filename => fs.readFile(join(process.env.BUILT_IN_DOCUMENTS_DIR, filename))
-                    .then(content => ({filename, html: content.toString()}))// Do I have to add UTF-8 here?
-                )
-        );
-        for (let i = 0; i < documents.length; i++) {
-            const {filename, html} = documents[i];
-            const htmlHash = sha1(html);
-            const name = startCase(filename);
-            const sameVersion = await this.documentRepository.findOne({html_hash: htmlHash, name})
-            const baseEntity = {
-                name,
-                html_hash: htmlHash,
-                global: true,
-                html,
-                creator_id: undefined
-            };
-            if (!sameVersion) {
-                const differentVersion = await this.documentRepository.findOne({name, creator_id: null})
-                if (differentVersion) {
-                    console.log(`Hash is different, updating ${differentVersion}`);
-                    await this.documentRepository.insert({...baseEntity, document_id: differentVersion.document_id});
-                } else {
-                    console.log(`Inserting ${name} for the first time`);
-                    await this.documentRepository.insert(baseEntity)
-                }
-            } else {
-                console.log(`${name} already exists`)
-            }
-        }
-    }
 
     async queryAvailableDocuments(user?: User | undefined): Promise<DocumentView[]> {
         return await this.documentViewRepository
@@ -76,7 +38,9 @@ export class DocumentsService implements OnModuleInit {
             )
     }
 
-    public async saveDocumentForUser(user: User, documentToBeSavedDto: DocumentToBeSavedDto): Promise<Document> {
+    public async saveDocumentForUser(
+        user: User,
+        documentToBeSavedDto: DocumentToBeSavedDto): Promise<Document> {
         const savingRevisionOfAnotherdocument = !!documentToBeSavedDto.document_id;
         if (savingRevisionOfAnotherdocument) {
             if (!await this.documentBelongsToUser(user, documentToBeSavedDto.document_id)) {

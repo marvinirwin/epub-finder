@@ -1,29 +1,24 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Headers,
-    Post,
-    Put,
-    UploadedFile,
-    UseGuards,
-    UseInterceptors
-} from "@nestjs/common";
+import {Body, Controller, Get, Headers, Put, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
 import {DocumentsService} from "./documents.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
 import {DocumentToBeSavedDto} from "./document-to-be-saved.dto";
-import {AnyFilesInterceptor, FileInterceptor} from "@nestjs/platform-express";
+import {AnyFilesInterceptor} from "@nestjs/platform-express";
+import {UploadedFileService} from "./uploaded-file.service";
+import {join, normalize} from "path";
 
 @Controller('documents')
 export class DocumentsController {
-    constructor(private documentsService: DocumentsService) {
+    constructor(
+        private documentsService: DocumentsService,
+        private uploadedFileService: UploadedFileService
+    ) {
 
     }
 
     @Get('/available')
-    async availableDocuments(
+    async available(
         @UserFromReq() user: User | undefined
     ) {
         return this.documentsService.queryAvailableDocuments(user)
@@ -36,7 +31,7 @@ export class DocumentsController {
     }
 
     @Get('')
-    async allDocuments(
+    async all(
         @UserFromReq() user: User | undefined
     ) {
         return this.documentsService.queryAvailableDocuments(user)
@@ -44,7 +39,7 @@ export class DocumentsController {
 
     @Put('')
     @UseGuards(LoggedInGuard)
-    async putDocument(
+    async put(
         @UserFromReq() user: User,
         @Body() documentToBeSavedDto: DocumentToBeSavedDto
     ) {
@@ -56,25 +51,26 @@ export class DocumentsController {
     @UseInterceptors(
         AnyFilesInterceptor({
             dest: process.env.UPLOADED_FILE_DIRECTORY,
+            limits: {
+                files: 1,
+                fields: 0,
+                fileSize: 1024 * 1024 * 10 // 10MB file size
+            }
         })
     )
-    async uploadDocument(
+    async upload(
         @UploadedFile() file,
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string,
         @Headers('name') name: string,
     ) {
-        // TODO do some assertion here
-        const documentToBeSavedDto: DocumentToBeSavedDto = {
-            document_id,
-            name,
-        };
+        const htmlPath = normalize(join(file.destination, file.filename));
+        return await this.documentsService.saveDocumentForUser(
+            user,
+            {
+                document_id,
+                name,
+            }
+        );
     }
-
-    /*
-        @Post('upload')
-        @UseInterceptors(FileInterceptor('file'))
-        async putFile(@UserFromReq() user: User | undefined, @UploadedFile() file) {
-        }
-    */
 }

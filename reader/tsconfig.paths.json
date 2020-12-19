@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@server/*": ["../server/src/types"]
+      "@server/*": ["../server/src/types"],
+      "@shared/*": ["../server/src/shared"]
     }
   }
 }

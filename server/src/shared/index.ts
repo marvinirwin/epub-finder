@@ -1,0 +1,1 @@
+export {InterpolateService} from './interpolate.service';

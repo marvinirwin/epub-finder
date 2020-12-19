@@ -5,17 +5,18 @@ import {DocumentView} from "../entities/document-view.entity";
 import {DocumentsController} from "./documents.controller";
 import {DocumentsService} from "./documents.service";
 import {User} from "../entities/user.entity";
+import {UploadedFileService} from "./uploaded-file.service";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Document, DocumentView, User]),
-
     ],
     controllers: [
         DocumentsController
     ],
     providers: [
-        DocumentsService
+        DocumentsService,
+        UploadedFileService
     ]
 })
 export class DocumentsModule {}

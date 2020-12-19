@@ -90,12 +90,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         ReplaceComponent: () => <FileChooser/>,
                         hidden: !profile?.email
                     },
+/*
                     {
                         name: 'requestRecording',
                         Component: () => <RequestRecordingSentences/>,
                         label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
                         hidden: !profile?.email
                     },
+*/
                     {
                         name: 'signInWith',
                         label: 'Sign In With',
