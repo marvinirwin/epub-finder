@@ -27,63 +27,6 @@ export async function resolveMediaSources(audio: (HTMLAudioElement | HTMLImageEl
     return sources;
 }
 
-export async function GetICard(
-    fields: string[],
-    resolveMediaSrc: (s: string) => Promise<string>,
-    deck: string,
-    ankiPackage: string,
-    collection: string
-): Promise<ICard> {
-    fields = fields.filter(f => f);
-    const c: ICard = {
-        learningLanguage: fields[0], // assuming the first field contains the character
-        photos: [],
-        sounds: [],
-        knownLanguage: [],
-        deck,
-        fields: [],
-        illustrationPhotos: [],
-        timestamp: Number.MIN_SAFE_INTEGER // Notes imported have the lowest timestamp because they're meant to be over-written
-    }
-    const soundMatchRegexp = new RegExp(`\\[sound:(.*?)\\]`);
-    for (let i = 0; i < fields.length; i++) {
-        let field = fields[i];
-        const groups = soundMatchRegexp.exec(field);
-        if (groups || field.includes('sound:')) {
-            field = `<audio src="${(groups || [])[1]}"/>` // I dont know if this will work
-        }
-
-        const parser = new DOMParser(
-            {
-                errorHandler: {
-                    warning () {
-                    }
-                },
-            }
-        );
-        const document = parser.parseFromString(field, 'text/html');
-        if (!document) {
-            throw new Error("No document")
-        }
-        const audio = Array.from(document.getElementsByTagName('audio'));
-        const images = Array.from(document.getElementsByTagName('img'));
-        const audioSources = await resolveMediaSources(audio, resolveMediaSrc);
-        const imageSources = await resolveMediaSources(images, resolveMediaSrc);
-        c.sounds.push(...audioSources);
-        // For this current package, the photos will always be illustrationPhotos
-        c.illustrationPhotos.push(...imageSources);
-        const innerHTML = new XMLSerializer().serializeToString(document);
-        if (!innerHTML || innerHTML === '??') {
-            throw new Error("No innerHTML")
-        }
-/*
-        c.fields.push(innerHTML);
-*/
-    }
-    return c;
-}
-
-
 export function getIsMeFunction(c1: ICard) {
     return ({deck, learningLanguage, id}: {
         deck: string | undefined,

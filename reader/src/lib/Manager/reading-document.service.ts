@@ -1,7 +1,7 @@
 import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {TrieObservable} from "./QuizCharacter";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
 import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";

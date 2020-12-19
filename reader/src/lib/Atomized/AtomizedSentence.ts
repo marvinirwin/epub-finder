@@ -3,7 +3,7 @@ import {Dictionary, maxBy, uniq} from "lodash";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
-import {AtomizedDocument} from "./AtomizedDocument";
+import {AtomizedDocument} from "./ERROR_DOCUMENT";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeSentenceInfo, TextWordData} from "./TextWordData";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";

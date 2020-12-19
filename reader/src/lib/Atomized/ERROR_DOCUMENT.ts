@@ -7,9 +7,9 @@ import {splitKeepDelim} from "../Util/Util";
 import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {mergeSentenceInfo} from "./TextWordData";
+import {InterpolateService} from "@shared/";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
-
 
 export function createPopperElement(document1: XMLDocument) {
 
@@ -27,7 +27,7 @@ export class AtomizedDocument {
     }
 
     public static atomizeDocument(xmlsource: string): AtomizedDocument {
-        const doc = new AtomizedDocument(new DOMParser().parseFromString(xmlsource, 'text/html'));
+        const doc = new AtomizedDocument(AtomizedDocument.getDomParser().parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
         doc.replaceDocumentSources(doc.document);
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
@@ -71,12 +71,33 @@ export class AtomizedDocument {
     }
 
     public static fromAtomizedString(atomizedString: string) {
-        return new AtomizedDocument(new DOMParser().parseFromString(atomizedString));
+        try {
+            return new AtomizedDocument(
+                this.getDomParser().parseFromString(atomizedString)
+            );
+        } catch (e) {
+            return ERROR_DOCUMENT;
+        }
+    }
+
+    public static getDomParser() {
+        return new DOMParser({
+            errorHandler: {
+                warning: w => {
+                    console.warn(w)
+                },
+                error: w => {
+                    throw w;
+                },
+                fatalError: w => {
+                    throw w;
+                }
+            }
+        });
     }
 
     constructor(public document: XMLDocument) {
     }
-
 
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {
         const currentSource = el.getAttribute(qualifiedName);
@@ -185,7 +206,7 @@ export class AtomizedDocument {
 
     splitLongTextElements(textElements: Element[]) {
         textElements.forEach(textNode => {
-            const split =  splitKeepDelim('。')(textNode.nodeValue as string);
+            const split = splitKeepDelim('。')(textNode.nodeValue as string);
             if (split.length > 1) {
                 this.replaceTextNodeWithSubTextNode(
                     textNode,
@@ -203,13 +224,18 @@ export class AtomizedDocument {
     }
 
     getAtomizedSentences(): AtomizedSentence[] {
-        const sentenceElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
-        const atomized = new Array(sentenceElements.length);
-        for (let i = 0; i < sentenceElements.length; i++) {
-            const sentenceElement = sentenceElements[i];
-            atomized[i] = new AtomizedSentence(sentenceElement as unknown as XMLDocumentNode);
+        try {
+            const sentenceElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
+            const atomized = new Array(sentenceElements.length);
+            for (let i = 0; i < sentenceElements.length; i++) {
+                const sentenceElement = sentenceElements[i];
+                atomized[i] = new AtomizedSentence(sentenceElement as unknown as XMLDocumentNode);
+            }
+            return atomized;
+        } catch (e) {
+            console.warn(e);
+            return [];
         }
-        return atomized;
     }
 
     getDocumentStats(trie: TrieWrapper): AtomizedDocumentStats {
@@ -266,6 +292,7 @@ export class AtomizedDocument {
             return n.tagName === 'body';
         });
     }
+
     private findPopperContainer() {
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
@@ -280,3 +307,9 @@ export class AtomizedDocument {
     }
 }
 
+const ERROR_DOCUMENT = new AtomizedDocument(
+    AtomizedDocument.getDomParser()
+        .parseFromString(
+            InterpolateService.text(`There was an error parsing this document`)
+        )
+);

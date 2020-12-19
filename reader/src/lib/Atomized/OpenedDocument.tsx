@@ -5,7 +5,7 @@ import {InnerHTMLIFrame} from "../../components/Frame/innerHTMLIFrame";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedSentence} from "./AtomizedSentence";
-import {ANNOTATE_AND_TRANSLATE} from "./AtomizedDocument";
+import {ANNOTATE_AND_TRANSLATE} from "./ERROR_DOCUMENT";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../services/safe-push";
 

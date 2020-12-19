@@ -90,4 +90,27 @@ export class DocumentsService {
     private async belongsToUser(user, document_id) {
         return !!await this.byId(user, document_id);
     }
+
+    public async byFilename(filename: string, user?: User) {
+        const whereConditions: {global?: boolean, filename: string, creator_id?: number}[] = [
+            {
+                global: true,
+                filename
+            },
+        ]
+        if (user) {
+            whereConditions.push(
+                {
+                    creator_id: user.id,
+                    filename
+                },
+            )
+        }
+        return await this.documentViewRepository.findOne({
+            where: whereConditions
+        });
+    }
+
+
+
 }

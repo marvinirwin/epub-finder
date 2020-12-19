@@ -8,6 +8,7 @@ function pdftohtml (filename, outfile, options) {
         this.options.additional.push(outfile);
     }
 
+/*
     pdftohtml.prototype._preset = (preset) => {
         let module;
 
@@ -28,6 +29,7 @@ function pdftohtml (filename, outfile, options) {
 
         }
     };
+*/
 
     pdftohtml.prototype.add_options = (optionArray) => {
         if (typeof optionArray.length !== undefined) {
@@ -56,7 +58,9 @@ function pdftohtml (filename, outfile, options) {
         return new Promise((resolve, reject)  => {
             let error = '';
 
+/*
             self._preset(presetFile);
+*/
 
             const child = spawn(self.options.bin, self.options.additional);
 

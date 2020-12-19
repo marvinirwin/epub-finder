@@ -12,7 +12,8 @@ import {User} from "./user.entity";
         b.created_at,
         b.creator_id,
         b.global,
-        b.deleted
+        b.deleted,
+        b.filename
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at
@@ -31,7 +32,10 @@ export class DocumentView  {
     name: string;
 
     @ViewColumn()
-    html: string;
+    html: string | null;
+
+    @ViewColumn()
+    filename: string | null;
 
     @ViewColumn()
     created_at: Date;

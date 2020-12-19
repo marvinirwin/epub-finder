@@ -8,7 +8,7 @@ import {AtomizedDocumentDocumentStats, AtomizedDocumentStats} from "../Atomized/
 import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
-import { AtomizedDocument} from "../Atomized/AtomizedDocument";
+import { AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";
 import { rehydratePage } from "../Atomized/OpenedDocument";
 

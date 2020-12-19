@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {DocumentViewDto, DocumentToBeSavedDto} from '@server/'
+import {DocumentViewDto} from '@server/'
 import {DatabaseService} from "../Storage/database.service";
 
 export class DocumentRepository {
@@ -33,15 +33,18 @@ export class DocumentRepository {
         const formData = new FormData();
         formData.append("file", file);
 
+        const headers: {filename: string, name: string, document_id?: string} = {
+            filename: file.name,
+            name: file.name.split('.').slice(0, -1).join('')
+        };
+        if (document_id) {
+            headers.document_id = document_id
+        }
         return axios.put(
             `${process.env.PUBLIC_URL}/documents/`,
             formData,
             {
-                headers: {
-                    document_id,
-                    filename: file.name,
-                    name: file.name.split('.').slice(0, -1).join('')
-                }
+                headers: headers
             }
         ).then(response => {
             return response?.data;

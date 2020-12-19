@@ -10,7 +10,7 @@ import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedDocument} from "../Atomized/ERROR_DOCUMENT";
 import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
@@ -66,13 +66,19 @@ export class OpenDocumentsService {
             map(libraryDocuments => {
                 return mapMap(
                     libraryDocuments,
-                    (id, documentViewDto) => {
+                    (id, {name, html, filename}) => {
                         const openDocument = new OpenDocument(
-                            documentViewDto.name,
+                            name,
                             config.trie$,
                             undefined,
                         );
-                        openDocument.unAtomizedSrcDoc$.next(documentViewDto.html);
+                        if (html) {
+                            openDocument.unAtomizedSrcDoc$.next(html);
+                        }
+                        if (filename) {
+                            // Gotta get a url for this filename
+                            openDocument.url$.next(`${process.env.PUBLIC_URL}/documents/${filename}`);
+                        }
                         return [
                             id,
                             openDocument

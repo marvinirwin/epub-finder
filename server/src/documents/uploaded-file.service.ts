@@ -32,8 +32,8 @@ export class UploadedFileService {
         return mammoth.convertToHtml({path: uploadedDocument.uploadedFilePath, convertImage: false})
             .then(async (o) => {
                 const html = InterpolateService.html("", o.value);
-                await fs.writeFile(`${uploadedDocument}.html`, html);
-            })
+                await fs.writeFile(uploadedDocument.htmlFilePath(), html);
+            });
     }
 
     private static async handleTxt(uploadedFile: UploadedDocument) {
@@ -98,6 +98,6 @@ export class UploadedFileService {
 
     public static fileHash(path: string): Promise<string> {
         return hashElement(basename(path), dirname(path))
-            .then(result => result.toString())
+            .then(result => result.hash)
     }
 }

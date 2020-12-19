@@ -13,9 +13,13 @@ export const AtomizeHtml = (HTMLString: string) =>
         .then(handleWorkerError);
 
 export const AtomizeUrl = async (url: string) => {
-    const cached = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '');
-    if (cached) {
-        return cached;
+    try {
+        const cached = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '');
+        if (cached) {
+            return cached;
+        }
+    } catch(e) {
+        console.warn(e);
     }
     return GetWorkerResults<string | WorkerError>(new AtomizeUrlWorker(), url)
         .then(handleCacheSuccessfulAtomizeUrl(url))

@@ -2,7 +2,7 @@ import {flatMap, shareReplay, switchMap} from "rxjs/operators";
 import {printExecTime} from "../../Util/Timer";
 import {BrowserInputs} from "../../Hotkeys/BrowserInputs";
 import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
-import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../../Atomized/AtomizedDocument";
+import {ANNOTATE_AND_TRANSLATE, AtomizedDocument} from "../../Atomized/ERROR_DOCUMENT";
 import {XMLDocumentNode} from "../../Interfaces/XMLDocumentNode";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {appendDocumentStyle} from "../AppendDocumentStyle";

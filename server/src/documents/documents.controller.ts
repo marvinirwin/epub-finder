@@ -1,11 +1,12 @@
+import {Request, Response} from "express";
 import {
     Body,
     Controller,
     Delete,
-    Get,
-    Headers,
+    Get, Header,
+    Headers, HttpCode, HttpStatus,
     Param,
-    Put,
+    Put, Res,
     UploadedFile,
     UseGuards,
     UseInterceptors
@@ -14,9 +15,11 @@ import {DocumentsService} from "./documents.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
-import { FileInterceptor} from "@nestjs/platform-express";
+import {FileInterceptor} from "@nestjs/platform-express";
 import {UploadedFileService} from "./uploaded-file.service";
 import {UploadedDocument} from "./uploaded-document";
+import {createReadStream} from "fs";
+import {join} from "path";
 
 @Controller('documents')
 export class DocumentsController {
@@ -49,14 +52,7 @@ export class DocumentsController {
 
     @Put('')
     @UseGuards(LoggedInGuard)
-    @UseInterceptors( /*AnyFilesInterceptor({
-            dest: process.env.UPLOADED_FILE_DIRECTORY,
-            limits: {
-                files: 1,
-                fields: 1,
-                fileSize: 1024 * 1024 * 10 // 10MB file size
-            }
-        })*/
+    @UseInterceptors(
         FileInterceptor(
             'file',
             {
@@ -70,12 +66,13 @@ export class DocumentsController {
         )
     )
     async upload(
-        @UploadedFile() file: {originalname: string, path: string},
+        @UploadedFile() file: { originalname: string, path: string },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string,
         @Headers('name') name: string,
     ) {
         const f = new UploadedDocument(file.path, file.originalname);
+        await UploadedFileService.normalise(f);
         if (document_id) {
             return this.documentsService.saveRevision(
                 user,
@@ -101,5 +98,21 @@ export class DocumentsController {
             user,
             id
         )
+    }
+
+    @Get(':filename')
+    @HttpCode(HttpStatus.OK)
+    @Header('Content-Type', 'text/html')
+    async file(
+        @UserFromReq() user: User | undefined,
+        @Param('filename') filename: string,
+        @Res() response: Response
+    ) {
+        const doc = await this.documentsService.byFilename(filename, user);
+        if (!doc) {
+            throw new Error(`Cannot find document ${filename} for user ${user?.id}`)
+        }
+        // @ts-ignore
+        return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
     }
 }

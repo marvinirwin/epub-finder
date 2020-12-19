@@ -6,6 +6,6 @@ import {AtomizeUrl} from "../Workers/WorkerHelpers";
 
 export const AtomizedStringsForURL = (rawHTML$: Observable<string>): Observable<string> => {
     return rawHTML$.pipe(
-        switchMap(AtomizeUrl)
+    switchMap(AtomizeUrl)
     )
 }

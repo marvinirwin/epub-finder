@@ -22,7 +22,7 @@ export class LibraryService {
 
 
     private async fetchDocuments() {
-        this.documents$.next(mapFromId<string, DocumentViewDto>(await this.documentRepository.all()))
+        this.documents$.next(mapFromId(await this.documentRepository.all()))
     }
 
     public async upsertDocument(file: File): Promise<void> {
