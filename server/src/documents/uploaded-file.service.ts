@@ -1,58 +1,63 @@
 import mammoth from 'mammoth';
-import pdftohtml from 'pdftohtmljs';
-import {dirname, extname, join, parse} from 'path';
-import {InterpolateService} from "../shared/interpolate.service";
+import pdftohtml from '../pdftohtmljs/pdftohtmljs';
+import {basename, dirname, extname, join, parse} from 'path';
+import {InterpolateService} from "../shared";
 import fs from 'fs-extra';
 import {Subject} from "rxjs";
+import {hashElement} from 'folder-hash';
+import {UploadedDocument} from "./uploaded-document";
 
 export class UploadedFileService {
-    public static async normalise(filepath: string) {
-        const ext = extname(filepath)
-        switch (ext) {
-            case 'html':
-                return filepath;
-            case 'docx':
-                return this.handleDocx(filepath);
-            case 'txt':
-                return this.handleTxt(filepath);
-            case 'pdf':
-                return this.handlePdf(filepath);
+    public static async normalise(uploadedFile: UploadedDocument): Promise<void> {
+        switch (uploadedFile.ext()) {
+            case '.html':
+                // Do nothing
+                return;
+            case '.docx':
+                return this.handleDocx(uploadedFile);
+            case '.txt':
+                return this.handleTxt(uploadedFile);
+            case '.pdf':
+                return this.handlePdf(uploadedFile);
             default:
-                throw new Error(`Unsupported file extension: ${ext}`);
+                throw new Error(`Unsupported file extension: ${uploadedFile.ext()}`);
         }
     }
 
-    private static handlePdf(filepath: string) {
+    private static handlePdf(filepath: UploadedDocument) {
         return this.convertPdfToHtml(filepath, new Subject<string>());
     }
 
-    private static handleDocx(filepath: string) {
-        return mammoth.convertToHtml({path: filepath, convertImage: false})
+    private static handleDocx(uploadedDocument: UploadedDocument) {
+        return mammoth.convertToHtml({path: uploadedDocument.uploadedFilePath, convertImage: false})
             .then(async (o) => {
                 const html = InterpolateService.html("", o.value);
-                const newPath = this.replaceExtInPath(filepath, 'html');
-                await fs.writeFile(newPath, html);
-                return newPath;
+                await fs.writeFile(`${uploadedDocument}.html`, html);
             })
     }
 
-    private static async handleTxt(filepath: string) {
-        const text = (await fs.readFile(filepath)).toString("utf8");
-        const newPath = this.replaceExtInPath(filepath, 'html');
-        await fs.writeFile(newPath, InterpolateService.text(text))
-        return newPath;
+    private static async handleTxt(uploadedFile: UploadedDocument) {
+        const text = (await fs.readFile(uploadedFile.uploadedFilePath)).toString("utf8");
+        await fs.writeFile(uploadedFile.htmlFilePath(), InterpolateService.text(text))
     }
 
     constructor() {
-        UploadedFileService.convertPdfToHtml(process.env.TEST_PDF_TO_HTML_FILE, new Subject<string>());
-        UploadedFileService.handleDocx(`docx/${process.env.TEST_DOCX_TO_HTML_FILE}`)
+        UploadedFileService.convertPdfToHtml(
+            new UploadedDocument(
+                process.env.TEST_PDF_TO_HTML_FILE,
+                process.env.TEST_PDF_TO_HTML_FILE
+            ),
+            new Subject<string>());
+        UploadedFileService.handleDocx(new UploadedDocument(
+            `docx/${process.env.TEST_DOCX_TO_HTML_FILE}`,
+            `docx/${process.env.TEST_DOCX_TO_HTML_FILE}`
+        ))
     }
 
-    private static async convertPdfToHtml(filepath: string, progress$: Subject<string>) {
-        const newPath = this.replaceExtInPath(filepath, 'html');
-        const converter = new pdftohtml(
-            filepath,
-            newPath,
+    private static async convertPdfToHtml(uploadedFile: UploadedDocument, progress$: Subject<string>) {
+        const converter = pdftohtml(
+            uploadedFile.uploadedFilePath,
+            uploadedFile.htmlFilePath(),
             {
                 bin: 'docker',
                 additional: [
@@ -74,18 +79,25 @@ export class UploadedFileService {
 
         // If you would like to tap into progress then create
         // progress handler
+        // @ts-ignore
         converter.progress((ret) => {
             const progress = (ret.current * 100.0) / ret.total;
             progress$.next(`${progress} %`)
         })
 
+        // @ts-ignore
         await converter.convert();
-
-        return newPath;
     }
 
-    private static replaceExtInPath(filepath: string, ext: string) {
-        let name = parse(filepath).name;
-        return join(dirname(filepath), `${name}.${ext}`);
+    /*
+        private static replaceExtInPath(filepath: string, ext: string) {
+            let name = parse(filepath).name;
+            return join(dirname(filepath), `${name}.${ext}`);
+        }
+    */
+
+    public static fileHash(path: string): Promise<string> {
+        return hashElement(basename(path), dirname(path))
+            .then(result => result.toString())
     }
 }

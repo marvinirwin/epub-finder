@@ -22,18 +22,20 @@ export class LibraryService {
 
 
     private async fetchDocuments() {
-        this.documents$.next( mapFromId<string, DocumentViewDto>(await this.documentRepository.all()) )
+        this.documents$.next(mapFromId<string, DocumentViewDto>(await this.documentRepository.all()))
     }
 
-    public async createDocument(f: File): Promise<void> {
-        // This is inefficient, we probably don't have to fetch everyone
-        await this.documentRepository.create(f);
-        this.fetchDocuments();
+    public async upsertDocument(file: File): Promise<void> {
+        await this.documentRepository.upsert({
+            file,
+        });
+        // Inefficient, we probably don't have to fetch all the time
+        await this.fetchDocuments();
     }
 
     public async deleteDocument(instanceId: string, document_id: string): Promise<void> {
-        await this.documentRepository .delete( document_id);
-        this.fetchDocuments();
+        await this.documentRepository.delete(document_id);
+        await this.fetchDocuments();
     }
 }
 

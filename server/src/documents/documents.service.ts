@@ -1,14 +1,10 @@
-import fs from 'fs-extra';
-import {startCase} from 'lodash';
 import {User} from "../entities/user.entity";
 import {Document} from "../entities/document.entity";
 import {DocumentView} from "../entities/document-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {OnModuleInit} from "@nestjs/common";
-import {join} from "path";
-import {sha1} from "../util/sha1";
-import {DocumentToBeSavedDto} from "./document-to-be-saved.dto";
+import {basename, join} from "path";
+import {UploadedFileService} from "./uploaded-file.service";
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(`Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`);
@@ -25,9 +21,7 @@ export class DocumentsService {
     ) {
     }
 
-
-
-    async queryAvailableDocuments(user?: User | undefined): Promise<DocumentView[]> {
+    async all(user?: User | undefined): Promise<DocumentView[]> {
         return await this.documentViewRepository
             .find({
                     where: [
@@ -38,21 +32,36 @@ export class DocumentsService {
             )
     }
 
-    public async saveDocumentForUser(
-        user: User,
-        documentToBeSavedDto: DocumentToBeSavedDto): Promise<Document> {
-        const savingRevisionOfAnotherdocument = !!documentToBeSavedDto.document_id;
-        if (savingRevisionOfAnotherdocument) {
-            if (!await this.documentBelongsToUser(user, documentToBeSavedDto.document_id)) {
-                throw CannotFindDocumentForUser(documentToBeSavedDto.document_id, user);
-            }
-            await this.queryExistingDocumentForUser(user, documentToBeSavedDto.document_id);
+    public async saveRevision(user: User, name: string, filePath: string, documentId: string) {
+        if (!await this.belongsToUser(user, documentId)) {
+            throw CannotFindDocumentForUser(documentId, user);
         }
         return await this.documentRepository.save({
-            ...documentToBeSavedDto,
+            document_id: documentId,
+            name,
+            filename: basename(filePath),
+            hash: await UploadedFileService.fileHash(filePath),
             creator_id: user.id,
-            global: false,
-            html_hash: sha1(documentToBeSavedDto.html)
+            global: false
+        })
+    }
+
+    public async saveNew(user: User, name: string, filePath: string) {
+        return await this.documentRepository.save({
+            name,
+            filename: basename(filePath),
+            hash: await UploadedFileService.fileHash(filePath),
+            creator_id: user.id,
+            global: false
+        })
+    }
+
+    public async delete(user: User, documentId: string) {
+        const existing = await this.existing(user, documentId);
+        delete existing.id;
+        return await this.documentRepository.save({
+            ...existing,
+            deleted: true
         })
     }
 
@@ -63,22 +72,22 @@ export class DocumentsService {
      * @param documentIdToDelete
      * @private
      */
-    private async queryExistingDocumentForUser(user: User, documentIdToDelete: string) {
-        const existingdocument = await this.queryDocumentForUser(user, documentIdToDelete);
-        if (!existingdocument) {
+    private async existing(user: User, documentIdToDelete: string) {
+        const existingDocument = await this.byId(user, documentIdToDelete);
+        if (!existingDocument) {
             throw CannotFindDocumentForUser(documentIdToDelete, user)
         }
-        return existingdocument;
+        return existingDocument;
     }
 
-    private async queryDocumentForUser(user: User, documentIdToDelete: string) {
-        return await this.documentRepository.find({
+    private async byId(user: User, documentId: string) {
+        return await this.documentViewRepository.findOne({
             creator_id: user.id,
-            document_id: documentIdToDelete
+            document_id: documentId
         });
     }
 
-    private async documentBelongsToUser(user, document_id) {
-        return !!await this.queryDocumentForUser(user, document_id);
+    private async belongsToUser(user, document_id) {
+        return !!await this.byId(user, document_id);
     }
 }

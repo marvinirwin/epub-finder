@@ -46,6 +46,7 @@
         "connect-typeorm": "^1.1.4",
         "dotenv": "^8.2.0",
         "errorhandler": "^1.5.1",
+        "folder-hash": "^4.0.0",
         "fs-extra": "^9.0.1",
         "google-translate-api": "^2.3.0",
         "googleapis": "^52.1.0",

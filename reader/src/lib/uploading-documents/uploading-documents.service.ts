@@ -45,7 +45,7 @@ export class UploadingDocumentsService {
             for (let i = 0; i < customDocuments.length; i++) {
                 const basicDocument = customDocuments[i];
                 lastDocument = basicDocument.name;
-                await libraryService.createDocument(basicDocument);
+                await libraryService.upsertDocument(basicDocument);
             }
             if (lastDocument) {
                 await documentCheckingOutService.checkoutDocument(lastDocument);

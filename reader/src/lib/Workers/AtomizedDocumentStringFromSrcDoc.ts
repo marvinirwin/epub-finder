@@ -15,9 +15,7 @@ ctx.onmessage = (ev) => {
     const srcdoc = ev.data as string;
     const doc = AtomizedDocument.atomizeDocument(srcdoc);
     ctx.postMessage(
-        [
             doc.toString(),
-        ]
     );
 };
 

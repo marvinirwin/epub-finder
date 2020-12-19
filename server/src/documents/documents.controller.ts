@@ -1,12 +1,22 @@
-import {Body, Controller, Get, Headers, Put, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Headers,
+    Param,
+    Put,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors
+} from "@nestjs/common";
 import {DocumentsService} from "./documents.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
-import {DocumentToBeSavedDto} from "./document-to-be-saved.dto";
-import {AnyFilesInterceptor} from "@nestjs/platform-express";
+import { FileInterceptor} from "@nestjs/platform-express";
 import {UploadedFileService} from "./uploaded-file.service";
-import {join, normalize} from "path";
+import {UploadedDocument} from "./uploaded-document";
 
 @Controller('documents')
 export class DocumentsController {
@@ -21,7 +31,7 @@ export class DocumentsController {
     async available(
         @UserFromReq() user: User | undefined
     ) {
-        return this.documentsService.queryAvailableDocuments(user)
+        return this.documentsService.all(user)
             .then(availableDocuments => availableDocuments.map(documentView => ({
                 name: documentView.name,
                 id: documentView.id,
@@ -34,43 +44,62 @@ export class DocumentsController {
     async all(
         @UserFromReq() user: User | undefined
     ) {
-        return this.documentsService.queryAvailableDocuments(user)
+        return this.documentsService.all(user)
     }
 
     @Put('')
     @UseGuards(LoggedInGuard)
-    async put(
-        @UserFromReq() user: User,
-        @Body() documentToBeSavedDto: DocumentToBeSavedDto
-    ) {
-        return this.documentsService.saveDocumentForUser(user, documentToBeSavedDto)
-    }
-
-    @Put('upload')
-    @UseGuards(LoggedInGuard)
-    @UseInterceptors(
-        AnyFilesInterceptor({
+    @UseInterceptors( /*AnyFilesInterceptor({
             dest: process.env.UPLOADED_FILE_DIRECTORY,
             limits: {
                 files: 1,
-                fields: 0,
+                fields: 1,
                 fileSize: 1024 * 1024 * 10 // 10MB file size
             }
-        })
+        })*/
+        FileInterceptor(
+            'file',
+            {
+                dest: process.env.UPLOADED_FILE_DIRECTORY,
+                limits: {
+                    files: 1,
+                    fields: 1,
+                    fileSize: 1024 * 1024 * 10 // 10MB file size
+                }
+            }
+        )
     )
     async upload(
-        @UploadedFile() file,
+        @UploadedFile() file: {originalname: string, path: string},
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string,
         @Headers('name') name: string,
     ) {
-        const htmlPath = normalize(join(file.destination, file.filename));
-        return await this.documentsService.saveDocumentForUser(
-            user,
-            {
-                document_id,
+        const f = new UploadedDocument(file.path, file.originalname);
+        if (document_id) {
+            return this.documentsService.saveRevision(
+                user,
                 name,
-            }
-        );
+                f.htmlFilePath(),
+                document_id
+            )
+        }
+        return this.documentsService.saveNew(
+            user,
+            name,
+            f.htmlFilePath(),
+        )
+    }
+
+    @Delete(':id')
+    @UseGuards(LoggedInGuard)
+    async delete(
+        @UserFromReq() user: User,
+        @Param('id') id: string
+    ) {
+        return this.documentsService.delete(
+            user,
+            id
+        )
     }
 }

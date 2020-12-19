@@ -32,7 +32,7 @@ export class BuiltInDocumentsService implements OnModuleInit {
             const {filename, html} = documents[i];
             const htmlHash = sha1(html);
             const name = startCase(filename);
-            const sameVersion = await this.documentRepository.findOne({html_hash: htmlHash, name})
+            const sameVersion = await this.documentRepository.findOne({hash: htmlHash, name})
             const baseEntity = {
                 name,
                 html_hash: htmlHash,

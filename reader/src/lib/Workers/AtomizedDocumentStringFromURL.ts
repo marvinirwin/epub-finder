@@ -14,11 +14,9 @@ ctx.onmessage = async (ev) => {
         const response = await fetch(url);
         const srcdoc = new TextDecoder().decode(await response.arrayBuffer());
         const doc = AtomizedDocument.atomizeDocument(srcdoc);
-        ctx.postMessage([doc.toString()]);
+        ctx.postMessage(doc.toString());
     } catch (e) {
-        ctx.postMessage([
-            JSON.stringify({type: "error", messge: `Could not find ${ev.data}`})
-        ]);
+        ctx.postMessage(JSON.stringify({type: "error", messge: `Could not find ${ev.data}`}));
     }
 };
 
