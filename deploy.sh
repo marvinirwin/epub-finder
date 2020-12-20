@@ -24,7 +24,7 @@ SSH_HOST="$marvinirwin";
 while getopts 'cs' o; do
     case "${o}" in
         s)
-            BUILD_CLIENT="${OPTARG:-1}"
+            BUILD_SERVER="${OPTARG:-1}"
             ;;
         c)
             BUILD_CLIENT="${OPTARG:-1}"
@@ -60,10 +60,11 @@ echo "rsyncing server package.json"
 rsync -v -a server/package.json "$DEST/package.json"
 
 echo "rsyncing test documents"
-rsync -v -a server/test_documents "$DEST/test_documents"
+rsync -v -a server/test_documents "$DEST"
 
 # popd || exit;
 [ ! -n "$BUILD_SERVER" ] && exit;
+exit;
 ssh -t "$SSH_USER@$SSH_HOST" "
 if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
   tmux attach -t \"language-trainer\";

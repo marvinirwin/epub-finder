@@ -6,6 +6,7 @@ import {DocumentsController} from "./documents.controller";
 import {DocumentsService} from "./documents.service";
 import {User} from "../entities/user.entity";
 import {UploadedFileService} from "./uploaded-file.service";
+import {BuiltInDocumentsService} from "./built-in-documents.service";
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import {UploadedFileService} from "./uploaded-file.service";
     ],
     providers: [
         DocumentsService,
-        UploadedFileService
+        UploadedFileService,
+        BuiltInDocumentsService
     ]
 })
 export class DocumentsModule {}

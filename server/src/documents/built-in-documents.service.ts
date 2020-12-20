@@ -5,7 +5,7 @@ import {Repository} from "typeorm";
 import {Document} from "../entities/document.entity";
 import {User} from "../entities/user.entity";
 import fs from "fs-extra";
-import {join} from "path";
+import {join, parse} from "path";
 import {sha1} from "../util/sha1";
 import {startCase} from "lodash";
 
@@ -31,7 +31,7 @@ export class BuiltInDocumentsService implements OnModuleInit {
         for (let i = 0; i < documents.length; i++) {
             const {filename, html} = documents[i];
             const htmlHash = sha1(html);
-            const name = startCase(filename);
+            const name = startCase(parse(filename).name);
             const sameVersion = await this.documentRepository.findOne({hash: htmlHash, name})
             const baseEntity = {
                 name,

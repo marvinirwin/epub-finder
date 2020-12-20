@@ -29,7 +29,10 @@ export class UploadedFileService {
     }
 
     private static handleDocx(uploadedDocument: UploadedDocument) {
-        return mammoth.convertToHtml({path: uploadedDocument.uploadedFilePath, convertImage: false})
+        return mammoth.convertToHtml({
+            path: uploadedDocument.uploadedFilePath,
+            convertImage: false
+        })
             .then(async (o) => {
                 const html = InterpolateService.html("", o.value);
                 await fs.writeFile(uploadedDocument.htmlFilePath(), html);
@@ -55,16 +58,18 @@ export class UploadedFileService {
     }
 
     private static async convertPdfToHtml(uploadedFile: UploadedDocument, progress$: Subject<string>) {
+        const filePathInDocker = join('/pdf', basename(uploadedFile.uploadedFilePath));
+        const volume = `${join(process.cwd(), dirname(uploadedFile.uploadedFilePath))}:/pdf`;
         const converter = pdftohtml(
-            uploadedFile.uploadedFilePath,
-            uploadedFile.htmlFilePath(),
+            basename(uploadedFile.uploadedFilePath),
+            basename(uploadedFile.htmlFilePath()),
             {
                 bin: 'docker',
                 additional: [
                     'run',
                     '--rm',
                     '-v',
-                    (`${join(process.cwd(), 'pdf')}:/pdf`),
+                    volume,
                     'iapain/pdf2htmlex',
                     'pdf2htmlEX',
                     '--process-nontext',
@@ -72,7 +77,7 @@ export class UploadedFileService {
                     '--process-outline',
                     '0',
                     '--optimize-text',
-                    '1'
+                    '1',
                 ]
             }
         )
