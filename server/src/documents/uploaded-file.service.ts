@@ -49,8 +49,8 @@ export class UploadedFileService {
             ),
             new Subject<string>());
         UploadedFileService.handleDocx(new UploadedDocument(
-            `docx/${process.env.TEST_DOCX_TO_HTML_FILE}`,
-            `docx/${process.env.TEST_DOCX_TO_HTML_FILE}`
+            process.env.TEST_DOCX_TO_HTML_FILE,
+            process.env.TEST_DOCX_TO_HTML_FILE
         ))
     }
 

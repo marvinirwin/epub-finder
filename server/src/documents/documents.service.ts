@@ -46,7 +46,7 @@ export class DocumentsService {
         })
     }
 
-    public async saveNew(user: User, name: string, filePath: string) {
+    public async saveNew(user: User, name: string, filePath: string)
         return await this.documentRepository.save({
             name,
             filename: basename(filePath),

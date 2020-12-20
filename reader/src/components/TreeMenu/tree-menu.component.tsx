@@ -6,10 +6,6 @@ import {
     ListItemIcon,
     ListItemSecondaryAction,
     ListItemText,
-    Theme,
-    Typography,
-    withStyles,
-    withTheme
 } from "@material-ui/core";
 import React, {Fragment} from "react";
 import {ArrowBack, KeyboardArrowRight} from "@material-ui/icons";

@@ -3,8 +3,6 @@ import {HighlightDelta} from "./highlight.interface";
 import {HighlighterPath, HighlighterService} from "./highlighter.service";
 import {Observable} from "rxjs";
 
-const highlightPath: HighlighterPath = [2, 'DIFFICULTY_HIGHLIGHT'];
-
 export class HighlightDifficultyService<T> {
     constructor(
         {

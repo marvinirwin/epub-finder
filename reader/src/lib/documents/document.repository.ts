@@ -44,7 +44,7 @@ export class DocumentRepository {
             `${process.env.PUBLIC_URL}/documents/`,
             formData,
             {
-                headers: headers
+                headers
             }
         ).then(response => {
             return response?.data;
