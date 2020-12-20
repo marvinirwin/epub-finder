@@ -21,9 +21,7 @@ npm_version() {
 SSH_USER=root;
 SSH_HOST="$marvinirwin";
 
-OPTIND o BUILD_CLIENT BUILD_SERVER;
-
-while getopts ":cs:" o; do
+while getopts 'cs' o; do
     case "${o}" in
         s)
             BUILD_CLIENT="${OPTARG:-1}"
@@ -61,8 +59,11 @@ rsync -v -a --exclude video --exclude books reader/build/*  "$DEST/public"
 echo "rsyncing server package.json"
 rsync -v -a server/package.json "$DEST/package.json"
 
+echo "rsyncing test documents"
+rsync -v -a server/test_documents "$DEST/test_documents"
+
 # popd || exit;
-[ ! -n "$BUILD_SERVER" ] && return;
+[ ! -n "$BUILD_SERVER" ] && exit;
 ssh -t "$SSH_USER@$SSH_HOST" "
 if [ \"\$(tmux ls | grep -q language-trainer)\" ]; then
   tmux attach -t \"language-trainer\";
