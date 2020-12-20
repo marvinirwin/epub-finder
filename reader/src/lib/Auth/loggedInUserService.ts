@@ -29,10 +29,15 @@ export class LoggedInUserService {
             try {
                 const user = await LoggedInUserService.fetchLoggedInProfile();
                 // If there's no user then an error will have been shown to the user
-                user && this.profile$.next(user);
+                this.profile$.next(user);
             } catch (e) {
                 console.warn(e);
             }
         })();
+    }
+
+    public async signOut() {
+        await axios.get(`${process.env.PUBLIC_URL}/auth/logout`)
+        this.profile$.next(undefined);
     }
 }

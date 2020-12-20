@@ -79,6 +79,10 @@ export class SettingsService {
     get completedSteps$(): ReplaySubject<string[]> {
         return this.resolveReplaySubject$<string[]>('introStepsCompleted', [])
     }
+
+    get showTranslations$(): ReplaySubject<boolean> {
+        return this.resolveReplaySubject$<boolean>('showTranslations', true);
+    }
 }
 export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
     return r.pipe(take(1)).toPromise();

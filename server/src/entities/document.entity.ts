@@ -26,8 +26,8 @@ export class Document {
     @Column({default: null})
     filename: string | null;
 
-    @Column('text')
-    hash: string;
+    @Column('text', {default: null})
+    hash: string | null;
 
     @Column({default: null})
     creator_id: number | null;
@@ -35,8 +35,8 @@ export class Document {
     @Column()
     global: boolean;
 
-    @Column({default: null})
-    deleted: boolean | null = false;
+    @Column({default: false})
+    deleted: boolean = false;
 
     @CreateDateColumn()
     created_at: Date;

@@ -7,7 +7,7 @@ import School from '@material-ui/icons/School';
 import {ManagerContext} from "../../App";
 import DeleteIcon from "@material-ui/icons/Delete";
 
-export const toTreeMenuNode = ({belongsToCurrentUser ,name, reading, document_id, id}: DocumentSelectionRowInterface): TreeMenuNode => ({
+export const toTreeMenuNode = ({belongsToCurrentUser ,name, reading,  document_id}: DocumentSelectionRowInterface): TreeMenuNode => ({
     name,
     ReplaceComponent: () => {
         const m = useContext(ManagerContext);
@@ -21,7 +21,9 @@ export const toTreeMenuNode = ({belongsToCurrentUser ,name, reading, document_id
     */}
                 {!reading &&
                 <IconButton onClick={() => m.settingsService.readingDocument$.next(name)}><School/></IconButton>}
-                {belongsToCurrentUser && <IconButton onClick={() => m.library.deleteDocument(id, document_id || id)}><DeleteIcon/></IconButton>}
+                {belongsToCurrentUser && <IconButton onClick={() => m.library.deleteDocument(
+                    document_id,
+                )}><DeleteIcon/></IconButton>}
                 {/*
                     {!open && <IconButton onClick={() => {
                     }}><LibraryAdd/></IconButton>}

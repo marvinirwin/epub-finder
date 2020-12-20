@@ -2,40 +2,19 @@ import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/Manager";
 import {combineLatest, Observable} from "rxjs";
-import {distinctUntilChanged, map, startWith, tap} from "rxjs/operators";
-import {useObservableState} from "observable-hooks";
+import {distinctUntilChanged, map, startWith} from "rxjs/operators";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
-import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {ReadingNode} from "./nodes/reading.component";
 import {WatchMode} from "./modes/watch-mode.component";
 import {SpeakMode} from "./modes/speak-mode.component";
 import {TreeMenuNode} from "./tree-menu-node.interface";
-import {IconButton} from "@material-ui/core";
-import GoogleIcon from "../Icons/GoogleIcon";
-import TwitterIcon from "../Icons/TwitterIcon";
 import {FileChooser} from "./file-chooser.component";
 import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
+import GoogleButton from "react-google-button";
+import {ToggleTranslate} from "./toggle-translate";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
-
-
-export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
-    const allSentences = useObservableState(m.videoMetadataService.allSentenceMetadata$, []);
-
-    return <div className={'all-sentences'}>
-        {allSentences.map(sentenceMetadata => <Sentence key={sentenceMetadata.sentence}
-                                                        sentenceMetadata$={sentenceMetadata.metadata$}
-                                                        sentence={sentenceMetadata.sentence}/>)}
-    </div>
-}
-
-export const Sentence: React.FC<{ sentenceMetadata$: Observable<VideoMetadata>, sentence: string }> = ({sentence, sentenceMetadata$}) => {
-    const metadata = useObservableState(sentenceMetadata$);
-    return <div style={{backgroundColor: metadata ? 'white' : 'pink'}}>
-        {sentence}
-    </div>
-}
 
 
 export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode>> => {
@@ -58,7 +37,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
         map(([
                  profile,
                  availableDocuments,
-            selectedComponent
+                 selectedComponent
              ]) => {
             return arrayToTreeRoot<TreeMenuNode>(
                 ReadingNode(m),
@@ -77,18 +56,20 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
-/*
+                    /*
+                                        {
+                                            name: 'library',
+                                            label: 'Library',
+                                            moveDirectory: true,
+                                        },
+                    */
                     {
-                        name: 'library',
-                        label: 'Library',
-                        moveDirectory: true,
-                    },
-*/
-                    {
-                        name: 'signInWith',
-                        label: 'Sign In With',
-                        moveDirectory: true,
-                        hidden: !!profile?.email
+                        name: 'signOut',
+                        label: 'Sign Out',
+                        action: () => m.authManager.signOut(),
+                        LeftIcon: () => {
+                        },
+                        hidden: !profile?.email
                     },
                     {
                         name: 'customDocument',
@@ -96,36 +77,51 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                     },
                     // @ts-ignore
                     ...availableDocuments.map(toTreeMenuNode),
-/*
+                    /*
+                                        {
+                                            name: 'requestRecording',
+                                            Component: () => <RequestRecordingSentences/>,
+                                            label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
+                                            hidden: !profile?.email
+                                        },
+                    */
                     {
-                        name: 'requestRecording',
-                        Component: () => <RequestRecordingSentences/>,
-                        label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
-                        hidden: !profile?.email
+                        name: 'signInWith',
+                        label: 'Sign In With',
+                        moveDirectory: true,
+                        hidden: !!profile?.email
                     },
-*/
                     [
                         {
                             name: 'google',
-                            ReplaceComponent: () => <IconButton
-                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/google`}>
+                            ReplaceComponent: () => <GoogleButton
+                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/google`}
+                            /> /*<IconButton
+                                onClick={() => }>
                                 <GoogleIcon/>
-                            </IconButton>
+                            </IconButton>*/
                         },
-                        {
-                            name: 'twitter',
-                            ReplaceComponent: () => <IconButton
-                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/twitter`}>
-                                <TwitterIcon/>
-                            </IconButton>,
-                            hidden: true,
-                        }
+                        /*
+                                                {
+                                                    name: 'twitter',
+                                                    ReplaceComponent: () => <IconButton
+                                                        onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/twitter`}>
+                                                        <TwitterIcon/>
+                                                    </IconButton>,
+                                                    hidden: true,
+                                                }
+                        */
                     ],
                     {
                         name: 'profile',
                         label: profile?.email,
                         hidden: !!profile
                     },
+                    {
+                        name: 'translate',
+                        ReplaceComponent: () => <ToggleTranslate/>
+                    },
+
                 ] as ArrayToTreeParams<TreeMenuNode>
             );
             /*

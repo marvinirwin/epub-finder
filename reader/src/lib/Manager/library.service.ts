@@ -33,8 +33,8 @@ export class LibraryService {
         await this.fetchDocuments();
     }
 
-    public async deleteDocument(instanceId: string, document_id: string): Promise<void> {
-        await this.documentRepository.delete(document_id);
+    public async deleteDocument(instanceId: string): Promise<void> {
+        await this.documentRepository.delete(instanceId);
         await this.fetchDocuments();
     }
 }

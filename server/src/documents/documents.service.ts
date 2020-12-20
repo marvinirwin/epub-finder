@@ -25,8 +25,8 @@ export class DocumentsService {
         return await this.documentViewRepository
             .find({
                     where: [
-                        {creator_id: user?.id},
-                        {global: true}
+                        {creator_id: user?.id, deleted: false},
+                        {global: true, deleted: false},
                     ]
                 }
             )
@@ -66,33 +66,41 @@ export class DocumentsService {
     }
 
     /**
-     * Returns an existing document by document_id belonging to a user
+     * Returns an existing document by document_id/id belonging to a user
      * Or throws an error if it cannot find it
      * @param user
      * @param documentIdToDelete
      * @private
      */
     private async existing(user: User, documentIdToDelete: string) {
-        const existingDocument = await this.byId(user, documentIdToDelete);
+        const existingDocument = await this.byDocumentId(user, documentIdToDelete);
         if (!existingDocument) {
             throw CannotFindDocumentForUser(documentIdToDelete, user)
         }
         return existingDocument;
     }
 
-    private async byId(user: User, documentId: string) {
+    private async byDocumentId(user: User, documentId: string) {
         return await this.documentViewRepository.findOne({
-            creator_id: user.id,
-            document_id: documentId
+            where: [
+                {
+                    creator_id: user.id,
+                    document_id: documentId
+                },
+                {
+                    creator_id: user.id,
+                    id: documentId
+                }
+            ]
         });
     }
 
     private async belongsToUser(user, document_id) {
-        return !!await this.byId(user, document_id);
+        return !!await this.byDocumentId(user, document_id);
     }
 
     public async byFilename(filename: string, user?: User) {
-        const whereConditions: {global?: boolean, filename: string, creator_id?: number}[] = [
+        const whereConditions: { global?: boolean, filename: string, creator_id?: number }[] = [
             {
                 global: true,
                 filename
@@ -110,7 +118,6 @@ export class DocumentsService {
             where: whereConditions
         });
     }
-
 
 
 }

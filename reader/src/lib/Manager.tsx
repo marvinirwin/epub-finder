@@ -65,7 +65,6 @@ import {CardCreationService} from "./card/card-creation.service";
 import {IntroService} from "../lib/intro/intro.service";
 import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
-import {ThirdPartyLoginService} from "../services/third-party-login.service";
 import {LoggedInUserService} from "./Auth/loggedInUserService";
 import {DocumentCheckingOutService} from "../components/Library/document-checking-out.service";
 import {DocumentRepository} from "./documents/document.repository";
@@ -168,7 +167,8 @@ export class Manager {
             hotkeys$: this.hotkeysService.mapHotkeysWithDefault(
                 HotKeyEvents.defaultHotkeys(),
                 this.hotkeyEvents.hotkeyActions()
-            )
+            ),
+            settings$: this.settingsService
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
 

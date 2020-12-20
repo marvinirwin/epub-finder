@@ -8,6 +8,5 @@ export interface DocumentSelectionRowInterface {
     belongsToCurrentUser?: boolean;
     lastModified: Date;
 
-    document_id: string | null;
-    id: string;
+    document_id: string;
 }

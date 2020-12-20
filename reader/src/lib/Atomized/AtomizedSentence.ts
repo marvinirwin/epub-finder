@@ -158,4 +158,11 @@ export class AtomizedSentence {
         this.element.parentNode.removeChild(this.element);
         this.popperElement.parentNode.removeChild(this.popperElement);
     }
+
+    public showPopper() {
+        this.getPopperHTMLElement().setAttribute('data-show', '');
+    }
+    public hidePopper() {
+        this.getPopperHTMLElement().removeAttribute('data-show');
+    }
 }

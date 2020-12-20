@@ -6,6 +6,7 @@ import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {HotkeyModes} from "./HotkeyModes";
 import {Hotkeys} from "./hotkeys.interface";
+import {SettingsService} from "../../services/settings.service";
 
 
 export function isDocument(t: HTMLElement | Document): t is Document {
@@ -51,9 +52,22 @@ export class BrowserInputs {
     videoCharacterIndex$ = new ReplaySubject<number | undefined>(1);
     focusedElement$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
-    constructor({hotkeys$}: {
+    showTranslations: boolean = false;
+    latestTranslationTarget: AtomizedSentence | undefined;
+
+
+    constructor({hotkeys$, settings$}: {
         hotkeys$: Observable<Map<string[], Subject<void>>>,
+        settings$: SettingsService
     }) {
+        settings$.showTranslations$.subscribe(showTranslations => {
+            this.showTranslations = showTranslations;
+            if (showTranslations) {
+                this.latestTranslationTarget?.showPopper();
+            } else {
+                this.latestTranslationTarget?.hidePopper();
+            }
+        });
         combineLatest([
                 hotkeys$,
                 this.keysPressed$
@@ -132,10 +146,15 @@ export class BrowserInputs {
             }
 
             const show = () => {
-                popperHTMLElement.setAttribute('data-show', '');
+                this.latestTranslationTarget = atomizedSentence;
+                if (this.showTranslations) {
+                    atomizedSentence.showPopper();
+                }
             }
             const hide = () => {
-                popperHTMLElement.removeAttribute('data-show');
+                this.latestTranslationTarget = undefined;
+
+                atomizedSentence.hidePopper();
             }
 
             showEvents.forEach(event => {

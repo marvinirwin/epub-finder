@@ -41,7 +41,7 @@ export class IntroService {
                 [
                     {
                         element: titleRef as HTMLElement,
-                        intro: `Welcome to Mandarin Trainer!`
+                        intro: `Welcome to Language Trainer!`
                     },
                     {
                         element: readingFrameRef as HTMLElement,

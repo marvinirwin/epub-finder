@@ -20,11 +20,12 @@ export class DocumentSelectionService {
             map(([available, checkedOutDocumentNames, readingDocumentName]) => {
                 const all: DocumentSelectionRowInterface[] = [
                     ...available
-                        .map(({name, belongsToUser, uploadDate}) => ({
+                        .map(({name, belongsToUser, uploadDate, document_id, id}) => ({
                             name,
                             belongsToCurrentUser: !!belongsToUser,
                             lastModified: uploadDate,
-                            reading: readingDocumentName === name
+                            reading: readingDocumentName === name,
+                            document_id: document_id || id
                         } as DocumentSelectionRowInterface)),
                 ];
                 // Get the latest version for each name

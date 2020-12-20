@@ -94,10 +94,7 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Param('id') id: string
     ) {
-        return this.documentsService.delete(
-            user,
-            id
-        )
+        return this.documentsService.delete( user, id)
     }
 
     @Get(':filename')
