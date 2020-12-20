@@ -1,10 +1,10 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
-import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {getDocumentWordData, OpenDocument} from "../DocumentFrame/OpenDocument";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
-import {DeltaScan, DeltaScanner, ds_Dict, flattenTree,  NamedDeltaScanner} from "../Tree/DeltaScanner";
+import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {DocumentWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
@@ -85,8 +85,7 @@ export class OpenDocumentsService {
                         ];
                     }
                 )
-            })
-        ).pipe(
+            }),
             shareReplay(1)
         );
 
@@ -114,7 +113,6 @@ export class OpenDocumentsService {
             )
         )
 
-        this.applyListenersToOpenedDocumentBodies();
 
         this.renderedAtomizedSentences$ = this.openDocumentTree
             .mapWith((documentFrame: OpenDocument) => documentFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
@@ -143,7 +141,7 @@ export class OpenDocumentsService {
                             ));
                         }
                     ),
-                    shareReplay(1)
+                    shareReplay(1),
                 );
             };
         }
@@ -151,7 +149,8 @@ export class OpenDocumentsService {
         this.checkedOutDocumentsData$ = this.allOpenDocuments$.pipe(
             switchMap(openDocuments =>
                 combineLatest(mapToArray(openDocuments, (id, document) => document.documentStats$))
-            )
+            ),
+            shareReplay(1)
         )
 
         this.renderedSentenceTextDataTree$ = this
@@ -161,19 +160,24 @@ export class OpenDocumentsService {
 
         this.renderedElements$ = this.renderedSentenceTextDataTree$.updates$
             .pipe(
-                switchMap(({delta}) => merge(...flattenTree(delta))),
-                map(documentWordDatas => Array.from(
-                    new Set(
-                        flatten(
-                            documentWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
-                        )
-                    ))
+                switchMap(({sourced}) => {
+                    return merge(...flattenTree(sourced));
+                }),
+                map(documentWordDatas => {
+                        return Array.from(
+                            new Set(
+                                flatten(
+                                    documentWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
+                                )
+                            ));
+                    }
                 ),
-/*
-                map((annotatedCharacters: IAnnotatedCharacter[]) =>
-                    annotatedCharacters.map(({element}) => element as unknown as HTMLElement)
-                )
-*/
+                shareReplay(1)
+                /*
+                                map((annotatedCharacters: IAnnotatedCharacter[]) =>
+                                    annotatedCharacters.map(({element}) => element as unknown as HTMLElement)
+                                )
+                */
             )
 
 
@@ -237,7 +241,8 @@ export class OpenDocumentsService {
             visibleOpenDocument,
             map((atomizedSentenceDictionaries: ds_Dict<AtomizedSentence[]>[]) => {
                 return mergeDictArrays(...atomizedSentenceDictionaries);
-            })
+            }),
+            shareReplay(1)
         )
 
 
@@ -266,15 +271,6 @@ export class OpenDocumentsService {
                 switchMap(({delta}) => merge(...flattenTree(delta))),
                 shareReplay(1)
             )
-        /*
-                    .subscribe(({delta}) => {
-                    .
-                        forEach(newOpenedDocument => newOpenedDocument.renderRoot$.subscribe(root => this.config.applyListeners(root.ownerDocument as HTMLDocument)))
-                    })
-        */
-
     }
 
-    private applyListenersToOpenedDocumentBodies() {
-    }
 }

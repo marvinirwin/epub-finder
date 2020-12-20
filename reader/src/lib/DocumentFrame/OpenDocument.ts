@@ -54,6 +54,7 @@ export class OpenDocument {
         public trie: Observable<TrieWrapper>,
         atomizedDocuments$: Observable<AtomizedDocument> | undefined,
     ) {
+        this.renderedSentences$.next({});
         this.id = name;
         this.atomizedDocumentString$ = merge(
             this.unAtomizedSrcDoc$.pipe(

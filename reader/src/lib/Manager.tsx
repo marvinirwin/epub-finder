@@ -184,10 +184,12 @@ export class Manager {
             libraryService: this.library
         });
         this.openedDocuments.renderedElements$
-            .subscribe(renderedCharacters => renderedCharacters
-                .map(renderedCharacter =>
-                    this.applyWordElementListener(renderedCharacter)
-                )
+            .subscribe(renderedCharacters => {
+                    renderedCharacters
+                        .map(renderedCharacter =>
+                            this.applyWordElementListener(renderedCharacter)
+                        );
+                }
             )
         this.openedDocuments.newOpenDocumentDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({

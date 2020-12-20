@@ -9,7 +9,7 @@ export const ToggleTranslate = () => {
     return <ListItem>
         <FormControlLabel
             control={
-                <Switch checked={showTranslations}
+                <Switch checked={!!showTranslations}
                         onChange={() => m.settingsService.showTranslations$.next(!showTranslations)}
                 />}
             label="Show Translations"/>

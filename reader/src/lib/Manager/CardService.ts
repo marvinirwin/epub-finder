@@ -42,6 +42,7 @@ export default class CardService {
         this.cardProcessingSignal$.next(true);
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
+        
         this.putWords$.subscribe(words => {
             this.addUnpersistedCards$.next(
                 words.map(cardForWord)

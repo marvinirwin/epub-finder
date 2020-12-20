@@ -259,6 +259,12 @@ $led-off: #c6c6c6;
 
   & > .selectable-menu-list {
     flex-basis: 240px;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-y: auto;
+    & > * {
+      flex-grow: 1;
+    }
   }
 
   & > .all-items-container {
