@@ -2,13 +2,13 @@ import {Column, CreateDateColumn, Entity, Generated, PrimaryColumn, PrimaryGener
 
 @Entity({name: 'video_metadata'})
 export class VideoMetadata {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     // Used in groupwise max
     @Column()
     @Generated("uuid")
-    video_metadata_id: number;
+    video_metadata_id: string;
 
     @Column("text")
     sentence: string;

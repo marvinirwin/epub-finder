@@ -66,7 +66,7 @@ export class OpenDocument {
         ).pipe(shareReplay(1));
 
         this.atomizedDocument$ = atomizedDocuments$ || this.atomizedDocumentString$.pipe(
-            map(AtomizedDocument.fromAtomizedString),
+            map(v => {return AtomizedDocument.fromAtomizedString(v)}),
             shareReplay(1)
         );
 

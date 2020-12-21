@@ -27,7 +27,7 @@ export const arrayToTreeChildren = <T extends Named>(...array: ArrayToTreeParams
     if (!root) {
         return {}
     }
-    const entries: [[string, ds_Tree<T>]] = [[root.name, {nodeLabel: root.name, value: root}]]
+    const entries: [[string, ds_Tree<T>]] = [[root.name, {nodeLabel: root.name, value: root, newTree: true}]];
     for (let i = 0; i < nextItems.length; i++) {
         const nextItem = nextItems[i];
         if (Array.isArray(nextItem)) {
@@ -35,7 +35,11 @@ export const arrayToTreeChildren = <T extends Named>(...array: ArrayToTreeParams
             const [, currentRoot ] =  entries[entries.length - 1];
             currentRoot.children = arrayToTreeChildren(...nextItem);
         } else {
-            entries.push([nextItem.name, {nodeLabel: nextItem.name, value: nextItem}]);
+            entries.push(
+                [
+                nextItem.name, {nodeLabel: nextItem.name, value: nextItem, newTree: true}
+                ]
+            );
         }
     }
     return Object.fromEntries(entries);

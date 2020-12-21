@@ -2,9 +2,9 @@ import {combineLatest, ReplaySubject} from "rxjs";
 import {DroppedFilesService} from "./dropped-files.service";
 import {DocumentCheckingOutService} from "../../components/Library/document-checking-out.service";
 import {LoggedInUserService} from "../Auth/loggedInUserService";
-import {DocumentViewDto} from "@server/*";
 import {last, map, startWith} from "rxjs/operators";
 import {LibraryService} from "../Manager/library.service";
+import {AvailableDocumentsService} from "../documents/available-documents.service";
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
 
@@ -15,18 +15,20 @@ const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
  * Then there's another service which loads them later
  */
 export class UploadingDocumentsService {
-    uploadingErrors$ = new ReplaySubject<string>()
+    uploadingErrors$ = new ReplaySubject<string>(1)
+    uploadingMessages$ = new ReplaySubject<string>(1)
 
     constructor({
                     loggedInUserService,
-                    documentCheckingOutService,
                     droppedFilesService,
                     libraryService,
+        availableDocumentService,
                 }: {
         loggedInUserService: LoggedInUserService,
         documentCheckingOutService: DocumentCheckingOutService,
         droppedFilesService: DroppedFilesService,
         libraryService: LibraryService,
+        availableDocumentService: AvailableDocumentsService,
     }) {
         // There will also have to be a document synchronization service
         combineLatest([
@@ -45,10 +47,12 @@ export class UploadingDocumentsService {
             for (let i = 0; i < customDocuments.length; i++) {
                 const basicDocument = customDocuments[i];
                 lastDocument = basicDocument.name;
+                this.uploadingMessages$.next(`Uploading ${basicDocument.name}...`)
                 await libraryService.upsertDocument(basicDocument);
+                this.uploadingMessages$.next(`Uploading ${basicDocument.name} success!`)
             }
             if (lastDocument) {
-                await documentCheckingOutService.checkoutDocument(lastDocument);
+                await availableDocumentService.fetchAll()
             }
         })
     }

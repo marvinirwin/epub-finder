@@ -9,4 +9,6 @@ export interface DocumentSelectionRowInterface {
     lastModified: Date;
 
     document_id: string;
+    
+    id: string;
 }

@@ -27,7 +27,8 @@ export class AtomizedDocument {
     }
 
     public static atomizeDocument(xmlsource: string): AtomizedDocument {
-        const doc = new AtomizedDocument(AtomizedDocument.getDomParser().parseFromString(xmlsource, 'text/html'));
+        const doc = new AtomizedDocument(AtomizedDocument.getDomParser()
+            .parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
         doc.replaceDocumentSources(doc.document);
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
@@ -85,10 +86,8 @@ export class AtomizedDocument {
         return new DOMParser({
             errorHandler: {
                 warning: w => {
-                    console.warn(w)
                 },
                 error: w => {
-                    throw w;
                 },
                 fatalError: w => {
                     throw w;

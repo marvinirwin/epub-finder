@@ -7,7 +7,7 @@ import {User} from "../entities/user.entity";
 export class LoggingInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest<Request & {user?: User}>();
-        console.log(`${request.url} ${request?.user?.email}`)
+        console.log(`${request.method} ${request.url} ${request?.user?.email}`)
         return next
             .handle()
             .pipe(

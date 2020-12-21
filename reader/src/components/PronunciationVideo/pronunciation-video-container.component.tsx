@@ -53,6 +53,12 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     const [startDragTimeout, setStartDragTimeout] = useState<number | null>()
     const [mouseDownTime, setMouseDownTime] = useState<Date | null>();
 
+
+    useSubscription(
+        m.inputManager.getKeyDownSubject('Escape'),
+        () => m.pronunciationVideoService.videoMetadata$.next(undefined)
+    )
+
     const startDrag = (
         highlightBarMsP1: number,
         setHighlightBarMsP1: (n: number) => void,
@@ -71,7 +77,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
             currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
 
         {/* @ts-ignore */}
-        <div className={`pronunciation-sections-container`}  ref={pronunciationSectionsContainer}>
+        <div className={`pronunciation-sections-container`} ref={pronunciationSectionsContainer}>
             {
                 (chunkedCharacterTimings && videoMetadata && sectionLengthMs)
                 && chunkedCharacterTimings.map((chunkedCharacterTiming, lineIndex) => {
@@ -130,6 +136,9 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                                     setReplayDragInProgress
                                 )
                             }, DRAG_TIMEOUT))
+                        }}
+                        onMouseUp={fraction => {
+                            setReplayDragInProgress(false)
                         }}
                     />;
                 })

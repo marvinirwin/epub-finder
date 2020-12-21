@@ -2,7 +2,7 @@ import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {TrieObservable} from "./QuizCharacter";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {map, shareReplay, startWith, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {shareReplay, switchMap} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
@@ -63,7 +63,9 @@ export class ReadingDocumentService {
                      ]) => {
             const foundDocument = findMap(checkedOutDocuments, (id, document) => document.name === selectedDocument)
             if ((!selectedDocument || !foundDocument) && checkedOutDocuments.size) {
-                this.displayDocument$.next(firstMap(checkedOutDocuments).atomizedDocument$)
+                const defaultReading = firstMap(checkedOutDocuments);
+                settingsService.readingDocument$.next(defaultReading.name);
+                this.displayDocument$.next(defaultReading.atomizedDocument$);
             }
             if (foundDocument) {
                 this.displayDocument$.next(foundDocument.atomizedDocument$);

@@ -58,9 +58,12 @@ export class DocumentsService {
 
     public async delete(user: User, documentId: string) {
         const existing = await this.existing(user, documentId);
+        const deletingId = existing.rootId()
         delete existing.id;
+        delete existing.created_at;
         return await this.documentRepository.save({
             ...existing,
+            document_id: deletingId,
             deleted: true
         })
     }
@@ -116,6 +119,12 @@ export class DocumentsService {
         }
         return await this.documentViewRepository.findOne({
             where: whereConditions
+        });
+    }
+    public async byName(name: string, user: User) {
+        return await this.documentViewRepository.findOne({
+            name,
+            creator_id: user.id
         });
     }
 

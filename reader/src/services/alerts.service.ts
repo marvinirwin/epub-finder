@@ -38,4 +38,8 @@ export class AlertsService {
         this.alertMessagesVisible$.next(true);
         this.alertMessages$.next(messages.concat({msg, severity: color}).slice(sliceStart, sliceStart + MAX_MESSAGES));
     }
+
+    info(msg: string) {
+        this.newAlerts$.next({msg, severity: "info"})
+    }
 }

@@ -2,6 +2,7 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {WorkerError} from "./WorkerHelpers";
 
 // @ts-ignore
 self.window = self;
@@ -16,7 +17,7 @@ ctx.onmessage = async (ev) => {
         const doc = AtomizedDocument.atomizeDocument(srcdoc);
         ctx.postMessage(doc.toString());
     } catch (e) {
-        ctx.postMessage(JSON.stringify({type: "error", messge: `Could not find ${ev.data}`}));
+        ctx.postMessage({type: "error", message: `Could not find ${e.toString()}`} as WorkerError);
     }
 };
 

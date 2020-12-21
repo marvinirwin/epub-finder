@@ -160,6 +160,7 @@ export class Manager {
     readingDocumentService: ReadingDocumentService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
+        this.availableDocumentsService = new AvailableDocumentsService()
         this.settingsService = new SettingsService({db})
         this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
@@ -173,7 +174,12 @@ export class Manager {
         this.documentRepository = new DocumentRepository({databaseService: this.db});
 
         this.cardManager = new CardService(this.db);
-        this.library = new LibraryService({db, documentRepository: this.documentRepository});
+        this.library = new LibraryService({
+            db,
+            settingsService: this.settingsService,
+            documentRepository: this.documentRepository,
+            availableDocumentsService: this.availableDocumentsService
+        });
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
         this.openedDocuments = new OpenDocumentsService({
@@ -194,10 +200,12 @@ export class Manager {
         this.openedDocuments.newOpenDocumentDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
+            availableDocumentService: this.availableDocumentsService,
             documentCheckingOutService: this.documentCheckingOutService,
             droppedFilesService: this.droppedFilesService,
             libraryService: this.library
         });
+        this.uploadingDocumentsService.uploadingMessages$.subscribe(msg => this.alertsService.info(msg));
         /*
          * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
          * wordCounts: Dictionary<number>;
@@ -499,7 +507,6 @@ export class Manager {
         this.documentCheckingOutService = new DocumentCheckingOutService({
             settingsService: this.settingsService
         })
-        this.availableDocumentsService = new AvailableDocumentsService()
         this.documentSelectionService = new DocumentSelectionService({
             availableDocumentsService: this.availableDocumentsService,
             settingsService: this.settingsService

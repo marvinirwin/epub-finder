@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {
     Body,
     Controller,
@@ -81,6 +81,15 @@ export class DocumentsController {
                 document_id
             )
         }
+        const existingDocumentWithSameName = await this.documentsService.byName(name, user)
+        if (existingDocumentWithSameName) {
+            return this.documentsService.saveRevision(
+                user,
+                name,
+                f.htmlFilePath(),
+                existingDocumentWithSameName.rootId()
+            )
+        }
         return this.documentsService.saveNew(
             user,
             name,
@@ -94,7 +103,7 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Param('id') id: string
     ) {
-        return this.documentsService.delete( user, id)
+        return this.documentsService.delete(user, id)
     }
 
     @Get(':filename')

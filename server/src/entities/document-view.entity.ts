@@ -1,4 +1,3 @@
-import {Document} from "./document.entity";
 import {Column, OneToOne, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
 import {User} from "./user.entity";
 
@@ -13,11 +12,13 @@ import {User} from "./user.entity";
         b.creator_id,
         b.global,
         b.deleted,
-        b.filename
+        b.filename,
+        b.hash
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at
-        AND document_max.document_id = b.document_id
+        AND COALESCE(document_max.document_id::text, document_max.id::text)
+        = COALESCE(b.document_id::text, b.id::text)
     WHERE document_max.id IS NULL
 `
 })
@@ -35,6 +36,9 @@ export class DocumentView  {
     html: string | null;
 
     @ViewColumn()
+    hash: string;
+
+    @ViewColumn()
     filename: string | null;
 
     @ViewColumn()
@@ -49,4 +53,8 @@ export class DocumentView  {
 
     @ViewColumn()
     deleted: boolean;
+
+    rootId() {
+        return this.document_id || this.id;
+    }
 }

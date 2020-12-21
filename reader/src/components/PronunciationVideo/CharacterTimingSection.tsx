@@ -26,9 +26,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
     onClick: (p: Percentage) => void,
     onMouseDown: (n: Percentage) => void,
     onMouseOver: (n: Percentage) => void,
-/*
     onMouseUp: (n: Percentage) => void,
-*/
     sectionIndex: number,
     characterIndexStart: number,
     audioBuffer: AudioBuffer | undefined
@@ -42,9 +40,7 @@ export const CharacterTimingSection: React.FunctionComponent<{
           highlightEndPosition,
           onMouseDown,
           onMouseOver,
-/*
           onMouseUp,
-*/
           sectionWidthPx,
           sectionIndex,
           characterIndexStart,
@@ -78,7 +74,8 @@ export const CharacterTimingSection: React.FunctionComponent<{
 
     useEffect(() => {
         if (canvas && audioBuffer) {
-            canvas.width = (canvas.parentElement?.clientWidth || 240) - 24; // This is the end of section padding
+            const sectionPadding = 24 * 2;
+            canvas.width = (canvas.parentElement?.clientWidth || 240) - sectionPadding;
             canvas.height = 50;
             draw(normalizeData(filterData(audioBuffer, 1000)), canvas)
         }
@@ -113,14 +110,12 @@ export const CharacterTimingSection: React.FunctionComponent<{
                         onMouseDown((ev.clientX - rect.x) / sectionContainer.clientWidth)
                     }
                 }}
-/*
                 onMouseUp={ev => {
                     if (sectionContainer) {
                         const rect = sectionContainer.getBoundingClientRect();
                         onMouseUp((ev.clientX - rect.x) / sectionContainer.clientWidth)
                     }
                 }}
-*/
                 onDragOver={ev => {
                     ev.dataTransfer.dropEffect = "move";
                     /*

@@ -41,6 +41,7 @@ const handleWorkerError = (r: string | WorkerError) => {
     if (typeof r === 'string') {
         return r;
     }
+    debugger;
     return InterpolateService.text(r.message)
 }
 

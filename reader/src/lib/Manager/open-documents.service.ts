@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
-import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
+import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {getDocumentWordData, OpenDocument} from "../DocumentFrame/OpenDocument";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
@@ -14,10 +14,8 @@ import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
-import {ReadingDocumentService} from "./reading-document.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
-import {DocumentViewDto} from "@server/*";
 import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
 

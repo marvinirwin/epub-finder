@@ -23,8 +23,6 @@ export function Main({m}: { m: Manager }) {
         AppDirectoryService(m).subscribe(v => m.treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
-
-
     const hotkeyHandler = useObservableState(m.inputManager.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {});
     const withDefaults = {...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig};

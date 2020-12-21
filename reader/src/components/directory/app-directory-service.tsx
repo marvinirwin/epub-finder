@@ -2,7 +2,7 @@ import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/Manager";
 import {combineLatest, Observable} from "rxjs";
-import {distinctUntilChanged, map, startWith} from "rxjs/operators";
+import {distinctUntilChanged, map, startWith, tap} from "rxjs/operators";
 import {PlaybackSpeedComponent} from "./playback-speed.component";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {ReadingNode} from "./nodes/reading.component";
@@ -13,6 +13,7 @@ import {FileChooser} from "./file-chooser.component";
 import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
 import GoogleButton from "react-google-button";
 import {ToggleTranslate} from "./toggle-translate";
+import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 
@@ -26,7 +27,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
             startWith(undefined)
         ),
         m.documentSelectionService.documentSelectionRows$.pipe(
-            startWith([])
+            startWith([] as DocumentSelectionRowInterface[]),
         ),
         m.treeMenuService.selectedComponent$.pipe(
             startWith(undefined),
@@ -64,19 +65,11 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                                         },
                     */
                     {
-                        name: 'signOut',
-                        label: 'Sign Out',
-                        action: () => m.authManager.signOut(),
-                        LeftIcon: () => {
-                        },
-                        hidden: !profile?.email
-                    },
-                    {
                         name: 'customDocument',
                         ReplaceComponent: () => <FileChooser/>,
                     },
                     // @ts-ignore
-                    ...availableDocuments.map(toTreeMenuNode),
+                    ...(availableDocuments.map(toTreeMenuNode)),
                     /*
                                         {
                                             name: 'requestRecording',
@@ -121,7 +114,14 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         name: 'translate',
                         ReplaceComponent: () => <ToggleTranslate/>
                     },
-
+                    {
+                        name: 'signOut',
+                        label: 'Sign Out',
+                        action: () => m.authManager.signOut(),
+                        LeftIcon: () => {
+                        },
+                        hidden: !profile?.email
+                    },
                 ] as ArrayToTreeParams<TreeMenuNode>
             );
             /*

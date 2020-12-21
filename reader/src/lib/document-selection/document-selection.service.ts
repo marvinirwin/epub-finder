@@ -25,11 +25,18 @@ export class DocumentSelectionService {
                             belongsToCurrentUser: !!belongsToUser,
                             lastModified: uploadDate,
                             reading: readingDocumentName === name,
-                            document_id: document_id || id
+                            document_id: document_id || id,
+                            id
                         } as DocumentSelectionRowInterface)),
                 ];
                 // Get the latest version for each name
-                return orderBy(Object.values(keyBy(all, 'name')), ['belongsToCurrentUser', 'lastModified'], ['desc', 'desc'])
+                let documentSelectionRowInterfaces = orderBy(
+                    Object.values(keyBy(all, 'id')),
+                    ['belongsToCurrentUser', 'lastModified'],
+                    ['desc', 'desc']
+                );
+                console.log(documentSelectionRowInterfaces);
+                return documentSelectionRowInterfaces
             }),
             shareReplay(1)
         )

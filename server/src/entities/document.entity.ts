@@ -26,8 +26,8 @@ export class Document {
     @Column({default: null})
     filename: string | null;
 
-    @Column('text', {default: null})
-    hash: string | null;
+    @Column('text')
+    hash: string;
 
     @Column({default: null})
     creator_id: number | null;
@@ -40,4 +40,8 @@ export class Document {
 
     @CreateDateColumn()
     created_at: Date;
+
+    rootId() {
+        return this.document_id || this.id;
+    }
 }

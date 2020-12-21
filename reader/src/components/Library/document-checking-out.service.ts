@@ -7,9 +7,11 @@ export class DocumentCheckingOutService {
         this.settingsService = settingsService;
     }
 
-    async checkoutDocument (titleBeingCheckedOut: string) {
+    async setReadingDocument (titleBeingCheckedOut: string) {
+/*
         const checkedOutDocuments = {...await observableLastValue(this.settingsService.checkedOutDocuments$)};
         checkedOutDocuments[titleBeingCheckedOut] = true;
+*/
         this.settingsService.readingDocument$.next(titleBeingCheckedOut);
     }
 
