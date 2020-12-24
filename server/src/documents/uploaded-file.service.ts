@@ -59,26 +59,28 @@ export class UploadedFileService {
 
     private static async convertPdfToHtml(uploadedFile: UploadedDocument, progress$: Subject<string>) {
         const filePathInDocker = join('/pdf', basename(uploadedFile.uploadedFilePath));
-        const volume = `${join(process.cwd(), dirname(uploadedFile.uploadedFilePath))}:/pdf`;
+        const volume = `${join(process.env.UPLOADED_FILE_DIRECTORY, uploadedFile.uploadedFilePath)}:/pdf`;
+        let pdfToHtmlBin = 'docker';
+        let additional = [
+            'run',
+            '--rm',
+            '-v',
+            volume,
+            'iapain/pdf2htmlex',
+            'pdf2htmlEX',
+            '--process-nontext',
+            '0',
+            '--process-outline',
+            '0',
+            '--optimize-text',
+            '1',
+        ];
         const converter = pdftohtml(
             basename(uploadedFile.uploadedFilePath),
             basename(uploadedFile.htmlFilePath()),
             {
-                bin: 'docker',
-                additional: [
-                    'run',
-                    '--rm',
-                    '-v',
-                    volume,
-                    'iapain/pdf2htmlex',
-                    'pdf2htmlEX',
-                    '--process-nontext',
-                    '0',
-                    '--process-outline',
-                    '0',
-                    '--optimize-text',
-                    '1',
-                ]
+                bin: pdfToHtmlBin,
+                additional: additional
             }
         )
 

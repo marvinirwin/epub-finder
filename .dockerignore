@@ -1,0 +1,8 @@
+**/node_modules
+**/.idea
+reader/build
+reader/public/video
+server/cache
+server/dist
+server/documents
+server/public
