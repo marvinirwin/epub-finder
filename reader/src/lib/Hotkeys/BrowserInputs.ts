@@ -1,12 +1,32 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {createPopper} from "@popperjs/core";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {HotkeyModes} from "./HotkeyModes";
 import {Hotkeys} from "./hotkeys.interface";
 import {SettingsService} from "../../services/settings.service";
+import { popperGenerator} from "@popperjs/core";
+import popperOffsets from '@popperjs/core/lib/modifiers/popperOffsets';
+import computeStyles from '@popperjs/core/lib/modifiers/computeStyles';
+import applyStyles from '@popperjs/core/lib/modifiers/applyStyles';
+import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
+
+const createPopper = popperGenerator({
+    defaultModifiers: [
+        popperOffsets,
+        computeStyles,
+        applyStyles,
+        eventListeners,
+        {
+            ...eventListeners,
+            options: {
+                resize: false,
+                scroll: false
+            }
+        }
+    ]
+})
 
 
 export function isDocument(t: HTMLElement | Document): t is Document {
@@ -100,9 +120,9 @@ export class BrowserInputs {
                 if (selObj) {
                     const text = selObj.toString();
                     if (text) {
-/*
-                        this.selectedText$.next(text);
-*/
+                        /*
+                                                this.selectedText$.next(text);
+                        */
                     }
                     return;
                 }
@@ -139,7 +159,7 @@ export class BrowserInputs {
             try {
                 createPopper(sentenceHTMLElement, popperHTMLElement, {
                     placement: 'bottom-start',
-                    strategy: 'fixed'
+                    strategy: 'fixed',
                 });
             } catch (e) {
                 console.error(e);
