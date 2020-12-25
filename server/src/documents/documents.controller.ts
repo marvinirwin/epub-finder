@@ -68,10 +68,10 @@ export class DocumentsController {
     async upload(
         @UploadedFile() file: { originalname: string, path: string },
         @UserFromReq() user: User,
-        @Headers('document_id') document_id: string,
-        @Headers('name') name: string,
+        @Headers('document_id') document_id: string | undefined,
     ) {
         const f = new UploadedDocument(file.path, file.originalname);
+        const name = file.originalname.split('.').slice(0, -1).join('');
         await UploadedFileService.normalise(f);
         if (document_id) {
             return this.documentsService.saveRevision(

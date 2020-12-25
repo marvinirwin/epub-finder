@@ -30,40 +30,16 @@ export class User {
     email: string | null; // { type: String, unique: true },
     @Column()
     password: string = '';
-    @Column()
-    password_reset_token: string = '';
-    @Column()
-    password_reset_expires: Date = new Date(); // I have no idea if this will break anything
-    @Column()
+    @Column({default: null})
+    password_reset_token: string | null;
+    @Column({default: null})
+    password_reset_expires: Date | null = new Date(); // I have no idea if this will break anything
+    @Column({default: null})
     email_verification_token: string = '';
-    @Column()
+    @Column({default: false})
     email_verified: boolean = false;
     @Column()
-    snapchat: string = '';
-    @Column()
-    facebook: string = '';
-    @Column()
-    twitter: string = '';
-    @Column()
     google: string = '';
-    @Column()
-    github: string = '';
-    @Column()
-    instagram: string = '';
-    @Column()
-    linkedin: string = '';
-    @Column()
-    steam: string = '';
-    @Column()
-    twitch: string = '';
-    @Column()
-    quickbooks: string = '';
-    // I wonder what the ORM will do with this?
-    @Column({
-        type: String,
-        transformer: new JsonValueTransformer<string[]>()
-    })
-    tokens: string[] = [];
     @Column()
     profile_name: string = '';
     @Column()
@@ -82,13 +58,6 @@ export class User {
 
     @OneToMany(() => DocumentView, (document: DocumentView) => document.creator_id)
     documents: Promise<DocumentView[]>;
-
-
-    @OneToMany(type => UsageEvent, (usageEvent: UsageEvent) => usageEvent.user_id)
-    usageEvents: UsageEvent[];
-
-    @OneToMany(type => session, (session: session) => session.userId)
-    sessions: session[];
 
     @AfterLoad()
     private storeInitialPassword(): void {

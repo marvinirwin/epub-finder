@@ -14,8 +14,10 @@ import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tr
 import GoogleButton from "react-google-button";
 import {ToggleTranslate} from "./toggle-translate";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
+import {Signup} from "./signup";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
+const TESTING = new URLSearchParams(window.location.search).has('test')
 
 
 export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode>> => {
@@ -44,6 +46,11 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                 ReadingNode(m),
                 [
                     ReadingNode(m, selectedComponent === 'reading'),
+                    {
+                        name: 'signup',
+                        hidden: !TESTING,
+                        ReplaceComponent: Signup
+                    },
                     {
                         name: 'watchPronunciation',
                         ReplaceComponent: WatchMode

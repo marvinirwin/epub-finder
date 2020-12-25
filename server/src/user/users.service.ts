@@ -17,19 +17,10 @@ export class UsersService {
     /**
      * Creates a user with a username and password
      */
-/*
     async createBasicUser({email, password}: CreateUserDto): Promise<User> {
-        return this.usersRepository.save(
-            Object.assign(
-                new User(),
-                {
-                    email,
-                    password
-                }
-            )
-        )
+        await this.usersRepository.insert(this.usersRepository.create({email, password}));
+        return this.usersRepository.findOneOrFail({email});
     }
-*/
 
     findAll(): Promise<User[]> {
         return this.usersRepository.find();
@@ -70,6 +61,12 @@ export class UsersService {
     }
 
     async profile() {
+    }
 
+    async findForAuth(email: string, password: string): Promise<User | undefined> {
+        const user = await this.usersRepository.findOne({email});
+        if (user && await User.comparePassword(user.password, password)) {
+            return user;
+        }
     }
 }

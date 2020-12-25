@@ -8,6 +8,7 @@ import {GithubStrategy} from "./strategies/github";
 import {TwitterStrategy} from "./strategies/twitter";
 import {UsersService} from "../user/users.service";
 import { GoogleStrategy } from "./strategies/google";
+import {LocalStrategy} from "./strategies/local";
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { GoogleStrategy } from "./strategies/google";
         GithubStrategy,
         TwitterStrategy,
         GoogleStrategy,
+        LocalStrategy,
         SessionSerializer,
         UsersService
     ],

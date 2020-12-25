@@ -24,16 +24,14 @@ export class LoggedInUserService {
         this.fetchProfile();
     }
 
-    private fetchProfile() {
-        (async () => {
-            try {
-                const user = await LoggedInUserService.fetchLoggedInProfile();
-                // If there's no user then an error will have been shown to the user
-                this.profile$.next(user);
-            } catch (e) {
-                console.warn(e);
-            }
-        })();
+    public async fetchProfile() {
+        try {
+            const user = await LoggedInUserService.fetchLoggedInProfile();
+            // If there's no user then an error will have been shown to the user
+            this.profile$.next(user);
+        } catch (e) {
+            console.warn(e);
+        }
     }
 
     public async signOut() {

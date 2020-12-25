@@ -27,6 +27,7 @@ export class AlertsService {
                 if (msg) {
                     this.newAlerts$.next({msg, severity: 'error'})
                 }
+                return Promise.reject(error);
             }
         );
     }

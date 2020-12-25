@@ -33,21 +33,18 @@ export class DocumentRepository {
         const formData = new FormData();
         formData.append("file", file);
 
-        const headers: { filename: string, name: string, document_id?: string } = {
-            filename: file.name,
-            name: file.name.split('.').slice(0, -1).join('')
+        const headers: { document_id?: string } = {
         };
         if (document_id) {
             headers.document_id = document_id
         }
-        const result = await axios.put(
+        const result = axios.put(
             `${process.env.PUBLIC_URL}/documents/`,
             formData,
             {
                 headers
             }
         );
-        debugger;
-        return result?.data;
+        return (await result).data;
     }
 }

@@ -1,6 +1,6 @@
 import mammoth from 'mammoth';
 import pdftohtml from '../pdftohtmljs/pdftohtmljs';
-import {basename, dirname, extname, join, parse} from 'path';
+import {basename, dirname, extname, join, parse, resolve} from 'path';
 import {InterpolateService} from "../shared";
 import fs from 'fs-extra';
 import {Subject} from "rxjs";
@@ -45,21 +45,10 @@ export class UploadedFileService {
     }
 
     constructor() {
-        UploadedFileService.convertPdfToHtml(
-            new UploadedDocument(
-                process.env.TEST_PDF_TO_HTML_FILE,
-                process.env.TEST_PDF_TO_HTML_FILE
-            ),
-            new Subject<string>());
-        UploadedFileService.handleDocx(new UploadedDocument(
-            process.env.TEST_DOCX_TO_HTML_FILE,
-            process.env.TEST_DOCX_TO_HTML_FILE
-        ))
     }
 
     private static async convertPdfToHtml(uploadedFile: UploadedDocument, progress$: Subject<string>) {
-        const filePathInDocker = join('/pdf', basename(uploadedFile.uploadedFilePath));
-        const volume = `${join(process.env.UPLOADED_FILE_DIRECTORY, uploadedFile.uploadedFilePath)}:/pdf`;
+        const volume = `${resolve(dirname(uploadedFile.uploadedFilePath))}:/pdf`;
         let pdfToHtmlBin = 'docker';
         let additional = [
             'run',

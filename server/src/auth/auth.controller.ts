@@ -1,6 +1,5 @@
 import {Request, Response} from "express";
 import {Body, Controller, Get, Post, Req, Res, HttpCode, UseGuards, Redirect} from "@nestjs/common";
-import {promisify} from "util";
 
 import {User} from "../entities/user.entity";
 import {UsersService} from "../user/users.service";
@@ -16,14 +15,28 @@ export class AuthController {
       private readonly userService: UsersService
   ) {}
 
-/*
+
+  @Public()
+  @Post('/signup')
+  public async signup(@Body() {email, password}: {email: string, password: string}) {
+    if (process.env.PROD) {
+      throw new Error("basic signup only available in test")
+    }
+    if (await this.userService.findOne({email})) {
+      throw new Error("This email has already been used")
+    }
+    return await this.userService.createBasicUser({email, password});
+  }
+
   @Public()
   @UseGuards(LoginGuard)
   @Post("/login")
   public login(@UserFromReq() user: User): User {
+    if (process.env.PROD) {
+      throw new Error("basic login only available in test")
+    }
     return user;
   }
-*/
 
   @Public()
   @HttpCode(204)
