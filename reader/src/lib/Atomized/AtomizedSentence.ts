@@ -13,6 +13,7 @@ import {fetchTranslation} from "../../services/translate.service";
 export class AtomizedSentence {
     private _translation: string | undefined;
     private _previousWords = new Set<string>();
+    public _popperInstance: any;
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
     public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
@@ -162,7 +163,9 @@ export class AtomizedSentence {
     public showPopper() {
         this.getPopperHTMLElement().setAttribute('data-show', '');
     }
+
     public hidePopper() {
+        this._popperInstance?.destroy()
         this.getPopperHTMLElement().removeAttribute('data-show');
     }
 }

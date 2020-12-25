@@ -156,24 +156,24 @@ export class BrowserInputs {
             if (!sentenceHTMLElement || !popperHTMLElement) {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
-            try {
-                createPopper(sentenceHTMLElement, popperHTMLElement, {
-                    placement: 'bottom-start',
-                    strategy: 'fixed',
-                });
-            } catch (e) {
-                console.error(e);
-            }
 
             const show = () => {
-                this.latestTranslationTarget = atomizedSentence;
-                if (this.showTranslations) {
-                    atomizedSentence.showPopper();
+
+                try {
+                    atomizedSentence._popperInstance = createPopper(sentenceHTMLElement, popperHTMLElement, {
+                        placement: 'bottom-start',
+                        strategy: 'fixed',
+                    });
+                    this.latestTranslationTarget = atomizedSentence;
+                    if (this.showTranslations) {
+                        atomizedSentence.showPopper();
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
             }
             const hide = () => {
                 this.latestTranslationTarget = undefined;
-
                 atomizedSentence.hidePopper();
             }
 
