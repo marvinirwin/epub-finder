@@ -19,13 +19,15 @@ import {FileInterceptor} from "@nestjs/platform-express";
 import {UploadedFileService} from "./uploaded-file.service";
 import {UploadedDocument} from "./uploaded-document";
 import {createReadStream} from "fs";
-import {basename, join} from "path";
+import {basename, join, parse} from "path";
 import multerS3 from 'multer-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 import AWS from 'aws-sdk';
 import {convertToHtml} from "./convert-to-html.service";
 import {BucketConfig} from "./bucket-config.interface";
+import fs, {rename} from "fs-extra";
+import {InterpolateService} from "../shared";
 
 let inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
 let inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;
@@ -86,41 +88,48 @@ export class DocumentsController {
         )
     )
     async upload(
-        @UploadedFile() file: { bucket: string, key: string, location: string },
+        @UploadedFile() file: { originalname: string, bucket: string, key: string, location: string },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
         debugger;
-        const ext = 'pdf';
-        await convertToHtml({
-            inputFormat: ext,
-            inputBucket: inputConfig,
-            outputBucket: outputConfig,
-            key: file.key
-        });
+        const ext = parse(file.originalname).ext.replace('.', '');
+        switch(ext) {
+            case "pdf":
+            case "docx":
+                await convertToHtml({
+                    inputFormat: ext,
+                    inputBucket: inputConfig,
+                    outputBucket: outputConfig,
+                    key: file.key
+                });
+                break;
+/*
+            case "txt":
+                // If it's text then read the whole file, run it through the converter and then write it to s3
+                const text = (await s3.getObject())
+                const text = (await fs.read(uploadedFile.uploadedFilePath)).toString("utf8");
+                await fs.writeFile(uploadedFile.htmlFilePath(), InterpolateService.text(text))
+                break;
+            case "html":
+                // Copy the file in s3
+                return await rename(uploadedFile.uploadedFilePath, join(
+                    process.env.UPLOADED_FILE_DIRECTORY,
+                    basename(uploadedFile.sourceFilePath)
+                ))
+                break;
+*/
+            default:
+                throw new Error(`Unsupported file extension: ${ext}`);
+        }
+/*
         switch (ext) {
             case "pdf":
 
                 debugger;
                 return;
-/*
-                return await convertToHtml("pdf", uploadedFile);
-*/
-/*
-            case '.html':
-                debugger;
-                return await fs.rename(uploadedFile.uploadedFilePath, join(
-                    process.env.UPLOADED_FILE_DIRECTORY,
-                    basename(uploadedFile.sourceFilePath)
-                ))
-            case '.docx':
-                return await convertToHtml("docx", uploadedFile);
-            case '.txt':
-                return this.handleTxt(uploadedFile);
-*/
-            default:
-                throw new Error(`Unsupported file extension: ${ext}`);
         }
+*/
 /*
         const name = /!*file.split('.').slice(0, -1).join('')*!/ key;
         await UploadedFileService.normalise(f);

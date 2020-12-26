@@ -29,8 +29,6 @@ export class UploadedFileService {
     }
 
     private static async handleTxt(uploadedFile: UploadedDocument) {
-        const text = (await fs.readFile(uploadedFile.uploadedFilePath)).toString("utf8");
-        await fs.writeFile(uploadedFile.htmlFilePath(), InterpolateService.text(text))
     }
 
     constructor() {
