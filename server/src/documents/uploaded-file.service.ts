@@ -1,27 +1,16 @@
 import mammoth from 'mammoth';
 import pdftohtml from '../pdftohtmljs/pdftohtmljs';
-import {basename, dirname, extname, join, parse, resolve} from 'path';
+import {basename, dirname, join, resolve} from 'path';
 import {InterpolateService} from "../shared";
 import fs from 'fs-extra';
 import {Subject} from "rxjs";
 import {hashElement} from 'folder-hash';
 import {UploadedDocument} from "./uploaded-document";
 
+
 export class UploadedFileService {
+
     public static async normalise(uploadedFile: UploadedDocument): Promise<void> {
-        switch (uploadedFile.ext()) {
-            case '.html':
-                // Do nothing
-                return;
-            case '.docx':
-                return this.handleDocx(uploadedFile);
-            case '.txt':
-                return this.handleTxt(uploadedFile);
-            case '.pdf':
-                return this.handlePdf(uploadedFile);
-            default:
-                throw new Error(`Unsupported file extension: ${uploadedFile.ext()}`);
-        }
     }
 
     private static handlePdf(filepath: UploadedDocument) {
@@ -57,12 +46,6 @@ export class UploadedFileService {
             volume,
             'iapain/pdf2htmlex',
             'pdf2htmlEX',
-            '--process-nontext',
-            '0',
-            '--process-outline',
-            '0',
-            '--optimize-text',
-            '1',
         ];
         const converter = pdftohtml(
             basename(uploadedFile.uploadedFilePath),

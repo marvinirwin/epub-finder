@@ -19,7 +19,36 @@ import {FileInterceptor} from "@nestjs/platform-express";
 import {UploadedFileService} from "./uploaded-file.service";
 import {UploadedDocument} from "./uploaded-document";
 import {createReadStream} from "fs";
-import {join} from "path";
+import {basename, join} from "path";
+import multerS3 from 'multer-s3';
+import { v4 as uuidv4 } from 'uuid';
+
+import AWS from 'aws-sdk';
+import {convertToHtml} from "./convert-to-html.service";
+import {BucketConfig} from "./bucket-config.interface";
+
+let inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
+let inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;
+let converterOutputKeyId = process.env.DOCUMENT_CONVERTER_OUTPUT_S3_ACCESS_KEY_ID;
+let converterOutputSecretKeyId = process.env.DOCUMENT_CONVERTER_OUTPUT_S3_ACCESS_KEY_SECRET;
+const s3Region = process.env.DOCUMENT_S3_REGION;
+const bucket = process.env.DOCUMENT_S3_BUCKET;
+const s3 = new AWS.S3({
+    accessKeyId: inputAccessKeyId,
+    secretAccessKey: inputSecretAccessKey,
+});
+const inputConfig: BucketConfig = {
+    region: s3Region,
+    access_key_id: inputAccessKeyId,
+    secret_access_key: inputSecretAccessKey,
+    bucket
+}
+const outputConfig: BucketConfig = {
+    region: s3Region,
+    access_key_id: converterOutputKeyId,
+    secret_access_key: converterOutputSecretKeyId,
+    bucket
+};
 
 @Controller('documents')
 export class DocumentsController {
@@ -30,33 +59,24 @@ export class DocumentsController {
 
     }
 
-    @Get('/available')
-    async available(
-        @UserFromReq() user: User | undefined
-    ) {
-        return this.documentsService.all(user)
-            .then(availableDocuments => availableDocuments.map(documentView => ({
-                name: documentView.name,
-                id: documentView.id,
-                lastModified: documentView.created_at,
-                belongsToUser: documentView.creator_id === user?.id
-            })))
-    }
-
-    @Get('')
-    async all(
-        @UserFromReq() user: User | undefined
-    ) {
-        return this.documentsService.all(user)
-    }
-
     @Put('')
     @UseGuards(LoggedInGuard)
     @UseInterceptors(
         FileInterceptor(
             'file',
             {
-                dest: process.env.UPLOADED_FILE_DIRECTORY,
+                storage: multerS3 ({
+                    s3: s3,
+                    bucket: 'languagetrainer-documents',
+                    metadata: (req, file, cb) => {
+                        return cb(null, {fieldName: file.fieldname});
+                    },
+                    key: (req, file, cb) => {
+                        let uuidv = uuidv4();
+
+                        return cb(null, uuidv);
+                    }
+                }),
                 limits: {
                     files: 1,
                     fields: 1,
@@ -66,12 +86,43 @@ export class DocumentsController {
         )
     )
     async upload(
-        @UploadedFile() file: { originalname: string, path: string },
+        @UploadedFile() file: { bucket: string, key: string, location: string },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
-        const f = new UploadedDocument(file.path, file.originalname);
-        const name = file.originalname.split('.').slice(0, -1).join('');
+        debugger;
+        const ext = 'pdf';
+        await convertToHtml({
+            inputFormat: ext,
+            inputBucket: inputConfig,
+            outputBucket: outputConfig,
+            key: file.key
+        });
+        switch (ext) {
+            case "pdf":
+
+                debugger;
+                return;
+/*
+                return await convertToHtml("pdf", uploadedFile);
+*/
+/*
+            case '.html':
+                debugger;
+                return await fs.rename(uploadedFile.uploadedFilePath, join(
+                    process.env.UPLOADED_FILE_DIRECTORY,
+                    basename(uploadedFile.sourceFilePath)
+                ))
+            case '.docx':
+                return await convertToHtml("docx", uploadedFile);
+            case '.txt':
+                return this.handleTxt(uploadedFile);
+*/
+            default:
+                throw new Error(`Unsupported file extension: ${ext}`);
+        }
+/*
+        const name = /!*file.split('.').slice(0, -1).join('')*!/ key;
         await UploadedFileService.normalise(f);
         if (document_id) {
             return this.documentsService.saveRevision(
@@ -95,7 +146,29 @@ export class DocumentsController {
             name,
             f.htmlFilePath(),
         )
+*/
     }
+
+    @Get('/available')
+    async available(
+        @UserFromReq() user: User | undefined
+    ) {
+        return this.documentsService.all(user)
+            .then(availableDocuments => availableDocuments.map(documentView => ({
+                name: documentView.name,
+                id: documentView.id,
+                lastModified: documentView.created_at,
+                belongsToUser: documentView.creator_id === user?.id
+            })))
+    }
+
+    @Get('')
+    async all(
+        @UserFromReq() user: User | undefined
+    ) {
+        return this.documentsService.all(user)
+    }
+
 
     @Delete(':id')
     @UseGuards(LoggedInGuard)

@@ -20,4 +20,8 @@ describe('File Uploading', () => {
         cy.get(fileChooser).attachFile('test_txt.txt');
         cy.contains(documentSelectionRow, 'test_txt')
     })
+    it('Uploads html', () => {
+        cy.get(fileChooser).attachFile('test_html.html');
+        cy.contains(documentSelectionRow, 'test_html')
+    })
 })

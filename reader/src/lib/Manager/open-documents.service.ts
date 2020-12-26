@@ -75,7 +75,7 @@ export class OpenDocumentsService {
                         }
                         if (filename) {
                             // Gotta get a url for this filename
-                            openDocument.url$.next(`${process.env.PUBLIC_URL}/documents/${filename}`);
+                            openDocument.url$.next(`/documents/${filename}`);
                         }
                         return [
                             id,

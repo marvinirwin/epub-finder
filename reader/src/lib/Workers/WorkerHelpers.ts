@@ -13,6 +13,7 @@ export const AtomizeHtml = (HTMLString: string) =>
         .then(handleWorkerError);
 
 export const AtomizeUrl = async (url: string) => {
+/*
     try {
         const cached = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '');
         if (cached) {
@@ -21,6 +22,7 @@ export const AtomizeUrl = async (url: string) => {
     } catch(e) {
         console.warn(e);
     }
+*/
     return GetWorkerResults<string | WorkerError>(new AtomizeUrlWorker(), url)
         .then(handleCacheSuccessfulAtomizeUrl(url))
         .then(handleWorkerError)
@@ -28,9 +30,11 @@ export const AtomizeUrl = async (url: string) => {
 
 function handleCacheSuccessfulAtomizeUrl(url: string) {
     return (result: string | WorkerError) => {
+/*
         if (typeof result === 'string') {
             localStorage.setItem(AtomizeUrlKey(url), result)
         }
+*/
         return result;
     };
 }
@@ -41,7 +45,6 @@ const handleWorkerError = (r: string | WorkerError) => {
     if (typeof r === 'string') {
         return r;
     }
-    debugger;
     return InterpolateService.text(r.message)
 }
 
