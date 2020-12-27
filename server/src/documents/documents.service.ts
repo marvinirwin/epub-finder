@@ -3,7 +3,7 @@ import {Document} from "../entities/document.entity";
 import {DocumentView} from "../entities/document-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {basename, join} from "path";
+import {basename} from "path";
 import {UploadedFileService} from "./uploaded-file.service";
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
@@ -17,7 +17,7 @@ export class DocumentsService {
         @InjectRepository(Document)
         private documentRepository: Repository<Document>,
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
     ) {
     }
 
@@ -47,6 +47,7 @@ export class DocumentsService {
     }
 
     public async saveNew(user: User, name: string, filePath: string) {
+
         return await this.documentRepository.save({
             name,
             filename: basename(filePath),
@@ -127,6 +128,4 @@ export class DocumentsService {
             creator_id: user.id
         });
     }
-
-
 }

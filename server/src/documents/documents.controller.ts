@@ -1,12 +1,15 @@
 import {Response} from "express";
 import {
-    Body,
     Controller,
     Delete,
-    Get, Header,
-    Headers, HttpCode, HttpStatus,
+    Get,
+    Header,
+    Headers,
+    HttpCode,
+    HttpStatus,
     Param,
-    Put, Res,
+    Put,
+    Res,
     UploadedFile,
     UseGuards,
     UseInterceptors
@@ -17,40 +20,11 @@ import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {UploadedFileService} from "./uploaded-file.service";
-import {UploadedDocument} from "./uploaded-document";
-import {createReadStream} from "fs";
-import {basename, join, parse} from "path";
+import {parse} from "path";
 import multerS3 from 'multer-s3';
-import { v4 as uuidv4 } from 'uuid';
-
-import AWS from 'aws-sdk';
+import {v4 as uuidv4} from 'uuid';
 import {convertToHtml} from "./convert-to-html.service";
-import {BucketConfig} from "./bucket-config.interface";
-import fs, {rename} from "fs-extra";
-import {InterpolateService} from "../shared";
-
-let inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
-let inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;
-let converterOutputKeyId = process.env.DOCUMENT_CONVERTER_OUTPUT_S3_ACCESS_KEY_ID;
-let converterOutputSecretKeyId = process.env.DOCUMENT_CONVERTER_OUTPUT_S3_ACCESS_KEY_SECRET;
-const s3Region = process.env.DOCUMENT_S3_REGION;
-const bucket = process.env.DOCUMENT_S3_BUCKET;
-const s3 = new AWS.S3({
-    accessKeyId: inputAccessKeyId,
-    secretAccessKey: inputSecretAccessKey,
-});
-const inputConfig: BucketConfig = {
-    region: s3Region,
-    access_key_id: inputAccessKeyId,
-    secret_access_key: inputSecretAccessKey,
-    bucket
-}
-const outputConfig: BucketConfig = {
-    region: s3Region,
-    access_key_id: converterOutputKeyId,
-    secret_access_key: converterOutputSecretKeyId,
-    bucket
-};
+import {bucket, inputConfig, outputConfig, s3} from "./s3.service";
 
 @Controller('documents')
 export class DocumentsController {
@@ -92,7 +66,6 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
-        debugger;
         const ext = parse(file.originalname).ext.replace('.', '');
         switch(ext) {
             case "pdf":
@@ -104,40 +77,16 @@ export class DocumentsController {
                     key: file.key
                 });
                 break;
-/*
-            case "txt":
-                // If it's text then read the whole file, run it through the converter and then write it to s3
-                const text = (await s3.getObject())
-                const text = (await fs.read(uploadedFile.uploadedFilePath)).toString("utf8");
-                await fs.writeFile(uploadedFile.htmlFilePath(), InterpolateService.text(text))
-                break;
-            case "html":
-                // Copy the file in s3
-                return await rename(uploadedFile.uploadedFilePath, join(
-                    process.env.UPLOADED_FILE_DIRECTORY,
-                    basename(uploadedFile.sourceFilePath)
-                ))
-                break;
-*/
             default:
                 throw new Error(`Unsupported file extension: ${ext}`);
         }
-/*
-        switch (ext) {
-            case "pdf":
-
-                debugger;
-                return;
-        }
-*/
-/*
-        const name = /!*file.split('.').slice(0, -1).join('')*!/ key;
-        await UploadedFileService.normalise(f);
+        const name = file.originalname.split('.').slice(0, -1).join('');
+        let htmlKey = `${file.key}.html`;
         if (document_id) {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                f.htmlFilePath(),
+                htmlKey,
                 document_id
             )
         }
@@ -146,16 +95,15 @@ export class DocumentsController {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                f.htmlFilePath(),
+                htmlKey,
                 existingDocumentWithSameName.rootId()
             )
         }
         return this.documentsService.saveNew(
             user,
             name,
-            f.htmlFilePath(),
+            htmlKey,
         )
-*/
     }
 
     @Get('/available')
@@ -200,7 +148,9 @@ export class DocumentsController {
         if (!doc) {
             throw new Error(`Cannot find document ${filename} for user ${user?.id}`)
         }
+
+        return s3.getObject({Bucket: bucket, Key: filename}).createReadStream().pipe(response);
         // @ts-ignore
-        return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
+        // return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
     }
 }

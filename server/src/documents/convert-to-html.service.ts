@@ -8,7 +8,7 @@ import axios from "axios";
 import {Job} from "cloudconvert/built/JobsResource";
 import {BucketConfig} from "./bucket-config.interface";
 
-export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY);
+export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY, true);
 
 export async function convertToHtml({inputBucket, outputBucket, key, inputFormat}: {
     inputBucket: BucketConfig,
@@ -26,6 +26,7 @@ export async function convertToHtml({inputBucket, outputBucket, key, inputFormat
 */
         await downloadJobResult(job);
     } catch (e) {
+        debugger;console.log();
         await cloudConvert.jobs.delete(job.id);
     }
 }
@@ -50,20 +51,13 @@ const uploadFileToImportJob = async (u: UploadedDocument, uploadUrl) => {
 }
 */
 const downloadJobResult = async (job: Job) => {
+    console.log(`Waiting for job ${job.id} to finish`);
     const jobResult = await cloudConvert.jobs.wait(job.id)
+    console.log(`job ${job.id} finished`);
     if (jobResult.status !== 'finished') {
         throw new Error("Job failed " + JSON.stringify(jobResult))
     }
 
-/*
-    const {filename, url} = jobResult
-        .tasks
-        .find(({name}) => name === 'export')
-        .result
-        .files[0];
-
-    await downloadFile(url, join(process.env.UPLOADED_FILE_DIRECTORY, filename))
-*/
 }
 
 async function conversionJob({inputFormat, inputBucket, outputBucket, key}:{
@@ -72,7 +66,8 @@ async function conversionJob({inputFormat, inputBucket, outputBucket, key}:{
     outputBucket: BucketConfig,
     key: string
                              }) {
-    return await cloudConvert
+    console.log(`Starting job for ${key} going from ${inputFormat} to html`);
+    const j = await cloudConvert
         .jobs
         .create({
             tasks: {
@@ -81,20 +76,28 @@ async function conversionJob({inputFormat, inputBucket, outputBucket, key}:{
                     key,
                     ...inputBucket
                 },
-                convert: {
+                convertPdfToDocx: {
                     operation: "convert",
                     input: "import",
-                    input_format: inputFormat,
+                    input_format: "pdf",
+                    output_format: "docx",
+                },
+                convertDocxToHtml: {
+                    operation: "convert",
+                    input: "convertPdfToDocx",
+                    input_format: "docx",
                     output_format: "html",
                 },
                 export: {
-                    input: "convert",
                     operation: 'export/s3',
+                    input: "convertDocxToHtml",
                     ...outputBucket,
                     key: `${key}.html`,
 
                 }
             }
         });
+    console.log(`Job created for ${key} going from ${inputFormat} to html`);
+    return j;
 }
 

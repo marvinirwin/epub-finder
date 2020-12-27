@@ -20,7 +20,8 @@ export class BuiltInDocumentsService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        this.insertDocumentsInDocumentsDir();
+        // TODO make this work with S3
+        // this.insertDocumentsInDocumentsDir();
     }
 
     private async insertDocumentsInDocumentsDir() {
