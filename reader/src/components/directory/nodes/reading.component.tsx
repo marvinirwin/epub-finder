@@ -1,10 +1,10 @@
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {Reading} from "../../Reading/Reading";
 import React from "react";
 import {Manager} from "../../../lib/Manager";
+import {ReadingComponent} from "../../reading/reading.component";
 
 export const ReadingNode = (m: Manager, hidden?: boolean): TreeMenuNode => ({
-    Component: () => <Reading m={m}/>,
+    Component: () => <ReadingComponent m={m}/>,
     label: 'Read',
     name: 'reading',
     hidden

@@ -120,7 +120,7 @@ export class HotKeyEvents {
             })))
         ).subscribe(([_, learningLanguage]) => {
             if (learningLanguage) {
-                m.cardManager.deleteWords.next([learningLanguage]);
+                m.cardService.deleteWords.next([learningLanguage]);
                 m.editingCardManager.queEditingCard$.next(undefined)
             }
         })

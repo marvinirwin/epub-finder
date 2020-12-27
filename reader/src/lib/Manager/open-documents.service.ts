@@ -1,6 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
-import {getDocumentWordData, OpenDocument} from "../DocumentFrame/OpenDocument";
 import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
@@ -18,6 +17,9 @@ import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
 import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
+import {OpenDocument} from "../DocumentFrame/open-document.entity";
+import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
+import { getDocumentWordData } from "../DocumentFrame/atomized-document-stats.service";
 
 
 export type Named = {
@@ -65,18 +67,19 @@ export class OpenDocumentsService {
                 return mapMap(
                     libraryDocuments,
                     (id, {name, html, filename}) => {
+                        const documentSource: AtomizedDocumentSources = {}
+                        if (html) {
+                            // TODO replaceSubject here?
+                            documentSource.unAtomizedDocument$ = of(html);
+                        }
+                        if (filename) {
+                            documentSource.url$ = of(`/documents/${filename}`)
+                        }
                         const openDocument = new OpenDocument(
                             name,
                             config.trie$,
-                            undefined,
+                            DocumentSourcesService.document(documentSource)
                         );
-                        if (html) {
-                            openDocument.unAtomizedSrcDoc$.next(html);
-                        }
-                        if (filename) {
-                            // Gotta get a url for this filename
-                            openDocument.url$.next(`/documents/${filename}`);
-                        }
                         return [
                             id,
                             openDocument

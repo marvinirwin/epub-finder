@@ -1,6 +1,5 @@
-/// <reference types="cypress" />
-const documentSelectionRow = '.document-selection-row';
-const fileChooser = '#file-chooser';
+import {documentSelectionRow, fileChooser} from "../constants";
+
 describe('File Uploading', () => {
     beforeEach(() => {
         cy.visit('http://localhost:3000/?test=1&skip_intro=1')

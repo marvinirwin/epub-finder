@@ -7,7 +7,7 @@ import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
 
-export const Reading: React.FunctionComponent<{ m: Manager }> = ({m}) => {
+export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const openedDocument = m.readingDocumentService.readingDocument;
     const showPronunciationVideo = !!useObservableState(m.pronunciationVideoService.videoMetadata$);
     const recentlyRecorded = !!useObservableState(m.audioManager.audioRecorder.recentlyRecorded$);

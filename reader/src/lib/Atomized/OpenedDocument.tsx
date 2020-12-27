@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react'
-import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {useObservableState} from "observable-hooks";
 import {InnerHTMLIFrame} from "../../components/Frame/innerHTMLIFrame";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
@@ -8,6 +7,7 @@ import {AtomizedSentence} from "./AtomizedSentence";
 import {ANNOTATE_AND_TRANSLATE} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../services/safe-push";
+import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 
 export const OpenedDocument =

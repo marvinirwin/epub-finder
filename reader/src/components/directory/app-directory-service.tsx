@@ -15,6 +15,10 @@ import GoogleButton from "react-google-button";
 import {ToggleTranslate} from "./toggle-translate";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 import {Signup} from "./signup";
+import {QuizPage} from "../Pages/QuizPage";
+import { QuizCard } from "../quiz/quiz-card.component";
+import { QuizSchedule } from "../quiz/quiz-schedule.component";
+import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
 const TESTING = new URLSearchParams(window.location.search).has('test')
@@ -64,6 +68,19 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                         label: 'playbackSpeed',
                         InlineComponent: () => <PlaybackSpeedComponent/>
                     },
+                    {
+                        name: 'quiz',
+                        label: 'Quiz',
+                        moveDirectory: true,
+                        Component: QuizCardCarousel
+                    },
+                    [
+                        {
+                            name: 'quiz-card',
+                            label: 'Quiz Schedule',
+                            Component: QuizSchedule
+                        },
+                    ],
                     /*
                                         {
                                             name: 'library',

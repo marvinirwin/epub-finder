@@ -12,7 +12,6 @@ import {AudioManager} from "./Manager/AudioManager";
 import CardService from "./Manager/CardService";
 import {CHARACTER_DOCUMENT_NODE_LABEL, OpenDocumentsService} from "./Manager/open-documents.service";
 import {NavigationPages} from "./Util/Util";
-import {ScheduleManager} from "./Manager/ScheduleManager";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
@@ -30,7 +29,6 @@ import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
 import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
-import {OpenDocument} from "./DocumentFrame/OpenDocument";
 import {QuizCharacter} from "./Manager/QuizCharacter";
 import {ds_Dict} from "./Tree/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
@@ -78,6 +76,8 @@ import {AlertsService} from "../services/alerts.service";
 import {ReadingDocumentService} from "./Manager/reading-document.service";
 import {RequestRecordingService} from "../components/PronunciationVideo/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
+import { ScheduleService } from "./Manager/schedule.service";
+import { OpenDocument } from "./DocumentFrame/open-document.entity";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -104,9 +104,9 @@ export class Manager {
     );
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
-    public cardManager: CardService;
+    public cardService: CardService;
     public openedDocuments: OpenDocumentsService;
-    public scheduleManager: ScheduleManager;
+    public scheduleManager: ScheduleService;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
     public inputManager: BrowserInputs;
@@ -173,7 +173,7 @@ export class Manager {
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
 
-        this.cardManager = new CardService(this.db);
+        this.cardService = new CardService(this.db);
         this.library = new LibraryService({
             db,
             settingsService: this.settingsService,
@@ -183,7 +183,7 @@ export class Manager {
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
         this.openedDocuments = new OpenDocumentsService({
-            trie$: this.cardManager.trie$,
+            trie$: this.cardService.trie$,
             bottomNavigationValue$: this.bottomNavigationValue$,
             db,
             settingsService: this.settingsService,
@@ -225,7 +225,7 @@ export class Manager {
         this.readingWordSentenceMap = sentenceMap$;
         this.pronunciationProgressService = new PronunciationProgressService({db});
         this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
-        this.scheduleManager = new ScheduleManager({
+        this.scheduleManager = new ScheduleService({
                 db,
                 wordCounts$: this.readingWordCounts$,
                 sortMode$: of('').pipe(shareReplay(1)),
@@ -242,7 +242,7 @@ export class Manager {
         this.quizManager = new QuizManager({
                 scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
                     map(rows => rows.map(row => row.word)),
-                    resolveICardForWords(this.cardManager.cardIndex$)
+                    resolveICardForWords(this.cardService.cardIndex$)
                 ),
                 requestHighlightedWord: s => {
                 }
@@ -306,16 +306,16 @@ export class Manager {
                     shareReplay(1)
                 ),
                 quizzingCard$: this.quizManager.quizzingCard$,
-                trie$: this.cardManager.trie$,
+                trie$: this.cardService.trie$,
             }
         )
 
-        CardScheduleQuiz(this.cardManager, this.scheduleManager, this.quizManager);
+        CardScheduleQuiz(this.cardService, this.scheduleManager, this.quizManager);
         InputPage(this.inputManager, this.openedDocuments);
-        CardPage(this.cardManager, this.openedDocuments);
+        CardPage(this.cardService, this.openedDocuments);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardManager, this.openedDocuments, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardService, this.openedDocuments, this.editingCardManager, this.cardDBManager, this.audioManager)
 
         merge(
             this.openedDocuments.renderedAtomizedSentences$,
@@ -325,7 +325,7 @@ export class Manager {
             }
         );
         this.readingDocumentService = new ReadingDocumentService({
-            trie$: this.cardManager.trie$,
+            trie$: this.cardService.trie$,
             openDocumentsService: this.openedDocuments,
             settingsService: this.settingsService
         });
@@ -352,7 +352,7 @@ export class Manager {
 
 
         this.setQuizWord$.pipe(
-            resolveICardForWord<string, ICard>(this.cardManager.cardIndex$)
+            resolveICardForWord<string, ICard>(this.cardService.cardIndex$)
         ).subscribe((icard) => {
             this.quizManager.setQuizCard(icard);
         })
@@ -451,7 +451,7 @@ export class Manager {
 
         this.temporaryHighlightService = new TemporaryHighlightService({
             highlighterService: this.highlighterService,
-            cardService: this.cardManager
+            cardService: this.cardService
         });
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioManager.audioRecorder.currentRecognizedText$
@@ -476,7 +476,7 @@ export class Manager {
         });
 
         new CardCreationService({
-            cardService: this.cardManager,
+            cardService: this.cardService,
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionService: this.wordRecognitionProgressService
         })
@@ -516,7 +516,7 @@ export class Manager {
             loggedInUserService: this.authManager
         });
         this.hotkeyEvents.startListeners();
-        this.cardManager.load();
+        this.cardService.load();
 
     }
 

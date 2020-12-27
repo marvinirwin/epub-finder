@@ -59,9 +59,3 @@ export const BodyStyle = `
     }
 `;
 
-export const appendDocumentStyle = (d: Document) => {
-
-    const el = d.createElement('style');
-    el.innerText = BodyStyle;
-    d.body.appendChild(el);
-}

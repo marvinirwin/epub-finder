@@ -431,3 +431,25 @@ $character-timing-section-padding: 24px;
   }
 }
 
+
+.quiz-carousel {
+
+  & > .quiz-card {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    & > img {
+      margin: 24px;
+      width: 170px;
+    }
+    & > h3 {
+
+    }
+    & > iframe {
+
+    }
+
+  }
+}

@@ -1,8 +1,6 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {Characters} from "../../components/Quiz/Characters";
 import { startWith, withLatestFrom} from "rxjs/operators";
-import {Conclusion} from "../../components/Quiz/Conclusion";
 import {sleep} from "../Util/Util";
 
 export interface QuizResult {

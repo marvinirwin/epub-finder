@@ -1,14 +1,9 @@
 import CloudConvert from "cloudconvert";
-import {downloadFile} from "./download-file.service";
-import {join} from "path";
-import {UploadedDocument} from "./uploaded-document";
-import FormData from 'form-data';
-import * as fs from "fs";
-import axios from "axios";
 import {Job} from "cloudconvert/built/JobsResource";
 import {BucketConfig} from "./bucket-config.interface";
+import {conversionJob} from "./pdf-to-docx.service";
 
-export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY, true);
+export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY, !!process.env.CLOUD_CONVERT_USE_SANDBOX);
 
 export async function convertToHtml({inputBucket, outputBucket, key, inputFormat}: {
     inputBucket: BucketConfig,
@@ -16,19 +11,29 @@ export async function convertToHtml({inputBucket, outputBucket, key, inputFormat
     key: string,
     inputFormat: string
 }) {
-    const job = await conversionJob({inputBucket, outputBucket, inputFormat, key});
-    try {
+    const {job: job1, outputKey} = await conversionJob("pdf", "docx")
+    ({inputBucket, outputBucket, key});
+    await waitForJobDone(job1)
 /*
-        const uploadUrl = job.tasks.find(({name}) => name === 'import').result.form.url;
+    const {job: job2} = await conversionJob("docx", "html")
+    ({inputBucket, outputBucket, key});
+    await waitForJobDone(job2);
 */
-/*
-        await uploadFileToImportJob(u, uploadUrl);
-*/
-        await downloadJobResult(job);
-    } catch (e) {
-        debugger;console.log();
-        await cloudConvert.jobs.delete(job.id);
+    /*
+            const uploadUrl = job.tasks.find(({name}) => name === 'import').result.form.url;
+    */
+    /*
+            await uploadFileToImportJob(u, uploadUrl);
+    */
+}
+
+async function waitForJobDone(job: Job) {
+    console.log(`Waiting for job ${job.id} to finish`);
+    const result = await cloudConvert.jobs.wait(job.id);
+    if (result.status !== 'finished') {
+        throw new Error("Job failed " + JSON.stringify(result))
     }
+    console.log(`job ${job.id} finished`);
 }
 
 /*
@@ -51,53 +56,6 @@ const uploadFileToImportJob = async (u: UploadedDocument, uploadUrl) => {
 }
 */
 const downloadJobResult = async (job: Job) => {
-    console.log(`Waiting for job ${job.id} to finish`);
-    const jobResult = await cloudConvert.jobs.wait(job.id)
-    console.log(`job ${job.id} finished`);
-    if (jobResult.status !== 'finished') {
-        throw new Error("Job failed " + JSON.stringify(jobResult))
-    }
-
-}
-
-async function conversionJob({inputFormat, inputBucket, outputBucket, key}:{
-    inputFormat: string
-    inputBucket: BucketConfig,
-    outputBucket: BucketConfig,
-    key: string
-                             }) {
-    console.log(`Starting job for ${key} going from ${inputFormat} to html`);
-    const j = await cloudConvert
-        .jobs
-        .create({
-            tasks: {
-                import: {
-                    operation: "import/s3",
-                    key,
-                    ...inputBucket
-                },
-                convertPdfToDocx: {
-                    operation: "convert",
-                    input: "import",
-                    input_format: "pdf",
-                    output_format: "docx",
-                },
-                convertDocxToHtml: {
-                    operation: "convert",
-                    input: "convertPdfToDocx",
-                    input_format: "docx",
-                    output_format: "html",
-                },
-                export: {
-                    operation: 'export/s3',
-                    input: "convertDocxToHtml",
-                    ...outputBucket,
-                    key: `${key}.html`,
-
-                }
-            }
-        });
-    console.log(`Job created for ${key} going from ${inputFormat} to html`);
-    return j;
+    const jobResult = await waitForJobDone(job);
 }
 

@@ -60,7 +60,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
         m.hotkeyEvents.deleteCard$,
         () => {
             if (characters) {
-                m.cardManager.deleteWords.next([characters])
+                m.cardService.deleteWords.next([characters])
                 m.editingCardManager.queEditingCard$.next(undefined);
             }
         }

@@ -24,7 +24,7 @@ export function CardPopup({text, card, getImages, m}: { text: string, card: ICar
                      m.editingCardManager.queEditingCard$.next(EditingCard.fromICard(
                          card,
                          m.cardDBManager,
-                         m.cardManager
+                         m.cardService
                      ))
                  }}
                  onMouseLeave={() => setClicked(false)}

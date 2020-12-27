@@ -37,7 +37,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 */
 
-export class ScheduleManager {
+export class ScheduleService {
     wordQuizList$: Observable<ScheduleRow[]>;
     sortedScheduleRows$: Observable<ScheduleRow[]>;
     indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;

@@ -1,6 +1,5 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {OpenDocument} from "../DocumentFrame/OpenDocument";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map} from "rxjs/operators";
@@ -8,6 +7,7 @@ import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {TrieWrapper} from "../TrieWrapper";
 import { InterpolateService } from "@shared/";
+import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 export type TrieObservable = Observable<TrieWrapper>;
 
