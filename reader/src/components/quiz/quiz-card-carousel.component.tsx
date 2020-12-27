@@ -1,7 +1,9 @@
-import React from "react";
+import React, {useContext} from "react";
+import {ManagerContext} from "../../App";
+import {QuizCardComponent} from "./quiz-card.component";
 
 export const QuizCardCarousel = () => {
-    return <div>
-
-    </div>
+    const m = useContext(ManagerContext);
+    const c = m.quizCarouselService.quizCard;
+    return <QuizCardComponent c={c}/>
 }

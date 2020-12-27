@@ -9,36 +9,39 @@ import {map, shareReplay} from "rxjs/operators";
 import {InterpolateExampleSentencesService} from "../example-sentences/interpolate-example-sentences.service";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
-import {Dictionary} from "lodash";
+import {Dictionary, uniq} from "lodash";
 import {ICard} from "../../lib/Interfaces/ICard";
 import CardService from "src/lib/Manager/CardService";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
+import {ScheduleService} from "../../lib/Manager/schedule.service";
+import {ExampleSentencesService} from "../../lib/example-sentences.service";
 
 export class QuizCardCarouselService {
     quizCard: QuizCard;
     constructor(
         {
-            currentScheduleRow$,
-            exampleSentencesMap$,
             trie$,
-            cardService
+            cardService,
+            scheduleService,
+            exampleSentencesService
         }: {
-            currentScheduleRow$: Observable<ScheduleRow | undefined>,
-            exampleSentencesMap$: Observable<Map<string, string[]>>,
             trie$: Observable<TrieWrapper>,
             cardService: CardService
+            scheduleService: ScheduleService,
+            exampleSentencesService: ExampleSentencesService
         }
         ) {
+        const currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(map(rows => rows[0]));
         const currentWord$ = currentScheduleRow$.pipe(map(row => row?.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
             'example-sentences',
             combineLatest([
-                exampleSentencesMap$,
+                exampleSentencesService.exampleSentenceMap$,
                 currentWord$
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
                     if (!currentWord) return [];
-                    return sentenceMap.get(currentWord) || []
+                    return uniq((sentenceMap.get(currentWord) || []).map(a => a.translatableText)).slice(0, 10)
                 }),
                 shareReplay(1)
             ),

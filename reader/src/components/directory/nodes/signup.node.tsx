@@ -1,7 +1,7 @@
-import {useContext, useState} from "react";
-import React from "react";
-import {ManagerContext} from "../../App";
+import React, {useContext, useState} from "react";
 import axios from "axios";
+import {ManagerContext} from "../../../App";
+import {TESTING} from "../app-directory-service";
 
 export const Signup = () => {
     const m = useContext(ManagerContext);
@@ -31,4 +31,12 @@ export const Signup = () => {
         }>sign up
         </button>
     </div>
+}
+
+export function SignupNode() {
+    return {
+        name: 'signup',
+        hidden: !TESTING,
+        ReplaceComponent: Signup
+    };
 }

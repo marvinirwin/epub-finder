@@ -1,4 +1,3 @@
-import {OpenDocument} from "../lib/DocumentFrame/OpenDocument";
 import {Manager} from "../lib/Manager";
 import React from "react";
 import {useObservableState} from "observable-hooks";
@@ -7,6 +6,7 @@ import {HSKWord} from "../lib/Manager/ProgressManager";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import { flatten, orderBy } from "lodash";
 import {isChineseCharacter} from "../lib/Interfaces/OldAnkiClasses/Card";
+import {OpenDocument} from "../lib/DocumentFrame/open-document.entity";
 
 
 const hsk1Array = HSK1 as HSKWord[];

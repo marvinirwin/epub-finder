@@ -68,7 +68,7 @@ import {DocumentCheckingOutService} from "../components/Library/document-checkin
 import {DocumentRepository} from "./documents/document.repository";
 import {LibraryService} from "./Manager/library.service";
 import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
-import {mapToArray} from "./map.module";
+import {mapMap, mapToArray} from "./map.module";
 import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
 import {AvailableDocumentsService} from "./documents/available-documents.service";
 import {DocumentSelectionService} from "./document-selection/document-selection.service";
@@ -78,6 +78,10 @@ import {RequestRecordingService} from "../components/PronunciationVideo/request-
 import {TreeMenuService} from "../services/tree-menu.service";
 import { ScheduleService } from "./Manager/schedule.service";
 import { OpenDocument } from "./DocumentFrame/open-document.entity";
+import {QuizCardCarouselService} from "../components/quiz/quiz-card-carousel.service";
+import {ScheduleRow} from "./schedule/schedule-row.interface";
+import {TrieWrapper} from "./TrieWrapper";
+import {ExampleSentencesService} from "./example-sentences.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -158,6 +162,8 @@ export class Manager {
     availableDocumentsService: AvailableDocumentsService;
     documentSelectionService: DocumentSelectionService;
     readingDocumentService: ReadingDocumentService;
+    exampleSentencesService: ExampleSentencesService;
+    public quizCarouselService: QuizCardCarouselService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.availableDocumentsService = new AvailableDocumentsService()
@@ -232,6 +238,10 @@ export class Manager {
                 recognitionRecordsService: this.wordRecognitionProgressService
             }
         );
+
+        this.exampleSentencesService = new ExampleSentencesService({
+            openDocumentsService: this.openedDocuments,
+        })
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
         this.editingCardManager = new EditingCardManager();
@@ -274,37 +284,6 @@ export class Manager {
         // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
         this.quizCharacterManager = new QuizCharacter(
             {
-                exampleSentences$: combineLatest([
-                    this.openedDocuments.allOpenDocuments$
-                        .pipe(
-                            switchMap(documents =>
-                                combineLatest(
-                                    mapToArray(documents, (id, document) => document.documentStats$)
-                                )
-                            )
-                        ),
-                    this.quizManager.quizzingCard$
-                ]).pipe(
-                    map(([textWordData, quizzingCard]: [AtomizedDocumentDocumentStats[], ICard | undefined]) => {
-                        if (!quizzingCard) return [];
-                        const limit = 10;
-                        let count = 0;
-                        const sentenceMatches: ds_Dict<AtomizedSentence> = {};
-                        for (let i = 0; i < textWordData.length && count < limit; i++) {
-                            const textData = textWordData[i];
-                            const wordSentenceMapElement = textData.wordSentenceMap[quizzingCard.learningLanguage];
-                            if (wordSentenceMapElement) {
-                                const translatableText = wordSentenceMapElement[0].translatableText;
-                                if (!sentenceMatches[translatableText]) {
-                                    sentenceMatches[translatableText] = wordSentenceMapElement[0];
-                                    count++;
-                                }
-                            }
-                        }
-                        return Object.values(sentenceMatches);
-                    }),
-                    shareReplay(1)
-                ),
                 quizzingCard$: this.quizManager.quizzingCard$,
                 trie$: this.cardService.trie$,
             }
@@ -515,6 +494,12 @@ export class Manager {
             readingDocumentService: this.readingDocumentService,
             loggedInUserService: this.authManager
         });
+        this.quizCarouselService = new QuizCardCarouselService({
+            scheduleService: this.scheduleManager,
+            exampleSentencesService: this.exampleSentencesService,
+            trie$: this.cardService.trie$,
+            cardService: this.cardService
+        })
         this.hotkeyEvents.startListeners();
         this.cardService.load();
 

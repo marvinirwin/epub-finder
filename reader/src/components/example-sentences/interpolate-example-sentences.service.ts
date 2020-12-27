@@ -1,4 +1,4 @@
-import {InterpolateService} from "@shared/*";
+import {InterpolateService} from "@shared/";
 
 export class InterpolateExampleSentencesService {
     public static interpolate(sentences: string[]) {

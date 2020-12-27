@@ -2,27 +2,62 @@ import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/Manager";
 import {combineLatest, Observable} from "rxjs";
-import {distinctUntilChanged, map, startWith, tap} from "rxjs/operators";
-import {PlaybackSpeedComponent} from "./playback-speed.component";
+import {distinctUntilChanged, map, startWith} from "rxjs/operators";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
-import {ReadingNode} from "./nodes/reading.component";
-import {WatchMode} from "./modes/watch-mode.component";
-import {SpeakMode} from "./modes/speak-mode.component";
+import {ReadingNode} from "./nodes/reading.node";
 import {TreeMenuNode} from "./tree-menu-node.interface";
-import {FileChooser} from "./file-chooser.component";
 import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
-import GoogleButton from "react-google-button";
-import {ToggleTranslate} from "./toggle-translate";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
-import {Signup} from "./signup";
-import {QuizPage} from "../Pages/QuizPage";
-import { QuizCard } from "../quiz/quiz-card.component";
-import { QuizSchedule } from "../quiz/quiz-schedule.component";
-import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
+import {Profile} from "../../lib/Auth/loggedInUserService";
+import {SignupNode} from "./nodes/signup.node";
+import {SignoutNode} from "./nodes/signout.node";
+import {ToggleTranslateNode} from "./nodes/toggle-translate.node";
+import {SignInWithNode} from "./nodes/sign-in-with.node";
+import {GoogleSigninNode} from "./nodes/google-sign-in.node";
+import {ProfileNode} from "./nodes/profile.node";
+import {UploadeNode} from "./nodes/upload.node";
+import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
+import {PlaybackSpeedNode} from "./nodes/playback-speed.node";
+import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
+import {LibraryNode} from "./nodes/library.node";
+import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
+import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 
 const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
-const TESTING = new URLSearchParams(window.location.search).has('test')
 
+export const TESTING = new URLSearchParams(window.location.search).has('test')
+
+
+function AppDirectory(
+    m: Manager, selectedComponent: string | undefined,
+    availableDocuments: DocumentSelectionRowInterface[],
+    profile: Profile | undefined) {
+    return arrayToTreeRoot<TreeMenuNode>(
+        ReadingNode(m),
+        [
+            ReadingNode(m, selectedComponent === 'reading'),
+            SignupNode(),
+            WatchPronunciationNode(),
+            RecognizeSpeechNode(),
+            PlaybackSpeedNode(),
+            QuizCarouselNode(),
+            [
+                QuizScheduleNode(),
+            ],
+            LibraryNode(),
+            UploadeNode(),
+            // @ts-ignore
+            ...(availableDocuments.map(toTreeMenuNode)),
+            SignInWithNode(profile),
+            [
+                GoogleSigninNode(),
+            ],
+            ProfileNode(profile),
+            ToggleTranslateNode(),
+            SignoutNode(m, profile),
+        ] as ArrayToTreeParams<TreeMenuNode>
+    );
+}
 
 export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode>> => {
     // This is going to break the way I do "Selected components".
@@ -46,107 +81,11 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
                  availableDocuments,
                  selectedComponent
              ]) => {
-            return arrayToTreeRoot<TreeMenuNode>(
-                ReadingNode(m),
-                [
-                    ReadingNode(m, selectedComponent === 'reading'),
-                    {
-                        name: 'signup',
-                        hidden: !TESTING,
-                        ReplaceComponent: Signup
-                    },
-                    {
-                        name: 'watchPronunciation',
-                        ReplaceComponent: WatchMode
-                    },
-                    {
-                        name: 'recognizeSpeech',
-                        ReplaceComponent: SpeakMode
-                    },
-                    {
-                        name: 'playbackSpeed',
-                        label: 'playbackSpeed',
-                        InlineComponent: () => <PlaybackSpeedComponent/>
-                    },
-                    {
-                        name: 'quiz',
-                        label: 'Quiz',
-                        moveDirectory: true,
-                        Component: QuizCardCarousel
-                    },
-                    [
-                        {
-                            name: 'quiz-card',
-                            label: 'Quiz Schedule',
-                            Component: QuizSchedule
-                        },
-                    ],
-                    /*
-                                        {
-                                            name: 'library',
-                                            label: 'Library',
-                                            moveDirectory: true,
-                                        },
-                    */
-                    {
-                        name: 'customDocument',
-                        ReplaceComponent: () => <FileChooser/>,
-                    },
-                    // @ts-ignore
-                    ...(availableDocuments.map(toTreeMenuNode)),
-                    /*
-                                        {
-                                            name: 'requestRecording',
-                                            Component: () => <RequestRecordingSentences/>,
-                                            label: profile?.email ? 'Request Recordings' : 'Log in to request custom recordings',
-                                            hidden: !profile?.email
-                                        },
-                    */
-                    {
-                        name: 'signInWith',
-                        label: 'Sign In With',
-                        moveDirectory: true,
-                        hidden: !!profile?.email
-                    },
-                    [
-                        {
-                            name: 'google',
-                            ReplaceComponent: () => <GoogleButton
-                                onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/google`}
-                            /> /*<IconButton
-                                onClick={() => }>
-                                <GoogleIcon/>
-                            </IconButton>*/
-                        },
-                        /*
-                                                {
-                                                    name: 'twitter',
-                                                    ReplaceComponent: () => <IconButton
-                                                        onClick={() => window.location.href = `${process.env.PUBLIC_URL}/auth/twitter`}>
-                                                        <TwitterIcon/>
-                                                    </IconButton>,
-                                                    hidden: true,
-                                                }
-                        */
-                    ],
-                    {
-                        name: 'profile',
-                        label: profile?.email,
-                        hidden: !!profile
-                    },
-                    {
-                        name: 'translate',
-                        ReplaceComponent: () => <ToggleTranslate/>
-                    },
-                    {
-                        name: 'signOut',
-                        label: 'Sign Out',
-                        action: () => m.authManager.signOut(),
-                        LeftIcon: () => {
-                        },
-                        hidden: !profile?.email
-                    },
-                ] as ArrayToTreeParams<TreeMenuNode>
+            return AppDirectory(
+                m,
+                selectedComponent,
+                availableDocuments,
+                profile
             );
             /*
                         const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);

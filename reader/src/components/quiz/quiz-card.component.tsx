@@ -1,15 +1,32 @@
-import React from "react";
-import {Paper, Typography} from "@material-ui/core";
-import {CardEntity} from "./card.entity";
-import {CardImage} from "./card-image.component";
-import {ExampleSentences} from "../example-sentences/example-sentences.component";
+import React, {useContext} from "react";
+import {Button, Paper, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
+import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
+import {QuizCard} from "./quiz-card.interface";
+import {EditableOnClick} from "./editable-image.component";
+import {ManagerContext} from "../../App";
 
-export const QuizCard = ({cardEntity}:{cardEntity: CardEntity}) => {
-    const word = useObservableState(cardEntity.)
+export const QuizCardComponent = ({c}:{c: QuizCard}) => {
+    const word = useObservableState(c.word$);
+    const source = useObservableState(c.image$.value$);
+    const m = useContext(ManagerContext);
     return <Paper className='quiz-card'>
-        <Typography> Card Text </Typography>
-        <CardImage c={cardEntity}> </CardImage>
-        <ExampleSentences sentences={exampleSentences$}/>
+        <EditableOnClick onEditClicked={() => {
+            // TODO image search
+        }}>
+            <img src={source}/>
+        </EditableOnClick>
+        <EditableOnClick onEditClicked={() => {
+            // TODO image search
+        }}>
+            <Typography> {word || ''} </Typography>
+        </EditableOnClick>
+        <OpenedDocument openedDocument={c.exampleSentenceOpenDocument} />
+        <div className={'quiz-button-row'}>
+            <Button className={'quiz-button-hard'} onClick={() => m.hotkeyEvents.quizResultHard$.next()}/>
+            <Button className={'quiz-button-medium'} onClick={() => m.hotkeyEvents.quizResultMedium$.next()}/>
+            <Button className={'quiz-button-easy'} onClick={() => m.hotkeyEvents.quizResultEasy$.next()}/>
+            <Button className={'quiz-button-hide'} onClick={() => {}}>Hide</Button>
+        </div>
     </Paper>
 }

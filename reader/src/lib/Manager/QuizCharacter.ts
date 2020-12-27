@@ -1,4 +1,4 @@
-import {Observable, ReplaySubject} from "rxjs";
+import {Observable, of, ReplaySubject} from "rxjs";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
@@ -6,16 +6,10 @@ import {distinct, map} from "rxjs/operators";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {AtomizedDocument} from "../Atomized/AtomizedDocument";
 import {TrieWrapper} from "../TrieWrapper";
-import { InterpolateService } from "@shared/";
+import {InterpolateService} from "@shared/";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 export type TrieObservable = Observable<TrieWrapper>;
-
-export interface QuizCharacterManagerParams {
-    exampleSentences$: Observable<AtomizedSentence[]>,
-    quizzingCard$: Observable<ICard | undefined>;
-    trie$: TrieObservable;
-}
 
 export class QuizCharacter {
     exampleSentences$: Observable<AtomizedSentence[]>;
@@ -26,12 +20,14 @@ export class QuizCharacter {
     private sentenceCache = new Set<string>();
 
     constructor({
-                    exampleSentences$,
                     quizzingCard$,
                     trie$,
-                }: QuizCharacterManagerParams) {
+                }: {
+        quizzingCard$: Observable<ICard | undefined>;
+        trie$: TrieObservable;
+    }) {
         this.atomizedSentenceMap$.next({})
-        this.exampleSentences$ = exampleSentences$;
+        this.exampleSentences$ = of([]);
         this.quizzingCard$ = quizzingCard$;
         this.exampleSentencesDocument = new OpenDocument(
             'ExampleSentences',

@@ -43,7 +43,7 @@ export class OpenDocumentsService {
     exampleSentenceSentenceData$: Observable<TextWordData[]>;
     displayDocument$: Observable<AtomizedDocument>;
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
-    allOpenDocuments$: Observable<Map<string, OpenDocument>>;
+    allReadingDocuments: Observable<Map<string, OpenDocument>>;
     checkedOutDocumentsData$: Observable<AtomizedDocumentDocumentStats[]>;
     // Visible means inside of the viewport
     visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
@@ -61,7 +61,7 @@ export class OpenDocumentsService {
         }
     ) {
 
-        this.allOpenDocuments$ = config.libraryService.documents$.pipe(
+        this.allReadingDocuments = config.libraryService.documents$.pipe(
             map(documents => filterMap(documents, (key, d) => !d.deleted)),
             map(libraryDocuments => {
                 return mapMap(
@@ -90,7 +90,7 @@ export class OpenDocumentsService {
             shareReplay(1)
         );
 
-        this.allOpenDocuments$.subscribe(
+        this.allReadingDocuments.subscribe(
             openDocuments => this.openDocumentTree.appendDelta$.next(
                 {
                     nodeLabel: 'root',
@@ -147,7 +147,7 @@ export class OpenDocumentsService {
             };
         }
 
-        this.checkedOutDocumentsData$ = this.allOpenDocuments$.pipe(
+        this.checkedOutDocumentsData$ = this.allReadingDocuments.pipe(
             switchMap(openDocuments =>
                 combineLatest(mapToArray(openDocuments, (id, document) => document.documentStats$))
             ),
