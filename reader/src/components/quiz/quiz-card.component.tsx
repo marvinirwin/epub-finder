@@ -5,12 +5,13 @@ import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableOnClick} from "./editable-image.component";
 import {ManagerContext} from "../../App";
+import {PaperProps} from "@material-ui/core/Paper/Paper";
 
-export const QuizCardComponent = ({c}:{c: QuizCard}) => {
+export const QuizCardComponent: React.FC<{c: QuizCard} & PaperProps> = ({c, ...props}) => {
     const word = useObservableState(c.word$);
     const source = useObservableState(c.image$.value$);
     const m = useContext(ManagerContext);
-    return <Paper className='quiz-card'>
+    return <Paper className='quiz-card' {...props}>
         <EditableOnClick onEditClicked={() => {
             // TODO image search
         }}>
