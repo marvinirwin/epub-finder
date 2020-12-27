@@ -1,4 +1,4 @@
-import {ScheduleService} from "../ScheduleService";
+import {ScheduleService} from "../schedule.service";
 import {QuizManager} from "../QuizManager";
 import CardService from "../CardService";
 

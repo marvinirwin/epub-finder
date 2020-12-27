@@ -2,8 +2,7 @@ import {documentSelectionRow, fileChooser} from "../constants";
 
 export function UploadLearningDocument() {
     cy.get(fileChooser).attachFile('test_quiz.html');
-    cy.contains(documentSelectionRow, 'test_quiz')
-        .should('have.class.reading');
+    cy.get(`${documentSelectionRow}.reading`).contains('test_quiz')
 }
 
 interface QuizCardData {

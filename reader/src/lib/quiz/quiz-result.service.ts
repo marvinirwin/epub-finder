@@ -1,7 +1,7 @@
 import {QuizManager} from "../Manager/QuizManager";
 import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
 import {QuizResultToRecognitionRows} from "../Pipes/QuizResultToRecognitionRows";
-import {ScheduleService} from "../Manager/ScheduleService";
+import {ScheduleService} from "../Manager/schedule.service";
 import {SrmService} from "../srm/srm.service";
 
 export class QuizResultService {

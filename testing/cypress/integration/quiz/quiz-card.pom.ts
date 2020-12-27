@@ -44,24 +44,14 @@ export class QuizCardPom {
     editDescription(newDescription: string) {
         this.body()
             .find('.known-language')
-            .find('.edit-icon')
-            .click();
-        // Now edit the text and unfocus
-        this.body()
-            .find('.known-language')
             .type(newDescription);
-        // Now wait for editing to disappear
-        this.body()
-            .find('.known-language.editing')
-            .should('not.exist');
     }
 
     selectNewImage() {
         // HACK, I just don't want to verify what src there is not, I'm just happy if it's not empty
         const oldSrc = '';
         this.body()
-            .find('.image-container')
-            .find('.edit-icon')
+            .find('.quiz-card-image')
             .click();
 
         cy.get('.image-search-modal')

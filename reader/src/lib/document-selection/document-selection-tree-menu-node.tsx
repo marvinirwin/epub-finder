@@ -16,7 +16,7 @@ export const toTreeMenuNode = ({
     name,
     ReplaceComponent: () => {
         const m = useContext(ManagerContext);
-        return <ListItem className={'document-selection-row'} key={Math.random()}>
+        return <ListItem className={`document-selection-row ${reading ? 'reading' : ''}`} key={Math.random()}>
             {name}
             <div className={'document-selection-row-icon-container'}>
                 {reading && <IconButton><LocalLibrary/></IconButton>}

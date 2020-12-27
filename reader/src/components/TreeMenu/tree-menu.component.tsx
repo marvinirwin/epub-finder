@@ -37,6 +37,8 @@ function TreeMenuNodeItem(
     return <ListItem
         button
         selected={false}
+        id={TreeMenuNode?.name}
+        className={`tree-menu-node`}
         onClick={() => {
             if (TreeMenuNode) {
                 const newPath = directoryPath.concat(TreeMenuNode?.name);

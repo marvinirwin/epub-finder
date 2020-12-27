@@ -1,5 +1,5 @@
 export class DirectoryPom {
     public static goToQuiz() {
-        cy.get('#quiz-directory').click();
+        cy.get('#quiz.tree-menu-node').click();
     }
 }
