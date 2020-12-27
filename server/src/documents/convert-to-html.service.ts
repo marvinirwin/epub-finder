@@ -11,7 +11,7 @@ export async function convertToHtml({inputBucket, outputBucket, key, inputFormat
     key: string,
     inputFormat: string
 }) {
-    const {job: job1, outputKey} = await conversionJob("pdf", "docx")
+    const {job: job1, outputKey} = await conversionJob("pdf", "html")
     ({inputBucket, outputBucket, key});
     await waitForJobDone(job1)
 /*

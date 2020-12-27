@@ -1,6 +1,11 @@
 import {bucket, s3} from "./s3.service";
 import {createHash} from "crypto";
 
+const s3Exists = (s3: AWS.S3, Bucket: string, Key: string) => new Promise(resolve => {
+    s3.headObject({Bucket, Key}, (err, data) => {
+        resolve(!err)
+    })
+})
 
 export class UploadedFileService {
     /*
@@ -11,9 +16,13 @@ export class UploadedFileService {
     */
 
     public static fileHash(key: string): Promise<string> {
-        return new Promise(resolve => {
+        return new Promise(async (resolve, reject) => {
             console.log(`Hashing ${key}: getting read stream`)
-            const readStream = s3.getObject({Bucket: bucket, Key: key}).createReadStream();
+            const params = {Bucket: bucket, Key: key};
+            if (!await s3Exists(s3, bucket, key)) {
+                throw new Error(`Cannot find ${key}`);
+            }
+            const readStream = s3.getObject(params).createReadStream();
             console.log(`Hashing ${key}: got read stream`)
             const hash = createHash('sha1');
             hash.setEncoding('hex');

@@ -66,6 +66,7 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
+        console.log(`Uploaded ${file.originalname} to S3 ${file.key}`);
         const ext = parse(file.originalname).ext.replace('.', '');
         switch(ext) {
             case "pdf":
@@ -76,6 +77,13 @@ export class DocumentsController {
                     outputBucket: outputConfig,
                     key: file.key
                 });
+                break;
+            case "html":
+                await s3.copyObject({
+                    Bucket: inputConfig.bucket,
+                    CopySource: `/${file.bucket}/${file.key}`,
+                    Key: `${file.key}.html`
+                }).promise()
                 break;
             default:
                 throw new Error(`Unsupported file extension: ${ext}`);
