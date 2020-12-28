@@ -23,9 +23,8 @@ export const PronunciationVideo = (
     const resizeContext = useContext(AudioRecorderResizedContext);
     const videoElementRef = useObservableState(m.pronunciationVideoService.videoRef$);
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$)
-    const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
 
-    useApplyTimeBySelectedCharacter(videoElementRef, videoMetadata?.sentence, currentSentenceCharacterIndex, videoMetadata);
+    useApplyTimeBySelectedCharacter(videoElementRef, videoMetadata?.sentence, videoMetadata);
     useApplyBoundedTime(videoElementRef, highlightBarPosition1Ms, highlightBarPosition2Ms)
     useApplyPlaybackSpeed(videoElementRef);
     useApplyPlaybackTime(videoElementRef);

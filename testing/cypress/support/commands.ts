@@ -29,6 +29,7 @@ declare namespace Cypress {
         signupLogin(): Chainable<void>
 
         skipIntro(): Chainable<void>
+        Å
     }
 }
 Cypress.Commands.add('signupLogin', () => {
@@ -42,13 +43,23 @@ Cypress.Commands.add('signupLogin', () => {
         )
 })
 
+
+Cypress.Commands.add('IframeBody', {
+    prevSubject: true
+}, (subject) => {
+    return cy.wrap(subject)
+        .its('0.contentDocument').should('exist')
+        .its('body').should('not.be.undefined')
+        .then(cy.wrap)
+});
+
 Cypress.Commands.add('skipIntro', () => {
-/*
-    cy.get('.introjs-skipbutton')
-        .then(el => {
-            if (el) {
-                el.click()
-            }
-        })
-*/
+    /*
+        cy.get('.introjs-skipbutton')
+            .then(el => {
+                if (el) {
+                    el.click()
+                }
+            })
+    */
 })

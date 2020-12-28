@@ -1,28 +1,27 @@
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
 import {VideoCharacter} from "./video-character.interface";
 import {VideoMetadata} from "../../types/";
+import {useSubscription} from "observable-hooks";
+import {ManagerContext} from "../../App";
 
 export function useApplyTimeBySelectedCharacter(
     videoElementRef: HTMLVideoElement | null | undefined,
     currentSentence: string | undefined,
-    currentSentenceCharacterIndex: number | undefined,
-    videoMetaData: VideoMetadata | undefined |
-        { sentence: string | undefined; timeScale: number | undefined; characters: VideoCharacter[] | undefined; filename?: string | undefined | undefined }) {
-    useEffect(() => {
-        if (videoElementRef
-            && currentSentence
-            && (currentSentenceCharacterIndex === 0 || currentSentenceCharacterIndex)
-            && videoMetaData) {
-            const time = videoMetaData?.characters?.[currentSentenceCharacterIndex]?.timestamp;
-            const timeScale = videoMetaData?.timeScale;
-            if (time && timeScale) {
-                videoElementRef.currentTime = (time * timeScale) / 1000;
+    videoMetaData: VideoMetadata | undefined ) {
+    const m = useContext(ManagerContext);
+    useSubscription(
+        m.inputManager.videoCharacterIndex$,
+        index => {
+            if (videoElementRef
+                && currentSentence
+                && (index === 0 || index )
+                && videoMetaData) {
+                const time = videoMetaData?.characters?.[index]?.timestamp;
+                const timeScale = videoMetaData?.timeScale;
+                if (time && timeScale) {
+                    videoElementRef.currentTime = (time * timeScale) / 1000;
+                }
             }
         }
-    }, [
-        currentSentenceCharacterIndex,
-        currentSentence,
-        videoElementRef,
-        videoMetaData
-    ]);
+    )
 }

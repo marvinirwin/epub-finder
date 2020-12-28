@@ -35,9 +35,7 @@ export class QuizCardPom {
     exampleSentences() {
         return this.body()
             .find('iframe')
-            .its('0.contentDocument').should('exist')
-            .its('body').should('not.be.undefined')
-            .then(cy.wrap)
+
             .find('.example-sentence')
     }
 

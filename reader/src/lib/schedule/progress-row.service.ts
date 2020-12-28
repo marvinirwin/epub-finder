@@ -8,6 +8,7 @@ import {safePush} from "../../services/safe-push";
 export class ProgressRowService<T extends {word: string, id?: number}> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
     addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1);
+    clearRecords$ = new ReplaySubject<void>(1);
     constructor({ db, load, add}: {
         db: DatabaseService,
         load: () => AsyncGenerator<T[]>,
@@ -21,6 +22,7 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
                     safePush(wordRecognitionRecords, row.word, row);
                     wordRecognitionRecords[row.word] = orderBy(wordRecognitionRecords[row.word], 'timestamp');
                 });
+                // This is a hack side effect
                 this.records$.next(wordRecognitionRecords);
             }),
         ).subscribe((([rows]) => {
@@ -31,6 +33,7 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
                 }
             }
         }));
+        this.clearRecords$.subscribe(v => this.records$.next({}));
         this.loadGenerator(load);
     }
 
