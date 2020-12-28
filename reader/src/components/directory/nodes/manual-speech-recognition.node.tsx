@@ -1,6 +1,5 @@
 import React, {useContext, useState} from "react";
 import {TESTING} from "../app-directory-service";
-import {Signup} from "./signup.component";
 import {ManagerContext} from "../../../App";
 
 export function ManualSpeechRecognitionNode() {
@@ -16,7 +15,8 @@ export function ManualSpeechRecognitionNode() {
                     () => m.pronunciationProgressService.addRecords$.next([
                             {
                                 word: speechRecInput?.value || '',
-                                success: true
+                                success: true,
+                                timestamp: new Date()
                             }
                         ]
                     )

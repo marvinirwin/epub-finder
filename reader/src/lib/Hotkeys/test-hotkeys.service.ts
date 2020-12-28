@@ -11,6 +11,7 @@ export class TestHotkeysService {
             pronunciationProgressService.addRecords$.next([{
                 word: '大小姐',
                 success: true,
+                timestamp: new Date()
             }])
         })
     }

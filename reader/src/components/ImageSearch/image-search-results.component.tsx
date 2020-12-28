@@ -6,11 +6,12 @@ export const ImageSearchResults = (
     {searchResults, onClick}:
         { searchResults: ImageResult[], onClick: (i: ImageResult) => void }
 ) => {
-    return <GridList cellHeight={160} cols={12}>
+    return <GridList cellHeight={160} cols={12} className={'image-search-results'}>
         {searchResults.map((imageResult, index) =>
             <GridListTile
                 style={{overflow: 'hidden'}}
                 key={index}
+                className={'image-search-result'}
             >
                 <img onClick={() => onClick(imageResult)}
                      src={imageResult.thumbnailUrl}

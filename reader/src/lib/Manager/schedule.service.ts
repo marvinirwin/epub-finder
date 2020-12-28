@@ -1,46 +1,21 @@
 import {combineLatest, Observable} from "rxjs";
 import {DatabaseService} from "../Storage/database.service";
 import {orderBy} from "lodash";
-import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
 import {map, shareReplay, startWith} from "rxjs/operators";
-import {ds_Dict} from "../Tree/DeltaScanner";
 import moment from "moment";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
-import {ProgressRowService} from "../schedule/progress-row.service";
 import {ScheduleRow} from "../schedule/schedule-row.interface";
 import {SrmService} from "../srm/srm.service";
-import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {dueDate, isLearning, isNew, isToReview, wordCount} from "../schedule/ScheduleRow";
+import {ScheduleRowsService} from "./schedule-rows.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 const LEARNING_CARDS_LIMIT = 20;
 
-/*
-function shuffle<T>(array: T[]): T[] {
-    var currentIndex = array.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-}
-*/
-
 export class ScheduleService {
     wordQuizList$: Observable<ScheduleRow[]>;
     sortedScheduleRows$: Observable<ScheduleRow[]>;
-    indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;
     learningCards$: Observable<ScheduleRow[]>;
 
     private today: number;
@@ -52,48 +27,20 @@ export class ScheduleService {
 
     constructor({
                     db,
-                    wordCounts$,
                     sortMode$: sortStrategy$,
-        recognitionRecordsService
+                    scheduleRowsService
                 }: {
-        wordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
         db: DatabaseService,
         sortMode$: Observable<string>,
-        recognitionRecordsService: ProgressRowService<WordRecognitionRow>
+        scheduleRowsService: ScheduleRowsService
     }) {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
         this.srmService = new SrmService();
 
-
-        this.indexedScheduleRows$ = combineLatest([
-            recognitionRecordsService.records$.pipe(startWith({})),
-            wordCounts$.pipe(startWith({}))
-        ]).pipe(
-            map(([wordRecognition, wordCounts]) => {
-                const scheduleRows: ds_Dict<ScheduleRow> = {};
-
-                function ensureScheduleRow(word: string) {
-                    if (!scheduleRows[word]) {
-                        scheduleRows[word] = {wordRecognitionRecords: [], wordCountRecords: [], word};
-                    }
-                    return scheduleRows[word];
-                }
-
-                Object.entries(wordCounts).forEach(([word, wordCountRecords]) => {
-                    ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
-                });
-                Object.entries(wordRecognition).forEach(([word, wordRecognitionRecords]) => {
-                    scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
-                });
-                return scheduleRows;
-            }),
-            shareReplay(1)
-        );
-
         this.sortedScheduleRows$ = combineLatest([
-            this.indexedScheduleRows$,
+            scheduleRowsService.indexedScheduleRows$,
             sortStrategy$
         ]).pipe(
             map(([indexedScheduleRows]) => {

@@ -76,13 +76,14 @@ import {AlertsService} from "../services/alerts.service";
 import {ReadingDocumentService} from "./Manager/reading-document.service";
 import {RequestRecordingService} from "../components/PronunciationVideo/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
-import { ScheduleService } from "./Manager/schedule.service";
-import { OpenDocument } from "./DocumentFrame/open-document.entity";
+import {ScheduleService} from "./Manager/schedule.service";
+import {OpenDocument} from "./DocumentFrame/open-document.entity";
 import {QuizCardCarouselService} from "../components/quiz/quiz-card-carousel.service";
 import {ScheduleRow} from "./schedule/schedule-row.interface";
 import {TrieWrapper} from "./TrieWrapper";
 import {ExampleSentencesService} from "./example-sentences.service";
 import {ImageSearchService} from "./image-search.service";
+import {ScheduleRowsService} from "./Manager/schedule-rows.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -129,6 +130,7 @@ export class Manager {
     public alertsService = new AlertsService();
     public requestRecordingService: RequestRecordingService;
     public treeMenuService = new TreeMenuService<any, { value: any }>();
+    public scheduleRowsService: ScheduleRowsService;
 
     public observableService = new ObservableService();
 
@@ -232,11 +234,15 @@ export class Manager {
         this.readingWordSentenceMap = sentenceMap$;
         this.pronunciationProgressService = new PronunciationProgressService({db});
         this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
+        this.scheduleRowsService = new ScheduleRowsService({
+            wordCounts$: this.readingWordCounts$,
+            recognitionRecordsService: this.wordRecognitionProgressService,
+            pronunciationRecordsService: this.pronunciationProgressService
+        })
         this.scheduleManager = new ScheduleService({
                 db,
-                wordCounts$: this.readingWordCounts$,
                 sortMode$: of('').pipe(shareReplay(1)),
-                recognitionRecordsService: this.wordRecognitionProgressService
+                scheduleRowsService: this.scheduleRowsService
             }
         );
 
@@ -248,7 +254,7 @@ export class Manager {
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
             wordRecognitionRows$: this.wordRecognitionProgressService.records$,
-            scheduleRows$: this.scheduleManager.indexedScheduleRows$
+            scheduleRows$: this.scheduleRowsService.indexedScheduleRows$
         });
         this.quizManager = new QuizManager({
                 scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
@@ -264,12 +270,12 @@ export class Manager {
             srmService: this.scheduleManager.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
-            scheduleManager: this.scheduleManager
+            scheduleRowsService: this.scheduleRowsService
         })
 
 
         combineLatest([
-            this.scheduleManager.indexedScheduleRows$,
+            this.scheduleRowsService.indexedScheduleRows$,
             this.quizManager.quizzingCard$
         ]).pipe(debounceTime(0)).subscribe(([indexedScheduleRows, quizzingCard]) => {
             if (quizzingCard && !indexedScheduleRows[quizzingCard.learningLanguage]) {
@@ -355,7 +361,7 @@ export class Manager {
 
         combineLatest([
             this.highlightAllWithDifficultySignal$,
-            this.scheduleManager.indexedScheduleRows$,
+            this.scheduleRowsService.indexedScheduleRows$,
         ]).subscribe(([signal, indexedScheduleRows]) => {
             signal ?
                 this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows) :

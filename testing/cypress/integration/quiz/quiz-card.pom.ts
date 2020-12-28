@@ -1,3 +1,5 @@
+import {ImageSearchPom} from "./image-search.pom";
+
 export const CurrentQuizCard = '#current-quiz-card';
 
 export class QuizCardPom {
@@ -52,15 +54,9 @@ export class QuizCardPom {
             .find('.quiz-card-image')
             .click();
 
-        cy.get('.image-search-modal')
-            .find('.image-search-result')
-            .should('exist')
+        ImageSearchPom.SearchResults().click()
 
-        cy.get('.image-search-modal')
-            .find('.image-search-result')
-            .click();
-
-        // Now assert we have an image we clicked
+        // Now assert we have an image we clicked (Or since I'm lazy, just not the previous one
         this.body()
             .find('.image')
             .should('have.attr', 'src').should('not.include', oldSrc);

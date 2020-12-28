@@ -2,7 +2,7 @@ import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
 import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
-import {ExpandableContainer} from "../Containers/ExpandableContainer";
+import {ExpandableContainer} from "../Containers/expandable-container";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
 import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";

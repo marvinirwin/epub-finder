@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }));
 
-export const ImageSearchAppbar = (
+export const ImageSearchAppBar = (
     {
         imageRequest,
         onClose,
@@ -48,9 +48,9 @@ export const ImageSearchAppbar = (
     }
     ) => {
     const classes = useStyles();
-    return <AppBar style={{position: 'relative'}}>
-        <Toolbar>
-            <Typography variant="h6" noWrap>
+    return <AppBar className={'image-search-app-bar'}>
+        <Toolbar className={'image-search-toolbar'}>
+            <Typography variant="h6" noWrap className={'image-search-term'}>
                 {imageRequest?.term}
             </Typography>
             <div className={classes.search}>

@@ -65,7 +65,7 @@ export class HotKeyEvents {
                 editingCard.learningLanguage$.toPromise(),
                 editingCard.photos$.toPromise()
             ]);
-            m.queryImageRequest$.next({
+            m.imageSearchService.queryImageRequest$.next({
                 term: characters,
                 cb: (s: string) => editingCard.photos$.next(photos?.concat(s))
             })
@@ -100,13 +100,13 @@ export class HotKeyEvents {
         setQuizResult(this.quizResultHard$, RecognitionMap.hard);
 
         this.hide$.pipe(withLatestFrom(
-            m.queryImageRequest$,
+            m.imageSearchService.queryImageRequest$,
             m.editingCardManager.showEditingCardPopup$
         )).subscribe(([_, imageQuery, showEditingCard]) => {
             if (imageQuery) {
                 m.editingCardManager.showEditingCardPopup$.next(false);
             } else if (showEditingCard) {
-                m.queryImageRequest$.next(undefined);
+                m.imageSearchService.queryImageRequest$.next(undefined);
             }
         });
 

@@ -5,6 +5,7 @@ import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
 import {TreeMenu} from "../TreeMenu/tree-menu.component";
 import {Typography} from "@material-ui/core";
 import {ManagerContext} from "../../App";
+import {ImageSearchComponent} from "../ImageSearch/image-search.component";
 
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
     const allItems = useObservableState(treeMenuService.allItems$) || {};
@@ -12,8 +13,8 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
     const directoryPath = useObservableState(treeMenuService.directoryPath$) || []
     const m = useContext(ManagerContext);
-
     return <div className={'app-container'}>
+        <ImageSearchComponent/>
         {
             menuItemTree?.sourced && <TreeMenu
                 title={() => <Typography

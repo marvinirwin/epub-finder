@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Manager} from "../../lib/Manager";
 import Dialog from "@material-ui/core/Dialog";
 import CloseIcon from '@material-ui/icons/Close';
@@ -22,7 +22,8 @@ import {getImages} from "../../services/image-search.service";
 import {ImageResult} from "./image-search-result.interface";
 import {Transition} from "./slide-up.component";
 import {ImageSearchResults} from "./image-search-results.component";
-import {ImageSearchAppbar} from "./image-search-appbar.component";
+import {ImageSearchAppBar} from "./image-search-app-bar.component";
+import {ManagerContext} from "../../App";
 
 
 export interface ImageSearchResponse {
@@ -62,8 +63,9 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export function ImageSearchComponent({m}: { m: Manager }) {
+export function ImageSearchComponent() {
     const classes = useStyles();
+    const m = useContext(ManagerContext)
     const imageRequest = useObservableState(m.imageSearchService.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
     const [loading, setLoading] = useState("");
@@ -92,9 +94,9 @@ export function ImageSearchComponent({m}: { m: Manager }) {
     }, [searchTerm]);
 
     const onClose = () => m.imageSearchService.queryImageRequest$.next(undefined);
-    return <Dialog fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
-        <div className={classes.root}>
-            <ImageSearchAppbar
+    return <Dialog id='image-search-dialog' fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
+        <div className={`image-search-container ${classes.root}`}>
+            <ImageSearchAppBar
                 imageRequest={imageRequest}
                 onClose={close}
                 searchTerm={searchTerm}
