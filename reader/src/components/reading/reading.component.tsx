@@ -23,8 +23,10 @@ export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({m}) =
                              resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        <OpenedDocument ref={ref => m.introService.readingFrameRef$.next(ref)}
-                    openedDocument={openedDocument}
+        <OpenedDocument
+            ref={ref => m.introService.readingFrameRef$.next(ref)}
+            openedDocument={openedDocument}
+            id={'reading-document'}
         />
     </div>
 }

@@ -8,9 +8,7 @@ const CurrentQuizCard = '#current-quiz-card';
 
 describe('Quiz Cards', () => {
     beforeEach(() => {
-        cy.visit('http://localhost:3000/?test=1&skip_intro=1')
-            .signupLogin()
-            .get(fileChooser).should('not.be.disabled');
+            cy.signupLogin()
     })
     it('Shows the correct card body', () => {
         UploadLearningDocument();

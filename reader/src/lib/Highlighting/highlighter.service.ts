@@ -196,7 +196,6 @@ function updateElementBackgroundColor(
         );
         (new Map(highestPriorityKeyValues)).forEach(rgba => rgbas.push(rgba));
     }
-    // @ts-ignore
     const backgroundColor = mixRGBA(rgbas);
     // @ts-ignore
     elementToHighlight.element.style.backgroundColor = backgroundColor;

@@ -22,8 +22,7 @@ import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
 import {LibraryNode} from "./nodes/library.node";
 import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
-
-const DEVELOPER_MODE = localStorage.getItem("DEVELOPER_MODE");
+import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -37,6 +36,7 @@ function AppDirectory(
         [
             ReadingNode(m, selectedComponent === 'reading'),
             SignupNode(),
+            ManualSpeechRecognitionNode(),
             WatchPronunciationNode(),
             RecognizeSpeechNode(),
             PlaybackSpeedNode(),

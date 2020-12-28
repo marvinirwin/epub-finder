@@ -3,6 +3,8 @@ import {debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, tak
 import {IntroSeriesService} from "./intro-series.service";
 import {VideoMetadata} from "../../components/PronunciationVideo/video-meta-data.interface";
 
+export const SKIP_INTRO = new URLSearchParams(window.location.search).has('skip_intro')
+
 export class IntroService {
     titleRef$ = new ReplaySubject<HTMLSpanElement | null>(1);
     readingFrameRef$ = new ReplaySubject<HTMLIFrameElement | null>(1);
@@ -31,6 +33,7 @@ export class IntroService {
             this.watchSentencesRef$.pipe(distinctUntilChanged()),
             this.promptFirstIntro$.pipe(distinctUntilChanged()),
         ]).pipe(
+            filter(() => !SKIP_INTRO),
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
             take(1),
@@ -69,6 +72,7 @@ export class IntroService {
             currentVideoMetadata$.pipe(distinctUntilChanged()),
             this.promptSecondIntro$.pipe(distinctUntilChanged()),
         ]).pipe(
+            filter(() => !SKIP_INTRO),
             filter(refs => refs.every(ref => ref)),
             debounceTime(1000),
             take(1)

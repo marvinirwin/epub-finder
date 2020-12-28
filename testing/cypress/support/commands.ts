@@ -29,10 +29,14 @@ declare namespace Cypress {
         signupLogin(): Chainable<void>
 
         skipIntro(): Chainable<void>
-        Å
+
+        iframeBody(): Chainable<void>
+
+        clearIndexedDB(): Chainable<void>
     }
 }
 Cypress.Commands.add('signupLogin', () => {
+    cy.visit('http://localhost:3000/?test=1&skip_intro=1');
     cy.task('randomEmailPassword')
         .then(({email, password}) => {
                 cy.wait(1000)
@@ -44,7 +48,7 @@ Cypress.Commands.add('signupLogin', () => {
 })
 
 
-Cypress.Commands.add('IframeBody', {
+Cypress.Commands.add('iframeBody', {
     prevSubject: true
 }, (subject) => {
     return cy.wrap(subject)
@@ -52,6 +56,47 @@ Cypress.Commands.add('IframeBody', {
         .its('body').should('not.be.undefined')
         .then(cy.wrap)
 });
+
+
+Cypress.Commands.add('clearIndexedDB', async () => {
+    // @ts-ignore
+    const databases = await window.indexedDB.databases();
+
+    await Promise.all(
+        databases.map(
+            ({ name }) =>
+                new Promise((resolve, reject) => {
+                    const request = window.indexedDB.open(name);
+                    request.onsuccess = event => {
+                        const db = request.result;
+                        let storeNames = [
+                            'cards',
+                            // cards: 'id++, learningLanguage, knownLanguage, deck',
+                            'wordRecognitionRecords',
+                            // wordRecognitionRecords: 'id++, word, timestamp',
+                            'pronunciationRecords',
+                            // pronunciationRecords: 'id++, word, timestamp',
+                            'settings2',
+                            // settings2: 'name, value',
+                            'createdSentences',
+                            // createdSentences: 'id++, learningLanguage',
+                            'customDocuments',
+                            // customDocuments: 'name, html'
+                        ];
+                        const transaction= db.transaction(storeNames, 'readwrite')
+                        storeNames.forEach(storeName => transaction.objectStore(storeName).clear())
+                        transaction.oncomplete = resolve;
+                    };
+
+                    // Note: we need to also listen to the "blocked" event
+                    // (and resolve the promise) due to https://stackoverflow.com/a/35141818
+                    request.addEventListener('blocked', resolve);
+                    request.addEventListener('error', reject);
+                }),
+        ),
+    );
+});
+
 
 Cypress.Commands.add('skipIntro', () => {
     /*

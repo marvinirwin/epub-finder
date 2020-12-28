@@ -35,7 +35,7 @@ export class QuizCardPom {
     exampleSentences() {
         return this.body()
             .find('iframe')
-
+            .iframeBody()
             .find('.example-sentence')
     }
 

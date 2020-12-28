@@ -3,11 +3,13 @@ export class DirectoryPom {
         cy.get('#quiz.tree-menu-node').click();
     }
     public static SubmitManualSpeechRecognition(result: string) {
-        cy.get('manual-speech-recognition-input')
+        cy.get('#manual-speech-recognition-input')
             .type(result);
-        cy.get('submit-manual-speech-recognition').click()
+        cy.get('#submit-manual-speech-recognition')
+            .click()
     }
     public static ClearSpeechRecognitionRecords() {
-        cy.get('clear-speech-recognition-rows').click()
+        cy.get('#clear-speech-recognition-rows')
+            .click()
     }
 }
