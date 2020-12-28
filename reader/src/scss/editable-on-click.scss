@@ -1,0 +1,14 @@
+.editable-on-click {
+  height: fit-content;
+  width: fit-content;
+  position: relative;
+   & > .editable-on-click-edit-container {
+     position: absolute;
+     background-color: transparent;
+     opacity: 0;
+   }
+  & > .editable-on-click-edit-container:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+}

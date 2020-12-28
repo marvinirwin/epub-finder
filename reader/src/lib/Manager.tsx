@@ -7,7 +7,7 @@ import {ICard} from "./Interfaces/ICard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {IAnnotatedCharacter} from "./Interfaces/Annotation/IAnnotatedCharacter";
 import {LocalStored} from "./Storage/LocalStored";
-import {SelectImageRequest} from "./Interfaces/IImageRequest";
+import {ImageSearchRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardService from "./Manager/CardService";
 import {CHARACTER_DOCUMENT_NODE_LABEL, OpenDocumentsService} from "./Manager/open-documents.service";
@@ -82,6 +82,7 @@ import {QuizCardCarouselService} from "../components/quiz/quiz-card-carousel.ser
 import {ScheduleRow} from "./schedule/schedule-row.interface";
 import {TrieWrapper} from "./TrieWrapper";
 import {ExampleSentencesService} from "./example-sentences.service";
+import {ImageSearchService} from "./image-search.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -131,7 +132,7 @@ export class Manager {
 
     public observableService = new ObservableService();
 
-    public queryImageRequest$: ReplaySubject<SelectImageRequest | undefined> = new ReplaySubject<SelectImageRequest | undefined>(1);
+    public imageSearchService = new ImageSearchService();
 
     bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
         new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE

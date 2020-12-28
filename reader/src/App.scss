@@ -1,3 +1,7 @@
+@import "scss/editable-on-click";
+@import "scss/image-search";
+
+
 .text-display {
   position: absolute;
   top: 10vh;
@@ -433,7 +437,6 @@ $character-timing-section-padding: 24px;
 
 
 .quiz-carousel {
-
   & > .quiz-card {
     display: flex;
     flex-flow: column nowrap;
@@ -451,21 +454,6 @@ $character-timing-section-padding: 24px;
 
     }
 
-  }
-}
-
-.editable-on-click {
-  height: fit-content;
-  width: fit-content;
-  position: relative;
-   & > .editable-on-click-edit-container {
-     position: absolute;
-     background-color: transparent;
-     opacity: 0;
-   }
-  & > .editable-on-click-edit-container:hover {
-    opacity: 1;
-    cursor: pointer;
   }
 }
 
