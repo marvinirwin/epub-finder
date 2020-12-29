@@ -14,6 +14,7 @@ export class ProgressRowService<T extends {word: string, id?: number}> {
         load: () => AsyncGenerator<T[]>,
         add: (t: T) => Promise<number>,
     }) {
+        this.records$.next({});
         this.addRecords$.pipe(
             filter(rows => !!rows.length),
             withLatestFrom(this.records$.pipe(startWith({}))),

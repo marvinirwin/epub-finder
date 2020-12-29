@@ -24,7 +24,8 @@ import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
 import {SettingsNode} from "./nodes/settings.node";
-import {DailyProgressNode} from "./nodes/daily-progress.node";
+import {DailyGoalNode} from "./nodes/daily-goal.node";
+import {DailyGoalSettingNode} from "./nodes/daily-goal-setting.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -37,7 +38,7 @@ function AppDirectory(
         ReadingNode(m),
         [
             ReadingNode(m, selectedComponent === 'reading'),
-            DailyProgressNode,
+            DailyGoalNode,
             WatchPronunciationNode(),
             RecognizeSpeechNode(),
             PlaybackSpeedNode(),
@@ -59,6 +60,7 @@ function AppDirectory(
             SettingsNode,
             [
                 ToggleTranslateNode(),
+                DailyGoalSettingNode,
             ],
             SignupNode(),
             SignoutNode(m, profile),

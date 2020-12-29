@@ -22,7 +22,7 @@ export const WatchMode = ({...props}) => {
             <PlayArrow  style={{ color}}/>
         </ListItemIcon>
         <ListItemText>
-            Watch Pronunciation
+            Watch
         </ListItemText>
     </ListItem>
 };

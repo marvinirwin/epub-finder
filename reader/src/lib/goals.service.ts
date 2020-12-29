@@ -14,7 +14,7 @@ const isInToday = (inputDate: Date) => {
 }
 
 export class GoalsService {
-    public dailyProgressFraction$: Observable<[number, number]>;
+    public dailyGoalFraction$: Observable<[number, number]>;
     private dailyProgress$: Observable<number>;
     constructor({
         settingsService,
@@ -30,6 +30,7 @@ export class GoalsService {
             pronunciationRecordsService.records$
         ]).pipe(
             map(([recognition, pronunciation]) => {
+                debugger;
                 /**
                  * This method could be made way more efficient
                  * if each of these scores was calculated outside of combineLatest
@@ -52,7 +53,7 @@ export class GoalsService {
             }),
             shareReplay(1)
         )
-        this.dailyProgressFraction$ = combineLatest([
+        this.dailyGoalFraction$ = combineLatest([
             this.dailyProgress$,
             settingsService.dailyGoal$
         ]).pipe(

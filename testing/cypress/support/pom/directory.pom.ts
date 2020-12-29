@@ -13,11 +13,26 @@ export class DirectoryPom {
             .click()
     }
     public static EnterLibrary() {
-        cy.contains('.tree-menu-node', 'Library')
+        cy.get(`#library`)
             .click()
     }
-    public static ExitLibrary() {
+    public static Back() {
         cy.get('#tree-menu-node-back-button')
             .click()
+    }
+    public static EnterSettings() {
+        cy.get(`#settings`)
+            .click()
+    }
+    public static SetDailyGoal(n: number) {
+        const s = '#daily-goal-input';
+        cy.get(s)
+            .click()
+            .focused()
+            .clear()
+            .type(`${n}`);
+    }
+    public static DailyProgressLabel() {
+        return cy.get('#daily-goal-label')
     }
 }
