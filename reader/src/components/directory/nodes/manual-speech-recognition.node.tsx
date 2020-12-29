@@ -20,8 +20,10 @@ export function ManualSpeechRecognitionNode() {
                             }
                         ]
                     )
-                }/>
-                <button id='clear-speech-recognition-rows' onClick={() => m.pronunciationProgressService.clearRecords$.next()}/>
+                }>Submit manual speech recognition</button>
+                <button id='clear-speech-recognition-rows' onClick={() => m.pronunciationProgressService.clearRecords$.next()}>
+                    Clear speech recognition rows
+                </button>
             </div>
         }
     }

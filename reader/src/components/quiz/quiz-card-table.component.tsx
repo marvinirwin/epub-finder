@@ -15,11 +15,10 @@ export const QuizCardTableComponent = () => {
         <Table aria-label="simple table">
             <TableHead>
                 <TableRow>
-                    <TableCell>Word</TableCell>
+                    <TableCell style={{minWidth: '10em'}}>Word</TableCell>
                     <TableCell align="right">Recognition</TableCell>
                     <TableCell align="right">Word Counts</TableCell>
                     <TableCell align="right">Pronunciation Records</TableCell>
-                    <TableCell align="right">Protein&nbsp;(g)</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>

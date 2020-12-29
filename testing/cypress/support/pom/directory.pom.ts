@@ -12,4 +12,12 @@ export class DirectoryPom {
         cy.get('#clear-speech-recognition-rows')
             .click()
     }
+    public static EnterLibrary() {
+        cy.contains('.tree-menu-node', 'Library')
+            .click()
+    }
+    public static ExitLibrary() {
+        cy.get('#tree-menu-node-back-button')
+            .click()
+    }
 }

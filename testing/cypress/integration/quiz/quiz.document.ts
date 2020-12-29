@@ -1,8 +1,11 @@
 import {documentSelectionRow, fileChooser} from "../constants";
+import {DirectoryPom} from "../../support/pom/directory.pom";
 
 export function UploadLearningDocument() {
     cy.get(fileChooser).attachFile('test_quiz.html');
+    DirectoryPom.EnterLibrary()
     cy.get(`${documentSelectionRow}.reading`).contains('test_quiz')
+    DirectoryPom.ExitLibrary()
 }
 
 interface QuizCardData {

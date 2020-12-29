@@ -30,7 +30,7 @@ export const SpeakMode: React.FunctionComponent = ({...props}) => {
             <Mic style={{color}}/>
         </ListItemIcon>
         <ListItemText>
-            Test your Pronunciation
+            Test Pronunciation
         </ListItemText>
     </ListItem>
 }

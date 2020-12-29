@@ -83,6 +83,10 @@ export class SettingsService {
     get showTranslations$(): ReplaySubject<boolean> {
         return this.resolveReplaySubject$<boolean>('showTranslations', true);
     }
+
+    get dailyGoal$() :ReplaySubject<number> {
+        return this.resolveReplaySubject$<number>('dailyGoal', 24);
+    }
 }
 export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
     return r.pipe(take(1)).toPromise();

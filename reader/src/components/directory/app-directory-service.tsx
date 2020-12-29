@@ -15,7 +15,7 @@ import {ToggleTranslateNode} from "./nodes/toggle-translate.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {GoogleSigninNode} from "./nodes/google-sign-in.node";
 import {ProfileNode} from "./nodes/profile.node";
-import {UploadeNode} from "./nodes/upload.node";
+import {uploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
 import {PlaybackSpeedNode} from "./nodes/playback-speed.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
@@ -23,6 +23,8 @@ import {LibraryNode} from "./nodes/library.node";
 import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
+import {SettingsNode} from "./nodes/settings.node";
+import {DailyProgressNode} from "./nodes/daily-progress.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -35,27 +37,33 @@ function AppDirectory(
         ReadingNode(m),
         [
             ReadingNode(m, selectedComponent === 'reading'),
-            SignupNode(),
-            ManualSpeechRecognitionNode(),
+            DailyProgressNode,
             WatchPronunciationNode(),
             RecognizeSpeechNode(),
             PlaybackSpeedNode(),
             QuizCarouselNode(),
             [
+                {...QuizCarouselNode(), moveDirectory: false},
                 QuizScheduleNode(),
             ],
+            uploadNode(),
             LibraryNode(),
-            UploadeNode(),
-            // @ts-ignore
-            ...(availableDocuments.map(toTreeMenuNode)),
+            //  This statement is why I can't have type safety
+            availableDocuments.map(toTreeMenuNode),
+
             SignInWithNode(profile),
             [
                 GoogleSigninNode(),
             ],
             ProfileNode(profile),
-            ToggleTranslateNode(),
+            SettingsNode,
+            [
+                ToggleTranslateNode(),
+            ],
+            SignupNode(),
             SignoutNode(m, profile),
-        ] as ArrayToTreeParams<TreeMenuNode>
+            ManualSpeechRecognitionNode(),
+        ] as unknown as ArrayToTreeParams<TreeMenuNode>
     );
 }
 

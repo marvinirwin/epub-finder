@@ -84,6 +84,7 @@ import {TrieWrapper} from "./TrieWrapper";
 import {ExampleSentencesService} from "./example-sentences.service";
 import {ImageSearchService} from "./image-search.service";
 import {ScheduleRowsService} from "./Manager/schedule-rows.service";
+import {GoalsService} from "./goals.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -167,6 +168,7 @@ export class Manager {
     readingDocumentService: ReadingDocumentService;
     exampleSentencesService: ExampleSentencesService;
     public quizCarouselService: QuizCardCarouselService;
+    public goalsService: GoalsService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.availableDocumentsService = new AvailableDocumentsService()
@@ -366,6 +368,12 @@ export class Manager {
             signal ?
                 this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows) :
                 this.highlighter.highlightWithDifficulty$.next({})
+        });
+
+        this.goalsService = new GoalsService({
+            settingsService: this.settingsService,
+            recognitionRecordsService: this.wordRecognitionProgressService,
+            pronunciationRecordsService: this.pronunciationProgressService
         })
 
         combineLatest([

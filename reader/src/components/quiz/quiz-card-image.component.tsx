@@ -1,4 +1,5 @@
 import {EditableOnClick} from "./editable-image.component";
+import {InsertPhoto} from '@material-ui/icons';
 import React, {useCallback, useContext} from "react";
 import {useObservableState} from "observable-hooks";
 import {QuizCard} from "./quiz-card.interface";
@@ -17,6 +18,11 @@ export function QuizCardImage({c}: {c: QuizCard}) {
             });
         }
     }}>
-        <img className={"quiz-card-image"} src={source}/>
+        {
+            source ?
+                <img className={"quiz-card-image"} src={source}/> :
+                <InsertPhoto id={'quiz-card-image-placeholder'}/>
+        }
+
     </EditableOnClick>;
 }

@@ -1,0 +1,22 @@
+.quiz-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+}
+#quiz-card-image-placeholder {
+  width: 240px;
+}
+.quiz-button-hard  {
+  background-color: lightcoral;
+}
+.quiz-button-medium {
+  background-color: lightyellow;
+}
+.quiz-button-easy {
+  background-color: lightgreen;
+}
+.quiz-button-hide {
+  background-color: lightgrey;
+}
