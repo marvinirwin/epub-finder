@@ -30,7 +30,6 @@ export class GoalsService {
             pronunciationRecordsService.records$
         ]).pipe(
             map(([recognition, pronunciation]) => {
-                debugger;
                 /**
                  * This method could be made way more efficient
                  * if each of these scores was calculated outside of combineLatest

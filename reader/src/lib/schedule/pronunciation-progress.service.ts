@@ -6,7 +6,12 @@ export class PronunciationProgressService extends ProgressRowService<Pronunciati
     constructor({db}: { db: DatabaseService }) {
         super({
                 db,
-                load: () => db.getWordRecordsGenerator(db.pronunciationRecords),
+                load: () => db.getWordRecordsGenerator(db.pronunciationRecords, v => {
+                    if (!v.timestamp) {
+                        v.timestamp = new Date()
+                    }
+                    return v
+                }),
                 add: (r) => db.pronunciationRecords.add(r)
             }
         );

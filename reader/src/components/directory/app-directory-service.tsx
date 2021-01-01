@@ -38,6 +38,10 @@ function AppDirectory(
         ReadingNode(m),
         [
             ReadingNode(m, selectedComponent === 'reading'),
+            SignInWithNode(profile),
+            [
+                GoogleSigninNode(),
+            ],
             DailyGoalNode,
             WatchPronunciationNode(),
             RecognizeSpeechNode(),
@@ -52,10 +56,6 @@ function AppDirectory(
             //  This statement is why I can't have type safety
             availableDocuments.map(toTreeMenuNode),
 
-            SignInWithNode(profile),
-            [
-                GoogleSigninNode(),
-            ],
             ProfileNode(profile),
             SettingsNode,
             [

@@ -42,8 +42,11 @@ export class UsersService {
     async upsertUserByEmailAndProvider(email: string, provider: 'google' | 'twitter', providerIdValue: string): Promise<User> {
         const user = await this.findOne({email});
         if (user) {
-            const providerMatches = user[provider] !== providerIdValue;
-            if (providerMatches) {
+            if (user.reserved_for_provider === provider) {
+                return this.linkUserToProvider(user, provider, providerIdValue);
+            }
+            const providerDoesntMatch = user[provider] !== providerIdValue;
+            if (providerDoesntMatch) {
                 throw new Error("This email account has already been registered with a different provider")
             }
             return user;
@@ -57,6 +60,14 @@ export class UsersService {
                     [provider]: providerIdValue
                 }
             )
+        )
+    }
+
+    private linkUserToProvider(user: User, provider: "google" | "twitter", providerIdValue: string) {
+        // Link this user
+        user[provider] = providerIdValue;
+        return this.usersRepository.save(
+            user
         )
     }
 

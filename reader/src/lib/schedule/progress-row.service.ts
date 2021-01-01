@@ -5,11 +5,12 @@ import {orderBy} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
 import {safePush} from "../../services/safe-push";
 
-export class ProgressRowService<T extends {word: string, id?: number}> {
+export class ProgressRowService<T extends { word: string, id?: number }> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
     addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1);
     clearRecords$ = new ReplaySubject<void>(1);
-    constructor({ db, load, add}: {
+
+    constructor({db, load, add}: {
         db: DatabaseService,
         load: () => AsyncGenerator<T[]>,
         add: (t: T) => Promise<number>,

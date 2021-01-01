@@ -68,13 +68,17 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async* getWordRecordsGenerator<T extends {word: string}>(table: Dexie.Table<T>): AsyncGenerator<T[]> {
+    async* getWordRecordsGenerator<T extends {word: string}>(table: Dexie.Table<T>, mapFn?: (v:T)=> T): AsyncGenerator<T[]> {
         let offset = 0;
         const chunkSize = 500;
         while (await table.offset(offset).first()) {
             const chunkedRecognitionRows = await table.offset(offset).limit(chunkSize).toArray();
             chunkedRecognitionRows.forEach(r => r.word = r.word.normalize())
-            yield chunkedRecognitionRows;
+            if (mapFn) {
+                yield chunkedRecognitionRows.map(mapFn);
+            } else {
+                yield chunkedRecognitionRows;
+            }
             offset += chunkSize;
         }
     }

@@ -22,7 +22,9 @@ export class UploadedFileService {
             if (!await s3Exists(s3, bucket, key)) {
                 throw new Error(`Cannot find ${key}`);
             }
-            const readStream = s3.getObject(params).createReadStream();
+            const readStream = s3.getObject(params)
+                .on('error', () => reject)
+                .createReadStream();
             console.log(`Hashing ${key}: got read stream`)
             const hash = createHash('sha1');
             hash.setEncoding('hex');

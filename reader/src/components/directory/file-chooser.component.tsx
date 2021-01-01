@@ -8,7 +8,7 @@ export const FileChooser = () => {
     const isLoggedIn = useObservableState(m.authManager.isLoggedIn$);
     return <ListItem style={{display: 'flex', flexFlow: 'column nowrap'}}>
         <Typography variant="overline">
-            {isLoggedIn ? 'Sign up to ' : ''} Upload learning material (docx, .txt, .pdf)
+            {!isLoggedIn ? 'Sign up to ' : ''} Upload learning material (docx, .txt, .pdf)
         </Typography>
         <input
             className={'file-chooser'}

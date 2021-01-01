@@ -51,8 +51,8 @@ export class User {
     @Column()
     profile_picture: string = '';
 
-    @Column()
-    ip: string = '';
+    @Column({default: null})
+    reserved_for_provider: string | null;
 
     private _loadedPassword: string;
 

@@ -23,8 +23,9 @@ import {UploadedFileService} from "./uploaded-file.service";
 import {parse} from "path";
 import multerS3 from 'multer-s3';
 import {v4 as uuidv4} from 'uuid';
-import {convertToHtml} from "./convert-to-html.service";
-import {bucket, inputConfig, outputConfig, s3} from "./s3.service";
+import {conversionJob, convertPdfToHtml} from "./convert-to-html.service";
+import {copyS3WithExtension, inputConfig, outputConfig, readStream, s3} from "./s3.service";
+import {handleUploadedDocument} from "./document-upload.service";
 
 @Controller('documents')
 export class DocumentsController {
@@ -66,30 +67,9 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
-        console.log(`Uploaded ${file.originalname} to S3 ${file.key}`);
-        const ext = parse(file.originalname).ext.replace('.', '');
-        switch(ext) {
-            case "pdf":
-            case "docx":
-                await convertToHtml({
-                    inputFormat: ext,
-                    inputBucket: inputConfig,
-                    outputBucket: outputConfig,
-                    key: file.key
-                });
-                break;
-            case "html":
-                await s3.copyObject({
-                    Bucket: inputConfig.bucket,
-                    CopySource: `/${file.bucket}/${file.key}`,
-                    Key: `${file.key}.html`
-                }).promise()
-                break;
-            default:
-                throw new Error(`Unsupported file extension: ${ext}`);
-        }
+        await handleUploadedDocument(file);
         const name = file.originalname.split('.').slice(0, -1).join('');
-        let htmlKey = `${file.key}.html`;
+        const htmlKey = `${file.key}.html`;
         if (document_id) {
             return this.documentsService.saveRevision(
                 user,
@@ -147,18 +127,23 @@ export class DocumentsController {
     @Get(':filename')
     @HttpCode(HttpStatus.OK)
     @Header('Content-Type', 'text/html')
-    async file(
+    file(
         @UserFromReq() user: User | undefined,
         @Param('filename') filename: string,
         @Res() response: Response
     ) {
-        const doc = await this.documentsService.byFilename(filename, user);
-        if (!doc) {
-            throw new Error(`Cannot find document ${filename} for user ${user?.id}`)
-        }
+        return new Promise(async (resolve, reject) => {
+            const doc = await this.documentsService.byFilename(filename, user);
+            if (!doc) {
+                return reject(new Error(`Cannot find document ${filename} for user ${user?.id}`));
+            }
 
-        return s3.getObject({Bucket: bucket, Key: filename}).createReadStream().pipe(response);
-        // @ts-ignore
-        // return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
+            readStream(filename, reject)
+                .pipe(response);
+
+            resolve()
+            // @ts-ignore
+            // return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
+        })
     }
 }

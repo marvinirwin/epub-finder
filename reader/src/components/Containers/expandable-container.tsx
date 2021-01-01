@@ -46,7 +46,10 @@ export const ExpandableContainer: React.FC<{ shouldShow: boolean, hideDelay?: nu
         }
     });
     useEffect(() => {
-        return () => setDims.cancel();
+        return () => {
+            clearTimeoutRef();
+            setDims.cancel();
+        };
     }, [])
 
     useSubscription(resizeObservable$ || blankObs, () => setDims())
