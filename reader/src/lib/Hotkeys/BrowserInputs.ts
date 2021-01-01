@@ -6,11 +6,12 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {HotkeyModes} from "./HotkeyModes";
 import {Hotkeys} from "./hotkeys.interface";
 import {SettingsService} from "../../services/settings.service";
-import { popperGenerator} from "@popperjs/core";
+import {popperGenerator} from "@popperjs/core";
 import popperOffsets from '@popperjs/core/lib/modifiers/popperOffsets';
 import computeStyles from '@popperjs/core/lib/modifiers/computeStyles';
 import applyStyles from '@popperjs/core/lib/modifiers/applyStyles';
 import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
+import {ActiveSentenceService} from "../active-sentence.service";
 
 const createPopper = popperGenerator({
     defaultModifiers: [
@@ -74,12 +75,15 @@ export class BrowserInputs {
 
     showTranslations: boolean = false;
     latestTranslationTarget: AtomizedSentence | undefined;
+    private activeSentenceService: ActiveSentenceService;
 
 
-    constructor({hotkeys$, settings$}: {
+    constructor({hotkeys$, settings$, activeSentenceService}: {
         hotkeys$: Observable<Map<string[], Subject<void>>>,
-        settings$: SettingsService
+        settings$: SettingsService,
+        activeSentenceService: ActiveSentenceService
     }) {
+        this.activeSentenceService = activeSentenceService;
         settings$.showTranslations$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
             if (showTranslations) {
@@ -145,9 +149,6 @@ export class BrowserInputs {
 
     public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
         atomizedSentences.forEach(atomizedSentence => {
-            atomizedSentence.getSentenceHTMLElement().onmouseenter = async (ev: MouseEvent) => {
-                atomizedSentence.getTranslation();
-            };
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
             const sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
@@ -156,6 +157,9 @@ export class BrowserInputs {
             if (!sentenceHTMLElement || !popperHTMLElement) {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
+            sentenceHTMLElement.addEventListener('mouseover', () =>
+                this.activeSentenceService.activeSentence$.next(atomizedSentence)
+            )
 
             const show = () => {
 
@@ -165,9 +169,7 @@ export class BrowserInputs {
                         strategy: 'fixed',
                     });
                     this.latestTranslationTarget = atomizedSentence;
-                    if (this.showTranslations) {
-                        atomizedSentence.showPopper();
-                    }
+                    atomizedSentence.showPopper();
                 } catch (e) {
                     console.error(e);
                 }

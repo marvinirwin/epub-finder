@@ -1,10 +1,12 @@
 import axios from "axios";
+import {memoize} from 'lodash';
 
-export async function fetchTranslation<A>(learningText: A) {
-    const result = await axios.post(`${process.env.PUBLIC_URL}/translate`, {
-        from: 'zh-CN',
-        to: 'en',
-        text: learningText
-    })
-    return result?.data?.translation || '';
-}
+export const fetchTranslation = memoize(
+    (text: string) =>
+        axios.post(`${process.env.PUBLIC_URL}/translate`, {
+            from: 'zh-CN',
+            to: 'en',
+            text: text
+        }).then(response => response?.data?.translation || '')
+)
+

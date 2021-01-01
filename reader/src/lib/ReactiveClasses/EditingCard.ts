@@ -1,6 +1,6 @@
 import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import {flatMap, map, mapTo, skip, switchMap,} from "rxjs/operators";
+import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
@@ -85,13 +85,7 @@ export class EditingCard {
             this.saveInProgress$.next(false);
         });
 
-        this.pinyin$ = this.learningLanguage$.pipe(map(s => {
-            return s.split('').map(char => {
-                const definitions = lookupPinyin(char);
-                if (definitions) return definitions.join('/')
-                return char;
-            }).join(' ')
-        }));
+        this.pinyin$ = this.learningLanguage$.pipe(switchMap(lookupPinyin), shareReplay(1));
     }
 
     private saveDataObservable() {

@@ -13,7 +13,7 @@ export const filterData = (audioBuffer: AudioBuffer, samples: number) => {
     }
     return filteredData;
 }
-export const normalizeData = (filteredData: number[]) => {
-    const multiplier = Math.pow(Math.max(...filteredData), -1);
+export const normalizeData = (filteredData: number[], x1: number) => {
+    const multiplier = Math.pow(x1, -1);
     return filteredData.map(n => n * multiplier);
 }

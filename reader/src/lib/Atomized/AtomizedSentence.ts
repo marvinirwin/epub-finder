@@ -148,9 +148,7 @@ export class AtomizedSentence {
         if (this.translated) {
             return this._translation as string;
         } else {
-            const translatedText = await fetchTranslation(this.translatableText)
             this.translated = true;
-            this.popperElement.textContent = translatedText;
             return this.translatableText;
         }
     }

@@ -24,4 +24,12 @@ module.exports = function(app) {
             logLevel: 'debug'
         })
     )
+    app.use(
+        '/translate/*',
+        createProxyMiddleware({
+            target: 'http://localhost:3001',
+            changeOrigin: true,
+            logLevel: 'debug'
+        })
+    )
 };

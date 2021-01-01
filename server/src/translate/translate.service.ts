@@ -26,10 +26,14 @@ export class TranslateService {
         const [translation] = await translate.translate(text, to);
         return {translation};
     }
+    async transliterate({text, to}: TranslateRequestDto) {
+        const [translation] = await translate.translate(text, to);
+        return {translation};
+    }
 
     private readonly _service = "GOOGLE_TRANSLATIONS";
 
-    async lookupCacheEntry(translateRequestDto: TranslateRequestDto): Promise<TranslateResponseDto | undefined> {
+    async lookupCacheEntry<T>(translateRequestDto: any): Promise<T | undefined> {
         const conditions: Partial<JsonCache> = {
             service: this._service,
             key_hash: sha1([translateRequestDto])
@@ -42,7 +46,7 @@ export class TranslateService {
         }
     }
 
-    insertCacheEntry(translateRequestDto: TranslateRequestDto, translateResponseDto: TranslateResponseDto) {
+    insertCacheEntry(translateRequestDto: any, translateResponseDto: any) {
         const cacheEntry: Partial<JsonCache> = {
             service: this._service,
             key_hash: sha1([translateRequestDto]),

@@ -22,7 +22,7 @@ export class DocumentSelectionService {
                     ...available
                         .map(({name, belongsToUser, uploadDate, document_id, id}) => ({
                             name,
-                            belongsToCurrentUser: !!belongsToUser,
+                            belongsToCurrentUser: belongsToUser,
                             lastModified: uploadDate,
                             reading: readingDocumentName === name,
                             document_id: document_id || id,
@@ -30,13 +30,11 @@ export class DocumentSelectionService {
                         } as DocumentSelectionRowInterface)),
                 ];
                 // Get the latest version for each name
-                let documentSelectionRowInterfaces = orderBy(
+                return orderBy(
                     Object.values(keyBy(all, 'id')),
                     ['belongsToCurrentUser', 'lastModified'],
                     ['desc', 'desc']
-                );
-                console.log(documentSelectionRowInterfaces);
-                return documentSelectionRowInterfaces
+                )
             }),
             shareReplay(1)
         )

@@ -85,6 +85,7 @@ import {ExampleSentencesService} from "./example-sentences.service";
 import {ImageSearchService} from "./image-search.service";
 import {ScheduleRowsService} from "./Manager/schedule-rows.service";
 import {GoalsService} from "./goals.service";
+import {ActiveSentenceService} from "./active-sentence.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -169,18 +170,22 @@ export class Manager {
     exampleSentencesService: ExampleSentencesService;
     public quizCarouselService: QuizCardCarouselService;
     public goalsService: GoalsService;
+    private activeSentenceService: ActiveSentenceService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.availableDocumentsService = new AvailableDocumentsService()
         this.settingsService = new SettingsService({db})
         this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
+        this.activeSentenceService = new ActiveSentenceService({settingsService: this.settingsService})
         this.inputManager = new BrowserInputs({
             hotkeys$: this.hotkeysService.mapHotkeysWithDefault(
                 HotKeyEvents.defaultHotkeys(),
-                this.hotkeyEvents.hotkeyActions()
+                this.hotkeyEvents.hotkeyActions(),
             ),
-            settings$: this.settingsService
+            activeSentenceService: this.activeSentenceService,
+            settings$: this.settingsService,
+
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
 
@@ -529,7 +534,6 @@ export class Manager {
             .pipe(withLatestFrom(this.modesService.mode$))
             .subscribe(([ev, mode]) => {
                 if (maxWord) {
-                    addHighlightedPinyin(this.mousedOverPinyin$, lookupPinyin(maxWord.word).join(''));
                     addHighlightedWord(this.highlighter.mousedOverWord$, maxWord?.word);
                 }
                 return;

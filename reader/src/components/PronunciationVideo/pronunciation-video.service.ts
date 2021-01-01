@@ -4,6 +4,7 @@ import {distinctUntilChanged, map, mapTo, shareReplay, switchMap} from "rxjs/ope
 import {VideoMetadata} from "../../types";
 import Ciseaux from '../../lib/ciseaux/browser';
 import {Tape} from "ciseaux/browser";
+import {filterData} from "../../lib/Audio/AudioGraphing";
 
 // @ts-ignore
 Ciseaux.context = new AudioContext();
@@ -20,7 +21,7 @@ export class PronunciationVideoService {
     public audioUrl$ = new ReplaySubject<string>(1)
     public tape$: Observable<Tape | void>;
     public chunkSizeSeconds$ = new ReplaySubject<number | undefined>(1)
-    public chunkedAudioBuffers$: Observable<AudioBuffer[]>;
+    public chunkedAudioBuffers$: Observable<{chunkedAudioBuffers: AudioBuffer[], max: number}>;
 
     constructor() {
         this.videoSentence$.pipe(distinctUntilChanged()).subscribe(async sentence => {
@@ -50,15 +51,17 @@ export class PronunciationVideoService {
             this.tape$,
             this.chunkSizeSeconds$,
         ]).pipe(
-            switchMap(([tape, chunkSizeSeconds]) => {
-                if (!tape || !chunkSizeSeconds) return [];
+            switchMap(async ([tape, chunkSizeSeconds]) => {
+                if (!tape || !chunkSizeSeconds) return {chunkedAudioBuffers: [], max: 0};
                 const tapes = [];
+                const normalMax = Math.max(...filterData(await tape.render(), 1000))
                 let i = 0;
                 while (i < tape.duration) {
-                    tapes.push(tape.slice(i, Math.min(i + chunkSizeSeconds, tape.duration)))
+                    tapes.push(tape.slice(i, /*Math.min(i + chunkSizeSeconds, tape.duration)*/chunkSizeSeconds))
                     i += chunkSizeSeconds;
                 }
-                return Promise.all(tapes.map(tape => tape.render()));
+                const arrays = await Promise.all(tapes.map(tape => tape.render()));
+                return {chunkedAudioBuffers: arrays, max: normalMax };
             }),
             shareReplay(1)
         )

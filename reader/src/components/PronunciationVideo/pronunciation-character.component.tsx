@@ -35,7 +35,6 @@ export const PronunciationTimingCharacterComponent: React.FC<{
                 editMode && manager.editingVideoMetadataService.editingCharacterIndex$.next(index)
             }
             draggable={editMode}
-
         >{videoCharacter.character}
         </mark>;
     }

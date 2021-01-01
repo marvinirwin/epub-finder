@@ -1,6 +1,6 @@
 import {from, Observable, of} from "rxjs";
 import {encode} from "base64-arraybuffer";
-import {concatMap, delay, map, withLatestFrom} from "rxjs/operators";
+import {concatMap, delay, filter, map, withLatestFrom} from "rxjs/operators";
 import {chunk} from "lodash";
 import {AUDIO_GRAPH_SAMPLE_SIZE, filterData, normalizeData} from "./Audio/AudioGraphing";
 import {audioContext} from "./Audio/AudioContext";
@@ -31,7 +31,10 @@ export class WavAudio {
         this.url = URL.createObjectURL(this.blob);
         this.el = new Audio("data:audio/wav;base64," + encode(newBuffer));
         this.duration$ = this.audioBuffer$.pipe(map(b => b.duration));
-        this.graphData$ = this.audioBuffer$.pipe(map(b => normalizeData(filterData(b, AUDIO_GRAPH_SAMPLE_SIZE))));
+        this.graphData$ = this.audioBuffer$.pipe(map(b => {
+            const filteredData = filterData(b, AUDIO_GRAPH_SAMPLE_SIZE);
+            return normalizeData(filteredData, Math.max(...filteredData));
+        }));
 
         this.graphObservable$ = this.graphData$.pipe(
             withLatestFrom(this.audioBuffer$, this.duration$), map(([graphData, audioBuffer, duration]) => {

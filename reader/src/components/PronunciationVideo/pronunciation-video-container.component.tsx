@@ -18,7 +18,10 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
     const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
-    const chunkedAudioBuffers = useObservableState(m.pronunciationVideoService.chunkedAudioBuffers$, []);
+    const {chunkedAudioBuffers, max} = useObservableState(
+        m.pronunciationVideoService.chunkedAudioBuffers$,
+        {chunkedAudioBuffers: [], max: 0}
+    );
     const currentSentenceCharacterIndex = useObservableState(m.inputManager.videoCharacterIndex$);
     // @ts-ignore
     const box = useResizeObserver(pronunciationSectionsContainer)
@@ -97,11 +100,12 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                     const highlightBarPoints = section.highlightBarPoints();
 
                     return <CharacterTimingSection
+                        sectionWidth={box?.width}
+                        normalMax={max}
                         key={lineIndex}
                         characterTimings={chunkedCharacterTiming}
                         videoMetaData={videoMetadata}
-                        sectionDurationMs={sectionLengthMs}
-                        sectionWidthPx={sectionWidth || 0}
+                        chunkSizeMs={sectionLengthMs}
                         progressBarFraction={section.timeBarFraction()}
                         sectionIndex={lineIndex}
                         characterIndexStart={previousCharacterCount}

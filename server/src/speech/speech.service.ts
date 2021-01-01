@@ -11,9 +11,9 @@ import {SpeechToken} from "../entities/speech-token.entity";
 import jwt_decode from "jwt-decode";
 
 const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string;
-const region = process.env.AZURE_SPEECH_LOCATION as string;
-const subscriptionKey = process.env.AZURE_SPEECH_KEY1 as string;
-const speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region);
+export const region = process.env.AZURE_SPEECH_LOCATION as string;
+export const subscriptionKey = process.env.AZURE_SPEECH_KEY1 as string;
+export const speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region);
 const MAX_SPEECH_TOKENS = 1000;
 
 speechConfig.speechRecognitionLanguage = "zh-CN";

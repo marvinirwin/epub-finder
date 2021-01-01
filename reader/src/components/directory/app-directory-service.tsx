@@ -26,6 +26,7 @@ import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.nod
 import {SettingsNode} from "./nodes/settings.node";
 import {DailyGoalNode} from "./nodes/daily-goal.node";
 import {DailyGoalSettingNode} from "./nodes/daily-goal-setting.node";
+import {TogglePinyinNode} from "./nodes/toggle-pinyin.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -55,11 +56,11 @@ function AppDirectory(
             LibraryNode(),
             //  This statement is why I can't have type safety
             availableDocuments.map(toTreeMenuNode),
-
             ProfileNode(profile),
             SettingsNode,
             [
                 ToggleTranslateNode(),
+                TogglePinyinNode(),
                 DailyGoalSettingNode,
             ],
             SignupNode(),

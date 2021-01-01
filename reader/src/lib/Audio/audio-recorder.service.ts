@@ -1,13 +1,15 @@
-import {race, ReplaySubject, Subject} from "rxjs";
-import {filter, map, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {Observable, race, ReplaySubject, Subject} from "rxjs";
+import {filter, map, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {RecordRequest} from "../Interfaces/RecordRequest";
 import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
+import {fetchPinyin} from "../pinyin.service";
 
 export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>();
     public currentRecognizedText$ = new ReplaySubject<string>(1);
     public recentlyRecorded$ = new ReplaySubject<boolean>(1);
+    public currentRecognizedPinyin$: Observable<string>;
     private countdown$ = new Subject<number>();
 
     public get isRecording$() {
@@ -15,6 +17,10 @@ export class AudioRecorder {
     }
 
     constructor(public audioSource: AudioSource) {
+        this.currentRecognizedPinyin$ = this.currentRecognizedText$.pipe(
+            switchMap(fetchPinyin),
+            shareReplay(1)
+        );
         this.isRecording$.subscribe(recordingNow => {
             recordingNow && this.recentlyRecorded$.next(recordingNow);
         });
