@@ -4,7 +4,7 @@ import {DocumentView} from "../entities/document-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {basename} from "path";
-import {UploadedFileService} from "./uploaded-file.service";
+import {HashService} from "./uploading/hash.service";
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(`Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`);
@@ -40,7 +40,7 @@ export class DocumentsService {
             document_id: documentId,
             name,
             filename: basename(filePath),
-            hash: await UploadedFileService.fileHash(filePath),
+            hash: await HashService.fileHash(filePath),
             creator_id: user.id,
             global: false
         })
@@ -51,7 +51,7 @@ export class DocumentsService {
         return await this.documentRepository.save({
             name,
             filename: basename(filePath),
-            hash: await UploadedFileService.fileHash(filePath),
+            hash: await HashService.fileHash(filePath),
             creator_id: user.id,
             global: false
         })

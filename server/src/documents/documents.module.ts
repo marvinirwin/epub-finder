@@ -5,7 +5,7 @@ import {DocumentView} from "../entities/document-view.entity";
 import {DocumentsController} from "./documents.controller";
 import {DocumentsService} from "./documents.service";
 import {User} from "../entities/user.entity";
-import {UploadedFileService} from "./uploaded-file.service";
+import {HashService} from "./uploading/hash.service";
 import {BuiltInDocumentsService} from "./built-in-documents.service";
 
 @Module({
@@ -17,7 +17,7 @@ import {BuiltInDocumentsService} from "./built-in-documents.service";
     ],
     providers: [
         DocumentsService,
-        UploadedFileService,
+        HashService,
         BuiltInDocumentsService
     ]
 })

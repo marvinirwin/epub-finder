@@ -1,5 +1,6 @@
-import {BucketConfig} from "./bucket-config.interface";
+import {BucketConfig} from "../bucket-config.interface";
 import AWS from "aws-sdk";
+import * as stream from "stream";
 
 const inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
 const inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;
@@ -24,10 +25,12 @@ export const outputConfig: BucketConfig = {
     bucket
 };
 
-export function readStream(filename: string, reject: (reason?: any) => void) {
-    return s3.getObject({Bucket: bucket, Key: filename})
-        .on('error', e => reject(e))
-        .createReadStream();
+export function readStream(filename: string): Promise<stream.Readable> {
+    return new Promise((resolve, reject) => {
+        const o = s3.getObject({Bucket: bucket, Key: filename})
+            .on('error', e => reject(e));
+        resolve(o.createReadStream())
+    })
 }
 
 

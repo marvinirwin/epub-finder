@@ -21,7 +21,11 @@ export const handleUploadedDocument = async (file: UploadedFile) => {
             await convertPdfToHtml(inputBucketOutputBucketKey);
             break;
         case "docx":
-            await conversionJob("docx", "html", "office") (inputBucketOutputBucketKey);
+            await conversionJob(
+                "docx",
+                "html",
+                "office"
+            ) (inputBucketOutputBucketKey);
             break;
         case "txt":
             await conversionJob("txt", "html", "libreoffice") (inputBucketOutputBucketKey);

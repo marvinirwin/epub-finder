@@ -19,19 +19,19 @@ import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {UploadedFileService} from "./uploaded-file.service";
+import {HashService} from "./uploading/hash.service";
 import {parse} from "path";
 import multerS3 from 'multer-s3';
 import {v4 as uuidv4} from 'uuid';
-import {conversionJob, convertPdfToHtml} from "./convert-to-html.service";
-import {copyS3WithExtension, inputConfig, outputConfig, readStream, s3} from "./s3.service";
-import {handleUploadedDocument} from "./document-upload.service";
+import {conversionJob, convertPdfToHtml} from "./uploading/convert-to-html.service";
+import {copyS3WithExtension, inputConfig, outputConfig, readStream, s3} from "./uploading/s3.service";
+import {handleUploadedDocument} from "./uploading/document-upload.service";
 
 @Controller('documents')
 export class DocumentsController {
     constructor(
         private documentsService: DocumentsService,
-        private uploadedFileService: UploadedFileService
+        private uploadedFileService: HashService
     ) {
 
     }
@@ -138,8 +138,7 @@ export class DocumentsController {
                 return reject(new Error(`Cannot find document ${filename} for user ${user?.id}`));
             }
 
-            readStream(filename, reject)
-                .pipe(response);
+            (await readStream(filename)).pipe(response)
 
             resolve()
             // @ts-ignore

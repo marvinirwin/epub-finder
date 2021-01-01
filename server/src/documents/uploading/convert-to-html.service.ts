@@ -1,6 +1,9 @@
 import CloudConvert from "cloudconvert";
 import {Job} from "cloudconvert/built/JobsResource";
-import {BucketConfig} from "./bucket-config.interface";
+import {BucketConfig} from "../bucket-config.interface";
+import {readStream} from "./s3.service";
+import axios from "axios";
+import FormData from 'form-data';
 
 export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY, !!process.env.CLOUD_CONVERT_USE_SANDBOX);
 
@@ -13,6 +16,7 @@ type ConversionParams = {
 /*
 let inputFormat1 = "pdf";
 let outputFormat = "docx";
+kajsldfjaskldfjaklsjdfklasjdklfjasdf
 */
 export const conversionJob = (inputFormat, outputFormat, engine) => async ({inputBucket, outputBucket, key}: {
     inputBucket: BucketConfig,
@@ -26,9 +30,7 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
         .create({
             tasks: {
                 import: {
-                    operation: "import/s3",
-                    key,
-                    ...inputBucket,
+                    operation: "import/upload",
                 },
                 convert: {
                     operation: "convert",
@@ -47,6 +49,27 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
             },
         });
     console.log(`Job created for ${key} going from ${inputFormat} to ${outputFormat}`);
+    const formJob = job.tasks.find(({name}) => name === 'import').result;
+    const uploadUrl = formJob.form.url;
+    const formData = new FormData();
+    Object.entries(formJob.form.parameters).forEach(([key, value]) => {
+        formData.append(key, value);
+    })
+    formData.append("file", (await readStream(key)));
+
+    const uploadResult = await axios.post(
+        uploadUrl,
+        formData,
+        {
+            headers: {
+                Authorization: `Bearer: ${process.env.CLOUD_CONVERT_API_KEY}`
+            }
+        }
+    );
+    if (uploadResult.status !== 200) {
+        throw new Error(`Error uploading file ${uploadResult.data}`)
+    }
+
 
     console.log(`Waiting for job ${job.id} to finish`);
     const result = await cloudConvert.jobs.wait(job.id);

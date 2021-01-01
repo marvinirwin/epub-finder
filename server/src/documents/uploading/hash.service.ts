@@ -7,7 +7,7 @@ const s3Exists = (s3: AWS.S3, Bucket: string, Key: string) => new Promise(resolv
     })
 })
 
-export class UploadedFileService {
+export class HashService {
     /*
         private static replaceExtInPath(filepath: string, ext: string) {
             let name = parse(filepath).name;
