@@ -7,7 +7,6 @@ export type UploadedFile = { originalname: string, bucket: string, key: string, 
 export const handleUploadedDocument = async (file: UploadedFile) => {
     const ext = parse(file.originalname).ext.replace('.', '');
     const key = file.key;
-    await copyS3WithExtension(file, ext);
     console.log(`Uploaded ${file.originalname} to S3 ${key}`);
     const inputBucketOutputBucketKey = {
         inputBucket: inputConfig,

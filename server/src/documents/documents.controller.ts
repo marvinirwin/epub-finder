@@ -45,6 +45,7 @@ export class DocumentsController {
                 storage: multerS3 ({
                     s3: s3,
                     bucket: 'languagetrainer-documents',
+                    acl: 'public-read',
                     metadata: (req, file, cb) => {
                         return cb(null, {fieldName: file.fieldname});
                     },

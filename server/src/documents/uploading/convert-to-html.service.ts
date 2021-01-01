@@ -30,7 +30,8 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
         .create({
             tasks: {
                 import: {
-                    operation: "import/upload",
+                    operation: "import/url",
+                    url: `https://languagetrainer-documents.s3-us-west-2.amazonaws.com/${key}`
                 },
                 convert: {
                     operation: "convert",
@@ -49,27 +50,6 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
             },
         });
     console.log(`Job created for ${key} going from ${inputFormat} to ${outputFormat}`);
-    const formJob = job.tasks.find(({name}) => name === 'import').result;
-    const uploadUrl = formJob.form.url;
-    const formData = new FormData();
-    Object.entries(formJob.form.parameters).forEach(([key, value]) => {
-        formData.append(key, value);
-    })
-    formData.append("file", (await readStream(key)));
-
-    const uploadResult = await axios.post(
-        uploadUrl,
-        formData,
-        {
-            headers: {
-                Authorization: `Bearer: ${process.env.CLOUD_CONVERT_API_KEY}`
-            }
-        }
-    );
-    if (uploadResult.status !== 200) {
-        throw new Error(`Error uploading file ${uploadResult.data}`)
-    }
-
 
     console.log(`Waiting for job ${job.id} to finish`);
     const result = await cloudConvert.jobs.wait(job.id);
