@@ -17,13 +17,6 @@ export class TwitterStrategy extends PassportStrategy(Strategy, "twitter") {
     }
 
     public async validate(_accessToken: string, _refreshToken: string, profile: any, ...args: any[]): Promise<User> {
-        return await this.userService.upsertUserByEmailAndProvider(profile.emails[0].value, 'twitter', profile.id);
-/*
-        const user = await this.userService.findOne({email: profile.emails[0].value});
-        if (user) {
-            return user;
-        }
-        throw new UnauthorizedException();
-*/
+        throw new Error("Not implemented")
     }
 }

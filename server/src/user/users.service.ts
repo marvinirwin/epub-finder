@@ -11,13 +11,28 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-    ) { }
+    ) {
+    }
 
 
     /**
      * Creates a user with a username and password
      */
-    async createBasicUser({email, password}: CreateUserDto): Promise<User> {
+    async signUpBasicUser(
+        {email, password}: CreateUserDto,
+        currentUser: User | undefined
+    ): Promise<User> {
+        if (await this.findOne({email})) {
+            throw new Error("This email has already been used")
+        }
+        if (currentUser) {
+            if (!currentUser.is_anonymous) {
+                throw new Error("This user account has already been linked via another authentication method");
+            }
+            currentUser.email = email;
+            currentUser.password = password;
+            return await this.usersRepository.save(currentUser);
+        }
         await this.usersRepository.insert(this.usersRepository.create({email, password}));
         return this.usersRepository.findOneOrFail({email});
     }
@@ -34,27 +49,26 @@ export class UsersService {
         await this.usersRepository.delete(id);
     }
 
-    /**
-     * TODO make this descriminate by email and throw an error if you attempt to use an email
-     *
-     * @param email
-     */
-    async upsertUserByEmailAndProvider(email: string, provider: 'google' | 'twitter', providerIdValue: string): Promise<User> {
-        const user = await this.findOne({email});
-        if (user) {
-            if (user.reserved_for_provider === provider) {
-                return this.linkUserToProvider(user, provider, providerIdValue);
+    async upsertUserByEmailAndProvider(
+        email: string,
+        provider: 'google' | 'twitter',
+        providerIdValue: string,
+        currentUser: User | undefined
+    ): Promise<User> {
+        const userWithTheSameEmail = await this.findOne({email});
+        if (userWithTheSameEmail) {
+            if (userWithTheSameEmail.reserved_for_provider === provider) {
+                return this.linkUserToProvider(userWithTheSameEmail, provider, providerIdValue);
             }
-            const providerDoesntMatch = user[provider] !== providerIdValue;
+            const providerDoesntMatch = userWithTheSameEmail[provider] !== providerIdValue;
             if (providerDoesntMatch) {
                 throw new Error("This email account has already been registered with a different provider")
             }
-            return user;
+            return userWithTheSameEmail;
         }
-
         return this.usersRepository.save(
             Object.assign(
-                new User(),
+                currentUser || new User(),
                 {
                     email,
                     [provider]: providerIdValue
@@ -79,5 +93,10 @@ export class UsersService {
         if (user && await User.comparePassword(user.password, password)) {
             return user;
         }
+    }
+
+    async createAnonymousUser() {
+        const result = await this.usersRepository.insert(this.usersRepository.create({is_anonymous: true}));
+        return await this.usersRepository.findOne(result.identifiers[0].id);
     }
 }

@@ -9,6 +9,7 @@ import {TwitterStrategy} from "./strategies/twitter";
 import {UsersService} from "../user/users.service";
 import { GoogleStrategy } from "./strategies/google";
 import {LocalStrategy} from "./strategies/local";
+import {AnonymousStrategy} from "./strategies/anonymous";
 
 @Module({
     imports: [
@@ -21,7 +22,8 @@ import {LocalStrategy} from "./strategies/local";
         GoogleStrategy,
         LocalStrategy,
         SessionSerializer,
-        UsersService
+        UsersService,
+        AnonymousStrategy
     ],
     controllers: [AuthController],
 })

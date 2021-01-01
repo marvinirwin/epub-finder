@@ -20,12 +20,11 @@ import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {HashService} from "./uploading/hash.service";
-import {parse} from "path";
 import multerS3 from 'multer-s3';
 import {v4 as uuidv4} from 'uuid';
-import {conversionJob, convertPdfToHtml} from "./uploading/convert-to-html.service";
-import {copyS3WithExtension, inputConfig, outputConfig, readStream, s3} from "./uploading/s3.service";
+import {readStream, s3} from "./uploading/s3.service";
 import {handleUploadedDocument} from "./uploading/document-upload.service";
+import {AnonymousGuard} from "../guards/anonymous";
 
 @Controller('documents')
 export class DocumentsController {
@@ -37,7 +36,7 @@ export class DocumentsController {
     }
 
     @Put('')
-    @UseGuards(LoggedInGuard)
+    @UseGuards(AnonymousGuard)
     @UseInterceptors(
         FileInterceptor(
             'file',
@@ -50,9 +49,7 @@ export class DocumentsController {
                         return cb(null, {fieldName: file.fieldname});
                     },
                     key: (req, file, cb) => {
-                        let uuidv = uuidv4();
-
-                        return cb(null, uuidv);
+                        return cb(null, uuidv4());
                     }
                 }),
                 limits: {
@@ -140,10 +137,7 @@ export class DocumentsController {
             }
 
             (await readStream(filename)).pipe(response)
-
             resolve()
-            // @ts-ignore
-            // return createReadStream(join(process.env.UPLOADED_FILE_DIRECTORY, doc.filename)).pipe(response);
         })
     }
 }

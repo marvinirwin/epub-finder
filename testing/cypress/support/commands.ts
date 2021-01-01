@@ -33,10 +33,23 @@ declare namespace Cypress {
         iframeBody(): Chainable<void>
 
         clearIndexedDB(): Chainable<void>
+
+        visitHome(): Chainable<void>
+
+        signup(): Chainable<void>
     }
 }
-Cypress.Commands.add('signupLogin', () => {
+
+Cypress.Commands.add('visitHome', () => {
     cy.visit('http://localhost:3000/?test=1&skip_intro=1');
+})
+
+Cypress.Commands.add('signupLogin', () => {
+    cy.visitHome();
+    cy.signup();
+});
+
+Cypress.Commands.add('signup', () => {
     cy.task('randomEmailPassword')
         .then(({email, password}) => {
                 cy.wait(1000)
@@ -46,7 +59,6 @@ Cypress.Commands.add('signupLogin', () => {
             }
         )
 })
-
 
 Cypress.Commands.add('iframeBody', {
     prevSubject: true

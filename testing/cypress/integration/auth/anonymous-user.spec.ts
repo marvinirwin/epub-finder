@@ -1,14 +1,18 @@
 import {documentSelectionRow, fileChooser} from "../constants";
 import {DirectoryPom} from "../../support/pom/directory.pom";
 
-describe('File Uploading', () => {
+describe('Anonymous users', () => {
     beforeEach(() => {
-        cy.visitHome()
+            cy.visitHome();
     })
-    it('Uploads docx', () => {
-        cy.get(fileChooser).attachFile('test_docx.docx');
+    it('Links the document uploaded by an anonymous user to the same user when they sign up after in the same session', () => {
+        cy.get(fileChooser).attachFile('test_txt.txt');
         DirectoryPom.EnterLibrary();
-        cy.contains(documentSelectionRow, 'test_docx')
+        cy.contains(documentSelectionRow, 'test_txt');
+        DirectoryPom.Back();
+        cy.signup();
+        DirectoryPom.EnterLibrary();
+        cy.contains(documentSelectionRow, 'test_txt');
     })
     /*
         it('Uploads pdf', () => {

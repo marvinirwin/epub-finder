@@ -38,11 +38,7 @@ export class UploadingDocumentsService {
                 )
             ),
             loggedInUserService.profile$.pipe(startWith(undefined))
-        ]).subscribe(async ([customDocuments, profile]) => {
-            if (!profile) {
-                this.uploadingErrors$.next(`Please log in to use custom documents`)
-                return;
-            }
+        ]).subscribe(async ([customDocuments]) => {
             let lastDocument: string | undefined
             for (let i = 0; i < customDocuments.length; i++) {
                 const basicDocument = customDocuments[i];
