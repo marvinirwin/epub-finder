@@ -256,13 +256,13 @@ $led-off: #c6c6c6;
   position: relative;
 
 
-
   & > .selectable-menu-list {
     flex-basis: 240px;
     display: flex;
     flex-flow: column nowrap;
     overflow-y: auto;
     overflow-x: hidden;
+
     & > * {
     }
   }
@@ -405,12 +405,13 @@ $character-timing-section-padding: 24px;
 
 .audio-recorder-popup {
 }
+
 .dropzone-container {
   position: fixed;
   pointer-events: none;
   height: 100vh;
   width: 100vw;
-  z-index:10;
+  z-index: 10;
   transition: all 0.5s;
   background-color: transparent;
 
@@ -429,6 +430,7 @@ $character-timing-section-padding: 24px;
 
 .document-selection-row {
   width: 100%;
+
   .document-selection-row-icon-container {
     flex-grow: 1;
     display: flex;
@@ -437,29 +439,58 @@ $character-timing-section-padding: 24px;
 }
 
 
-.quiz-carousel {
-  & > .quiz-card {
-    display: flex;
-    flex-flow: column nowrap;
+.quiz-card {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+
+  & > .quiz-card-image {
+    min-width: 54px;
+    min-height: 54px;
+  }
+  & > #quiz-card-image-placeholder {
     width: 100%;
-    height: 100%;
-    align-items: center;
-    & > img {
-      margin: 24px;
-      width: 170px;
-    }
-    & > h3 {
-
-    }
-    & > iframe {
-
+  }
+  & > iframe {
+    width: 100%;
+    flex-grow: 1;
+  }
+  & > .quiz-button-row {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    margin-bottom: 24px;
+    & > * {
+      margin-left: 24px;
+      margin-right: 24px;
     }
 
   }
 }
-
-.quiz-card-image {
-  min-width: 54px;
-  min-height: 54px;
+$successColor: #97c17c;
+$mediumColor: #ded97d;
+$hardColor: #e98b7f;
+$hideColor:#f5f5f5;
+.quiz-button-easy {
+  background-color: $successColor !important;
+}
+.quiz-button-medium {
+  background-color: $mediumColor !important;
+}
+.quiz-button-hard {
+  background-color: $hardColor !important;
+}
+.quiz-button-hide {
+  background-color: $hideColor !important;
 }
 
+#quiz-card-image-placeholder {
+  height: 200px;
+  width: 300px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

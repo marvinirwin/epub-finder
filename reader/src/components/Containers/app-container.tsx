@@ -8,11 +8,11 @@ import {ManagerContext} from "../../App";
 import {ImageSearchComponent} from "../ImageSearch/image-search.component";
 
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
+    const m = useContext(ManagerContext);
     const allItems = useObservableState(treeMenuService.allItems$) || {};
     const selectedComponent = useObservableState(treeMenuService.selectedComponent$)
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
-    const directoryPath = useObservableState(treeMenuService.directoryPath$) || []
-    const m = useContext(ManagerContext);
+    const directoryPath = useObservableState(m.settingsService.directoryPath$) || []
     return <div className={'app-container'}>
         <ImageSearchComponent/>
         {
@@ -24,9 +24,9 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                 }
                 tree={menuItemTree.sourced}
                 directoryPath={directoryPath}
-                directoryChanged={directoryPath => treeMenuService.directoryPath$.next(directoryPath)}
+                directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath)}
                 componentChanged={componentPath => {
-                    treeMenuService.componentPath$.next(componentPath);
+                    m.settingsService.componentPath$.next(componentPath);
                 }}
                 actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
             />

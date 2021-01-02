@@ -1,10 +1,10 @@
 import {GridList, GridListTile} from "@material-ui/core";
 import React from "react";
-import {ImageResult} from "./image-search-result.interface";
+import {ImageObject} from "@server/";
 
 export const ImageSearchResults = (
     {searchResults, onClick}:
-        { searchResults: ImageResult[], onClick: (i: ImageResult) => void }
+        { searchResults: ImageObject[], onClick: (i: ImageObject) => void }
 ) => {
     return <GridList cellHeight={160} cols={12} className={'image-search-results'}>
         {searchResults.map((imageResult, index) =>

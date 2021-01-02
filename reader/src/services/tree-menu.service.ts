@@ -4,12 +4,11 @@ import {DeltaScanner, ds_Dict} from "../lib/Tree/DeltaScanner";
 import {map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
 import {TreeMenuNode} from "../components/directory/tree-menu-node.interface";
+import {SettingsService} from "./settings.service";
 
 export type TreeMenuProps<T> = { value: T };
 
 export class TreeMenuService<T, U extends TreeMenuProps<any>> {
-    directoryPath$ = new ReplaySubject<string[]>(1);
-    componentPath$ = new ReplaySubject<string[] | undefined>(1);
     selectedDirectory$: Observable<TreeMenuNode | undefined>;
     selectedComponent$: Observable<TreeMenuNode | undefined>;
     actionSelected$ = new ReplaySubject<string[]>(1);
@@ -17,19 +16,20 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     directoryIsInvalid$: Observable<boolean>;
 
     allItems$: Observable<ds_Dict<TreeMenuNode>>;
-/*
-    menuItems: DeltaScanner<T>;
-*/
 
-    constructor() {
-        this.directoryPath$.next([])
-        this.componentPath$.next([])
-        const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(this.directoryPath$);
-        const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(this.componentPath$);
+    /*
+        menuItems: DeltaScanner<T>;
+    */
+
+    constructor({ settingsService, }: { settingsService: SettingsService }) {
+        const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(
+            settingsService.directoryPath$);
+        const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(
+            settingsService.componentPath$);
 
         this.directoryIsInvalid$ = combineLatest([
             itemAtDirectoryPath$,
-            this.directoryPath$
+            settingsService.directoryPath$
         ]).pipe(
             map(([itemAtPath, path]) =>
                 !!itemAtPath && !!path.length
@@ -42,9 +42,9 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
         this.allItems$ = this.tree.updates$.pipe(
             flattenTreeIntoDict()
         );
-/*
-        this.menuItems = this.tree.mapWith(v => v.value);
-*/
+        /*
+                this.menuItems = this.tree.mapWith(v => v.value);
+        */
 
         this.actionSelected$.pipe(
             withLatestFrom(this.tree.updates$)
@@ -59,9 +59,9 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     }
 
     private itemAtPath$(path$:
-                        ReplaySubject<string[] | undefined>
-                        | ReplaySubject<string[]>) {
-    return combineLatest([
+                            ReplaySubject<string[] | undefined>
+                            | ReplaySubject<string[]>) {
+        return combineLatest([
             path$,
             this.tree.updates$
         ]).pipe(

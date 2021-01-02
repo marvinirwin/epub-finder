@@ -6,3 +6,4 @@ export {AvailableDocumentDto} from '../documents/available-document.dto'
 export {TranslateRequestDto} from '../translate/translate-request-dto';
 export {TransliterateRequestDto} from '../translate/transliterate-request.dto';
 export {TransliterateResponseDto} from '../translate/transliterate-response.dto';
+export {ImageObject} from "@azure/cognitiveservices-imagesearch/src/models/index";

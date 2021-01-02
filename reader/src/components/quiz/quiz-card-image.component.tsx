@@ -5,8 +5,9 @@ import {useObservableState} from "observable-hooks";
 import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {observableLastValue} from "../../services/settings.service";
+import {IconButton} from "@material-ui/core";
 
-export function QuizCardImage({c}: {c: QuizCard}) {
+export function QuizCardImage({c}: { c: QuizCard }) {
     const source = useObservableState(c.image$.value$);
     const m = useContext(ManagerContext);
     return <EditableOnClick onEditClicked={async () => {

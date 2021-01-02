@@ -6,18 +6,16 @@ import {ImageSearchRequestDto} from "./image-search-request-dto";
 export class ImageSearchController {
     constructor(private imageSearchService: ImageSearchService) {}
 
-/*
     @Post()
-    async search(imageSearchRequestDto: ImageSearchRequestDto) {
+    async search(@Body() imageSearchRequestDto: ImageSearchRequestDto) {
         const cached = await this.imageSearchService.lookupCacheEntry(imageSearchRequestDto);
         if (cached) {
             console.log(`Cache hit ${JSON.stringify(imageSearchRequestDto)}`)
             return cached;
         }
         console.log(`Cache miss ${JSON.stringify(imageSearchRequestDto)}`)
-        const cost = 20;
         const result = await this.imageSearchService.fetchSearchResults(imageSearchRequestDto);
         this.imageSearchService.insertCacheEntry(imageSearchRequestDto, result);
+        return result;
     }
-*/
 }

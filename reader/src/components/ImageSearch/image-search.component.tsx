@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Manager} from "../../lib/Manager";
 import Dialog from "@material-ui/core/Dialog";
-import CloseIcon from '@material-ui/icons/Close';
+import {ImageObject} from "@server/types";
 import {
     AppBar,
     createStyles,
@@ -15,7 +14,6 @@ import {
     Typography
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import SearchIcon from '@material-ui/icons/Search';
 import {debounce} from 'lodash';
 import {useObservableState} from "observable-hooks";
 import {getImages} from "../../services/image-search.service";
@@ -69,12 +67,11 @@ export function ImageSearchComponent() {
     const imageRequest = useObservableState(m.imageSearchService.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
     const [loading, setLoading] = useState("");
-    const [sources, setSrces] = useState<ImageResult[]>([]);
+    const [sources, setSrces] = useState<ImageObject[]>([]);
     const debounceSearch = debounce((term: string) => {
         setLoading(term);
         getImages(term).then((response) => {
-            const results: ImageSearchResponse = response.data;
-            setSrces(results.images);
+            setSrces(response);
         }).finally(() => {
             setLoading('');
         })
@@ -109,7 +106,7 @@ export function ImageSearchComponent() {
                         <ImageSearchResults
                             searchResults={sources}
                             onClick={result => {
-                                imageRequest?.cb(result.thumbnailUrl);
+                                imageRequest?.cb(result.thumbnailUrl || '');
                                 close()
                             }}
                         /> :

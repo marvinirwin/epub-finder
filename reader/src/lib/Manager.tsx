@@ -131,7 +131,7 @@ export class Manager {
     public introService: IntroService;
     public alertsService = new AlertsService();
     public requestRecordingService: RequestRecordingService;
-    public treeMenuService = new TreeMenuService<any, { value: any }>();
+    public treeMenuService: TreeMenuService<any, { value: any }>
     public scheduleRowsService: ScheduleRowsService;
 
     public observableService = new ObservableService();
@@ -175,6 +175,9 @@ export class Manager {
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.availableDocumentsService = new AvailableDocumentsService()
         this.settingsService = new SettingsService({db})
+        this.treeMenuService = new TreeMenuService<any, { value: any }>({
+            settingsService: this.settingsService
+        });
         this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
         this.activeSentenceService = new ActiveSentenceService({settingsService: this.settingsService})

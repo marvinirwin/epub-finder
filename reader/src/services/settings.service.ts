@@ -2,7 +2,7 @@ import {DatabaseService} from "../lib/Storage/database.service";
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
-import { take} from "rxjs/operators";
+import {take} from "rxjs/operators";
 
 export class SettingsService {
     private settingsReplaySubjects: { [setting: string]: ReplaySubject<any> } = {};
@@ -46,7 +46,7 @@ export class SettingsService {
                 if (row) {
                     try {
                         settingReplaySubject.next(JSON.parse(row.value))
-                    } catch(e) {
+                    } catch (e) {
                         settingReplaySubject.next(defaultWhenNotAvailable)
                     }
                 } else {
@@ -64,6 +64,7 @@ export class SettingsService {
     get checkedOutDocuments$(): ReplaySubject<ds_Dict<boolean>> {
         return this.resolveSetting$<ds_Dict<boolean>>('checkedOutDocuments', {'cat-likes-tea': true})
     }
+
     get readingDocument$(): ReplaySubject<string | undefined> {
         return this.resolveSetting$<string | undefined>('readingDocument', undefined)
     }
@@ -84,13 +85,22 @@ export class SettingsService {
         return this.resolveReplaySubject$<boolean>('showTranslations', true);
     }
 
-    get dailyGoal$() :ReplaySubject<number> {
+    get dailyGoal$(): ReplaySubject<number> {
         return this.resolveReplaySubject$<number>('dailyGoal', 24);
     }
-    get showPinyin$() :ReplaySubject<boolean> {
+
+    get showPinyin$(): ReplaySubject<boolean> {
         return this.resolveReplaySubject$<boolean>('showPinyin', true);
     }
+
+    get directoryPath$(): ReplaySubject<string[]> {
+        return this.resolveReplaySubject$<string[]>('directoryPath', [])
+    }
+    get componentPath$(): ReplaySubject<string[]> {
+        return this.resolveReplaySubject$<string[]>('componentPath', [])
+    }
 }
+
 export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
     return r.pipe(take(1)).toPromise();
 }

@@ -12,9 +12,8 @@ export const QuizCardComponent: React.FC<{ c: QuizCard } & PaperProps> = ({c, ..
     const word = useObservableState(c.word$);
     const m = useContext(ManagerContext);
     return <Paper className='quiz-card' {...props}>
-        <Typography className={'quiz-text'}>{word || ''}</Typography>
+        <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
         <QuizCardImage c={c}/>
-        <QuizCardKnownLanguage c={c}/>
         <OpenedDocument openedDocument={c.exampleSentenceOpenDocument}/>
         <div className={'quiz-button-row'}>
             <Button

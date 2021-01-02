@@ -14,7 +14,7 @@
         "watch": "nest start --watch -p tsconfig.json"
     },
     "dependencies": {
-        "@azure/cognitiveservices-imagesearch": "^3.0.0",
+        "@azure/cognitiveservices-imagesearch": "^3.0.1",
         "@azure/ms-rest-azure-js": "^2.0.1",
         "@google-cloud/translate": "^6.0.0",
         "@ladjs/bootstrap-social": "^7.0.2",
