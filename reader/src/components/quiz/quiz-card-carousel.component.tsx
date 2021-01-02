@@ -4,6 +4,6 @@ import {QuizCardComponent} from "./quiz-card.component";
 
 export const QuizCardCarousel = () => {
     const m = useContext(ManagerContext);
-    const c = m.quizCarouselService.quizCard;
+    const c = m.quizService.quizCard;
     return <QuizCardComponent c={c} id={'current-quiz-card'}/>
 }

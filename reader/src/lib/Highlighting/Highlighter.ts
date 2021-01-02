@@ -5,6 +5,7 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
 import {ScheduleRow} from "../schedule/schedule-row.interface";
+import {QuizService} from "../../components/quiz/quiz.service";
 
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
         const m = new Map<string, RGBA>();
@@ -27,7 +28,13 @@ export class Highlighter {
     createdCards$ = new ReplaySubject<string[]>(1);
     highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow>>(1);
 
-    constructor({highlighterService}: {highlighterService: HighlighterService}) {
+    constructor({
+                    highlighterService,
+        quizService
+    }: {
+        quizService: QuizService
+        highlighterService: HighlighterService
+    }) {
         const s = highlighterService;
         const {wordToMap} = HighlighterService;
         const rgba: RGBA = [160, 160, 160, 0.5];
@@ -44,14 +51,10 @@ export class Highlighter {
                 ),
             [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
-/*
         s.singleHighlight(
-            config.quizWord$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
-            this.highlightMap$,
-            config.visibleElements$,
+            quizService.quizCard.word$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
             [0, 'QUIZ_WORD_HIGHLIGHT']
         );
-*/
         s.timedHighlight(
             this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
             s.highlightMap$,

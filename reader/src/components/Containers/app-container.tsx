@@ -10,7 +10,7 @@ import {ImageSearchComponent} from "../ImageSearch/image-search.component";
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
     const m = useContext(ManagerContext);
     const allItems = useObservableState(treeMenuService.allItems$) || {};
-    const selectedComponent = useObservableState(treeMenuService.selectedComponent$)
+    const selectedComponent = useObservableState(treeMenuService.selectedComponentNode$)
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
     const directoryPath = useObservableState(m.settingsService.directoryPath$) || []
     return <div className={'app-container'}>
@@ -42,7 +42,6 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
                         className={'directory-item'}
                         style={{
                             zIndex: item.name === selectedComponent?.name ? 1 : 0,
-
                         }}>
                         {
                             item.Component && <item.Component/>

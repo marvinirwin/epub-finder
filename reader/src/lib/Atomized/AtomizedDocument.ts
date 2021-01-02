@@ -6,7 +6,7 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {splitKeepDelim} from "../Util/Util";
 import {TrieWrapper} from "../TrieWrapper";
 import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
-import {mergeSentenceInfo} from "./TextWordData";
+import {mergeSentenceInfo} from "./DocumentDataIndex";
 import {InterpolateService} from "@shared/";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';

@@ -12,8 +12,8 @@ export const QuizCardComponent: React.FC<{ c: QuizCard } & PaperProps> = ({c, ..
     const word = useObservableState(c.word$);
     const m = useContext(ManagerContext);
     return <Paper className='quiz-card' {...props}>
-        <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
         <QuizCardImage c={c}/>
+        <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
         <OpenedDocument openedDocument={c.exampleSentenceOpenDocument}/>
         <div className={'quiz-button-row'}>
             <Button
@@ -35,8 +35,9 @@ export const QuizCardComponent: React.FC<{ c: QuizCard } & PaperProps> = ({c, ..
             <Button
                 className={'quiz-button-hide'}
                 onClick={() => {
+                    word && m.cardService.deleteWords.next([word])
                 }}>
-                Hide
+                Ignore
             </Button>
         </div>
     </Paper>

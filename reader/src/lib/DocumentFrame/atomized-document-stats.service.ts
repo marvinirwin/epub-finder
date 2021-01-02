@@ -1,5 +1,5 @@
-import {DocumentWordData, TextWordData} from "../Atomized/TextWordData";
 import {AtomizedDocumentDocumentStats, AtomizedDocumentStats} from "../Atomized/AtomizedDocumentStats";
+import {DocumentDataIndex} from "../Atomized/document-data-index.interfaec";
 
 export function getAtomizedDocumentDocumentStats(stats: AtomizedDocumentStats, name: string): AtomizedDocumentDocumentStats {
     return {
@@ -10,7 +10,7 @@ export function getAtomizedDocumentDocumentStats(stats: AtomizedDocumentStats, n
     }
 }
 
-export function getDocumentWordData(stats: TextWordData, name: string): DocumentWordData {
+export function getTextWordData(stats: DocumentDataIndex, name: string): DocumentDataIndex {
     return {
         ...stats,
         documentWordCounts: Object.fromEntries(

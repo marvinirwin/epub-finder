@@ -1,22 +1,17 @@
 import {combineLatest, Observable, Subject} from "rxjs";
-import {ScheduleRow} from "../../lib/schedule/schedule-row.interface";
-import {OpenDocument} from "../../lib/DocumentFrame/open-document.entity";
 import {TrieWrapper} from "../../lib/TrieWrapper";
-import {AtomizedDocument} from "../../lib/Atomized/AtomizedDocument";
-import {DocumentSourcesService} from "../../lib/DocumentFrame/document-sources.service";
 import {OpenExampleSentencesFactory} from "../../lib/DocumentFrame/open-example-sentences-document.factory";
 import {catchError, map, shareReplay} from "rxjs/operators";
-import {InterpolateExampleSentencesService} from "../example-sentences/interpolate-example-sentences.service";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {Dictionary, uniq} from "lodash";
-import {ICard} from "../../lib/Interfaces/ICard";
 import CardService from "src/lib/Manager/CardService";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/Manager/schedule.service";
 import {ExampleSentencesService} from "../../lib/example-sentences.service";
+import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/Manager/open-documents.service";
 
-export class QuizCardCarouselService {
+export class QuizService {
     quizCard: QuizCard;
 
     constructor(
@@ -24,12 +19,14 @@ export class QuizCardCarouselService {
             trie$,
             cardService,
             scheduleService,
-            exampleSentencesService
+            exampleSentencesService,
+            openDocumentsService
         }: {
             trie$: Observable<TrieWrapper>,
             cardService: CardService
             scheduleService: ScheduleService,
-            exampleSentencesService: ExampleSentencesService
+            exampleSentencesService: ExampleSentencesService,
+            openDocumentsService: OpenDocumentsService
         }
     ) {
         const currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
@@ -50,6 +47,19 @@ export class QuizCardCarouselService {
             ),
             trie$
         );
+        openExampleSentencesDocument.renderedSentences$.subscribe(v => {
+            debugger;console.log();
+        })
+        openDocumentsService.openDocumentTree.appendDelta$.next( {
+                nodeLabel: 'root',
+                children: {
+                    [EXAMPLE_SENTENCE_DOCUMENT]: {
+                        nodeLabel: EXAMPLE_SENTENCE_DOCUMENT,
+                        value: openExampleSentencesDocument
+                    }
+                }
+            }
+        )
 
         this.quizCard = {
             exampleSentenceOpenDocument: openExampleSentencesDocument,

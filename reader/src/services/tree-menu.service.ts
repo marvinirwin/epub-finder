@@ -10,7 +10,7 @@ export type TreeMenuProps<T> = { value: T };
 
 export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     selectedDirectory$: Observable<TreeMenuNode | undefined>;
-    selectedComponent$: Observable<TreeMenuNode | undefined>;
+    selectedComponentNode$: Observable<TreeMenuNode | undefined>;
     actionSelected$ = new ReplaySubject<string[]>(1);
     tree = new DeltaScanner<TreeMenuNode>();
     directoryIsInvalid$: Observable<boolean>;
@@ -36,7 +36,7 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
             )
         );
 
-        this.selectedComponent$ = componentAtActionPath$.pipe(map(itemAtPath => itemAtPath?.value));
+        this.selectedComponentNode$ = componentAtActionPath$.pipe(map(itemAtPath => itemAtPath?.value));
         this.selectedDirectory$ = itemAtDirectoryPath$.pipe(map(itemAtPath => itemAtPath?.value));
 
         this.allItems$ = this.tree.updates$.pipe(

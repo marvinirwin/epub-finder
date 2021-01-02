@@ -10,7 +10,7 @@ import {LocalStored} from "./Storage/LocalStored";
 import {ImageSearchRequest} from "./Interfaces/IImageRequest";
 import {AudioManager} from "./Manager/AudioManager";
 import CardService from "./Manager/CardService";
-import {CHARACTER_DOCUMENT_NODE_LABEL, OpenDocumentsService} from "./Manager/open-documents.service";
+import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "./Manager/open-documents.service";
 import {NavigationPages} from "./Util/Util";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
@@ -21,14 +21,13 @@ import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
-import {DocumentWordData, mergeSentenceInfo} from "./Atomized/TextWordData";
+import {mergeSentenceInfo} from "./Atomized/DocumentDataIndex";
 import {AtomizedSentence} from "./Atomized/AtomizedSentence";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import EditingCardManager from "./Manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {ViewingFrameManager} from "./Manager/ViewingFrameManager";
 import {QuizCharacter} from "./Manager/QuizCharacter";
 import {ds_Dict} from "./Tree/DeltaScanner";
 import {RecordRequest} from "./Interfaces/RecordRequest";
@@ -78,7 +77,7 @@ import {RequestRecordingService} from "../components/PronunciationVideo/request-
 import {TreeMenuService} from "../services/tree-menu.service";
 import {ScheduleService} from "./Manager/schedule.service";
 import {OpenDocument} from "./DocumentFrame/open-document.entity";
-import {QuizCardCarouselService} from "../components/quiz/quiz-card-carousel.service";
+import {QuizService} from "../components/quiz/quiz.service";
 import {ScheduleRow} from "./schedule/schedule-row.interface";
 import {TrieWrapper} from "./TrieWrapper";
 import {ExampleSentencesService} from "./example-sentences.service";
@@ -86,6 +85,8 @@ import {ImageSearchService} from "./image-search.service";
 import {ScheduleRowsService} from "./Manager/schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
+import {FramesInViewService} from "./Manager/frames-in-view.service";
+import {DocumentDataIndex} from "./Atomized/document-data-index.interfaec";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -93,7 +94,7 @@ const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: st
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
 
-function splitTextDataStreams$(textData$: Observable<DocumentWordData>) {
+function splitTextDataStreams$(textData$: Observable<DocumentDataIndex>) {
     return {
         wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
         wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
@@ -113,14 +114,14 @@ export class Manager {
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
     public cardService: CardService;
-    public openedDocuments: OpenDocumentsService;
+    public openedDocumentsService: OpenDocumentsService;
     public scheduleManager: ScheduleService;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
     public inputManager: BrowserInputs;
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
-    public viewingFrameManager = new ViewingFrameManager();
+    public viewingFrameManager: FramesInViewService;
     public quizCharacterManager: QuizCharacter;
     public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
@@ -137,10 +138,6 @@ export class Manager {
     public observableService = new ObservableService();
 
     public imageSearchService = new ImageSearchService();
-
-    bottomNavigationValue$: ReplaySubject<NavigationPages> = LocalStored(
-        new ReplaySubject<NavigationPages>(1), 'bottom_navigation_value', NavigationPages.READING_PAGE
-    );
 
     readingWordElementMap!: Observable<Dictionary<IAnnotatedCharacter[]>>;
     setQuizWord$: Subject<string> = new Subject<string>();
@@ -168,7 +165,7 @@ export class Manager {
     documentSelectionService: DocumentSelectionService;
     readingDocumentService: ReadingDocumentService;
     exampleSentencesService: ExampleSentencesService;
-    public quizCarouselService: QuizCardCarouselService;
+    public quizService: QuizService;
     public goalsService: GoalsService;
     private activeSentenceService: ActiveSentenceService;
 
@@ -201,14 +198,13 @@ export class Manager {
         });
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
-        this.openedDocuments = new OpenDocumentsService({
+        this.openedDocumentsService = new OpenDocumentsService({
             trie$: this.cardService.trie$,
-            bottomNavigationValue$: this.bottomNavigationValue$,
             db,
             settingsService: this.settingsService,
             libraryService: this.library
         });
-        this.openedDocuments.renderedElements$
+        this.openedDocumentsService.renderedElements$
             .subscribe(renderedCharacters => {
                     renderedCharacters
                         .map(renderedCharacter =>
@@ -216,7 +212,7 @@ export class Manager {
                         );
                 }
             )
-        this.openedDocuments.newOpenDocumentDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
+        this.openedDocumentsService.newOpenDocumentDocumentBodies$.subscribe(body => this.inputManager.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             loggedInUserService: this.authManager,
             availableDocumentService: this.availableDocumentsService,
@@ -232,7 +228,7 @@ export class Manager {
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
         const {wordElementMap$, sentenceMap$, documentWordCounts} = splitTextDataStreams$(
-            this.openedDocuments.renderedDocumentSentenceData$.pipe(
+            this.openedDocumentsService.sourceDocumentSentenceData$.pipe(
                 map(textData => {
                         return mergeSentenceInfo(...textData);
                     }
@@ -257,7 +253,7 @@ export class Manager {
         );
 
         this.exampleSentencesService = new ExampleSentencesService({
-            openDocumentsService: this.openedDocuments,
+            openDocumentsService: this.openedDocumentsService,
         })
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
@@ -307,14 +303,14 @@ export class Manager {
         )
 
         CardScheduleQuiz(this.cardService, this.scheduleManager, this.quizManager);
-        InputPage(this.inputManager, this.openedDocuments);
-        CardPage(this.cardService, this.openedDocuments);
+        InputPage(this.inputManager, this.openedDocumentsService);
+        CardPage(this.cardService, this.openedDocumentsService);
         InputQuiz(this.inputManager, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardService, this.openedDocuments, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardService, this.openedDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
 
         merge(
-            this.openedDocuments.renderedAtomizedSentences$,
+            this.openedDocumentsService.renderedAtomizedSentences$,
             this.quizCharacterManager.atomizedSentenceMap$
         ).subscribe(indexedSentences => {
                 Object.values(indexedSentences).map(sentences => this.inputManager.applyAtomizedSentenceListeners(sentences))
@@ -322,19 +318,27 @@ export class Manager {
         );
         this.readingDocumentService = new ReadingDocumentService({
             trie$: this.cardService.trie$,
-            openDocumentsService: this.openedDocuments,
+            openDocumentsService: this.openedDocumentsService,
             settingsService: this.settingsService
         });
         this.visibleSentencesService = new VisibleSentencesService({readingDocumentService: this.readingDocumentService})
         this.highlighterService = new HighlighterService(
             {
-                wordElementMap$: this.openedDocuments.visibleElements$,
+                wordElementMap$: this.openedDocumentsService.visibleElements$,
                 sentenceMap$: this.visibleSentencesService.visibleSentences$
             }
         )
 
+        this.quizService = new QuizService({
+            scheduleService: this.scheduleManager,
+            exampleSentencesService: this.exampleSentencesService,
+            trie$: this.cardService.trie$,
+            cardService: this.cardService,
+            openDocumentsService: this.openedDocumentsService
+        })
         this.highlighter = new Highlighter({
-            highlighterService: this.highlighterService
+            highlighterService: this.highlighterService,
+            quizService: this.quizService
         })
 
         this.readingWordElementMap = combineLatest([
@@ -384,30 +388,6 @@ export class Manager {
             pronunciationRecordsService: this.pronunciationProgressService
         })
 
-        combineLatest([
-            this.bottomNavigationValue$,
-            this.openedDocuments.openDocumentTree.updates$,
-        ]).subscribe(
-            ([bottomNavigationValue, {sourced}]) => {
-                if (!sourced) return;
-                switch (bottomNavigationValue) {
-                    case NavigationPages.READING_PAGE:
-                        const o: ds_Dict<ds_Tree<OpenDocument>, string> = sourced.children as ds_Dict<ds_Tree<OpenDocument>, string>;
-                        this.viewingFrameManager.framesInView.appendDelta$.next({
-                            nodeLabel: "root",
-                            value: Object.values(o)[0].value
-                        })
-                        break;
-                    case NavigationPages.QUIZ_PAGE:
-                        this.viewingFrameManager.framesInView.appendDelta$.next({
-                            nodeLabel: 'root',
-                            value: this.quizCharacterManager.exampleSentencesDocument
-                        })
-                        break;
-                }
-            }
-        );
-
 
         this.audioManager.audioRecorder.audioSource
             .errors$.pipe(AlertsService.pipeToColor('warning'))
@@ -415,7 +395,7 @@ export class Manager {
 
 
         this.videoMetadataService = new VideoMetadataService({
-                allSentences$: this.openedDocuments.checkedOutDocumentsData$.pipe(
+                allSentences$: this.openedDocumentsService.checkedOutDocumentsData$.pipe(
                     switchMap(async documentWordDatas => {
                         const sentenceSet = new Set<string>();
                         documentWordDatas.forEach(d => Object.values(d.wordSentenceMap).map(s => s.forEach(sentence => sentenceSet.add(sentence.translatableText))));
@@ -440,7 +420,7 @@ export class Manager {
 
 
         new SentenceVideoHighlightService({
-            visibleAtomizedSentences$: this.openedDocuments.visibleAtomizedSentences$,
+            visibleAtomizedSentences$: this.openedDocumentsService.visibleAtomizedSentences$,
             modesService: this.modesService,
             videoMetadataService: this.videoMetadataService
         });
@@ -484,21 +464,12 @@ export class Manager {
         })
 
 
-        this.openedDocuments.openDocumentTree.appendDelta$.next({
-            nodeLabel: 'root',
-            children: {
-                [CHARACTER_DOCUMENT_NODE_LABEL]: {
-                    nodeLabel: CHARACTER_DOCUMENT_NODE_LABEL,
-                    value: this.quizCharacterManager.exampleSentencesDocument
-                }
-            }
-        });
         this.introSeriesService = new IntroSeriesService({
             settingsService: this.settingsService
         });
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
-            atomizedSentences$: this.openedDocuments.renderedAtomizedSentences$
+            atomizedSentences$: this.openedDocumentsService.renderedAtomizedSentences$
         });
         this.introService = new IntroService({
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
@@ -517,11 +488,13 @@ export class Manager {
             readingDocumentService: this.readingDocumentService,
             loggedInUserService: this.authManager
         });
-        this.quizCarouselService = new QuizCardCarouselService({
-            scheduleService: this.scheduleManager,
-            exampleSentencesService: this.exampleSentencesService,
-            trie$: this.cardService.trie$,
-            cardService: this.cardService
+
+        this.viewingFrameManager = new FramesInViewService({
+            componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
+                map(component => component?.name || '')
+            ),
+            openDocumentsService: this.openedDocumentsService,
+            quizService: this.quizService
         })
         this.hotkeyEvents.startListeners();
         this.cardService.load();

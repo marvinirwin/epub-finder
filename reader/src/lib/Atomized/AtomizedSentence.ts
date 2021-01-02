@@ -5,10 +5,11 @@ import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./AtomizedDocument";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {mergeSentenceInfo, TextWordData} from "./TextWordData";
+import {mergeSentenceInfo} from "./DocumentDataIndex";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
 import {fetchTranslation} from "../../services/translate.service";
+import {DocumentDataIndex} from "./document-data-index.interfaec";
 
 export class AtomizedSentence {
     private _translation: string | undefined;
@@ -16,7 +17,7 @@ export class AtomizedSentence {
     public _popperInstance: any;
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
-    public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): TextWordData {
+    public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): DocumentDataIndex {
         const textWordDataRecords = atomizedSentences.map(atomizedSentence =>
             atomizedSentence.getTextWordData(trie, trieElementSizes)
         );
@@ -39,7 +40,7 @@ export class AtomizedSentence {
             ) as unknown as XMLDocumentNode;
     }
 
-    getTextWordData(t: ITrie, uniqueLengths: number[]): TextWordData {
+    getTextWordData(t: ITrie, uniqueLengths: number[]): DocumentDataIndex {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};

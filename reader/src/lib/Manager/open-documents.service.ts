@@ -4,7 +4,6 @@ import {Website} from "../Website/Website";
 import {AtomizedSentence} from "../Atomized/AtomizedSentence";
 import {Dictionary, flatten} from "lodash";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
-import {DocumentWordData, TextWordData} from "../Atomized/TextWordData";
 import {TrieWrapper} from "../TrieWrapper";
 import {NavigationPages} from "../Util/Util";
 import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
@@ -19,7 +18,8 @@ import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
-import { getDocumentWordData } from "../DocumentFrame/atomized-document-stats.service";
+import {getTextWordData} from "../DocumentFrame/atomized-document-stats.service";
+import {DocumentDataIndex} from "../Atomized/document-data-index.interfaec";
 
 
 export type Named = {
@@ -27,7 +27,7 @@ export type Named = {
 }
 
 export const SOURCE_DOCUMENTS_NODE_LABEL = 'libraryDocuments';
-export const CHARACTER_DOCUMENT_NODE_LABEL = 'CharacterPageDocument';
+export const EXAMPLE_SENTENCE_DOCUMENT = 'CharacterPageDocument';
 export const READING_DOCUMENT_NODE_LABEL = 'readingDocument';
 export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
     (variableToCheck as Website).url !== undefined;
@@ -38,9 +38,9 @@ export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
     renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    renderedSentenceTextDataTree$: DeltaScanner<Observable<DocumentWordData[]>>;
-    renderedDocumentSentenceData$: Observable<DocumentWordData[]>;
-    exampleSentenceSentenceData$: Observable<TextWordData[]>;
+    renderedDocumentDataTree: DeltaScanner<Observable<DocumentDataIndex[]>>;
+    sourceDocumentSentenceData$: Observable<DocumentDataIndex[]>;
+    exampleSentenceSentenceData$: Observable<DocumentDataIndex[]>;
     displayDocument$: Observable<AtomizedDocument>;
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
     allReadingDocuments: Observable<Map<string, OpenDocument>>;
@@ -54,7 +54,6 @@ export class OpenDocumentsService {
     constructor(
         private config: {
             trie$: TrieObservable,
-            bottomNavigationValue$: ReplaySubject<NavigationPages>,
             db: DatabaseService;
             settingsService: SettingsService;
             libraryService: LibraryService;
@@ -137,7 +136,10 @@ export class OpenDocumentsService {
                     map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
                             return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
                                 sentences.map(sentence =>
-                                    getDocumentWordData(sentence.getTextWordData(trie.t, trie.getUniqueLengths()), documentFrame.name)
+                                    getTextWordData(
+                                        sentence.getTextWordData(trie.t, trie.getUniqueLengths()),
+                                        documentFrame.name
+                                    )
                                 )
                             ));
                         }
@@ -154,12 +156,12 @@ export class OpenDocumentsService {
             shareReplay(1)
         )
 
-        this.renderedSentenceTextDataTree$ = this
+        this.renderedDocumentDataTree = this
             .openDocumentTree
             .mapWith(documentDataMap());
 
 
-        this.renderedElements$ = this.renderedSentenceTextDataTree$.updates$
+        this.renderedElements$ = this.renderedDocumentDataTree.updates$
             .pipe(
                 switchMap(({sourced}) => {
                     return merge(...flattenTree(sourced));
@@ -182,70 +184,31 @@ export class OpenDocumentsService {
             )
 
 
-        this.renderedDocumentSentenceData$ = this.renderedSentenceTextDataTree$
+        this.sourceDocumentSentenceData$ = this.renderedDocumentDataTree
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
                     const readingFrames = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
-                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentWordData[]>>(readingFrames) : []);
+                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentDataIndex[]>>(readingFrames) : []);
                 }),
-                map((v: DocumentWordData[][]) => {
+                map((v: DocumentDataIndex[][]) => {
                     return flatten(v);
                 }),
                 shareReplay(1)
             );
 
-        this.exampleSentenceSentenceData$ = this.renderedSentenceTextDataTree$
+        this.exampleSentenceSentenceData$ = this.renderedDocumentDataTree
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'
-                    const readingFrames = sourced?.children?.[CHARACTER_DOCUMENT_NODE_LABEL];
-                    return combineLatest(readingFrames ? flattenTree<Observable<TextWordData[]>>(readingFrames) : [])
+                    const readingFrames = sourced?.children?.[EXAMPLE_SENTENCE_DOCUMENT];
+                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentDataIndex[]>>(readingFrames) : [])
                 }),
-                map((v: TextWordData[][]) => {
+                map((v: DocumentDataIndex[][]) => {
                     return flatten(v);
                 }),
                 shareReplay(1)
             );
-
-        const visibleOpenDocument = <U, T extends Observable<U>>(o$: Observable<[DeltaScan<T>, NavigationPages]>): Observable<U[]> => {
-            return o$.pipe(switchMap(([{sourced}, bottomNavigationValue]) => {
-                if (!sourced?.children) {
-                    throw new Error("OpenedDocuments has no tree, this should not happen")
-                }
-                switch (bottomNavigationValue) {
-                    case NavigationPages.READING_PAGE:
-                        const child = sourced.children[READING_DOCUMENT_NODE_LABEL];
-                        return combineLatest(child ? flattenTree(child) : []);
-                    case NavigationPages.QUIZ_PAGE:
-                        const child1 = sourced.children[CHARACTER_DOCUMENT_NODE_LABEL];
-                        return combineLatest(child1 ? flattenTree(child1) : []);
-                    default:
-                        return combineLatest([]);
-                }
-            }));
-        }
-
-        const visibleOpenedDocumentData$: Observable<TextWordData[][]> = combineLatest([
-            this.renderedSentenceTextDataTree$.updates$,
-            config.bottomNavigationValue$
-        ]).pipe(
-            visibleOpenDocument,
-            shareReplay(1)
-        );
-
-
-        this.visibleAtomizedSentences$ = combineLatest([
-            this.openDocumentTree.mapWith(openDocument => openDocument.renderedSentences$).updates$,
-            config.bottomNavigationValue$
-        ]).pipe(
-            visibleOpenDocument,
-            map((atomizedSentenceDictionaries: ds_Dict<AtomizedSentence[]>[]) => {
-                return mergeDictArrays(...atomizedSentenceDictionaries);
-            }),
-            shareReplay(1)
-        )
-
 
         this.visibleElements$ = visibleOpenedDocumentData$.pipe(
             map(flatten),

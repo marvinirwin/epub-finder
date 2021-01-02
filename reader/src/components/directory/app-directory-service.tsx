@@ -81,7 +81,7 @@ export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode
         m.documentSelectionService.documentSelectionRows$.pipe(
             startWith([] as DocumentSelectionRowInterface[]),
         ),
-        m.treeMenuService.selectedComponent$.pipe(
+        m.treeMenuService.selectedComponentNode$.pipe(
             startWith(undefined),
             map(c => c?.name),
             distinctUntilChanged(),
