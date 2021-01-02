@@ -1,7 +1,7 @@
 import {DeltaScanner, ds_Dict, flattenTree} from "../Tree/DeltaScanner";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
-import {Dictionary} from "lodash";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
+import {Dictionary, flatten} from "lodash";
+import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {combineLatest, Observable} from "rxjs";
 import {NavigationPages} from "../Util/Util";
 import {ds_Tree, flattenTreeIntoDict} from "../../services/tree.service";
@@ -11,65 +11,58 @@ import {QUIZ_NODE} from "../../components/directory/nodes/quiz-carousel.node";
 import {QuizService} from "../../components/quiz/quiz.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {DocumentDataIndex} from "../Atomized/document-data-index.interfaec";
+import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
+import {AtomizedDocument} from "../Atomized/atomized-document";
+import {Segment} from "../Atomized/segment";
 
-export class FramesInViewService {
-    documentsInView$: Observable<Set<OpenDocument>>
+
+export const documentElements = (o$: Observable<AtomizedDocument[]>) =>
+    o$.pipe(
+        map(atomizedDocuments => new Set(
+            flatten(
+                atomizedDocuments
+                    .map(atomizedDocument =>
+                        atomizedDocument.atomElements() as unknown as HTMLElement[]
+                    ))
+            )
+        )
+    );
+
+export class VisibleElementsService {
+    elementsInView$: Observable<Set<HTMLElement>>
 
     constructor({componentInView$, openDocumentsService, quizService}: {
         componentInView$: Observable<string>,
         openDocumentsService: OpenDocumentsService,
         quizService: QuizService
     }) {
-        this.documentsInView$ = combineLatest([
-                componentInView$,
-                openDocumentsService.renderedDocumentDataTree.updates$
-            ]).pipe(map(
+        this.elementsInView$ = combineLatest([
+            componentInView$,
+            openDocumentsService.openDocumentTree.mapWith(openDocument => openDocument.atomizedDocument$).updates$
+        ]).pipe(
+            switchMap(
                 ([componentInView, {sourced}]) => {
                     if (!sourced || !sourced.children) return [];
-
                     switch (componentInView) {
                         case READING_NODE:
-                            return flattenTree(sourced.children[READING_DOCUMENT_NODE_LABEL]);
+                            return combineLatest(flattenTree(sourced.children[READING_DOCUMENT_NODE_LABEL]));
                         case QUIZ_NODE:
-                            return flattenTree(sourced.children[EXAMPLE_SENTENCE_DOCUMENT]);
+                            return combineLatest(flattenTree(sourced.children[EXAMPLE_SENTENCE_DOCUMENT]));
                         default:
-                            return []
+                            return combineLatest([])
                     }
-                }
-            ),
-            switchMap((documentStats: Observable<DocumentDataIndex[]>[]) => combineLatest(documentStats)),
-            map((...sentenceData) => {
-                mergeDictArrays(...sentenceData.map(sentenceDatum => sentenceDatum.))
-            })
-            map(v => {
-                v.
-                v?.
-            })
-            documentsrenderedSentenceTextDataTree
-
-            map(flatten)
-            map(document => {
-                const s = new Set<OpenDocument>();
-                if (document) {
-                    s.add(document);
-                }
-                return s;
-            }),
+                }),
+            documentElements,
             shareReplay(1)
-        );
-        this.elementsInView$ = this.documentsInView$.pipe(
-            switchMap(documentSet => {
-                [...documentSet].map(document => document.renderedSentences$)
-            })
         )
     }
 
+
     getHighlightElementsForWords(
-        wordElementMaps: Dictionary<IAnnotatedCharacter[]>[],
+        wordElementMaps: Dictionary<AtomMetadata[]>[],
         word: string
     ) {
-        const results: IAnnotatedCharacter[] = [];
+        const results: AtomMetadata[] = [];
         for (let i = 0; i < wordElementMaps.length; i++) {
             const wordElementMap = wordElementMaps[i];
             if (wordElementMap[word]) {

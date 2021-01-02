@@ -10,7 +10,7 @@ export function useApplyTimeBySelectedCharacter(
     videoMetaData: VideoMetadata | undefined ) {
     const m = useContext(ManagerContext);
     useSubscription(
-        m.inputManager.videoCharacterIndex$,
+        m.browserInputs.videoCharacterIndex$,
         index => {
             if (videoElementRef
                 && currentSentence

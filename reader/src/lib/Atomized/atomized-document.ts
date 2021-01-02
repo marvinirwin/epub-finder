@@ -1,18 +1,17 @@
 import {getIndexOfEl} from "../Util/getIndexOfEl";
-import {Dictionary, uniqueId} from 'lodash';
+import {Dictionary, uniqueId, flatten} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
-import {AtomizedSentence} from "./AtomizedSentence";
+import {Segment} from "./segment";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {splitKeepDelim} from "../Util/Util";
 import {TrieWrapper} from "../TrieWrapper";
-import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
-import {mergeSentenceInfo} from "./DocumentDataIndex";
+import {mergeTabulations} from "./merge-tabulations";
 import {InterpolateService} from "@shared/";
+import {TabulatedDocuments} from "./tabulated-documents.interface";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
 export function createPopperElement(document1: XMLDocument) {
-
     const popperEl = document1.createElement('div');
     const popperId = uniqueId();
     popperEl.setAttribute("class", "translation-popover");
@@ -223,13 +222,13 @@ export class AtomizedDocument {
         }
     }
 
-    getAtomizedSentences(): AtomizedSentence[] {
+    segments(): Segment[] {
         try {
-            const sentenceElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
-            const atomized = new Array(sentenceElements.length);
-            for (let i = 0; i < sentenceElements.length; i++) {
-                const sentenceElement = sentenceElements[i];
-                atomized[i] = new AtomizedSentence(sentenceElement as unknown as XMLDocumentNode);
+            const segmentElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
+            const atomized = new Array(segmentElements.length);
+            for (let i = 0; i < segmentElements.length; i++) {
+                const segmentElement = segmentElements[i];
+                atomized[i] = new Segment(segmentElement as unknown as XMLDocumentNode);
             }
             return atomized;
         } catch (e) {
@@ -238,17 +237,8 @@ export class AtomizedDocument {
         }
     }
 
-    getDocumentStats(trie: TrieWrapper): AtomizedDocumentStats {
-        const atomizedSentences = this.getAtomizedSentences();
-        const sentenceStats = atomizedSentences.map(atomizedSentence => atomizedSentence.getTextWordData(trie.t, trie.getUniqueLengths()))
-        const data = mergeSentenceInfo(...sentenceStats);
-        return {
-            wordCounts: data.wordCounts,
-            wordSentenceMap: data.wordSentenceMap,
-            text: atomizedSentences.map(sentence => sentence.translatableText).join('\n'),
-            head: this.headInnerHTML(),
-            body: this.bodyInnerHTML(),
-        }
+    atomElements(): XMLDocumentNode[] {
+        return flatten(this.segments().map(segment => segment.children))
     }
 
     headInnerHTML() {

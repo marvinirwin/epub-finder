@@ -1,7 +1,7 @@
 import {Dictionary} from "lodash";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
+import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 
-export function mergeWordTextNodeMap(cDict: Dictionary<IAnnotatedCharacter[]>, acc: Dictionary<IAnnotatedCharacter[]>) {
+export function mergeWordTextNodeMap(cDict: Dictionary<AtomMetadata[]>, acc: Dictionary<AtomMetadata[]>) {
     Object.entries(cDict).forEach(([word, annotatedCharacters]) => {
         if (acc[word]) {
             acc[word].push(...annotatedCharacters);

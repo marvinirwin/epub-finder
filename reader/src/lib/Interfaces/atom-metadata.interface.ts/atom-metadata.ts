@@ -1,12 +1,12 @@
-import {IPositionedWord} from "./IPositionedWord";
+import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {AtomizedSentence} from "../../Atomized/AtomizedSentence";
+import {Segment} from "../../Atomized/segment";
 
-export interface IAnnotatedCharacter {
+export interface AtomMetadata {
     words: IPositionedWord[];
     char: string;
     element: XMLDocumentNode;
     maxWord: IPositionedWord | undefined;
     i: number;
-    parent: AtomizedSentence;
+    parent: Segment;
 }

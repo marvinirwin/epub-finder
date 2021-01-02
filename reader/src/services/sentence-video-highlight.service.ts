@@ -1,10 +1,11 @@
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
-import {AtomizedSentence} from "../lib/Atomized/AtomizedSentence";
+import {Segment} from "../lib/Atomized/segment";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/Modes/modes.service";
 import {VideoMetadataService} from "./video-metadata.service";
 import {debounceTime, map, shareReplay, switchMap, startWith} from "rxjs/operators";
-import {keyBy} from 'lodash';
+import {keyBy, Dictionary} from 'lodash';
+import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
 
 export class SentenceVideoHighlightService {
     constructor({
@@ -12,11 +13,11 @@ export class SentenceVideoHighlightService {
                     modesService,
                     videoMetadataService
                 }: {
-        visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>,
+        visibleAtomizedSentences$: Observable<Map<string, Set<Segment>>>,
         modesService: ModesService,
         videoMetadataService: VideoMetadataService
     }) {
-        let previousHighlightedSentences: ds_Dict<AtomizedSentence[]> = {};
+        let previousHighlightedSentences: Map<string, Set<Segment>> = new Map();
         combineLatest([
             modesService.mode$,
             visibleAtomizedSentences$,
@@ -37,13 +38,8 @@ export class SentenceVideoHighlightService {
             )
         ]).subscribe(([mode, visibleAtomizedSentences, sentenceMetadata]) => {
             previousHighlightedSentences = visibleAtomizedSentences;
-            const iterateAtomizedSentences = (s: ds_Dict<AtomizedSentence[]>, func: (atomizedSentence: AtomizedSentence) => void) => {
-                Object.values(s)
-                    .forEach(atomizedSentences => {
-                            atomizedSentences
-                                .forEach(func);
-                        }
-                    )
+            const iterateAtomizedSentences = (s: Map<string, Set<Segment>>, func: (atomizedSentence: Segment) => void) => {
+                s.forEach(segmentSet => segmentSet.forEach(func))
             }
             switch (mode) {
                 case Modes.VIDEO:

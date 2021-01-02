@@ -23,3 +23,10 @@ export const mapFromId = <IdType extends number | string, Value extends {id: IdT
 export const mapFromNamed = <Value extends {name: string}>(values: Value[]): Map<string, Value> => {
     return new Map(values.map(value => [value.name, value]))
 }
+
+
+export const mergeMaps = <T, U>(...maps: Map<T, U>[]): Map<T, U> => {
+    const m = new Map();
+    maps.map(map => map.forEach((value, key) => m.set(value, key)))
+    return m;
+}

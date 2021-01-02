@@ -1,11 +1,11 @@
-import {AtomizedSentence} from "./Atomized/AtomizedSentence";
+import {Segment} from "./Atomized/segment";
 import {combineLatest, ReplaySubject} from "rxjs";
 import {SettingsService} from "../services/settings.service";
 import {fetchTranslation} from "../services/translate.service";
 import {fetchPinyin} from "./pinyin.service";
 
 export class ActiveSentenceService {
-    activeSentence$ = new ReplaySubject<AtomizedSentence>(1);
+    activeSentence$ = new ReplaySubject<Segment>(1);
 
     constructor(
         {

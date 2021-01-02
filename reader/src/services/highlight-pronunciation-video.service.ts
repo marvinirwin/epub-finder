@@ -1,18 +1,18 @@
 import {HighlighterService} from "../lib/Highlighting/highlighter.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {distinctUntilChanged, map, shareReplay, withLatestFrom} from "rxjs/operators";
-import {VisibleSentencesService} from "./visible-sentences.service";
 import {HighlightDelta} from "../lib/Highlighting/highlight.interface";
+import {WordMetadataMapService} from "./word-metadata-map.service";
 
 export class HighlightPronunciationVideoService {
     constructor({
                     pronunciationVideoService,
                     highlighterService,
-                    visibleSentencesService
+                    wordMetadataMapService
                 }: {
                     pronunciationVideoService: PronunciationVideoService,
                     highlighterService: HighlighterService,
-                    visibleSentencesService: VisibleSentencesService
+                    wordMetadataMapService: WordMetadataMapService
                 }
     ) {
 
@@ -27,21 +27,20 @@ export class HighlightPronunciationVideoService {
                 return metadata.characters.findIndex(char => playbackTimeMs < (char.timestamp * metadata.timeScale))
             }),
             distinctUntilChanged(),
-            withLatestFrom(visibleSentencesService.visibleSentences$, pronunciationVideoService.videoMetadata$),
+            withLatestFrom(wordMetadataMapService.visibleWordSegmentMap, pronunciationVideoService.videoMetadata$),
             map(([characterIndex, visibleSentences, videoMetadata]) => {
                 if (characterIndex === -1 || !characterIndex || !videoMetadata) {
                     // Highlight nothing
                     return;
                 }
                 const delta: HighlightDelta = new Map();
-                visibleSentences[videoMetadata.sentence]
-                    .forEach(atomizedSentence => {
-                            return delta.set(
-                                atomizedSentence.element.childNodes[characterIndex] as unknown as HTMLElement,
-                                [204, 255, 0, 1]
-                            );
-                        }
-                    )
+                visibleSentences.get(videoMetadata.sentence)?.forEach(atomizedSentence => {
+                        return delta.set(
+                            atomizedSentence.element.childNodes[characterIndex] as unknown as HTMLElement,
+                            [204, 255, 0, 1]
+                        );
+                    }
+                )
                 return delta;
             }),
             shareReplay(1)

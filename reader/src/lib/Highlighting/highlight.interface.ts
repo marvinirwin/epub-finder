@@ -1,13 +1,13 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
+import {Segment} from "../Atomized/segment";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {RGBA} from "./color.service";
 
 export interface HighlighterConfig {
-    visibleSentences$: Observable<Dictionary<AtomizedSentence[]>>;
+    visibleSentences$: Observable<Dictionary<Segment[]>>;
     quizWord$: Observable<string | undefined>;
 }
 

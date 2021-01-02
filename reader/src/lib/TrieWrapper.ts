@@ -46,7 +46,7 @@ export class TrieWrapper {
         }
     }
 
-    getUniqueLengths(): number[] {
+    uniqueLengths(): number[] {
         return Object.entries(this.lengths)
             .filter(([key, val]) => val > 0).map(([key]) => parseInt(key))
     }

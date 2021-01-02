@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import {Button, Paper, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
-import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
+import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component";
 import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";
@@ -14,7 +14,7 @@ export const QuizCardComponent: React.FC<{ c: QuizCard } & PaperProps> = ({c, ..
     return <Paper className='quiz-card' {...props}>
         <QuizCardImage c={c}/>
         <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
-        <OpenedDocument openedDocument={c.exampleSentenceOpenDocument}/>
+        <OpenDocumentComponent openedDocument={c.exampleSentenceOpenDocument}/>
         <div className={'quiz-button-row'}>
             <Button
                 className={'quiz-button-hard'}

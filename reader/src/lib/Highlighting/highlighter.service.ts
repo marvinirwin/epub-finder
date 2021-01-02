@@ -9,8 +9,7 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {ElementContainer} from "./Highlighter";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {map, shareReplay, tap} from "rxjs/operators";
 import debug from 'debug';
 import {safePushMap} from "../../services/safe-push";
@@ -31,21 +30,18 @@ export class HighlighterService {
 
     public highlightMap$ = new ReplaySubject<TargetHighlightPriorityList>(1);
 
-    private sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>;
 
     private highlightTargetMap$: Observable<Map<HighlightTarget, ElementContainer[]>>;
 
-    constructor({wordElementMap$, sentenceMap$}: {
-        wordElementMap$: Observable<Dictionary<IAnnotatedCharacter[]>>;
-        sentenceMap$: Observable<Dictionary<AtomizedSentence[]>>
+    constructor({wordElementMap$}: {
+        wordElementMap$: Observable<Dictionary<Set<AtomMetadata>>>;
     }) {
-        this.sentenceMap$ = sentenceMap$;
         this.highlightTargetMap$ = wordElementMap$.pipe(
             map(
                 wordElementMap => {
                     const targetElementMap = new Map<HighlightTarget, ElementContainer[]>();
                     Object.entries(wordElementMap).forEach(([word, elements]) => {
-                        targetElementMap.set(word, elements);
+                        targetElementMap.set(word, [...elements]);
                         elements.forEach(element => targetElementMap.set(
                             element.element as unknown as HTMLElement,
                             [element]

@@ -1,5 +1,5 @@
 import {merge, Observable} from "rxjs";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedDocument} from "../Atomized/atomized-document";
 import {AtomizedStringsForRawHTML} from "../Pipes/AtomizedStringsForRawHTML";
 import {map, shareReplay} from "rxjs/operators";
 import {AtomizedStringsForURL} from "../Pipes/AtomizedStringsForURL";

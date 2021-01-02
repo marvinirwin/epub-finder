@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {Segment} from "../Atomized/segment";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {HotkeyModes} from "./HotkeyModes";
@@ -74,7 +74,7 @@ export class BrowserInputs {
     focusedElement$ = new ReplaySubject<HTMLElement | Document | null>(1);
 
     showTranslations: boolean = false;
-    latestTranslationTarget: AtomizedSentence | undefined;
+    latestTranslationTarget: Segment | undefined;
     private activeSentenceService: ActiveSentenceService;
 
 
@@ -147,7 +147,7 @@ export class BrowserInputs {
     }
 
 
-    public applyAtomizedSentenceListeners(atomizedSentences: AtomizedSentence[]) {
+    public applySegmentListeners(atomizedSentences: Segment[]) {
         atomizedSentences.forEach(atomizedSentence => {
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];

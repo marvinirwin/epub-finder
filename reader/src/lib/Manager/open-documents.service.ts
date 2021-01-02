@@ -1,15 +1,10 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {Website} from "../Website/Website";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
-import {Dictionary, flatten} from "lodash";
+import {Segment} from "../Atomized/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
-import {TrieWrapper} from "../TrieWrapper";
-import {NavigationPages} from "../Util/Util";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
+import {AtomizedDocument} from "../Atomized/atomized-document";
 import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
@@ -18,8 +13,8 @@ import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
-import {getTextWordData} from "../DocumentFrame/atomized-document-stats.service";
-import {DocumentDataIndex} from "../Atomized/document-data-index.interfaec";
+import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
+import {mergeTabulations} from "../Atomized/merge-tabulations";
 
 
 export type Named = {
@@ -37,19 +32,13 @@ export const isCustomDocument = (variableToCheck: any): variableToCheck is Basic
 export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
-    renderedAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
-    renderedDocumentDataTree: DeltaScanner<Observable<DocumentDataIndex[]>>;
-    sourceDocumentSentenceData$: Observable<DocumentDataIndex[]>;
-    exampleSentenceSentenceData$: Observable<DocumentDataIndex[]>;
+    renderedAtomizedSentences$: Observable<ds_Dict<Segment[]>>;
+    sourceDocumentTabulation$: Observable<TabulatedDocuments>;
     displayDocument$: Observable<AtomizedDocument>;
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
     allReadingDocuments: Observable<Map<string, OpenDocument>>;
-    checkedOutDocumentsData$: Observable<AtomizedDocumentDocumentStats[]>;
-    // Visible means inside of the viewport
-    visibleElements$: Observable<Dictionary<IAnnotatedCharacter[]>>;
-    visibleAtomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>;
+    tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
     newOpenDocumentDocumentBodies$: Observable<HTMLBodyElement>;
-    renderedElements$: Observable<IAnnotatedCharacter[]>;
 
     constructor(
         private config: {
@@ -127,97 +116,27 @@ export class OpenDocumentsService {
             );
 
 
-        function documentDataMap() {
-            return (documentFrame: OpenDocument) => {
-                return combineLatest([
-                    documentFrame.renderedSentences$,
-                    config.trie$
-                ]).pipe(
-                    map(([sentences, trie]: [ds_Dict<AtomizedSentence[]>, TrieWrapper]) => {
-                            return flatten(Object.entries(sentences).map(([sentenceStr, sentences]) =>
-                                sentences.map(sentence =>
-                                    getTextWordData(
-                                        sentence.getTextWordData(trie.t, trie.getUniqueLengths()),
-                                        documentFrame.name
-                                    )
-                                )
-                            ));
-                        }
-                    ),
-                    shareReplay(1),
-                );
-            };
-        }
-
-        this.checkedOutDocumentsData$ = this.allReadingDocuments.pipe(
+        this.tabulationsOfCheckedOutDocuments$ = this.allReadingDocuments.pipe(
             switchMap(openDocuments =>
-                combineLatest(mapToArray(openDocuments, (id, document) => document.documentStats$))
+                combineLatest(mapToArray(openDocuments, (id, document) => document.tabulation$))
             ),
-            shareReplay(1)
-        )
-
-        this.renderedDocumentDataTree = this
-            .openDocumentTree
-            .mapWith(documentDataMap());
-
-
-        this.renderedElements$ = this.renderedDocumentDataTree.updates$
-            .pipe(
-                switchMap(({sourced}) => {
-                    return merge(...flattenTree(sourced));
-                }),
-                map(documentWordDatas => {
-                        return Array.from(
-                            new Set(
-                                flatten(
-                                    documentWordDatas.map(d => flatten(Object.values(d.wordElementsMap)))
-                                )
-                            ));
-                    }
-                ),
-                shareReplay(1)
-                /*
-                                map((annotatedCharacters: IAnnotatedCharacter[]) =>
-                                    annotatedCharacters.map(({element}) => element as unknown as HTMLElement)
-                                )
-                */
-            )
-
-
-        this.sourceDocumentSentenceData$ = this.renderedDocumentDataTree
-            .updates$.pipe(
-                switchMap(({sourced}) => {
-                    // I only want the tree from 'readingFrames'
-                    const readingFrames = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
-                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentDataIndex[]>>(readingFrames) : []);
-                }),
-                map((v: DocumentDataIndex[][]) => {
-                    return flatten(v);
-                }),
-                shareReplay(1)
-            );
-
-        this.exampleSentenceSentenceData$ = this.renderedDocumentDataTree
-            .updates$.pipe(
-                switchMap(({sourced}) => {
-                    // I only want the tree from 'readingFrames'
-                    const readingFrames = sourced?.children?.[EXAMPLE_SENTENCE_DOCUMENT];
-                    return combineLatest(readingFrames ? flattenTree<Observable<DocumentDataIndex[]>>(readingFrames) : [])
-                }),
-                map((v: DocumentDataIndex[][]) => {
-                    return flatten(v);
-                }),
-                shareReplay(1)
-            );
-
-        this.visibleElements$ = visibleOpenedDocumentData$.pipe(
-            map(flatten),
-            map(sentenceData =>
-                mergeDictArrays(...sentenceData.map(sentenceDatum => sentenceDatum.wordElementsMap))
-            ),
+            map(tabulations => mergeTabulations(...tabulations)),
             shareReplay(1)
         );
 
+        this.sourceDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.tabulation$)
+            .updates$.pipe(
+                switchMap(({sourced}) => {
+                    // I only want the tree from 'readingFrames'
+                    const sourceDocuments = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
+                    const documentTabulations: Observable<TabulatedDocuments>[] = flattenTree<Observable<TabulatedDocuments>>(sourceDocuments);
+                    return combineLatest(documentTabulations);
+                }),
+                map((documentTabulations: TabulatedDocuments[]) =>
+                    mergeTabulations(...documentTabulations)
+                ),
+                shareReplay(1)
+            );
 
         this.displayDocument$ = this.readingDocument$.pipe(
             switchMap(readingDocument => {

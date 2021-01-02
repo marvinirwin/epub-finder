@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {Segment} from "../Atomized/segment";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, map, take} from "rxjs/operators";
 import {flatten, chunk} from "lodash";
@@ -9,7 +9,7 @@ import {sleep} from "../Util/Util";
 
 export class IntroHighlightService {
     constructor({atomizedSentences$, temporaryHighlightService}: {
-        atomizedSentences$: Observable<ds_Dict<AtomizedSentence[]>>,
+        atomizedSentences$: Observable<ds_Dict<Segment[]>>,
         temporaryHighlightService: TemporaryHighlightService,
     }) {
         atomizedSentences$.pipe(

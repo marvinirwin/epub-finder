@@ -1,5 +1,5 @@
 import {Observable, of, ReplaySubject} from "rxjs";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {Segment} from "../Atomized/segment";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {ICard} from "../Interfaces/ICard";
 import {distinct, map} from "rxjs/operators";
@@ -8,9 +8,9 @@ import {TrieWrapper} from "../TrieWrapper";
 export type TrieObservable = Observable<TrieWrapper>;
 
 export class QuizCharacter {
-    exampleSentences$: Observable<AtomizedSentence[]>;
+    exampleSentences$: Observable<Segment[]>;
     quizzingCard$: Observable<ICard | undefined>;
-    atomizedSentenceMap$ = new ReplaySubject<ds_Dict<AtomizedSentence>>(1);
+    atomizedSentenceMap$ = new ReplaySubject<ds_Dict<Segment>>(1);
     public recordingClass$ = new ReplaySubject<string>(1);
     private sentenceCache = new Set<string>();
 

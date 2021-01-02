@@ -1,25 +1,23 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {map, shareReplay} from "rxjs/operators";
-import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
-import {AtomizedSentence} from "../Atomized/AtomizedSentence";
+import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
+import {Segment} from "../Atomized/segment";
 import {TrieWrapper} from "../TrieWrapper";
-import {AtomizedDocumentDocumentStats} from "../Atomized/AtomizedDocumentStats";
 import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
-import {rehydratePage} from "../Atomized/OpenedDocument";
-import {getAtomizedDocumentDocumentStats} from "./atomized-document-stats.service";
+import {AtomizedDocument} from "../Atomized/atomized-document";
+import {rehydratePage} from "../Atomized/open-document.component";
+import {mergeTabulations} from "../Atomized/merge-tabulations";
+import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
+import {flatten} from "lodash";
+import {AtomMetadataIndex} from "../Atomized/atom-metadata-index";
 
 export class OpenDocument {
     public id: string;
-    public text$: Observable<string>;
-    public wordCountRecords$: Observable<DocumentWordCount[]>;
-    public renderedSentences$ = new ReplaySubject<ds_Dict<AtomizedSentence[]>>(1)
-    public documentStats$: Observable<AtomizedDocumentDocumentStats>;
-
-    public url$ = new ReplaySubject<string>(1)
+    public renderedSentences$ = new ReplaySubject<ds_Dict<Segment[]>>(1)
+    public tabulation$: Observable<TabulatedDocuments>;
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
+    public atomMetadataIndex$: Observable<AtomMetadataIndex>;
 
     constructor(
         public name: string,
@@ -28,27 +26,28 @@ export class OpenDocument {
     ) {
         this.renderedSentences$.next({});
         this.id = name;
-        this.documentStats$ = combineLatest([
+        this.tabulation$ = combineLatest([
             this.atomizedDocument$,
-            trie
+            trie,
         ]).pipe(
             map(([document, trie]) => {
-                const stats = document.getDocumentStats(trie);
-                return getAtomizedDocumentDocumentStats(stats, this.name);
-            }),
-            shareReplay(1)
-        );
-
-
-        this.text$ = this.documentStats$.pipe(map(documentStats => documentStats.text), shareReplay(1));
-
-        this.wordCountRecords$ = this.documentStats$.pipe(
-            map(documentStat => {
-                    return Object.values(documentStat.documentWordCounts);
+                    return mergeTabulations(
+                        ...document.segments()
+                            .map(s => s.tabulate(trie.t, trie.uniqueLengths()))
+                    );
                 }
             ),
             shareReplay(1)
         );
+        this.atomMetadataIndex$ = this.atomizedDocument$
+            .pipe(map(atomizedDocument => {
+                    return new AtomMetadataIndex(
+                        atomizedDocument.atomElements(),
+                        this.tabulation$
+                    );
+                }
+                )
+            );
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {

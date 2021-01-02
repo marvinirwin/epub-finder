@@ -1,6 +1,6 @@
 import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
-import {OpenedDocument} from "../../lib/Atomized/OpenedDocument";
+import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component";
 import AudioRecorder from "../AudioPopup/AudioRecorder";
 import {ExpandableContainer} from "../Containers/expandable-container";
 import {useObservableState} from "observable-hooks";
@@ -23,7 +23,7 @@ export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({m}) =
                              resizeObservable$={useContext(PronunciationVideoResizedContext)}>
             <PronunciationVideoContainer m={m}/>
         </ExpandableContainer>
-        <OpenedDocument
+        <OpenDocumentComponent
             ref={ref => m.introService.readingFrameRef$.next(ref)}
             openedDocument={openedDocument}
             id={'reading-document'}

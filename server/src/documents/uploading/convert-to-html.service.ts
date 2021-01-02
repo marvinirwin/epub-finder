@@ -25,30 +25,33 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
 }) => {
     console.log(`Starting job for ${key} going from ${inputFormat} to ${outputFormat}`);
     let outputKey = `${key}.${outputFormat}`;
+    let data = {
+        tasks: {
+            import: {
+                operation: "import/url",
+                url: `https://languagetrainer-documents.s3-us-west-2.amazonaws.com/${key}`
+            },
+            convert: {
+                operation: "convert",
+                input: ["import"],
+                input_format: inputFormat,
+                output_format: outputFormat,
+                engine
+            },
+            export: {
+                input: "convert",
+                operation: 'export/s3',
+                ...outputBucket,
+                key: outputKey,
+
+            }
+        },
+    };
+    const v= JSON.stringify(data, null, "\t");
+    console.log(v);
     const job = await cloudConvert
         .jobs
-        .create({
-            tasks: {
-                import: {
-                    operation: "import/url",
-                    url: `https://languagetrainer-documents.s3-us-west-2.amazonaws.com/${key}`
-                },
-                convert: {
-                    operation: "convert",
-                    input: ["import"],
-                    input_format: inputFormat,
-                    output_format: outputFormat,
-                    engine
-                },
-                export: {
-                    input: "convert",
-                    operation: 'export/s3',
-                    ...outputBucket,
-                    key: outputKey,
-
-                }
-            },
-        });
+        .create(data);
     console.log(`Job created for ${key} going from ${inputFormat} to ${outputFormat}`);
 
     console.log(`Waiting for job ${job.id} to finish`);

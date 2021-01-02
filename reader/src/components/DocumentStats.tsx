@@ -17,12 +17,14 @@ const hsk1Characters = new Set(flatten(hsk1Words))
 
 
 export const DocumentStats: React.FunctionComponent<{m: Manager, b: OpenDocument}> = ({children, m, b}) => {
-    const stats = useObservableState(b.documentStats$)
+    const atomizedDocument = useObservableState(b.atomizedDocument$)
     const characterCounts: ds_Dict<number> = {};
-    if (stats) {
+    if (atomizedDocument) {
         // This is probably normalized, right?
-        for (let i = 0; i < stats.text.length; i++) {
-            const character = stats.text[i];
+        // TODO we can get the text from joining all the segments
+/*
+        for (let i = 0; i < atomizedDocument.text.length; i++) {
+            const character = atomizedDocument.text[i];
             if (!isChineseCharacter(character)) {
                 continue;
             }
@@ -31,6 +33,12 @@ export const DocumentStats: React.FunctionComponent<{m: Manager, b: OpenDocument
             }
             characterCounts[character]++;
         }
+        askldfjaklsdjfklajsdlfj
+
+
+        a
+        sdfasdfasdf
+*/
     }
     return <div className={'documentstats'}>
         <div>Distinct Characters: {Object.keys(characterCounts).length}</div>

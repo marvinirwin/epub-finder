@@ -1,24 +1,23 @@
 import React, {useEffect, useState} from 'react'
 import {useObservableState} from "observable-hooks";
 import {InnerHTMLIFrame} from "../../components/Frame/innerHTMLIFrame";
-import {AtomizedDocumentStats} from "./AtomizedDocumentStats";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {AtomizedSentence} from "./AtomizedSentence";
-import {ANNOTATE_AND_TRANSLATE} from "./AtomizedDocument";
+import {Segment} from "./segment";
+import {ANNOTATE_AND_TRANSLATE} from "./atomized-document";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../services/safe-push";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 
-export const OpenedDocument =
+export const OpenDocumentComponent =
     React.forwardRef<HTMLIFrameElement,
         { openedDocument: OpenDocument } & React.HTMLProps<HTMLIFrameElement>>(({openedDocument, ...props}, ref) => {
-        const documentStats = useObservableState<AtomizedDocumentStats>(openedDocument.documentStats$)
+        const document = useObservableState(openedDocument.atomizedDocument$)
         return <InnerHTMLIFrame
             {...props}
             title={openedDocument.name}
-            bodyText={documentStats?.body || ''}
-            headText={documentStats?.head || ''}
+            bodyText={document?.bodyInnerHTML() || ''}
+            headText={document?.headInnerHTML() || ''}
             renderHandler={(head, body) => {
                 // @ts-ignore
                 openedDocument.handleHTMLHasBeenRendered(head, body);
@@ -27,12 +26,12 @@ export const OpenedDocument =
         />
     })
 
-export function rehydratePage(htmlDocument: HTMLDocument): ds_Dict<AtomizedSentence[]> {
+export function rehydratePage(htmlDocument: HTMLDocument): ds_Dict<Segment[]> {
     const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
-    const annotatedElements: ds_Dict<AtomizedSentence[]> = {};
+    const annotatedElements: ds_Dict<Segment[]> = {};
     for (let i = 0; i < elements.length; i++) {
         const annotatedElement = elements[i];
-        const sentenceElement = new AtomizedSentence(annotatedElement as unknown as XMLDocumentNode);
+        const sentenceElement = new Segment(annotatedElement as unknown as XMLDocumentNode);
         safePush(annotatedElements, sentenceElement.translatableText, sentenceElement);
     }
     return annotatedElements;

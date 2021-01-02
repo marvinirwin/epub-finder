@@ -63,6 +63,12 @@ export class DeltaScanner<T, U extends string = string> {
         return derivedTree;
     }
 
+    flatUpdates(): Observable<T[]> {
+        return this.updates$.pipe(
+            map(({sourced}) => flattenTree(sourced))
+        )
+    }
+
     subTree(subTreeFunc: DeltaScanSubTreeFunc<T>): DeltaScanner<T> {
         const derivedTree = new DeltaScanner<T>();
         this.updates$.subscribe(({sourced}) => {

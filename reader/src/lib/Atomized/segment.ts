@@ -1,27 +1,26 @@
 import {ITrie} from "../Interfaces/Trie";
 import {Dictionary, maxBy, uniq} from "lodash";
-import {IAnnotatedCharacter} from "../Interfaces/Annotation/IAnnotatedCharacter";
+import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
-import {AtomizedDocument} from "./AtomizedDocument";
+import {AtomizedDocument} from "./atomized-document";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {mergeSentenceInfo} from "./DocumentDataIndex";
+import {mergeTabulations} from "./merge-tabulations";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
-import {fetchTranslation} from "../../services/translate.service";
-import {DocumentDataIndex} from "./document-data-index.interfaec";
+import {TabulatedDocuments, TabulatedSentences} from "./tabulated-documents.interface";
 
-export class AtomizedSentence {
+export class Segment {
     private _translation: string | undefined;
     private _previousWords = new Set<string>();
     public _popperInstance: any;
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
-    public static getTextWordData(atomizedSentences: AtomizedSentence[], trie: ITrie, trieElementSizes: number[]): DocumentDataIndex {
+    public static tabulateSentences(atomizedSentences: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
         const textWordDataRecords = atomizedSentences.map(atomizedSentence =>
-            atomizedSentence.getTextWordData(trie, trieElementSizes)
+            atomizedSentence.tabulate(trie, trieElementSizes)
         );
-        return mergeSentenceInfo(...textWordDataRecords);
+        return mergeTabulations(...textWordDataRecords);
     }
 
     translatableText: string;
@@ -40,11 +39,12 @@ export class AtomizedSentence {
             ) as unknown as XMLDocumentNode;
     }
 
-    getTextWordData(t: ITrie, uniqueLengths: number[]): DocumentDataIndex {
+    tabulate(t: ITrie, uniqueLengths: number[]): TabulatedSentences {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
-        const wordElementsMap: Dictionary<IAnnotatedCharacter[]> = {};
-        const wordSentenceMap: Dictionary<AtomizedSentence[]> = {};
+        const wordElementsMap: Dictionary<AtomMetadata[]> = {};
+        const wordSentenceMap: Dictionary<Segment[]> = {};
+        const atomMetadatas = new Map<XMLDocumentNode, AtomMetadata>();
         const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
         const children = this.element.childNodes;
@@ -102,7 +102,7 @@ export class AtomizedSentence {
              * I'm trying to figure out why wordElementMap isn't populated with 中 when scanning the word 中共中央
              */
             const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
-            const annotationElement: IAnnotatedCharacter = {
+            const atomMetadata: AtomMetadata = {
                 char: (textContent as string)[i],
                 words,
                 element: currentMark,
@@ -110,20 +110,16 @@ export class AtomizedSentence {
                 i,
                 parent: this
             };
-/*
-            if (maxWord?.word === '中共中央' && currentCharacter === '中') {
-            }
-*/
-
-            annotationElement.words.forEach(word => {
+            atomMetadatas.set(currentMark, atomMetadata);
+            atomMetadata.words.forEach(word => {
                 if (wordElementsMap[word.word]) {
-                    wordElementsMap[word.word].push(annotationElement);
+                    wordElementsMap[word.word].push(atomMetadata);
                 } else {
-                    wordElementsMap[word.word] = [annotationElement]
+                    wordElementsMap[word.word] = [atomMetadata]
                 }
             })
         }
-        const sentenceMap: Dictionary<AtomizedSentence[]> = {
+        const sentenceMap: Dictionary<Segment[]> = {
             [this.translatableText]: [this]
         };
         if (newWords.size) {
@@ -133,7 +129,8 @@ export class AtomizedSentence {
             wordElementsMap,
             wordCounts,
             wordSentenceMap,
-            sentenceMap
+            segments: sentenceMap,
+            atomMetadatas
         };
     }
 
@@ -166,5 +163,9 @@ export class AtomizedSentence {
     public hidePopper() {
         this._popperInstance?.destroy()
         this.getPopperHTMLElement().removeAttribute('data-show');
+    }
+
+    get children() {
+        return this.element.childNodes
     }
 }

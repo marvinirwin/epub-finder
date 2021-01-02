@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "../Atomized/AtomizedDocument";
+import {AtomizedDocument} from "../Atomized/atomized-document";
 // @ts-ignore
 import {XMLSerializer} from 'xmldom';
 
