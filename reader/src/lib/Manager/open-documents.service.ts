@@ -22,7 +22,7 @@ export type Named = {
 }
 
 export const SOURCE_DOCUMENTS_NODE_LABEL = 'libraryDocuments';
-export const EXAMPLE_SENTENCE_DOCUMENT = 'CharacterPageDocument';
+export const EXAMPLE_SENTENCE_DOCUMENT = 'exampleSentences';
 export const READING_DOCUMENT_NODE_LABEL = 'readingDocument';
 export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
     (variableToCheck as Website).url !== undefined;
@@ -104,7 +104,7 @@ export class OpenDocumentsService {
 
 
         this.renderedAtomizedSentences$ = this.openDocumentTree
-            .mapWith((documentFrame: OpenDocument) => documentFrame.renderedSentences$.pipe(startWith({}))).updates$.pipe(
+            .mapWith((documentFrame: OpenDocument) => documentFrame.renderedSegments$.pipe(startWith({}))).updates$.pipe(
                 switchMap(({sourced}) => {
                     const sources = sourced ? flattenTree(sourced) : [];
                     return combineLatest(sources);
@@ -118,13 +118,13 @@ export class OpenDocumentsService {
 
         this.tabulationsOfCheckedOutDocuments$ = this.allReadingDocuments.pipe(
             switchMap(openDocuments =>
-                combineLatest(mapToArray(openDocuments, (id, document) => document.tabulation$))
+                combineLatest(mapToArray(openDocuments, (id, document) => document.renderedTabulation$))
             ),
             map(tabulations => mergeTabulations(...tabulations)),
             shareReplay(1)
         );
 
-        this.sourceDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.tabulation$)
+        this.sourceDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.renderedTabulation$)
             .updates$.pipe(
                 switchMap(({sourced}) => {
                     // I only want the tree from 'readingFrames'

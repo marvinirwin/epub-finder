@@ -1,25 +1,20 @@
 import {merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary} from "lodash";
-import trie from "trie-prefix-tree";
-import {catchError, flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
+import { flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {DatabaseService} from "../Storage/database.service";
-import {TrieWrapper} from "../TrieWrapper";
-import {TrieObservable} from "./QuizCharacter";
 import {cardForWord} from "../Util/Util";
-import debug from 'debug';
 
-const d = debug('carsd');
-
-export default class CardService {
+export default class CardsService {
     public deleteWords: Subject<string[]> = new Subject<string[]>();
     public putWords$: Subject<string[]> = new Subject<string[]>();
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
     addUnpersistedCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
     cardProcessingSignal$ = new ReplaySubject<boolean>(1);
-    trie$: TrieObservable;
+    newWords$: Observable<string[]>
+    private db: DatabaseService;
 
     static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
@@ -39,16 +34,24 @@ export default class CardService {
         }
     }
 
-    constructor(public db: DatabaseService) {
+    constructor({
+                    databaseService
+                }: {
+        databaseService: DatabaseService,
+    }) {
+        this.db = databaseService;
         this.cardProcessingSignal$.next(true);
-        const t = new TrieWrapper(trie([]));
-        this.trie$ = t.changeSignal$;
 
         this.putWords$.subscribe(words => {
             this.addUnpersistedCards$.next(
                 words.map(cardForWord)
             )
-        })
+        });
+
+        this.newWords$= this.addPersistedCards$.pipe(
+            map(cards => cards.map(card => card.learningLanguage)),
+            shareReplay(1)
+        );
         this.cardIndex$ = merge(
             this.addPersistedCards$.pipe(
                 map(addCards => [addCards, []]),
@@ -61,20 +64,17 @@ export default class CardService {
             startWith([[], []]),
             scan((cardIndex: Dictionary<ICard[]>, [newCards, cardsToDelete]: [ICard[], string[]]) => {
                 try {
-                    t.removeWords(...cardsToDelete);
-                    const newWords = newCards.map(card => card.learningLanguage);
-                    t.addWords(...newWords)
                     // TODO I think this is wrong because technically we can have more than 1 card per word
                     // But its a hack that works for now
                     cardsToDelete.forEach(cardToDelete => delete cardIndex[cardToDelete])
                     // TODO I dont think we need to shallow clone here
                     const newCardIndex = {...cardIndex};
                     newCards.forEach(newICard => {
-                        CardService.mergeCardIntoCardDict(newICard, newCardIndex);
+                        CardsService.mergeCardIntoCardDict(newICard, newCardIndex);
                     });
                     return newCardIndex;
-                } catch(e) {
-                    debugger;
+                } catch (e) {
+                    console.warn(e)
                     return {}
                 }
             }, {}),

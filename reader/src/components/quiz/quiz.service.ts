@@ -1,14 +1,14 @@
 import {combineLatest, Observable, Subject} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/DocumentFrame/open-example-sentences-document.factory";
-import {catchError, map, shareReplay} from "rxjs/operators";
+import {catchError, map, shareReplay, tap} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {Dictionary, uniq} from "lodash";
-import CardService from "src/lib/Manager/CardService";
+import CardsService from "src/lib/Manager/cards.service";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/Manager/schedule.service";
-import {ExampleSentencesService} from "../../lib/example-sentences.service";
+import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/Manager/open-documents.service";
 
 export class QuizService {
@@ -23,9 +23,9 @@ export class QuizService {
             openDocumentsService
         }: {
             trie$: Observable<TrieWrapper>,
-            cardService: CardService
+            cardService: CardsService
             scheduleService: ScheduleService,
-            exampleSentencesService: ExampleSentencesService,
+            exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService
         }
     ) {
@@ -36,7 +36,7 @@ export class QuizService {
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
             'example-sentences',
             combineLatest([
-                exampleSentencesService.exampleSentenceMap$,
+                exampleSentencesService.exampleSegmentMap$,
                 currentWord$
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
@@ -47,9 +47,6 @@ export class QuizService {
             ),
             trie$
         );
-        openExampleSentencesDocument.renderedSentences$.subscribe(v => {
-            debugger;console.log();
-        })
         openDocumentsService.openDocumentTree.appendDelta$.next( {
                 nodeLabel: 'root',
                 children: {

@@ -7,7 +7,7 @@ import {ICard} from "./Interfaces/ICard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {AudioManager} from "./Manager/AudioManager";
-import CardService from "./Manager/CardService";
+import CardsService from "./Manager/cards.service";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
@@ -18,7 +18,6 @@ import {CardPage} from "./Manager/ManagerConnections/Card-Page";
 import {InputQuiz} from "./Manager/ManagerConnections/Input-Quiz";
 import {ScheduleQuiz} from "./Manager/ManagerConnections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./Manager/CreatedSentenceManager";
-import {mergeTabulations} from "./Atomized/merge-tabulations";
 import {Segment} from "./Atomized/segment";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import EditingCardManager from "./Manager/EditingCardManager";
@@ -67,33 +66,32 @@ import {RequestRecordingService} from "../components/PronunciationVideo/request-
 import {TreeMenuService} from "../services/tree-menu.service";
 import {ScheduleService} from "./Manager/schedule.service";
 import {QuizService} from "../components/quiz/quiz.service";
-import {ExampleSentencesService} from "./example-sentences.service";
+import {ExampleSegmentsService} from "./example-segments.service";
 import {ImageSearchService} from "./image-search.service";
 import {ScheduleRowsService} from "./Manager/schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
-import {documentElements, VisibleElementsService} from "./Manager/visible-elements.service";
+import { VisibleService} from "./Manager/visible.service";
 import {TabulatedDocuments} from "./Atomized/tabulated-documents.interface";
-import {flattenTree} from "./Tree/DeltaScanner";
 import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
-import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
-import {safePush, safePushSet} from "../services/safe-push";
-import {mapMap} from "./map.module";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
+import {TrieService} from "./Manager/trie.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
+/*
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
+*/
 
 function splitTextDataStreams$(textData$: Observable<TabulatedDocuments>) {
     return {
         wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
         wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
         documentWordCounts: textData$.pipe(map(({documentWordCounts}) => documentWordCounts)),
-        wordSentenceMap: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap)),
-        sentenceMap$: textData$.pipe(map(({wordSentenceMap}) => wordSentenceMap))
+        wordSentenceMap: textData$.pipe(map(({wordSegmentMap}) => wordSegmentMap)),
+        sentenceMap$: textData$.pipe(map(({wordSegmentMap}) => wordSegmentMap))
     }
 }
 
@@ -106,7 +104,7 @@ export class Manager {
     );
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
-    public cardService: CardService;
+    public cardService: CardsService;
     public openDocumentsService: OpenDocumentsService;
     public scheduleManager: ScheduleService;
     public quizManager: QuizManager;
@@ -114,7 +112,7 @@ export class Manager {
     public browserInputs: BrowserInputs;
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
-    public visibleElementsService: VisibleElementsService;
+    public visibleElementsService: VisibleService;
     public quizCharacterManager: QuizCharacter;
     public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
@@ -155,12 +153,13 @@ export class Manager {
     availableDocumentsService: AvailableDocumentsService;
     documentSelectionService: DocumentSelectionService;
     readingDocumentService: ReadingDocumentService;
-    exampleSentencesService: ExampleSentencesService;
+    exampleSentencesService: ExampleSegmentsService;
     public quizService: QuizService;
     public goalsService: GoalsService;
     public activeSentenceService: ActiveSentenceService;
     public aggregateElementIndexService: AggregateElementIndexService;
     public wordMetadataMapService: WordMetadataMapService;
+    public trieService: TrieService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.availableDocumentsService = new AvailableDocumentsService()
@@ -181,8 +180,7 @@ export class Manager {
 
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
-
-        this.cardService = new CardService(this.db);
+        this.cardService = new CardsService({databaseService: db});
         this.library = new LibraryService({
             db,
             settingsService: this.settingsService,
@@ -191,16 +189,19 @@ export class Manager {
         });
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
+        this.pronunciationProgressService = new PronunciationProgressService({db});
+        this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
+        this.trieService = new TrieService({
+            cardsService: this.cardService,
+            pronunciationProgressService: this.pronunciationProgressService,
+            wordRecognitionProgressService: this.wordRecognitionProgressService
+        })
         this.openDocumentsService = new OpenDocumentsService({
-            trie$: this.cardService.trie$,
+            trie$: this.trieService.trie$,
             db,
             settingsService: this.settingsService,
             libraryService: this.library
         });
-        this.aggregateElementIndexService = new AggregateElementIndexService({
-            openDocumentsService: this.openDocumentsService
-        })
-
 
         this.openDocumentsService.newOpenDocumentDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
@@ -223,13 +224,11 @@ export class Manager {
         this.readingWordElementMap = wordElementMap$;
         this.readingWordCounts$ = documentWordCounts;
         this.readingWordSentenceMap = sentenceMap$;
-        this.pronunciationProgressService = new PronunciationProgressService({db});
-        this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
         this.scheduleRowsService = new ScheduleRowsService({
             wordCounts$: this.readingWordCounts$,
             recognitionRecordsService: this.wordRecognitionProgressService,
             pronunciationRecordsService: this.pronunciationProgressService
-        })
+        });
         this.scheduleManager = new ScheduleService({
                 db,
                 sortMode$: of('').pipe(shareReplay(1)),
@@ -237,7 +236,7 @@ export class Manager {
             }
         );
 
-        this.exampleSentencesService = new ExampleSentencesService({
+        this.exampleSentencesService = new ExampleSegmentsService({
             openDocumentsService: this.openDocumentsService,
         })
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
@@ -283,7 +282,7 @@ export class Manager {
         this.quizCharacterManager = new QuizCharacter(
             {
                 quizzingCard$: this.quizManager.quizzingCard$,
-                trie$: this.cardService.trie$,
+                trie$: this.trieService.trie$,
             }
         )
 
@@ -302,7 +301,7 @@ export class Manager {
             }
         );
         this.readingDocumentService = new ReadingDocumentService({
-            trie$: this.cardService.trie$,
+            trie$: this.trieService.trie$,
             openDocumentsService: this.openDocumentsService,
             settingsService: this.settingsService
         });
@@ -310,17 +309,21 @@ export class Manager {
         this.quizService = new QuizService({
             scheduleService: this.scheduleManager,
             exampleSentencesService: this.exampleSentencesService,
-            trie$: this.cardService.trie$,
+            trie$: this.trieService.trie$,
             cardService: this.cardService,
             openDocumentsService: this.openDocumentsService
         })
-        this.visibleElementsService = new VisibleElementsService({
+        this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map(component => component?.name || '')
             ),
             openDocumentsService: this.openDocumentsService,
             quizService: this.quizService
         });
+        this.aggregateElementIndexService = new AggregateElementIndexService({
+            openDocumentsService: this.openDocumentsService,
+            visibleElementsService: this.visibleElementsService
+        })
         this.wordMetadataMapService = new WordMetadataMapService({
             visibleElementsService: this.visibleElementsService,
             aggregateElementIndexService: this.aggregateElementIndexService

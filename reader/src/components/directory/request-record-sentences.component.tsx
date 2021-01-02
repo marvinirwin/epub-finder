@@ -36,7 +36,7 @@ const RecordRequestSentence: React.FC<{
 
 export const RequestRecordingSentences = () => {
     const m = useContext(ManagerContext);
-    const sentences = useObservableState(m.requestRecordingService.allSentences$) || [];
+    const sentences = useObservableState(m.requestRecordingService.allRenderedSentences$) || [];
     const selectedSentenceMap = useObservableState(m.requestRecordingService.recordRequestSentences$);
     const alreadySubmittedSet = useObservableState(m.requestRecordingService.allRecordRequestsSubmitted);
     const toggleSentenceSelected = useCallback((sentence) => {

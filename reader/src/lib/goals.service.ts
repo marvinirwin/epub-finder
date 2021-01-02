@@ -4,7 +4,6 @@ import {WordRecognitionRow} from "./schedule/word-recognition-row";
 import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {flatten} from "lodash";
 import {RecognitionMap} from "./srm/srm.service";
 
 

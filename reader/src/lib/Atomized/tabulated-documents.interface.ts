@@ -9,7 +9,7 @@ export interface TabulatedDocuments extends TabulatedSentences {
 }
 export interface TabulatedSentences {
     wordElementsMap: Dictionary<AtomMetadata[]>;
-    wordSentenceMap: Dictionary<Segment[]>;
+    wordSegmentMap: Dictionary<Segment[]>;
     wordCounts: Dictionary<number>;
     segments: Dictionary<Segment[]>;
     atomMetadatas: Map<XMLDocumentNode, AtomMetadata>

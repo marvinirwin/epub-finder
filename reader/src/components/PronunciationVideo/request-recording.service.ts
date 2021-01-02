@@ -8,7 +8,7 @@ import {LoggedInUserService} from "../../lib/Auth/loggedInUserService";
 export class RequestRecordingService {
     recordRequestSentences$ = new ReplaySubject<Map<string, boolean>>(1);
     allRecordRequestsSubmitted = new ReplaySubject<Set<string>>(1);
-    allSentences$: Observable<string[]>;
+    allRenderedSentences$: Observable<string[]>;
     infoMessages$ = new ReplaySubject<string>(1);
 
     constructor({readingDocumentService, loggedInUserService}: {
@@ -18,7 +18,7 @@ export class RequestRecordingService {
         this.allRecordRequestsSubmitted.next(new Set());
         this.recordRequestSentences$.next(new Map())
 
-        this.allSentences$ = readingDocumentService.readingDocument.renderedSentences$.pipe(
+        this.allRenderedSentences$ = readingDocumentService.readingDocument.renderedSegments$.pipe(
             map(Object.keys),
             shareReplay(1)
         );
@@ -31,7 +31,7 @@ export class RequestRecordingService {
 
 
     async sendRecordingRequests() {
-        const sentences = await observableLastValue(this.allSentences$);
+        const sentences = await observableLastValue(this.allRenderedSentences$);
         const currentMap = await observableLastValue(this.recordRequestSentences$);
         const submittingSentences = sentences.filter(sentence => currentMap.get(sentence));
         await axios.post(

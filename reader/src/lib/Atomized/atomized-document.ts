@@ -76,7 +76,6 @@ export class AtomizedDocument {
                 AtomizedDocument.getDomParser().parseFromString(atomizedString)
             );
         } catch (e) {
-            debugger;
             return ERROR_DOCUMENT;
         }
     }
@@ -235,10 +234,6 @@ export class AtomizedDocument {
             console.warn(e);
             return [];
         }
-    }
-
-    atomElements(): XMLDocumentNode[] {
-        return flatten(this.segments().map(segment => segment.children))
     }
 
     headInnerHTML() {

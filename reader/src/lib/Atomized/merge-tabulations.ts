@@ -4,7 +4,7 @@ import {TabulatedDocuments, TabulatedSentences} from "./tabulated-documents.inte
 export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos: T[]): TabulatedDocuments {
     const aggregateSentenceInfo: TabulatedDocuments = {
         wordElementsMap: {},
-        wordSentenceMap: {},
+        wordSegmentMap: {},
         wordCounts: {},
         segments: {},
         documentWordCounts: {},
@@ -34,7 +34,7 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
             aggregateSentenceInfo.wordCounts[key] += val
         });
         merge(newSentenceInfo.wordElementsMap, aggregateSentenceInfo.wordElementsMap);
-        merge(newSentenceInfo.wordSentenceMap, aggregateSentenceInfo.wordSentenceMap);
+        merge(newSentenceInfo.wordSegmentMap, aggregateSentenceInfo.wordSegmentMap);
         merge(newSentenceInfo.segments, aggregateSentenceInfo.segments)
         // @ts-ignore
         if (newSentenceInfo.documentWordCounts) {

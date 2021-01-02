@@ -28,11 +28,11 @@ export const OpenDocumentComponent =
 
 export function rehydratePage(htmlDocument: HTMLDocument): ds_Dict<Segment[]> {
     const elements = htmlDocument.getElementsByClassName(ANNOTATE_AND_TRANSLATE);
-    const annotatedElements: ds_Dict<Segment[]> = {};
+    const segments: ds_Dict<Segment[]> = {};
     for (let i = 0; i < elements.length; i++) {
         const annotatedElement = elements[i];
-        const sentenceElement = new Segment(annotatedElement as unknown as XMLDocumentNode);
-        safePush(annotatedElements, sentenceElement.translatableText, sentenceElement);
+        const segmentElement = new Segment(annotatedElement as unknown as XMLDocumentNode);
+        safePush(segments, segmentElement.translatableText, segmentElement);
     }
-    return annotatedElements;
+    return segments;
 }

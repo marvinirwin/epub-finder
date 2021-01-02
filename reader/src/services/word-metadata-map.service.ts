@@ -4,7 +4,7 @@ import {Dictionary} from "lodash";
 import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {XMLDocumentNode} from "../lib/Interfaces/XMLDocumentNode";
 import {safePushMapSet, safePushSet} from "./safe-push";
-import {VisibleElementsService} from "../lib/Manager/visible-elements.service";
+import {VisibleService} from "../lib/Manager/visible.service";
 import {AggregateElementIndexService} from "./aggregate-element-index.service";
 import {Segment} from "../lib/Atomized/segment";
 
@@ -16,7 +16,7 @@ export class WordMetadataMapService {
                     visibleElementsService,
                     aggregateElementIndexService
                 }: {
-        visibleElementsService: VisibleElementsService
+        visibleElementsService: VisibleService
         aggregateElementIndexService: AggregateElementIndexService
     }) {
         this.visibleWordMetadataMap$ = combineLatest([

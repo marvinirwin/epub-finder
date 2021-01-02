@@ -8,7 +8,7 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {mergeTabulations} from "./merge-tabulations";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
-import {TabulatedDocuments, TabulatedSentences} from "./tabulated-documents.interface";
+import {TabulatedSentences} from "./tabulated-documents.interface";
 
 export class Segment {
     private _translation: string | undefined;
@@ -128,7 +128,7 @@ export class Segment {
         return {
             wordElementsMap,
             wordCounts,
-            wordSentenceMap,
+            wordSegmentMap: wordSentenceMap,
             segments: sentenceMap,
             atomMetadatas
         };
@@ -165,7 +165,7 @@ export class Segment {
         this.getPopperHTMLElement().removeAttribute('data-show');
     }
 
-    get children() {
-        return this.element.childNodes
+    get children(): XMLDocumentNode[] {
+        return Array.from(this.element.childNodes);
     }
 }

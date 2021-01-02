@@ -4,11 +4,9 @@ import {map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
 import {flattenTree} from "./Tree/DeltaScanner";
-import {documentElements} from "./Manager/visible-elements.service";
+import {renderedSegmentsElements} from "./Manager/visible.service";
 import {mergeMaps} from "./map.module";
 import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
-import {AtomMetadataIndex, AtomMetadataMap} from "./Atomized/atom-metadata-index";
-import {HighlighterService} from "./Highlighting/highlighter.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
 import {debounce} from "lodash";
@@ -62,11 +60,13 @@ export class AtomElementEventsService {
             }
         }
         openDocumentsService.openDocumentTree
-            .mapWith(openDocument => openDocument.atomizedDocument$)
+            .mapWith(openDocument => openDocument.renderedSegments$)
             .updates$.pipe(
             map(({sourced}) => combineLatest(flattenTree(sourced))),
-            switchMap(documentElements),
-        ).subscribe(elements => elements.forEach(element => applyListener(element)));
+            switchMap(renderedSegmentsElements),
+        ).subscribe(elements => {
+            elements.forEach(element => applyListener(element));
+        });
 
     }
 
