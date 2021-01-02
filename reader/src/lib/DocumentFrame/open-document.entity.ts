@@ -46,7 +46,8 @@ export class OpenDocument {
                         this.tabulation$
                     );
                 }
-                )
+                ),
+                shareReplay(1)
             );
     }
 

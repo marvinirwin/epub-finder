@@ -65,7 +65,8 @@ export class DeltaScanner<T, U extends string = string> {
 
     flatUpdates(): Observable<T[]> {
         return this.updates$.pipe(
-            map(({sourced}) => flattenTree(sourced))
+            map(({sourced}) => flattenTree(sourced)),
+            shareReplay(1)
         )
     }
 
