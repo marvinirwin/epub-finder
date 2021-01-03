@@ -18,10 +18,13 @@ export class RequestRecordingService {
         this.allRecordRequestsSubmitted.next(new Set());
         this.recordRequestSentences$.next(new Map())
 
-        this.allRenderedSentences$ = readingDocumentService.readingDocument.renderedSegments$.pipe(
-            map(Object.keys),
-            shareReplay(1)
-        );
+        this.allRenderedSentences$ = readingDocumentService
+            .readingDocument
+            .renderedSegments$
+            .pipe(
+                map(Object.keys),
+                shareReplay(1)
+            );
         loggedInUserService.isLoggedIn$.subscribe(isLoggedIn => {
             if (isLoggedIn) {
                 this.fetchAllRecordRequests();

@@ -26,7 +26,7 @@ export class AggregateElementIndexService {
             .openDocumentsInView$
             .pipe(
                 switchMap(openDocuments => combineLatest(
-                    ...openDocuments.map(openDocument => openDocument.renderedTabulation$)
+                    openDocuments.map(openDocument => openDocument.renderedTabulation$)
                 )),
                 map((tabulations: TabulatedDocuments[]) => {
                     const m: AtomMetadataMap = new Map()

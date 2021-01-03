@@ -4,6 +4,5 @@ import {TreeMenuNode} from "../tree-menu-node.interface";
 export const SettingsNode =  {
     name: 'settings',
     LeftIcon: () => <Settings/>,
-    label: 'Settings',
     moveDirectory: true
 } as TreeMenuNode

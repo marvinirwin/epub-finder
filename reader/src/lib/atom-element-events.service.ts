@@ -1,17 +1,15 @@
-import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
-import {BehaviorSubject, combineLatest, fromEvent, Observable, Subject} from "rxjs";
-import {map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {merge, Subject} from "rxjs";
+import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Modes, ModesService} from "./Modes/modes.service";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
-import {flattenTree} from "./Tree/DeltaScanner";
-import {renderedSegmentsElements} from "./Manager/visible.service";
-import {mergeMaps} from "./map.module";
+import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
 import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
-import {debounce} from "lodash";
+import {debounce, flatten} from "lodash";
 import {Highlighter} from "./Highlighting/Highlighter";
 import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
+import {Segment} from "./Atomized/segment";
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 
@@ -60,10 +58,30 @@ export class AtomElementEventsService {
             }
         }
         openDocumentsService.openDocumentTree
-            .mapWith(openDocument => openDocument.renderedSegments$)
+            .mapWith(openDocument => {
+                return openDocument.renderedSegments$;
+            })
             .updates$.pipe(
-            map(({sourced}) => combineLatest(flattenTree(sourced))),
-            switchMap(renderedSegmentsElements),
+            switchMap(({sourced}) => {
+                return merge(...(flattenTree(sourced)))
+                    .pipe(
+                        map(segmentMap => [segmentMap]),
+                        shareReplay(1)
+                    );
+            }),
+            map((segmentDicts: ds_Dict<Segment[]>[]): Segment[] => {
+                    return flatten(segmentDicts.map(segmentDict => flatten(Object.values(segmentDict))));
+                }
+            ),
+            map((segments: Segment[]) => {
+                    return new Set(
+                        flatten(
+                            segments
+                                .map(segment => [...segment.getSentenceHTMLElement().children] as HTMLElement[])
+                        )
+                    );
+                }
+            )
         ).subscribe(elements => {
             elements.forEach(element => applyListener(element));
         });

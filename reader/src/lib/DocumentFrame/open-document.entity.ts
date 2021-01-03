@@ -9,9 +9,11 @@ import {rehydratePage} from "../Atomized/open-document.component";
 import {mergeTabulations} from "../Atomized/merge-tabulations";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {flatten} from "lodash";
+
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[]  {
     return flatten(Object.values(segments));
 }
+
 
 export class OpenDocument {
     public id: string;

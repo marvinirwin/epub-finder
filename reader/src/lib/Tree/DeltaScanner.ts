@@ -1,5 +1,5 @@
 import {Observable, ReplaySubject} from "rxjs";
-import {map, scan, shareReplay} from "rxjs/operators";
+import {map, scan, shareReplay, skip, take} from "rxjs/operators";
 import {Named} from "../Manager/open-documents.service";
 import {applyTreeDiff, ds_Tree, flattenTreeIntoDict} from "../../services/tree.service";
 
@@ -34,8 +34,10 @@ export class DeltaScanner<T, U extends string = string> {
                             delta
                         } as DeltaScan<T, U>;
 
+                    const sourced = applyTreeDiff(scan.sourced, delta);
+                    debugger;
                     return {
-                        sourced: applyTreeDiff(scan.sourced, delta),
+                        sourced: sourced,
                         previousTree: scan.sourced,
                         delta
                     } as DeltaScan<T, U>;
@@ -55,7 +57,18 @@ export class DeltaScanner<T, U extends string = string> {
 
     mapWith<U>(mapFunc: DeltaScanMapFunc<T, U>): DeltaScanner<U> {
         const derivedTree = new DeltaScanner<U>();
-        this.updates$.subscribe(({delta}) => {
+        this.updates$.pipe(
+            take(1),
+        ).subscribe(({sourced}) => {
+            if (sourced) {
+                derivedTree.appendDelta$.next(
+                    MapTree(sourced, mapFunc)
+                )
+            }
+        });
+        this.updates$.pipe(
+            skip(1),
+        ).subscribe(({delta}) => {
             derivedTree.appendDelta$.next(
                 MapTree(delta, mapFunc)
             )

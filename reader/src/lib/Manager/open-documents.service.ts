@@ -32,13 +32,13 @@ export const isCustomDocument = (variableToCheck: any): variableToCheck is Basic
 export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
-    renderedAtomizedSentences$: Observable<ds_Dict<Segment[]>>;
     sourceDocumentTabulation$: Observable<TabulatedDocuments>;
     displayDocument$: Observable<AtomizedDocument>;
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
-    allReadingDocuments: Observable<Map<string, OpenDocument>>;
+    sourceDocuments$: Observable<Map<string, OpenDocument>>;
     tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
     newOpenDocumentDocumentBodies$: Observable<HTMLBodyElement>;
+    newRenderedSegments$: Observable<ds_Dict<Segment[]>>;
 
     constructor(
         private config: {
@@ -49,7 +49,7 @@ export class OpenDocumentsService {
         }
     ) {
 
-        this.allReadingDocuments = config.libraryService.documents$.pipe(
+        this.sourceDocuments$ = config.libraryService.documents$.pipe(
             map(documents => filterMap(documents, (key, d) => !d.deleted)),
             map(libraryDocuments => {
                 return mapMap(
@@ -78,45 +78,34 @@ export class OpenDocumentsService {
             shareReplay(1)
         );
 
-        this.allReadingDocuments.subscribe(
-            openDocuments => this.openDocumentTree.appendDelta$.next(
-                {
-                    nodeLabel: 'root',
-                    children: {
-                        [SOURCE_DOCUMENTS_NODE_LABEL]: {
-                            nodeLabel: SOURCE_DOCUMENTS_NODE_LABEL,
-                            children: Object.fromEntries(
-                                Object.entries(openDocuments)
-                                    .map(([name, openDocument]) => [
-                                            name,
-                                            {
-                                                value: openDocument,
-                                                nodeLabel: name
-                                            }
-                                        ]
-                                    )
-                            )
-                        }
-                    },
-                }
-            )
+        this.sourceDocuments$.subscribe(
+            openDocuments => {
+                const children = Object.fromEntries(
+                    [...openDocuments.entries()]
+                        .map(([name, openDocument]) => [
+                                name,
+                                {
+                                    value: openDocument,
+                                    nodeLabel: name
+                                }
+                            ]
+                        )
+                );
+                this.openDocumentTree.appendDelta$.next(
+                    {
+                        nodeLabel: 'root',
+                        children: {
+                            [SOURCE_DOCUMENTS_NODE_LABEL]: {
+                                nodeLabel: SOURCE_DOCUMENTS_NODE_LABEL,
+                                children: children
+                            }
+                        },
+                    }
+                );
+            }
         )
 
-
-        this.renderedAtomizedSentences$ = this.openDocumentTree
-            .mapWith((documentFrame: OpenDocument) => documentFrame.renderedSegments$.pipe(startWith({}))).updates$.pipe(
-                switchMap(({sourced}) => {
-                    const sources = sourced ? flattenTree(sourced) : [];
-                    return combineLatest(sources);
-                }),
-                map((atomizedSentenceArrays) =>
-                    mergeDictArrays(...atomizedSentenceArrays)
-                ),
-                shareReplay(1)
-            );
-
-
-        this.tabulationsOfCheckedOutDocuments$ = this.allReadingDocuments.pipe(
+        this.tabulationsOfCheckedOutDocuments$ = this.sourceDocuments$.pipe(
             switchMap(openDocuments =>
                 combineLatest(mapToArray(openDocuments, (id, document) => document.renderedTabulation$))
             ),
@@ -127,8 +116,7 @@ export class OpenDocumentsService {
         this.sourceDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.renderedTabulation$)
             .updates$.pipe(
                 switchMap(({sourced}) => {
-                    // I only want the tree from 'readingFrames'
-                    const sourceDocuments = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
+                    const sourceDocuments = sourced?.children?.[SOURCE_DOCUMENTS_NODE_LABEL];
                     const documentTabulations: Observable<TabulatedDocuments>[] = flattenTree<Observable<TabulatedDocuments>>(sourceDocuments);
                     return combineLatest(documentTabulations);
                 }),
@@ -149,6 +137,13 @@ export class OpenDocumentsService {
 
         this.newOpenDocumentDocumentBodies$ = this.openDocumentTree
             .mapWith(r => r.renderRoot$)
+            .updates$
+            .pipe(
+                switchMap(({delta}) => merge(...flattenTree(delta))),
+                shareReplay(1)
+            );
+        this.newRenderedSegments$ = this.openDocumentTree
+            .mapWith(r => r.renderedSegments$)
             .updates$
             .pipe(
                 switchMap(({delta}) => merge(...flattenTree(delta))),

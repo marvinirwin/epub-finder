@@ -54,7 +54,7 @@ export class ReadingDocumentService {
 
         combineLatest(
             [
-                openDocumentsService.allReadingDocuments,
+                openDocumentsService.sourceDocuments$,
                 settingsService.readingDocument$
             ]
         ).subscribe(([

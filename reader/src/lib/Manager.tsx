@@ -273,7 +273,6 @@ export class Manager {
             }
         });
 
-
         this.observableService.videoMetadata$
             .subscribe(metadata => {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
@@ -293,11 +292,8 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardService, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
 
-        merge(
-            this.openDocumentsService.renderedAtomizedSentences$,
-            this.quizCharacterManager.atomizedSentenceMap$
-        ).subscribe(indexedSentences => {
-                Object.values(indexedSentences).map(sentences => this.browserInputs.applySegmentListeners(sentences))
+        this.openDocumentsService.newRenderedSegments$.subscribe(indexedSentences => {
+                Object.values(indexedSentences).map(segment => this.browserInputs.applySegmentListeners(segment))
             }
         );
         this.readingDocumentService = new ReadingDocumentService({
@@ -465,7 +461,7 @@ export class Manager {
         });
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
-            atomizedSentences$: this.openDocumentsService.renderedAtomizedSentences$
+            atomizedSentences$: this.openDocumentsService.newRenderedSegments$
         });
         this.introService = new IntroService({
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,

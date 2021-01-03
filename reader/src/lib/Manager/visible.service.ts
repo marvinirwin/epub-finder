@@ -6,7 +6,7 @@ import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService, READING_DOCUMENT_NODE_L
 import {READING_NODE} from "../../components/directory/nodes/reading.node";
 import {QUIZ_NODE} from "../../components/directory/nodes/quiz-carousel.node";
 import {QuizService} from "../../components/quiz/quiz.service";
-import {map, shareReplay, switchMap} from "rxjs/operators";
+import {map, shareReplay, switchMap, tap} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/atomized-document";
 import {Segment} from "../Atomized/segment";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
@@ -14,17 +14,20 @@ import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 export const renderedSegmentsElements = (o$: Observable<ds_Dict<Segment[]>[]>) =>
     o$.pipe(
-        map((segmentDicts: ds_Dict<Segment[]>[]): Segment[] =>
-            flatten(segmentDicts.map(segmentDict => flatten(Object.values(segmentDict))))
+        map((segmentDicts: ds_Dict<Segment[]>[]): Segment[] => {
+                return flatten(segmentDicts.map(segmentDict => flatten(Object.values(segmentDict))));
+            }
         ),
-        map((segments: Segment[]) =>
-            new Set(
-                flatten(
-                    segments
-                        .map(segment => [...segment.getSentenceHTMLElement().children] as HTMLElement[])
-                )
-            )
+        map((segments: Segment[]) => {
+                return new Set(
+                    flatten(
+                        segments
+                            .map(segment => [...segment.getSentenceHTMLElement().children] as HTMLElement[])
+                    )
+                );
+            }
         ),
+        shareReplay(1)
     );
 
 export class VisibleService {
@@ -65,7 +68,6 @@ export class VisibleService {
             renderedSegmentsElements,
             shareReplay(1)
         );
-        this.elementsInView$.subscribe(() => {})
     }
 
 
