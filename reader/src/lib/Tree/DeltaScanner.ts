@@ -35,7 +35,6 @@ export class DeltaScanner<T, U extends string = string> {
                         } as DeltaScan<T, U>;
 
                     const sourced = applyTreeDiff(scan.sourced, delta);
-                    debugger;
                     return {
                         sourced: sourced,
                         previousTree: scan.sourced,

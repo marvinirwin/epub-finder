@@ -32,7 +32,7 @@ export const isCustomDocument = (variableToCheck: any): variableToCheck is Basic
 export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
-    sourceDocumentTabulation$: Observable<TabulatedDocuments>;
+    displayDocumentTabulation$: Observable<TabulatedDocuments>;
     displayDocument$: Observable<AtomizedDocument>;
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
     sourceDocuments$: Observable<Map<string, OpenDocument>>;
@@ -113,10 +113,10 @@ export class OpenDocumentsService {
             shareReplay(1)
         );
 
-        this.sourceDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.renderedTabulation$)
+        this.displayDocumentTabulation$ = this.openDocumentTree.mapWith(document => document.renderedTabulation$)
             .updates$.pipe(
                 switchMap(({sourced}) => {
-                    const sourceDocuments = sourced?.children?.[SOURCE_DOCUMENTS_NODE_LABEL];
+                    const sourceDocuments = sourced?.children?.[READING_DOCUMENT_NODE_LABEL];
                     const documentTabulations: Observable<TabulatedDocuments>[] = flattenTree<Observable<TabulatedDocuments>>(sourceDocuments);
                     return combineLatest(documentTabulations);
                 }),

@@ -40,7 +40,7 @@ export class OpenDocument {
                     );
                 }
             ),
-            shareReplay(1)
+            shareReplay(1),
         );
     }
 

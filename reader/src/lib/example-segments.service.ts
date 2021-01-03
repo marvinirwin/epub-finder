@@ -16,7 +16,7 @@ export class ExampleSegmentsService {
             openDocumentsService: OpenDocumentsService
         }
     ) {
-        this.exampleSegmentMap$ = openDocumentsService.sourceDocumentTabulation$.pipe(
+        this.exampleSegmentMap$ = openDocumentsService.displayDocumentTabulation$.pipe(
             map((sentenceMaps) => {
                     return new Map(Object.entries(sentenceMaps.wordSegmentMap));
                 }

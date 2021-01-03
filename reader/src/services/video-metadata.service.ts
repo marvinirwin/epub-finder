@@ -20,10 +20,10 @@ export class VideoMetadataService {
     }) {
         this.allSentences$ = allSentences$.pipe(
             map(allSentences => Array.from(allSentences)),
-            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+            shareReplay(1)
         );
-        this.allSentences$.pipe(
-        ).subscribe(async sentences => {
+        this.allSentences$.pipe().subscribe(async sentences => {
             const allMetadata = await fetchBulkMetadata(sentences);
             if (allMetadata) {
                 Object.entries(allMetadata).forEach(([sentence, metadata]) => {
@@ -32,12 +32,16 @@ export class VideoMetadataService {
             }
         });
         this.allSentenceMetadata$ = this.allSentences$.pipe(
-            map(allSentences => allSentences.map(sentence => ({
-                        sentence,
-                        metadata$: this.resolveMetadataListener$(sentence)
-                    }
-                ))
-            )
+            map(allSentences => {
+                    return allSentences
+                        .map(sentence => ({
+                                sentence,
+                                metadata$: this.resolveMetadataListener$(sentence)
+                            }
+                        ));
+                }
+            ),
+            shareReplay(1)
         )
     }
 

@@ -219,7 +219,7 @@ export class Manager {
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
         const {wordElementMap$, sentenceMap$, documentWordCounts} = splitTextDataStreams$(
-            this.openDocumentsService.sourceDocumentTabulation$
+            this.openDocumentsService.displayDocumentTabulation$
         );
         this.readingWordElementMap = wordElementMap$;
         this.readingWordCounts$ = documentWordCounts;
@@ -389,7 +389,7 @@ export class Manager {
 
 
         this.videoMetadataService = new VideoMetadataService({
-                allSentences$: this.openDocumentsService.tabulationsOfCheckedOutDocuments$.pipe(
+                allSentences$: this.openDocumentsService.displayDocumentTabulation$.pipe(
                     switchMap(async tabulation => {
                         return new Set<string>(Object.keys(tabulation.segments));
                     }),

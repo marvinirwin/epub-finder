@@ -3,7 +3,7 @@ import {Segment} from "../lib/Atomized/segment";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/Modes/modes.service";
 import {VideoMetadataService} from "./video-metadata.service";
-import {debounceTime, map, shareReplay, switchMap, startWith} from "rxjs/operators";
+import {debounceTime, map, shareReplay, switchMap, startWith, tap} from "rxjs/operators";
 import {keyBy, Dictionary} from 'lodash';
 import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
 
@@ -23,20 +23,18 @@ export class SentenceVideoHighlightService {
             visibleAtomizedSentences$,
             videoMetadataService.allSentenceMetadata$.pipe(
                 switchMap(sentenceMetadata => {
-                        return combineLatest(
-                            Object.entries(sentenceMetadata)
-                                .map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)))
-                        ).pipe(
-                            map(videoMetadata => {
-                                return keyBy(videoMetadata, 'sentence');
-                            })
-                        );
+                    let sources = Object.entries(sentenceMetadata).map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)));
+                    debugger;
+                    return combineLatest(
+                            sources
+                        )
                     }
                 ),
                 debounceTime(1000),
                 shareReplay(1)
             )
-        ]).subscribe(([mode, visibleAtomizedSentences, sentenceMetadata]) => {
+        ]).subscribe(([mode, visibleAtomizedSentences, sentenceMetadataList]) => {
+            const sentenceMetadata = keyBy(sentenceMetadataList, 'sentence')
             previousHighlightedSentences = visibleAtomizedSentences;
             const iterateAtomizedSentences = (s: Map<string, Set<Segment>>, func: (atomizedSentence: Segment) => void) => {
                 s.forEach(segmentSet => segmentSet.forEach(func))

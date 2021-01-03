@@ -6,8 +6,6 @@ export function SignoutNode(m: Manager, profile: undefined | Profile) {
         name: 'signOut',
         label: 'Sign Out',
         action: () => m.authManager.signOut(),
-        LeftIcon: () => {
-        },
         hidden: !profile?.email
     };
 }
