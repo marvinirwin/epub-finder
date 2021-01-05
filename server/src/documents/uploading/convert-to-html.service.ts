@@ -1,9 +1,7 @@
 import CloudConvert from "cloudconvert";
-import {Job} from "cloudconvert/built/JobsResource";
+import {v4 as uuidv4} from 'uuid';
 import {BucketConfig} from "../bucket-config.interface";
-import {readStream} from "./s3.service";
-import axios from "axios";
-import FormData from 'form-data';
+import {FinishedConversion} from "./finished-conversion";
 
 export const cloudConvert = new CloudConvert(process.env.CLOUD_CONVERT_API_KEY, !!process.env.CLOUD_CONVERT_USE_SANDBOX);
 
@@ -11,48 +9,65 @@ type ConversionParams = {
     inputBucket: BucketConfig,
     outputBucket: BucketConfig,
     key: string,
+    filename: string
 };
 
 /*
 let inputFormat1 = "pdf";
 let outputFormat = "docx";
-kajsldfjaskldfjaklsjdfklasjdklfjasdf
 */
-export const conversionJob = (inputFormat, outputFormat, engine) => async ({inputBucket, outputBucket, key}: {
-    inputBucket: BucketConfig,
+export const conversionJob = (
+    formatChain: [
+        string,
+        string,
+        ...string[]
+    ],
+    filename,
+) => async ({outputBucket, key}: {
     outputBucket: BucketConfig,
     key: string
 }) => {
-    console.log(`Starting job for ${key} going from ${inputFormat} to ${outputFormat}`);
-    let outputKey = `${key}.${outputFormat}`;
+    console.log(`Starting job for ${key} traversing ${formatChain.join(' -> ')}`);
+    const outputKey = `${key}.${formatChain[formatChain.length - 1]}`;
+    const convert = {};
+    let lastInputKey = 'import';
+    for (let i = 0; i < formatChain.length - 1; i++) {
+        const inputFormat = formatChain[i];
+        const convertOperationKey = `convert_${i}`;
+        const outputFormat = formatChain[i + 1];
+        const convertOperation = {
+            operation: "convert",
+            input: lastInputKey,
+            input_format: inputFormat,
+            output_format: outputFormat,
+        };
+        convert[convertOperationKey] = convertOperation;
+        if (convertOperation.output_format === 'html') {
+            convertOperation["embed_images"] = true;
+        }
+        lastInputKey = convertOperationKey;
+    }
     let data = {
         tasks: {
             import: {
                 operation: "import/url",
-                url: `https://languagetrainer-documents.s3-us-west-2.amazonaws.com/${key}`
+                filename,
+                url: `https://languagetrainer-documents.s3-us-west-2.amazonaws.com/${key}`,
             },
-            convert: {
-                operation: "convert",
-                input: ["import"],
-                input_format: inputFormat,
-                output_format: outputFormat,
-                engine
-            },
+            ...convert,
             export: {
-                input: "convert",
+                input: lastInputKey,
                 operation: 'export/s3',
                 ...outputBucket,
-                key: outputKey,
-
+                key: uuidv4(),
             }
         },
     };
-    const v= JSON.stringify(data, null, "\t");
-    console.log(v);
+    console.log(JSON.stringify(data, null, '\t'));
     const job = await cloudConvert
         .jobs
+        // @ts-ignore
         .create(data);
-    console.log(`Job created for ${key} going from ${inputFormat} to ${outputFormat}`);
 
     console.log(`Waiting for job ${job.id} to finish`);
     const result = await cloudConvert.jobs.wait(job.id);
@@ -60,13 +75,12 @@ export const conversionJob = (inputFormat, outputFormat, engine) => async ({inpu
         throw new Error(JSON.stringify(result.tasks.map(task => task.message), null, '\t'))
     }
     console.log(`job ${job.id} finished`);
-    return {job, outputKey};
+    return new FinishedConversion(result);
 }
 
-export async function convertPdfToHtml({inputBucket, outputBucket, key}: ConversionParams) {
-    const {job: job1, outputKey} = await conversionJob("pdf", "docx", "bcl")
-    ({inputBucket, outputBucket, key});
-    const {job: job2} = await conversionJob("docx", "html", "office")
-    ({inputBucket, outputBucket, key: outputKey});
+export async function convertPdfToHtml({inputBucket, outputBucket, key, filename}: ConversionParams) {
+    return conversionJob(["pdf", "docx", "html"], filename)
+    ({ outputBucket, key});
 }
+
 

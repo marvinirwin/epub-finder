@@ -11,24 +11,21 @@ export const handleUploadedDocument = async (file: UploadedFile) => {
     const inputBucketOutputBucketKey = {
         inputBucket: inputConfig,
         outputBucket: outputConfig,
-        key: key
+        key: key,
+        filename: file.originalname
     };
     switch(ext) {
         case "html":
-            break;
         case "pdf":
-            await convertPdfToHtml(inputBucketOutputBucketKey);
-            break;
+            return await convertPdfToHtml(inputBucketOutputBucketKey);
         case "docx":
-            await conversionJob(
-                "docx",
-                "html",
-                "office"
+            return await conversionJob( ["docx", "html"], file.originalname,
             ) (inputBucketOutputBucketKey);
-            break;
         case "txt":
-            await conversionJob("txt", "html", "libreoffice") (inputBucketOutputBucketKey);
-            break;
+            return await conversionJob(
+                ["txt", "html"],
+                file.originalname,
+            ) (inputBucketOutputBucketKey);
         default:
             throw new Error(`Unsupported file extension: ${ext}`);
     }

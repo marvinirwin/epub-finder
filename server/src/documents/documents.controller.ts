@@ -65,14 +65,13 @@ export class DocumentsController {
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
     ) {
-        await handleUploadedDocument(file);
+        const output = await handleUploadedDocument(file);
         const name = file.originalname.split('.').slice(0, -1).join('');
-        const htmlKey = `${file.key}.html`;
         if (document_id) {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                htmlKey,
+                output.htmlFile().s3Key,
                 document_id
             )
         }
@@ -81,14 +80,14 @@ export class DocumentsController {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                htmlKey,
+                output.htmlFile().s3Key,
                 existingDocumentWithSameName.rootId()
             )
         }
         return this.documentsService.saveNew(
             user,
             name,
-            htmlKey,
+            output.htmlFile().s3Key,
         )
     }
 
