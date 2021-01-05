@@ -1,11 +1,9 @@
-import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {Segment} from "../lib/Atomized/segment";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/Modes/modes.service";
 import {VideoMetadataService} from "./video-metadata.service";
-import {debounceTime, map, shareReplay, switchMap, startWith, tap} from "rxjs/operators";
-import {keyBy, Dictionary} from 'lodash';
-import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
+import {debounceTime, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {keyBy} from 'lodash';
 
 export class SentenceVideoHighlightService {
     constructor({
@@ -23,10 +21,8 @@ export class SentenceVideoHighlightService {
             visibleAtomizedSentences$,
             videoMetadataService.allSentenceMetadata$.pipe(
                 switchMap(sentenceMetadata => {
-                    let sources = Object.entries(sentenceMetadata).map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)));
-                    debugger;
                     return combineLatest(
-                            sources
+                            Object.entries(sentenceMetadata).map(([sentence, {metadata$}]) => metadata$.pipe(startWith(undefined)))
                         )
                     }
                 ),
