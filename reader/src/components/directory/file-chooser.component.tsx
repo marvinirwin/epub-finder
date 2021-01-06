@@ -5,7 +5,7 @@ import {ListItem, Typography} from "@material-ui/core";
 export const FileChooser = () => {
     const m = useContext(ManagerContext);
     return <ListItem style={{display: 'flex', flexFlow: 'column nowrap'}}>
-        <Typography variant="overline">Upload learning material (docx, .txt, .pdf)</Typography>
+        <Typography variant="overline">(docx, .txt, .pdf)</Typography>
         <input
             className={'file-chooser'}
             id={'file-chooser'}

@@ -43,15 +43,12 @@ function AppDirectory(
             [
                 GoogleSigninNode(),
             ],
+/*
             DailyGoalNode,
-            WatchPronunciationNode(),
+*/
             RecognizeSpeechNode(),
+            WatchPronunciationNode(),
             PlaybackSpeedNode(),
-            QuizCarouselNode(),
-            [
-                {...QuizCarouselNode(), moveDirectory: false},
-                QuizScheduleNode(),
-            ],
             uploadNode(),
             LibraryNode(),
             //  This statement is why I can't have type safety
@@ -66,6 +63,11 @@ function AppDirectory(
             SignupNode(),
             SignoutNode(m, profile),
             ManualSpeechRecognitionNode(),
+            QuizCarouselNode(),
+            [
+                {...QuizCarouselNode(), moveDirectory: false},
+                QuizScheduleNode(),
+            ],
         ] as unknown as ArrayToTreeParams<TreeMenuNode>
     );
 }

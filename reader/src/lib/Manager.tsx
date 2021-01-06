@@ -77,6 +77,8 @@ import {AggregateElementIndexService} from "../services/aggregate-element-index.
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
 import {TrieService} from "./Manager/trie.service";
+import {ToastMessageService} from "./toast-message.service";
+import {ProgressItem, ProgressItemService} from "../components/progress-item.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -129,6 +131,8 @@ export class Manager {
 
     public imageSearchService = new ImageSearchService();
 
+    public progressItemsService = new ProgressItemService();
+
     readingWordElementMap!: Observable<Dictionary<AtomMetadata[]>>;
     setQuizWord$: Subject<string> = new Subject<string>();
     characterPageWordElementMap$ = new Subject<Dictionary<AtomMetadata[]>>();
@@ -160,8 +164,12 @@ export class Manager {
     public aggregateElementIndexService: AggregateElementIndexService;
     public wordMetadataMapService: WordMetadataMapService;
     public trieService: TrieService;
+    public toastMessageService: ToastMessageService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
+        this.toastMessageService = new ToastMessageService({
+            alertsService: this.alertsService
+        })
         this.availableDocumentsService = new AvailableDocumentsService()
         this.settingsService = new SettingsService({db})
         this.treeMenuService = new TreeMenuService<any, { value: any }>({
@@ -203,9 +211,9 @@ export class Manager {
             libraryService: this.library
         });
 
-        this.openDocumentsService.newOpenDocumentDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
+        this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
-            loggedInUserService: this.authManager,
+            progressItemService: this.progressItemsService,
             availableDocumentService: this.availableDocumentsService,
             documentCheckingOutService: this.documentCheckingOutService,
             droppedFilesService: this.droppedFilesService,
@@ -292,7 +300,7 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardService, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
 
-        this.openDocumentsService.newRenderedSegments$.subscribe(indexedSentences => {
+        this.openDocumentsService.renderedSegments$.subscribe(indexedSentences => {
                 Object.values(indexedSentences).map(segment => this.browserInputs.applySegmentListeners(segment))
             }
         );
@@ -461,7 +469,7 @@ export class Manager {
         });
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
-            atomizedSentences$: this.openDocumentsService.newRenderedSegments$
+            atomizedSentences$: this.openDocumentsService.renderedSegments$
         });
         this.introService = new IntroService({
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,

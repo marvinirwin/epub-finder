@@ -3,7 +3,7 @@ import {Color} from "@material-ui/lab";
 import {map} from "rxjs/operators";
 import axios, {AxiosError, AxiosResponse} from "axios";
 
-type AlertMessage = { severity: Color, msg: string };
+export type AlertMessage = { severity: Color, msg: string };
 
 export class AlertsService {
     public static pipeToColor = (color: Color) => (o$: Observable<string>): Observable<AlertMessage> => o$.pipe(map(msg => ({

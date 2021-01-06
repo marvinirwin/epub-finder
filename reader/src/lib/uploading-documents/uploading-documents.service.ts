@@ -5,6 +5,7 @@ import {LoggedInUserService} from "../Auth/loggedInUserService";
 import {last, map, startWith} from "rxjs/operators";
 import {LibraryService} from "../Manager/library.service";
 import {AvailableDocumentsService} from "../documents/available-documents.service";
+import {ProgressItemService} from "../../components/progress-item.service";
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
 
@@ -15,41 +16,43 @@ const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
  * Then there's another service which loads them later
  */
 export class UploadingDocumentsService {
-    uploadingErrors$ = new ReplaySubject<string>(1)
     uploadingMessages$ = new ReplaySubject<string>(1)
+    isUploading$ = new ReplaySubject<boolean>(1)
 
     constructor({
-                    loggedInUserService,
                     droppedFilesService,
                     libraryService,
-        availableDocumentService,
+                    availableDocumentService,
+                    progressItemService
                 }: {
-        loggedInUserService: LoggedInUserService,
+        progressItemService: ProgressItemService,
         documentCheckingOutService: DocumentCheckingOutService,
         droppedFilesService: DroppedFilesService,
         libraryService: LibraryService,
         availableDocumentService: AvailableDocumentsService,
     }) {
+        this.isUploading$.next(false);
         // There will also have to be a document synchronization service
-        combineLatest([
-            droppedFilesService.uploadFileRequests$.pipe(
-                map(files => files
-                    .filter(file => supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name)))
-                )
-            ),
-            loggedInUserService.profile$.pipe(startWith(undefined))
-        ]).subscribe(async ([customDocuments]) => {
-            let lastDocument: string | undefined
-            for (let i = 0; i < customDocuments.length; i++) {
-                const basicDocument = customDocuments[i];
-                lastDocument = basicDocument.name;
-                this.uploadingMessages$.next(`Uploading ${basicDocument.name}...`)
-                await libraryService.upsertDocument(basicDocument);
-                this.uploadingMessages$.next(`Uploading ${basicDocument.name} success!`)
-            }
-            if (lastDocument) {
-                await availableDocumentService.fetchAll()
-            }
+        droppedFilesService.uploadFileRequests$.pipe(
+            map(files => files
+                .filter(file => supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name)))
+            )
+        ).subscribe(async (customDocuments) => {
+            progressItemService.newProgressItem().exec(async () => {
+                let lastDocument: string | undefined
+                for (let i = 0; i < customDocuments.length; i++) {
+                    const basicDocument = customDocuments[i];
+                    lastDocument = basicDocument.name;
+                    this.uploadingMessages$.next(`Uploading ${basicDocument.name}.  This can take up to 30 seconds`)
+                    this.isUploading$.next(true);
+                    await libraryService.upsertDocument(basicDocument);
+                    this.isUploading$.next(false);
+                    this.uploadingMessages$.next(`Uploading ${basicDocument.name} success!`)
+                }
+                if (lastDocument) {
+                    await availableDocumentService.fetchAll()
+                }
+            })
         })
     }
 }

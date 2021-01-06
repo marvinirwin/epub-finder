@@ -37,8 +37,8 @@ export class OpenDocumentsService {
     readingDocument$ = new ReplaySubject<OpenDocument>(1);
     sourceDocuments$: Observable<Map<string, OpenDocument>>;
     tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
-    newOpenDocumentDocumentBodies$: Observable<HTMLBodyElement>;
-    newRenderedSegments$: Observable<ds_Dict<Segment[]>>;
+    openDocumentBodies$: Observable<HTMLBodyElement>;
+    renderedSegments$: Observable<ds_Dict<Segment[]>>;
 
     constructor(
         private config: {
@@ -135,18 +135,21 @@ export class OpenDocumentsService {
         );
 
 
-        this.newOpenDocumentDocumentBodies$ = this.openDocumentTree
+        this.openDocumentBodies$ = this.openDocumentTree
             .mapWith(r => r.renderRoot$)
             .updates$
             .pipe(
-                switchMap(({delta}) => merge(...flattenTree(delta))),
+                switchMap(({sourced}) => {
+                    // TODO this will result in
+                    return merge(...flattenTree(sourced));
+                }),
                 shareReplay(1)
             );
-        this.newRenderedSegments$ = this.openDocumentTree
+        this.renderedSegments$ = this.openDocumentTree
             .mapWith(r => r.renderedSegments$)
             .updates$
             .pipe(
-                switchMap(({delta}) => merge(...flattenTree(delta))),
+                switchMap(({sourced}) => merge(...flattenTree(sourced))),
                 shareReplay(1)
             )
     }

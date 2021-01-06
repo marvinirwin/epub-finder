@@ -4,12 +4,13 @@ import React, {useCallback} from 'react';
 import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import {getManager} from "./AppSingleton";
-import {CssBaseline} from "@material-ui/core";
+import {Backdrop, CircularProgress, CssBaseline} from "@material-ui/core";
 import {Main} from "./components/Main";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {green, indigo} from "@material-ui/core/colors";
 import {GlobalDragOver} from "./components/global-drag-over.component";
-import {AlertSnackbar} from "./components/alertSnackbar";
+import {AlertSnackbar} from "./components/alert-snackbar.component";
+import {LoadingBackdrop} from "./components/loading-backdrop.component";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -37,6 +38,7 @@ export const ManagerContext = React.createContext(manager)
 function App() {
     return <ThemeProvider theme={darkTheme}>
             <ManagerContext.Provider value={manager}>
+                <LoadingBackdrop/>
                 <AlertSnackbar/>
                 <GlobalDragOver/>
                 <CssBaseline/>
