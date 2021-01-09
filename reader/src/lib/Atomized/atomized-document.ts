@@ -4,10 +4,8 @@ import {DOMParser, XMLSerializer} from "xmldom";
 import {Segment} from "./segment";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {splitKeepDelim} from "../Util/Util";
-import {TrieWrapper} from "../TrieWrapper";
-import {mergeTabulations} from "./merge-tabulations";
 import {InterpolateService} from "@shared/";
-import {TabulatedDocuments} from "./tabulated-documents.interface";
+import {computeElementIndexMap} from "./compute-element-index-map";
 
 export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
 
@@ -21,6 +19,8 @@ export function createPopperElement(document1: XMLDocument) {
 }
 
 export class AtomizedDocument {
+    private elementIndexMap: Map<XMLDocumentNode, number> = new Map();
+
     public static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
@@ -94,14 +94,14 @@ export class AtomizedDocument {
         });
     }
 
-    constructor(public document: XMLDocument) {
-    }
-
     private static replaceHrefOrSource(el: Element, qualifiedName: string) {
         const currentSource = el.getAttribute(qualifiedName);
         if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
         }
+    }
+
+    constructor(public document: XMLDocument) {
     }
 
     private getTextElements(doc: Document) {
@@ -138,20 +138,15 @@ export class AtomizedDocument {
         return leaves;
     }
 
-    appendRehydratableText(str: string): XMLDocumentNode {
-        const div = this.document.createElement('div');
-        const textNode = this.document.createTextNode(str);
-        this.document.body.appendChild(div);
-        div.appendChild(textNode);
-        return this.makeTextNodeRehydratable(textNode as unknown as Element)
-    }
-
-    makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
+    private makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
         const document1 = this.document;
         const nodeValue = textNode.nodeValue as string;
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
-            nodeValue.normalize().trim().split(''),
+            nodeValue
+                .normalize()
+                .trim()
+                .split(''),
             "mark"
         );
         const {popperEl, popperId} = createPopperElement(document1);
@@ -161,15 +156,21 @@ export class AtomizedDocument {
         return newParent as unknown as XMLDocumentNode;
     }
 
-    replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
+    private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
+        const indexOfParent = textNode?.parentNode &&
+             this.elementIndexMap.get(textNode.parentNode as unknown as XMLDocumentNode)
+        if (!indexOfParent) {
+            throw new Error("No parent index");
+        }
         const indexOfMe = getIndexOfEl(textNode);
         (textNode.parentNode as Element).removeChild(textNode);
         const newParent = this.document.createElement('span');
-        newSubStrings.forEach(string => {
+        newSubStrings.forEach((string, index) => {
             // I'll probably need to do labelling later so the data can be rehydrated
             // Perhaps this is inefficient, but for character based stuff its probably fine
             const mark = this.document.createElement(newTagType);
             const textNode = this.document.createTextNode(string);
+            mark.setAttribute('nodeindex', `${index}`);
             mark.insertBefore(textNode, null);
             newParent.insertBefore(mark, null)
         })
@@ -178,7 +179,7 @@ export class AtomizedDocument {
         return newParent;
     }
 
-    replaceDocumentSources(doc: Document) {
+    private replaceDocumentSources(doc: Document) {
         const walk = (node: Node) => {
             let child, next;
             switch (node.nodeType) {
@@ -202,26 +203,14 @@ export class AtomizedDocument {
         return doc;
     }
 
-    splitLongTextElements(textElements: Element[]) {
-        textElements.forEach(textNode => {
-            const split = splitKeepDelim('。')(textNode.nodeValue as string);
-            if (split.length > 1) {
-                this.replaceTextNodeWithSubTextNode(
-                    textNode,
-                    split,
-                    "div"
-                );
-            }
-        })
-    }
-
-    createMarksUnderLeaves(textNodes: Element[]) {
+    private createMarksUnderLeaves(textNodes: Element[]) {
+        this.regenerateElementIndexMap();
         for (let i = 0; i < textNodes.length; i++) {
             this.makeTextNodeRehydratable(textNodes[i]);
         }
     }
 
-    segments(): Segment[] {
+    public segments(): Segment[] {
         try {
             const segmentElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
             const atomized = new Array(segmentElements.length);
@@ -236,7 +225,7 @@ export class AtomizedDocument {
         }
     }
 
-    headInnerHTML() {
+    public headInnerHTML() {
         const head = this.findHead();
         return (new XMLSerializer()).serializeToString(head as Node)
     }
@@ -248,7 +237,7 @@ export class AtomizedDocument {
         });
     }
 
-    bodyInnerHTML() {
+    public bodyInnerHTML() {
         const body = this.findBody();
         return (new XMLSerializer()).serializeToString(body as Node)
     }
@@ -285,6 +274,10 @@ export class AtomizedDocument {
             const namedItem = n.attributes?.getNamedItem('class')?.nodeValue;
             return namedItem === 'popper-container';
         });
+    }
+
+    private regenerateElementIndexMap() {
+        this.elementIndexMap = computeElementIndexMap(this.document);
     }
 
     public toString() {
