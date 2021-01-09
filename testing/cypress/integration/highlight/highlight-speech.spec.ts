@@ -9,7 +9,6 @@ const CurrentQuizCard = '#current-quiz-card';
 
 describe('Highlighting speech recognition results', () => {
     beforeEach(() => {
-        cy.signupLogin();
         cy.clearIndexedDB();
     })
     it('Highlights words when results are submitted', () => {

@@ -1,6 +1,7 @@
 import React, {useContext, useState} from "react";
 import {TESTING} from "../app-directory-service";
 import {ManagerContext} from "../../../App";
+import {useObservableState} from "observable-hooks";
 
 export function ManualSpeechRecognitionNode() {
     return {
@@ -8,8 +9,10 @@ export function ManualSpeechRecognitionNode() {
         hidden: !TESTING,
         ReplaceComponent: () => {
             const m = useContext(ManagerContext);
+            const manualIsRecording = useObservableState(m.settingsService.manualIsRecording$ )|| false;
             const [speechRecInput, setSpeechRecInput] = useState<HTMLInputElement | null>();
             return <div>
+                <input id='manual-is-recording' type="check" checked={manualIsRecording}/>
                 <input id='manual-speech-recognition-input' ref={setSpeechRecInput}/>
                 <button id='submit-manual-speech-recognition' onClick={
                     () => m.pronunciationProgressService.addRecords$.next([

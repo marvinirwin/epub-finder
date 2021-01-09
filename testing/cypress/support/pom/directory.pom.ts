@@ -8,6 +8,15 @@ export class DirectoryPom {
         cy.get('#submit-manual-speech-recognition')
             .click()
     }
+    public static SetIsRecording(isRecording: boolean) {
+        if (isRecording) {
+            cy.get('#manual-is-recording')
+                .check()
+        } else {
+            cy.get('#manual-is-recording')
+                .uncheck()
+        }
+    }
     public static ClearSpeechRecognitionRecords() {
         cy.get('#clear-speech-recognition-rows')
             .click()
@@ -34,5 +43,9 @@ export class DirectoryPom {
     }
     public static DailyProgressLabel() {
         return cy.get('#daily-goal-label')
+    }
+    public static EnterSpeechPractise() {
+        return cy.get('#speech-practise')
+            .click()
     }
 }
