@@ -1,5 +1,5 @@
-import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject, Subject} from "rxjs";
-import {debounce, Dictionary} from "lodash";
+import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
+import {Dictionary} from "lodash";
 import {debounceTime, map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {DatabaseService} from "./Storage/database.service";
 import React from "react";
@@ -71,18 +71,19 @@ import {ImageSearchService} from "./image-search.service";
 import {ScheduleRowsService} from "./Manager/schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
-import { VisibleService} from "./Manager/visible.service";
+import {VisibleService} from "./Manager/visible.service";
 import {TabulatedDocuments} from "./Atomized/tabulated-documents.interface";
 import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
 import {TrieService} from "./Manager/trie.service";
 import {ToastMessageService} from "./toast-message.service";
-import {ProgressItem, ProgressItemService} from "../components/progress-item.service";
+import {ProgressItemService} from "../components/progress-item.service";
 import {IsRecordingService} from "./is-recording.service";
 import {HistoryService} from "./history.service";
 import {LanguageConfigsService} from "./language-configs.service";
 import {SpeechPracticeService} from "./speech-practice.service";
+import {MicFeedbackService} from "./mic-feedback.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -173,6 +174,7 @@ export class Manager {
     private historyService: HistoryService;
     private languageConfigsService: LanguageConfigsService;
     public speechPracticeService: SpeechPracticeService;
+    public micFeedbackService: MicFeedbackService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.toastMessageService = new ToastMessageService({
@@ -266,6 +268,9 @@ export class Manager {
         })
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
+        this.micFeedbackService = new MicFeedbackService({
+            audioSource
+        });
         this.isRecordingService = new IsRecordingService({
             settingsService: this.settingsService,
             audioRecordingService: this.audioManager

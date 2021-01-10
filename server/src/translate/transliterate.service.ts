@@ -28,4 +28,6 @@ export const transliterate = ({text, language, fromScript, toScript}: Transliter
             text
         }],
         responseType: 'json'
-    }).then(response => response.data)
+    }).then(response => {
+        return response.data;
+    })

@@ -62,19 +62,19 @@ export class LanguageConfigsService {
                 return learningLanguageCode;
             }
         });
+        let supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
         this.learningToLatinTransliterate$ = h((knownLanguageCode, learningLanguageCode) => {
-            const goesToLatin = SupportedTransliterationService
-                .SupportedTransliteration.find(({script1, script2, bidirectional, languageCode}) => {
-                    return languageCode === learningLanguageCode &&
-                        script2 === 'Latin Latn'
-                });
+            const goesToLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
+                return code.toLowerCase() === learningLanguageCode.toLowerCase() &&
+                    script2 === 'Latn'
+            });
             /**
              */
             if (goesToLatin) {
                 return (text: string) =>
                     transliterate({
                         text,
-                        language: learningLanguageCode,
+                        language: goesToLatin.code,
                         fromScript: goesToLatin.script1,
                         toScript: goesToLatin.script2
                     })
@@ -84,13 +84,12 @@ export class LanguageConfigsService {
         this.latinToLearningTransliterate$ = h((knownLanguageCode, learningLanguageCode) => {
             // Need script2 and bidirectional
             // Is there a script1 that's latin?  Only for serbian, but that's a serial case
-            const goesFromLatin = SupportedTransliterationService
-                .SupportedTransliteration.find(({script1, script2, bidirectional, languageCode}) => {
-                    return languageCode === learningLanguageCode &&
-                        script2 === 'Latin Latn' &&
-                        bidirectional;
+            const goesFromLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
+                return code.toLowerCase() === learningLanguageCode.toLocaleLowerCase() &&
+                    script2 === 'Latin Latn' &&
+                    bidirectional;
 
-                });
+            });
             if (goesFromLatin) {
                 return (text: string) => transliterate({
                     text,

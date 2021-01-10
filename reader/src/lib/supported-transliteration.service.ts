@@ -2,7 +2,7 @@ import {chunk} from "lodash";
 
 export interface SupportedTransliteration {
     languageLabel: string;
-    languageCode: string;
+    code: string;
     script1: string;
     script2: string;
     bidirectional: boolean;
@@ -11,26 +11,28 @@ export interface SupportedTransliteration {
 export class SupportedTransliterationService {
     // @ts-ignore
     public static SupportedTransliteration: SupportedTransliteration[] = chunk([
-        'Arabic', 'ar', 'Arabic Arab', true, 'Latin Latn',
-        'Bangla', 'bn', 'Bengali Beng', true, 'Latin Latn',
-        'Chinese (Simplified)', 'zh-Hans', 'Chinese Simplified Hans', true, 'Latin Latn',
-        'Chinese (Simplified)', 'zh-Hans', 'Chinese Simplified Hans', true, 'Chinese Traditional Hant',
-        'Chinese (Traditional)', 'zh-Hant', 'Chinese Traditional Hant', true, 'Latin Latn',
-        'Chinese (Traditional)', 'zh-Hant', 'Chinese Traditional Hant', true, 'Chinese Simplified Hans',
-        'Gujarati', 'gu', 'Gujarati Gujr', true, 'Latin Latn',
-        'Hebrew', 'he', 'Hebrew Hebr', true, 'Latin Latn',
-        'Hindi', 'hi', 'Devanagari Deva', true, 'Latin Latn',
-        'Japanese', 'ja', 'Japanese Jpan', true, 'Latin Latn',
-        'Kannada', 'kn', 'Kannada Knda', true, 'Latin Latn',
-        'Malayalam', 'ml', 'Malayalam Mlym', true, 'Latin Latn',
-        'Marathi', 'mr', 'Devanagari Deva', true, 'Latin Latn',
-        'Odia', 'or', 'Oriya', 'Orya', true, 'Latin Latn',
-        'Punjabi', 'pa', 'Gurmukhi Guru', true, 'Latin Latn',
-        'Serbian (Cyrillic)', 'sr-Cyrl', 'Cyrillic Cyrl', false, 'Latin Latn',
-        'Serbian (Latin)', 'sr-Latn', 'Latin Latn', false, 'Cyrillic Cyrl',
-        'Tamil', 'ta', 'Tamil Taml', true, 'Latin Latn',
-        'Telugu', 'te', 'Telugu Telu', true, 'Latin Latn',
-        'Thai', 'th', 'Thai Thai', false, 'Latin Latn',
+        'Arabic', 'ar', 'Arabic Arab', true, 'Latn',
+        'Bangla', 'bn', 'Bengali Beng', true, 'Latn',
+        'Chinese (Simplified)', 'zh-Hans', 'Hans', true, 'Latn',
+        'Chinese (Simplified)', 'zh-Hans', 'Hans', true, 'Chinese Traditional Hant',
+        'Chinese (Traditional)', 'zh-Hant', 'Hant', true, 'Latn',
+        'Chinese (Traditional)', 'zh-Hant', 'Hant', true, 'Chinese Simplified Hans',
+        'Gujarati', 'gu', 'Gujarati Gujr', true, 'Latn',
+        'Hebrew', 'he', 'Hebrew Hebr', true, 'Latn',
+        'Hindi', 'hi', 'Devanagari Deva', true, 'Latn',
+        'Japanese', 'ja', 'Japanese Jpan', true, 'Latn',
+        'Kannada', 'kn', 'Kannada Knda', true, 'Latn',
+        'Malayalam', 'ml', 'Malayalam Mlym', true, 'Latn',
+        'Marathi', 'mr', 'Devanagari Deva', true, 'Latn',
+/*
+        'Odia', 'or', 'Oriya', 'Orya', true, 'Latn',
+*/
+        'Punjabi', 'pa', 'Gurmukhi Guru', true, 'Latn',
+        'Serbian (Cyrillic)', 'sr-Cyrl', 'Cyrillic Cyrl', false, 'Latn',
+        'Serbian (Latin)', 'sr-Latn', 'Latn', false, 'Cyrillic Cyrl',
+        'Tamil', 'ta', 'Tamil Taml', true, 'Latn',
+        'Telugu', 'te', 'Telugu Telu', true, 'Latn',
+        'Thai', 'th', 'Thai Thai', false, 'Latn',
         // @ts-ignore
     ], 5).map(([language, code, script1, bidirectional, script2]: [string, string, string, boolean, string]) => ({
         language,

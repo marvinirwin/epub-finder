@@ -8,6 +8,9 @@ import {CardContent, Input, Typography} from "@material-ui/core";
 const useStyles = makeStyles({
     root: {
         minWidth: 275,
+/*
+        minHeight: 275,
+*/
     },
     bullet: {
         display: 'inline-block',

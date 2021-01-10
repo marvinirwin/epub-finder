@@ -7,4 +7,5 @@ export interface AudioSource {
     recognizedText$: Observable<string>;
     mostRecentRecognizedText$: Observable<string>;
     errors$: Observable<string>;
+    microphone$: Observable<MediaStream>
 }

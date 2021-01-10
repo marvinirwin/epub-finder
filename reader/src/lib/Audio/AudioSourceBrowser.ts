@@ -16,6 +16,7 @@ export class AudioSourceBrowser implements AudioSource {
     public recognizedText$ = new Subject<string>();
     public mostRecentRecognizedText$: Observable<string>;
     public errors$ = new ReplaySubject<string>(1)
+    public microphone$ = new ReplaySubject<MediaStream>(1);
     private speechRecognitionConfigService = new SpeechRecognitionConfigService();
 
     constructor() {
@@ -41,7 +42,9 @@ export class AudioSourceBrowser implements AudioSource {
 */
 
         this.beginRecordingSignal$.subscribe(async () => {
-            const audioConfig = AudioConfig.fromMicrophoneInput((await navigator.mediaDevices.getUserMedia({audio: true})).id);
+            const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true});
+            this.microphone$.next(mediaStream);
+            const audioConfig = AudioConfig.fromMicrophoneInput(mediaStream.id);
             const recognizer = new SpeechRecognizer(await this.speechRecognitionConfigService.config.get(), audioConfig);
             recognizer.recognizeOnceAsync(
                 result => {
