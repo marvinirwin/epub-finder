@@ -19,7 +19,7 @@ export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuSe
             menuItemTree?.sourced && <TreeMenu
                 title={() => <Typography
                     ref={ref => m.introService.titleRef$.next(ref)}
-                    variant='h6'>Language Trainer
+                    variant='h6'>
                 </Typography>
                 }
                 tree={menuItemTree.sourced}
