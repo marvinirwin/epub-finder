@@ -37,7 +37,7 @@ export class LanguageConfigsService {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {
-                return (text: string) => fetchTranslation({
+                return (text: string='') => fetchTranslation({
                     text,
                     from: supportedLanguage.code,
                     to: learningLanguageCode
@@ -48,7 +48,7 @@ export class LanguageConfigsService {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {
-                return (text: string) => fetchTranslation({
+                return (text: string='') => fetchTranslation({
                     from: learningLanguageCode,
                     to: knownLanguageCode,
                     text
@@ -56,10 +56,14 @@ export class LanguageConfigsService {
             }
         })
         this.learningToKnownSpeech$ = h((knownLanguageCode, learningLanguageCode) => {
-            const supportedLanguage = SupportedSpeechToTextService
-                .SpeechToTextConfigs.find(({code}) => code === learningLanguageCode);
+            const textSpeechMap = {
+                'Zh-Hans': 'zh-CN'
+            } as {[key: string]: string};
+            const speechToTextConfigs = SupportedSpeechToTextService
+                .SpeechToTextConfigs;
+            const supportedLanguage = speechToTextConfigs.find(({code}) => code === textSpeechMap[learningLanguageCode]);
             if (supportedLanguage) {
-                return learningLanguageCode;
+                return supportedLanguage.code;
             }
         });
         let supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
@@ -71,7 +75,7 @@ export class LanguageConfigsService {
             /**
              */
             if (goesToLatin) {
-                return (text: string) =>
+                return (text: string='') =>
                     transliterate({
                         text,
                         language: goesToLatin.code,
@@ -86,12 +90,12 @@ export class LanguageConfigsService {
             // Is there a script1 that's latin?  Only for serbian, but that's a serial case
             const goesFromLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
                 return code.toLowerCase() === learningLanguageCode.toLocaleLowerCase() &&
-                    script2 === 'Latin Latn' &&
+                    script2 === 'Latn' &&
                     bidirectional;
 
             });
             if (goesFromLatin) {
-                return (text: string) => transliterate({
+                return (text: string = '') => transliterate({
                     text,
                     language: learningLanguageCode,
                     fromScript: goesFromLatin.script2,

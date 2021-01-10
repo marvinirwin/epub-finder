@@ -27,7 +27,7 @@ export const SpeakMode: React.FunctionComponent = ({...props}) => {
         m.audioManager.audioRecorder.recordRequest$.next(recordRequest)
     } }>
         <ListItemIcon>
-            <Mic style={{color}}/>
+            <Mic color={isRecording ? 'primary' : 'disabled'}/>
         </ListItemIcon>
         <ListItemText>
             Speak

@@ -12,6 +12,7 @@ export class UnitTestAudio implements AudioSource {
     public mostRecentRecognizedText$: Observable<string>;
     public errors$ = new ReplaySubject<string>(1);
     public microphone$ = new ReplaySubject<MediaStream>(1);
+    public learningToKnownSpeech$ = new ReplaySubject<string | undefined>(1);
     constructor(public text: string) {
         this.beginRecordingSignal$.subscribe(async () => {
             this.isRecording$.next(true);

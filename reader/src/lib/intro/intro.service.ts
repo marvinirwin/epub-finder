@@ -40,6 +40,7 @@ export class IntroService {
             shareReplay(1)
         );
         firstIntro$.subscribe(async ([titleRef, readingFrameRef, trySpeakingRef, watchSentenceRef]) => {
+            return;
             introSeriesService.addSteps(
                 [
                     {

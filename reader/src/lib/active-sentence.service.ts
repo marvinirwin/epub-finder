@@ -34,9 +34,9 @@ export class ActiveSentenceService {
             if (activeSentence?.popperElement) {
                 const els = [
                     showTranslations && learningToKnownTranslateFn &&
-                    await learningToKnownTranslateFn(activeSentence.translatableText),
+                    await learningToKnownTranslateFn(activeSentence.translatableText || ''),
                     showRomanization && learningToLatinFn &&
-                    await learningToLatinFn(activeSentence.translatableText)
+                    await learningToLatinFn(activeSentence.translatableText || '')
                 ].filter(v => v)
                 // @ts-ignore
                 activeSentence.popperElement.innerHTML = `${els.join(`</br></br>`)}`

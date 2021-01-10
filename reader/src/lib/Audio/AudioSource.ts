@@ -8,4 +8,5 @@ export interface AudioSource {
     mostRecentRecognizedText$: Observable<string>;
     errors$: Observable<string>;
     microphone$: Observable<MediaStream>
+    learningToKnownSpeech$: ReplaySubject<string | undefined>;
 }

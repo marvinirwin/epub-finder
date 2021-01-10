@@ -3,14 +3,15 @@ import React, {useContext} from "react";
 import {ManagerContext} from "../App";
 import {makeStyles} from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card/Card";
-import {CardContent, Input, Typography} from "@material-ui/core";
+import {CardContent, Typography} from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        minWidth: 275,
-/*
-        minHeight: 275,
-*/
+        margin: 8 * 4,
+        minWidth: 475,
+        /*
+                minHeight: 275,
+        */
     },
     bullet: {
         display: 'inline-block',
@@ -24,10 +25,26 @@ const useStyles = makeStyles({
 
 export const SpeechPracticeCard = () => {
     const m = useContext(ManagerContext);
+    const languageConfig = m.languageConfigsService;
+    const lang = useObservableState(m.settingsService.learningLanguage$);
+    const speechCode = useObservableState(languageConfig.learningToKnownSpeech$);
+    const recognitionSupported = !!speechCode;
+    const romanizationSupported = !!useObservableState(languageConfig.learningToLatinTransliterate$);
+    const translationSupported = !!useObservableState(languageConfig.learningToKnownTranslate$);
     const classes = useStyles();
-    const recordedText = useObservableState(m.speechPracticeService.learningLanguage$) || '';
-    const romanization = useObservableState(m.speechPracticeService.romanization$) || '';
-    const translation = useObservableState(m.speechPracticeService.translation$) || '';
+
+    const recordedText = useObservableState(m.speechPracticeService.learningLanguage$) ||
+    (recognitionSupported ? `Speech recognition for ${speechCode} available, try it!` :
+        `Speech Recognition for ${lang} not available :(`);
+
+    const romanization = useObservableState(m.speechPracticeService.romanization$) ||
+    (romanizationSupported ? `Romanization for ${lang} available` :
+        `Romanization for ${lang} not available :(`);
+
+    const translation = useObservableState(m.speechPracticeService.translation$) ||
+    (translationSupported ? `Translation for ${lang} available` :
+        `Translation for ${lang} not available :(`);
+
     return <Card className={classes.root} id={'speech-practice-card'} variant="outlined">
         <CardContent>
             <Typography
