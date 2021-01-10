@@ -44,8 +44,8 @@ export class DirectoryPom {
     public static DailyProgressLabel() {
         return cy.get('#daily-goal-label')
     }
-    public static EnterSpeechPractise() {
-        return cy.get('#speech-practise')
+    public static EnterSpeechPractice() {
+        return cy.get('#speech-practice')
             .click()
     }
 }

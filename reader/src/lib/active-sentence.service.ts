@@ -1,29 +1,42 @@
 import {Segment} from "./Atomized/segment";
 import {combineLatest, ReplaySubject} from "rxjs";
 import {SettingsService} from "../services/settings.service";
-import {fetchTranslation} from "../services/translate.service";
-import {fetchPinyin} from "./pinyin.service";
+import {transliterate} from "./transliterate.service";
+import {LanguageConfigsService} from "./language-configs.service";
 
 export class ActiveSentenceService {
     activeSentence$ = new ReplaySubject<Segment>(1);
 
     constructor(
         {
-            settingsService
+            settingsService,
+            languageConfigsService
         }: {
             settingsService: SettingsService
+            languageConfigsService: LanguageConfigsService
         }) {
         combineLatest([
             this.activeSentence$,
-            settingsService.showTranslations$,
-            settingsService.showPinyin$
+            settingsService.showTranslation$,
+            settingsService.showRomanization$,
+            languageConfigsService.learningToKnownTranslate$,
+            languageConfigsService.learningToLatinTransliterate$
+
         ]).subscribe(async (
-            [activeSentence, showTranslations, showPinyin]
+            [
+                activeSentence,
+                showTranslations,
+                showRomanization,
+                learningToKnownTranslateFn,
+                learningToLatinFn
+            ]
         ) => {
             if (activeSentence?.popperElement) {
                 const els = [
-                    showTranslations && await fetchTranslation(activeSentence.translatableText),
-                    showPinyin && await fetchPinyin(activeSentence.translatableText)
+                    showTranslations && learningToKnownTranslateFn &&
+                    await learningToKnownTranslateFn(activeSentence.translatableText),
+                    showRomanization && learningToLatinFn &&
+                    await learningToLatinFn(activeSentence.translatableText)
                 ].filter(v => v)
                 // @ts-ignore
                 activeSentence.popperElement.innerHTML = `${els.join(`</br></br>`)}`

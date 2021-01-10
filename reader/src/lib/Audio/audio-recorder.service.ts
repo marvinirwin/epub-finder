@@ -3,24 +3,33 @@ import {filter, map, shareReplay, startWith, switchMap, take, withLatestFrom} fr
 import {RecordRequest} from "../Interfaces/RecordRequest";
 import {sleep} from "../Util/Util";
 import {AudioSource} from "./AudioSource";
-import {fetchPinyin} from "../pinyin.service";
+import {transliterate} from "../transliterate.service";
+import {LanguageConfigsService} from "../language-configs.service";
 
 export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>();
     public currentRecognizedText$ = new ReplaySubject<string>(1);
     public recentlyRecorded$ = new ReplaySubject<boolean>(1);
+/*
     public currentRecognizedPinyin$: Observable<string>;
+*/
     private countdown$ = new Subject<number>();
+    public audioSource: AudioSource;
 
     public get isRecording$() {
         return this.audioSource.isRecording$
     }
 
-    constructor(public audioSource: AudioSource) {
+    constructor({audioSource}:{audioSource: AudioSource}) {
+        this.audioSource = audioSource
+/*
         this.currentRecognizedPinyin$ = this.currentRecognizedText$.pipe(
-            switchMap(fetchPinyin),
+            switchMap(async text => {
+
+            }),
             shareReplay(1)
         );
+*/
         this.isRecording$.subscribe(recordingNow => {
             recordingNow && this.recentlyRecorded$.next(recordingNow);
         });

@@ -1,12 +1,18 @@
 import axios from "axios";
 import {memoize} from 'lodash';
 
+export interface TranslateRequest extends TranslateConfig {
+    text: string
+}
+
+export interface TranslateConfig {
+    from: string;
+    to: string
+}
+
 export const fetchTranslation = memoize(
-    (text: string) =>
-        axios.post(`${process.env.PUBLIC_URL}/translate`, {
-            from: 'zh-CN',
-            to: 'en',
-            text: text
-        }).then(response => response?.data?.translation || '')
+    (t: TranslateRequest) =>
+        axios.post(`${process.env.PUBLIC_URL}/translate`, t)
+            .then(response => response?.data?.translation as string || '')
 )
 

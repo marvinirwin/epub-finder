@@ -6,24 +6,25 @@ export class HistoryService {
     url$: Observable<URL>;
     constructor() {
         window.onpopstate = () => {
-            const url = new URL(window.location.pathname);
-            this._url$.next(url);
+            this._url$.next(HistoryService.url());
         };
         this.url$ = this._url$.pipe(
-            distinctUntilChanged((url1, url2) => url1.pathname === url2.pathname),
+            distinctUntilChanged((url1, url2) => {
+                return url1.href !== url2.href;
+            }),
             shareReplay(1)
         )
     }
     public set(k: string, v: string) {
         const url = HistoryService.url();
         url.searchParams.set(k, v);
-        window.history.pushState({}, '', url.pathname)
+        window.history.pushState({}, '', url.href)
         this._url$.next(url);
     }
     public get(k: string): string | null {
         return HistoryService.url().searchParams.get(k)
     }
     private static url() {
-        return new URL(window.location.pathname)
+        return new URL(window.location.href)
     }
 }

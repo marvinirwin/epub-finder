@@ -2,7 +2,7 @@ import {chunk} from "lodash"
 
 export interface SpeechToTextConfig {
     label: string;
-    id: string;
+    code: string;
 }
 
 export class SupportedSpeechToTextService {
@@ -93,5 +93,5 @@ export class SupportedSpeechToTextService {
             "Telugu (India)", `te-IN`,
             "Thai (Thailand)", `th-TH`,
             "Turkish (Turkey)", `tr-TR`,
-        ], 2).map(([label, id]) => ({label, id}))
+        ], 2).map(([label, id]) => ({label, code: id}))
 }

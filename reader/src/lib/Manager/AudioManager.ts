@@ -20,7 +20,7 @@ export class AudioManager {
     */
 
     constructor(audioSource: AudioSource) {
-        this.audioRecorder = new AudioRecorder(audioSource);
+        this.audioRecorder = new AudioRecorder({audioSource});
         this.queSynthesizedSpeechRequest$.pipe(
             flatMap(async speechText => {
                     const wavAudio = await fetchSynthesizedAudio(speechText);

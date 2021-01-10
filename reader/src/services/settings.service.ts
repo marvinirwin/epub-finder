@@ -2,7 +2,7 @@ import {DatabaseService} from "../lib/Storage/database.service";
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
-import {take} from "rxjs/operators";
+import {distinct, distinctUntilChanged, skip, take} from "rxjs/operators";
 import {HistoryService} from "../lib/history.service";
 import {SettingGetSet, SettingType} from "./setting-get-set";
 
@@ -74,7 +74,10 @@ export class SettingsService {
                 }
             });
 */
-            settingReplaySubject.subscribe(value => {
+            settingReplaySubject.pipe(
+                skip(1),
+                distinctUntilChanged()
+            ).pipe().subscribe(value => {
                 getSet.set(value);
             });
             this.settingsReplaySubjects[getSet.name] = settingReplaySubject;
@@ -87,7 +90,7 @@ export class SettingsService {
     }
 
     get readingDocument$(): ReplaySubject<string | undefined> {
-        return this.resolveSetting$<string | undefined>('readingDocument', undefined, 'url')
+        return this.resolveSetting$<string | undefined>('readingDocument', undefined, 'indexedDB')
     }
 
     get hotkeys$(): ReplaySubject<Partial<Hotkeys<string[]>>> {
@@ -102,7 +105,7 @@ export class SettingsService {
         return this.resolveSetting$<string[]>('introStepsCompleted', [], 'indexedDB')
     }
 
-    get showTranslations$(): ReplaySubject<boolean> {
+    get showTranslation$(): ReplaySubject<boolean> {
         return this.resolveSetting$<boolean>('showTranslations', true, 'indexedDB');
     }
 
@@ -110,7 +113,7 @@ export class SettingsService {
         return this.resolveSetting$<number>('dailyGoal', 24, 'indexedDB');
     }
 
-    get showPinyin$(): ReplaySubject<boolean> {
+    get showRomanization$(): ReplaySubject<boolean> {
         return this.resolveSetting$<boolean>('showPinyin', true, 'indexedDB');
     }
 
@@ -121,7 +124,10 @@ export class SettingsService {
         return this.resolveSetting$<string[]>('page', [], 'url')
     }
     get manualIsRecording$(): ReplaySubject<boolean> {
-        return this.resolveSetting$<boolean>('manualIsRecording', false, 'url')
+        return this.resolveSetting$<boolean>('manualIsRecording', false, 'indexedDB')
+    }
+    get learningLanguage$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('lang', 'Zh-Hans', 'url')
     }
 }
 

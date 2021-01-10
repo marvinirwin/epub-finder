@@ -1,11 +1,13 @@
+import { chunk } from "lodash";
+
 export interface SupportedTranslation {
     label: string;
-    key: string;
+    code: string;
 }
 
 export class SupportedTranslationService {
-    public static SupportedTranslations =
-        ['Afrikaans', 'af',
+    public static SupportedTranslations: SupportedTranslation[] =
+        chunk( ['Afrikaans', 'af',
             'Arabic', 'ar',
             'Assamese', 'as',
             'Bangla', 'bn',
@@ -85,5 +87,5 @@ export class SupportedTranslationService {
             'Vietnamese', 'vi',
             'Welsh', 'cy',
             'Yucatec Maya', 'yua',
-        ]
+        ], 2).map(([label, code]) => ({label, code}))
 }

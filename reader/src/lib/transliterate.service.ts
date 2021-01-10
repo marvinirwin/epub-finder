@@ -3,13 +3,8 @@ import axios, { AxiosResponse } from "axios";
 import {memoize} from 'lodash';
 
 
-export const fetchPinyin = memoize((text: string) => axios.post(
+export const transliterate = memoize((d: TransliterateRequestDto) => axios.post(
     `${process.env.PUBLIC_URL}/translate/transliterate`,
-    {
-        language: 'zh-hans',
-        text,
-        fromScript: 'Hans',
-        toScript: 'Latn'
-    } as TransliterateRequestDto
+    d
 ).then((response: AxiosResponse<TransliterateResponseDto>) => response?.data?.[0].text || ''))
 

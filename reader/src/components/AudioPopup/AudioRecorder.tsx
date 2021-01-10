@@ -1,4 +1,3 @@
-import {makeStyles, createStyles, Theme} from "@material-ui/core/styles";
 import React, {useContext, useEffect, useState} from "react";
 import {LinearProgress, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
@@ -17,7 +16,7 @@ export const SLIM_CARD_CONTENT = {
 export default function AudioRecorder({m}: { m: Manager }) {
     const recorder = m.audioManager.audioRecorder;
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
-    const currentPinyin = useObservableState(recorder.currentRecognizedPinyin$);
+    const currentRomanized = useObservableState(m.speechPracticeService.romanization$);
     const currentAudioRequest = useObservableState(recorder.recordRequest$);
     const isRecording = useObservableState(recorder.isRecording$);
 
@@ -40,6 +39,6 @@ export default function AudioRecorder({m}: { m: Manager }) {
         <Typography variant="h6">{currentAudioRequest?.label}</Typography>
         {isRecording && <LinearProgress variant='indeterminate'/>}
         <Typography variant="h6">{recognizedText}</Typography>
-        <Typography variant="h6">{currentPinyin}</Typography>
+        <Typography variant="h6">{currentRomanized}</Typography>
     </div>
 }

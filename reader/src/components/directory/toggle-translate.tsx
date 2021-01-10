@@ -5,12 +5,12 @@ import {FormControlLabel, ListItem, Switch} from "@material-ui/core";
 
 export const ToggleTranslate = () => {
     const m = useContext(ManagerContext);
-    const showTranslations = useObservableState(m.settingsService.showTranslations$)
+    const showTranslations = useObservableState(m.settingsService.showTranslation$)
     return <ListItem>
         <FormControlLabel
             control={
                 <Switch checked={!!showTranslations}
-                        onChange={() => m.settingsService.showTranslations$.next(!showTranslations)}
+                        onChange={() => m.settingsService.showTranslation$.next(!showTranslations)}
                 />}
             label="Show Translations"/>
     </ListItem>

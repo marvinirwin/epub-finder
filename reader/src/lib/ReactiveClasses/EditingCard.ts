@@ -1,4 +1,4 @@
-import {combineLatest, Observable, race, ReplaySubject, Subject, timer} from "rxjs";
+import {combineLatest, Observable, of, race, ReplaySubject, Subject, timer} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
@@ -31,11 +31,14 @@ export class EditingCard {
         public timestamp?: Date | number | undefined,
     ) {
 
+        this.translation$ = of('todo');
+/*
         this.translation$ = this.learningLanguage$.pipe(
             flatMap(async (learningLanguage) =>
                 learningLanguage ? await fetchTranslation(learningLanguage) : ''
             )
         )
+*/
         this.saveInProgress$.next(false);
         const saveData$ = this.saveDataObservable();
 

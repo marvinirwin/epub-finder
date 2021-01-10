@@ -21,22 +21,23 @@ window.addEventListener("unhandledrejection", event => {
     event.stopImmediatePropagation();
 });
 
-const darkTheme = createMuiTheme({
+const theme = createMuiTheme({
     palette: {
         primary: indigo,
         secondary: green,
     },
     typography: {
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif'
-    }
+    },
+
 });
-darkTheme.spacing(2);
+theme.spacing(3);
 
 const manager = getManager(urlParams.get('mode') || 'test')
 export const ManagerContext = React.createContext(manager)
 
 function App() {
-    return <ThemeProvider theme={darkTheme}>
+    return <ThemeProvider theme={theme}>
             <ManagerContext.Provider value={manager}>
                 <LoadingBackdrop/>
                 <AlertSnackbar/>

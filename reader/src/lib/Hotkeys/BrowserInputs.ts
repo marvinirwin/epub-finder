@@ -84,7 +84,7 @@ export class BrowserInputs {
         activeSentenceService: ActiveSentenceService
     }) {
         this.activeSentenceService = activeSentenceService;
-        settings$.showTranslations$.subscribe(showTranslations => {
+        settings$.showTranslation$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
             if (showTranslations) {
                 this.latestTranslationTarget?.showPopper();

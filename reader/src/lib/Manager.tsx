@@ -79,6 +79,10 @@ import {AtomElementEventsService} from "./atom-element-events.service";
 import {TrieService} from "./Manager/trie.service";
 import {ToastMessageService} from "./toast-message.service";
 import {ProgressItem, ProgressItemService} from "../components/progress-item.service";
+import {IsRecordingService} from "./is-recording.service";
+import {HistoryService} from "./history.service";
+import {LanguageConfigsService} from "./language-configs.service";
+import {SpeechPracticeService} from "./speech-practice.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -165,19 +169,33 @@ export class Manager {
     public wordMetadataMapService: WordMetadataMapService;
     public trieService: TrieService;
     public toastMessageService: ToastMessageService;
+    public isRecordingService: IsRecordingService;
+    private historyService: HistoryService;
+    private languageConfigsService: LanguageConfigsService;
+    public speechPracticeService: SpeechPracticeService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.toastMessageService = new ToastMessageService({
             alertsService: this.alertsService
         })
         this.availableDocumentsService = new AvailableDocumentsService()
-        this.settingsService = new SettingsService({db})
+        this.historyService = new HistoryService()
+        this.settingsService = new SettingsService({
+            db,
+            historyService: this.historyService
+        });
+        this.languageConfigsService = new LanguageConfigsService({
+            settingsService: this.settingsService,
+        });
         this.treeMenuService = new TreeMenuService<any, { value: any }>({
             settingsService: this.settingsService
         });
         this.hotkeysService = new HotkeysService({settingsService: this.settingsService})
         this.hotkeyEvents = new HotKeyEvents(this)
-        this.activeSentenceService = new ActiveSentenceService({settingsService: this.settingsService})
+        this.activeSentenceService = new ActiveSentenceService({
+            settingsService: this.settingsService,
+            languageConfigsService: this.languageConfigsService
+        })
         this.browserInputs = new BrowserInputs({
             hotkeys$: this.hotkeysService.mapHotkeysWithDefault(
                 HotKeyEvents.defaultHotkeys(),
@@ -185,7 +203,6 @@ export class Manager {
             ),
             activeSentenceService: this.activeSentenceService,
             settings$: this.settingsService,
-
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardService = new CardsService({databaseService: db});
@@ -249,6 +266,14 @@ export class Manager {
         })
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioManager = new AudioManager(audioSource);
+        this.isRecordingService = new IsRecordingService({
+            settingsService: this.settingsService,
+            audioRecordingService: this.audioManager
+        })
+        this.speechPracticeService = new SpeechPracticeService({
+            audioRecorder: this.audioManager.audioRecorder,
+            languageConfigsService: this.languageConfigsService
+        });
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
             wordRecognitionRows$: this.wordRecognitionProgressService.records$,
@@ -499,10 +524,7 @@ export class Manager {
 
         this.hotkeyEvents.startListeners();
         this.cardService.load();
-
     }
-
-
 }
 
 

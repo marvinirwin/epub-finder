@@ -499,3 +499,22 @@ $hideColor:#f5f5f5;
 .quiz-text {
   margin: $padding;
 }
+
+#speech-practice-container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+#speech-practice-card {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+  align-items: center;
+}
+#speech-practice-recording-indicator {
+  height: 100px;
+  width: 100px;
+}
