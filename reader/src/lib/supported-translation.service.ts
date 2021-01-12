@@ -7,7 +7,8 @@ export interface SupportedTranslation {
 
 export class SupportedTranslationService {
     public static SupportedTranslations: SupportedTranslation[] =
-        chunk( ['Afrikaans', 'af',
+        chunk( [
+            'Afrikaans', 'af',
             'Arabic', 'ar',
             'Assamese', 'as',
             'Bangla', 'bn',

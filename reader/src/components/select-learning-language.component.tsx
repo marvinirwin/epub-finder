@@ -7,7 +7,7 @@ import {useObservableState} from "observable-hooks";
 
 export const SelectLearningLanguage = () => {
     const m =useContext(ManagerContext);
-    const allLanguages = SupportedSpeechToTextService.SpeechToTextConfigs;
+    const allLanguages = SupportedSpeechToTextService.Configs;
     const lang = useObservableState(m.settingsService.learningLanguage$) || '';
     return <Select
         id='#speech-practice-learning-language'

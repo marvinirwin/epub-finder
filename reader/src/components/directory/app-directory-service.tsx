@@ -40,6 +40,9 @@ function AppDirectory(
         [
             ReadingNode(m, selectedComponent === 'reading'),
             SpeechPracticeNode,
+            [
+
+            ],
             SignInWithNode(profile),
             [
                 GoogleSigninNode(),
