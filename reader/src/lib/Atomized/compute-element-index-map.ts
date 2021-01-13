@@ -1,5 +1,9 @@
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 
+/**
+ * Assigns every element an index, which will function as its "path" and a list of these paths will become a "section"
+ * @param d
+ */
 export const computeElementIndexMap = (d: XMLDocument) => {
     const m = new Map<XMLDocumentNode, number>();
     const walk = (node: XMLDocumentNode, index: number = 0) => {

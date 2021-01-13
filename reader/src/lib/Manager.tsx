@@ -189,7 +189,9 @@ export class Manager {
         this.languageConfigsService = new LanguageConfigsService({
             settingsService: this.settingsService,
         });
-        this.languageConfigsService.learningToKnownSpeech$.subscribe(audioSource.learningToKnownSpeech$)
+        this.settingsService
+            .spokenLanguage$
+            .subscribe(audioSource.learningToKnownSpeech$);
         this.treeMenuService = new TreeMenuService<any, { value: any }>({
             settingsService: this.settingsService
         });

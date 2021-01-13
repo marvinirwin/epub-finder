@@ -97,6 +97,6 @@ let speechToTextConfigs = chunk([
 export class SupportedSpeechToTextService {
     public static Configs: SpeechToTextConfig[] = speechToTextConfigs
     public static ConfigMap = new Map<string, SpeechToTextConfig>(
-        speechToTextConfigs.map(c => [c.code, c])
+        speechToTextConfigs.map(c => [c.code.toLowerCase(), c])
     )
 }

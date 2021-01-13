@@ -8,11 +8,11 @@ import {useObservableState} from "observable-hooks";
 export const SelectLearningLanguage = () => {
     const m =useContext(ManagerContext);
     const allLanguages = SupportedSpeechToTextService.Configs;
-    const lang = useObservableState(m.settingsService.learningLanguage$) || '';
+    const lang = useObservableState(m.settingsService.readingLanguage$) || '';
     return <Select
         id='#speech-practice-learning-language'
         value={lang}
-        onChange={ev => { m.settingsService.learningLanguage$.next(ev.target.value as string) }
+        onChange={ev => { m.settingsService.readingLanguage$.next(ev.target.value as string) }
         }>
         {
             allLanguages.map(

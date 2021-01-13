@@ -19,8 +19,6 @@ export function createPopperElement(document1: XMLDocument) {
 }
 
 export class AtomizedDocument {
-    private elementIndexMap: Map<XMLDocumentNode, number> = new Map();
-
     public static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
@@ -157,11 +155,6 @@ export class AtomizedDocument {
     }
 
     private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
-        const indexOfParent = textNode?.parentNode &&
-             this.elementIndexMap.get(textNode.parentNode as unknown as XMLDocumentNode)
-        if (!indexOfParent) {
-            throw new Error("No parent index");
-        }
         const indexOfMe = getIndexOfEl(textNode);
         (textNode.parentNode as Element).removeChild(textNode);
         const newParent = this.document.createElement('span');
@@ -175,7 +168,10 @@ export class AtomizedDocument {
             newParent.insertBefore(mark, null)
         })
         const oldParent = textNode.parentNode as Element;
-        oldParent.insertBefore(newParent, oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null);
+        oldParent.insertBefore(
+            newParent,
+            oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null
+        );
         return newParent;
     }
 
@@ -204,7 +200,6 @@ export class AtomizedDocument {
     }
 
     private createMarksUnderLeaves(textNodes: Element[]) {
-        this.regenerateElementIndexMap();
         for (let i = 0; i < textNodes.length; i++) {
             this.makeTextNodeRehydratable(textNodes[i]);
         }
@@ -276,9 +271,6 @@ export class AtomizedDocument {
         });
     }
 
-    private regenerateElementIndexMap() {
-        this.elementIndexMap = computeElementIndexMap(this.document);
-    }
 
     public toString() {
         return new XMLSerializer().serializeToString(this.document);

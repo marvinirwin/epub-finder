@@ -5,5 +5,6 @@ import React from "react";
 export const SpeechPracticeNode: TreeMenuNode = {
     name: 'speech-practice',
     label: 'Speech Practice',
-    Component: () => <SpeechPractice/>
+    Component: () => <SpeechPractice/>,
+    moveDirectory: true
 }

@@ -126,8 +126,11 @@ export class SettingsService {
     get manualIsRecording$(): ReplaySubject<boolean> {
         return this.resolveSetting$<boolean>('manualIsRecording', false, 'indexedDB')
     }
-    get learningLanguage$(): ReplaySubject<string> {
-        return this.resolveSetting$<string>('lang', 'Zh-Hans', 'url')
+    get readingLanguage$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('reading', 'Zh-Hans', 'url')
+    }
+    get spokenLanguage$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('spoken', 'zh-CN', 'url')
     }
 }
 

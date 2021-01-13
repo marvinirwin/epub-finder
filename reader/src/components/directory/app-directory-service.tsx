@@ -27,6 +27,7 @@ import {SettingsNode} from "./nodes/settings.node";
 import {DailyGoalSettingNode} from "./nodes/daily-goal-setting.node";
 import {TogglePinyinNode} from "./nodes/toggle-pinyin.node";
 import {SpeechPracticeNode} from "./nodes/speech-practice.node";
+import {LanguageSelectNode} from "./nodes/language-select.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -41,7 +42,7 @@ function AppDirectory(
             ReadingNode(m, selectedComponent === 'reading'),
             SpeechPracticeNode,
             [
-
+                LanguageSelectNode
             ],
             SignInWithNode(profile),
             [

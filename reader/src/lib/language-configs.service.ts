@@ -3,7 +3,7 @@ import {map, shareReplay} from "rxjs/operators";
 import {SupportedTranslationService} from "./supported-translation.service";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {fetchTranslation, TranslateConfig} from "../services/translate.service";
-import {SupportedSpeechToTextService} from "./supported-speech-to-text.service";
+import {SpeechToTextConfig, SupportedSpeechToTextService} from "./supported-speech-to-text.service";
 import {SupportedTransliterationService} from "./supported-transliteration.service";
 import {transliterate} from "./transliterate.service";
 
@@ -12,9 +12,9 @@ type PossibleStringFetcher = ((text: string) => Promise<string>) | undefined;
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleStringFetcher>;
     public learningToKnownTranslate$: Observable<PossibleStringFetcher>;
-    public learningToKnownSpeech$: Observable<string | undefined>;
     public learningToLatinTransliterate$: Observable<PossibleStringFetcher>;
     public latinToLearningTransliterate$: Observable<PossibleStringFetcher>;
+    public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>;
 
     constructor(
         {
@@ -28,7 +28,7 @@ export class LanguageConfigsService {
         const h = <T>(f: (knownLanguageCode: string, learningLanguageCode: string) => T) =>
             combineLatest([
                 knownLanguage$,
-                settingsService.learningLanguage$
+                settingsService.readingLanguage$
             ]).pipe(
                 map(([knownLanguage, learningLanguage]) => f(knownLanguage, learningLanguage)),
                 shareReplay(1)
@@ -54,8 +54,9 @@ export class LanguageConfigsService {
                     text
                 })
             }
-        })
-        this.learningToKnownSpeech$ = h((knownLanguageCode, learningLanguageCode) => {
+        });
+
+        this.potentialLearningSpoken$ = h((knownLanguageCode, learningLanguageCode) => {
             const textSpeechMap = {
                 'zh-hant': [
                     'zh-cn',
@@ -105,18 +106,18 @@ export class LanguageConfigsService {
                     'nl-nl'
                 ],
                 'en': [
-                     `en-au`,
-                     `en-ca`,
-                     `en-hk`,
-                     `en-in`,
-                     `en-ie`,
-                     `en-nz`,
-                     `en-ng`,
-                     `en-ph`,
-                     `en-sg`,
-                     `en-za`,
-                     `en-gb`,
-                     `en-us`,
+                    `en-au`,
+                    `en-ca`,
+                    `en-hk`,
+                    `en-in`,
+                    `en-ie`,
+                    `en-nz`,
+                    `en-ng`,
+                    `en-ph`,
+                    `en-sg`,
+                    `en-za`,
+                    `en-gb`,
+                    `en-us`,
                 ],
                 'et': [
                     `et-ee`
@@ -155,7 +156,7 @@ export class LanguageConfigsService {
                     `ja-jp`
                 ],
                 'ko': [
-                   'ko-kr'
+                    'ko-kr'
                 ],
                 'lv': [
                     `lv-lv`
@@ -163,9 +164,7 @@ export class LanguageConfigsService {
                 'lt': [
                     'lt-lt'
                 ],
-                'mt': [
-
-                ],
+                'mt': [],
                 'mr': [
                     `mr-in`
                 ],
@@ -194,28 +193,28 @@ export class LanguageConfigsService {
                     'sl-si'
                 ],
                 'es': [
-                     `es-ar`,
-                     `es-bo`,
-                     `es-cl`,
-                     `es-co`,
-                     `es-cr`,
-                     `es-cu`,
-                     `es-do`,
-                     `es-ec`,
-                     `es-sv`,
-                     `es-gq`,
-                     `es-gt`,
-                     `es-hn`,
-                     `es-mx`,
-                     `es-ni`,
-                     `es-pa`,
-                     `es-py`,
-                     `es-pe`,
-                     `es-pr`,
-                     `es-es`,
-                     `es-uy`,
-                     `es-us`,
-                     `es-ve`,
+                    `es-ar`,
+                    `es-bo`,
+                    `es-cl`,
+                    `es-co`,
+                    `es-cr`,
+                    `es-cu`,
+                    `es-do`,
+                    `es-ec`,
+                    `es-sv`,
+                    `es-gq`,
+                    `es-gt`,
+                    `es-hn`,
+                    `es-mx`,
+                    `es-ni`,
+                    `es-pa`,
+                    `es-py`,
+                    `es-pe`,
+                    `es-pr`,
+                    `es-es`,
+                    `es-uy`,
+                    `es-us`,
+                    `es-ve`,
                 ],
                 'sv': [
                     `sv-se`
@@ -232,15 +231,37 @@ export class LanguageConfigsService {
                 'tr': [
                     `tr-tr`
                 ]
-            } as {[key: string]: string[]}
-            const speechToTextConfigs = SupportedSpeechToTextService.Configs;
-            const supportedLanguage = speechToTextConfigs.find(({code}) =>
-                textSpeechMap[learningLanguageCode.toLowerCase()]?.includes(code.toLowerCase())
-            );
-            if (supportedLanguage) {
-                return supportedLanguage.code;
-            }
+            } as { [key: string]: string[] };
+            const lowerCode = learningLanguageCode.toLowerCase();
+            return (textSpeechMap[lowerCode] || [])
+                .map(code => SupportedSpeechToTextService.ConfigMap.get(code)) as SpeechToTextConfig[]
+                ;
+            /*
+                        const speechToTextConfigs = SupportedSpeechToTextService.Configs;
+                        const supportedLanguage = speechToTextConfigs.find(({code}) =>
+                            ?.includes(code.toLowerCase())
+                        );
+                        if (supportedLanguage) {
+                            return supportedLanguage.code;
+                        }
+            */
         });
+        combineLatest([
+                this.potentialLearningSpoken$,
+                settingsService.spokenLanguage$
+            ]
+        ).subscribe(([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
+            const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0];
+            const shouldSetDefaultSpokenLanguage = !currentSpokenLanguageCode && firstPotentialSpokenLanguageConfig;
+            if (shouldSetDefaultSpokenLanguage) {
+                settingsService.spokenLanguage$.next(firstPotentialSpokenLanguageConfig.code)
+            }
+            const shouldClearSpokenLanguage = currentSpokenLanguageCode &&
+                !potentialSpokenLanguageConfigs.map(c => c.code).includes(currentSpokenLanguageCode);
+            if (shouldClearSpokenLanguage) {
+                settingsService.spokenLanguage$.next('')
+            }
+        })
         let supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
         this.learningToLatinTransliterate$ = h((knownLanguageCode, learningLanguageCode) => {
             const goesToLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
