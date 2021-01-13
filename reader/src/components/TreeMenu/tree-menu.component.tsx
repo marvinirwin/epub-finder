@@ -21,7 +21,8 @@ export const TreeMenu: React.FunctionComponent<{
         directoryPath,
         directoryChanged,
         componentChanged,
-        actionSelected
+        actionSelected,
+        children
     }
 ) => {
     const useMinified = false;
@@ -30,6 +31,7 @@ export const TreeMenu: React.FunctionComponent<{
         .filter(treeNode => !treeNode?.value?.hidden);
 
     return <List className={'selectable-menu-list'}>
+        {children}
         {directoryPath.length ?
             <Fragment>
                 <ListItem

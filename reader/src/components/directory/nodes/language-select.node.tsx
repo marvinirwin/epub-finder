@@ -6,6 +6,7 @@ import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
 import {LanguageConfigsService} from "../../../lib/language-configs.service";
 import {SupportedSpeechToTextService} from "../../../lib/supported-speech-to-text.service";
+import {SupportedTranslationService} from "../../../lib/supported-translation.service";
 
 export const SettingsNode = {
     name: 'language-select',
@@ -13,16 +14,15 @@ export const SettingsNode = {
         const m = useContext(ManagerContext);
         const langCode = useObservableState(m.settingsService.learningLanguage$) || '';
         return <ListItem>
-            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+            <InputLabel id="language-select-label">Age</InputLabel>
             <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
+                labelId="language-select-label"
                 value={langCode}
-                onChange={e => m.settingsService.}
+                onChange={e => m.settingsService.learningLanguage$.next(e.target.value as string)}
             >
                 {
-                    SupportedSpeechToTextService
-                        .Configs
+                    SupportedTranslationService
+                        .SupportedTranslations
                         .map(c => <MenuItem value={c.code}>{c.label}</MenuItem>)
                 }
             </Select>

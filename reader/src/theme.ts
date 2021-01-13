@@ -10,6 +10,8 @@ export const theme = createMuiTheme({
     spacing: factor => {
         const f = () => {
             switch(factor) {
+                case 0:
+                    return 0;
                 case 1:
                     // --space-xxxs: calc(0.25 * var(--space-unit));
                     return 0.25;

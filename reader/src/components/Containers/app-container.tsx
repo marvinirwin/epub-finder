@@ -8,46 +8,9 @@ import {ManagerContext} from "../../App";
 import {ImageSearchComponent} from "../ImageSearch/image-search.component";
 
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
-    const m = useContext(ManagerContext);
-    const allItems = useObservableState(treeMenuService.allItems$) || {};
-    const selectedComponent = useObservableState(treeMenuService.selectedComponentNode$)
-    const menuItemTree = useObservableState(treeMenuService.tree.updates$);
-    const directoryPath = useObservableState(m.settingsService.directoryPath$) || []
     return <div className={'app-container'}>
         <ImageSearchComponent/>
         {
-            menuItemTree?.sourced && <TreeMenu
-                title={() => <Typography
-                    ref={ref => m.introService.titleRef$.next(ref)}
-                    variant='h6'>
-                </Typography>
-                }
-                tree={menuItemTree.sourced}
-                directoryPath={directoryPath}
-                directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath)}
-                componentChanged={componentPath => {
-                    m.settingsService.componentPath$.next(componentPath);
-                }}
-                actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
-            />
         }
-        <div className={'all-items-container'}>
-            {
-                uniqueBy(
-                    Object.values(allItems)
-                        .filter(menuNode => menuNode.Component),
-                    menuNode => menuNode.Component
-                ).map((item, index) => <div
-                        key={index}
-                        className={'directory-item'}
-                        style={{
-                            zIndex: item.name === selectedComponent?.name ? 1 : 0,
-                        }}>
-                        {
-                            item.Component && <item.Component/>
-                        }
-                    </div>
-                )}
-        </div>
     </div>
 }
