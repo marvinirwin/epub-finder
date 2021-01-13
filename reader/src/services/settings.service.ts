@@ -117,11 +117,11 @@ export class SettingsService {
         return this.resolveSetting$<boolean>('showPinyin', true, 'indexedDB');
     }
 
-    get directoryPath$(): ReplaySubject<string[]> {
-        return this.resolveSetting$<string[]>('dir', [], 'url')
+    get directoryPath$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('dir', '', 'url')
     }
-    get componentPath$(): ReplaySubject<string[]> {
-        return this.resolveSetting$<string[]>('page', [], 'url')
+    get componentPath$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('page', '', 'url')
     }
     get manualIsRecording$(): ReplaySubject<boolean> {
         return this.resolveSetting$<boolean>('manualIsRecording', false, 'indexedDB')

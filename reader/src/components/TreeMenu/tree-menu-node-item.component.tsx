@@ -45,8 +45,7 @@ export function TreeMenuNodeItem(
         }}
     >
         {TreeMenuNode?.LeftIcon && <ListItemIcon><TreeMenuNode.LeftIcon/></ListItemIcon>}
-        {!useMinified && !TreeMenuNode?.InlineComponent &&
-        <ListItemText primary={TreeMenuNode?.label}/>}
+        {!TreeMenuNode?.InlineComponent && <ListItemText primary={TreeMenuNode?.label}/>}
         {TreeMenuNode?.InlineComponent && <TreeMenuNode.InlineComponent/>}
         {TreeMenuNode?.moveDirectory && <ListItemSecondaryAction>
             <IconButton

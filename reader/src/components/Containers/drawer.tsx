@@ -68,7 +68,7 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
     const m = useContext(ManagerContext);
     const treeMenuService = m.treeMenuService;
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
-    const directoryPath = useObservableState(m.settingsService.directoryPath$) || []
+    const directoryPath = useObservableState(m.settingsService.directoryPath$) || '';
 
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
@@ -96,10 +96,10 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
                         </Typography>
                         }
                         tree={menuItemTree.sourced}
-                        directoryPath={directoryPath}
-                        directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath)}
+                        directoryPath={directoryPath.split('.').filter(v => v)}
+                        directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath.join('.'))}
                         componentChanged={componentPath => {
-                            m.settingsService.componentPath$.next(componentPath);
+                            m.settingsService.componentPath$.next(componentPath.join('.'));
                         }}
                         actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
                     >

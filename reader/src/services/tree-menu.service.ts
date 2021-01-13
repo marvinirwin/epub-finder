@@ -21,11 +21,15 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
         menuItems: DeltaScanner<T>;
     */
 
-    constructor({ settingsService, }: { settingsService: SettingsService }) {
+    constructor({settingsService,}: { settingsService: SettingsService }) {
         const itemAtDirectoryPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(
-            settingsService.directoryPath$);
+            settingsService.directoryPath$
+                .pipe(map(str => str.split('.').filter(v => v)))
+        );
         const componentAtActionPath$: Observable<ds_Tree<TreeMenuNode> | undefined> = this.itemAtPath$(
-            settingsService.componentPath$);
+            settingsService.componentPath$
+                .pipe(map(str => str.split('.').filter(v => v)))
+        );
 
         this.directoryIsInvalid$ = combineLatest([
             itemAtDirectoryPath$,
@@ -59,8 +63,8 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
     }
 
     private itemAtPath$(path$:
-                            ReplaySubject<string[] | undefined>
-                            | ReplaySubject<string[]>) {
+                            Observable<string[] | undefined>
+                            | Observable<string[]>) {
         return combineLatest([
             path$,
             this.tree.updates$

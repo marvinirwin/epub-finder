@@ -35,15 +35,15 @@ export const SpeechPracticeCard = () => {
 
     const recordedText = useObservableState(m.speechPracticeService.learningLanguage$) ||
     (recognitionSupported ? `Speech recognition for ${speechCode} available, try it!` :
-        `Speech Recognition for ${lang} not available :(`);
+        ``);
 
     const romanization = useObservableState(m.speechPracticeService.romanization$) ||
     (romanizationSupported ? `Romanization for ${lang} available` :
-        `Romanization for ${lang} not available :(`);
+        ``);
 
     const translation = useObservableState(m.speechPracticeService.translation$) ||
     (translationSupported ? `Translation for ${lang} available` :
-        `Translation for ${lang} not available :(`);
+        ``);
 
     return <Card className={classes.root} id={'speech-practice-card'} variant="outlined">
         <CardContent>
