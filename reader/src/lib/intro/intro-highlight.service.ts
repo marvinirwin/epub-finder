@@ -4,8 +4,6 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, map, take} from "rxjs/operators";
 import {flatten, chunk} from "lodash";
 import {TemporaryHighlightService} from "../Highlighting/temporary-highlight.service";
-import {RandomColorsService} from "../../services/random-colors.service";
-import {sleep} from "../Util/Util";
 
 export class IntroHighlightService {
     constructor({atomizedSentences$, temporaryHighlightService}: {

@@ -28,14 +28,23 @@ export const ManagerContext = React.createContext(manager)
 
 function App() {
     return <ThemeProvider theme={theme}>
-            <ManagerContext.Provider value={manager}>
-                {manager.modalService.modals().map(modal => <ActionModal navModal={modal}/>)}
+        <ManagerContext.Provider value={manager}>
+            <CssBaseline>
+                {
+                    manager.modalService.modals()
+                        .map(Modal => <ActionModal
+                                key={Modal.id}
+                                navModal={Modal}>
+                                <Modal.CardContents/>
+                            </ActionModal>
+                        )
+                }
                 <LoadingBackdrop/>
                 <AlertSnackbar/>
                 <GlobalDragOver/>
-                <CssBaseline/>
                 <Main m={manager}/>
-            </ManagerContext.Provider>
+            </CssBaseline>
+        </ManagerContext.Provider>
     </ThemeProvider>;
 }
 

@@ -4,6 +4,6 @@ export function ProfileNode(profile: { email: string | undefined } | Profile | u
     return {
         name: 'profile',
         label: profile?.email,
-        hidden: !!profile
+        hidden: !profile
     };
 }

@@ -2,7 +2,6 @@ import React, {useContext} from "react"
 import {Badge} from "@material-ui/core"
 import {FocusedElement, HotkeyContext} from "./Main";
 import {hotkeyMode, isListening} from "../lib/Hotkeys/BrowserInputs";
-import {HotkeyModes} from "../lib/Hotkeys/HotkeyModes";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 
 export interface HotkeyWrapperParams {

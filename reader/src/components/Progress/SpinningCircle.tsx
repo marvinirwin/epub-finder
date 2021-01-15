@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
         buttonSuccess: {
             backgroundColor: theme.palette.primary.main,
             '&:hover': {
-                backgroundColor: '##CCFCA7',
+                backgroundColor: '#CCFCA7',
             },
         },
         fabProgress: {

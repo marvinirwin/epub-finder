@@ -47,6 +47,7 @@ export function TreeMenuNodeItem(
         {TreeMenuNode?.LeftIcon && <ListItemIcon><TreeMenuNode.LeftIcon/></ListItemIcon>}
         {!TreeMenuNode?.InlineComponent && <ListItemText primary={TreeMenuNode?.label}/>}
         {TreeMenuNode?.InlineComponent && <TreeMenuNode.InlineComponent/>}
+{/*
         {TreeMenuNode?.moveDirectory && <ListItemSecondaryAction>
             <IconButton
                 style={{marginRight: useMinified ? 150 : undefined}}
@@ -58,5 +59,6 @@ export function TreeMenuNodeItem(
             </IconButton>
         </ListItemSecondaryAction>
         }
+*/}
     </ListItem>;
 }

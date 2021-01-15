@@ -6,9 +6,9 @@ import { Settings } from "@material-ui/icons";
 
 export function uploadNode(m: Manager) {
     return {
-        name: 'customDocument',
+        name: 'uploadLearningMaterial',
         action: () => m.modalService.fileUpload.open$.next(true),
         LeftIcon: () => <Settings/>,
-        label: "Upload learning material",
+        label: "Upload",
     } as TreeMenuNode;
 }

@@ -21,9 +21,6 @@ const useStyles = makeStyles((theme) => ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
-    avatar: {
-        backgroundColor: red[500],
-    },
 }));
 
 export const ExpansionPanelNoMargin = withStyles({

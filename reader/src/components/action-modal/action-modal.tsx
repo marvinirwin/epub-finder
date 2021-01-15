@@ -13,12 +13,14 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+
         },
-        paper: {
-            backgroundColor: theme.palette.background.paper,
+        card: {
+            padding: theme.spacing(5)
+/*
             border: '2px solid #000',
             boxShadow: theme.shadows[5],
-            padding: theme.spacing(2, 4, 3),
+*/
         },
     }),
 );
@@ -39,6 +41,7 @@ export const ActionModal: React.FC<{
 
     return (
         <Modal
+            id={'action-modal'}
             className={classes.modal}
             open={open}
             onClose={handleClose}
@@ -49,7 +52,7 @@ export const ActionModal: React.FC<{
             }}
         >
             <Fade in={open}>
-                <Card>
+                <Card className={classes.card}>
                     {children}
                 </Card>
             </Fade>

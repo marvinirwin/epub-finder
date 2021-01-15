@@ -7,7 +7,9 @@ describe('Anonymous users', () => {
     })
     it('Links the document uploaded by an anonymous user to the same user when they sign up after in the same session', () => {
         const selectionRow = () => cy.contains(documentSelectionRow, 'test_txt');
+        DirectoryPom.openUploadDialog();
         cy.get(fileChooser).attachFile('test_txt.txt');
+        DirectoryPom.closeDialog();
         DirectoryPom.EnterLibrary();
         selectionRow().should('exist');
         DirectoryPom.Back();
