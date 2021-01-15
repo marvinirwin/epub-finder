@@ -9,7 +9,8 @@ describe('Anonymous users', () => {
         const selectionRow = () => cy.contains(documentSelectionRow, 'test_txt');
         DirectoryPom.openUploadDialog();
         cy.get(fileChooser).attachFile('test_txt.txt');
-        DirectoryPom.closeDialog();
+        cy.get('#loading-backdrop').should('not.be.visible');
+        DirectoryPom.closeAllDialogs();
         DirectoryPom.EnterLibrary();
         selectionRow().should('exist');
         DirectoryPom.Back();

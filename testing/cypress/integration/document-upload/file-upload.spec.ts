@@ -4,7 +4,7 @@ import {DirectoryPom} from "../../support/pom/directory.pom";
 describe('File Uploading', () => {
     beforeEach(() => {
         cy.visitHome();
-        DirectoryPom.closeDialog();
+        DirectoryPom.closeAllDialogs();
         DirectoryPom.openUploadDialog();
     })
     it('Uploads docx', () => {

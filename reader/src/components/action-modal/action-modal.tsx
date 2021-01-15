@@ -41,8 +41,7 @@ export const ActionModal: React.FC<{
 
     return (
         <Modal
-            id={'action-modal'}
-            className={classes.modal}
+            className={`action-modal ${classes.modal}`}
             open={open}
             onClose={handleClose}
             closeAfterTransition

@@ -17,7 +17,7 @@ export const LoadingBackdrop = () => {
     const m = useContext(ManagerContext);
     const thingsInProgress =  useObservableState(m.progressItemsService.progressItems$);
     const classes = useStyles();
-    return <Backdrop className={classes.backdrop} open={!!thingsInProgress?.size}>
+    return <Backdrop className={classes.backdrop} open={!!thingsInProgress?.size} id={'loading-backdrop'}>
         <CircularProgress color="inherit" />
     </Backdrop>
 }

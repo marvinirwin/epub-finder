@@ -75,8 +75,9 @@ export class DirectoryPom {
         cy.get('#uploadLearningMaterial').click();
     }
 
-    public static closeDialog() {
-        // TODO I should just press escape
-        cy.get('#action-modal > .MuiBackdrop-root').click({force: true});
+    public static closeAllDialogs() {
+        cy.get('body').trigger('keydown', {key: 'Escape'})
+        cy.get('.action-modal').should('not.exist');
+        // cy.get('.action-modal > .MuiBackdrop-root').click({force: true});
     }
 }
