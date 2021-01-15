@@ -50,8 +50,10 @@ function AppDirectory(
             ],
             RecognizeSpeechNode(),
             WatchPronunciationNode(),
+/*
             PlaybackSpeedNode(),
-            uploadNode(),
+*/
+            uploadNode(m),
             LibraryNode(),
             //  This statement is why I can't have type safety
             availableDocuments.map(toTreeMenuNode),

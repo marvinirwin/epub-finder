@@ -36,7 +36,9 @@ declare namespace Cypress {
 
         visitHome(): Chainable<void>
 
-        signup(): Chainable<void>
+        signup(): Chainable<{email: string, password: string}>
+
+        login(credentials: {email: string, password: string}): Chainable<void>
     }
 }
 
@@ -56,8 +58,15 @@ Cypress.Commands.add('signup', () => {
                     .get('#signup-email').type(email)
                     .get('#signup-password').type(password)
                     .get('#signup-button').click()
+                return {email, password};
             }
         )
+});
+
+Cypress.Commands.add('login', ({email, password}) => {
+    cy.get('#login-email').type(email)
+    cy.get('#login-password').type(password)
+    cy.get('#login-button').click()
 })
 
 Cypress.Commands.add('iframeBody', {
@@ -76,7 +85,7 @@ Cypress.Commands.add('clearIndexedDB', async () => {
 
     await Promise.all(
         databases.map(
-            ({ name }) =>
+            ({name}) =>
                 new Promise((resolve, reject) => {
                     const request = window.indexedDB.open(name);
                     request.onsuccess = event => {
@@ -95,7 +104,7 @@ Cypress.Commands.add('clearIndexedDB', async () => {
                             'customDocuments',
                             // customDocuments: 'name, html'
                         ];
-                        const transaction= db.transaction(storeNames, 'readwrite')
+                        const transaction = db.transaction(storeNames, 'readwrite')
                         storeNames.forEach(storeName => transaction.objectStore(storeName).clear())
                         transaction.oncomplete = resolve;
                     };

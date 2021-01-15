@@ -13,6 +13,7 @@ export function PlaybackSpeedComponent() {
             Video playback speed
         </Typography>
         <Slider
+            id={'playback-speed-slider'}
             value={playbackRate}
             onChange={(_, value) => {
                 m.settingsService.playbackSpeed$.next(value as number);

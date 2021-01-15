@@ -48,4 +48,17 @@ export class DirectoryPom {
         return cy.get('#speech-practice')
             .click()
     }
+
+    public static signout() {
+        return cy.get('#signOut').click()
+    }
+
+    public static setWatchMode(on: boolean) {
+        return cy.get('#watch-mode-icon').then(el => {
+            const isCurrentlyOn = el.hasClass('video-mode-icon-on');
+            if (isCurrentlyOn !== on) {
+                cy.wrap(el).click()
+            }
+        })
+    }
 }

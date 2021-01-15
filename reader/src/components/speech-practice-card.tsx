@@ -8,10 +8,6 @@ import {CardContent, Typography} from "@material-ui/core";
 const useStyles = makeStyles({
     root: {
         margin: 8 * 4,
-        minWidth: 475,
-        /*
-                minHeight: 275,
-        */
     },
     bullet: {
         display: 'inline-block',

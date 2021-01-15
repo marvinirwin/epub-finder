@@ -11,6 +11,7 @@ import {GlobalDragOver} from "./components/global-drag-over.component";
 import {AlertSnackbar} from "./components/alert-snackbar.component";
 import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
+import {ActionModal} from "./components/action-modal/action-modal";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -28,6 +29,7 @@ export const ManagerContext = React.createContext(manager)
 function App() {
     return <ThemeProvider theme={theme}>
             <ManagerContext.Provider value={manager}>
+                {manager.modalService.modals().map(modal => <ActionModal navModal={modal}/>)}
                 <LoadingBackdrop/>
                 <AlertSnackbar/>
                 <GlobalDragOver/>

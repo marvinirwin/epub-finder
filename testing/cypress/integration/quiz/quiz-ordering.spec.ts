@@ -2,12 +2,9 @@ import {fileChooser} from "../constants";
 
 describe('Quiz ordering', () => {
     beforeEach(() => {
-        cy.visit('http://localhost:3000/?test=1&skip_intro=1')
-            .signupLogin()
-            .get(fileChooser).should('not.be.disabled');
+        cy.visitHome()
     })
     it('TODO', () => {
-
         // Now test all transitions
         // Test the hide part
         // Test easy/medium/hard and test their influence on the table page

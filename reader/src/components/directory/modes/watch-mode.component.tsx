@@ -8,8 +8,8 @@ import {useObservableState} from "observable-hooks";
 export const WatchMode = ({...props}) => {
     const m = useContext(ManagerContext);
     const mode = useObservableState(m.modesService.mode$);
-    const color = mode === Modes.VIDEO ?
-        '#3d5afe' :
+    const className = mode === Modes.VIDEO ?
+        'video-mode-icon-on' :
         undefined
     return <ListItem button {...props}  ref={ref => m.introService.watchSentencesRef$.next(ref)} onClick={async () => {
         m.modesService.mode$.next(
@@ -19,10 +19,8 @@ export const WatchMode = ({...props}) => {
         );
     }}>
         <ListItemIcon>
-            <PlayArrow  style={{ color}}/>
+            <PlayArrow id={'watch-mode-icon'} className={className}/>
         </ListItemIcon>
-        <ListItemText>
-            Watch
-        </ListItemText>
+        <ListItemText primary={'Watch'}/>
     </ListItem>
 };

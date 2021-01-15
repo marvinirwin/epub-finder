@@ -50,15 +50,11 @@ export class QuizCardPom {
     selectNewImage() {
         // HACK, I just don't want to verify what src there is not, I'm just happy if it's not empty
         const oldSrc = '';
-        this.body()
-            .find('.quiz-card-image')
-            .click();
-
-        ImageSearchPom.SearchResults().click()
-
+        ImageSearchPom.SelectFirstSearchResult();
         // Now assert we have an image we clicked (Or since I'm lazy, just not the previous one
         this.body()
             .find('.image')
             .should('have.attr', 'src').should('not.include', oldSrc);
     }
+
 }

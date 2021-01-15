@@ -21,7 +21,7 @@ export const DailyGoalSettingNode = {
         return <ListItem>
             <TextField
                 label={`Daily Goal`}
-                id={'daily-goal-input'}
+                inputProps={{id: 'daily-goal-input'}}
                 value={dailyGoal}
                 onChange={ev => onInputChanged(parseInt(ev.target.value) || 0)}>
 

@@ -84,6 +84,7 @@ import {HistoryService} from "./history.service";
 import {LanguageConfigsService} from "./language-configs.service";
 import {SpeechPracticeService} from "./speech-practice.service";
 import {MicFeedbackService} from "./mic-feedback.service";
+import {ModalService} from "./modal.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -175,6 +176,7 @@ export class Manager {
     public languageConfigsService: LanguageConfigsService;
     public speechPracticeService: SpeechPracticeService;
     public micFeedbackService: MicFeedbackService;
+    public modalService = new ModalService();
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.toastMessageService = new ToastMessageService({

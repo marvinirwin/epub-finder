@@ -7,7 +7,7 @@ import {QuizCard} from "./quiz-card.interface";
 export function QuizCardKnownLanguage({c}: { c: QuizCard }) {
     const description = useObservableState(c.description$.value$);
     return <TextField
-        className={'known-language'}
+        inputProps={{className: 'known-language'}}
         value={description}
         onChange={v => c.description$.setValue$.next(v.target.value)}
     />
