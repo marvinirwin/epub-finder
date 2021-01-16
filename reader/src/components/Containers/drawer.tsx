@@ -167,7 +167,10 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
                     }
                 </List>
             </Drawer>
-            <AllItemsContainer className={`all-items-container ${classes.content}`}/>
+            <div className={classes.content}>
+                <div className={classes.toolbar} />
+                <AllItemsContainer className={`all-items-container`}/>
+            </div>
         </div>
     );
 }
