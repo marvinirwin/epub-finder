@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {HttpException, Injectable} from '@nestjs/common';
 import {AudioConfig, SpeechConfig, SpeechSynthesizer} from "microsoft-cognitiveservices-speech-sdk";
 import axios from "axios";
 import {sha1} from "../util/sha1";
@@ -49,11 +49,13 @@ export class SpeechService {
                 }
             );
             const decoded = jwt_decode(result.data) as {exp: number};
-            console.log(decoded);
             await this.speechTokenRepository.save({exp: decoded.exp, token: result.data})
             return result.data;
         }
-        throw new Error(`Speech recognition overloaded (${count} / ${max} in use), please try again later`);
+        throw new HttpException(
+            `Speech recognition overloaded (${count} / ${max} in use), please try again later`,
+            500
+        );
     }
 
     async downloadSynthesizedSpeech(filename: string, ssml1: string) {

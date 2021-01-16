@@ -1,7 +1,7 @@
 import {TrieObservable} from "./QuizCharacter";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "../Atomized/atomized-document";
-import {shareReplay, switchMap} from "rxjs/operators";
+import {shareReplay, switchMap, tap} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
@@ -50,7 +50,6 @@ export class ReadingDocumentService {
                 }
             }
         );
-
 
         combineLatest(
             [
