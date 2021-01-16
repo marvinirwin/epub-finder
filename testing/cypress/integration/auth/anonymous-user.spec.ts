@@ -1,16 +1,21 @@
 import {documentSelectionRow, fileChooser} from "../constants";
 import {DirectoryPom} from "../../support/pom/directory.pom";
 
+function uploadFile(fixture: string) {
+    DirectoryPom.openUploadDialog();
+    cy.get(fileChooser).attachFile(fixture);
+    DirectoryPom.closeAllDialogs();
+    cy.get('#global-loading-spinner').should('be.visible');
+    cy.get('#global-loading-spinner').should('not.be.visible');
+}
+
 describe('Anonymous users', () => {
     beforeEach(() => {
         cy.visitHome();
     })
     it('Links the document uploaded by an anonymous user to the same user when they sign up after in the same session', () => {
         const selectionRow = () => cy.contains(documentSelectionRow, 'test_txt');
-        DirectoryPom.openUploadDialog();
-        cy.get(fileChooser).attachFile('test_txt.txt');
-        cy.get('#loading-backdrop').should('not.be.visible');
-        DirectoryPom.closeAllDialogs();
+        uploadFile('test_txt.txt');
         DirectoryPom.EnterLibrary();
         selectionRow().should('exist');
         DirectoryPom.Back();

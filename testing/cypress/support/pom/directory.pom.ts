@@ -27,6 +27,10 @@ export class DirectoryPom {
 
     public static EnterLibrary() {
         cy.get(`#library`)
+            .then(el$ => {
+                debugger;console.log();
+                return el$;
+            })
             .click()
     }
 
