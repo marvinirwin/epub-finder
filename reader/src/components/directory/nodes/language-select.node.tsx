@@ -4,9 +4,9 @@ import {TreeMenuNode} from "../tree-menu-node.interface";
 import {Manager} from "../../../lib/Manager";
 
 
-export const LanguageSelectNode = (m: Manager) => ({
+export const LanguageSelectNode = (m: Manager): TreeMenuNode => ({
     name: 'languageSelect',
-    LeftIcon: <Settings/>,
+    LeftIcon: () => <Settings/>,
     label: 'Select Language',
     action: () => m.modalService.languageSelect.open$.next(true)
 })

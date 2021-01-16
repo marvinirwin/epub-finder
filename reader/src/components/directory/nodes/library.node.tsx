@@ -3,5 +3,6 @@ export function LibraryNode() {
         name: 'library',
         label: 'Library',
         moveDirectory: true,
+
     };
 }

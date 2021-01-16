@@ -2,14 +2,16 @@ import React, {useContext, useState} from "react";
 import {TESTING} from "../app-directory-service";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
+import {TreeMenuNode} from "../tree-menu-node.interface";
 
-export function ManualSpeechRecognitionNode() {
+export function ManualSpeechRecognitionNode(): TreeMenuNode {
     return {
         name: 'manual-speech-recognition',
         hidden: !TESTING,
-        ReplaceComponent: () => {
+        label: 'Manual Speech Rec',
+        LeftIcon: () => {
             const m = useContext(ManagerContext);
-            const manualIsRecording = useObservableState(m.settingsService.manualIsRecording$ )|| false;
+            const manualIsRecording = useObservableState(m.settingsService.manualIsRecording$) || false;
             const [speechRecInput, setSpeechRecInput] = useState<HTMLInputElement | null>();
             return <div>
                 <input id='manual-is-recording' type="check" checked={manualIsRecording}/>
@@ -23,8 +25,10 @@ export function ManualSpeechRecognitionNode() {
                             }
                         ]
                     )
-                }>Submit manual speech recognition</button>
-                <button id='clear-speech-recognition-rows' onClick={() => m.pronunciationProgressService.clearRecords$.next()}>
+                }>Submit manual speech recognition
+                </button>
+                <button id='clear-speech-recognition-rows'
+                        onClick={() => m.pronunciationProgressService.clearRecords$.next()}>
                     Clear speech recognition rows
                 </button>
             </div>

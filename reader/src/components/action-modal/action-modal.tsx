@@ -3,7 +3,7 @@ import {makeStyles, Theme, createStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import {Card} from "@material-ui/core";
+import {Card, Dialog} from "@material-ui/core";
 import {NavModal} from "../../lib/modal.service";
 import {useObservableState} from "observable-hooks";
 
@@ -17,10 +17,10 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         card: {
             padding: theme.spacing(5)
-/*
-            border: '2px solid #000',
-            boxShadow: theme.shadows[5],
-*/
+            /*
+                        border: '2px solid #000',
+                        boxShadow: theme.shadows[5],
+            */
         },
     }),
 );
@@ -40,7 +40,7 @@ export const ActionModal: React.FC<{
     };
 
     return (
-        <Modal
+        <Dialog
             className={`action-modal ${classes.modal}`}
             open={open}
             onClose={handleClose}
@@ -50,11 +50,9 @@ export const ActionModal: React.FC<{
                 timeout: 500,
             }}
         >
-            <Fade in={open}>
-                <Card className={classes.card}>
-                    {children}
-                </Card>
-            </Fade>
-        </Modal>
+            <Card className={classes.card}>
+                {children}
+            </Card>
+        </Dialog>
     );
 }

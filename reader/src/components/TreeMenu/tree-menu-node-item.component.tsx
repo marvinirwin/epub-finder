@@ -1,7 +1,7 @@
 import {ds_Tree} from "../../services/tree.service";
 import {TreeMenuNode} from "../directory/tree-menu-node.interface";
 import {IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText} from "@material-ui/core";
-import {KeyboardArrowRight} from "@material-ui/icons";
+import {Inbox, KeyboardArrowRight, Settings} from "@material-ui/icons";
 import React from "react";
 
 export function TreeMenuNodeItem(
@@ -19,16 +19,12 @@ export function TreeMenuNodeItem(
         directoryChanged: (s: string[]) => void,
         useMinified: boolean
     }) {
-    const TreeMenuNode = treeNode?.value;
-    if (TreeMenuNode?.ReplaceComponent) {
-        return <TreeMenuNode.ReplaceComponent/>;
-    }
+    const TreeMenuNode = treeNode.value as TreeMenuNode;
 
     return <ListItem
         button
         selected={false}
         id={TreeMenuNode?.name}
-        className={`tree-menu-node`}
         onClick={() => {
             if (TreeMenuNode) {
                 const newPath = directoryPath.concat(TreeMenuNode?.name);
@@ -44,9 +40,15 @@ export function TreeMenuNodeItem(
             }
         }}
     >
+        <ListItemIcon>{TreeMenuNode.LeftIcon ? <TreeMenuNode.LeftIcon/> : <Settings/>}</ListItemIcon>
+        <ListItemText primary={TreeMenuNode.label} />
+{/*
         {TreeMenuNode?.LeftIcon && <ListItemIcon><TreeMenuNode.LeftIcon/></ListItemIcon>}
+*/}
+{/*
         {!TreeMenuNode?.InlineComponent && <ListItemText primary={TreeMenuNode?.label}/>}
         {TreeMenuNode?.InlineComponent && <TreeMenuNode.InlineComponent/>}
+*/}
 {/*
         {TreeMenuNode?.moveDirectory && <ListItemSecondaryAction>
             <IconButton

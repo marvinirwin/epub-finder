@@ -11,6 +11,9 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {TreeMenu} from "../TreeMenu/tree-menu.component";
 import {AllItemsContainer} from "./all-items-container.component";
+import {AppBar, Divider, Toolbar} from "@material-ui/core";
+import {theme} from "../../theme";
+import {Menu} from "@material-ui/icons";
 
 const drawerWidth = 240;
 
@@ -18,7 +21,21 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
-            height: '100%'
+        },
+        appBar: {
+            zIndex: theme.zIndex.drawer + 1,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+        },
+        appBarShift: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
         },
         menuButton: {
             marginRight: 36,
@@ -59,7 +76,6 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         content: {
             flexGrow: 1,
-            padding: theme.spacing(3),
         },
     }),
 );
@@ -69,12 +85,42 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
     const treeMenuService = m.treeMenuService;
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
     const directoryPath = useObservableState(m.settingsService.directoryPath$) || '';
-
-    const classes = useStyles();
     const [open, setOpen] = React.useState(false);
 
+    const classes = useStyles();
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+    };
+
     return (
-        <div className={'app-container'}>
+        <div className={`app-container ${classes.root}`}>
+            <AppBar
+                position="fixed"
+                className={clsx(classes.appBar, {
+                    [classes.appBarShift]: open,
+                })}
+            >
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
+                        edge="start"
+                        className={clsx(classes.menuButton, {
+                            [classes.hide]: open,
+                        })}
+                    >
+                        <Menu />
+                    </IconButton>
+                    <Typography variant="h6" noWrap>
+                        Language Trainer
+                    </Typography>
+                </Toolbar>
+            </AppBar>
             <Drawer
                 variant="permanent"
                 className={clsx(classes.drawer, {
@@ -88,6 +134,12 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
                     }),
                 }}
             >
+                <div className={classes.toolbar}>
+                    <IconButton onClick={handleDrawerClose}>
+                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    </IconButton>
+                </div>
+                <Divider />
                 {
                     menuItemTree?.sourced && <TreeMenu
                         title={() => <Typography
@@ -103,15 +155,17 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
                         }}
                         actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
                     >
+{/*
                         <ListItem button>
                             <IconButton onClick={ () => setOpen(!open)}>
                                 {open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
                             </IconButton>
                         </ListItem>
+*/}
                     </TreeMenu>
                 }
             </Drawer>
-            <AllItemsContainer/>
+            <AllItemsContainer className={`all-items-container ${classes.content}`}/>
         </div>
     );
 }

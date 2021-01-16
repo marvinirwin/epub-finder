@@ -30,7 +30,22 @@ export const TreeMenu: React.FunctionComponent<{
     const treeNodes = Object.values(walkTree(tree, ...directoryPath)?.children || {})
         .filter(treeNode => !treeNode?.value?.hidden);
 
-    return <List className={'selectable-menu-list'}>
+    return <Fragment>
+        {
+            treeNodes
+                .map((treeNode, index) =>
+                    <TreeMenuNodeItem
+                        key={Math.random()}
+                        treeNode={treeNode}
+                        directoryPath={directoryPath}
+                        componentChanged={componentChanged}
+                        actionSelected={actionSelected}
+                        directoryChanged={directoryChanged}
+                        useMinified={useMinified}/>
+                )
+        }
+    </Fragment>
+    {/*
         {children}
         {directoryPath.length ?
             <Fragment>
@@ -52,18 +67,6 @@ export const TreeMenu: React.FunctionComponent<{
                 <Title/>
             </ListItem>
         }
-        {
-            treeNodes
-                .map((treeNode, index) =>
-                    <TreeMenuNodeItem
-                        key={Math.random()}
-                        treeNode={treeNode}
-                        directoryPath={directoryPath}
-                        componentChanged={componentChanged}
-                        actionSelected={actionSelected}
-                        directoryChanged={directoryChanged}
-                        useMinified={useMinified}/>
-                )
-        }
-    </List>
+*/
+    }
 }

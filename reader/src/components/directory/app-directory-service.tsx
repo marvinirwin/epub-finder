@@ -17,9 +17,7 @@ import {GoogleSigninNode} from "./nodes/google-sign-in.node";
 import {ProfileNode} from "./nodes/profile.node";
 import {uploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
-import {PlaybackSpeedNode} from "./nodes/playback-speed.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
-import {LibraryNode} from "./nodes/library.node";
 import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
@@ -28,6 +26,7 @@ import {DailyGoalSettingNode} from "./nodes/daily-goal-setting.node";
 import {TogglePinyinNode} from "./nodes/toggle-pinyin.node";
 import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
+import {LibraryNode} from "./nodes/library.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -42,21 +41,22 @@ function AppDirectory(
             ReadingNode(m, selectedComponent === 'reading'),
             SpeechPracticeNode,
             [
-                LanguageSelectNode
+                LanguageSelectNode(m)
             ],
             SignInWithNode(profile),
             [
                 GoogleSigninNode(),
             ],
             RecognizeSpeechNode(),
-            WatchPronunciationNode(),
+            WatchPronunciationNode(m),
 /*
             PlaybackSpeedNode(),
 */
             uploadNode(m),
             LibraryNode(),
-            //  This statement is why I can't have type safety
-            availableDocuments.map(toTreeMenuNode),
+            /*
+                        availableDocuments.map(toTreeMenuNode),
+            */
             ProfileNode(profile),
             SettingsNode,
             [
@@ -72,7 +72,7 @@ function AppDirectory(
                 {...QuizCarouselNode(), moveDirectory: false},
                 QuizScheduleNode(),
             ],
-        ] as unknown as ArrayToTreeParams<TreeMenuNode>
+        ] as ArrayToTreeParams<TreeMenuNode>
     );
 }
 

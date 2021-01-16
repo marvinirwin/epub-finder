@@ -1,11 +1,13 @@
 import {ReplaySubject} from "rxjs";
-import React, {ReactNode} from "react";
+import React from "react";
 import {FileChooser} from "../components/directory/file-chooser.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
+import {DocumentSelect} from "./document-select.component";
 
 export class ModalService {
     public languageSelect: NavModal;
     public fileUpload: NavModal;
+    private documentSelect: NavModal;
 
     constructor() {
         this.fileUpload = new NavModal(
@@ -15,12 +17,17 @@ export class ModalService {
         this.languageSelect = new NavModal(
             'spokenLanguage',
             () => <LanguageSelect/>
+        );
+        this.documentSelect = new NavModal(
+            'documentSelect',
+            () => <DocumentSelect/>
         )
     }
     public modals() {
         return [
             this.fileUpload,
-            this.languageSelect
+            this.languageSelect,
+            this.documentSelect
         ]
     }
 }

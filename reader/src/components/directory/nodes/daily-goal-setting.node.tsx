@@ -6,7 +6,7 @@ import {useObservableState} from "observable-hooks";
 import {debounce} from 'lodash';
 
 export const DailyGoalSettingNode = {
-    ReplaceComponent: () => {
+    LeftIcon: () => {
         const m = useContext(ManagerContext);
         const dailyGoal = useObservableState(m.settingsService.dailyGoal$) || 0;
         const onInputChanged = useCallback(
@@ -28,5 +28,6 @@ export const DailyGoalSettingNode = {
             </TextField>
         </ListItem>
     },
-    name: 'dailyGoalSetting'
+    name: 'dailyGoalSetting',
+    label: 'Daily Goal'
 } as TreeMenuNode;
