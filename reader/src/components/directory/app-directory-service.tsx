@@ -6,7 +6,6 @@ import {distinctUntilChanged, map, startWith} from "rxjs/operators";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {ReadingNode} from "./nodes/reading.node";
 import {TreeMenuNode} from "./tree-menu-node.interface";
-import {toTreeMenuNode} from "../../lib/document-selection/document-selection-tree-menu-node";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 import {Profile} from "../../lib/Auth/loggedInUserService";
 import {SignupNode} from "./nodes/signup.node";
@@ -47,13 +46,13 @@ function AppDirectory(
             [
                 GoogleSigninNode(),
             ],
-            RecognizeSpeechNode(),
+            RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
 /*
             PlaybackSpeedNode(),
 */
             uploadNode(m),
-            LibraryNode(),
+            LibraryNode(m),
             /*
                         availableDocuments.map(toTreeMenuNode),
             */

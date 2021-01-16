@@ -1,10 +1,39 @@
 import {SpeakMode} from "../modes/speak-mode.component";
 import {TreeMenuNode} from "../tree-menu-node.interface";
+import {Manager} from "../../../lib/Manager";
+import {RecordRequest} from "../../../lib/Interfaces/RecordRequest";
+import {removePunctuation} from "../../../lib/Highlighting/temporary-highlight.service";
+import React, {useContext} from "react";
+import {ManagerContext} from "../../../App";
+import {useObservableState} from "observable-hooks";
+import {Mic, RecordVoiceOver} from "@material-ui/icons";
 
-export function RecognizeSpeechNode(): TreeMenuNode {
+export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
     return {
         name: 'recognizeSpeech',
-        LeftIcon: SpeakMode,
-        label: 'Speak'
+        LeftIcon: () => {
+            const m = useContext(ManagerContext);
+            const isRecording = useObservableState(m.audioManager.audioRecorder.isRecording$);
+            return <RecordVoiceOver color={isRecording ? 'primary' : 'disabled'}/>;
+        },
+        label: 'Speak',
+        action: () => {
+                const recordRequest = new RecordRequest(`Try reading one of the sentences below`);
+                recordRequest.sentence.then(recognizedSentence => {
+                    const word = removePunctuation(recognizedSentence);
+                    m.pronunciationProgressService.addRecords$.next([{
+                        word,
+                        success: true,
+                        timestamp: new Date()
+                    }]);
+                    // Add a highlight for each of these characters
+                    m.highlighter.createdCards$.next(word.split(' '));
+                })
+                m.audioManager.audioRecorder.recordRequest$.next(recordRequest)
+            },
+
+        props: {
+            ref: ref => m.introService.trySpeakingRef$.next(ref)
+        }
     };
 }

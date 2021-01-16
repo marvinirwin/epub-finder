@@ -7,7 +7,7 @@ import {DocumentSelect} from "./document-select.component";
 export class ModalService {
     public languageSelect: NavModal;
     public fileUpload: NavModal;
-    private documentSelect: NavModal;
+    public documentSelect: NavModal;
 
     constructor() {
         this.fileUpload = new NavModal(
