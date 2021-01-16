@@ -15,6 +15,7 @@ import {OpenDocument} from "../DocumentFrame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {mergeTabulations} from "../Atomized/merge-tabulations";
+import {DocumentRepository} from "../documents/document.repository";
 
 
 export type Named = {
@@ -45,12 +46,14 @@ export class OpenDocumentsService {
             trie$: TrieObservable,
             db: DatabaseService;
             settingsService: SettingsService;
-            libraryService: LibraryService;
+            documentRepository: DocumentRepository;
         }
     ) {
 
-        this.sourceDocuments$ = config.libraryService.documents$.pipe(
+        this.sourceDocuments$ = config.documentRepository.collection$.pipe(
+/*
             map(documents => filterMap(documents, (key, d) => !d.deleted)),
+*/
             map(libraryDocuments => {
                 return mapMap(
                     libraryDocuments,

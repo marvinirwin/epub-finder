@@ -4,7 +4,6 @@ import {DocumentCheckingOutService} from "../../components/Library/document-chec
 import {LoggedInUserService} from "../Auth/loggedInUserService";
 import {last, map, startWith} from "rxjs/operators";
 import {LibraryService} from "../Manager/library.service";
-import {AvailableDocumentsService} from "../documents/available-documents.service";
 import {ProgressItemService} from "../../components/progress-item.service";
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
@@ -22,14 +21,12 @@ export class UploadingDocumentsService {
     constructor({
                     droppedFilesService,
                     libraryService,
-                    availableDocumentService,
                     progressItemService
                 }: {
         progressItemService: ProgressItemService,
         documentCheckingOutService: DocumentCheckingOutService,
         droppedFilesService: DroppedFilesService,
         libraryService: LibraryService,
-        availableDocumentService: AvailableDocumentsService,
     }) {
         this.isUploading$.next(false);
         // There will also have to be a document synchronization service
@@ -48,9 +45,6 @@ export class UploadingDocumentsService {
                     await libraryService.upsertDocument(basicDocument);
                     this.isUploading$.next(false);
                     this.uploadingMessages$.next(`Uploading ${basicDocument.name} success!`)
-                }
-                if (lastDocument) {
-                    await availableDocumentService.fetchAll()
                 }
             })
         })

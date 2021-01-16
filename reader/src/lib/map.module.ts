@@ -16,17 +16,20 @@ export const findMap = <Key, Value>(m: Map<Key, Value>, fn: (key: Key, value: Va
 export const firstMap = <Key, Value>(m: Map<Key, Value>): Value => m.values().next().value
 
 
-export const mapFromId = <IdType extends number | string, Value extends {id: IdType}>(values: Value[]): Map<IdType, Value> => {
-    return new Map(values.map(value => [value.id, value]))
+export const mapFromId = <IdType extends number | string, Value>(
+    values: Value[],
+    idFunc: (v: Value) => IdType
+    ): Map<IdType, Value> => {
+    return new Map(values.map(value => [idFunc(value), value]))
 }
-
-export const mapFromNamed = <Value extends {name: string}>(values: Value[]): Map<string, Value> => {
-    return new Map(values.map(value => [value.name, value]))
-}
-
 
 export const mergeMaps = <T, U>(...maps: Map<T, U>[]): Map<T, U> => {
     const m = new Map();
     maps.map(map => map.forEach((value, key) => m.set(value, key)))
     return m;
+}
+
+export const deleteMap = <T, U>(m: Map<T, U>, key: T) => {
+    m.delete(key)
+    return new Map(m);
 }

@@ -11,7 +11,7 @@ export const toTreeMenuNode = ({
                                    belongsToCurrentUser,
                                    name,
                                    reading,
-                                   document_id
+                                   id
                                }: DocumentSelectionRowInterface): TreeMenuNode => ({
     name,
     ReplaceComponent: () => {
@@ -23,7 +23,7 @@ export const toTreeMenuNode = ({
                 {!reading &&
                 <IconButton onClick={() => m.settingsService.readingDocument$.next(name)}><School/></IconButton>}
                 {belongsToCurrentUser && <IconButton onClick={() => m.library.deleteDocument(
-                    document_id,
+                    id
                 )}><DeleteIcon/></IconButton>}
             </div>
         </ListItem>

@@ -25,6 +25,7 @@ import {v4 as uuidv4} from 'uuid';
 import {readStream, s3} from "./uploading/s3.service";
 import {handleUploadedDocument} from "./uploading/document-upload.service";
 import {AnonymousGuard} from "../guards/anonymous";
+import {DocumentViewDto} from "./document-view.dto";
 
 @Controller('documents')
 export class DocumentsController {
@@ -64,7 +65,7 @@ export class DocumentsController {
         @UploadedFile() file: { originalname: string, bucket: string, key: string, location: string },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
-    ) {
+    ): Promise<DocumentViewDto> {
         const output = await handleUploadedDocument(file);
         const name = file.originalname.split('.').slice(0, -1).join('');
         if (document_id) {
@@ -84,11 +85,12 @@ export class DocumentsController {
                 existingDocumentWithSameName.rootId()
             )
         }
-        return this.documentsService.saveNew(
+        const savedDocument = await this.documentsService.saveNew(
             user,
             name,
             output.htmlFile().s3Key,
         )
+        return this.documentsService.byFilename(savedDocument.filename)
     }
 
     @Get('/available')

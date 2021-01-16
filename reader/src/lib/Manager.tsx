@@ -58,7 +58,6 @@ import {DocumentRepository} from "./documents/document.repository";
 import {LibraryService} from "./Manager/library.service";
 import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
 import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
-import {AvailableDocumentsService} from "./documents/available-documents.service";
 import {DocumentSelectionService} from "./document-selection/document-selection.service";
 import {AlertsService} from "../services/alerts.service";
 import {ReadingDocumentService} from "./Manager/reading-document.service";
@@ -160,7 +159,6 @@ export class Manager {
     documentCheckingOutService: DocumentCheckingOutService;
     documentRepository: DocumentRepository;
     uploadingDocumentsService: UploadingDocumentsService;
-    availableDocumentsService: AvailableDocumentsService;
     documentSelectionService: DocumentSelectionService;
     readingDocumentService: ReadingDocumentService;
     exampleSentencesService: ExampleSegmentsService;
@@ -182,7 +180,6 @@ export class Manager {
         this.toastMessageService = new ToastMessageService({
             alertsService: this.alertsService
         })
-        this.availableDocumentsService = new AvailableDocumentsService()
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService({
             db,
@@ -217,7 +214,6 @@ export class Manager {
             db,
             settingsService: this.settingsService,
             documentRepository: this.documentRepository,
-            availableDocumentsService: this.availableDocumentsService
         });
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
@@ -232,13 +228,12 @@ export class Manager {
             trie$: this.trieService.trie$,
             db,
             settingsService: this.settingsService,
-            libraryService: this.library
+            documentRepository: this.documentRepository
         });
 
         this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService({
             progressItemService: this.progressItemsService,
-            availableDocumentService: this.availableDocumentsService,
             documentCheckingOutService: this.documentCheckingOutService,
             droppedFilesService: this.droppedFilesService,
             libraryService: this.library
@@ -515,7 +510,7 @@ export class Manager {
             settingsService: this.settingsService
         })
         this.documentSelectionService = new DocumentSelectionService({
-            availableDocumentsService: this.availableDocumentsService,
+            documentRepository: this.documentRepository,
             settingsService: this.settingsService
         });
         this.requestRecordingService = new RequestRecordingService({
