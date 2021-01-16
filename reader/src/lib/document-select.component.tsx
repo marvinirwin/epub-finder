@@ -8,7 +8,7 @@ export const DocumentSelect = () => {
     const m = useContext(ManagerContext);
     const books = useObservableState(m.documentRepository.collection$);
     return <List>
-        {[...books?.values()].map((document: LtDocument) => (
+        {[...(books?.values() || [])].map((document: LtDocument) => (
             <ListItem button
                       onClick={() => {
                           m.settingsService.readingDocument$.next(document.name)

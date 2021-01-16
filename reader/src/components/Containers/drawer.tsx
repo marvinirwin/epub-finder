@@ -11,7 +11,7 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {TreeMenu} from "../TreeMenu/tree-menu.component";
 import {AllItemsContainer} from "./all-items-container.component";
-import {AppBar, Divider, Toolbar} from "@material-ui/core";
+import {AppBar, Divider, List, Toolbar} from "@material-ui/core";
 import {theme} from "../../theme";
 import {Menu} from "@material-ui/icons";
 
@@ -140,30 +140,32 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
                     </IconButton>
                 </div>
                 <Divider />
-                {
-                    menuItemTree?.sourced && <TreeMenu
-                        title={() => <Typography
-                            ref={ref => m.introService.titleRef$.next(ref)}
-                            variant='h6'>
-                        </Typography>
-                        }
-                        tree={menuItemTree.sourced}
-                        directoryPath={directoryPath.split('.').filter(v => v)}
-                        directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath.join('.'))}
-                        componentChanged={componentPath => {
-                            m.settingsService.componentPath$.next(componentPath.join('.'));
-                        }}
-                        actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
-                    >
-{/*
+                <List>
+                    {
+                        menuItemTree?.sourced && <TreeMenu
+                            title={() => <Typography
+                                ref={ref => m.introService.titleRef$.next(ref)}
+                                variant='h6'>
+                            </Typography>
+                            }
+                            tree={menuItemTree.sourced}
+                            directoryPath={directoryPath.split('.').filter(v => v)}
+                            directoryChanged={directoryPath => m.settingsService.directoryPath$.next(directoryPath.join('.'))}
+                            componentChanged={componentPath => {
+                                m.settingsService.componentPath$.next(componentPath.join('.'));
+                            }}
+                            actionSelected={actionPath => treeMenuService.actionSelected$.next(actionPath)}
+                        >
+                            {/*
                         <ListItem button>
                             <IconButton onClick={ () => setOpen(!open)}>
                                 {open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
                             </IconButton>
                         </ListItem>
 */}
-                    </TreeMenu>
-                }
+                        </TreeMenu>
+                    }
+                </List>
             </Drawer>
             <AllItemsContainer className={`all-items-container ${classes.content}`}/>
         </div>

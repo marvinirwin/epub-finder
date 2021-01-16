@@ -5,6 +5,7 @@ import {ds_Tree, treeValue, walkTree} from "../../services/tree.service";
 import {TreeMenuNode} from "../directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {TreeMenuNodeItem} from "./tree-menu-node-item.component";
+import IconButton from "@material-ui/core/IconButton";
 
 
 export const TreeMenu: React.FunctionComponent<{
@@ -26,11 +27,20 @@ export const TreeMenu: React.FunctionComponent<{
     }
 ) => {
     const useMinified = false;
-    const Title = title;
     const treeNodes = Object.values(walkTree(tree, ...directoryPath)?.children || {})
         .filter(treeNode => !treeNode?.value?.hidden);
 
     return <Fragment>
+        {
+            directoryPath.length ? <ListItem>
+                    <IconButton onClick={() => {
+                        directoryChanged(directoryPath.slice(0, directoryPath.length - 1));
+                    }}>
+                        <ArrowBack/>
+                    </IconButton>
+                </ListItem> :
+                null
+        }
         {
             treeNodes
                 .map((treeNode, index) =>

@@ -23,9 +23,9 @@ import {HashService} from "./uploading/hash.service";
 import multerS3 from 'multer-s3';
 import {v4 as uuidv4} from 'uuid';
 import {readStream, s3} from "./uploading/s3.service";
-import {handleUploadedDocument} from "./uploading/document-upload.service";
 import {AnonymousGuard} from "../guards/anonymous";
 import {DocumentViewDto} from "./document-view.dto";
+import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
 
 @Controller('documents')
 export class DocumentsController {
@@ -65,14 +65,19 @@ export class DocumentsController {
         @UploadedFile() file: { originalname: string, bucket: string, key: string, location: string },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
+        @Headers('sandbox_file') sandbox_file: string | undefined,
     ): Promise<DocumentViewDto> {
-        const output = await handleUploadedDocument(file);
+        console.log(`Uploaded ${file.originalname} to S3 ${file.key}`);
+        const output: UploadOutput = await new S3UploadedFile(
+            file,
+            !!sandbox_file
+        ).output();
         const name = file.originalname.split('.').slice(0, -1).join('');
         if (document_id) {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                output.htmlFile().s3Key,
+                output.index().s3Key,
                 document_id
             )
         }
@@ -81,14 +86,14 @@ export class DocumentsController {
             return this.documentsService.saveRevision(
                 user,
                 name,
-                output.htmlFile().s3Key,
+                output.index().s3Key,
                 existingDocumentWithSameName.rootId()
             )
         }
         const savedDocument = await this.documentsService.saveNew(
             user,
             name,
-            output.htmlFile().s3Key,
+            output.index().s3Key,
         )
         return this.documentsService.byFilename(savedDocument.filename)
     }
