@@ -4,6 +4,7 @@ import {DatabaseService} from "../Storage/database.service";
 import {BehaviorSubject} from "rxjs";
 import {deleteMap, mapFromId, mergeMaps} from "../map.module";
 import {LtDocument} from "@shared/";
+import {TESTING} from "../../components/directory/app-directory-service";
 
 export class DocumentRepository {
     private databaseService: DatabaseService;
@@ -49,9 +50,12 @@ export class DocumentRepository {
         const formData = new FormData();
         formData.append("file", file);
 
-        const headers: { document_id?: string } = {};
+        const headers: { document_id?: string, sandbox_file?: string } = {};
         if (document_id) {
             headers.document_id = document_id
+        }
+        if (TESTING) {
+            headers.sandbox_file = '1'
         }
         const result = axios.put(
             `${process.env.PUBLIC_URL}/documents/`,
