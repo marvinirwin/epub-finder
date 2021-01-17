@@ -5,7 +5,7 @@ import {distinctUntilChanged, map, shareReplay, tap} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
-import CardsRepositoryService from "src/lib/Manager/cards.repository.service";
+import CardsRepository from "src/lib/Manager/cards.repository";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/Manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
@@ -25,7 +25,7 @@ export class QuizService {
             openDocumentsService
         }: {
             trie$: Observable<TrieWrapper>,
-            cardService: CardsRepositoryService
+            cardService: CardsRepository
             scheduleService: ScheduleService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService

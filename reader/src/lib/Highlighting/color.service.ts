@@ -1,4 +1,4 @@
-import {blendColors} from "./Highlighter";
+import {blendColors} from "./blend-colors.service";
 
 export type RGBA = [number, number, number, number];
 /**

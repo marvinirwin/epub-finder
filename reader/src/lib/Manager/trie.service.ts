@@ -1,6 +1,6 @@
 import {TrieWrapper} from "../TrieWrapper";
 import trie from "trie-prefix-tree";
-import CardsRepositoryService from "./cards.repository.service";
+import CardsRepository from "./cards.repository";
 import {Observable} from "rxjs";
 import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
 import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
@@ -15,7 +15,7 @@ export class TrieService {
             pronunciationProgressService,
             wordRecognitionProgressService
         }: {
-            cardsService: CardsRepositoryService,
+            cardsService: CardsRepository,
             pronunciationProgressService: PronunciationProgressService,
             wordRecognitionProgressService: WordRecognitionProgressService
         }

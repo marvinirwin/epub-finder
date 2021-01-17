@@ -7,7 +7,6 @@ import {DatabaseService} from "../Storage/database.service";
 import {cardForWord} from "../Util/Util";
 import {observableLastValue} from "../../services/settings.service";
 
-
 const highestPriorityCard = (c1: ICard, c2: ICard) => {
 /*
     const ordered = orderBy([c1, c2], ['id', 'timestamp'], ['desc', 'desc']);
@@ -15,7 +14,7 @@ const highestPriorityCard = (c1: ICard, c2: ICard) => {
     return ([c1,c2]).find(c => c.id) || c1;
 }
 
-export default class CardsRepositoryService {
+export default class CardsRepository {
 
     public static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
@@ -35,7 +34,7 @@ export default class CardsRepositoryService {
 
     public deleteWords: Subject<string[]> = new Subject<string[]>();
     public putWords$: Subject<string[]> = new Subject<string[]>();
-    addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
+    addCardWhichDoesNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>();
     upsertCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
     cardProcessingSignal$ = new ReplaySubject<boolean>(1);
@@ -61,17 +60,17 @@ export default class CardsRepositoryService {
         this.cardProcessingSignal$.next(true);
 
         this.putWords$.subscribe(words => {
-            this.addPersistedCards$.next(
+            this.addCardWhichDoesNotHaveToBePersisted$.next(
                 words.map(cardForWord)
             )
         });
 
-        this.newWords$ = this.addPersistedCards$.pipe(
+        this.newWords$ = this.addCardWhichDoesNotHaveToBePersisted$.pipe(
             map(cards => cards.map(card => card.learningLanguage)),
             shareReplay(1)
         );
         this.cardIndex$ = merge(
-            this.addPersistedCards$.pipe(
+            this.addCardWhichDoesNotHaveToBePersisted$.pipe(
                 map(addCards => [addCards, []]),
             ),
             this.deleteWords.pipe(
@@ -88,7 +87,7 @@ export default class CardsRepositoryService {
                     // TODO I dont think we need to shallow clone here
                     const newCardIndex = {...cardIndex};
                     newCards.forEach(newICard => {
-                        CardsRepositoryService.mergeCardIntoCardDict(newICard, newCardIndex);
+                        CardsRepository.mergeCardIntoCardDict(newICard, newCardIndex);
                     });
                     return newCardIndex;
                 } catch (e) {
@@ -106,7 +105,7 @@ export default class CardsRepositoryService {
                 }
                 return cards;
             })
-        ).subscribe(this.addPersistedCards$);
+        ).subscribe(this.addCardWhichDoesNotHaveToBePersisted$);
         this.deleteWords.subscribe(cards => {
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
@@ -129,10 +128,10 @@ export default class CardsRepositoryService {
         const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
         for await (const cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
-            this.addPersistedCards$.next(cards);
+            this.addCardWhichDoesNotHaveToBePersisted$.next(cards);
         }
         for await (const cards of this.db.getCardsFromDB({}, 500)) {
-            this.addPersistedCards$.next(cards);
+            this.addCardWhichDoesNotHaveToBePersisted$.next(cards);
         }
     }
 }

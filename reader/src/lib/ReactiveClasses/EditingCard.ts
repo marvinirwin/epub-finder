@@ -4,7 +4,7 @@ import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
 import pinyin from 'pinyin';
-import CardsRepositoryService from "../Manager/cards.repository.service";
+import CardsRepository from "../Manager/cards.repository";
 import {fetchTranslation} from "../../services/translate.service";
 
 
@@ -27,7 +27,7 @@ export class EditingCard {
 
     constructor(
         public persistor: IndexDBManager<ICard>,
-        private c: CardsRepositoryService,
+        private c: CardsRepository,
         public timestamp?: Date | number | undefined,
     ) {
 
@@ -84,7 +84,7 @@ export class EditingCard {
                 throw new Error("Upserting returned a weird array")
             }
             const rec = records[0];
-            this.c.addPersistedCards$.next([rec])
+            this.c.addCardWhichDoesNotHaveToBePersisted$.next([rec])
             this.saveInProgress$.next(false);
         });
 
@@ -105,7 +105,7 @@ export class EditingCard {
         ).pipe(skip(1));
     }
 
-    static fromICard( iCard: ICard, persistor: IndexDBManager<ICard>, c: CardsRepositoryService): EditingCard {
+    static fromICard( iCard: ICard, persistor: IndexDBManager<ICard>, c: CardsRepository): EditingCard {
         const e = new EditingCard(
             persistor,
             c

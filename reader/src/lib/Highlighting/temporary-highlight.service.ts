@@ -2,7 +2,7 @@ import { ReplaySubject} from "rxjs";
 import {RGBA} from "./color.service";
 import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
-import CardsRepositoryService from "../Manager/cards.repository.service";
+import CardsRepository from "../Manager/cards.repository";
 import {sleep} from "../Util/Util";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
@@ -15,7 +15,7 @@ export function removePunctuation(withPunctuation: string) {
 
 export class TemporaryHighlightService {
     private temporaryHighlightRequests$ = new ReplaySubject<{ word: string, color: RGBA, duration: number }>(1)
-    private cardService: CardsRepositoryService;
+    private cardService: CardsRepository;
 
     constructor(
         {
@@ -23,7 +23,7 @@ export class TemporaryHighlightService {
             cardService
         }: {
             highlighterService: HighlighterService,
-            cardService: CardsRepositoryService
+            cardService: CardsRepository
         }
     ) {
         this.cardService = cardService;

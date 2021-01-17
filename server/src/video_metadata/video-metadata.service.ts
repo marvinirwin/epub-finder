@@ -27,6 +27,10 @@ export class VideoMetadataService {
         }
     }
 
+    public async allVideoMetadata() {
+        return this.videoMetadataEntityRepository.find();
+    }
+
     public async checkForJson(hash: string): Promise<VideoMetadata | undefined> {
         const filename = `${hash}.json`;
         const filePath = join(process.env.VIDEO_DIR, filename);

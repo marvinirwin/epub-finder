@@ -1,5 +1,5 @@
 import {OpenDocumentsService} from "../open-documents.service";
-import CardsRepositoryService from "../cards.repository.service";
+import CardsRepository from "../cards.repository";
 
-export function CardPage(c: CardsRepositoryService, p: OpenDocumentsService) {
+export function CardPage(c: CardsRepository, p: OpenDocumentsService) {
 }

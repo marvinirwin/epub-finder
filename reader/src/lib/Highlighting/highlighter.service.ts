@@ -27,6 +27,11 @@ export class HighlighterService {
         }
         return m;
     }
+    public static wordsToMap = (rgba: RGBA) => (words: string[]) => {
+        const m = new Map<string, RGBA>();
+        words.forEach(word => m.set(word, rgba))
+        return m;
+    }
 
     public highlightMap$ = new ReplaySubject<TargetHighlightPriorityList>(1);
 

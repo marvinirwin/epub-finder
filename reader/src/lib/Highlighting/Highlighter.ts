@@ -1,5 +1,5 @@
 import {ReplaySubject} from "rxjs";
-import {map, tap} from "rxjs/operators";
+import {map} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {HighlighterService} from "./highlighter.service";
@@ -8,13 +8,13 @@ import {ScheduleRow} from "../schedule/schedule-row.interface";
 import {QuizService} from "../../components/quiz/quiz.service";
 
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
-        const m = new Map<string, RGBA>();
-        words.forEach(word => m.set(word, numbers))
-        return ({
-            timeout,
-            delta: m
-        });
-    };
+    const m = new Map<string, RGBA>();
+    words.forEach(word => m.set(word, numbers))
+    return ({
+        timeout,
+        delta: m
+    });
+};
 
 export const CORRECT_RECOGNITION_SCORE = 2;
 
@@ -30,8 +30,8 @@ export class Highlighter {
 
     constructor({
                     highlighterService,
-        quizService
-    }: {
+                    quizService
+                }: {
         quizService: QuizService
         highlighterService: HighlighterService
     }) {
@@ -49,7 +49,7 @@ export class Highlighter {
                 .pipe(
                     map(wordToMap(rgba)),
                 ),
-            [1,'MOUSEOVER_SENTENCE_HIGHLIGHT']
+            [1, 'MOUSEOVER_SENTENCE_HIGHLIGHT']
         );
         s.singleHighlight(
             quizService.quizCard.word$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
@@ -65,8 +65,6 @@ export class Highlighter {
             s.highlightMap$,
             [0, 'CREATED_CARDS_HIGHLIGHT']
         );
-
-
         s.highlightMap$.next(new Map());
     }
 
@@ -74,37 +72,5 @@ export class Highlighter {
 
 export interface LtElement {
     element: HTMLElement | XMLDocumentNode;
-}
-
-export const blendColors = (args: RGBA[]) => {
-    args = args.slice();
-    let base = [0, 0, 0, 0];
-    let mix;
-    let added;
-    while (added = args.shift()) {
-        if (typeof added[3] === 'undefined') {
-            added[3] = 1;
-        }
-        // check if both alpha channels exist.
-        if (base[3] && added[3]) {
-            mix = [0, 0, 0, 0];
-            // alpha
-            mix[3] = 1 - (1 - added[3]) * (1 - base[3]);
-            // red
-            mix[0] = Math.round((added[0] * added[3] / mix[3]) + (base[0] * base[3] * (1 - added[3]) / mix[3]));
-            // green
-            mix[1] = Math.round((added[1] * added[3] / mix[3]) + (base[1] * base[3] * (1 - added[3]) / mix[3]));
-            // blue
-            mix[2] = Math.round((added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1 - added[3]) / mix[3]));
-
-        } else if (added) {
-            mix = added;
-        } else {
-            mix = base;
-        }
-        base = mix;
-    }
-
-    return mix;
 }
 

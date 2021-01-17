@@ -12,7 +12,7 @@ export class VideoMetadataController {
 
     @Get(":hash")
     @Header('content-type', 'application/json')
-    async metadata(@Param() {hash}) {
+    async metadataForHash(@Param() {hash}) {
         return (await this.videoMetadataService.resolveVideoMetadataByHash(hash))?.metadata
     }
 
@@ -21,15 +21,10 @@ export class VideoMetadataController {
         return this.videoMetadataService.saveVideoMetadata(videoMetadataDto);
     }
 
-    @Post()
-    @HttpCode(200)
+    @Get()
+    // TODO will this collide with the above :hash route?
     @Header('content-type', 'application/json')
-    async bulkMetadata(@Body() sentenceList: string[]) {
-        const allMetadata = await Promise.all(
-            sentenceList
-                .map(sentence => this.videoMetadataService.resolveVideoMetadataByHash(sha1(sentence))
-                    .then(metadataEntity => metadataEntity?.metadata ? JSON.parse(metadataEntity.metadata) : undefined))
-        );
-        return zipObject(sentenceList, allMetadata);
+    async allMetadata() {
+        return this.videoMetadataService.allVideoMetadata();
     }
 }
