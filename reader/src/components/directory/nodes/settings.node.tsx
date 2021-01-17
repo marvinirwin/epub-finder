@@ -1,9 +1,10 @@
 import {Settings} from '@material-ui/icons'
 import React from "react";
 import {TreeMenuNode} from "../tree-menu-node.interface";
-export const SettingsNode =  {
+import {Manager} from "../../../lib/Manager";
+export const SettingsNode =  (m: Manager): TreeMenuNode =>  ( {
     name: 'settings',
     LeftIcon: () => <Settings/>,
-    moveDirectory: true,
+    action: () => m.modalService.settings.open$.next(true),
     label: 'Settings'
-} as TreeMenuNode
+} )

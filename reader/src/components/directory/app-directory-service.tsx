@@ -10,7 +10,6 @@ import {DocumentSelectionRowInterface} from "../../lib/document-selection/docume
 import {Profile} from "../../lib/Auth/loggedInUserService";
 import {SignupNode} from "./nodes/signup.node";
 import {SignoutNode} from "./nodes/signout.node";
-import {ToggleTranslateNode} from "./nodes/toggle-translate.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {GoogleSigninNode} from "./nodes/google-sign-in.node";
 import {ProfileNode} from "./nodes/profile.node";
@@ -21,8 +20,6 @@ import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
 import {SettingsNode} from "./nodes/settings.node";
-import {DailyGoalSettingNode} from "./nodes/daily-goal-setting.node";
-import {TogglePinyinNode} from "./nodes/toggle-pinyin.node";
 import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
 import {LibraryNode} from "./nodes/library.node";
@@ -57,12 +54,7 @@ function AppDirectory(
                         availableDocuments.map(toTreeMenuNode),
             */
             ProfileNode(profile),
-            SettingsNode,
-            [
-                ToggleTranslateNode(),
-                TogglePinyinNode(),
-                DailyGoalSettingNode,
-            ],
+            SettingsNode(m),
             SignupNode(),
             SignoutNode(m, profile),
             ManualSpeechRecognitionNode(),
