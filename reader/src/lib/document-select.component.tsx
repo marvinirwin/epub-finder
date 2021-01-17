@@ -10,6 +10,7 @@ export const DocumentSelect = () => {
     return <List>
         {[...(books?.values() || [])].map((document: LtDocument) => (
             <ListItem button
+                      className={'document-selection-row'}
                       onClick={() => {
                           m.settingsService.readingDocument$.next(document.name)
                       }}

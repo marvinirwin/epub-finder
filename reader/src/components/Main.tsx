@@ -7,6 +7,7 @@ import {AppContainer} from "./Containers/app-container";
 import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./Containers/drawer";
+import {ImageSearchComponent} from "./ImageSearch/image-search.component";
 
 
 
@@ -32,6 +33,7 @@ export function Main({m}: { m: Manager }) {
         <FocusedElement.Provider value={hotkeyHandler}>
             <PronunciationVideoResizedContext.Provider value={pronunciationVideoResized$}>
                 <AudioRecorderResizedContext.Provider value={audioRecorderResized$}>
+                    <ImageSearchComponent/>
                     <MiniDrawer/>
                 </AudioRecorderResizedContext.Provider>
             </PronunciationVideoResizedContext.Provider>

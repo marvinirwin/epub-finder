@@ -9,7 +9,6 @@ import {ImageSearchComponent} from "../ImageSearch/image-search.component";
 
 export const AppContainer: React.FunctionComponent<{ treeMenuService: TreeMenuService<{}, any> }> = ({treeMenuService}) => {
     return <div className={'app-container'}>
-        <ImageSearchComponent/>
         {
         }
     </div>

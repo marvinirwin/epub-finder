@@ -22,6 +22,7 @@ import {Transition} from "./slide-up.component";
 import {ImageSearchResults} from "./image-search-results.component";
 import {ImageSearchAppBar} from "./image-search-app-bar.component";
 import {ManagerContext} from "../../App";
+import {useDebouncedFn} from "beautiful-react-hooks";
 
 
 export interface ImageSearchResponse {
@@ -68,14 +69,16 @@ export function ImageSearchComponent() {
     const [searchTerm, setSearchTerm] = useState(imageRequest?.term);
     const [loading, setLoading] = useState("");
     const [sources, setSrces] = useState<ImageObject[]>([]);
-    const debounceSearch = debounce((term: string) => {
-        setLoading(term);
-        getImages(term).then((response) => {
-            setSrces(response);
-        }).finally(() => {
-            setLoading('');
-        })
-    }, 1000);
+    const debounceSearch = useDebouncedFn(
+        (term: string) => {
+            setLoading(term);
+            getImages(term).then((response) => {
+                setSrces(response);
+            }).finally(() => {
+                setLoading('');
+            })
+        }, 1000
+    )
     useEffect(() => {
         setSearchTerm(imageRequest?.term)
     }, [imageRequest])
@@ -91,7 +94,13 @@ export function ImageSearchComponent() {
     }, [searchTerm]);
 
     const onClose = () => m.imageSearchService.queryImageRequest$.next(undefined);
-    return <Dialog id='image-search-dialog' fullScreen open={!!imageRequest} onClose={onClose} TransitionComponent={Transition}>
+    return <Dialog
+        id='image-search-dialog'
+        fullScreen
+        open={!!imageRequest}
+        onClose={onClose}
+        TransitionComponent={Transition}
+    >
         <div className={`image-search-container ${classes.root}`}>
             <ImageSearchAppBar
                 imageRequest={imageRequest}

@@ -1,4 +1,4 @@
-import CardsRepository from "../Manager/cardsRepository";
+import CardsRepositoryService from "../Manager/cards.repository.service";
 import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
 import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
 
@@ -9,7 +9,7 @@ export class CardCreationService {
             pronunciationProgressService,
             wordRecognitionService
         }: {
-            cardService: CardsRepository,
+            cardService: CardsRepositoryService,
             pronunciationProgressService: PronunciationProgressService,
             wordRecognitionService: WordRecognitionProgressService,
         }) {

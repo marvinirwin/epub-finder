@@ -1,4 +1,4 @@
-import CardsRepository from "../cardsRepository";
+import CardsRepositoryService from "../cards.repository.service";
 import {OpenDocumentsService} from "../open-documents.service";
 import EditingCardManager from "../EditingCardManager";
 import {resolveICardForWord} from "../../Pipes/ResolveICardForWord";
@@ -9,7 +9,7 @@ import {AudioManager} from "../AudioManager";
 
 
 export function CardPageEditingCardCardDBAudio(
-    c: CardsRepository,
+    c: CardsRepositoryService,
     p: OpenDocumentsService,
     e: EditingCardManager,
     cdb: CardDB,

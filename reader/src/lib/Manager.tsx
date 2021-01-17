@@ -7,7 +7,7 @@ import {ICard} from "./Interfaces/ICard";
 import {IndexDBManager} from "./Storage/StorageManagers";
 import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {AudioManager} from "./Manager/AudioManager";
-import CardsRepository from "./Manager/cardsRepository";
+import CardsRepositoryService from "./Manager/cards.repository.service";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
 import {QuizComponent, QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
@@ -111,7 +111,7 @@ export class Manager {
     );
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
-    public cardService: CardsRepository;
+    public cardService: CardsRepositoryService;
     public openDocumentsService: OpenDocumentsService;
     public scheduleManager: ScheduleService;
     public quizManager: QuizManager;
@@ -209,7 +209,7 @@ export class Manager {
             settings$: this.settingsService,
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
-        this.cardService = new CardsRepository({databaseService: db});
+        this.cardService = new CardsRepositoryService({databaseService: db});
         this.library = new LibraryService({
             db,
             settingsService: this.settingsService,

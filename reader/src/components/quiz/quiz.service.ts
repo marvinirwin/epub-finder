@@ -1,11 +1,11 @@
 import {combineLatest, Observable} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/DocumentFrame/open-example-sentences-document.factory";
-import {map, shareReplay} from "rxjs/operators";
+import {distinctUntilChanged, map, shareReplay, tap} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
-import CardsRepository from "src/lib/Manager/cardsRepository";
+import CardsRepositoryService from "src/lib/Manager/cards.repository.service";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/Manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
@@ -25,7 +25,7 @@ export class QuizService {
             openDocumentsService
         }: {
             trie$: Observable<TrieWrapper>,
-            cardService: CardsRepository
+            cardService: CardsRepositoryService
             scheduleService: ScheduleService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService
@@ -43,13 +43,16 @@ export class QuizService {
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
                     if (!currentWord) return [];
+                    if (sentenceMap.size) {
+                        debugger;console.log()
+                    }
                     return uniq((sentenceMap.get(currentWord) || []).map(a => a.translatableText)).slice(0, 10)
                 }),
                 shareReplay(1)
             ),
             trie$
         );
-        openDocumentsService.openDocumentTree.appendDelta$.next( {
+        openDocumentsService.openDocumentTree.appendDelta$.next({
                 nodeLabel: 'root',
                 children: {
                     [EXAMPLE_SENTENCE_DOCUMENT]: {
@@ -76,7 +79,11 @@ export class QuizService {
             image$: new EditableValue<string | undefined>(
                 resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
                     .pipe(
-                        map(c => c?.photos?.[0]),
+                        distinctUntilChanged(),
+                        map(c => {
+                            debugger;
+                            return c?.photos?.[0];
+                        }),
                         shareReplay(1),
                     ),
                 imageSrc => {

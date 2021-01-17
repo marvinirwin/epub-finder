@@ -1,13 +1,21 @@
 import {merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
-import {Dictionary} from "lodash";
+import {Dictionary, orderBy} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {DatabaseService} from "../Storage/database.service";
 import {cardForWord} from "../Util/Util";
 import {observableLastValue} from "../../services/settings.service";
 
-export default class CardsRepository {
+
+const highestPriorityCard = (c1: ICard, c2: ICard) => {
+/*
+    const ordered = orderBy([c1, c2], ['id', 'timestamp'], ['desc', 'desc']);
+*/
+    return ([c1,c2]).find(c => c.id) || c1;
+}
+
+export default class CardsRepositoryService {
 
     public static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
@@ -16,9 +24,7 @@ export default class CardsRepository {
             const indexOfDuplicateCard = presentCards.findIndex(detectDuplicateCard);
             if (indexOfDuplicateCard >= 0) {
                 const presentCard = presentCards[indexOfDuplicateCard];
-                if (newICard.timestamp > presentCard.timestamp) {
-                    presentCards[indexOfDuplicateCard] = newICard;
-                }
+                presentCards[indexOfDuplicateCard] = highestPriorityCard(newICard, presentCard);
             } else {
                 presentCards.push(newICard)
             }
@@ -30,16 +36,15 @@ export default class CardsRepository {
     public deleteWords: Subject<string[]> = new Subject<string[]>();
     public putWords$: Subject<string[]> = new Subject<string[]>();
     addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
-    addUnpersistedCards$ = new Subject<ICard[]>();
+    upsertCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
     cardProcessingSignal$ = new ReplaySubject<boolean>(1);
     newWords$: Observable<string[]>
     private db: DatabaseService;
 
-
     public async updateICard(word: string, propsToUpdate: Partial<ICard>) {
         const card = await this.resolveCard(word);
-        this.addUnpersistedCards$.next([{...card, ...propsToUpdate}]);
+        this.upsertCards$.next([{...card, timestamp: new Date(), ...propsToUpdate}]);
     }
 
     public async resolveCard(word: string): Promise<ICard> {
@@ -56,12 +61,12 @@ export default class CardsRepository {
         this.cardProcessingSignal$.next(true);
 
         this.putWords$.subscribe(words => {
-            this.addUnpersistedCards$.next(
+            this.addPersistedCards$.next(
                 words.map(cardForWord)
             )
         });
 
-        this.newWords$= this.addPersistedCards$.pipe(
+        this.newWords$ = this.addPersistedCards$.pipe(
             map(cards => cards.map(card => card.learningLanguage)),
             shareReplay(1)
         );
@@ -83,7 +88,7 @@ export default class CardsRepository {
                     // TODO I dont think we need to shallow clone here
                     const newCardIndex = {...cardIndex};
                     newCards.forEach(newICard => {
-                        CardsRepository.mergeCardIntoCardDict(newICard, newCardIndex);
+                        CardsRepositoryService.mergeCardIntoCardDict(newICard, newCardIndex);
                     });
                     return newCardIndex;
                 } catch (e) {
@@ -93,11 +98,11 @@ export default class CardsRepository {
             }, {}),
             shareReplay(1)
         );
-        this.addUnpersistedCards$.pipe(
+        this.upsertCards$.pipe(
             map((cards) => {
                 for (let i = 0; i < cards.length; i++) {
                     const card = cards[i];
-                    this.db.cards.add(card).then(id => card.id = id);
+                    this.db.cards.put(card, card?.id).then(id => card.id = id);
                 }
                 return cards;
             })
@@ -124,9 +129,11 @@ export default class CardsRepository {
         const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
         for await (const cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
+            debugger;
             this.addPersistedCards$.next(cards);
         }
         for await (const cards of this.db.getCardsFromDB({}, 500)) {
+            debugger;
             this.addPersistedCards$.next(cards);
         }
     }

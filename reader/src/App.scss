@@ -437,6 +437,14 @@ $character-timing-section-padding: $padding;
   }
 }
 
+.quiz-card-image {
+  min-width: 54px;
+  min-height: 54px;
+  max-width: 240px;
+  max-height: 240px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
 
 .quiz-card {
   display: flex;
@@ -445,10 +453,6 @@ $character-timing-section-padding: $padding;
   height: 100%;
   align-items: center;
 
-  & > .quiz-card-image {
-    min-width: 54px;
-    min-height: 54px;
-  }
   & > #quiz-card-image-placeholder {
     width: 100%;
   }
