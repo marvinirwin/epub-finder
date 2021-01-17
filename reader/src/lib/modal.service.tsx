@@ -38,7 +38,8 @@ export class ModalService {
         return [
             this.fileUpload,
             this.languageSelect,
-            this.documentSelect
+            this.documentSelect,
+            this.settings
         ]
     }
 }

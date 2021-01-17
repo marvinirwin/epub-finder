@@ -6,7 +6,7 @@ import {
     TargetHighlightPriorityList, HighlightTarget
 } from "./highlight.interface";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {ElementContainer} from "./Highlighter";
+import {LtElement} from "./Highlighter";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
 import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
@@ -31,7 +31,7 @@ export class HighlighterService {
     public highlightMap$ = new ReplaySubject<TargetHighlightPriorityList>(1);
 
 
-    private highlightTargetMap$: Observable<Map<HighlightTarget, ElementContainer[]>>;
+    private highlightTargetMap$: Observable<Map<HighlightTarget, LtElement[]>>;
 
     constructor({wordElementMap$}: {
         wordElementMap$: Observable<Dictionary<Set<AtomMetadata>>>;
@@ -39,7 +39,7 @@ export class HighlighterService {
         this.highlightTargetMap$ = wordElementMap$.pipe(
             map(
                 wordElementMap => {
-                    const targetElementMap = new Map<HighlightTarget, ElementContainer[]>();
+                    const targetElementMap = new Map<HighlightTarget, LtElement[]>();
                     Object.entries(wordElementMap).forEach(([word, elements]) => {
                         targetElementMap.set(word, [...elements]);
                         elements.forEach(element => targetElementMap.set(
@@ -137,26 +137,22 @@ export class HighlighterService {
 
     private updateHighlightBackgroundColors(
         targetsToUpdate: Set<HighlightTarget>,
-        targetElementMap: Map<HighlightTarget, ElementContainer[]>,
+        targetElementMap: Map<HighlightTarget, LtElement[]>,
         wordHighlightMap: TargetHighlightPriorityList,
     ) {
         const computedElementHighlightMap = computeElementHighlightMap(
             targetElementMap,
             wordHighlightMap,
         );
-        d(targetsToUpdate);
-        d(targetElementMap);
         targetsToUpdate.forEach(word => {
             const elementsToHighlight = targetElementMap.get(word);
             if (!elementsToHighlight) {
-                debug(`cannot find ${word} in target map`);
                 return;
             }
             elementsToHighlight.forEach(elementToHighlight => {
                 updateElementBackgroundColor(elementToHighlight, computedElementHighlightMap);
             })
         })
-        d(`Finished updating backgound colors`);
     }
 
     private removeHighlightDelta(
@@ -173,7 +169,7 @@ export class HighlighterService {
 }
 
 function updateElementBackgroundColor(
-    elementToHighlight: ElementContainer,
+    elementToHighlight: LtElement,
     elementHighlightMap: ElementHighlightMap) {
     const priorityLists = elementHighlightMap.get(elementToHighlight.element as HTMLElement);
     const rgbas: RGBA[] = [];
@@ -195,18 +191,17 @@ function updateElementBackgroundColor(
     const backgroundColor = mixRGBA(rgbas);
     // @ts-ignore
     elementToHighlight.element.style.backgroundColor = backgroundColor;
-    d(`updated highlight background key of ${elementToHighlight.element.textContent} to ${backgroundColor}`)
 }
 
 const computeElementHighlightMap = (
-    wordElementMap: Map<string | HTMLElement, ElementContainer[]>,
+    wordElementMap: Map<string | HTMLElement, LtElement[]>,
     wordHighlightMap: TargetHighlightPriorityList,
 ): ElementHighlightMap => {
     const elementHighlightMap: ElementHighlightMap = new Map();
-    wordElementMap.forEach((elementContainers, targetToUpdate) => {
-        elementContainers.forEach(annotatedCharacters => {
+    wordElementMap.forEach((ltElements, targetToUpdate) => {
+        ltElements.forEach(ltElement => {
             const wordHighlightMapElement: HighlightDeltaPriorityList = wordHighlightMap.get(targetToUpdate) || [];
-            const element = annotatedCharacters.element as unknown as HTMLElement;
+            const element = ltElement.element as unknown as HTMLElement;
             safePushMap(
                 elementHighlightMap,
                 element,

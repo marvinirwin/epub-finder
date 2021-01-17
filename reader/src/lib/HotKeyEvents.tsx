@@ -74,10 +74,10 @@ export class HotKeyEvents {
 
         this.requestEditQuizWord$
             .pipe(
-                withLatestFrom(m.quizCharacterManager.quizzingCard$)
-            ).subscribe(async ([_, card]) => {
-            if (card) {
-                m.editingCardManager.requestEditWord$.next(card.learningLanguage);
+                withLatestFrom(m.quizService.quizCard.word$)
+            ).subscribe(async ([_, word]) => {
+            if (word) {
+                m.editingCardManager.requestEditWord$.next(word);
             }
         });
 
@@ -87,10 +87,10 @@ export class HotKeyEvents {
 
         function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: number) {
             quizResultEasy$2.pipe(
-                withLatestFrom(m.quizCharacterManager.quizzingCard$)
-            ).subscribe(([_, card]) => {
-                if (card) {
-                    m.quizManager.completeQuiz(card.learningLanguage, recognitionScore1)
+                withLatestFrom(m.quizService.quizCard.word$)
+            ).subscribe(([_, word]) => {
+                if (word) {
+                    m.quizManager.completeQuiz(word, recognitionScore1)
                 }
             });
         }

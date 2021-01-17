@@ -5,7 +5,6 @@ import {Segment} from "../Atomized/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/atomized-document";
-import {TrieObservable} from "./QuizCharacter";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
@@ -16,7 +15,10 @@ import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {mergeTabulations} from "../Atomized/merge-tabulations";
 import {DocumentRepository} from "../documents/document.repository";
+import {TrieWrapper} from "../TrieWrapper";
 
+
+export type TrieObservable = Observable<TrieWrapper>;
 
 export type Named = {
     name: string;

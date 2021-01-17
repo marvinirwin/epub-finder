@@ -72,7 +72,7 @@ export class Highlighter {
 
 }
 
-export interface ElementContainer {
+export interface LtElement {
     element: HTMLElement | XMLDocumentNode;
 }
 

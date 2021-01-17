@@ -24,7 +24,6 @@ import EditingCardManager from "./Manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./Manager/ManagerConnections/Card-Page-EditingCard-CardDB-Audio";
 import {ProgressManager} from "./Manager/ProgressManager";
 import {AppContext} from "./AppContext/AppContext";
-import {QuizCharacter} from "./Manager/QuizCharacter";
 import {RecordRequest} from "./Interfaces/RecordRequest";
 import {resolveICardForWords} from "./Pipes/ResultICardForWords";
 import {DocumentWordCount} from "./Interfaces/DocumentWordCount";
@@ -120,7 +119,6 @@ export class Manager {
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public visibleElementsService: VisibleService;
-    public quizCharacterManager: QuizCharacter;
     public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
     public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
@@ -316,12 +314,6 @@ export class Manager {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
             })
         // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
-        this.quizCharacterManager = new QuizCharacter(
-            {
-                quizzingCard$: this.quizManager.quizzingCard$,
-                trie$: this.trieService.trie$,
-            }
-        )
 
         CardScheduleQuiz(this.cardService, this.scheduleManager, this.quizManager);
         InputPage(this.browserInputs, this.openDocumentsService);

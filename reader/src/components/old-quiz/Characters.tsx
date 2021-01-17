@@ -45,7 +45,9 @@ export function Characters({c, m}: QuizCardProps) {
         })
     }, [c?.learningLanguage]);
 
+/*
     const recordingClass = useObservableState(m.quizCharacterManager.recordingClass$, '');
+*/
 
     useSubscription(
         m.hotkeyEvents.recordQuizWord$,
@@ -57,18 +59,24 @@ export function Characters({c, m}: QuizCardProps) {
             // TODO should this take(1)?
             newRecordRequest.recording$.subscribe(isRecording => {
                 if (isRecording) {
+/*
                     m.quizCharacterManager.recordingClass$.next('prompting-recording');
+*/
                 }
             })
             newRecordRequest.sentence.then(sentence => {
                 if (!c) return;
                 if (sentence.includes(c.learningLanguage)) {
+/*
                     m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingSuccess);
+*/
                     setTimeout(() => {
                         m.hotkeyEvents.advanceQuiz$.next();
                     }, 250);
                 } else {
+/*
                     m.quizCharacterManager.recordingClass$.next(promptingRecordingRecordingFailed);
+*/
                 }
             });
             m.audioManager.audioRecorder.recordRequest$.next(newRecordRequest);
@@ -95,6 +103,7 @@ export function Characters({c, m}: QuizCardProps) {
 */}
                 <div style={{width: '100%', display: 'flex', flexFlow: 'row nowrap', justifyContent: 'center'}}>
                     <HotkeyWrapper action={"RECORD_QUIZ_WORD"}>
+{/*
                         <div className={`${recordingClass} quiz-character`} onClick={
                             () => m.hotkeyEvents.requestEditQuizWord$.next()
                         }>
@@ -102,6 +111,7 @@ export function Characters({c, m}: QuizCardProps) {
                                 {c?.learningLanguage}
                             </Typography>
                         </div>
+*/}
                     </HotkeyWrapper>
                 </div>
             </div>
