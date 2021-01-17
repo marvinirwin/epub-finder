@@ -8,7 +8,6 @@ import {ReadingNode} from "./nodes/reading.node";
 import {TreeMenuNode} from "./tree-menu-node.interface";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 import {Profile} from "../../lib/Auth/loggedInUserService";
-import {SignupNode} from "./nodes/signup.node";
 import {SignoutNode} from "./nodes/signout.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {GoogleSigninNode} from "./nodes/google-sign-in.node";
@@ -18,7 +17,7 @@ import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
 import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
-import {ManualSpeechRecognitionNode} from "./nodes/manual-speech-recognition.node";
+import {TestingUtilsNode} from "./nodes/testing-utils.node";
 import {SettingsNode} from "./nodes/settings.node";
 import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
@@ -55,9 +54,8 @@ function AppDirectory(
             */
             ProfileNode(profile),
             SettingsNode(m),
-            SignupNode(),
             SignoutNode(m, profile),
-            ManualSpeechRecognitionNode(),
+            TestingUtilsNode(m),
             QuizCarouselNode(),
             [
                 {...QuizCarouselNode(), moveDirectory: false},

@@ -16,13 +16,13 @@ describe('Highlighting speech recognition results', () => {
         DirectoryPom.SubmitManualSpeechRecognition('的一是');
         // Assert that one character is highlighted
         ReadingPom
-            .AtomizedSentences()
+            .RenderedSegments()
             .contains('的一是')
             .find('mark')
             .should('not.have.css', 'background-color', 'transparent');
 
         ReadingPom
-            .AtomizedSentences()
+            .RenderedSegments()
             .contains(/^的一$/)
             .find('mark')
             .should('have.css', 'background-color', 'rgba(0, 0, 0, 0)')

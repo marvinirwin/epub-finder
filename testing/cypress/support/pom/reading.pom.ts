@@ -4,14 +4,14 @@ export class ReadingPom {
             .iframeBody()
     }
 
-    public static AtomizedSentences() {
+    public static RenderedSegments() {
         return ReadingPom
             .frame()
             .find('.annotated_and_translated')
     }
 
     public static Marks() {
-        return ReadingPom.AtomizedSentences()
+        return ReadingPom.RenderedSegments()
             .find('mark')
     }
 }
