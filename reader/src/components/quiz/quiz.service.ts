@@ -43,9 +43,6 @@ export class QuizService {
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
                     if (!currentWord) return [];
-                    if (sentenceMap.size) {
-                        debugger;console.log()
-                    }
                     return uniq((sentenceMap.get(currentWord) || []).map(a => a.translatableText)).slice(0, 10)
                 }),
                 shareReplay(1)
@@ -81,7 +78,6 @@ export class QuizService {
                     .pipe(
                         distinctUntilChanged(),
                         map(c => {
-                            debugger;
                             return c?.photos?.[0];
                         }),
                         shareReplay(1),

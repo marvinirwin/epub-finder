@@ -2,7 +2,7 @@ import {ManagerContext} from "../../App";
 import React, {useContext} from "react";
 import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
-import {last5} from "./last-n";
+import {last5, lastN} from "./last-n";
 
 
 
@@ -18,7 +18,7 @@ export const QuizCardTableComponent = () => {
                     <TableCell style={{minWidth: '10em'}}>Word</TableCell>
                     <TableCell align="right">Recognition</TableCell>
                     <TableCell align="right">Word Counts</TableCell>
-                    <TableCell align="right">Pronunciation Records</TableCell>
+                    <TableCell align="right">Pronunciation</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -26,19 +26,19 @@ export const QuizCardTableComponent = () => {
                     <TableRow key={row.word}>
                         <TableCell component="th" scope="row"> {row.word} </TableCell>
                         <TableCell align="right">{
-                            last5(row.wordRecognitionRecords)
-                                .map(r => `${r.timestamp} ${r.recognitionScore}`)
+                            lastN(1)(row.wordRecognitionRecords)
+                                .map(r => `${r.recognitionScore}`)
                                 .join(',')
                         }
                         </TableCell>
                         <TableCell align="right">{
-                            last5(row.wordCountRecords)
+                            (row.wordCountRecords)
                                 .map(r => `${r.document} ${r.count}`)
                                 .join(',')
                         }</TableCell>
                         <TableCell align="right">{
-                            last5(row.pronunciationRecords)
-                                .map(r => `${r.timestamp} ${r.success ? 'Correct' : 'Incorrect'}`)
+                            lastN(1)(row.pronunciationRecords)
+                                .map(r => `${r.success ? 'Correct' : 'Incorrect'}`)
                                 .join(',')
                         }</TableCell>
                     </TableRow>

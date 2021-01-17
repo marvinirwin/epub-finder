@@ -59,7 +59,7 @@ export class ScheduleService {
                     return orderBy(Object.values(indexedScheduleRows), [(row) => {
                         const date = dueDate(row);
                         const count = wordCount(row);
-                        const sortNumber = count * (date.getTime() - minDueDate) / dueDateSpread;
+                        const sortNumber = count * (date.getTime() - minDueDate) / Math.min(dueDateSpread, 2);
                         row.sortString = `${count} ${moment(date).format('MMM DD')} ${sortNumber.toString().slice(0, 3)}`;
                         row.sortNumber = sortNumber;
                         return sortNumber;

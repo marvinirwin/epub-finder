@@ -129,11 +129,9 @@ export default class CardsRepositoryService {
         const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
         for await (const cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
-            debugger;
             this.addPersistedCards$.next(cards);
         }
         for await (const cards of this.db.getCardsFromDB({}, 500)) {
-            debugger;
             this.addPersistedCards$.next(cards);
         }
     }
