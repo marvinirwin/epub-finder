@@ -57,13 +57,14 @@ export class DocumentRepository {
         if (TESTING) {
             headers.sandbox_file = '1'
         }
-        const result = axios.put(
+        const result = await axios.put(
             `${process.env.PUBLIC_URL}/documents/`,
             formData,
             {
                 headers
             }
         );
-        return new LtDocument((await result).data);
+        const d = (await result).data;
+        return new LtDocument(d);
     }
 }

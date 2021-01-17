@@ -5,7 +5,7 @@ import {
     Get,
     Header,
     Headers,
-    HttpCode,
+    HttpCode, HttpException,
     HttpStatus,
     Param,
     Put,
@@ -95,20 +95,7 @@ export class DocumentsController {
             name,
             output.index().s3Key,
         )
-        return this.documentsService.byFilename(savedDocument.filename)
-    }
-
-    @Get('/available')
-    async available(
-        @UserFromReq() user: User | undefined
-    ) {
-        return this.documentsService.all(user)
-            .then(availableDocuments => availableDocuments.map(documentView => ({
-                name: documentView.name,
-                id: documentView.id,
-                lastModified: documentView.created_at,
-                belongsToUser: documentView.creator_id === user?.id
-            })))
+        return await this.documentsService.byFilename(savedDocument.filename, user)
     }
 
     @Get('')
@@ -139,7 +126,7 @@ export class DocumentsController {
         return new Promise(async (resolve, reject) => {
             const doc = await this.documentsService.byFilename(filename, user);
             if (!doc) {
-                return reject(new Error(`Cannot find document ${filename} for user ${user?.id}`));
+                return reject(new HttpException(`Cannot find document ${filename} for user ${user?.id}`, 404));
             }
 
             (await readStream(filename)).pipe(response)

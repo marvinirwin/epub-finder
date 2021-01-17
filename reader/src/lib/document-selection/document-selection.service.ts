@@ -32,7 +32,7 @@ export class DocumentSelectionService {
                 return orderBy(
                     Object.values(keyBy(all, 'id')),
                     ['belongsToCurrentUser', 'lastModified'],
-                    ['desc', 'desc']
+                    ['asc', 'desc']
                 )
             }),
             shareReplay(1)
