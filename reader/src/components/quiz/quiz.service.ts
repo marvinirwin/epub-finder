@@ -1,15 +1,17 @@
-import {combineLatest, Observable, Subject} from "rxjs";
+import {combineLatest, Observable} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/DocumentFrame/open-example-sentences-document.factory";
-import {catchError, map, shareReplay, tap} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
-import {Dictionary, uniq} from "lodash";
-import CardsService from "src/lib/Manager/cards.service";
+import {uniq} from "lodash";
+import CardsRepository from "src/lib/Manager/cardsRepository";
 import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/Manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/Manager/open-documents.service";
+import {observableLastValue} from "../../services/settings.service";
+import {ICard} from "../../lib/Interfaces/ICard";
 
 export class QuizService {
     quizCard: QuizCard;
@@ -23,7 +25,7 @@ export class QuizService {
             openDocumentsService
         }: {
             trie$: Observable<TrieWrapper>,
-            cardService: CardsService
+            cardService: CardsRepository
             scheduleService: ScheduleService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService
@@ -58,6 +60,16 @@ export class QuizService {
             }
         )
 
+        function update(propsToUpdate: Partial<ICard>) {
+            observableLastValue(currentWord$)
+                .then(word => {
+                    cardService.updateICard(
+                        word,
+                        propsToUpdate
+                    )
+                })
+        }
+
         this.quizCard = {
             exampleSentenceOpenDocument: openExampleSentencesDocument,
             word$: currentWord$,
@@ -67,8 +79,8 @@ export class QuizService {
                         map(c => c?.photos?.[0]),
                         shareReplay(1),
                     ),
-                v => {
-                    // TODO Persist here or something
+                imageSrc => {
+                    update({photos: [imageSrc || '']});
                 }),
             description$: new EditableValue<string | undefined>(
                 resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
@@ -76,8 +88,8 @@ export class QuizService {
                         map(c => c?.knownLanguage?.[0]),
                         shareReplay(1)
                     ),
-                v => {
-                    // TODO persist here or something
+                description => {
+                    update({knownLanguage: [description || '']});
                 }),
         }
     }

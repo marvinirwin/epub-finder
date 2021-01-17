@@ -72,7 +72,7 @@ export class UploadOutput {
     }
 
     index() {
-        return this.f.find(file => file.filename === 'index.html' && !file.dir)
+        return this.f.find(file => file.filename.endsWith('.html'))
     }
 
 }

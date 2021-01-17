@@ -1,22 +1,15 @@
 import {merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary} from "lodash";
-import { flatMap, map, scan, shareReplay, startWith} from "rxjs/operators";
+import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../Interfaces/Message";
 import {DatabaseService} from "../Storage/database.service";
 import {cardForWord} from "../Util/Util";
+import {observableLastValue} from "../../services/settings.service";
 
-export default class CardsService {
-    public deleteWords: Subject<string[]> = new Subject<string[]>();
-    public putWords$: Subject<string[]> = new Subject<string[]>();
-    addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
-    addUnpersistedCards$ = new Subject<ICard[]>();
-    cardIndex$!: Observable<Dictionary<ICard[]>>;
-    cardProcessingSignal$ = new ReplaySubject<boolean>(1);
-    newWords$: Observable<string[]>
-    private db: DatabaseService;
+export default class CardsRepository {
 
-    static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
+    public static mergeCardIntoCardDict(newICard: ICard, o: { [p: string]: ICard[] }) {
         const detectDuplicateCard = getIsMeFunction(newICard);
         const presentCards = o[newICard.learningLanguage];
         if (presentCards) {
@@ -32,6 +25,26 @@ export default class CardsService {
         } else {
             o[newICard.learningLanguage] = [newICard]
         }
+    }
+
+    public deleteWords: Subject<string[]> = new Subject<string[]>();
+    public putWords$: Subject<string[]> = new Subject<string[]>();
+    addPersistedCards$: Subject<ICard[]> = new Subject<ICard[]>();
+    addUnpersistedCards$ = new Subject<ICard[]>();
+    cardIndex$!: Observable<Dictionary<ICard[]>>;
+    cardProcessingSignal$ = new ReplaySubject<boolean>(1);
+    newWords$: Observable<string[]>
+    private db: DatabaseService;
+
+
+    public async updateICard(word: string, propsToUpdate: Partial<ICard>) {
+        const card = await this.resolveCard(word);
+        this.addUnpersistedCards$.next([{...card, ...propsToUpdate}]);
+    }
+
+    public async resolveCard(word: string): Promise<ICard> {
+        const index = await observableLastValue(this.cardIndex$);
+        return index[word]?.[0] || cardForWord(word)
     }
 
     constructor({
@@ -70,7 +83,7 @@ export default class CardsService {
                     // TODO I dont think we need to shallow clone here
                     const newCardIndex = {...cardIndex};
                     newCards.forEach(newICard => {
-                        CardsService.mergeCardIntoCardDict(newICard, newCardIndex);
+                        CardsRepository.mergeCardIntoCardDict(newICard, newCardIndex);
                     });
                     return newCardIndex;
                 } catch (e) {

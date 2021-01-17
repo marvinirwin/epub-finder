@@ -8,13 +8,13 @@ import {PaperProps} from "@material-ui/core/Paper/Paper";
 import {QuizCardKnownLanguage} from "./quiz-card-known-language.component";
 import {QuizCardImage} from "./quiz-card-image.component";
 
-export const QuizCardComponent: React.FC<{ c: QuizCard } & PaperProps> = ({c, ...props}) => {
-    const word = useObservableState(c.word$);
+export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
+    const word = useObservableState(quizCard.word$);
     const m = useContext(ManagerContext);
     return <Paper className='quiz-card' {...props}>
-        <QuizCardImage c={c}/>
+        <QuizCardImage quizCard={quizCard}/>
         <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
-        <OpenDocumentComponent openedDocument={c.exampleSentenceOpenDocument}/>
+        <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
         <div className={'quiz-button-row'}>
             <Button
                 className={'quiz-button-hard'}
