@@ -5,18 +5,19 @@ import {Modes, ModesService} from "../Modes/modes.service";
 import {combineLatest} from "rxjs";
 import {map} from "rxjs/operators";
 import {RGBA} from "./color.service";
+import CardsRepository from "../Manager/cards.repository";
 
 export class VideoMetadataHighlight {
     constructor(
         {
             highlighterService,
             videoMetadataRepository,
-            modesService
+            modesService,
         }:
             {
                 highlighterService: HighlighterService,
                 videoMetadataRepository: VideoMetadataRepository,
-                modesService: ModesService
+                modesService: ModesService,
             }
     ) {
         const rgba: RGBA = [0, 160, 0, 0.5];

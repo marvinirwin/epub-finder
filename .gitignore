@@ -2,3 +2,4 @@
 reader/.env
 server/.env
 .env
+**/*/.idea

@@ -31,8 +31,6 @@ import {Highlighter} from "./Highlighting/Highlighter";
 import {HotKeyEvents} from "./HotKeyEvents";
 import {ModesService} from "./Modes/modes.service";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
-import {VideoMetadataService} from "../services/video-metadata.service";
-import {SentenceVideoHighlightService} from "../services/sentence-video-highlight.service";
 import {ObservableService} from "../services/observable.service";
 import {HighlighterService} from "./Highlighting/highlighter.service";
 import {removePunctuation, TemporaryHighlightService} from "./Highlighting/temporary-highlight.service";
@@ -83,6 +81,8 @@ import {LanguageConfigsService} from "./language-configs.service";
 import {SpeechPracticeService} from "./speech-practice.service";
 import {MicFeedbackService} from "./mic-feedback.service";
 import {ModalService} from "./modal.service";
+import {VideoMetadataRepository} from "../services/video-metadata.repository";
+import {VideoMetadataHighlight} from "./Highlighting/video-metadata.highlight";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -110,7 +110,7 @@ export class Manager {
     );
     public hotkeyEvents: HotKeyEvents;
     public audioManager: AudioManager;
-    public cardService: CardsRepository;
+    public cardsRepository: CardsRepository;
     public openDocumentsService: OpenDocumentsService;
     public scheduleManager: ScheduleService;
     public quizManager: QuizManager;
@@ -145,7 +145,6 @@ export class Manager {
     library: LibraryService;
     modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
-    videoMetadataService: VideoMetadataService;
     public editingVideoMetadataService: EditingVideoMetadataService;
     private highlighterService: HighlighterService;
     settingsService: SettingsService;
@@ -173,6 +172,7 @@ export class Manager {
     public speechPracticeService: SpeechPracticeService;
     public micFeedbackService: MicFeedbackService;
     public modalService = new ModalService();
+    public videoMetadataRepository:VideoMetadataRepository;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.toastMessageService = new ToastMessageService({
@@ -207,7 +207,7 @@ export class Manager {
             settings$: this.settingsService,
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
-        this.cardService = new CardsRepository({databaseService: db});
+        this.cardsRepository = new CardsRepository({databaseService: db});
         this.library = new LibraryService({
             db,
             settingsService: this.settingsService,
@@ -218,7 +218,7 @@ export class Manager {
         this.pronunciationProgressService = new PronunciationProgressService({db});
         this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
         this.trieService = new TrieService({
-            cardsService: this.cardService,
+            cardsService: this.cardsRepository,
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionProgressService: this.wordRecognitionProgressService
         })
@@ -261,6 +261,10 @@ export class Manager {
             }
         );
 
+        this.videoMetadataRepository = new VideoMetadataRepository({
+            cardsRepository: this.cardsRepository
+        });
+
         this.exampleSentencesService = new ExampleSegmentsService({
             openDocumentsService: this.openDocumentsService,
         })
@@ -285,7 +289,7 @@ export class Manager {
         this.quizManager = new QuizManager({
                 scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
                     map(rows => rows.map(row => row.word)),
-                    resolveICardForWords(this.cardService.cardIndex$)
+                    resolveICardForWords(this.cardsRepository.cardIndex$)
                 ),
                 requestHighlightedWord: s => {
                 }
@@ -315,12 +319,12 @@ export class Manager {
             })
         // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
 
-        CardScheduleQuiz(this.cardService, this.scheduleManager, this.quizManager);
+        CardScheduleQuiz(this.cardsRepository, this.scheduleManager, this.quizManager);
         InputPage(this.browserInputs, this.openDocumentsService);
-        CardPage(this.cardService, this.openDocumentsService);
+        CardPage(this.cardsRepository, this.openDocumentsService);
         InputQuiz(this.browserInputs, this.quizManager)
         ScheduleQuiz(this.scheduleManager, this.quizManager);
-        CardPageEditingCardCardDBAudio(this.cardService, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
+        CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
 
         this.openDocumentsService.renderedSegments$.subscribe(indexedSentences => {
                 Object.values(indexedSentences).map(segment => this.browserInputs.applySegmentListeners(segment))
@@ -336,7 +340,7 @@ export class Manager {
             scheduleService: this.scheduleManager,
             exampleSentencesService: this.exampleSentencesService,
             trie$: this.trieService.trie$,
-            cardService: this.cardService,
+            cardService: this.cardsRepository,
             openDocumentsService: this.openDocumentsService
         })
         this.visibleElementsService = new VisibleService({
@@ -376,7 +380,7 @@ export class Manager {
 
 
         this.setQuizWord$.pipe(
-            resolveICardForWord<string, ICard>(this.cardService.cardIndex$)
+            resolveICardForWord<string, ICard>(this.cardsRepository.cardIndex$)
         ).subscribe((icard) => {
             this.quizManager.setQuizCard(icard);
         })
@@ -418,15 +422,6 @@ export class Manager {
             .subscribe(alert => this.alertsService.newAlerts$.next(alert))
 
 
-        this.videoMetadataService = new VideoMetadataService({
-                allSentences$: this.openDocumentsService.displayDocumentTabulation$.pipe(
-                    switchMap(async tabulation => {
-                        return new Set<string>(Object.keys(tabulation.segments));
-                    }),
-                    shareReplay(1)
-                )
-            }
-        )
 
 
         this.quizManager.quizStage$.subscribe(stage => {
@@ -441,11 +436,13 @@ export class Manager {
         })
 
 
+/*
         new SentenceVideoHighlightService({
             visibleAtomizedSentences$: this.wordMetadataMapService.visibleWordSegmentMap,
             modesService: this.modesService,
             videoMetadataService: this.videoMetadataService
         });
+*/
 
         new HighlightPronunciationVideoService({
             pronunciationVideoService: this.pronunciationVideoService,
@@ -455,7 +452,7 @@ export class Manager {
 
         this.temporaryHighlightService = new TemporaryHighlightService({
             highlighterService: this.highlighterService,
-            cardService: this.cardService
+            cardService: this.cardsRepository
         });
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioManager.audioRecorder.currentRecognizedText$
@@ -480,7 +477,7 @@ export class Manager {
         });
 
         new CardCreationService({
-            cardService: this.cardService,
+            cardService: this.cardsRepository,
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionService: this.wordRecognitionProgressService
         })
@@ -517,10 +514,16 @@ export class Manager {
             pronunciationVideoService: this.pronunciationVideoService,
             browserInputs: this.browserInputs,
             aggregateElementIndexService: this.aggregateElementIndexService
+        });
+
+        new VideoMetadataHighlight({
+            highlighterService: this.highlighterService,
+            videoMetadataRepository: this.videoMetadataRepository,
+            modesService: this.modesService
         })
 
         this.hotkeyEvents.startListeners();
-        this.cardService.load();
+        this.cardsRepository.load();
     }
 }
 

@@ -35,7 +35,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             <Button
                 className={'quiz-button-hide'}
                 onClick={() => {
-                    word && m.cardService.deleteWords.next([word])
+                    word && m.cardsRepository.deleteWords.next([word])
                 }}>
                 Ignore
             </Button>
