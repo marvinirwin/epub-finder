@@ -327,13 +327,13 @@ $character-timing-section-padding: $padding;
   height: 0;
 }
 
+#pronunciation-video {
+  max-height: 360px;
+}
+
 .pronunciation-video-container-card {
   display: flex;
   flex-flow: row nowrap;
-
-  & > video {
-    max-height: 360px;
-  }
 
   & > .pronunciation-sections-container {
     display: flex;
@@ -522,4 +522,8 @@ $hideColor:#f5f5f5;
 }
 .video-mode-icon-on {
   color: #5dce05;
+}
+
+#playback-speed-slider {
+  padding: 24px;
 }

@@ -7,6 +7,7 @@ import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {PronunciationVideo} from "./pronunciation-video.component";
 import {useResizeObserver} from "beautiful-react-hooks";
 import {PronunciationSection} from "./pronunciation-section";
+import {PlaybackSpeedComponent} from "../directory/playback-speed.component";
 
 
 const DRAG_TIMEOUT = 500;
@@ -74,10 +75,13 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     let characterCounter = 0;
 
     return <Card className={'pronunciation-video-container-card'}>
-        <PronunciationVideo
-            highlightBarPosition1Ms={highlightBarPosition1Ms}
-            highlightBarPosition2Ms={highlightBarPosition2Ms}
-            currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
+        <div>
+            <PronunciationVideo
+                highlightBarPosition1Ms={highlightBarPosition1Ms}
+                highlightBarPosition2Ms={highlightBarPosition2Ms}
+                currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
+            <PlaybackSpeedComponent/>
+        </div>
 
         {/* @ts-ignore */}
         <div className={`pronunciation-sections-container`} ref={pronunciationSectionsContainer}>

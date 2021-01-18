@@ -8,6 +8,7 @@ import {useApplyBoundedTime} from "./useApplyBoundedTime";
 import {useApplyPlaybackSpeed} from "./useApplyPlaybackRate";
 import {useApplyPlaybackTime} from "./useApplyPlaybackTime";
 import {useObservableState} from "observable-hooks";
+import {PlaybackSpeedComponent} from "../directory/playback-speed.component";
 
 export const PronunciationVideo = (
     {
@@ -36,6 +37,7 @@ export const PronunciationVideo = (
         : undefined;
 
     return <video
+        id={'pronunciation-video'}
         ref={el => m.pronunciationVideoService.videoRef$.next(el)}
         src={videoSource}
         autoPlay

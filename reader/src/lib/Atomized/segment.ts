@@ -1,11 +1,10 @@
 import {ITrie} from "../Interfaces/Trie";
-import {Dictionary, maxBy, uniq} from "lodash";
+import {Dictionary, maxBy, uniq, flatten} from "lodash";
 import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./atomized-document";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {mergeTabulations} from "./merge-tabulations";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
 import {TabulatedSentences} from "./tabulated-documents.interface";
@@ -16,11 +15,27 @@ export class Segment {
     public _popperInstance: any;
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
-    public static tabulateSentences(atomizedSentences: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
-        const textWordDataRecords = atomizedSentences.map(atomizedSentence =>
-            atomizedSentence.tabulate(trie, trieElementSizes)
+    public static tabulateSentences(segments: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
+/*
+        const textWordDataRecords = segments.map(segment =>
+            segment.tabulate(trie, trieElementSizes)
         );
+*/
+        const nodeSegmentMap = new Map<XMLDocumentNode, Segment>();
+        const orderedNodes = flatten(segments.map(segment => {
+            segment.children.forEach(node => nodeSegmentMap.set(node, segment));
+            return segment.children;
+        }));
+
+        return Segment.tabulate(
+            trie,
+            trieElementSizes,
+            orderedNodes,
+            nodeSegmentMap
+        )
+/*
         return mergeTabulations(...textWordDataRecords);
+*/
     }
 
     translatableText: string;
@@ -39,7 +54,12 @@ export class Segment {
             ) as unknown as XMLDocumentNode;
     }
 
-    tabulate(t: ITrie, uniqueLengths: number[]): TabulatedSentences {
+    public static tabulate(
+        t: ITrie,
+        uniqueLengths: number[],
+        nodes: XMLDocumentNode[],
+        nodeSegmentMap: Map<XMLDocumentNode, Segment>
+    ): TabulatedSentences {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
@@ -47,8 +67,9 @@ export class Segment {
         const atomMetadatas = new Map<XMLDocumentNode, AtomMetadata>();
         const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
-        const children = this.element.childNodes;
-        const textContent = this.element.textContent as string;
+        // It's kind of janky that I use nodes and textcontent at the same time,  I guess I need the substr
+        const children = nodes;
+        const textContent = nodes.map(node => node.textContent).join('')
         for (let i = 0; i < children.length; i++) {
             const currentMark = children[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
@@ -59,7 +80,6 @@ export class Segment {
             const wordsWhichStartHere: string[] = potentialWords.reduce((acc: string[], potentialWord) => {
                 if (t.hasWord(potentialWord)) {
                     acc.push(potentialWord);
-                    wordSentenceMap[potentialWord] = [this];
                 }
                 return acc;
             }, []);
@@ -71,7 +91,7 @@ export class Segment {
              */
             const currentCharacter = textContent[i];
             if ((wordsWhichStartHere.length === 0 && wordsInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
-                wordSentenceMap[currentCharacter] = [this];
+                wordSentenceMap[currentCharacter] = [];
                 wordsWhichStartHere.push(currentCharacter);
             }
 
@@ -91,16 +111,15 @@ export class Segment {
                     word,
                     position
                 };
+/*
                 if (!this._previousWords.has(word)) {
                     newWords.add(word);
                 }
                 this._previousWords.add(word);
+*/
                 return newPositionedWord;
             });
 
-            /**
-             * I'm trying to figure out why wordElementMap isn't populated with 中 when scanning the word 中共中央
-             */
             const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
             const atomMetadata: AtomMetadata = {
                 char: (textContent as string)[i],
@@ -108,7 +127,10 @@ export class Segment {
                 element: currentMark,
                 maxWord,
                 i,
+                parent: nodeSegmentMap.get(currentMark) as Segment
+/*
                 parent: this
+*/
             };
             atomMetadatas.set(currentMark, atomMetadata);
             atomMetadata.words.forEach(word => {
@@ -120,10 +142,14 @@ export class Segment {
             })
         }
         const sentenceMap: Dictionary<Segment[]> = {
+/*
             [this.translatableText]: [this]
+*/
         };
         if (newWords.size) {
+/*
             this.newWords$.next(newWords);
+*/
         }
         return {
             wordElementsMap,

@@ -34,10 +34,12 @@ export class OpenDocument {
             trie,
         ]).pipe(
             map(([segments, trie]) => {
-                    return mergeTabulations(
-                        ...flattenDictArray(segments)
-                            .map(segment => segment.tabulate(trie.t, trie.uniqueLengths()))
-                    );
+                const segmentArr = flattenDictArray(segments);
+                return mergeTabulations(Segment.tabulateSentences(
+                    segmentArr,
+                    trie.t,
+                    trie.uniqueLengths()
+                ))
                 }
             ),
             shareReplay(1),
