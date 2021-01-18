@@ -17,7 +17,7 @@ export class VideoMetadataRepository {
             .then(response => {
                 if (response.status === 200) {
                     const metadataMap = mapFromId(response.data as unknown as VideoMetadata[], v => v.sentence);
-                    cardsRepository.putWords$.next([...metadataMap.keys()]);
+                    cardsRepository.putMouseoverDisabledWords([...metadataMap.keys()]);
                     this.all$.next(metadataMap)
                 }
             });

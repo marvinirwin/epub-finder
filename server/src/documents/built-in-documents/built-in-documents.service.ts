@@ -1,12 +1,12 @@
 import {OnModuleInit} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {DocumentView} from "../entities/document-view.entity";
+import {DocumentView} from "../../entities/document-view.entity";
 import {Repository} from "typeorm";
-import {Document} from "../entities/document.entity";
-import {User} from "../entities/user.entity";
+import {Document} from "../../entities/document.entity";
+import {User} from "../../entities/user.entity";
 import fs from "fs-extra";
 import {join, parse} from "path";
-import {sha1} from "../util/sha1";
+import {sha1} from "../../util/sha1";
 import {startCase} from "lodash";
 
 export class BuiltInDocumentsService implements OnModuleInit {

@@ -1,4 +1,4 @@
-import {merge, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../Interfaces/ICard";
 import {Dictionary, orderBy} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
@@ -34,11 +34,12 @@ export default class CardsRepository {
 
     public deleteWords: Subject<string[]> = new Subject<string[]>();
     public putWords$: Subject<string[]> = new Subject<string[]>();
-    addCardWhichDoesNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>();
+    addCardsWhichDoNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>();
     upsertCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
     cardProcessingSignal$ = new ReplaySubject<boolean>(1);
     newWords$: Observable<string[]>
+    all$ = new BehaviorSubject<Dictionary<ICard[]>>({});
     private db: DatabaseService;
 
     public async updateICard(word: string, propsToUpdate: Partial<ICard>) {
@@ -60,17 +61,15 @@ export default class CardsRepository {
         this.cardProcessingSignal$.next(true);
 
         this.putWords$.subscribe(words => {
-            this.addCardWhichDoesNotHaveToBePersisted$.next(
-                words.map(cardForWord)
-            )
+            this.putWords(words);
         });
 
-        this.newWords$ = this.addCardWhichDoesNotHaveToBePersisted$.pipe(
+        this.newWords$ = this.addCardsWhichDoNotHaveToBePersisted$.pipe(
             map(cards => cards.map(card => card.learningLanguage)),
             shareReplay(1)
         );
         this.cardIndex$ = merge(
-            this.addCardWhichDoesNotHaveToBePersisted$.pipe(
+            this.addCardsWhichDoNotHaveToBePersisted$.pipe(
                 map(addCards => [addCards, []]),
             ),
             this.deleteWords.pipe(
@@ -97,6 +96,7 @@ export default class CardsRepository {
             }, {}),
             shareReplay(1)
         );
+        this.cardIndex$.subscribe(this.all$);
         this.upsertCards$.pipe(
             map((cards) => {
                 for (let i = 0; i < cards.length; i++) {
@@ -105,7 +105,7 @@ export default class CardsRepository {
                 }
                 return cards;
             })
-        ).subscribe(this.addCardWhichDoesNotHaveToBePersisted$);
+        ).subscribe(this.addCardsWhichDoNotHaveToBePersisted$);
         this.deleteWords.subscribe(cards => {
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
@@ -128,10 +128,24 @@ export default class CardsRepository {
         const priorityCards = await this.db.settings.where({name: Settings.MOST_POPULAR_WORDS}).first();
         const priorityWords = priorityCards?.value || [];
         for await (const cards of this.db.getCardsFromDB({learningLanguage: priorityWords}, 100)) {
-            this.addCardWhichDoesNotHaveToBePersisted$.next(cards);
+            this.addCardsWhichDoNotHaveToBePersisted$.next(cards);
         }
         for await (const cards of this.db.getCardsFromDB({}, 500)) {
-            this.addCardWhichDoesNotHaveToBePersisted$.next(cards);
+            this.addCardsWhichDoNotHaveToBePersisted$.next(cards);
         }
+    }
+
+    public putWords(words: string[]) {
+        this.addCardsWhichDoNotHaveToBePersisted$.next(
+            words.map(cardForWord)
+        )
+    }
+    public putMouseoverDisabledWords(words: string[]) {
+        this.addCardsWhichDoNotHaveToBePersisted$.next(
+            words.map(cardForWord).map(card => {
+                card.disableMouseover = true;
+                return card
+           })
+        )
     }
 }

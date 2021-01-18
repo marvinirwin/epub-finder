@@ -14,7 +14,7 @@ export class CardCreationService {
             wordRecognitionService: WordRecognitionProgressService,
         }) {
         function putWords(records: {word: string}[]) {
-            cardService.putWords$.next(records.map(r => r.word));
+            cardService.putWords(records.map(r => r.word))
         }
         pronunciationProgressService.addRecords$.subscribe(putWords);
         wordRecognitionService.addRecords$.subscribe(putWords);

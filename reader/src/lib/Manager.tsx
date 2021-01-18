@@ -513,7 +513,8 @@ export class Manager {
             highlighter: this.highlighter,
             pronunciationVideoService: this.pronunciationVideoService,
             browserInputs: this.browserInputs,
-            aggregateElementIndexService: this.aggregateElementIndexService
+            aggregateElementIndexService: this.aggregateElementIndexService,
+            cardsRepository: this.cardsRepository
         });
 
         new VideoMetadataHighlight({

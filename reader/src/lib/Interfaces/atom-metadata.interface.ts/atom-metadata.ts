@@ -6,7 +6,6 @@ export interface AtomMetadata {
     words: IPositionedWord[];
     char: string;
     element: XMLDocumentNode;
-    maxWord: IPositionedWord | undefined;
     i: number;
     parent: Segment;
 }

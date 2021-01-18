@@ -9,7 +9,9 @@ export interface ICard {
     deck: string | undefined;
     fields: string[];
     illustrationPhotos: string[];
-    timestamp: number | Date
+    timestamp: number | Date;
+
+    disableMouseover?: boolean;
 }
 
 export async function resolveMediaSources(audio: (HTMLAudioElement | HTMLImageElement)[], resolveMediaSrc: (s: string) => Promise<string>) {

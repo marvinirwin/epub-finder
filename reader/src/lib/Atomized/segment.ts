@@ -120,12 +120,13 @@ export class Segment {
                 return newPositionedWord;
             });
 
+/*
             const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
+*/
             const atomMetadata: AtomMetadata = {
                 char: (textContent as string)[i],
                 words,
                 element: currentMark,
-                maxWord,
                 i,
                 parent: nodeSegmentMap.get(currentMark) as Segment
 /*

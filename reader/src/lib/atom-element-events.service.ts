@@ -6,10 +6,13 @@ import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
 import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
-import {debounce, flatten} from "lodash";
+import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./Highlighting/Highlighter";
 import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
 import {Segment} from "./Atomized/segment";
+import CardsRepository from "./Manager/cards.repository";
+import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
+import {ICard} from "./Interfaces/ICard";
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 
@@ -22,7 +25,8 @@ export class AtomElementEventsService {
             highlighter,
             pronunciationVideoService,
             browserInputs,
-            aggregateElementIndexService
+            aggregateElementIndexService,
+            cardsRepository
         }:
             {
                 openDocumentsService: OpenDocumentsService
@@ -30,18 +34,39 @@ export class AtomElementEventsService {
                 highlighter: Highlighter,
                 pronunciationVideoService: PronunciationVideoService,
                 browserInputs: BrowserInputs,
-                aggregateElementIndexService: AggregateElementIndexService
+                aggregateElementIndexService: AggregateElementIndexService,
+                cardsRepository: CardsRepository
             }
     ) {
         const applyListener = (element: HTMLElement) => {
-            const maxWord = () => aggregateElementIndexService.aggregateIndex$.getValue().get(element as unknown as XMLDocumentNode)?.maxWord;
-            const mode = () => modesService.mode$.getValue();
             element.classList.add("applied-word-element-listener");
+
+            const findAtom = () => aggregateElementIndexService
+                .aggregateIndex$
+                .getValue().get(element as unknown as XMLDocumentNode);
+            const mode = () => modesService.mode$.getValue();
+
+            function highestPriorityMouseoverCard(): ICard | undefined {
+                const cardMap = cardsRepository.all$.getValue();
+                const atom = findAtom() as AtomMetadata;
+                return maxBy(flatten(atom.words
+                    .map(word => {
+                        const cardMapElement = cardMap[word.word] || [];
+                        return cardMapElement
+                            .filter(v => !v.disableMouseover);
+                    })
+                ), c => c.learningLanguage.length);
+            }
+
             element.onmouseenter = ev => {
-                addHighlightedWord(highlighter.mousedOverWord$, maxWord()?.word);
+                addHighlightedWord(highlighter.mousedOverWord$, highestPriorityMouseoverCard()?.learningLanguage ||
+                    element.textContent as string
+                );
             }
             element.onmouseleave = (ev) => {
-                addHighlightedWord(highlighter.mousedOverWord$, maxWord()?.word);
+                addHighlightedWord(highlighter.mousedOverWord$, highestPriorityMouseoverCard()?.learningLanguage ||
+                    element.textContent as string
+                );
             }
 
             element.onclick = ev => {
