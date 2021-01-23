@@ -21,17 +21,11 @@ export class Segment {
             segment.tabulate(trie, trieElementSizes)
         );
 */
-        const nodeSegmentMap = new Map<XMLDocumentNode, Segment>();
-        const orderedNodes = flatten(segments.map(segment => {
-            segment.children.forEach(node => nodeSegmentMap.set(node, segment));
-            return segment.children;
-        }));
 
         return Segment.tabulate(
             trie,
             trieElementSizes,
-            orderedNodes,
-            nodeSegmentMap
+            segments,
         )
 /*
         return mergeTabulations(...textWordDataRecords);
@@ -57,9 +51,13 @@ export class Segment {
     public static tabulate(
         t: ITrie,
         uniqueLengths: number[],
-        nodes: XMLDocumentNode[],
-        nodeSegmentMap: Map<XMLDocumentNode, Segment>
+        segments: Segment[],
     ): TabulatedSentences {
+        const nodeSegmentMap = new Map<XMLDocumentNode, Segment>();
+        const nodes = flatten(segments.map(segment => {
+            segment.children.forEach(node => nodeSegmentMap.set(node, segment));
+            return segment.children;
+        }));
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
@@ -111,28 +109,16 @@ export class Segment {
                     word,
                     position
                 };
-/*
-                if (!this._previousWords.has(word)) {
-                    newWords.add(word);
-                }
-                this._previousWords.add(word);
-*/
                 return newPositionedWord;
             });
 
-/*
-            const maxWord: IPositionedWord | undefined = maxBy(words, w => w.word.length);
-*/
-            const atomMetadata: AtomMetadata = {
+            const atomMetadata = new AtomMetadata({
                 char: (textContent as string)[i],
                 words,
                 element: currentMark,
                 i,
                 parent: nodeSegmentMap.get(currentMark) as Segment
-/*
-                parent: this
-*/
-            };
+            });
             atomMetadatas.set(currentMark, atomMetadata);
             atomMetadata.words.forEach(word => {
                 if (wordElementsMap[word.word]) {
@@ -142,21 +128,13 @@ export class Segment {
                 }
             })
         }
-        const sentenceMap: Dictionary<Segment[]> = {
-/*
-            [this.translatableText]: [this]
-*/
-        };
         if (newWords.size) {
-/*
-            this.newWords$.next(newWords);
-*/
         }
         return {
             wordElementsMap,
             wordCounts,
             wordSegmentMap: wordSentenceMap,
-            segments: sentenceMap,
+            segments,
             atomMetadatas
         };
     }

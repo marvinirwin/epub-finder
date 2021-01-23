@@ -5,7 +5,7 @@ import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-me
 import {XMLDocumentNode} from "../lib/Interfaces/XMLDocumentNode";
 import {safePushMapSet, safePushSet} from "./safe-push";
 import {VisibleService} from "../lib/Manager/visible.service";
-import {AggregateElementIndexService} from "./aggregate-element-index.service";
+import {ElementAtomMetadataIndex} from "./element-atom-metadata.index";
 import {Segment} from "../lib/Atomized/segment";
 
 export class WordMetadataMapService {
@@ -17,11 +17,11 @@ export class WordMetadataMapService {
                     aggregateElementIndexService
                 }: {
         visibleElementsService: VisibleService
-        aggregateElementIndexService: AggregateElementIndexService
+        aggregateElementIndexService: ElementAtomMetadataIndex
     }) {
         this.visibleWordMetadataMap$ = combineLatest([
             visibleElementsService.elementsInView$,
-            aggregateElementIndexService.aggregateIndex$
+            aggregateElementIndexService.index$
         ]).pipe(
             map(([elementsInView, elementIndex]) => {
                 const map = {} as Dictionary<Set<AtomMetadata>>;

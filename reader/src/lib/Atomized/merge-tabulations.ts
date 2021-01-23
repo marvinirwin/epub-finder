@@ -6,7 +6,7 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
         wordElementsMap: {},
         wordSegmentMap: {},
         wordCounts: {},
-        segments: {},
+        segments: [],
         documentWordCounts: {},
         atomMetadatas: new Map()
     };
@@ -35,7 +35,7 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
         });
         merge(newSentenceInfo.wordElementsMap, aggregateSentenceInfo.wordElementsMap);
         merge(newSentenceInfo.wordSegmentMap, aggregateSentenceInfo.wordSegmentMap);
-        merge(newSentenceInfo.segments, aggregateSentenceInfo.segments)
+        aggregateSentenceInfo.segments.push(...newSentenceInfo.segments)
         // @ts-ignore
         if (newSentenceInfo.documentWordCounts) {
             // @ts-ignore

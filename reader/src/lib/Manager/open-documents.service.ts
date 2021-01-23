@@ -41,7 +41,7 @@ export class OpenDocumentsService {
     sourceDocuments$: Observable<Map<string, OpenDocument>>;
     tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
     openDocumentBodies$: Observable<HTMLBodyElement>;
-    renderedSegments$: Observable<ds_Dict<Segment[]>>;
+    renderedSegments$: Observable<Segment[]>;
 
     constructor(
         private config: {

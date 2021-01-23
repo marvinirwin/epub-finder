@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {LinearProgress, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
 import {TutorialPopper} from "../Popover/Tutorial";
@@ -15,19 +15,19 @@ export const SLIM_CARD_CONTENT = {
 
 export default function AudioRecorder({m}: { m: Manager }) {
     const recorder = m.audioManager.audioRecorder;
-    const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
-    const currentRomanized = useObservableState(m.speechPracticeService.romanization$);
-    const currentAudioRequest = useObservableState(recorder.recordRequest$);
     const isRecording = useObservableState(recorder.isRecording$);
 
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
     const audioRecorderResize = useContext(AudioRecorderResizedContext)
+/*
     useEffect(() => {
         audioRecorderResize.next()
     }, [recognizedText])
+*/
 
     return <div className={'audio-recorder-popup'}>
+        {isRecording && <LinearProgress variant='indeterminate'/>}
         <TutorialPopper
             referenceElement={referenceElement}
             storageKey={'AUDIO_POPUP'}
@@ -36,9 +36,5 @@ export default function AudioRecorder({m}: { m: Manager }) {
             <Typography variant="subtitle2">Test your pronunciation by speaking when the light is green. The
                 recognized text should match the pinyin on the flashcard.</Typography>
         </TutorialPopper>
-        <Typography variant="h6">{currentAudioRequest?.label}</Typography>
-        {isRecording && <LinearProgress variant='indeterminate'/>}
-        <Typography variant="h6">{recognizedText}</Typography>
-        <Typography variant="h6">{currentRomanized}</Typography>
     </div>
 }

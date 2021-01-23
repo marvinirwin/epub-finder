@@ -12,10 +12,10 @@ import {Segment} from "../Atomized/segment";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 
 
-export const renderedSegmentsElements = (o$: Observable<ds_Dict<Segment[]>[]>) =>
+export const renderedSegmentsElements = (o$: Observable<Segment[][]>) =>
     o$.pipe(
-        map((segmentDicts: ds_Dict<Segment[]>[]): Segment[] => {
-                return flatten(segmentDicts.map(segmentDict => flatten(Object.values(segmentDict))));
+        map((segmentLists): Segment[] => {
+                return flatten(segmentLists);
             }
         ),
         map((segments: Segment[]) => {

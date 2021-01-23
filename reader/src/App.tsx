@@ -12,6 +12,7 @@ import {AlertSnackbar} from "./components/alert-snackbar.component";
 import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
+import {SpeechRecognitionSnackbar} from "./components/speech-recognition-snackbar.component";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -41,6 +42,7 @@ function App() {
                 }
                 <LoadingBackdrop/>
                 <AlertSnackbar/>
+                <SpeechRecognitionSnackbar/>
                 <GlobalDragOver/>
                 <Main m={manager}/>
             </CssBaseline>

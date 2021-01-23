@@ -10,8 +10,8 @@ import {TabulatedDocuments} from "../lib/Atomized/tabulated-documents.interface"
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>;
 
-export class AggregateElementIndexService {
-    public aggregateIndex$ = new BehaviorSubject<AtomMetadataMap>(new Map());
+export class ElementAtomMetadataIndex {
+    public index$ = new BehaviorSubject<AtomMetadataMap>(new Map());
 
     constructor(
         {
@@ -37,6 +37,10 @@ export class AggregateElementIndexService {
                     return m;
                 }),
                 shareReplay(1)
-            ).subscribe(this.aggregateIndex$);
+            ).subscribe(this.index$);
+    }
+
+    public metadataForElement(e: HTMLElement): AtomMetadata {
+        return this.index$.getValue().get(e as unknown as XMLDocumentNode) as AtomMetadata;
     }
 }

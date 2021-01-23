@@ -69,7 +69,7 @@ import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
 import {VisibleService} from "./Manager/visible.service";
 import {TabulatedDocuments} from "./Atomized/tabulated-documents.interface";
-import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
+import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
 import {TrieService} from "./Manager/trie.service";
@@ -83,6 +83,7 @@ import {MicFeedbackService} from "./mic-feedback.service";
 import {ModalService} from "./modal.service";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
 import {VideoMetadataHighlight} from "./Highlighting/video-metadata.highlight";
+import {MousedOverWordHighlightService} from "./Highlighting/moused-over-word-highlight.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -121,7 +122,6 @@ export class Manager {
     public visibleElementsService: VisibleService;
     public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
-    public mousedOverPinyin$ = new ReplaySubject<string | undefined>(1);
     public pronunciationProgressService: PronunciationProgressService;
     public wordRecognitionProgressService: WordRecognitionProgressService;
     public introService: IntroService;
@@ -162,7 +162,7 @@ export class Manager {
     public quizService: QuizService;
     public goalsService: GoalsService;
     public activeSentenceService: ActiveSentenceService;
-    public aggregateElementIndexService: AggregateElementIndexService;
+    public elementAtomMetadataIndex: ElementAtomMetadataIndex;
     public wordMetadataMapService: WordMetadataMapService;
     public trieService: TrieService;
     public toastMessageService: ToastMessageService;
@@ -172,7 +172,8 @@ export class Manager {
     public speechPracticeService: SpeechPracticeService;
     public micFeedbackService: MicFeedbackService;
     public modalService = new ModalService();
-    public videoMetadataRepository:VideoMetadataRepository;
+    public videoMetadataRepository: VideoMetadataRepository;
+    public mousedOverWordHighlightService: MousedOverWordHighlightService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.toastMessageService = new ToastMessageService({
@@ -326,8 +327,8 @@ export class Manager {
         ScheduleQuiz(this.scheduleManager, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioManager)
 
-        this.openDocumentsService.renderedSegments$.subscribe(indexedSentences => {
-                Object.values(indexedSentences).map(segment => this.browserInputs.applySegmentListeners(segment))
+        this.openDocumentsService.renderedSegments$.subscribe(segments => {
+                this.browserInputs.applySegmentListeners(segments)
             }
         );
         this.readingDocumentService = new ReadingDocumentService({
@@ -350,13 +351,13 @@ export class Manager {
             openDocumentsService: this.openDocumentsService,
             quizService: this.quizService
         });
-        this.aggregateElementIndexService = new AggregateElementIndexService({
+        this.elementAtomMetadataIndex = new ElementAtomMetadataIndex({
             openDocumentsService: this.openDocumentsService,
             visibleElementsService: this.visibleElementsService
         })
         this.wordMetadataMapService = new WordMetadataMapService({
             visibleElementsService: this.visibleElementsService,
-            aggregateElementIndexService: this.aggregateElementIndexService
+            aggregateElementIndexService: this.elementAtomMetadataIndex
         });
         this.highlighterService = new HighlighterService(
             {
@@ -422,8 +423,6 @@ export class Manager {
             .subscribe(alert => this.alertsService.newAlerts$.next(alert))
 
 
-
-
         this.quizManager.quizStage$.subscribe(stage => {
             switch (stage) {
                 case QuizComponent.Characters:
@@ -434,15 +433,6 @@ export class Manager {
                     break;
             }
         })
-
-
-/*
-        new SentenceVideoHighlightService({
-            visibleAtomizedSentences$: this.wordMetadataMapService.visibleWordSegmentMap,
-            modesService: this.modesService,
-            videoMetadataService: this.videoMetadataService
-        });
-*/
 
         new HighlightPronunciationVideoService({
             pronunciationVideoService: this.pronunciationVideoService,
@@ -481,14 +471,12 @@ export class Manager {
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionService: this.wordRecognitionProgressService
         })
-
-
         this.introSeriesService = new IntroSeriesService({
             settingsService: this.settingsService
         });
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
-            atomizedSentences$: this.openDocumentsService.renderedSegments$
+            renderedSegments$: this.openDocumentsService.renderedSegments$
         });
         this.introService = new IntroService({
             pronunciationVideoRef$: this.pronunciationVideoService.videoRef$,
@@ -507,21 +495,28 @@ export class Manager {
             loggedInUserService: this.authManager
         });
 
+        this.mousedOverWordHighlightService = new MousedOverWordHighlightService({
+            highlighterService: this.highlighterService
+        })
+
         new AtomElementEventsService({
             openDocumentsService: this.openDocumentsService,
             modesService: this.modesService,
             highlighter: this.highlighter,
             pronunciationVideoService: this.pronunciationVideoService,
             browserInputs: this.browserInputs,
-            aggregateElementIndexService: this.aggregateElementIndexService,
-            cardsRepository: this.cardsRepository
+            elementAtomMetadataIndex: this.elementAtomMetadataIndex,
+            cardsRepository: this.cardsRepository,
+            videoMetadataRepository: this.videoMetadataRepository,
+            mousedOverWordHighlightService: this.mousedOverWordHighlightService
         });
 
         new VideoMetadataHighlight({
             highlighterService: this.highlighterService,
             videoMetadataRepository: this.videoMetadataRepository,
             modesService: this.modesService
-        })
+        });
+
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();
