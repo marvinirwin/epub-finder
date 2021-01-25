@@ -1,22 +1,44 @@
-import {Paper, Snackbar, SnackbarContent} from "@material-ui/core";
+import {IconButton, Paper, Snackbar, SnackbarContent} from "@material-ui/core";
 import {Alert} from "@material-ui/lab";
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import {ManagerContext} from "../App";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {LatestRecognizedText} from "./latest-recognized-text.component";
+import CloseIcon from "@material-ui/icons/Close";
 
 export const SpeechRecognitionSnackbar = () => {
     const m = useContext(ManagerContext);
-    const recognizedText = useObservableState(m.audioManager.audioRecorder.currentRecognizedText$, '');
+    const [latestRecognizedText, setLatestRecognizedText,] = useState<string>('')
+    useSubscription(
+        m.audioManager.audioRecorder.currentRecognizedText$,
+        v => v && setLatestRecognizedText(v)
+    )
+
+    function close() {
+        setLatestRecognizedText('');
+    }
+
     return <Snackbar
-        open={!!recognizedText}
+        open={!!latestRecognizedText}
         autoHideDuration={10000}
-        onClose={() => {
-        }}
+        onClose={close}
         anchorOrigin={{vertical: 'top', horizontal: 'center'}}
     >
-        <Paper style={{padding: '12px', minWidth: '480px'}}>
-            <LatestRecognizedText/>
+        <Paper style={{
+            padding: '12px',
+            minWidth: '480px',
+            display: 'flex',
+            flexFlow: 'row nowrap',
+            justifyContent: 'space-between'
+        }}>
+            <div>
+                <LatestRecognizedText/>
+            </div>
+            <div>
+                <IconButton size="small" aria-label="close" color="inherit" onClick={close}>
+                    <CloseIcon fontSize="small" />
+                </IconButton>
+            </div>
         </Paper>
     </Snackbar>
 }

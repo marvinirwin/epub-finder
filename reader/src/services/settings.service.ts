@@ -132,6 +132,9 @@ export class SettingsService {
     get spokenLanguage$(): ReplaySubject<string> {
         return this.resolveSetting$<string>('spoken', 'zh-CN', 'url')
     }
+    get frequencyWeight$(): ReplaySubject<number> {
+        return this.resolveSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+    }
 }
 
 export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {

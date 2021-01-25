@@ -75,7 +75,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     let characterCounter = 0;
 
     return <Card className={'pronunciation-video-container-card'}>
-        <div>
+        <div style={{}}>
             <PronunciationVideo
                 highlightBarPosition1Ms={highlightBarPosition1Ms}
                 highlightBarPosition2Ms={highlightBarPosition2Ms}

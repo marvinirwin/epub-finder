@@ -94,6 +94,7 @@ export class Segment {
             }
 
             wordsInProgress.push(...wordsWhichStartHere.map(word => {
+                // Side effects bad
                 if (wordCounts[word]) {
                     wordCounts[word]++;
                 } else {
@@ -127,8 +128,6 @@ export class Segment {
                     wordElementsMap[word.word] = [atomMetadata]
                 }
             })
-        }
-        if (newWords.size) {
         }
         return {
             wordElementsMap,

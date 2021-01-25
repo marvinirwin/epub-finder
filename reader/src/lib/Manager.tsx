@@ -257,7 +257,7 @@ export class Manager {
         });
         this.scheduleManager = new ScheduleService({
                 db,
-                sortMode$: of('').pipe(shareReplay(1)),
+                settingsService: this.settingsService,
                 scheduleRowsService: this.scheduleRowsService
             }
         );

@@ -23,6 +23,7 @@ export const colorForPercentage = function(pct: number): RGBA {
         g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
         b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
     };
-    return [color.r, color.g, color.b, 0.5]
+    // return [color.r, color.g, color.b, 0.5]
+    return [0, 0xff, 0, pct]
     // or output as hex if preferred
 };
