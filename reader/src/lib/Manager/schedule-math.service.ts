@@ -28,8 +28,8 @@ export class ScheduleMathService {
 
         return ScheduleMathService.orderMappedValues(
             ScheduleMathService.addValuesMappedToNumbers(
-                new Map(dateEntries),
-                new Map(frequencyEntries)
+                new Map(ScheduleMathService.inverseLog(dateEntries)),
+                new Map(ScheduleMathService.inverseLog(frequencyEntries))
             )
         )
     }
@@ -59,8 +59,8 @@ export class ScheduleMathService {
         return (val - min) / (max - min)
     }
 
-    private static inverseLog<T>(normalizedValues: [number, T][]) {
-        return normalizedValues.map(([normalValue, o]) => [normalValue - Math.log(normalValue), o])
+    private static inverseLog<T>(normalizedValues: [T, number][]): [T, number][] {
+        return normalizedValues.map(([o, normalValue]) => [o, normalValue - Math.log(normalValue)])
     }
 
     private static addValuesMappedToNumbers<T>(...valueNumberMaps: Map<T, number>[]) {
@@ -79,7 +79,7 @@ export class ScheduleMathService {
     }
 
     private static orderMappedValues<T>(valueNumberMap: Map<T, number>): T[]{
-        return orderBy([...valueNumberMap.entries()], ([value, number]) => number)
+        return orderBy([...valueNumberMap.entries()], ([value, number]) => number, 'desc')
             .map(([value, number]) => value)
     }
 }

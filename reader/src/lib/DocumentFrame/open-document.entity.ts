@@ -10,7 +10,7 @@ import {mergeTabulations} from "../Atomized/merge-tabulations";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {flatten} from "lodash";
 
-function flattenDictArray<T>(segments: ds_Dict<T[]>): T[]  {
+function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
 }
 
@@ -34,11 +34,21 @@ export class OpenDocument {
             trie,
         ]).pipe(
             map(([segments, trie]) => {
-                return mergeTabulations(Segment.tabulateSentences(
-                    segments,
-                    trie.t,
-                    trie.uniqueLengths()
-                ))
+                    const tabulatedSentences = mergeTabulations(Segment.tabulateSentences(
+                        segments,
+                        trie.t,
+                        trie.uniqueLengths()
+                    ));
+
+                    // Right now this will count the example sentences :(.
+                    const entries = Object.entries(tabulatedSentences.wordCounts)
+                        .map(([word, count]) =>
+                            [word, [{word, count, document: this.name}]]);
+
+                    return {
+                        ...tabulatedSentences,
+                        documentWordCounts: Object.fromEntries(entries)
+                    } as TabulatedDocuments;
                 }
             ),
             shareReplay(1),

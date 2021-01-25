@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {debounceTime, map, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {debounceTime, map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {DatabaseService} from "./Storage/database.service";
 import React from "react";
 import {ICard} from "./Interfaces/ICard";

@@ -1,5 +1,5 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
-import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {Website} from "../Website/Website";
 import {Segment} from "../Atomized/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
@@ -53,9 +53,9 @@ export class OpenDocumentsService {
     ) {
 
         this.sourceDocuments$ = config.documentRepository.collection$.pipe(
-/*
-            map(documents => filterMap(documents, (key, d) => !d.deleted)),
-*/
+            /*
+                        map(documents => filterMap(documents, (key, d) => !d.deleted)),
+            */
             map(libraryDocuments => {
                 return mapMap(
                     libraryDocuments,
@@ -126,7 +126,7 @@ export class OpenDocumentsService {
                     return combineLatest(documentTabulations);
                 }),
                 map((documentTabulations: TabulatedDocuments[]) =>
-                    mergeTabulations(...documentTabulations)
+                    mergeTabulations(...documentTabulations),
                 ),
                 shareReplay(1)
             );

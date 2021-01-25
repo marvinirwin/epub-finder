@@ -1,6 +1,16 @@
 import {Dictionary} from "lodash";
 import {TabulatedDocuments, TabulatedSentences} from "./tabulated-documents.interface";
 
+const isDocumentTabulation = (t: any): t is TabulatedDocuments => {
+    return !!(t as TabulatedDocuments).documentWordCounts;
+}
+
+
+function mergeDocumentWordCounts(merge: <TabulatedDocuments>
+(dict: Dictionary<TabulatedDocuments[]>, aggregateDict: Dictionary<TabulatedDocuments[]>) => void, newSentenceInfo: TabulatedDocuments, aggregateSentenceInfo: TabulatedDocuments) {
+    merge(newSentenceInfo.documentWordCounts, aggregateSentenceInfo.documentWordCounts)
+}
+
 export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos: T[]): TabulatedDocuments {
     const aggregateSentenceInfo: TabulatedDocuments = {
         wordElementsMap: {},
@@ -20,7 +30,6 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
             }
         }
     }
-
     for (let i = 0; i < sentenceInfos.length; i++) {
         const newSentenceInfo = sentenceInfos[i];
         newSentenceInfo.atomMetadatas.forEach(
@@ -36,10 +45,8 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
         merge(newSentenceInfo.wordElementsMap, aggregateSentenceInfo.wordElementsMap);
         merge(newSentenceInfo.wordSegmentMap, aggregateSentenceInfo.wordSegmentMap);
         aggregateSentenceInfo.segments.push(...newSentenceInfo.segments)
-        // @ts-ignore
-        if (newSentenceInfo.documentWordCounts) {
-            // @ts-ignore
-            merge(newSentenceInfo.documentWordCounts, aggregateSentenceInfo.documentWordCounts)
+        if (isDocumentTabulation(newSentenceInfo)) {
+            mergeDocumentWordCounts(merge, newSentenceInfo, aggregateSentenceInfo);
         }
     }
     return aggregateSentenceInfo;

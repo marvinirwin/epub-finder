@@ -26,7 +26,7 @@ export class ScheduleRowsService {
             map(([wordRecognition, wordCounts, pronunciationRecords]) => {
                 const scheduleRows: ds_Dict<ScheduleRow> = {};
 
-                function ensureScheduleRow(word: string) {
+                const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
                         scheduleRows[word] = {
                             wordRecognitionRecords: [],
@@ -36,7 +36,7 @@ export class ScheduleRowsService {
                         };
                     }
                     return scheduleRows[word];
-                }
+                };
 
                 Object.entries(wordCounts).forEach(([word, wordCountRecords]) => {
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);

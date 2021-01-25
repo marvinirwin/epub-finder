@@ -11,8 +11,6 @@ export interface TabulatedSentences {
     wordElementsMap: Dictionary<AtomMetadata[]>;
     wordSegmentMap: Dictionary<Segment[]>;
     wordCounts: Dictionary<number>;
-
-
     segments: Segment[];
     atomMetadatas: Map<XMLDocumentNode, AtomMetadata>
 }
