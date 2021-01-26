@@ -6,24 +6,29 @@ import {ProgressRowService} from "../schedule/progress-row.service";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
 import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
+import CardsRepository from "./cards.repository";
 
 export class ScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;
+
     constructor({
                     recognitionRecordsService,
                     wordCounts$,
-                    pronunciationRecordsService
+                    pronunciationRecordsService,
+                    cardsRepository
                 }: {
         recognitionRecordsService: ProgressRowService<WordRecognitionRow>,
         pronunciationRecordsService: PronunciationProgressService
         wordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
+        cardsRepository: CardsRepository
     }) {
         this.indexedScheduleRows$ = combineLatest([
             recognitionRecordsService.records$.pipe(startWith({})),
             wordCounts$.pipe(startWith({})),
-            pronunciationRecordsService.records$
+            pronunciationRecordsService.records$,
+            cardsRepository.cardIndex$
         ]).pipe(
-            map(([wordRecognition, wordCounts, pronunciationRecords]) => {
+            map(([wordRecognition, wordCounts, pronunciationRecords, cardIndex]) => {
                 const scheduleRows: ds_Dict<ScheduleRow> = {};
 
                 const ensureScheduleRow = (word: string) => {
@@ -38,7 +43,12 @@ export class ScheduleRowsService {
                     return scheduleRows[word];
                 };
 
-                Object.entries(wordCounts).forEach(([word, wordCountRecords]) => {
+                /**
+                 * Prevent cards created only for visual purposes from showing up in the quiz rows
+                 */
+                Object.entries(wordCounts).filter(
+                    ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
+                ).forEach(([word, wordCountRecords]) => {
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
                 });
                 Object.entries(pronunciationRecords).forEach(([word, pronunciationRecords]) => {

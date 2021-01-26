@@ -6,6 +6,7 @@ import {DocumentSelect} from "./document-select.component";
 import {ToggleTranslate} from "../components/directory/toggle-translate";
 import {TogglePinyin} from "../components/directory/toggle-pinyin";
 import {ManualTestModal} from "../components/modals/manual-test-modal.component";
+import {AdjustFrequencyWeight} from "../components/directory/adjust-frequency-weight.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -33,6 +34,7 @@ export class ModalService {
             () => <div>
                 <ToggleTranslate/>
                 <TogglePinyin/>
+                <AdjustFrequencyWeight/>
             </div>
         );
 

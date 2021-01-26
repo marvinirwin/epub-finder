@@ -31,7 +31,7 @@ export class AtomMetadata {
                     .map(word => {
                         const cardMapElement = cardMap[word.word] || [];
                         return cardMapElement
-                            .filter(v => !v.disableMouseover);
+                            .filter(v => !v.highlightOnly);
                     })
             ), c => c.learningLanguage.length);
     }

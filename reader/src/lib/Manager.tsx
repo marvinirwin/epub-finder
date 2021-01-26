@@ -253,7 +253,8 @@ export class Manager {
         this.scheduleRowsService = new ScheduleRowsService({
             wordCounts$: this.readingWordCounts$,
             recognitionRecordsService: this.wordRecognitionProgressService,
-            pronunciationRecordsService: this.pronunciationProgressService
+            pronunciationRecordsService: this.pronunciationProgressService,
+            cardsRepository: this.cardsRepository
         });
         this.scheduleManager = new ScheduleService({
                 db,

@@ -26,11 +26,12 @@ export class ScheduleMathService {
             n * freqWeight,
         ]);
 
+        const valueNumberMap = ScheduleMathService.addValuesMappedToNumbers(
+            new Map(ScheduleMathService.inverseLog(dateEntries)),
+            new Map(ScheduleMathService.inverseLog(frequencyEntries))
+        );
         return ScheduleMathService.orderMappedValues(
-            ScheduleMathService.addValuesMappedToNumbers(
-                new Map(ScheduleMathService.inverseLog(dateEntries)),
-                new Map(ScheduleMathService.inverseLog(frequencyEntries))
-            )
+            valueNumberMap
         )
     }
 
@@ -41,7 +42,7 @@ export class ScheduleMathService {
         let maxValue = Number.MIN_SAFE_INTEGER;
         let minValue = Number.MAX_SAFE_INTEGER;
         scheduleRows.forEach(row => {
-            const rowValue = valueFunction(row);
+            const rowValue = valueFunction(row) || 0;
             if (maxValue < rowValue) {
                 maxValue = rowValue;
             }
@@ -50,7 +51,7 @@ export class ScheduleMathService {
             }
         })
         return scheduleRows.map(row => [
-            ScheduleMathService.normalize(valueFunction(row), minValue, maxValue),
+            ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
             row
         ])
     }
@@ -72,7 +73,7 @@ export class ScheduleMathService {
                     return;
                 }
                 usedSet.add(value);
-                resultMap.set(value, sum(valueNumberMaps.map(map => map.get(value))));
+                resultMap.set(value, sum(valueNumberMaps.map(map => map.get(value))) || 0);
             })
         });
         return resultMap;

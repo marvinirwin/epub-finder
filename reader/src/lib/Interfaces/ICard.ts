@@ -11,7 +11,10 @@ export interface ICard {
     illustrationPhotos: string[];
     timestamp: number | Date;
 
-    disableMouseover?: boolean;
+    // Only created for purposes of highlight
+    highlightOnly?: boolean;
+    // Created by the program and never interacted with by the user
+    synthetic?: boolean;
 }
 
 export async function resolveMediaSources(audio: (HTMLAudioElement | HTMLImageElement)[], resolveMediaSrc: (s: string) => Promise<string>) {

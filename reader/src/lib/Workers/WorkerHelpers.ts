@@ -3,6 +3,8 @@ import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromSrcDoc';
 // @ts-ignore
+import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./identify-subsequences.worker';
+// @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
 import {InterpolateService} from "@shared/";
 
@@ -13,28 +15,17 @@ export const AtomizeHtml = (HTMLString: string) =>
         .then(handleWorkerError);
 
 export const AtomizeUrl = async (url: string) => {
-/*
-    try {
-        const cached = JSON.parse(localStorage.getItem(AtomizeUrlKey(url)) || '');
-        if (cached) {
-            return cached;
-        }
-    } catch(e) {
-        console.warn(e);
-    }
-*/
     return GetWorkerResults<string | WorkerError>(new AtomizeUrlWorker(), url)
         .then(handleCacheSuccessfulAtomizeUrl(url))
         .then(handleWorkerError)
 };
 
+export const IdentifySubsequences = async (text: string) => GetWorkerResults<string[] | WorkerError>(new IdentifySubSequencesWorker(), text)
+    .then(handleWorkerError)
+
+
 function handleCacheSuccessfulAtomizeUrl(url: string) {
     return (result: string | WorkerError) => {
-/*
-        if (typeof result === 'string') {
-            localStorage.setItem(AtomizeUrlKey(url), result)
-        }
-*/
         return result;
     };
 }

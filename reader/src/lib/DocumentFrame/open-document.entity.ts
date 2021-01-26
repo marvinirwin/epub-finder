@@ -1,5 +1,5 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {map, shareReplay, tap, withLatestFrom} from "rxjs/operators";
+import {map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {Segment} from "../Atomized/segment";
 import {TrieWrapper} from "../TrieWrapper";
 import {printExecTime} from "../Util/Timer";
@@ -9,6 +9,7 @@ import {rehydratePage} from "../Atomized/open-document.component";
 import {mergeTabulations} from "../Atomized/merge-tabulations";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {flatten} from "lodash";
+import {IdentifySubsequences} from "../Workers/WorkerHelpers";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
@@ -21,6 +22,7 @@ export class OpenDocument {
     public renderedTabulation$: Observable<TabulatedDocuments>;
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
+    public notableSubsequences$: Observable<string[]>;
 
     constructor(
         public name: string,
@@ -53,6 +55,12 @@ export class OpenDocument {
             ),
             shareReplay(1),
         );
+
+        this.notableSubsequences$ = this.renderedSegments$.pipe(
+            map(segments => segments.map(segment => segment.translatableText).join('')),
+            switchMap(IdentifySubsequences),
+            shareReplay(1),
+        )
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {

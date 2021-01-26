@@ -143,7 +143,7 @@ export default class CardsRepository {
     public putMouseoverDisabledWords(words: string[]) {
         this.addCardsWhichDoNotHaveToBePersisted$.next(
             words.map(cardForWord).map(card => {
-                card.disableMouseover = true;
+                card.highlightOnly = true;
                 return card
            })
         )
