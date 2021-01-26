@@ -10,6 +10,7 @@ import {mergeTabulations} from "../Atomized/merge-tabulations";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
 import {flatten} from "lodash";
 import {IdentifySubsequences} from "../Workers/WorkerHelpers";
+import {SubSequenceReturn} from "../subsequence-return.interface";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
@@ -22,7 +23,7 @@ export class OpenDocument {
     public renderedTabulation$: Observable<TabulatedDocuments>;
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
-    public notableSubsequences$: Observable<string[]>;
+    public notableSubsequences$: Observable<SubSequenceReturn>;
 
     constructor(
         public name: string,

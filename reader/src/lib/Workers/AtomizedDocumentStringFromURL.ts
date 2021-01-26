@@ -17,7 +17,7 @@ ctx.onmessage = async (ev) => {
         const doc = AtomizedDocument.atomizeDocument(srcdoc);
         ctx.postMessage(doc.toString());
     } catch (e) {
-        ctx.postMessage({type: "error", message: `Could not find ${e.toString()}`} as WorkerError);
+        ctx.postMessage({type: "error", errorMessage: `Could not find ${e.toString()}`} as WorkerError);
     }
 };
 

@@ -49,6 +49,8 @@ export class ScheduleRowsService {
                 Object.entries(wordCounts).filter(
                     ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
                 ).forEach(([word, wordCountRecords]) => {
+                    const w = cardIndex[word];
+                    console.log(wordCounts);
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
                 });
                 Object.entries(pronunciationRecords).forEach(([word, pronunciationRecords]) => {

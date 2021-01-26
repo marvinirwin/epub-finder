@@ -7,8 +7,9 @@ import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./nota
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
 import {InterpolateService} from "@shared/";
+import {SubSequenceReturn} from "../subsequence-return.interface";
 
-export type WorkerError = { type: "error", message: string };
+export type WorkerError = { errorMessage: string };
 
 export const AtomizeHtml = (HTMLString: string) =>
     GetWorkerResults<string | WorkerError>(new AtomizeSrcdocWorker(), HTMLString)
@@ -20,12 +21,12 @@ export const AtomizeUrl = async (url: string) => {
         .then(handleWorkerError)
 };
 
-export const IdentifySubsequences = async (text: string) => GetWorkerResults<string[] | WorkerError>(new IdentifySubSequencesWorker(), text)
-    .then((result: string[] | WorkerError) => {
-        if (!Array.isArray(result)) {
-            return [];
+export const IdentifySubsequences = async (text: string) => GetWorkerResults<SubSequenceReturn  | WorkerError>(new IdentifySubSequencesWorker(), text)
+    .then((result: SubSequenceReturn | WorkerError) => {
+        if ((result as WorkerError).errorMessage !== undefined) {
+            return {popularStrings: [], characterSet: []};
         }
-        return result;
+        return result as SubSequenceReturn;
     })
 
 
@@ -41,6 +42,6 @@ const handleWorkerError = (r: string | WorkerError) => {
     if (typeof r === 'string') {
         return r;
     }
-    return InterpolateService.text(r.message)
+    return InterpolateService.text(r.errorMessage)
 }
 
