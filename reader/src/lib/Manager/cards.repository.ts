@@ -148,4 +148,12 @@ export default class CardsRepository {
            })
         )
     }
+    public putSyntheticWords(words: string[]) {
+        this.addCardsWhichDoNotHaveToBePersisted$.next(
+            words.map(cardForWord).map(card => {
+                card.synthetic = true;
+                return card
+            })
+        )
+    }
 }

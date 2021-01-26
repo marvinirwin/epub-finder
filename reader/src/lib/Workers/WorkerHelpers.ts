@@ -21,7 +21,12 @@ export const AtomizeUrl = async (url: string) => {
 };
 
 export const IdentifySubsequences = async (text: string) => GetWorkerResults<string[] | WorkerError>(new IdentifySubSequencesWorker(), text)
-    .then(handleWorkerError)
+    .then((result: string[] | WorkerError) => {
+        if (!Array.isArray(result)) {
+            return [];
+        }
+        return result;
+    })
 
 
 function handleCacheSuccessfulAtomizeUrl(url: string) {

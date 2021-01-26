@@ -31,7 +31,8 @@ ctx.onmessage = async (ev) => {
         const popularEntries = [...popularityMap.entries()].filter(
             ([str, count]) => count >= POPULAR_SEQUENCE_COUNT_THRESHOLD
         );
-        ctx.postMessage(new Map(popularEntries));
+        const message: string[] = popularEntries.map(([str]) => str);
+        ctx.postMessage(message);
     } catch (e) {
         ctx.postMessage({type: "error", message: e} as WorkerError);
     }

@@ -84,6 +84,7 @@ import {ModalService} from "./modal.service";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
 import {VideoMetadataHighlight} from "./Highlighting/video-metadata.highlight";
 import {MousedOverWordHighlightService} from "./Highlighting/moused-over-word-highlight.service";
+import {NotableSubsequencesService} from "./notable-subsequences.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -517,6 +518,11 @@ export class Manager {
             videoMetadataRepository: this.videoMetadataRepository,
             modesService: this.modesService
         });
+
+        new NotableSubsequencesService({
+            cardsRepository: this.cardsRepository,
+            openDocumentsService: this.openDocumentsService
+        })
 
 
         this.hotkeyEvents.startListeners();
