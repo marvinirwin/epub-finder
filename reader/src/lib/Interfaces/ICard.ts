@@ -1,5 +1,3 @@
-import {DOMParser, XMLSerializer} from "xmldom";
-
 export interface ICard {
     id?: number; // Primary key. Optional (autoincremented)
     learningLanguage: string;

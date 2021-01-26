@@ -3,7 +3,7 @@ import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromSrcDoc';
 // @ts-ignore
-import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./identify-subsequences.worker';
+import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./notable-subsequences.worker';
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
 import {InterpolateService} from "@shared/";

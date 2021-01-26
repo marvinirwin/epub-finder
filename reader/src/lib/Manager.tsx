@@ -471,7 +471,8 @@ export class Manager {
         new CardCreationService({
             cardService: this.cardsRepository,
             pronunciationProgressService: this.pronunciationProgressService,
-            wordRecognitionService: this.wordRecognitionProgressService
+            wordRecognitionService: this.wordRecognitionProgressService,
+            openDocumentsService: this.openDocumentsService,
         })
         this.introSeriesService = new IntroSeriesService({
             settingsService: this.settingsService

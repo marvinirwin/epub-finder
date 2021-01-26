@@ -33,7 +33,6 @@ export default class CardsRepository {
     }
 
     public deleteWords: Subject<string[]> = new Subject<string[]>();
-    public putWords$: Subject<string[]> = new Subject<string[]>();
     addCardsWhichDoNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>();
     upsertCards$ = new Subject<ICard[]>();
     cardIndex$!: Observable<Dictionary<ICard[]>>;
@@ -60,9 +59,6 @@ export default class CardsRepository {
         this.db = databaseService;
         this.cardProcessingSignal$.next(true);
 
-        this.putWords$.subscribe(words => {
-            this.putWords(words);
-        });
 
         this.newWords$ = this.addCardsWhichDoNotHaveToBePersisted$.pipe(
             map(cards => cards.map(card => card.learningLanguage)),

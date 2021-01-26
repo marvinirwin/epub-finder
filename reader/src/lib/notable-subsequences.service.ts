@@ -23,6 +23,7 @@ export class NotableSubsequencesService {
                 return merge(...subSequences);
             }),
         ).subscribe(subsequences => {
+            debugger;
             cardsRepository.putSyntheticWords(subsequences);
         })
         ;

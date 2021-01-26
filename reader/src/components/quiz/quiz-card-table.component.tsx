@@ -4,6 +4,7 @@ import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody}
 import {useObservableState} from "observable-hooks";
 import {last5, lastN} from "./last-n";
 import {isLearning, isNew, isToReview} from "../../lib/schedule/ScheduleRow";
+import {sum} from 'lodash';
 
 
 
@@ -18,7 +19,7 @@ export const QuizCardTableComponent = () => {
                 <TableRow>
                     <TableCell style={{minWidth: '10em'}}>Word</TableCell>
                     <TableCell align="right">Recognition</TableCell>
-                    <TableCell align="right">Word Counts</TableCell>
+                    <TableCell align="right">Frequency</TableCell>
                     <TableCell align="right">Pronunciation</TableCell>
                 </TableRow>
             </TableHead>
@@ -44,9 +45,7 @@ export const QuizCardTableComponent = () => {
                             }
                             </TableCell>
                             <TableCell align="right">{
-                                (row.wordCountRecords)
-                                    .map(r => `${r.document} ${r.count}`)
-                                    .join(',')
+                                sum(row.wordCountRecords.map(r => r.count))
                             }</TableCell>
                             <TableCell align="right">{
                                 lastN(1)(row.pronunciationRecords)

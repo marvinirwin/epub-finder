@@ -17,6 +17,7 @@ ctx.onmessage = async (ev) => {
     try {
         const popularityMap = new Map<string, number>();
         const text = ev.data as string;
+        debugger;
         for (let substrStart = 0; substrStart < text.length; substrStart++) {
             for (let i = MIN_SEQUENCE_LENGTH; i < MAX_SEQUENCE_LENGTH; i++) {
                 const substr = text.slice(substrStart, i);
