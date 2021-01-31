@@ -5,6 +5,7 @@ import {TransliterateResponseDto} from "./transliterate-response.dto";
 import { transliterate } from './transliterate.service';
 import {TransliterateRequestDto} from "./transliterate-request.dto";
 import {Public} from "../decorators/public";
+import {Unprotected} from "nest-keycloak-connect";
 
 @Controller('translate')
 export class TranslateController {
@@ -13,6 +14,7 @@ export class TranslateController {
     ) {}
 
     @Post()
+    @Unprotected()
     async translate(@Body() translateRequestDto: TranslateRequestDto) {
         const cacheResult = await this.translateService.lookupCacheEntry(translateRequestDto);
         if (cacheResult) {
@@ -25,6 +27,7 @@ export class TranslateController {
     }
 
     @Public()
+    @Unprotected()
     @Post('/transliterate')
     async transliterate(@Body() transliterateRequestDto: TransliterateRequestDto) {
         const cacheResult = await this.translateService.lookupCacheEntry<TransliterateResponseDto>(transliterateRequestDto);

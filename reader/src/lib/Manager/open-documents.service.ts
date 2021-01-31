@@ -3,13 +3,11 @@ import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {Website} from "../Website/Website";
 import {Segment} from "../Atomized/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
-import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
 import {AtomizedDocument} from "../Atomized/atomized-document";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
 import {filterMap, mapMap, mapToArray} from "../map.module";
-import {LibraryService} from "./library.service";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
 import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
@@ -59,12 +57,8 @@ export class OpenDocumentsService {
             map(libraryDocuments => {
                 return mapMap(
                     libraryDocuments,
-                    (id, {name, html, filename}) => {
+                    (id, {name, filename}) => {
                         const documentSource: AtomizedDocumentSources = {}
-                        if (html) {
-                            // TODO replaceSubject here?
-                            documentSource.unAtomizedDocument$ = of(html);
-                        }
                         if (filename) {
                             documentSource.url$ = of(`/documents/${filename}`)
                         }

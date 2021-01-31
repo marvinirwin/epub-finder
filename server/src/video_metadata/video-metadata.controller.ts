@@ -3,6 +3,7 @@ import {Body, Controller, Get, Header, Param, Post, Put, HttpStatus, HttpCode} f
 import {VideoMetadataDto} from "./video-metadata.dto";
 import {sha1} from "../util/sha1";
 import {zip, zipObject} from "lodash";
+import {Unprotected} from "nest-keycloak-connect";
 
 
 @Controller('video_metadata')
@@ -11,6 +12,7 @@ export class VideoMetadataController {
     }
 
     @Get(":hash")
+    @Unprotected()
     @Header('content-type', 'application/json')
     async metadataForHash(@Param() {hash}) {
         return (await this.videoMetadataService.resolveVideoMetadataByHash(hash))?.metadata
@@ -22,6 +24,7 @@ export class VideoMetadataController {
     }
 
     @Get()
+    @Unprotected()
     // TODO will this collide with the above :hash route?
     @Header('content-type', 'application/json')
     async allMetadata() {

@@ -26,6 +26,7 @@ import {readStream, s3} from "./uploading/s3.service";
 import {AnonymousGuard} from "../guards/anonymous";
 import {DocumentViewDto} from "./document-view.dto";
 import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
+import {Unprotected} from "nest-keycloak-connect";
 
 @Controller('documents')
 export class DocumentsController {
@@ -37,6 +38,7 @@ export class DocumentsController {
     }
 
     @Put('')
+    @Unprotected()
     @UseGuards(AnonymousGuard)
     @UseInterceptors(
         FileInterceptor(
@@ -99,6 +101,7 @@ export class DocumentsController {
     }
 
     @Get('')
+    @Unprotected()
     async all(
         @UserFromReq() user: User | undefined,
         @Headers('is_test') is_test: string
@@ -119,6 +122,7 @@ export class DocumentsController {
     @Get(':filename')
     @HttpCode(HttpStatus.OK)
     @Header('Content-Type', 'text/html')
+    @Unprotected()
     file(
         @UserFromReq() user: User | undefined,
         @Param('filename') filename: string,
