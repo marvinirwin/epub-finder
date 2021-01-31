@@ -20,9 +20,6 @@ export class Document {
     @Column("text")
     name: string;
 
-    @Column('text', {default: null})
-    html: string | null;
-
     @Column({default: null})
     filename: string | null;
 
@@ -34,6 +31,9 @@ export class Document {
 
     @Column()
     global: boolean;
+
+    @Column({default: false})
+    for_testing: boolean = false;
 
     @Column({default: false})
     deleted: boolean = false;

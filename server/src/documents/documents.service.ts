@@ -21,12 +21,12 @@ export class DocumentsService {
     ) {
     }
 
-    async all(user?: User | undefined): Promise<DocumentView[]> {
+    async all({user, for_testing}:{user?: User | undefined, for_testing?: boolean}): Promise<DocumentView[]> {
         return await this.documentViewRepository
             .find({
                     where: [
                         {creator_id: user?.id, deleted: false},
-                        {global: true, deleted: false},
+                        {global: true, deleted: false, for_testing: for_testing},
                     ]
                 }
             )
@@ -40,7 +40,7 @@ export class DocumentsService {
             document_id: documentId,
             name,
             filename: basename(filePath),
-            hash: await HashService.fileHash(filePath),
+            hash: await HashService.hashS3(filePath),
             creator_id: user.id,
             global: false
         })
@@ -51,7 +51,7 @@ export class DocumentsService {
         return await this.documentRepository.save({
             name,
             filename: basename(filePath),
-            hash: await HashService.fileHash(filePath),
+            hash: await HashService.hashS3(filePath),
             creator_id: user.id,
             global: false
         })
@@ -103,12 +103,16 @@ export class DocumentsService {
         return !!await this.byDocumentId(user, document_id);
     }
 
-    public async byFilename(filename: string, user?: User) {
-        const whereConditions: { global?: boolean, filename: string, creator_id?: number }[] = [
+    public async byFilename({filename, user, for_testing}:{filename: string, user?: User, for_testing?: boolean}) {
+        const whereConditions: Partial<DocumentView>[] = [
             {
                 global: true,
                 filename
             },
+            {
+                for_testing,
+                filename
+            }
         ]
         if (user) {
             whereConditions.push(

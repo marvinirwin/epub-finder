@@ -3,11 +3,9 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {DocumentView} from "../../entities/document-view.entity";
 import {Repository} from "typeorm";
 import {Document} from "../../entities/document.entity";
-import {User} from "../../entities/user.entity";
-import fs from "fs-extra";
+import {promises as fs} from "fs";
 import {join, parse} from "path";
-import {sha1} from "../../util/sha1";
-import {startCase} from "lodash";
+import {BuiltInDocument} from "./built-in-document";
 
 export class BuiltInDocumentsService implements OnModuleInit {
 
@@ -25,47 +23,32 @@ export class BuiltInDocumentsService implements OnModuleInit {
     }
 
     private async insertDocumentsInDocumentsDir() {
-        // Get all the documents, get their hashes, compare with the current documents
-        const documents = await Promise.all(
-            (await fs.readdir(process.env.BUILT_IN_DOCUMENTS_DIR))
-                .filter(filename => filename.endsWith('.html'))
-                .map(filename =>
-                    fs.readFile(join(process.env.BUILT_IN_DOCUMENTS_DIR, filename))
-                        .then(content => ({filename, html: content.toString()}))// Do I have to add UTF-8 here?
-                )
-        );
-        for (let i = 0; i < documents.length; i++) {
-            const {filename, html} = documents[i];
-            const htmlHash = sha1(html);
-            const name = startCase(parse(filename).name);
-            const sameVersion = await this.documentViewRepository.findOne({
-                hash: htmlHash,
-                name
-            })
-            const baseEntity: Partial<Document> = {
-                name,
-                hash: htmlHash,
+        const builtInPaths = (await readPathsInDir(process.env.BUILT_IN_DOCUMENTS_DIR))
+            .map(filePath => new BuiltInDocument({
+                filePath,
                 global: true,
-                html,
-                creator_id: undefined
-            };
-            if (!sameVersion) {
-                const differentVersion = await this
-                    .documentViewRepository
-                    .findOne({name, creator_id: null});
-
-                if (differentVersion) {
-                    console.log(`Hash is different, updating ${differentVersion.name}`);
-                    await this.documentRepository.insert({
-                        ...baseEntity, document_id: differentVersion.rootId()
-                    });
-                } else {
-                    console.log(`Inserting ${name} for the first time`);
-                    await this.documentRepository.insert(baseEntity)
-                }
-            } else {
-                console.log(`${name} already exists`)
-            }
-        }
+                for_testing: false
+            }));
+        const testPaths = (await readPathsInDir(process.env.TEST_DOCUMENTS_DIR))
+            .map(filePath => new BuiltInDocument({
+                filePath,
+                global: false,
+                for_testing: true
+            }));
+        [
+            ...builtInPaths,
+            ...testPaths
+        ].map(document => document.upsert({
+            documentRepository: this.documentRepository,
+            documentViewRepository: this.documentViewRepository
+        }))
     }
 }
+const readPathsInDir = async (dir: string): Promise<string[]>  => {
+    try {
+        return (await fs.readdir(dir)).map(filename => join(dir, filename))
+    } catch(e){
+        return [];
+    }
+}
+

@@ -15,9 +15,8 @@ export class HashService {
         }
     */
 
-    public static fileHash(key: string): Promise<string> {
+    public static hashS3(key: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            console.log(`Hashing ${key}: getting read stream`)
             const params = {Bucket: bucket, Key: key};
             if (!await s3Exists(s3, bucket, key)) {
                 throw new Error(`Cannot find ${key}`);
@@ -25,11 +24,9 @@ export class HashService {
             const readStream = s3.getObject(params)
                 .on('error', () => reject)
                 .createReadStream();
-            console.log(`Hashing ${key}: got read stream`)
             const hash = createHash('sha1');
             hash.setEncoding('hex');
             readStream.on('end', () => {
-                console.log(`Hashing ${key}: readStream ended`)
                 hash.end();
                 resolve(hash.read())
             });

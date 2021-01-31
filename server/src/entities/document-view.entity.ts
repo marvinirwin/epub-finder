@@ -13,7 +13,8 @@ import {User} from "./user.entity";
         b.global,
         b.deleted,
         b.filename,
-        b.hash
+        b.hash,
+        b.for_testing
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at
@@ -33,9 +34,6 @@ export class DocumentView  {
     name: string;
 
     @ViewColumn()
-    html: string | null;
-
-    @ViewColumn()
     hash: string;
 
     @ViewColumn()
@@ -53,6 +51,9 @@ export class DocumentView  {
 
     @ViewColumn()
     deleted: boolean;
+
+    @Column()
+    for_testing: boolean;
 
     rootId() {
         return this.document_id || this.id;

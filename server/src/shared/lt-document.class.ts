@@ -20,7 +20,4 @@ export class LtDocument {
     get filename() {
         return this.d.filename;
     }
-    get html() {
-        return this.d.html;
-    }
 }

@@ -20,9 +20,11 @@ import {ObservableModule} from "./observable/observable.module";
 import {DocumentsModule} from "./documents/documents.module";
 import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
 import {RecordRequestModule} from "./record-request/record-request.module";
+import {KeycloakModule} from "./keycloak/keycloak.module";
 
 @Module({
     imports: [
+        KeycloakModule,
         DatabaseModule,
         TranslateModule,
         TranslateHttpModule,
