@@ -10,7 +10,7 @@ import {DocumentSelectionRowInterface} from "../../lib/document-selection/docume
 import {Profile} from "../../lib/Auth/loggedInUserService";
 import {SignoutNode} from "./nodes/signout.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
-import {GoogleSigninNode} from "./nodes/google-sign-in.node";
+import {KeycloakSignInNode} from "./nodes/keycloak-sign-in.node";
 import {ProfileNode} from "./nodes/profile.node";
 import {uploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
@@ -40,7 +40,7 @@ function AppDirectory(
             ],
             SignInWithNode(profile),
             [
-                GoogleSigninNode(),
+                KeycloakSignInNode(),
             ],
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),

@@ -2,7 +2,7 @@
   "realm": "LanguageTrainer",
   "auth-server-url": "http://localhost:8080/auth/",
   "ssl-required": "external",
-  "resource": "LanguageTrainer dev",
+  "resource": "LanguageTrainer",
   "public-client": true,
   "confidential-port": 0
 }
