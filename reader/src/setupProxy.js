@@ -11,7 +11,15 @@ module.exports = function(app) {
     app.use(
         '/auth/*',
         createProxyMiddleware({
-            target: 'http://localhost:3001',
+            target: 'http://localhost:8080',
+            changeOrigin: true,
+            logLevel: 'debug'
+        })
+    );
+    app.use(
+        '/keycloak/*',
+        createProxyMiddleware({
+            target: 'http://localhost:8080',
             changeOrigin: true,
             logLevel: 'debug'
         })
