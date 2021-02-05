@@ -7,16 +7,16 @@ import {useObservableState} from "observable-hooks";
 
 export function PlaybackSpeedComponent() {
     const m = useContext(ManagerContext);
-    const playbackRate = useObservableState(m.settingsService.playbackSpeed$, 0);
+    const playbackRate = useObservableState(m.settingsService.playbackSpeed$, '0.5');
     return <div  ref={el => m.introService.playbackSpeedRef$.next(el)}>
         <Typography gutterBottom>
             Video playback speed
         </Typography>
         <Slider
             id={'playback-speed-slider'}
-            value={playbackRate}
+            value={parseFloat(playbackRate) || 0.5}
             onChange={(_, value) => {
-                m.settingsService.playbackSpeed$.next(value as number);
+                m.settingsService.playbackSpeed$.next(`${value}`);
             }}
             step={.1}
             marks
