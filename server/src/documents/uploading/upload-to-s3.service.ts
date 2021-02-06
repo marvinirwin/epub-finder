@@ -17,7 +17,7 @@ export class UploadToS3Service {
         ).promise();
         return new S3UploadedFile(
             {
-                originalname: `${parse(path).name}.${parse(path).ext}`,
+                originalname: `${parse(path).name}${parse(path).ext}`,
                 bucket: inputConfig.bucket,
                 key: uploadResult.Key,
                 location: inputConfig.region,

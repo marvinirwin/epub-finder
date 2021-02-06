@@ -49,7 +49,7 @@ export class BuiltInDocument {
         if (exactlyTheSameVersion) {
             return;
         }
-        const convertedFile = await UploadToS3Service.upload( this.config.filePath, true );//asdfasdfasdfasdf
+        const convertedFile = await UploadToS3Service.upload( this.config.filePath, true );
 
 /*
         const presentButDifferentVersion = await documentViewRepository
@@ -66,7 +66,7 @@ export class BuiltInDocument {
         };
 
         console.log(`Inserting ${name} for the first time`);
-        await documentRepository.insert(baseEntity)
+        await documentRepository.insert(baseEntity);
 /*
         if (presentButDifferentVersion) {
             console.log(`Hash is different, updating ${presentButDifferentVersion.name}`);

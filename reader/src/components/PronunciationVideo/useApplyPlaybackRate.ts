@@ -10,7 +10,7 @@ const setPlaybackSpeed = (videoElementRef: HTMLVideoElement | null | undefined, 
 
 export const useApplyPlaybackSpeed = (videoElementRef: HTMLVideoElement | null | undefined) => {
     const m = useContext(ManagerContext);
-    const speed = useObservableState(m.settingsService.playbackSpeed$);
+    const speed = useObservableState(m.settingsService.playbackSpeed$.obs$);
     useSubscription(m.pronunciationVideoService.canPlay$, () => {
         setPlaybackSpeed(videoElementRef, speed);
     })

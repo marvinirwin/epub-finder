@@ -24,7 +24,7 @@ export class LibraryService {
         const saved = await this.documentRepository.upsert({
             file,
         });
-        this.settingsService.readingDocument$.next(saved.name)
+        this.settingsService.readingDocument$.next(saved.id())
     }
 
     public async deleteDocument(instanceId: string): Promise<void> {

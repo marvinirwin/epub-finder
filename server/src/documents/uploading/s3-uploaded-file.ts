@@ -11,28 +11,28 @@ import {ConversionProcess} from "./cloud-convert/conversion-process";
 
 export class S3UploadedFile {
     constructor(
-        public file: { originalname: string, bucket: string, key: string, location: string },
+        public file: { originalname: string; bucket: string; key: string; location: string },
         public isSandboxFile: boolean
     ) {}
 
     formatChain(): string[] {
         switch(this.ext()) {
-            case 'pdf':
-                return ['pdf', 'docx', 'html'];
-            case 'docx':
-                return ['docx', 'html'];
-            case 'txt':
-                return ['txt', 'html']
+            case "pdf":
+                return ["pdf", "docx", "html"];
+            case "docx":
+                return ["docx", "html"];
+            case "txt":
+                return ["txt", "html"];
             default:
-                throw new Error(`No format chain found for ${this.ext()}`)
+                throw new Error(`No format chain found for ${this.ext()}`);
         }
     }
     ext() {
-        return parse(this.file.originalname).ext.replace('.', '');
+        return parse(this.file.originalname).ext.replace(".", "");
     }
 
     async output(): Promise<UploadOutput> {
-        const ext = this.ext()
+        const ext = this.ext();
         const key = this.file.key;
         const inputBucketOutputBucketKey = {
             inputBucket: inputConfig,
@@ -45,16 +45,16 @@ export class S3UploadedFile {
                 return new UploadOutput(
                     [
                         {
-                            dir: '',
+                            dir: "",
                             s3Key: this.file.key,
-                            filename: 'index.html'
+                            filename: "index.html"
                         }
                     ]
-                )
+                );
             case "pdf":
             case "docx":
             case "txt":
-                return new ConversionProcess(this).convert()
+                return new ConversionProcess(this).convert();
             default:
                 throw new Error(`Cannot upload file with extension: ${ext}`);
         }
@@ -72,7 +72,7 @@ export class UploadOutput {
     }
 
     index() {
-        return this.f.find(file => file.filename.endsWith('.html'))
+        return this.f.find(file => file.filename.endsWith(".html"));
     }
 
 }

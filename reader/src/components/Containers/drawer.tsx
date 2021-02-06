@@ -87,15 +87,15 @@ export const MiniDrawer: React.FC<{}> = ({children}) => {
     const treeMenuService = m.treeMenuService;
     const menuItemTree = useObservableState(treeMenuService.tree.updates$);
     const directoryPath = useObservableState(m.settingsService.directoryPath$) || '';
-    const [open, setOpen] = React.useState(false);
+    const open = useObservableState(m.settingsService.drawerClosed$) || false;
 
     const classes = useStyles();
     const handleDrawerOpen = () => {
-        setOpen(true);
+        m.settingsService.drawerClosed$.next(true);
     };
 
     const handleDrawerClose = () => {
-        setOpen(false);
+        m.settingsService.drawerClosed$.next(false);
     };
 
     return (

@@ -56,22 +56,19 @@ export class OpenDocumentsService {
             /*
                         map(documents => filterMap(documents, (key, d) => !d.deleted)),
             */
-            map(libraryDocuments => {
+            map(documents => {
                 return mapMap(
-                    libraryDocuments,
-                    (id, {name, html, filename}) => {
+                    documents,
+                    (id, document) => {
                         const documentSource: AtomizedDocumentSources = {}
-                        if (html) {
-                            // TODO replaceSubject here?
-                            documentSource.unAtomizedDocument$ = of(html);
-                        }
-                        if (filename) {
-                            documentSource.url$ = of(`/documents/${filename}`)
+                        if (document.filename) {
+                            documentSource.url$ = of(`/documents/${(document.filename)}`)
                         }
                         const openDocument = new OpenDocument(
-                            name,
+                            document.id(),
                             config.trie$,
-                            DocumentSourcesService.document(documentSource)
+                            DocumentSourcesService.document(documentSource),
+                            document.name
                         );
                         return [
                             id,

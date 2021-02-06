@@ -15,7 +15,7 @@ export const OpenDocumentComponent =
         const document = useObservableState(openedDocument.atomizedDocument$)
         return <InnerHTMLIFrame
             {...props}
-            title={openedDocument.name}
+            title={openedDocument.label}
             bodyText={document?.bodyInnerHTML() || ''}
             headText={document?.headInnerHTML() || ''}
             renderHandler={(head, body) => {

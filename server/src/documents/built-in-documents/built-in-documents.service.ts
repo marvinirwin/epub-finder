@@ -41,14 +41,14 @@ export class BuiltInDocumentsService implements OnModuleInit {
         ].map(document => document.upsert({
             documentRepository: this.documentRepository,
             documentViewRepository: this.documentViewRepository
-        }))
+        }));
     }
 }
 const readPathsInDir = async (dir: string): Promise<string[]>  => {
     try {
-        return (await fs.readdir(dir)).map(filename => join(dir, filename))
+        return (await fs.readdir(dir)).map(filename => join(dir, filename));
     } catch(e){
         return [];
     }
-}
+};
 

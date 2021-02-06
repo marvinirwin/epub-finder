@@ -13,8 +13,6 @@ import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
 import {SpeechRecognitionSnackbar} from "./components/speech-recognition-snackbar.component";
-import { ReactKeycloakProvider } from '@react-keycloak/web'
-import keycloak from "./components/keycloak/keycloak";
 
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -32,7 +30,6 @@ export const ManagerContext = React.createContext(manager)
 
 function App() {
     return <ThemeProvider theme={theme}>
-        <ReactKeycloakProvider authClient={keycloak}>
             <ManagerContext.Provider value={manager}>
                 <CssBaseline>
                     {
@@ -51,7 +48,6 @@ function App() {
                     <Main m={manager}/>
                 </CssBaseline>
             </ManagerContext.Provider>
-        </ReactKeycloakProvider>
     </ThemeProvider>;
 }
 

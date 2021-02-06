@@ -31,6 +31,7 @@ export class ReadingDocumentService {
                 }),
                 shareReplay(1)
             ),
+            "Reading Document"
         );
 
         openDocumentsService.openDocumentTree.appendDelta$.next(
@@ -40,8 +41,8 @@ export class ReadingDocumentService {
                     [READING_DOCUMENT_NODE_LABEL]: {
                         nodeLabel: READING_DOCUMENT_NODE_LABEL,
                         children: {
-                            [this.readingDocument.name]: {
-                                nodeLabel: this.readingDocument.name,
+                            [this.readingDocument.id]: {
+                                nodeLabel: this.readingDocument.id,
                                 value: this.readingDocument
                             }
                         }
@@ -59,11 +60,12 @@ export class ReadingDocumentService {
                          checkedOutDocuments,
                          selectedDocument,
                      ]) => {
-            const foundDocument = findMap(checkedOutDocuments, (id, document) => document.name === selectedDocument)
+            const foundDocument = findMap(checkedOutDocuments, (id, document) => document.id === selectedDocument)
             if ((!selectedDocument || !foundDocument) && checkedOutDocuments.size) {
-                const defaultReading = firstMap(checkedOutDocuments);
-                settingsService.readingDocument$.next(defaultReading.name);
-                this.displayDocument$.next(defaultReading.atomizedDocument$);
+                const firstCheckedOutDocument = firstMap(checkedOutDocuments);
+                // Will this id
+                settingsService.readingDocument$.next(firstCheckedOutDocument.id);
+                this.displayDocument$.next(firstCheckedOutDocument.atomizedDocument$);
             }
             if (foundDocument) {
                 this.displayDocument$.next(foundDocument.atomizedDocument$);

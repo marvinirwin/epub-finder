@@ -13,11 +13,11 @@ import {useHighlightBarPositionPercentage} from "./useSetHighlightBarPositionPer
 const DRAG_TIMEOUT = 500;
 
 export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState<number>(
-        parseFloat(useObservableState(m.settingsService.playbackStartPercent$) || '') || 0
+    const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState(
+        useObservableState(m.settingsService.playbackStartPercent$.obs$)
     );
-    const [highlightBarPosition2Ms, setHighlightBarMsP2] = useState<number>(
-        parseFloat(useObservableState(m.settingsService.playbackEndPercent$) || '') || 0
+    const [highlightBarPosition2Ms, setHighlightBarMsP2] = useState(
+        useObservableState(m.settingsService.playbackEndPercent$.obs$)
     );
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
     const pronunciationSectionsContainer = useRef<HTMLDivElement>();

@@ -7,7 +7,6 @@ import {User} from "./user.entity";
         b.id,
         b.document_id,
         b.name,
-        b.html,
         b.created_at,
         b.creator_id,
         b.global,

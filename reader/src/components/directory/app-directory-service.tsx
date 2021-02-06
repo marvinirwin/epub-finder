@@ -9,8 +9,6 @@ import {TreeMenuNode} from "./tree-menu-node.interface";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 import {Profile} from "../../lib/Auth/loggedInUserService";
 import {SignoutNode} from "./nodes/signout.node";
-import {SignInWithNode} from "./nodes/sign-in-with.node";
-import {GoogleSigninNode} from "./nodes/google-sign-in.node";
 import {ProfileNode} from "./nodes/profile.node";
 import {uploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
@@ -38,10 +36,12 @@ function AppDirectory(
             [
                 LanguageSelectNode(m)
             ],
+/*
             SignInWithNode(profile),
             [
                 GoogleSigninNode(),
             ],
+*/
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
 /*

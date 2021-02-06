@@ -19,6 +19,7 @@ export const OpenExampleSentencesFactory = (
             .document({
                 unAtomizedDocument$: sentences$.pipe(
                     map(InterpolateExampleSentencesService.interpolate))
-            })
+            }),
+        'Example Sentences'
     );
 }

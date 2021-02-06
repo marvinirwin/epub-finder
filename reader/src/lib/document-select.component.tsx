@@ -12,7 +12,7 @@ export const DocumentSelect = () => {
             <ListItem button
                       className={'document-selection-row'}
                       onClick={() => {
-                          m.settingsService.readingDocument$.next(document.name)
+                          m.settingsService.readingDocument$.next(document.id())
                       }}
                       key={document.id()}
             >

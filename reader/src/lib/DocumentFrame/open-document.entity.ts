@@ -18,7 +18,7 @@ function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
 
 
 export class OpenDocument {
-    public id: string;
+    public name: string;
     public renderedSegments$ = new ReplaySubject<Segment[]>(1)
     public renderedTabulation$: Observable<TabulatedDocuments>;
 
@@ -26,12 +26,13 @@ export class OpenDocument {
     public notableSubsequences$: Observable<SubSequenceReturn>;
 
     constructor(
-        public name: string,
+        public id: string,
         public trie: Observable<TrieWrapper>,
-        public atomizedDocument$: Observable<AtomizedDocument>
+        public atomizedDocument$: Observable<AtomizedDocument>,
+        public label: string
     ) {
+        this.name = id;
         this.renderedSegments$.next([]);
-        this.id = name;
         this.renderedTabulation$ = combineLatest([
             this.renderedSegments$,
             trie,
@@ -46,7 +47,7 @@ export class OpenDocument {
                     // Right now this will count the example sentences :(.
                     const entries = Object.entries(tabulatedSentences.wordCounts)
                         .map(([word, count]) =>
-                            [word, [{word, count, document: this.name}]]);
+                            [word, [{word, count, document: this.label}]]);
 
                     return {
                         ...tabulatedSentences,

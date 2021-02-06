@@ -17,14 +17,14 @@ export class DocumentSelectionService {
             settingsService.checkedOutDocuments$,
             settingsService.readingDocument$
         ]).pipe(
-            map(([available, checkedOutDocumentNames, readingDocumentName]) => {
+            map(([available, checkedOutDocumentNames, readingDocumentId]) => {
                 const all: DocumentSelectionRowInterface[] = [
                     ...[...available.values()]
                         .map((d) => ({
                             name: d.name,
                             belongsToCurrentUser: !d.global, // HACK this is a proxy for belongsToUser
                             lastModified: d.createdAt,
-                            reading: readingDocumentName === d.name,
+                            reading: readingDocumentId === d.id(),
                             id: d.id(),
                         } as DocumentSelectionRowInterface)),
                 ];
