@@ -50,7 +50,7 @@ export class Segment {
         const characterElements = flatten(segments.map(segment => {
             segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
-        })).filter(n => characterFilterFunc(n.textContent as string));
+        })).filter(n => (n.textContent as string).trim());
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
