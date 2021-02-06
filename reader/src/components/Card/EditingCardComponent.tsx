@@ -53,7 +53,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
         }
     }, [sounds]);
 
-    const pinyin = useObservableState(card.pinyin$);
+    // const pinyin = useObservableState(card.pinyin$);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
 
     useSubscription(
@@ -83,7 +83,9 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                                 <Done fontSize="small" />
                             </IconButton>
                         </HotkeyWrapper>
+{/*
                         <Typography variant="subtitle1" gutterBottom> {characters} ({pinyin}) ({score})</Typography>
+*/}
                         <Typography variant="subtitle1" gutterBottom> {translation} </Typography>
                         <HotkeyWrapper action={"DELETE_CARD"}>
                             <IconButton aria-label="delete" onClick={() => m.hotkeyEvents.deleteCard$.next()}>

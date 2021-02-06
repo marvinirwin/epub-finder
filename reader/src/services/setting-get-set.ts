@@ -1,7 +1,7 @@
 import {DatabaseService} from "../lib/Storage/database.service";
 import {HistoryService} from "../lib/history.service";
 import {Observable, of} from "rxjs";
-import {skip} from "rxjs/operators";
+import {distinctUntilChanged, skip} from "rxjs/operators";
 
 export type SettingType = "url" | "indexedDB" | "REST";
 
@@ -54,7 +54,9 @@ export class SettingGetSet<T> {
                             return defaultWhenNotAvailable;
                         }
                     },
-                    (v: Value) => historyService.set(name, JSON.stringify(v)),
+                    (v: Value) => {
+                        historyService.set(name, JSON.stringify(v));
+                    },
                     historyService.url$
                 )
             default:
@@ -68,7 +70,9 @@ export class SettingGetSet<T> {
         public set: (v: T) => Promise<void> | void,
         private changed$: Observable<any>
     ) {
-        changed$.pipe(skip(1)).subscribe(async v => {
+        changed$.pipe(skip(1), distinctUntilChanged((previous, after) => {
+            return previous.href === after.href;
+        })).subscribe(async v => {
             this.set(await get())
         })
     }

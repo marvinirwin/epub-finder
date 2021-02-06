@@ -31,17 +31,22 @@ export class VideoMetadataService {
         return this.videoMetadataEntityRepository.find();
     }
 
-    public async checkForJson(hash: string): Promise<VideoMetadata | undefined> {
-        const filename = `${hash}.json`;
+    public async checkForJson(sentence_hash: string): Promise<VideoMetadata | undefined> {
+        const existingMetadata = await this.videoMetadataEntityRepository.findOne({sentence_hash});
+        const filename = `${sentence_hash}.json`;
         const filePath = join(process.env.VIDEO_DIR, filename);
+        if (existingMetadata) {
+            return existingMetadata;
+        }
         if (await fs.pathExists(filePath)) {
-            const metadata: { sentence: string } = await fs.readJson(filePath)
+            const metadata: { sentence: string } = await fs.readJson(filePath);
             if (metadata.sentence) {
+                console.log(JSON.stringify(metadata));
                 return await this.videoMetadataEntityRepository.save({
                     sentence: metadata.sentence,
-                    sentence_hash: hash,
+                    sentence_hash: sentence_hash,
                     metadata: JSON.stringify(metadata),
-                })
+                });
             } else {
                 console.log(`json file without sentence? ${filePath}`);
             }
@@ -51,7 +56,7 @@ export class VideoMetadataService {
     public async saveVideoMetadata(videoMetadataDto: VideoMetadataDto): Promise<VideoMetadata> {
         const sentence_hash = sha1(videoMetadataDto.metadata.sentence);
         const existingMetadata = await this.videoMetadataViewEntityRepository
-            .findOne({sentence_hash: sentence_hash});
+            .findOne({sentence_hash});
 
         const baseMetadata: Partial<VideoMetadata> = {
             sentence: videoMetadataDto.metadata.sentence,

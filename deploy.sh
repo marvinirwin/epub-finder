@@ -59,9 +59,6 @@ rsync -v -a --exclude video --exclude books reader/build/*  "$DEST/public"
 echo "rsyncing server package.json"
 rsync -v -a server/package.json "$DEST/package.json"
 
-echo "rsyncing test documents"
-rsync -v -a server/test_documents "$DEST"
-
 # popd || exit;
 [ ! -n "$BUILD_SERVER" ] && exit;
 exit;

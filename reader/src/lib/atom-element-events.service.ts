@@ -51,7 +51,7 @@ export class AtomElementEventsService {
 
             function highestPriorityMouseoverCard() {
                 return elementAtomMetadataIndex.metadataForElement(element)
-                    .priorityMouseoverHighlightWord({cardsRepository: cardsRepository})
+                    ?.priorityMouseoverHighlightWord({cardsRepository})
             }
 
             element.onmouseenter = ev => {

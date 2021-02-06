@@ -3,13 +3,10 @@ import {ICard} from "../Interfaces/ICard";
 import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
-import pinyin from 'pinyin';
 import CardsRepository from "../Manager/cards.repository";
-import {fetchTranslation} from "../../services/translate.service";
 
 
 
-export const lookupPinyin: (s: string) => string[] = memoize(s => flatten(pinyin(s)))
 
 
 export class EditingCard {
@@ -22,7 +19,7 @@ export class EditingCard {
     learningLanguage$ = new ReplaySubject<string>(1);
     saveInProgress$ = new ReplaySubject<boolean>(1);
     cardClosed$ = new Subject<void>();
-    pinyin$: Observable<string>;
+    // pinyin$: Observable<string>;
     translation$: Observable<string>;
 
     constructor(
@@ -88,7 +85,7 @@ export class EditingCard {
             this.saveInProgress$.next(false);
         });
 
-        this.pinyin$ = this.learningLanguage$.pipe(switchMap(lookupPinyin), shareReplay(1));
+        // this.pinyin$ = this.learningLanguage$.pipe(switchMap(pinyin), shareReplay(1));
     }
 
     private saveDataObservable() {

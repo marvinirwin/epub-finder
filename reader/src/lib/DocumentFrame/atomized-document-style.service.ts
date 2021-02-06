@@ -7,6 +7,7 @@ export const BodyStyle = `
     }
     body {
         padding: 8px;
+        padding-top: 24px;
         font-size: 150%;
         font-family: Helvetica, Tahoma, Arial, STXihei, "华文细黑", "Microsoft YaHei", "微软雅黑", SimSun, "宋体", Heiti, "黑体", sans-serif !important;
     }
@@ -48,6 +49,7 @@ export const BodyStyle = `
         font-size: 13px;
         display: none;
         z-index: 2;
+        font-size: 125%;
     }
 
     .POPPER_ELEMENT[data-show] {

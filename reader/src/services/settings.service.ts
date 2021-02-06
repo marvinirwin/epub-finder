@@ -52,11 +52,25 @@ export class SettingsService {
         this.drawerClosed$ = this.createSetting$<boolean>('drawerClosed', false, 'indexedDB');
         this.checkedOutDocuments$ = this.createSetting$<ds_Dict<boolean>>('checkedOutDocuments', {'cat-likes-tea': true}, 'indexedDB')
 
-        this.readingDocument$ = this.createSetting$<string>('readingDocument', '', 'url')
+        this.playbackStartPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbs', '0', 'url'));
 
-        this.hotkeys$ = this.createSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {}, 'indexedDB');
+        this.playbackEndPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbe', '0', 'url'));
 
         this.playbackSpeed$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('playbackSpeed', '0.5', 'url'))
+
+        this.pronunciationVideoSentenceHash$ = this.createSetting$<string>('video', '', 'url');
+
+        this.readingDocument$ = this.createSetting$<string>('readingDocument', '', 'url')
+
+        this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
+
+        this.componentPath$ = this.createSetting$<string>('page', '', 'url')
+
+        this.readingLanguage$ = this.createSetting$<string>('reading', 'zh-Hans', 'url')
+
+        this.spokenLanguage$ = this.createSetting$<string>('spoken', 'zh-CN', 'url')
+
+        this.hotkeys$ = this.createSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {}, 'indexedDB');
 
         this.completedSteps$ = this.createSetting$<string[]>('introStepsCompleted', [], 'indexedDB')
 
@@ -66,23 +80,9 @@ export class SettingsService {
 
         this.showRomanization$ = this.createSetting$<boolean>('showPinyin', true, 'indexedDB');
 
-        this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
-
-        this.componentPath$ = this.createSetting$<string>('page', '', 'url')
-
         this.manualIsRecording$ = this.createSetting$<boolean>('manualIsRecording', false, 'indexedDB')
 
-        this.readingLanguage$ = this.createSetting$<string>('reading', 'Zh-Hans', 'url')
-
-        this.spokenLanguage$ = this.createSetting$<string>('spoken', 'zh-CN', 'url')
-
         this.frequencyWeight$ = this.createSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
-
-        this.pronunciationVideoSentenceHash$ = this.createSetting$<string>('video', '', 'url');
-
-        this.playbackStartPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbs', '0', 'url'));
-
-        this.playbackEndPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbe', '0', 'url'));
     }
 
     public createSetting$<T>(

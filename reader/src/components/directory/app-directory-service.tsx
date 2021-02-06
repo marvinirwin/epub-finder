@@ -52,9 +52,13 @@ function AppDirectory(
             /*
                         availableDocuments.map(toTreeMenuNode),
             */
+/*
             ProfileNode(profile),
+*/
             SettingsNode(m),
+/*
             SignoutNode(m, profile),
+*/
             TestingUtilsNode(m),
             QuizCarouselNode(),
             [

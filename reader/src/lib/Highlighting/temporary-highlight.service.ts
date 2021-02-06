@@ -1,4 +1,4 @@
-import { ReplaySubject} from "rxjs";
+import {ReplaySubject} from "rxjs";
 import {RGBA} from "./color.service";
 import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
@@ -7,10 +7,9 @@ import {sleep} from "../Util/Util";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 export function removePunctuation(withPunctuation: string) {
-    const word = withPunctuation.split('').filter(c => {
+    return withPunctuation.split('').filter(c => {
         return isChineseCharacter(c) && !punctuation.has(c);
     }).join('');
-    return word;
 }
 
 export class TemporaryHighlightService {

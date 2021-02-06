@@ -1,5 +1,5 @@
 import {ITrie} from "../Interfaces/Trie";
-import {Dictionary, maxBy, uniq, flatten} from "lodash";
+import {Dictionary, flatten, uniq} from "lodash";
 import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {IWordInProgress} from "../Interfaces/Annotation/IWordInProgress";
 import {IPositionedWord} from "../Interfaces/Annotation/IPositionedWord";
@@ -16,20 +16,12 @@ export class Segment {
     public newWords$ = new ReplaySubject<Set<string>>(1);
 
     public static tabulateSentences(segments: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
-/*
-        const textWordDataRecords = segments.map(segment =>
-            segment.tabulate(trie, trieElementSizes)
-        );
-*/
-
         return Segment.tabulate(
             trie,
             trieElementSizes,
             segments,
+            c => !isChineseCharacter(c)
         )
-/*
-        return mergeTabulations(...textWordDataRecords);
-*/
     }
 
     translatableText: string;
@@ -52,24 +44,22 @@ export class Segment {
         t: ITrie,
         uniqueLengths: number[],
         segments: Segment[],
+        characterFilterFunc: (c: string) => boolean
     ): TabulatedSentences {
-        const nodeSegmentMap = new Map<XMLDocumentNode, Segment>();
-        const nodes = flatten(segments.map(segment => {
-            segment.children.forEach(node => nodeSegmentMap.set(node, segment));
+        const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
+        const characterElements = flatten(segments.map(segment => {
+            segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
-        }));
+        })).filter(n => characterFilterFunc(n.textContent as string));
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
         const wordSentenceMap: Dictionary<Segment[]> = {};
         const atomMetadatas = new Map<XMLDocumentNode, AtomMetadata>();
-        const newWords = new Set<string>();
         let wordsInProgress: IWordInProgress[] = [];
-        // It's kind of janky that I use nodes and textcontent at the same time,  I guess I need the substr
-        const children = nodes;
-        const textContent = nodes.map(node => node.textContent).join('')
-        for (let i = 0; i < children.length; i++) {
-            const currentMark = children[i] as unknown as XMLDocumentNode;
+        const textContent = characterElements.map(node => node.textContent).join('');
+        for (let i = 0; i < characterElements.length; i++) {
+            const currentMark = characterElements[i] as unknown as XMLDocumentNode;
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
@@ -118,7 +108,7 @@ export class Segment {
                 words,
                 element: currentMark,
                 i,
-                parent: nodeSegmentMap.get(currentMark) as Segment
+                parent: elementSegmentMap.get(currentMark) as Segment
             });
             atomMetadatas.set(currentMark, atomMetadata);
             atomMetadata.words.forEach(word => {
