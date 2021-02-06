@@ -26,6 +26,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
 
+
     const {chunkedAudioBuffers, max} = useObservableState(
         m.pronunciationVideoService.chunkedAudioBuffers$,
         {chunkedAudioBuffers: [], max: 0}
@@ -66,6 +67,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         setHighlightBarMsP1(0);
         setHighlightBarMsP2(0);
     });
+
 
     const [startDragTimeout, setStartDragTimeout] = useState<number | null>()
     const [mouseDownTime, setMouseDownTime] = useState<Date | null>();

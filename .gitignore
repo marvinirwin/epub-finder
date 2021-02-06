@@ -1,5 +1,5 @@
 ./clean-package.json
 reader/.env
 server/.env
-.env
+env
 **/*/.idea
