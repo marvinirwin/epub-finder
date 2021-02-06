@@ -49,7 +49,7 @@ export const BodyStyle = `
         font-size: 13px;
         display: none;
         z-index: 2;
-        font-size: 125%;
+        font-size: 100%;
     }
 
     .POPPER_ELEMENT[data-show] {
