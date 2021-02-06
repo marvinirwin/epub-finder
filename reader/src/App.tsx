@@ -12,6 +12,10 @@ import {AlertSnackbar} from "./components/alert-snackbar.component";
 import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
+import {SpeechRecognitionSnackbar} from "./components/speech-recognition-snackbar.component";
+import { ReactKeycloakProvider } from '@react-keycloak/web'
+import keycloak from "./components/keycloak/keycloak";
+
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -28,23 +32,26 @@ export const ManagerContext = React.createContext(manager)
 
 function App() {
     return <ThemeProvider theme={theme}>
-        <ManagerContext.Provider value={manager}>
-            <CssBaseline>
-                {
-                    manager.modalService.modals()
-                        .map(Modal => <ActionModal
-                                key={Modal.id}
-                                navModal={Modal}>
-                                <Modal.CardContents/>
-                            </ActionModal>
-                        )
-                }
-                <LoadingBackdrop/>
-                <AlertSnackbar/>
-                <GlobalDragOver/>
-                <Main m={manager}/>
-            </CssBaseline>
-        </ManagerContext.Provider>
+        <ReactKeycloakProvider authClient={keycloak}>
+            <ManagerContext.Provider value={manager}>
+                <CssBaseline>
+                    {
+                        manager.modalService.modals()
+                            .map(Modal => <ActionModal
+                                    key={Modal.id}
+                                    navModal={Modal}>
+                                    <Modal.CardContents/>
+                                </ActionModal>
+                            )
+                    }
+                    <LoadingBackdrop/>
+                    <AlertSnackbar/>
+                    <SpeechRecognitionSnackbar/>
+                    <GlobalDragOver/>
+                    <Main m={manager}/>
+                </CssBaseline>
+            </ManagerContext.Provider>
+        </ReactKeycloakProvider>
     </ThemeProvider>;
 }
 

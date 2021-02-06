@@ -16,13 +16,13 @@ export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]
     });
 };
 
+
 export const CORRECT_RECOGNITION_SCORE = 2;
 
 /**
  * TODO probably execute all these things in a try since elements may disappear
  */
 export class Highlighter {
-    mousedOverWord$ = new ReplaySubject<string | undefined>(1);
     mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
@@ -36,23 +36,8 @@ export class Highlighter {
         highlighterService: HighlighterService
     }) {
         const s = highlighterService;
-        const {wordToMap} = HighlighterService;
-        const rgba: RGBA = [160, 160, 160, 0.5];
         s.singleHighlight(
-            this.mousedOverWord$.pipe(
-                map(wordToMap(rgba))
-            ),
-            [0, 'MOUSEOVER_CHARACTER_HIGHLIGHT']
-        );
-        s.singleHighlight(
-            this.mouseoverHighlightedSentences$
-                .pipe(
-                    map(wordToMap(rgba)),
-                ),
-            [1, 'MOUSEOVER_SENTENCE_HIGHLIGHT']
-        );
-        s.singleHighlight(
-            quizService.quizCard.word$.pipe(map(wordToMap([28, 176, 246, 0.5]))),
+            quizService.quizCard.word$.pipe(map(HighlighterService.wordToMap([28, 176, 246, 0.5]))),
             [0, 'QUIZ_WORD_HIGHLIGHT']
         );
         s.timedHighlight(

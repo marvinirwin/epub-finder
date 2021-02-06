@@ -7,7 +7,7 @@ import {splitKeepDelim} from "../Util/Util";
 import {InterpolateService} from "@shared/";
 import {computeElementIndexMap} from "./compute-element-index-map";
 
-export const ANNOTATE_AND_TRANSLATE = 'annotated_and_translated';
+export const ANNOTATED_AND_TRANSLATE = 'annotated_and_translated';
 
 export function createPopperElement(document1: XMLDocument) {
     const popperEl = document1.createElement('div');
@@ -149,7 +149,7 @@ export class AtomizedDocument {
         );
         const {popperEl, popperId} = createPopperElement(document1);
         newParent.setAttribute('popper-id', popperId);
-        newParent.setAttribute("class", ANNOTATE_AND_TRANSLATE);
+        newParent.setAttribute("class", ANNOTATED_AND_TRANSLATE);
         (this.findPopperContainer() as Node).insertBefore(popperEl, popperEl.firstChild);
         return newParent as unknown as XMLDocumentNode;
     }
@@ -207,7 +207,7 @@ export class AtomizedDocument {
 
     public segments(): Segment[] {
         try {
-            const segmentElements = this.document.getElementsByClassName(ANNOTATE_AND_TRANSLATE)
+            const segmentElements = this.document.getElementsByClassName(ANNOTATED_AND_TRANSLATE)
             const atomized = new Array(segmentElements.length);
             for (let i = 0; i < segmentElements.length; i++) {
                 const segmentElement = segmentElements[i];

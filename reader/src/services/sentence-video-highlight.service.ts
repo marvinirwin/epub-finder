@@ -1,10 +1,10 @@
 import {Segment} from "../lib/Atomized/segment";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/Modes/modes.service";
-import {VideoMetadataService} from "./video-metadata.service";
 import {debounceTime, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {keyBy} from 'lodash';
 
+/*
 export class SentenceVideoHighlightService {
     constructor({
                     visibleAtomizedSentences$,
@@ -52,4 +52,4 @@ export class SentenceVideoHighlightService {
             }
         })
     }
-}
+}*/

@@ -1,13 +1,12 @@
 import {ReplaySubject} from "rxjs";
-import React, {useContext, useState} from "react";
+import React from "react";
 import {FileChooser} from "../components/directory/file-chooser.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
 import {DocumentSelect} from "./document-select.component";
 import {ToggleTranslate} from "../components/directory/toggle-translate";
 import {TogglePinyin} from "../components/directory/toggle-pinyin";
-import {ManagerContext} from "../App";
-import {useObservableState} from "observable-hooks";
-import {SignupLogin} from "../components/directory/nodes/signup.component";
+import {ManualTestModal} from "../components/modals/manual-test-modal.component";
+import {AdjustFrequencyWeight} from "../components/directory/adjust-frequency-weight.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -35,38 +34,16 @@ export class ModalService {
             () => <div>
                 <ToggleTranslate/>
                 <TogglePinyin/>
+                <AdjustFrequencyWeight/>
             </div>
         );
 
         this.testingUtils = new NavModal(
             'testingUtils ',
-            () => {
-                const m = useContext(ManagerContext);
-                const manualIsRecording = useObservableState(m.settingsService.manualIsRecording$) || false;
-                const [speechRecInput, setSpeechRecInput] = useState<HTMLInputElement | null>();
-                return <div>
-                    <SignupLogin/>
-                    <input id='manual-is-recording' type="check" checked={manualIsRecording}/>
-                    <input id='manual-speech-recognition-input' ref={setSpeechRecInput}/>
-                    <button id='submit-manual-speech-recognition' onClick={
-                        () => m.pronunciationProgressService.addRecords$.next([
-                                {
-                                    word: speechRecInput?.value || '',
-                                    success: true,
-                                    timestamp: new Date()
-                                }
-                            ]
-                        )
-                    }>Submit manual speech recognition
-                    </button>
-                    <button id='clear-speech-recognition-rows'
-                            onClick={() => m.pronunciationProgressService.clearRecords$.next()}>
-                        Clear speech recognition rows
-                    </button>
-                </div>
-            }
+            ManualTestModal
         )
     }
+
     public modals() {
         return [
             this.fileUpload,

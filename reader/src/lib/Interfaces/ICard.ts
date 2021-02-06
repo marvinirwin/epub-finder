@@ -1,5 +1,3 @@
-import {DOMParser, XMLSerializer} from "xmldom";
-
 export interface ICard {
     id?: number; // Primary key. Optional (autoincremented)
     learningLanguage: string;
@@ -9,7 +7,12 @@ export interface ICard {
     deck: string | undefined;
     fields: string[];
     illustrationPhotos: string[];
-    timestamp: number | Date
+    timestamp: number | Date;
+
+    // Only created for purposes of highlight
+    highlightOnly?: boolean;
+    // Created by the program and never interacted with by the user
+    synthetic?: boolean;
 }
 
 export async function resolveMediaSources(audio: (HTMLAudioElement | HTMLImageElement)[], resolveMediaSrc: (s: string) => Promise<string>) {

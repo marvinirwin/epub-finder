@@ -46,7 +46,7 @@ export class TemporaryHighlightService {
     }
 
     public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
-        this.cardService.putWords$.next([word]);
+        this.cardService.putMouseoverDisabledWords([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);
         this.cardService.deleteWords.next([word])

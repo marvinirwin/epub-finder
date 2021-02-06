@@ -36,6 +36,7 @@ export const PronunciationVideo = (
         : undefined;
 
     return <video
+        id={'pronunciation-video'}
         ref={el => m.pronunciationVideoService.videoRef$.next(el)}
         src={videoSource}
         autoPlay

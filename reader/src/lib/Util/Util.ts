@@ -1,8 +1,9 @@
 import {uniq, flatten} from "lodash";
 import {ITrie} from "../Interfaces/Trie";
 import axios from "axios";
+import {ICard} from "../Interfaces/ICard";
 
-export function cardForWord(word: string) {
+export function cardForWord(word: string): ICard {
     return {
         learningLanguage: word,
         photos: [],

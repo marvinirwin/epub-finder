@@ -6,10 +6,15 @@ import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
 import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
-import {debounce, flatten} from "lodash";
+import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./Highlighting/Highlighter";
-import {AggregateElementIndexService} from "../services/aggregate-element-index.service";
+import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
 import {Segment} from "./Atomized/segment";
+import CardsRepository from "./Manager/cards.repository";
+import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
+import {ICard} from "./Interfaces/ICard";
+import {VideoMetadataRepository} from "../services/video-metadata.repository";
+import {MousedOverWordHighlightService} from "./Highlighting/moused-over-word-highlight.service";
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 
@@ -22,7 +27,10 @@ export class AtomElementEventsService {
             highlighter,
             pronunciationVideoService,
             browserInputs,
-            aggregateElementIndexService
+            elementAtomMetadataIndex,
+            cardsRepository,
+            videoMetadataRepository,
+            mousedOverWordHighlightService
         }:
             {
                 openDocumentsService: OpenDocumentsService
@@ -30,28 +38,49 @@ export class AtomElementEventsService {
                 highlighter: Highlighter,
                 pronunciationVideoService: PronunciationVideoService,
                 browserInputs: BrowserInputs,
-                aggregateElementIndexService: AggregateElementIndexService
+                elementAtomMetadataIndex: ElementAtomMetadataIndex,
+                cardsRepository: CardsRepository,
+                videoMetadataRepository: VideoMetadataRepository,
+                mousedOverWordHighlightService: MousedOverWordHighlightService
             }
     ) {
         const applyListener = (element: HTMLElement) => {
-            const maxWord = () => aggregateElementIndexService.aggregateIndex$.getValue().get(element as unknown as XMLDocumentNode)?.maxWord;
-            const mode = () => modesService.mode$.getValue();
             element.classList.add("applied-word-element-listener");
+
+            const mode = () => modesService.mode$.getValue();
+
+            function highestPriorityMouseoverCard() {
+                return elementAtomMetadataIndex.metadataForElement(element)
+                    .priorityMouseoverHighlightWord({cardsRepository: cardsRepository})
+            }
+
             element.onmouseenter = ev => {
-                addHighlightedWord(highlighter.mousedOverWord$, maxWord()?.word);
+                addHighlightedWord(
+                    mousedOverWordHighlightService.mousedOverWord$,
+                    highestPriorityMouseoverCard()?.learningLanguage ||
+                    element.textContent as string
+                );
             }
             element.onmouseleave = (ev) => {
-                addHighlightedWord(highlighter.mousedOverWord$, maxWord()?.word);
+                addHighlightedWord(
+                    mousedOverWordHighlightService.mousedOverWord$,
+                    highestPriorityMouseoverCard()?.learningLanguage ||
+                    element.textContent as string
+                );
             }
 
             element.onclick = ev => {
                 switch (mode()) {
                     case Modes.VIDEO:
-                        const metadata = aggregateElementIndexService.aggregateIndex$.getValue().get(element as unknown as XMLDocumentNode);
-                        browserInputs.videoCharacterIndex$.next(metadata?.i);
-                        pronunciationVideoService.videoSentence$.next(
-                            metadata?.parent?.translatableText
-                        );
+                        const atomMetadata = elementAtomMetadataIndex.metadataForElement(element)
+                        const wordWithVideoData = atomMetadata
+                            .words
+                            .find(word => videoMetadataRepository.all$.getValue().get(word.word))
+                        if (!wordWithVideoData) {
+                            return;
+                        }
+                        browserInputs.videoCharacterIndex$.next(0);
+                        pronunciationVideoService.videoSentence$.next(wordWithVideoData.word);
                         break;
                     default:
                 }
@@ -65,14 +94,9 @@ export class AtomElementEventsService {
             switchMap(({sourced}) => {
                 return merge(...(flattenTree(sourced)))
                     .pipe(
-                        map(segmentMap => [segmentMap]),
                         shareReplay(1)
                     );
             }),
-            map((segmentDicts: ds_Dict<Segment[]>[]): Segment[] => {
-                    return flatten(segmentDicts.map(segmentDict => flatten(Object.values(segmentDict))));
-                }
-            ),
             map((segments: Segment[]) => {
                     return new Set(
                         flatten(

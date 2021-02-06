@@ -1,6 +1,6 @@
 {
     "name": "express-typescript-starter",
-    "version": "3.4.0",
+    "version": "3.4.1",
     "description": "A starting point for Node.js express apps with TypeScript",
     "repository": {
         "type": "git",
@@ -66,6 +66,7 @@
         "multer-s3": "^2.9.0",
         "mysql": "^2.18.1",
         "mysql2": "^2.1.0",
+        "nest-keycloak-connect": "^1.4.2",
         "node-sass": "^4.14.1",
         "node-sass-middleware": "^0.11.0",
         "nodemailer": "^6.4.10",
@@ -88,6 +89,7 @@
         "pug": "^3.0.0",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^6.6.3",
+        "stripe": "^8.132.0",
         "swagger-ui-express": "^4.1.4",
         "typeorm": "^0.2.26",
         "typeorm-store": "^1.2.0",

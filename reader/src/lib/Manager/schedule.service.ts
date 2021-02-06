@@ -8,6 +8,8 @@ import {ScheduleRow} from "../schedule/schedule-row.interface";
 import {SrmService} from "../srm/srm.service";
 import {dueDate, isLearning, isNew, isToReview, wordCount} from "../schedule/ScheduleRow";
 import {ScheduleRowsService} from "./schedule-rows.service";
+import {SettingsService} from "../../services/settings.service";
+import {ScheduleMathService} from "./schedule-math.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -27,12 +29,12 @@ export class ScheduleService {
 
     constructor({
                     db,
-                    sortMode$: sortStrategy$,
-                    scheduleRowsService
+                    scheduleRowsService,
+                    settingsService
                 }: {
         db: DatabaseService,
-        sortMode$: Observable<string>,
-        scheduleRowsService: ScheduleRowsService
+        scheduleRowsService: ScheduleRowsService,
+        settingsService: SettingsService
     }) {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
@@ -41,29 +43,14 @@ export class ScheduleService {
 
         this.sortedScheduleRows$ = combineLatest([
             scheduleRowsService.indexedScheduleRows$,
-            sortStrategy$
+            settingsService.frequencyWeight$
         ]).pipe(
-            map(([indexedScheduleRows]) => {
-                    let maxDueDate = Number.MIN_SAFE_INTEGER;
-                    let minDueDate = Number.MAX_SAFE_INTEGER;
-                    for (const word in indexedScheduleRows) {
-                        const dd = dueDate(indexedScheduleRows[word]).getTime();
-                        if (maxDueDate < dd) {
-                            maxDueDate = dd;
-                        }
-                        if (minDueDate > dd) {
-                            minDueDate = dd;
-                        }
-                    }
-                    const dueDateSpread = maxDueDate - minDueDate;
-                    return orderBy(Object.values(indexedScheduleRows), [(row) => {
-                        const date = dueDate(row);
-                        const count = wordCount(row);
-                        const sortNumber = count * (date.getTime() - minDueDate) / Math.min(dueDateSpread, 2);
-                        row.sortString = `${count} ${moment(date).format('MMM DD')} ${sortNumber.toString().slice(0, 3)}`;
-                        row.sortNumber = sortNumber;
-                        return sortNumber;
-                    }], ['desc']);
+            map(([indexedScheduleRows, frequencyWeight]) => {
+                    return ScheduleMathService.sortScheduleRows(
+                        Object.values(indexedScheduleRows),
+                        frequencyWeight,
+                        1 - frequencyWeight
+                    )
                 }
             ),
             shareReplay(1)

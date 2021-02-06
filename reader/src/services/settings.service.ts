@@ -29,28 +29,28 @@ export class SettingsService {
                 settingName,
                 defaultVal
             )
-/*
-            settingName,
-            () => new ReplaySubject<T>(1),
-            this.settingsReplaySubjects,
-            defaultVal
-*/
+            /*
+                        settingName,
+                        () => new ReplaySubject<T>(1),
+                        this.settingsReplaySubjects,
+                        defaultVal
+            */
         )
     }
 
-/*
-    public resolveReplaySubject$<T>(
-        settingsName: string,
-        defaultNoDb: T,
-    ): ReplaySubject<T> {
-        return this._resolveSetting$(
-            settingsName,
-            () => new ReplaySubject<T>(1),
-            this.settingsReplaySubjects,
-            defaultNoDb
-        )
-    }
-*/
+    /*
+        public resolveReplaySubject$<T>(
+            settingsName: string,
+            defaultNoDb: T,
+        ): ReplaySubject<T> {
+            return this._resolveSetting$(
+                settingsName,
+                () => new ReplaySubject<T>(1),
+                this.settingsReplaySubjects,
+                defaultNoDb
+            )
+        }
+    */
 
     private _resolveSetting$<T>(
         getSet: SettingGetSet<T>
@@ -61,19 +61,19 @@ export class SettingsService {
                 .then(value => {
                     settingReplaySubject.next(value);
                 })
-/*
-            this.db.settings.where({name: settingName}).first().then(row => {
-                if (row) {
-                    try {
-                        settingReplaySubject.next(JSON.parse(row.value))
-                    } catch (e) {
-                        settingReplaySubject.next(defaultWhenNotAvailable)
-                    }
-                } else {
-                    settingReplaySubject.next(defaultWhenNotAvailable);
-                }
-            });
-*/
+            /*
+                        this.db.settings.where({name: settingName}).first().then(row => {
+                            if (row) {
+                                try {
+                                    settingReplaySubject.next(JSON.parse(row.value))
+                                } catch (e) {
+                                    settingReplaySubject.next(defaultWhenNotAvailable)
+                                }
+                            } else {
+                                settingReplaySubject.next(defaultWhenNotAvailable);
+                            }
+                        });
+            */
             settingReplaySubject.pipe(
                 skip(1),
                 distinctUntilChanged()
@@ -97,8 +97,8 @@ export class SettingsService {
         return this.resolveSetting$<Partial<Hotkeys<string[]>>>('hotkeys', {}, 'indexedDB');
     }
 
-    get playbackSpeed$(): ReplaySubject<number> {
-        return this.resolveSetting$('playbackSpeed', 0.5, 'indexedDB')
+    get playbackSpeed$(): ReplaySubject<string> {
+        return this.resolveSetting$('playbackSpeed', '0.5', 'url')
     }
 
     get completedSteps$(): ReplaySubject<string[]> {
@@ -120,17 +120,37 @@ export class SettingsService {
     get directoryPath$(): ReplaySubject<string> {
         return this.resolveSetting$<string>('dir', '', 'url')
     }
+
     get componentPath$(): ReplaySubject<string> {
         return this.resolveSetting$<string>('page', '', 'url')
     }
+
     get manualIsRecording$(): ReplaySubject<boolean> {
         return this.resolveSetting$<boolean>('manualIsRecording', false, 'indexedDB')
     }
+
     get readingLanguage$(): ReplaySubject<string> {
         return this.resolveSetting$<string>('reading', 'Zh-Hans', 'url')
     }
+
     get spokenLanguage$(): ReplaySubject<string> {
         return this.resolveSetting$<string>('spoken', 'zh-CN', 'url')
+    }
+
+    get frequencyWeight$(): ReplaySubject<number> {
+        return this.resolveSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+    }
+
+    get pronunciationVideoSentenceHash$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('video', '', 'url');
+    }
+
+    get playbackStartPercent$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('pbs', '0', 'url');
+    }
+
+    get playbackEndPercent$(): ReplaySubject<string> {
+        return this.resolveSetting$<string>('pbe', '0', 'url');
     }
 }
 

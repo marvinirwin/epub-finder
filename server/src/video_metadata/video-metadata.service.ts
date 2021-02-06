@@ -36,14 +36,15 @@ export class VideoMetadataService {
         const filePath = join(process.env.VIDEO_DIR, filename);
         if (await fs.pathExists(filePath)) {
             const metadata: { sentence: string } = await fs.readJson(filePath)
-/*
-            console.log(metadata);
-*/
-            return await this.videoMetadataEntityRepository.save({
-                sentence: metadata.sentence,
-                sentence_hash: hash,
-                metadata: JSON.stringify(metadata),
-            })
+            if (metadata.sentence) {
+                return await this.videoMetadataEntityRepository.save({
+                    sentence: metadata.sentence,
+                    sentence_hash: hash,
+                    metadata: JSON.stringify(metadata),
+                })
+            } else {
+                console.log(`json file without sentence? ${filePath}`);
+            }
         }
     }
 

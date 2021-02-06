@@ -84,7 +84,7 @@ export class EditingCard {
                 throw new Error("Upserting returned a weird array")
             }
             const rec = records[0];
-            this.c.addCardWhichDoesNotHaveToBePersisted$.next([rec])
+            this.c.addCardsWhichDoNotHaveToBePersisted$.next([rec])
             this.saveInProgress$.next(false);
         });
 

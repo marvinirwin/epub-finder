@@ -6,12 +6,11 @@ import {flatten, chunk} from "lodash";
 import {TemporaryHighlightService} from "../Highlighting/temporary-highlight.service";
 
 export class IntroHighlightService {
-    constructor({atomizedSentences$, temporaryHighlightService}: {
-        atomizedSentences$: Observable<ds_Dict<Segment[]>>,
+    constructor({renderedSegments$, temporaryHighlightService}: {
+        renderedSegments$: Observable<Segment[]>,
         temporaryHighlightService: TemporaryHighlightService,
     }) {
-        atomizedSentences$.pipe(
-            map(atomizedSentences => flatten(Object.values(atomizedSentences))),
+        renderedSegments$.pipe(
             filter(atomizedSentences => atomizedSentences.length >= 10),
             take(1)
         ).subscribe(async atomizedSentences => {

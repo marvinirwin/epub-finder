@@ -4,7 +4,8 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CreateUserDto} from "./create-user.dto";
 import {Profiles} from "../types/custom";
-import GoogleProfile = Profiles.GoogleProfile;
+import axios from "axios";
+import {v4 as uuidv4} from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -96,7 +97,21 @@ export class UsersService {
     }
 
     async createAnonymousUser() {
+        const result = await axios.post(
+            `${process.env.KEYCLOAK_URL}/${process.env.KEYCLOAK_REALM}/users`,
+            {
+                username: uuidv4(),
+            }
+        );
+        // What does result return?
+        debugger;
+        return result.data.id;
+
+/*
         const result = await this.usersRepository.insert(this.usersRepository.create({is_anonymous: true}));
+*/
+/*
         return await this.usersRepository.findOne(result.identifiers[0].id);
+*/
     }
 }

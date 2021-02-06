@@ -95,14 +95,15 @@ export class DocumentsController {
             name,
             output.index().s3Key,
         )
-        return await this.documentsService.byFilename(savedDocument.filename, user)
+        return await this.documentsService.byFilename({filename: savedDocument.filename, user})
     }
 
     @Get('')
     async all(
-        @UserFromReq() user: User | undefined
+        @UserFromReq() user: User | undefined,
+        @Headers('is_test') is_test: string
     ) {
-        return this.documentsService.all(user)
+        return this.documentsService.all({user, for_testing: !!is_test})
     }
 
 
@@ -121,10 +122,11 @@ export class DocumentsController {
     file(
         @UserFromReq() user: User | undefined,
         @Param('filename') filename: string,
-        @Res() response: Response
-    ) {
+        @Res() response: Response,
+        @Headers('is_test') is_test: string
+) {
         return new Promise(async (resolve, reject) => {
-            const doc = await this.documentsService.byFilename(filename, user);
+            const doc = await this.documentsService.byFilename({filename, user, for_testing: !!is_test});
             if (!doc) {
                 return reject(new HttpException(`Cannot find document ${filename} for user ${user?.id}`, 404));
             }

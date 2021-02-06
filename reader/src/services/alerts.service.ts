@@ -2,6 +2,7 @@ import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
 import {Color} from "@material-ui/lab";
 import {map} from "rxjs/operators";
 import axios, {AxiosError, AxiosResponse} from "axios";
+import {TESTING} from "../components/directory/app-directory-service";
 
 export type AlertMessage = { severity: Color, msg: string };
 
@@ -20,7 +21,12 @@ export class AlertsService {
             this.appendAlertMessage(msg, severity);
         })
         axios.interceptors.response.use(
-            response => response,
+            response => {
+                if (TESTING) {
+                    response.headers['testing'] = '1'
+                }
+                return response;
+            },
             (error) => {
                 // if has response show the error
                 const msg = error?.response?.data?.message || error?.response?.statusCode;

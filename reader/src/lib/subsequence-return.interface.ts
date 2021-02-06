@@ -1,0 +1,1 @@
+export type SubSequenceReturn = { popularStrings: string[], characterSet: string[] };

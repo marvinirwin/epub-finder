@@ -5,24 +5,39 @@ import {Card} from "@material-ui/core";
 import {CharacterTimingSection} from "./CharacterTimingSection";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {PronunciationVideo} from "./pronunciation-video.component";
-import {useResizeObserver} from "beautiful-react-hooks";
+import {useDebouncedFn, useResizeObserver} from "beautiful-react-hooks";
 import {PronunciationSection} from "./pronunciation-section";
-
+import {PlaybackSpeedComponent} from "../directory/playback-speed.component";
+import {useHighlightBarPositionPercentage} from "./useSetHighlightBarPositionPercentage";
 
 const DRAG_TIMEOUT = 500;
+
 export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }> = ({m}) => {
-    const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState<number>();
-    const [highlightBarPosition2Ms, setHighlightBarMsP2] = useState<number>();
+    const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState<number>(
+        parseFloat(useObservableState(m.settingsService.playbackStartPercent$) || '') || 0
+    );
+    const [highlightBarPosition2Ms, setHighlightBarMsP2] = useState<number>(
+        parseFloat(useObservableState(m.settingsService.playbackEndPercent$) || '') || 0
+    );
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(false);
     const pronunciationSectionsContainer = useRef<HTMLDivElement>();
+
     const editingIndex = useObservableState(m.editingVideoMetadataService.editingCharacterIndex$);
     const videoTimeMs = useObservableState(m.pronunciationVideoService.videoPlaybackTime$);
     const videoMetadata = useObservableState(m.pronunciationVideoService.videoMetadata$);
+
+
     const {chunkedAudioBuffers, max} = useObservableState(
         m.pronunciationVideoService.chunkedAudioBuffers$,
         {chunkedAudioBuffers: [], max: 0}
     );
     const currentSentenceCharacterIndex = useObservableState(m.browserInputs.videoCharacterIndex$);
+
+    useHighlightBarPositionPercentage(
+        highlightBarPosition1Ms || 0,
+        highlightBarPosition2Ms || 0
+    );
+
     // @ts-ignore
     const box = useResizeObserver(pronunciationSectionsContainer)
     const sectionWidth = box?.width;
@@ -36,8 +51,8 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
 
     useEffect(() => {
         if (isEditing && replayDragInProgress) {
-            setHighlightBarMsP1(undefined);
-            setHighlightBarMsP2(undefined);
+            setHighlightBarMsP1(0);
+            setHighlightBarMsP2(0);
             setReplayDragInProgress(false);
         }
     }, [isEditing, replayDragInProgress])
@@ -49,9 +64,10 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     }, [sectionLengthMs]);
 
     useSubscription(m.browserInputs.getKeyDownSubject('q'), () => {
-        setHighlightBarMsP1(undefined);
-        setHighlightBarMsP2(undefined);
+        setHighlightBarMsP1(0);
+        setHighlightBarMsP2(0);
     });
+
 
     const [startDragTimeout, setStartDragTimeout] = useState<number | null>()
     const [mouseDownTime, setMouseDownTime] = useState<Date | null>();
@@ -74,10 +90,13 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     let characterCounter = 0;
 
     return <Card className={'pronunciation-video-container-card'}>
-        <PronunciationVideo
-            highlightBarPosition1Ms={highlightBarPosition1Ms}
-            highlightBarPosition2Ms={highlightBarPosition2Ms}
-            currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
+        <div style={{}}>
+            <PronunciationVideo
+                highlightBarPosition1Ms={highlightBarPosition1Ms}
+                highlightBarPosition2Ms={highlightBarPosition2Ms}
+                currentSentenceCharacterIndex={currentSentenceCharacterIndex}/>
+            <PlaybackSpeedComponent/>
+        </div>
 
         {/* @ts-ignore */}
         <div className={`pronunciation-sections-container`} ref={pronunciationSectionsContainer}>
@@ -118,8 +137,8 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
                             if (mouseDownTime) {
                                 // If the click was fast enough then clear the range
                                 if (new Date().getTime() - mouseDownTime.getTime() < DRAG_TIMEOUT) {
-                                    setHighlightBarMsP1(undefined);
-                                    setHighlightBarMsP2(undefined);
+                                    setHighlightBarMsP1(0);
+                                    setHighlightBarMsP2(0);
                                 }
                             }
                             if (!replayDragInProgress) {
