@@ -10,11 +10,6 @@ import {
 } from "typeorm";
 
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
-import {UsageEvent} from "./usage-event.entity";
-import {JsonValueTransformer} from "../util/JsonValueTransformer";
-import {Usage} from "./usage.entity";
-import {session} from "./session.entity";
 import {DocumentView} from "./document-view.entity";
 
 @Entity()
@@ -25,13 +20,12 @@ export class User {
     email: string | null;
     @Column()
     password: string = '';
-    @Column()
-    google: string = '';
     @Column({default: null})
     reserved_for_provider: string | null;
     @Column({default: null})
     is_anonymous: boolean | null;
-
+    @Column({default: null})
+    keycloak: string | null;
     @OneToMany(() => DocumentView, (document: DocumentView) => document.creator_id)
     documents: Promise<DocumentView[]>;
 

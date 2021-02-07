@@ -5,10 +5,8 @@ import {User} from "../entities/user.entity";
 import {UsersService} from "../user/users.service";
 import {Public} from "src/decorators/public";
 import {UserFromReq} from "../decorators/userFromReq";
-import {FacebookGuard, GoogleGuard, LoginGuard} from "../guards";
-import {GithubGuard} from "../guards/github";
-import {TwitterGuard} from "../guards/twitter";
-
+import {KeycloakGuard} from "../guards/keycloak.guard";
+import {LoginGuard} from "../guards/login.guard";
 @Controller("/auth")
 export class AuthController {
     constructor(
@@ -17,7 +15,6 @@ export class AuthController {
     }
 
 
-    @Public()
     @Post('/signup')
     public async signup(
         @Body() {email, password}: { email: string, password: string },
@@ -31,7 +28,6 @@ export class AuthController {
             );
     }
 
-    @Public()
     @UseGuards(LoginGuard)
     @Post("/login")
     public login(@UserFromReq() user: User): User {
@@ -41,7 +37,6 @@ export class AuthController {
         return user;
     }
 
-    @Public()
     @HttpCode(204)
     @Get("/logout")
     public logout(@Req() req: Request, @Res() res: Response): void {
@@ -53,83 +48,18 @@ export class AuthController {
     }
 
     @Public()
-    @Get("/google")
-    @UseGuards(GoogleGuard)
+    @Get("/keycloak")
+    @UseGuards(KeycloakGuard)
     public googleLogin(): void {
         // initiates the Google OAuth2 login flow
     }
 
     @Public()
-    @Get("/google/callback")
-    @UseGuards(GoogleGuard)
-    @Redirect(process.env.BASE_URL)
+    @Get("/keycloak/callback")
+    @UseGuards(KeycloakGuard)
+    @Redirect(process.env.BA1SE_URL)
     public googleLoginCallback(@UserFromReq() user: User): string {
         // Redirect to index.html
         return '';
     }
-
-    @Public()
-    @Get("/github")
-    @UseGuards(GithubGuard)
-    public githubLogin(): void {
-        // initiates the Github OAuth2 login flow
-    }
-
-    @Public()
-    @Get("/github/callback")
-    @UseGuards(GithubGuard)
-    @Redirect(process.env.BASE_URL)
-    public githubLoginCallback(@UserFromReq() user: User): string {
-        return '';
-    }
-
-    @Public()
-    @Get("/twitter")
-    @UseGuards(TwitterGuard)
-    public twitterLogin(): void {
-        // initiates the Twitter OAuth2 login flow
-    }
-
-    @Public()
-    @Get("/twitter/callback")
-    @UseGuards(TwitterGuard)
-    @Redirect(process.env.BASE_URL)
-    public twitterLoginCallback(@UserFromReq() user: User): string {
-        return '';
-    }
-
-    @Public()
-    @Get("/facebook")
-    @UseGuards(FacebookGuard)
-    public facebookLogin(): void {
-        // initiates the Facebook OAuth2 login flow
-    }
-
-    @Public()
-    @Get("/facebook/callback")
-    @UseGuards(FacebookGuard)
-    @Redirect(process.env.BASE_URL)
-    public facebookLoginCallback(@UserFromReq() user: User): string {
-        return '';
-    }
-
-    /*
-      @Public()
-      @Get('third-party-logins')
-      public thirdPartyOptions() {
-        return {
-          settings: [
-            {
-              thirdPartyName: 'google',
-            },
-            {
-              thirdPartyName: 'facebook',
-            },
-            {
-              thirdPartyName: 'twitter',
-            }
-          ]
-        }
-      }
-    */
 }

@@ -16,6 +16,7 @@
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",
         "@azure/ms-rest-azure-js": "^2.0.1",
+        "@exlinc/keycloak-passport": "^1.0.2",
         "@google-cloud/translate": "^6.0.0",
         "@ladjs/bootstrap-social": "^7.0.2",
         "@nestjs/cli": "^7.5.1",

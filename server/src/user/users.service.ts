@@ -52,7 +52,7 @@ export class UsersService {
 
     async upsertUserByEmailAndProvider(
         email: string,
-        provider: 'google' | 'twitter',
+        provider: 'keycloak',
         providerIdValue: string,
         currentUser: User | undefined
     ): Promise<User> {
@@ -78,7 +78,7 @@ export class UsersService {
         )
     }
 
-    private linkUserToProvider(user: User, provider: "google" | "twitter", providerIdValue: string) {
+    private linkUserToProvider(user: User, provider: "keycloak" , providerIdValue: string) {
         // Link this user
         user[provider] = providerIdValue;
         return this.usersRepository.save(

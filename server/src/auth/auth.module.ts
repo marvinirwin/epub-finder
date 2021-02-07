@@ -4,12 +4,10 @@ import {PassportModule} from "@nestjs/passport";
 import {UsersModule} from "../user/user.module";
 import {SessionSerializer} from "./session.serializer";
 import {AuthController} from "./auth.controller";
-import {GithubStrategy} from "./strategies/github";
-import {TwitterStrategy} from "./strategies/twitter";
 import {UsersService} from "../user/users.service";
-import { GoogleStrategy } from "./strategies/google";
-import {LocalStrategy} from "./strategies/local";
-import {AnonymousStrategy} from "./strategies/anonymous";
+import {LocalStrategy} from "./strategies/local.strategy";
+import {AnonymousStrategy} from "./strategies/anonymous.strategy";
+import {KeycloakStrategy} from "./strategies/keycloak.strategy";
 
 @Module({
     imports: [
@@ -17,9 +15,7 @@ import {AnonymousStrategy} from "./strategies/anonymous";
         PassportModule,
     ],
     providers: [
-        GithubStrategy,
-        TwitterStrategy,
-        GoogleStrategy,
+        KeycloakStrategy,
         LocalStrategy,
         SessionSerializer,
         UsersService,
