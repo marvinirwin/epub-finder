@@ -84,7 +84,7 @@ export class IntroService {
                     [
                         {
                             element: pronunciationVideoRef as HTMLElement,
-                            intro: `Watch how a native speaker speaks, if you're having difficulty try and imitate the way the mount moves from word to work `,
+                            intro: `Watch how a native speaker speaks, if you're having difficulty try and imitate the way the mount moves from word to word`,
                             position: 'left'
                         },
                         {

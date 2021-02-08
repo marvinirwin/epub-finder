@@ -7,7 +7,7 @@ export function SignInWithNode(profile: Profile | undefined): TreeMenuNode {
     return {
         name: 'signInWith',
         label: 'Sign In With',
-        moveDirectory: true,
+        action: () => window.location.href = `${process.env.PUBLIC_URL}/auth/keycloak`,
         hidden: !!profile?.email,
         LeftIcon: () => <AccountCircle/>
     };

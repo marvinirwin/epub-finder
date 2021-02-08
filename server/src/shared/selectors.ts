@@ -1,0 +1,1 @@
+export const loadingBackdropTypography = 'loading-backdrop-typography';

@@ -17,6 +17,14 @@ module.exports = function(app) {
         })
     );
     app.use(
+        '/keycloak/*',
+        createProxyMiddleware({
+            target: 'https://languagetrainer.app',
+            changeOrigin: true,
+            logLevel: 'debug'
+        })
+    );
+    app.use(
         '/documents/*',
         createProxyMiddleware({
             target: 'http://localhost:3001',

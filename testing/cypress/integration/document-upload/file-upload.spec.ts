@@ -1,5 +1,13 @@
 import {documentSelectionRow, fileChooser} from "../constants";
 import {DirectoryPom} from "../../support/pom/directory.pom";
+import {loadingBackdropTypography} from '@shared/*';
+
+function testUpload(fixture: string, testDocx: string) {
+    cy.get(fileChooser).attachFile(fixture);
+    cy.contains(loadingBackdropTypography, testDocx);
+    DirectoryPom.EnterLibrary();
+    cy.contains(documentSelectionRow, testDocx);
+}
 
 describe('File Uploading', () => {
     beforeEach(() => {
@@ -8,20 +16,15 @@ describe('File Uploading', () => {
         DirectoryPom.openUploadDialog();
     })
     it('Uploads docx', () => {
-        cy.get(fileChooser).attachFile('test_docx.docx');
-        DirectoryPom.EnterLibrary();
-        cy.contains(documentSelectionRow, 'test_docx')
+        testUpload('test_docx.docx', 'test_docx');
     })
     it('Uploads pdf', () => {
-        cy.get(fileChooser).attachFile('test_pdf.pdf');
-        cy.contains(documentSelectionRow, 'test_pdf')
+        testUpload('test_pdf.pdf', 'test_pdf');
     })
     it('Uploads html', () => {
-        cy.get(fileChooser).attachFile('test_html.html');
-        cy.contains(documentSelectionRow, 'test_html')
+        testUpload('test_html.html', 'test_html');
     })
     it('Uploads text', () => {
-        cy.get(fileChooser).attachFile('test_txt.txt');
-        cy.contains(documentSelectionRow, 'test_txt')
+        testUpload('test_txt.txt', 'test_txt');
     })
 })

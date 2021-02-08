@@ -1,6 +1,6 @@
 import {Manager} from "./lib/Manager";
 import {DatabaseService} from "./lib/Storage/database.service";
-import {AudioSourceBrowser} from "./lib/Audio/AudioSourceBrowser";
+import {BrowserAudio} from "./lib/Audio/browser.audio";
 import {Website} from "./lib/Website/Website";
 
 export function websiteFromFilename(filename: string) {
@@ -12,6 +12,6 @@ export function websiteFromFilename(filename: string) {
 
 export function getManager(mode: string): Manager {
     return new Manager(new DatabaseService(), {
-        audioSource: new AudioSourceBrowser(),
+        audioSource: new BrowserAudio(),
     });
 }

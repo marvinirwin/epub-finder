@@ -20,6 +20,7 @@ import {SettingsNode} from "./nodes/settings.node";
 import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
 import {LibraryNode} from "./nodes/library.node";
+import {SignInWithNode} from "./nodes/sign-in-with.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 
@@ -36,12 +37,12 @@ function AppDirectory(
             [
                 LanguageSelectNode(m)
             ],
-/*
             SignInWithNode(profile),
-            [
-                GoogleSigninNode(),
-            ],
-*/
+            /*
+                        [
+                            GoogleSigninNode(),
+                        ],
+            */
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
 /*

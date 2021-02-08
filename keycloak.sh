@@ -1,5 +1,5 @@
 KEYCLOAK_USER=admin
-KEYCLOAK_PASSWORD=admin
+KEYCLOAK_PASSWORD=future_DOOR_fence_22
 DB_USER=postgres
 DB_PASSWORD=Cirdan999
 DB_ADDR=language-trainer.cepasb0h4kbd.us-east-2.rds.amazonaws.com
@@ -15,7 +15,7 @@ sudo docker run \
 -e DB_ADDR=$DB_ADDR \
 -e DB_VENDOR=POSTGRES \
 -e PROXY_ADDRESS_FORWARDING=true \
--e KEYCLOAK_FRONTEND_URL=localhost:3000/auth \
+-e KEYCLOAK_FRONTEND_URL=https://languagetrainer.app/keycloak \
 quay.io/keycloak/keycloak:12.0.2
 
 # Create Realm LanguageTrainer

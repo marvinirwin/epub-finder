@@ -10,7 +10,7 @@ import {SpeechRecognitionConfigService} from "./speech-recognition-config.servic
 import {LanguageConfigsService} from "../language-configs.service";
 
 
-export class AudioSourceBrowser implements AudioSource {
+export class BrowserAudio implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1);
     public beginRecordingSignal$ = new Subject<void>();
     public stopRecordingSignal$ = new Subject<void>();

@@ -14,22 +14,26 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, "keycloak") {
             realm: process.env.KEYCLOAK_REALM,
             clientID: process.env.KEYCLOAK_CLIENT_ID,
             clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-            callbackURL: `/auth/keycloak/callback`,
-            authorizationURL: 'TODO',
-            tokenURL: 'TODO',
-            userInfoURL: 'TODO',
+            callbackURL: '/auth/keycloak/callback',
+            authorizationURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
+            tokenURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
+            userInfoURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
+            passReqToCallback: true,
         });
     }
 
     public async validate(
-        accessToken, refreshToken, profile,
-        done: Function, request
+        accessToken,
+        refreshToken,
+        profile,
+        done: Function,
+        ...args
     ): Promise<User> {
         return await this.userService.upsertUserByEmailAndProvider(
             profile.email,
             'keycloak',
             profile.keycloakId,
-            request.user
+            args[0].user
         );
     }
 }
