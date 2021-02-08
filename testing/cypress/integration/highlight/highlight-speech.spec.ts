@@ -4,8 +4,6 @@ import {DirectoryPom} from "../../support/pom/directory.pom";
 import {UploadLearningDocument} from "../quiz/quiz.document";
 import {ReadingPom} from "../../support/pom/reading.pom";
 
-const CurrentQuizCard = '#current-quiz-card';
-
 
 describe('Highlighting speech recognition results', () => {
     beforeEach(() => {

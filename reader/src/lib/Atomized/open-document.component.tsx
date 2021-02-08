@@ -3,7 +3,7 @@ import {useObservableState} from "observable-hooks";
 import {InnerHTMLIFrame} from "../../components/Frame/innerHTMLIFrame";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {Segment} from "./segment";
-import {ANNOTATED_AND_TRANSLATE} from "./atomized-document";
+import {annotatedAndTranslated} from "./atomized-document";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {safePush} from "../../services/safe-push";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
@@ -27,6 +27,6 @@ export const OpenDocumentComponent =
     })
 
 export function rehydratePage(htmlDocument: HTMLDocument): Segment[] {
-    return [...htmlDocument.getElementsByClassName(ANNOTATED_AND_TRANSLATE)]
+    return [...htmlDocument.getElementsByClassName(annotatedAndTranslated)]
         .map(element => new Segment(element as unknown as XMLDocumentNode))
 }

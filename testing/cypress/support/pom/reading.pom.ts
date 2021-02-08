@@ -1,18 +1,20 @@
+import {annotatedAndTranslated} from "@shared/";
+
 export class ReadingPom {
     public static frame() {
         return cy.get('#reading-document')
             .iframeBody()
     }
 
-    public static TextIncludes(text: string) {
-            ReadingPom.RenderedSegments()
-                .should('have.text', text)
+    public static TextIncludes(t: string) {
+        cy.wait(500);
+        ReadingPom.frame().contains(t)
     }
 
     public static RenderedSegments() {
         return ReadingPom
             .frame()
-            .find('.annotated_and_translated')
+            .find(`.${annotatedAndTranslated}`)
     }
 
     public static Marks() {

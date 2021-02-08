@@ -57,12 +57,12 @@ export class ReadingDocumentService {
                 settingsService.readingDocument$
             ]
         ).subscribe(([
-                         checkedOutDocuments,
+                         selectableDocuments,
                          selectedDocument,
                      ]) => {
-            const foundDocument = findMap(checkedOutDocuments, (id, document) => document.id === selectedDocument)
-            if ((!selectedDocument || !foundDocument) && checkedOutDocuments.size) {
-                const firstCheckedOutDocument = firstMap(checkedOutDocuments);
+            const foundDocument = findMap(selectableDocuments, (id, document) => document.id === selectedDocument)
+            if ((!selectedDocument || !foundDocument) && selectableDocuments.size) {
+                const firstCheckedOutDocument = firstMap(selectableDocuments);
                 // Will this id
                 settingsService.readingDocument$.next(firstCheckedOutDocument.id);
                 this.displayDocument$.next(firstCheckedOutDocument.atomizedDocument$);

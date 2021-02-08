@@ -1,10 +1,7 @@
-import {combineLatest, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {mapToArray} from "./map.module";
 import {Segment} from "./Atomized/segment";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
-import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
-import {Dictionary} from "lodash";
 
 export class ExampleSegmentsService {
     exampleSegmentMap$: Observable<Map<string, Segment[]>>

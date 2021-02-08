@@ -16,14 +16,26 @@ export class AlertsService {
     public newAlerts$ = new ReplaySubject<AlertMessage>(1);
     public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
 
+    private readonly _testing = 'is_test';
+
     constructor() {
         this.newAlerts$.subscribe(({msg, severity}) => {
             this.appendAlertMessage(msg, severity);
-        })
+        });
+        axios.interceptors.request.use(
+            request => {
+                request.headers[this._testing] = '1'
+                return request;
+            },
+            request => {
+                request.headers[this._testing] = '1'
+                return request;
+            }
+        )
         axios.interceptors.response.use(
             response => {
                 if (TESTING) {
-                    response.headers['testing'] = '1'
+                    response.headers[this._testing] = '1'
                 }
                 return response;
             },
