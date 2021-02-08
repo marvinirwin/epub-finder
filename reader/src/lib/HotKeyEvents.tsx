@@ -81,9 +81,6 @@ export class HotKeyEvents {
             }
         });
 
-        this.advanceQuiz$.subscribe(() => {
-            m.quizManager.advanceQuizStage$.next()
-        });
 
         function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: number) {
             quizResultEasy$2.pipe(

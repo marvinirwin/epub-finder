@@ -16,7 +16,7 @@ const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
  */
 export class UploadingDocumentsService {
     uploadingMessages$ = new ReplaySubject<string>(1)
-    isUploading$ = new ReplaySubject<boolean>(1)
+    currentUploadingFile$ = new ReplaySubject<File | undefined>(1)
 
     constructor({
                     droppedFilesService,
@@ -28,7 +28,7 @@ export class UploadingDocumentsService {
         droppedFilesService: DroppedFilesService,
         libraryService: LibraryService,
     }) {
-        this.isUploading$.next(false);
+        this.currentUploadingFile$.next();
         // There will also have to be a document synchronization service
         droppedFilesService.uploadFileRequests$.pipe(
             map(files => files
@@ -41,9 +41,9 @@ export class UploadingDocumentsService {
                     const basicDocument = customDocuments[i];
                     lastDocument = basicDocument.name;
                     this.uploadingMessages$.next(`Uploading ${basicDocument.name}.  This can take up to 30 seconds`)
-                    this.isUploading$.next(true);
+                    this.currentUploadingFile$.next(basicDocument);
                     await libraryService.upsertDocument(basicDocument);
-                    this.isUploading$.next(false);
+                    this.currentUploadingFile$.next(undefined);
                     this.uploadingMessages$.next(`Uploading ${basicDocument.name} success!`)
                 }
             })

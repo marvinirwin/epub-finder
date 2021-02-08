@@ -1,7 +1,6 @@
-import {Observable, ReplaySubject, Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
-import { startWith, withLatestFrom} from "rxjs/operators";
-import {sleep} from "../Util/Util";
+import {AlertsService} from "../../services/alerts.service";
 
 export interface QuizResult {
     word: string;
@@ -13,79 +12,19 @@ export enum QuizComponent {
     Characters = "Characters"
 }
 
-export interface QuizManagerParams {
-    scheduledCards$: Observable<ICard[]>;
-    requestHighlightedWord: (s: string) => void
-}
-
 export class QuizManager {
-    quizzingCard$ = new ReplaySubject<ICard | undefined>(1);
-    quizStage$ = new ReplaySubject<QuizComponent>(1);
     quizResult$ = new Subject<QuizResult>();
-    advanceQuizStage$ = new Subject();
-
-    scheduledCards$: Observable<ICard[]>;
-
     requestNextCard$ = new Subject<void>();
 
-    constructor({scheduledCards$, requestHighlightedWord}: QuizManagerParams) {
-        this.scheduledCards$ = scheduledCards$;
-        this.quizzingCard$.subscribe(() => {
-            console.log();
-        })
-        this.quizzingCard$.pipe(
-            startWith(undefined),
-            withLatestFrom(this.scheduledCards$)
-        ).subscribe(async ([quizzingCard, scheduledCards]: [ICard | undefined, ICard[]]) => {
-            if (!quizzingCard && scheduledCards[0]) {
-                this.requestNextCard$.next();
-            }
-        });
-
-        this.requestNextCard$.pipe(
-            withLatestFrom(this.scheduledCards$)
-        ).subscribe(async ([_, scheduledCards]) => {
-            const iCard = scheduledCards[0];
-            if (!iCard) return;
-            this.quizzingCard$.next(iCard);
-            this.quizStage$.next(QuizComponent.Characters);
-            await sleep(1000);
-            requestHighlightedWord(iCard.learningLanguage)
-        })
-
-        this.scheduledCards$.pipe(
-            withLatestFrom(
-                this.quizzingCard$.pipe(
-                    startWith(undefined),
-                )
-            ),
-        ).subscribe(([scheduledCards, quizzingCard]) => {
-            if (!quizzingCard && scheduledCards[0]) {
-                this.requestNextCard$.next();
-            }
-        })
-
-        this.advanceQuizStage$.pipe(
-            withLatestFrom(this.quizStage$)
-        ).subscribe(([, currentDialogComponent]) => {
-            switch (currentDialogComponent) {
-                case QuizComponent.Characters:
-                    this.quizStage$.next(QuizComponent.Conclusion)
-                    break;
-            }
-        })
+    constructor() {
     }
 
-    setQuizCard(icard: ICard | undefined) {
-        this.quizzingCard$.next(icard);
-        this.quizStage$.next(QuizComponent.Characters)
-    }
-
-    completeQuiz(word: string, recognitionScore: number) {
+    completeQuiz(word : string, recognitionScore : number ) {
         this.quizResult$.next({
             score: recognitionScore,
             word
         });
+
         this.requestNextCard$.next()
     }
 

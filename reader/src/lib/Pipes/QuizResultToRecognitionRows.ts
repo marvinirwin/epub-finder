@@ -20,10 +20,10 @@ export const QuizResultToRecognitionRows =
                         scorePair.score,
                         new Date()
                     );
-                    return [{
+                    return {
                         word: scorePair.word,
                         timestamp: new Date(),
                         ...nextRecognitionRecord
-                    }];
+                    };
                 })
             )

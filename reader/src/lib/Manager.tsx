@@ -289,32 +289,15 @@ export class Manager {
             wordRecognitionRows$: this.wordRecognitionProgressService.records$,
             scheduleRows$: this.scheduleRowsService.indexedScheduleRows$
         });
-        this.quizManager = new QuizManager({
-                scheduledCards$: this.scheduleManager.wordQuizList$.pipe(
-                    map(rows => rows.map(row => row.word)),
-                    resolveICardForWords(this.cardsRepository.cardIndex$)
-                ),
-                requestHighlightedWord: s => {
-                }
-            },
-        );
+        this.quizManager = new QuizManager();
 
         new QuizResultService({
             srmService: this.scheduleManager.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
-            scheduleRowsService: this.scheduleRowsService
+            scheduleRowsService: this.scheduleRowsService,
+            alertsService: this.alertsService
         })
-
-
-        combineLatest([
-            this.scheduleRowsService.indexedScheduleRows$,
-            this.quizManager.quizzingCard$
-        ]).pipe(debounceTime(0)).subscribe(([indexedScheduleRows, quizzingCard]) => {
-            if (quizzingCard && !indexedScheduleRows[quizzingCard.learningLanguage]) {
-                this.quizManager.requestNextCard$.next();
-            }
-        });
 
         this.observableService.videoMetadata$
             .subscribe(metadata => {
@@ -382,12 +365,6 @@ export class Manager {
         }));
 
 
-        this.setQuizWord$.pipe(
-            resolveICardForWord<string, ICard>(this.cardsRepository.cardIndex$)
-        ).subscribe((icard) => {
-            this.quizManager.setQuizCard(icard);
-        })
-
         this.hotkeyEvents.hide$.subscribe(() => {
             this.editingCardManager.showEditingCardPopup$.next(false)
         });
@@ -425,16 +402,6 @@ export class Manager {
             .subscribe(alert => this.alertsService.newAlerts$.next(alert))
 
 
-        this.quizManager.quizStage$.subscribe(stage => {
-            switch (stage) {
-                case QuizComponent.Characters:
-                    this.editingCardManager.showEditingCardPopup$.next(false)
-                    break;
-                case QuizComponent.Conclusion:
-                    this.editingCardManager.showEditingCardPopup$.next(true)
-                    break;
-            }
-        })
 
         new HighlightPronunciationVideoService({
             pronunciationVideoService: this.pronunciationVideoService,

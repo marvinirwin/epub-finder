@@ -1,6 +1,6 @@
 import {ReplaySubject} from "rxjs";
 import React from "react";
-import {FileChooser} from "../components/directory/file-chooser.component";
+import {FileChooser} from "../components/directory/upload.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
 import {DocumentSelect} from "./document-select.component";
 import {ToggleTranslate} from "../components/directory/toggle-translate";
