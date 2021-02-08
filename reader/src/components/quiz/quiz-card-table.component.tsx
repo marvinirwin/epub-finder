@@ -1,6 +1,6 @@
 import {ManagerContext} from "../../App";
 import React, {useContext} from "react";
-import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody} from "@material-ui/core";
+import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {last5, lastN} from "./last-n";
 import {isLearning, isNew, isToReview} from "../../lib/schedule/ScheduleRow";
@@ -37,7 +37,7 @@ export const QuizCardTableComponent = () => {
                     }
                     return (
                         <TableRow key={row.word} className={className}>
-                            <TableCell component="th" scope="row"> {row.word} </TableCell>
+                            <TableCell component="th" scope="row"> <Typography variant={'h6'}>{row.word}</Typography> </TableCell>
                             <TableCell align="right">{
                                 lastN(1)(row.wordRecognitionRecords)
                                     .map(r => `${r.recognitionScore}`)

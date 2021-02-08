@@ -3,7 +3,7 @@ import React from "react";
 import {Manager} from "../../../lib/Manager";
 import {ReadingComponent} from "../../reading/reading.component";
 import {Book, Settings} from "@material-ui/icons";
-import { READING_NODE } from "@shared/*";
+import { READING_NODE } from "@shared/";
 
 export const ReadingNode = (m: Manager, hidden?: boolean): TreeMenuNode => ({
     Component: () => <ReadingComponent m={m}/>,

@@ -2,7 +2,7 @@ import {QuizCardTableComponent} from "../../quiz/quiz-card-table.component";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import React from "react";
 import {CalendarToday} from "@material-ui/icons";
-import { QUIZ_SCHEDULE } from "@shared/*";
+import { QUIZ_SCHEDULE } from "@shared/";
 
 
 export function QuizScheduleNode(): TreeMenuNode {

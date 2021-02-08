@@ -1,7 +1,7 @@
 import React from "react";
 import {LibraryBooks} from "@material-ui/icons";
 import {Manager} from "../../../lib/Manager";
-import { LIBRARY } from "@shared/*";
+import { LIBRARY } from "@shared/";
 
 export function LibraryNode(m: Manager) {
     return {

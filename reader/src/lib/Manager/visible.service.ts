@@ -3,13 +3,12 @@ import {Dictionary, flatten} from "lodash";
 import {AtomMetadata} from "../Interfaces/atom-metadata.interface.ts/atom-metadata";
 import {combineLatest, Observable} from "rxjs";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
-import {READING_NODE} from "../../components/directory/nodes/reading.node";
-import {QUIZ_NODE} from "../../components/directory/nodes/quiz-carousel.node";
 import {QuizService} from "../../components/quiz/quiz.service";
 import {map, shareReplay, switchMap, tap} from "rxjs/operators";
 import {AtomizedDocument} from "../Atomized/atomized-document";
 import {Segment} from "../Atomized/segment";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
+import {QUIZ_NODE, READING_NODE} from "@shared/";
 
 
 export const renderedSegmentsElements = (o$: Observable<Segment[][]>) =>

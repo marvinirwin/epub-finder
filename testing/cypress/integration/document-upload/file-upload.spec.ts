@@ -1,6 +1,6 @@
 import {documentSelectionRow, fileChooser} from "../constants";
 import {DirectoryPom} from "../../support/pom/directory.pom";
-import {loadingBackdropTypography} from '@shared/*';
+import {loadingBackdropTypography} from '@shared/';
 
 function testUpload(fixture: string, testDocx: string) {
     cy.get(fileChooser).attachFile(fixture);

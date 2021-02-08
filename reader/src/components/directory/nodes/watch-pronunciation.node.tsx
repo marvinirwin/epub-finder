@@ -5,7 +5,7 @@ import React, {useContext} from "react";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
 import {PlayArrow} from "@material-ui/icons";
-import {WATCH_PRONUNCIATION} from "@shared/*";
+import {WATCH_PRONUNCIATION} from "@shared/";
 
 
 export function WatchPronunciationNode(m: Manager): TreeMenuNode {

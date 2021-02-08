@@ -2,7 +2,7 @@ import React from "react";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import {Manager} from "../../../lib/Manager";
 import {AttachFile} from "@material-ui/icons";
-import { UPLOAD_LEARNING_MATERIAL } from "@shared/*";
+import { UPLOAD_LEARNING_MATERIAL } from "@shared/";
 
 
 export function uploadNode(m: Manager) {
