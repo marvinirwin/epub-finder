@@ -2,8 +2,8 @@ import {QuizCardCarousel} from "../../quiz/quiz-card-carousel.component";
 import React from "react";
 import {AmpStories} from "@material-ui/icons";
 import {TreeMenuNode} from "../tree-menu-node.interface";
+import {QUIZ_NODE} from "@shared/*";
 
-export const QUIZ_NODE = 'quiz-carousel';
 
 export function QuizCarouselNode(): TreeMenuNode {
     return {

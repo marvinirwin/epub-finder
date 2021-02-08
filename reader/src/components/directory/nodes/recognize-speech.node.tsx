@@ -7,10 +7,12 @@ import React, {useContext} from "react";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
 import {Mic, RecordVoiceOver} from "@material-ui/icons";
+import {RECOGNIZE_SPEECH} from "@shared/*";
+
 
 export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
     return {
-        name: 'recognizeSpeech',
+        name: RECOGNIZE_SPEECH,
         LeftIcon: () => {
             const m = useContext(ManagerContext);
             const isRecording = useObservableState(m.audioManager.audioRecorder.isRecording$);

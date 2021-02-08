@@ -1,4 +1,12 @@
+
+import {PAGES} from '@shared/'
+
+
 export class DirectoryPom {
+    public static visitPage(page: keyof typeof PAGES) {
+        cy.visit(`http://localhost:3000/?test=1&skip_intro=1&page=${page}`);
+    }
+
     public static goToQuiz() {
         cy.get('#quiz.tree-menu-node').click();
     }
