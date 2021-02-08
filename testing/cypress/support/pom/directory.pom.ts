@@ -1,6 +1,4 @@
-
 import {PAGES} from '@shared/'
-
 
 export class DirectoryPom {
     public static visitPage(page: keyof typeof PAGES) {

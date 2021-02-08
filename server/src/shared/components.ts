@@ -10,18 +10,17 @@ export const SETTINGS = 'settings';
 export const TESTING_UTILS = 'manual-speech-recognition';
 export const QUIZ_NODE = 'quiz-carousel';
 export const QUIZ_SCHEDULE = 'quiz-card';
-export const PAGES = {
-    SPEECH_PRACTICE,
-    READING_NODE,
-    LANGUAGE_SELECT,
-    AUTH,
-    RECOGNIZE_SPEECH,
-    WATCH_PRONUNCIATION,
-    UPLOAD_LEARNING_MATERIAL,
-    LIBRARY,
-    SETTINGS,
-    TESTING_UTILS,
-    QUIZ_NODE,
-    QUIZ_SCHEDULE
-}
-;
+
+export type PAGES =
+    typeof SPEECH_PRACTICE |
+    typeof READING_NODE |
+    typeof LANGUAGE_SELECT |
+    typeof AUTH |
+    typeof RECOGNIZE_SPEECH |
+    typeof WATCH_PRONUNCIATION |
+    typeof UPLOAD_LEARNING_MATERIAL |
+    typeof LIBRARY |
+    typeof SETTINGS |
+    typeof TESTING_UTILS |
+    typeof QUIZ_NODE |
+    typeof QUIZ_SCHEDULE;

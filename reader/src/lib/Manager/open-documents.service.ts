@@ -36,8 +36,6 @@ export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
     displayDocumentTabulation$: Observable<TabulatedDocuments>;
-    displayDocument$: Observable<AtomizedDocument>;
-    readingDocument$ = new ReplaySubject<OpenDocument>(1);
     sourceDocuments$: Observable<Map<string, OpenDocument>>;
     tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
     openDocumentBodies$: Observable<HTMLBodyElement>;
@@ -98,8 +96,8 @@ export class OpenDocumentsService {
                         nodeLabel: 'root',
                         children: {
                             [SOURCE_DOCUMENTS_NODE_LABEL]: {
+                                children,
                                 nodeLabel: SOURCE_DOCUMENTS_NODE_LABEL,
-                                children: children
                             }
                         },
                     }
@@ -127,14 +125,6 @@ export class OpenDocumentsService {
                 ),
                 shareReplay(1)
             );
-
-        this.displayDocument$ = this.readingDocument$.pipe(
-            switchMap(readingDocument => {
-                if (!readingDocument) return of<AtomizedDocument>();
-                return readingDocument.atomizedDocument$;
-            }),
-            shareReplay(1)
-        );
 
 
         this.openDocumentBodies$ = this.openDocumentTree

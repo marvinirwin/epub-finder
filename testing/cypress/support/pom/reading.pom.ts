@@ -4,6 +4,11 @@ export class ReadingPom {
             .iframeBody()
     }
 
+    public static TextIncludes(text: string) {
+            ReadingPom.RenderedSegments()
+                .should('have.text', text)
+    }
+
     public static RenderedSegments() {
         return ReadingPom
             .frame()
