@@ -8,6 +8,7 @@ import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
 import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
 import {TabulatedSentences} from "./tabulated-documents.interface";
+import {safePushSet} from "../../services/safe-push";
 
 export class Segment {
     private _translation: string | undefined;
@@ -54,7 +55,7 @@ export class Segment {
         uniqueLengths = uniq(uniqueLengths.concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
-        const wordSentenceMap: Dictionary<Segment[]> = {};
+        const wordSegmentMap: Dictionary<Set<Segment>> = {};
         const atomMetadatas = new Map<XMLDocumentNode, AtomMetadata>();
         let wordsInProgress: IWordInProgress[] = [];
         const textContent = characterElements.map(node => node.textContent).join('');
@@ -67,6 +68,7 @@ export class Segment {
             const potentialWords = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
             const wordsWhichStartHere: string[] = potentialWords.reduce((acc: string[], potentialWord) => {
                 if (t.hasWord(potentialWord)) {
+                    safePushSet(wordSegmentMap, potentialWord, elementSegmentMap.get(currentMark))
                     acc.push(potentialWord);
                 }
                 return acc;
@@ -79,7 +81,6 @@ export class Segment {
              */
             const currentCharacter = textContent[i];
             if ((wordsWhichStartHere.length === 0 && wordsInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
-                wordSentenceMap[currentCharacter] = [];
                 wordsWhichStartHere.push(currentCharacter);
             }
 
@@ -119,13 +120,18 @@ export class Segment {
                 }
             })
         }
+        const segmentDictionary: Dictionary<Segment[]> = Object.fromEntries(
+            Object.entries(wordSegmentMap)
+                .map(([word, segmentSet]) => [word, Array.from(segmentSet)])
+        );
+        console.log(segmentDictionary);
         return {
             wordElementsMap,
             wordCounts,
-            wordSegmentMap: wordSentenceMap,
+            wordSegmentMap: segmentDictionary,
             segments,
             atomMetadatas
-        };
+        } as TabulatedSentences;
     }
 
     getSentenceHTMLElement(): HTMLElement {
