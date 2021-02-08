@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import {useObservableState} from "observable-hooks";
 import {InnerHTMLIFrame} from "../../components/Frame/innerHTMLIFrame";
-import {ds_Dict} from "../Tree/DeltaScanner";
 import {Segment} from "./segment";
-import {annotatedAndTranslated} from "./atomized-document";
 import {XMLDocumentNode} from "../Interfaces/XMLDocumentNode";
-import {safePush} from "../../services/safe-push";
 import {OpenDocument} from "../DocumentFrame/open-document.entity";
+import { annotatedAndTranslated } from '@shared/';
 
 
 export const OpenDocumentComponent =

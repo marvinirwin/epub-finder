@@ -1,10 +1,14 @@
 export interface TestDocument {
     name: string;
-    textContent: string;
+    firstLine: string;
 }
 export class TestDocumentsPom {
     public static defaultDocument: TestDocument = {
-        name: 'test_txt',
-        textContent: '今天'
+        name: 'Test Txt',
+        firstLine: '今天'
+    }
+    public static htmlDocument: TestDocument = {
+        name: 'Test Html',
+        firstLine: '你好'
     }
 }

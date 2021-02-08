@@ -1,4 +1,5 @@
-import {annotatedAndTranslated} from "@shared/";
+/// <reference types="cypress" />
+import {annotatedAndTranslated} from '@shared/*'
 
 export class ReadingPom {
     public static frame() {

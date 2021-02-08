@@ -12,7 +12,7 @@ function testUpload(fixture: string, testDocx: string) {
 describe('File Uploading', () => {
     beforeEach(() => {
         cy.visitHome();
-        DirectoryPom.closeAllDialogs();
+        DirectoryPom.CloseAllDialogs();
         DirectoryPom.openUploadDialog();
     })
     it('Uploads docx', () => {

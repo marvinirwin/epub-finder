@@ -123,10 +123,11 @@ export class DocumentsController {
         @UserFromReq() user: User | undefined,
         @Param('filename') filename: string,
         @Res() response: Response,
-        @Headers('is_test') is_test: string
 ) {
         return new Promise(async (resolve, reject) => {
-            const doc = await this.documentsService.byFilename({filename, user, for_testing: !!is_test});
+            const doc = await this.documentsService.byFilename(
+                {filename, user}
+                );
             if (!doc) {
                 return reject(new HttpException(`Cannot find document ${filename} for user ${user?.id}`, 404));
             }

@@ -1,7 +1,8 @@
-import {PAGES} from '@shared/'
+/// <reference types="cypress" />
+import {documentSelectionRow, LIBRARY, PAGES} from '@shared/*'
 
 export class DirectoryPom {
-    public static visitPage(page: keyof typeof PAGES) {
+    public static visitPage(page: PAGES) {
         cy.visit(`http://localhost:3000/?test=1&skip_intro=1&page=${page}`);
     }
 
@@ -32,7 +33,7 @@ export class DirectoryPom {
     }
 
     public static EnterLibrary() {
-        cy.get(`#library`).click()
+        cy.get(`#${LIBRARY}`).click()
     }
 
     public static Back() {
@@ -80,9 +81,15 @@ export class DirectoryPom {
         cy.get('#uploadLearningMaterial').click();
     }
 
-    public static closeAllDialogs() {
+    public static CloseAllDialogs() {
         cy.get('body').trigger('keydown', {key: 'Escape'})
         cy.get('.action-modal').should('not.exist');
         // cy.get('.action-modal > .MuiBackdrop-root').click({force: true});
+    }
+
+    public static SelectDocumentToRead(documentName: string) {
+        DirectoryPom.CloseAllDialogs()
+        DirectoryPom.EnterLibrary()
+        cy.contains(`.${documentSelectionRow}`, documentName).click()
     }
 }

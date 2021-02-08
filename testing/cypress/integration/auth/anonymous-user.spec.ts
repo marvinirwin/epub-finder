@@ -4,7 +4,7 @@ import {DirectoryPom} from "../../support/pom/directory.pom";
 function uploadFile(fixture: string) {
     DirectoryPom.openUploadDialog();
     cy.get(fileChooser).attachFile(fixture);
-    DirectoryPom.closeAllDialogs();
+    DirectoryPom.CloseAllDialogs();
     cy.get('#global-loading-spinner').should('be.visible');
     cy.get('#global-loading-spinner').should('not.be.visible');
 }

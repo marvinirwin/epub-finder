@@ -26,7 +26,7 @@ export class DocumentsService {
             .find({
                     where: [
                         {creator_id: user?.id, deleted: false},
-                        {global: true, deleted: false, for_testing: for_testing},
+                        {deleted: false, for_testing: for_testing},
                     ]
                 }
             )
@@ -103,14 +103,14 @@ export class DocumentsService {
         return !!await this.byDocumentId(user, document_id);
     }
 
-    public async byFilename({filename, user, for_testing}:{filename: string, user?: User, for_testing?: boolean}) {
+    public async byFilename({filename, user}:{filename: string, user?: User}) {
         const whereConditions: Partial<DocumentView>[] = [
             {
                 global: true,
                 filename
             },
             {
-                for_testing,
+                for_testing: true,
                 filename
             }
         ]
