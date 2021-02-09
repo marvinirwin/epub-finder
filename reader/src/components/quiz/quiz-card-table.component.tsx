@@ -5,7 +5,13 @@ import {useObservableState} from "observable-hooks";
 import {last5, lastN} from "./last-n";
 import {isLearning, isNew, isToReview} from "../../lib/schedule/ScheduleRow";
 import {sum} from 'lodash';
-
+import {
+    quizCardTableRow,
+    quizCardTableRowCounts,
+    quizCardTableRowLastAnswer,
+    quizCardTableRowRecognitions,
+    quizCardTableRowWord
+} from "@shared/";
 
 
 export const QuizCardTableComponent = () => {
@@ -36,18 +42,30 @@ export const QuizCardTableComponent = () => {
                         className = 'learning'
                     }
                     return (
-                        <TableRow key={row.word} className={className}>
-                            <TableCell component="th" scope="row"> <Typography variant={'h6'}>{row.word}</Typography> </TableCell>
-                            <TableCell align="right">{
+                        <TableRow key={row.word} className={`${quizCardTableRow} ${className}`}>
+                            <TableCell
+                                component="th"
+                                scope="row"
+                                className={quizCardTableRowWord}
+                            >
+                                <Typography variant={'h6'} >{row.word} </Typography>
+                            </TableCell>
+                            <TableCell
+                                className={quizCardTableRowRecognitions}
+                            >{
                                 lastN(1)(row.wordRecognitionRecords)
                                     .map(r => `${r.recognitionScore}`)
                                     .join(',')
                             }
                             </TableCell>
-                            <TableCell align="right">{
+                            <TableCell
+                                className={quizCardTableRowCounts}
+                            >{
                                 sum(row.wordCountRecords.map(r => r.count))
                             }</TableCell>
-                            <TableCell align="right">{
+                            <TableCell
+                                className={quizCardTableRowLastAnswer}
+                            >{
                                 lastN(1)(row.pronunciationRecords)
                                     .map(r => `${r.success ? 'Correct' : 'Incorrect'}`)
                                     .join(',')

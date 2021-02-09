@@ -30,7 +30,6 @@ export class ScheduleRowsService {
         ]).pipe(
             map(([wordRecognition, wordCounts, pronunciationRecords, cardIndex]) => {
                 const scheduleRows: ds_Dict<ScheduleRow> = {};
-
                 const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
                         scheduleRows[word] = {
@@ -38,7 +37,7 @@ export class ScheduleRowsService {
                             wordCountRecords: [],
                             word,
                             pronunciationRecords: [],
-                        };
+                        } as ScheduleRow;
                     }
                     return scheduleRows[word];
                 };

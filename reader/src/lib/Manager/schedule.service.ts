@@ -10,6 +10,7 @@ import {dueDate, isLearning, isNew, isToReview, wordCount} from "../schedule/Sch
 import {ScheduleRowsService} from "./schedule-rows.service";
 import {SettingsService} from "../../services/settings.service";
 import {ScheduleMathService} from "./schedule-math.service";
+import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -47,7 +48,8 @@ export class ScheduleService {
         ]).pipe(
             map(([indexedScheduleRows, frequencyWeight]) => {
                     return ScheduleMathService.sortScheduleRows(
-                        Object.values(indexedScheduleRows),
+                        Object.values(indexedScheduleRows).filter(row => row.word.split('')
+                            .find(isChineseCharacter)),
                         frequencyWeight,
                         1 - frequencyWeight
                     )

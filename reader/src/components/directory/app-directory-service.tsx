@@ -44,7 +44,7 @@ function AppDirectory(
             TestingUtilsNode(m),
             QuizCarouselNode(),
             [
-                SpeechPracticeNode,
+                RecognizeSpeechNode(m),
                 {...QuizCarouselNode(), moveDirectory: false},
                 QuizScheduleNode(),
             ],

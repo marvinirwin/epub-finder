@@ -1,12 +1,14 @@
 import React, {useContext} from "react";
 import {Button, Paper, Typography} from "@material-ui/core";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component";
 import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";
 import {QuizCardKnownLanguage} from "./quiz-card-known-language.component";
 import {QuizCardImage} from "./quiz-card-image.component";
+import {observableLastValue} from "../../services/settings.service";
+import { uniq, flatten } from "lodash";
 
 const QUIZ_BUTTON_HARD = 'quiz-button-hard';
 const QUIZ_BUTTON_EASY = 'quiz-button-easy';
@@ -16,6 +18,21 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const word = useObservableState(quizCard.word$);
     const m = useContext(ManagerContext);
     const QUIZ_BUTTON_MEDIUM = 'quiz-button-medium';
+    useSubscription(
+        m.audioManager.audioRecorder.currentRecognizedText$,
+            async recognizedText => {
+            if (!word) {
+                return;
+            }
+            const exampleSegments = await observableLastValue(m.exampleSentencesService.exampleSegmentMap$);
+            const pronouncedQuizWord = recognizedText.includes(word);
+            const pronouncedTextIsInExampleSegments = uniq(
+                flatten(Array.from(exampleSegments.values()))).map(segment => segment.translatableText)
+                .find(segmentText => segmentText.includes(recognizedText))
+            if (pronouncedQuizWord && pronouncedTextIsInExampleSegments) {
+                m.hotkeyEvents.quizResultEasy$.next()
+            }
+    })
     return <Paper className='quiz-card' {...props}>
         <QuizCardImage quizCard={quizCard}/>
         <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>

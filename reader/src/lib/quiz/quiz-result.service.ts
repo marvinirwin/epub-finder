@@ -23,7 +23,9 @@ export class QuizResultService {
         quizManager.quizResult$.pipe(
             QuizResultToRecognitionRows(scheduleRowsService.indexedScheduleRows$, srmService)
         ).subscribe(record => {
+/*
             alertsService.info(`You'll review this card in ${humanizeDuration(record.nextDueDate.getTime() - new Date().getTime())}`)
+*/
             wordRecognitionProgressService.addRecords$.next([ record ])
         });
     }

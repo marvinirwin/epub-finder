@@ -124,7 +124,6 @@ export class Segment {
             Object.entries(wordSegmentMap)
                 .map(([word, segmentSet]) => [word, Array.from(segmentSet)])
         );
-        console.log(segmentDictionary);
         return {
             wordElementsMap,
             wordCounts,
