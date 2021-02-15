@@ -1,11 +1,11 @@
 import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
-import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component";
-import AudioRecorder from "../AudioPopup/AudioRecorder";
-import {ExpandableContainer} from "../Containers/expandable-container";
+import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
+import AudioRecorder from "../audio-popup/AudioRecorder";
+import {ExpandableContainer} from "../containers/expandable-container";
 import {useObservableState} from "observable-hooks";
-import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../Main";
-import {PronunciationVideoContainer} from "../PronunciationVideo/pronunciation-video-container.component";
+import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../main";
+import {PronunciationVideoContainer} from "../pronunciation-video/pronunciation-video-container.component";
 
 export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({m}) => {
     const openedDocument = m.readingDocumentService.readingDocument;

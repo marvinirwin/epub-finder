@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import {Button, Paper, Typography} from "@material-ui/core";
 import {useObservableState, useSubscription} from "observable-hooks";
-import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component";
+import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
 import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";

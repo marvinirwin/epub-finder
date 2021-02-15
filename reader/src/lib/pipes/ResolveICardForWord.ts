@@ -1,6 +1,6 @@
 import {combineLatest, Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {ICard} from "../Interfaces/ICard";
+import {ICard} from "../interfaces/ICard";
 import {catchError, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {cardForWord} from "../Util/Util";
 

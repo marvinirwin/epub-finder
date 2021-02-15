@@ -1,9 +1,9 @@
 import CardsRepository from "../cards.repository";
 import {OpenDocumentsService} from "../open-documents.service";
 import EditingCardManager from "../EditingCardManager";
-import {resolveICardForWord} from "../../Pipes/ResolveICardForWord";
-import {ICard} from "../../Interfaces/ICard";
-import {EditingCard} from "../../ReactiveClasses/EditingCard";
+import {resolveICardForWord} from "../../pipes/ResolveICardForWord";
+import {ICard} from "../../interfaces/ICard";
+import {EditingCard} from "../../reactive-classes/EditingCard";
 import {CardDB} from "../../Manager";
 import {AudioManager} from "../AudioManager";
 

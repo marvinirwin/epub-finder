@@ -1,7 +1,7 @@
 import {ReplaySubject} from "rxjs";
 import {take} from "rxjs/operators";
 import {cloneDeep, orderBy} from "lodash";
-import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
+import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
 import {VideoMetadata} from "../types/index";
 import axios from 'axios';
 import {debounce} from 'lodash';

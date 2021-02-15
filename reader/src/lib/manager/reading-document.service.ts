@@ -1,10 +1,10 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {AtomizedDocument} from "../Atomized/atomized-document";
+import {AtomizedDocument} from "../atomized/atomized-document";
 import {shareReplay, switchMap, tap} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from "./open-documents.service";
-import {OpenDocument} from "../DocumentFrame/open-document.entity";
+import {OpenDocument} from "../document-frame/open-document.entity";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;

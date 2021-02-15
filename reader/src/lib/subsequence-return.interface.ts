@@ -1,3 +1,3 @@
-import {TabulatedSentences} from "./Atomized/tabulated-documents.interface";
+import {TabulatedSentences} from "./atomized/tabulated-documents.interface";
 
 export type SubSequenceReturn = TabulatedSentences;

@@ -4,7 +4,7 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
-import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
+import {DocumentWordCount} from "../interfaces/DocumentWordCount";
 import CardsRepository from "./cards.repository";
 import {IgnoredWordsRepository} from "../schedule/ignored-words.repository";
 import {ScheduleRow} from "../schedule/ScheduleRow";

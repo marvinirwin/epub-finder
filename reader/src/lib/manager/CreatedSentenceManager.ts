@@ -1,6 +1,6 @@
 import {DatabaseService} from "../Storage/database.service";
 import {Observable, Subject} from "rxjs";
-import {CreatedSentence} from "../Interfaces/CreatedSentence";
+import {CreatedSentence} from "../interfaces/CreatedSentence";
 import {scan, shareReplay} from "rxjs/operators";
 import { Dictionary } from "lodash";
 

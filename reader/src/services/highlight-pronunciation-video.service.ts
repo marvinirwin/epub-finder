@@ -1,7 +1,7 @@
-import {HighlighterService} from "../lib/Highlighting/highlighter.service";
-import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
+import {HighlighterService} from "../lib/highlighting/highlighter.service";
+import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
 import {distinctUntilChanged, map, shareReplay, withLatestFrom} from "rxjs/operators";
-import {HighlightDelta} from "../lib/Highlighting/highlight.interface";
+import {HighlightDelta} from "../lib/highlighting/highlight.interface";
 import {WordMetadataMapService} from "./word-metadata-map.service";
 
 export class HighlightPronunciationVideoService {

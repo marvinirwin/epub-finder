@@ -1,14 +1,14 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "../Atomized/atomized-document";
+import {AtomizedDocument} from "../atomized/atomized-document";
 import {WorkerError} from "./worker.helpers";
 import axios from "axios";
 import {TrieWrapper} from "../TrieWrapper";
-import {ITrie} from "../Interfaces/Trie";
+import {ITrie} from "../interfaces/Trie";
 import {InterpolateExampleSentencesService} from "../../components/example-sentences/interpolate-example-sentences.service";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
-import {Segment} from "../Atomized/segment";
+import {Segment} from "../atomized/segment";
 import { uniq } from "lodash";
 
 // @ts-ignore

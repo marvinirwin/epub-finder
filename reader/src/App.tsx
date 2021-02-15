@@ -5,7 +5,7 @@ import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";
-import {Main} from "./components/Main";
+import {Main} from "./components/main";
 import {ThemeProvider} from '@material-ui/core/styles';
 import {GlobalDragOver} from "./components/global-drag-over.component";
 import {AlertSnackbar} from "./components/alert-snackbar.component";

@@ -1,5 +1,5 @@
 import {Observable, Subject} from "rxjs";
-import {ICard} from "../Interfaces/ICard";
+import {ICard} from "../interfaces/ICard";
 import {AlertsService} from "../../services/alerts.service";
 
 export interface QuizResult {

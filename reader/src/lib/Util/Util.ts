@@ -1,7 +1,7 @@
 import {uniq, flatten} from "lodash";
-import {ITrie} from "../Interfaces/Trie";
+import {ITrie} from "../interfaces/Trie";
 import axios from "axios";
-import {ICard} from "../Interfaces/ICard";
+import {ICard} from "../interfaces/ICard";
 
 export function cardForWord(word: string): ICard {
     return {

@@ -1,12 +1,12 @@
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {Dictionary} from "lodash";
-import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
-import {XMLDocumentNode} from "../lib/Interfaces/XMLDocumentNode";
+import {AtomMetadata} from "../lib/interfaces/atom-metadata.interface.ts/atom-metadata";
+import {XMLDocumentNode} from "../lib/interfaces/XMLDocumentNode";
 import {safePushMapSet, safePushSet} from "./safe-push";
-import {VisibleService} from "../lib/Manager/visible.service";
+import {VisibleService} from "../lib/manager/visible.service";
 import {ElementAtomMetadataIndex} from "./element-atom-metadata.index";
-import {Segment} from "../lib/Atomized/segment";
+import {Segment} from "../lib/atomized/segment";
 
 export class WordMetadataMapService {
     public visibleWordMetadataMap$: Observable<Dictionary<Set<AtomMetadata>>>;

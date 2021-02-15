@@ -1,17 +1,17 @@
 import {combineLatest, Observable} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
-import {OpenExampleSentencesFactory} from "../../lib/DocumentFrame/open-example-sentences-document.factory";
+import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
 import {distinctUntilChanged, map, shareReplay, tap} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
-import CardsRepository from "src/lib/Manager/cards.repository";
-import {resolveICardForWordLatest} from "../../lib/Pipes/ResolveICardForWord";
-import {ScheduleService} from "../../lib/Manager/schedule.service";
+import CardsRepository from "src/lib/manager/cards.repository";
+import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
+import {ScheduleService} from "../../lib/manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
-import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/Manager/open-documents.service";
+import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {observableLastValue} from "../../services/settings.service";
-import {ICard} from "../../lib/Interfaces/ICard";
+import {ICard} from "../../lib/interfaces/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 

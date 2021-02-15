@@ -1,4 +1,4 @@
-import {Segment} from "./Atomized/segment";
+import {Segment} from "./atomized/segment";
 import {combineLatest, ReplaySubject} from "rxjs";
 import {SettingsService} from "../services/settings.service";
 import {transliterate} from "./transliterate.service";

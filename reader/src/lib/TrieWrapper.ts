@@ -1,5 +1,5 @@
 import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
-import {ITrie} from "./Interfaces/Trie";
+import {ITrie} from "./interfaces/Trie";
 
 export class TrieWrapper {
     public changeSignal$ = new ReplaySubject<TrieWrapper>(1);

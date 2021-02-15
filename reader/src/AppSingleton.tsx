@@ -1,6 +1,6 @@
 import {Manager} from "./lib/Manager";
 import {DatabaseService} from "./lib/Storage/database.service";
-import {BrowserAudio} from "./lib/Audio/browser.audio";
+import {BrowserAudio} from "./lib/audio/browser.audio";
 import {Website} from "./lib/Website/Website";
 
 export function websiteFromFilename(filename: string) {

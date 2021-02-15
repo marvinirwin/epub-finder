@@ -1,5 +1,5 @@
 import {Manager} from "../../../lib/Manager";
-import {Profile} from "../../../lib/Auth/loggedInUserService";
+import {Profile} from "../../../lib/auth/loggedInUserService";
 import {Settings} from "@material-ui/icons";
 import React from "react";
 import {TreeMenuNode} from "../tree-menu-node.interface";

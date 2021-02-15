@@ -1,9 +1,9 @@
 import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
-import {VideoMetadata} from "../components/PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../components/pronunciation-video/video-meta-data.interface";
 import axios from "axios";
 import {mapFromId} from "../lib/map.module";
-import CardsRepository from "../lib/Manager/cards.repository";
-import {isChineseCharacter} from "../lib/Interfaces/OldAnkiClasses/Card";
+import CardsRepository from "../lib/manager/cards.repository";
+import {isChineseCharacter} from "../lib/interfaces/OldAnkiClasses/Card";
 
 export class VideoMetadataRepository {
     all$ = new BehaviorSubject<Map<string, VideoMetadata>>(new Map())

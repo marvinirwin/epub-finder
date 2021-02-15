@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject} from "rxjs";
-import {AudioSource} from "./Audio/AudioSource";
+import {AudioSource} from "./audio/AudioSource";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {audioContext} from "./Audio/AudioContext";
+import {audioContext} from "./audio/AudioContext";
 import {observableLastValue} from "../services/settings.service";
 
 

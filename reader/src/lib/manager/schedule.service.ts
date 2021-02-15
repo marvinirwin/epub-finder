@@ -8,7 +8,7 @@ import {SrmService} from "../srm/srm.service";
 import {ScheduleRowsService} from "./schedule-rows.service";
 import {SettingsService} from "../../services/settings.service";
 import {ScheduleMathService} from "./schedule-math.service";
-import {isChineseCharacter} from "../Interfaces/OldAnkiClasses/Card";
+import {isChineseCharacter} from "../interfaces/OldAnkiClasses/Card";
 import {ScheduleRow} from "../schedule/ScheduleRow";
 import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
 

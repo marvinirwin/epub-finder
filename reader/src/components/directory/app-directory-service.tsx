@@ -7,7 +7,7 @@ import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {ReadingNode} from "./nodes/reading.node";
 import {TreeMenuNode} from "./tree-menu-node.interface";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
-import {Profile} from "../../lib/Auth/loggedInUserService";
+import {Profile} from "../../lib/auth/loggedInUserService";
 import {uploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";

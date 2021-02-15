@@ -2,7 +2,7 @@ import React from "react";
 import {Manager} from "../../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import {Observable} from "rxjs";
-import {VideoMetadata} from "../PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../pronunciation-video/video-meta-data.interface";
 
 export const AllSentences: React.FC<{ m: Manager }> = ({m}) => {
     const allSentences /*useObservableState(m.videoMetadataService.allSentenceMetadata$, []);*/ = [];

@@ -1,9 +1,9 @@
 import {combineLatest, Observable, of, race, ReplaySubject, Subject, timer} from "rxjs";
-import {ICard} from "../Interfaces/ICard";
+import {ICard} from "../interfaces/ICard";
 import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";
-import CardsRepository from "../Manager/cards.repository";
+import CardsRepository from "../manager/cards.repository";
 
 
 
@@ -98,7 +98,7 @@ export class EditingCard {
                 this.learningLanguage$,
                 this.deck$
             ]
-            // This debounce Time and then skip means skip the first emit when we create the ReactiveClasses
+            // This debounce Time and then skip means skip the first emit when we create the reactive-classes
         ).pipe(skip(1));
     }
 

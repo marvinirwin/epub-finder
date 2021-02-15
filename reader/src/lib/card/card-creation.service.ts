@@ -1,7 +1,7 @@
-import CardsRepository from "../Manager/cards.repository";
+import CardsRepository from "../manager/cards.repository";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
-import {OpenDocumentsService} from "../Manager/open-documents.service";
+import {OpenDocumentsService} from "../manager/open-documents.service";
 
 export class CardCreationService {
     constructor(

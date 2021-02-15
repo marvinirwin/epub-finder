@@ -1,4 +1,4 @@
-import {AudioRecorder} from "./Audio/audio-recorder.service";
+import {AudioRecorder} from "./audio/audio-recorder.service";
 import {combineLatest, Observable} from "rxjs";
 import {LanguageConfigsService} from "./language-configs.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";

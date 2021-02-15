@@ -1,11 +1,11 @@
 import {BehaviorSubject, combineLatest, merge, Observable} from "rxjs";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {mergeMaps} from "../lib/map.module";
-import {OpenDocumentsService} from "../lib/Manager/open-documents.service";
-import {VisibleService} from "../lib/Manager/visible.service";
-import {AtomMetadata} from "../lib/Interfaces/atom-metadata.interface.ts/atom-metadata";
-import {XMLDocumentNode} from "../lib/Interfaces/XMLDocumentNode";
-import {TabulatedDocuments} from "../lib/Atomized/tabulated-documents.interface";
+import {OpenDocumentsService} from "../lib/manager/open-documents.service";
+import {VisibleService} from "../lib/manager/visible.service";
+import {AtomMetadata} from "../lib/interfaces/atom-metadata.interface.ts/atom-metadata";
+import {XMLDocumentNode} from "../lib/interfaces/XMLDocumentNode";
+import {TabulatedDocuments} from "../lib/atomized/tabulated-documents.interface";
 
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>;

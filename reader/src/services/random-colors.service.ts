@@ -1,4 +1,4 @@
-import {RGBA} from "../lib/Highlighting/color.service";
+import {RGBA} from "../lib/highlighting/color.service";
 
 export class RandomColorsService {
     private static hsv_to_rgb(h: number, s: number, v: number): RGBA {

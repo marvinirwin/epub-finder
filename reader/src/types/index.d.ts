@@ -1,4 +1,4 @@
-export {VideoMetadata} from 'src/components/PronunciationVideo/video-meta-data.interface'
+export {VideoMetadata} from 'src/components/pronunciation-video/video-meta-data.interface'
 
 
 export class BasicDocument {

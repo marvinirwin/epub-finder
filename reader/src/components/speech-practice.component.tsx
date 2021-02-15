@@ -4,7 +4,7 @@ import {useObservableState, useSubscription} from "observable-hooks";
 import {Mic} from "@material-ui/icons";
 import {SpeechPracticeCard} from "./speech-practice-card";
 import {Button, Card, CardActions} from "@material-ui/core";
-import {RecordRequest} from "../lib/Interfaces/RecordRequest";
+import {RecordRequest} from "../lib/interfaces/RecordRequest";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>

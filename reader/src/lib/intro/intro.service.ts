@@ -1,7 +1,7 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, take, distinct} from "rxjs/operators";
 import {IntroSeriesService} from "./intro-series.service";
-import {VideoMetadata} from "../../components/PronunciationVideo/video-meta-data.interface";
+import {VideoMetadata} from "../../components/pronunciation-video/video-meta-data.interface";
 
 export const SKIP_INTRO = new URLSearchParams(window.location.search).has('skip_intro')
 

@@ -2,7 +2,7 @@ import {Manager} from "./Manager";
 import {of, Subject} from "rxjs";
 import {switchMap, withLatestFrom} from "rxjs/operators";
 import {RecognitionMap} from "./srm/srm.service";
-import {Hotkeys} from "./Hotkeys/hotkeys.interface";
+import {Hotkeys} from "./hotkeys/hotkeys.interface";
 
 export class HotKeyEvents {
 

@@ -1,9 +1,9 @@
 import {combineLatest, ReplaySubject} from "rxjs";
 import {DroppedFilesService} from "./dropped-files.service";
-import {DocumentCheckingOutService} from "../../components/Library/document-checking-out.service";
-import {LoggedInUserService} from "../Auth/loggedInUserService";
+import {DocumentCheckingOutService} from "../../components/library/document-checking-out.service";
+import {LoggedInUserService} from "../auth/loggedInUserService";
 import {last, map, startWith} from "rxjs/operators";
-import {LibraryService} from "../Manager/library.service";
+import {LibraryService} from "../manager/library.service";
 import {ProgressItemService} from "../../components/progress-item.service";
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);

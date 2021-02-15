@@ -1,4 +1,4 @@
-import {DocumentWordCount} from "../Interfaces/DocumentWordCount";
+import {DocumentWordCount} from "../interfaces/DocumentWordCount";
 import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
 import {orderBy, sum} from "lodash";

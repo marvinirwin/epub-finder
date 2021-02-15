@@ -1,7 +1,7 @@
 import {DatabaseService} from "../lib/Storage/database.service";
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/Tree/DeltaScanner";
-import {Hotkeys} from "../lib/Hotkeys/hotkeys.interface";
+import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {distinct, distinctUntilChanged, skip, take} from "rxjs/operators";
 import {HistoryService} from "../lib/history.service";
 import {SettingGetSet, SettingType} from "./setting-get-set";

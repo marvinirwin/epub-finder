@@ -1,5 +1,5 @@
 import {Observable, Subject} from "rxjs";
-import {OpenDocument} from "../../lib/DocumentFrame/open-document.entity";
+import {OpenDocument} from "../../lib/document-frame/open-document.entity";
 import {EditableValue} from "./editing-value";
 
 export interface QuizCard {

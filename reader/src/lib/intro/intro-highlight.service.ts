@@ -1,9 +1,9 @@
 import {Observable} from "rxjs";
-import {Segment} from "../Atomized/segment";
+import {Segment} from "../atomized/segment";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, map, take} from "rxjs/operators";
 import {flatten, chunk} from "lodash";
-import {TemporaryHighlightService} from "../Highlighting/temporary-highlight.service";
+import {TemporaryHighlightService} from "../highlighting/temporary-highlight.service";
 
 export class IntroHighlightService {
     constructor({renderedSegments$, temporaryHighlightService}: {

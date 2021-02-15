@@ -2,7 +2,7 @@ import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {Box, Button, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
-import {BorderLinearProgress} from "../Progress/BorderLinearProgress";
+import {BorderLinearProgress} from "../progress/BorderLinearProgress";
 
 
 export const FileChooser = () => {

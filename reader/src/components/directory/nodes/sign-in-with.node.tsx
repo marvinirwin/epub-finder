@@ -1,4 +1,4 @@
-import {Profile} from "../../../lib/Auth/loggedInUserService";
+import {Profile} from "../../../lib/auth/loggedInUserService";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import React from "react";
 import {AccountCircle} from "@material-ui/icons";

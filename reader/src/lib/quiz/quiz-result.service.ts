@@ -1,8 +1,8 @@
-import {QuizManager} from "../Manager/QuizManager";
+import {QuizManager} from "../manager/QuizManager";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
-import {QuizResultToRecognitionRows} from "../Pipes/QuizResultToRecognitionRows";
+import {QuizResultToRecognitionRows} from "../pipes/QuizResultToRecognitionRows";
 import {SrmService} from "../srm/srm.service";
-import {ScheduleRowsService} from "../Manager/schedule-rows.service";
+import {ScheduleRowsService} from "../manager/schedule-rows.service";
 import {AlertsService} from "../../services/alerts.service";
 import humanizeDuration from 'humanize-duration';
 

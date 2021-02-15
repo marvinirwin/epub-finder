@@ -1,6 +1,6 @@
-import {Segment} from "../lib/Atomized/segment";
+import {Segment} from "../lib/atomized/segment";
 import {combineLatest, Observable} from "rxjs";
-import {Modes, ModesService} from "../lib/Modes/modes.service";
+import {Modes, ModesService} from "../lib/modes/modes.service";
 import {debounceTime, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {keyBy} from 'lodash';
 

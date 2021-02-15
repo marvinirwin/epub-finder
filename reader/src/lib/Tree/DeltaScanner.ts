@@ -1,6 +1,6 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {map, scan, shareReplay, skip, take} from "rxjs/operators";
-import {Named} from "../Manager/open-documents.service";
+import {Named} from "../manager/open-documents.service";
 import {applyTreeDiff, ds_Tree, flattenTreeIntoDict} from "../../services/tree.service";
 
 export type ds_Dict<T, U extends string = string> = {

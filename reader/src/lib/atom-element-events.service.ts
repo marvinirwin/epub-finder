@@ -1,20 +1,20 @@
 import {merge, Subject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Modes, ModesService} from "./Modes/modes.service";
-import {OpenDocumentsService} from "./Manager/open-documents.service";
+import {Modes, ModesService} from "./modes/modes.service";
+import {OpenDocumentsService} from "./manager/open-documents.service";
 import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
-import {XMLDocumentNode} from "./Interfaces/XMLDocumentNode";
-import {PronunciationVideoService} from "../components/PronunciationVideo/pronunciation-video.service";
-import {BrowserInputs} from "./Hotkeys/BrowserInputs";
+import {XMLDocumentNode} from "./interfaces/XMLDocumentNode";
+import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
+import {BrowserInputs} from "./hotkeys/BrowserInputs";
 import {debounce, flatten, maxBy} from "lodash";
-import {Highlighter} from "./Highlighting/Highlighter";
+import {Highlighter} from "./highlighting/Highlighter";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
-import {Segment} from "./Atomized/segment";
-import CardsRepository from "./Manager/cards.repository";
-import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadata";
-import {ICard} from "./Interfaces/ICard";
+import {Segment} from "./atomized/segment";
+import CardsRepository from "./manager/cards.repository";
+import {AtomMetadata} from "./interfaces/atom-metadata.interface.ts/atom-metadata";
+import {ICard} from "./interfaces/ICard";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
-import {MousedOverWordHighlightService} from "./Highlighting/moused-over-word-highlight.service";
+import {MousedOverWordHighlightService} from "./highlighting/moused-over-word-highlight.service";
 
 const addHighlightedWord = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
 

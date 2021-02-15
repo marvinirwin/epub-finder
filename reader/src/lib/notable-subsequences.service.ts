@@ -1,10 +1,10 @@
-import CardsRepository from "./Manager/cards.repository";
-import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./Manager/open-documents.service";
+import CardsRepository from "./manager/cards.repository";
+import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./manager/open-documents.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {combineLatest, merge, Observable} from "rxjs";
-import {TabulatedDocuments, TabulatedSentences} from "./Atomized/tabulated-documents.interface";
+import {TabulatedDocuments, TabulatedSentences} from "./atomized/tabulated-documents.interface";
 import {flattenTree} from "./Tree/DeltaScanner";
-import {mergeTabulations} from "./Atomized/merge-tabulations";
+import {mergeTabulations} from "./atomized/merge-tabulations";
 import {SubSequenceReturn} from "./subsequence-return.interface";
 
 export class NotableSubsequencesService {

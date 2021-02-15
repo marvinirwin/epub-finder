@@ -4,7 +4,7 @@ import React, {useContext} from "react";
 import {orderBy} from "lodash";
 import {ds_Tree} from "../../services/tree.service";
 import {HotkeyDirectoryComponent} from "./hotkey-directory.component";
-import {Hotkeys} from "../../lib/Hotkeys/hotkeys.interface";
+import {Hotkeys} from "../../lib/hotkeys/hotkeys.interface";
 import {TreeMenuNode} from "./tree-menu-node.interface";
 
 

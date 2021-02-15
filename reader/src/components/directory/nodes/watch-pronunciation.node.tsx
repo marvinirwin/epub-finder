@@ -1,5 +1,5 @@
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {Modes} from "../../../lib/Modes/modes.service";
+import {Modes} from "../../../lib/modes/modes.service";
 import {Manager} from "../../../lib/Manager";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../../App";

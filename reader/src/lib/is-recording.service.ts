@@ -1,5 +1,5 @@
 import {SettingsService} from "../services/settings.service";
-import {AudioManager} from "./Manager/AudioManager";
+import {AudioManager} from "./manager/AudioManager";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 

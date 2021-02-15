@@ -1,19 +1,19 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {Website} from "../Website/Website";
-import {Segment} from "../Atomized/segment";
+import {Segment} from "../atomized/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {AtomizedDocument} from "../Atomized/atomized-document";
+import {AtomizedDocument} from "../atomized/atomized-document";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
 import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
-import {OpenDocument} from "../DocumentFrame/open-document.entity";
-import {AtomizedDocumentSources, DocumentSourcesService} from "../DocumentFrame/document-sources.service";
-import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
-import {mergeTabulations} from "../Atomized/merge-tabulations";
+import {OpenDocument} from "../document-frame/open-document.entity";
+import {AtomizedDocumentSources, DocumentSourcesService} from "../document-frame/document-sources.service";
+import {TabulatedDocuments} from "../atomized/tabulated-documents.interface";
+import {mergeTabulations} from "../atomized/merge-tabulations";
 import {DocumentRepository} from "../documents/document.repository";
 import {TrieWrapper} from "../TrieWrapper";
 

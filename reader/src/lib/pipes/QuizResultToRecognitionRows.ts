@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {QuizResult} from "../Manager/QuizManager";
+import {QuizResult} from "../manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
 import {ScheduleRow} from "../schedule/ScheduleRow";

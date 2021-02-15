@@ -1,8 +1,8 @@
 import {SpeakMode} from "../modes/speak-mode.component";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import {Manager} from "../../../lib/Manager";
-import {RecordRequest} from "../../../lib/Interfaces/RecordRequest";
-import {removePunctuation} from "../../../lib/Highlighting/temporary-highlight.service";
+import {RecordRequest} from "../../../lib/interfaces/RecordRequest";
+import {removePunctuation} from "../../../lib/highlighting/temporary-highlight.service";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";

@@ -1,5 +1,5 @@
 import {ds_Tree} from "../../services/tree.service";
-import {Named} from "../../lib/Manager/open-documents.service";
+import {Named} from "../../lib/manager/open-documents.service";
 
 /**
  * Each one of these things is an observable which returns treeNdoes

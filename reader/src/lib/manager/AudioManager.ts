@@ -1,9 +1,9 @@
-import {AudioRecorder} from "../Audio/audio-recorder.service";
+import {AudioRecorder} from "../audio/audio-recorder.service";
 import {ReplaySubject} from "rxjs";
 import {WavAudio} from "../WavAudio";
 import {flatMap, take} from "rxjs/operators";
-import {AudioSource} from "../Audio/AudioSource";
-import {fetchSynthesizedAudio} from "../Audio/FetchSynthesizedAudio";
+import {AudioSource} from "../audio/AudioSource";
+import {fetchSynthesizedAudio} from "../audio/FetchSynthesizedAudio";
 import {sleep} from "../Util/Util";
 
 
