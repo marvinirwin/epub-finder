@@ -1,30 +1,7 @@
 import {ScheduleRow} from "../schedule/ScheduleRow";
-import {orderBy, sum} from "lodash";
-import {NormalizedScheduleRowData, SortValue} from "../schedule/schedule-row.interface";
-
-function getInverseLogNormalValue(normalCount: number) {
-    if (normalCount === 0) {
-        return 0;
-    }
-    return normalCount;
-/*
-    const number = Math.log(normalCount);
-    if (number < 0) {
-        debugger;console.log();
-    }
-    return number;
-*/
-}
-
-function getSortValue<T>(normalizedValue: number, weight: number, value: T): SortValue<T> {
-    return {
-        value,
-        weight,
-        normalValue: normalizedValue,
-        inverseLogNormalValue: getInverseLogNormalValue(normalizedValue),
-        weightedInverseLogNormalValue: getInverseLogNormalValue(normalizedValue) * weight,
-    };
-}
+import {orderBy} from "lodash";
+import {NormalizedScheduleRowData} from "../schedule/schedule-row.interface";
+import {getSortValue} from "./sort-value.interface";
 
 export class ScheduleMathService {
 

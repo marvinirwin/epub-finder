@@ -48,10 +48,11 @@ export class ScheduleService {
         ]).pipe(
             map(([indexedScheduleRows, frequencyWeight]) => {
                     return ScheduleMathService.sortScheduleRows(
-                        Object.values(indexedScheduleRows).filter(row => row.d.word.split('')
+                        Object.values(indexedScheduleRows)
+                            .filter(row => row.d.word.split('')
                             .find(isChineseCharacter)),
+                        1 - frequencyWeight,
                         frequencyWeight,
-                        1 - frequencyWeight
                     )
                 }
             ),
