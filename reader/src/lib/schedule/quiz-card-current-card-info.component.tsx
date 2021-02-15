@@ -29,11 +29,6 @@ const ScheduleRowDisplay = ({scheduleRow}: { scheduleRow: ScheduleRow<Normalized
             Frequency: {scheduleRow.count()}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
         </div>
-            {DEV &&
-                <div style={{marginTop: '24px'}}>
-                    {scheduleRow.d.finalSortValue}
-                </div>
-            }
     </div>
 }
 const DisplaySortValue = ({sortValue}: { sortValue: SortValue<any> }) => {
