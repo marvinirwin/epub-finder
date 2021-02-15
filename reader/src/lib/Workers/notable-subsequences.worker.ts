@@ -2,18 +2,32 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../Atomized/atomized-document";
-import {WorkerError} from "./WorkerHelpers";
+import {WorkerError} from "./worker.helpers";
+import axios from "axios";
+import {TrieWrapper} from "../TrieWrapper";
+import {ITrie} from "../Interfaces/Trie";
+import {InterpolateExampleSentencesService} from "../../components/example-sentences/interpolate-example-sentences.service";
+import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
+import {Segment} from "../Atomized/segment";
+import { uniq } from "lodash";
 
 // @ts-ignore
 self.window = self;
 // @ts-ignore
 const ctx: Worker = self as any;
 
-const MAX_SEQUENCE_LENGTH = 20;
-const MIN_SEQUENCE_LENGTH = 3;
-const POPULAR_SEQUENCE_COUNT_THRESHOLD = 3;
-
 ctx.onmessage = async (ev) => {
+    const {trie, url}: {trie: ITrie, url: string} = ev.data;
+    const response = await fetch(url);
+    const characters = new TextDecoder().decode(await response.arrayBuffer());
+    const doc = AtomizedDocument.atomizeDocument(InterpolateExampleSentencesService.interpolate([characters]));
+    const tabulated = Segment.tabulate(
+        trie,
+        uniq(trie.getWords().map(word => word.length)),
+        doc.segments(),
+    );
+    ctx.postMessage(tabulated);
+/*
     try {
         const popularityMap = new Map<string, number>();
         const characterSet = new Set<string>();
@@ -34,9 +48,9 @@ ctx.onmessage = async (ev) => {
             ([str, count]) => count >= POPULAR_SEQUENCE_COUNT_THRESHOLD
         );
         const popularStrings: string[] = popularEntries.map(([str]) => str);
-        ctx.postMessage({popularStrings, characterSet: [...characterSet].filter(c => c.trim())});
     } catch (e) {
         ctx.postMessage({errorMessage: e} as WorkerError);
     }
+*/
 };
 

@@ -5,10 +5,11 @@ import {OpenDocumentComponent} from "../../lib/Atomized/open-document.component"
 import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";
-import {QuizCardKnownLanguage} from "./quiz-card-known-language.component";
 import {QuizCardImage} from "./quiz-card-image.component";
 import {observableLastValue} from "../../services/settings.service";
-import { uniq, flatten } from "lodash";
+import {uniq, flatten} from "lodash";
+import {QuizCardCurrentCardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
+import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
 
 const QUIZ_BUTTON_HARD = 'quiz-button-hard';
 const QUIZ_BUTTON_EASY = 'quiz-button-easy';
@@ -20,7 +21,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const QUIZ_BUTTON_MEDIUM = 'quiz-button-medium';
     useSubscription(
         m.audioManager.audioRecorder.currentRecognizedText$,
-            async recognizedText => {
+        async recognizedText => {
             if (!word) {
                 return;
             }
@@ -32,10 +33,20 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             if (pronouncedQuizWord && pronouncedTextIsInExampleSegments) {
                 m.hotkeyEvents.quizResultEasy$.next()
             }
-    })
+        })
     return <Paper className='quiz-card' {...props}>
-        <QuizCardImage quizCard={quizCard}/>
-        <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
+        <div className={'quiz-card-data-sheet'}>
+            <div>
+                <QuizCardProgress quizCard={quizCard}/>
+            </div>
+            <div className={'quiz-card-data-sheet-middle'}>
+                <QuizCardImage quizCard={quizCard}/>
+                <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
+            </div>
+            <div>
+                <QuizCardCurrentCardInfo quizCard={quizCard}/>
+            </div>
+        </div>
         <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
         <div className={'quiz-button-row'}>
             <Button
@@ -58,7 +69,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                 className={QUIZ_BUTTON_IGNORE}
                 onClick={() => {
                     if (word) {
-                        m.cardsRepository.deleteWords.next([word])
+                        m.ignoredWordsRepository.addRecords$.next([{word, timestamp: new Date()}])
                     }
                 }}>
                 Ignore

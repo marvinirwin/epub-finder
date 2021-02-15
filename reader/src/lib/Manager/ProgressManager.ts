@@ -5,7 +5,7 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {CORRECT_RECOGNITION_SCORE} from "../Highlighting/Highlighter";
 import HSK1 from '../HSK/hsk-level-1.json';
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
-import {ScheduleRow} from "../schedule/schedule-row.interface";
+import {ScheduleRow} from "../schedule/ScheduleRow";
 
 export interface HSKWord {
     id: number;

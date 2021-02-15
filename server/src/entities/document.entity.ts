@@ -36,6 +36,9 @@ export class Document {
     for_testing: boolean = false;
 
     @Column({default: false})
+    for_freq: boolean = false;
+
+    @Column({default: false})
     deleted: boolean = false;
 
     @CreateDateColumn()

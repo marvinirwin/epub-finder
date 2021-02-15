@@ -21,6 +21,7 @@ import {LibraryNode} from "./nodes/library.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
+export const DEV = new URLSearchParams(window.location.search).has('dev')
 
 
 function AppDirectory(

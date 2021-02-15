@@ -1,7 +1,7 @@
 import {SettingsService} from "../services/settings.service";
-import {ProgressRowService} from "./schedule/progress-row.service";
+import {IndexedRowsRepository} from "./schedule/indexed-rows.repository";
 import {WordRecognitionRow} from "./schedule/word-recognition-row";
-import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
+import {PronunciationProgressRepository} from "./schedule/pronunciation-progress.repository";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {RecognitionMap} from "./srm/srm.service";
@@ -21,8 +21,8 @@ export class GoalsService {
                     pronunciationRecordsService
                 }: {
         settingsService: SettingsService,
-        recognitionRecordsService: ProgressRowService<WordRecognitionRow>,
-        pronunciationRecordsService: PronunciationProgressService
+        recognitionRecordsService: IndexedRowsRepository<WordRecognitionRow>,
+        pronunciationRecordsService: PronunciationProgressRepository
     }) {
         this.dailyProgress$ = combineLatest([
             recognitionRecordsService.records$,
@@ -34,14 +34,14 @@ export class GoalsService {
                  * if each of these scores was calculated outside of combineLatest
                  */
                 const wordsRecognizedToday = Object.values(recognition)
-                    .filter(recordsForWord => recordsForWord
+                    .filter(recordsForword => recordsForword
                         .find(r =>
                             r.recognitionScore === RecognitionMap.easy &&
                             isInToday(r.timestamp)
                         )
                     );
                 const wordsPronouncedToday = Object.values(pronunciation)
-                    .filter(recordsForWord => recordsForWord
+                    .filter(recordsForword => recordsForword
                         .find(r =>
                             r.success &&
                             isInToday(r.timestamp)

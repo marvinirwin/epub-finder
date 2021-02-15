@@ -22,7 +22,7 @@ export class HotKeyEvents {
     public get quizResultMedium$() {
         return this.subjects.QUIZ_RESULT_MEDIUM;
     }
-    public get recordQuizWord$() {
+    public get recordQuizword$() {
         return this.subjects.RECORD_QUIZ_WORD;
     }
     public get quizResultHard$() {

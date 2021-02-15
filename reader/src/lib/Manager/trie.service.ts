@@ -2,9 +2,9 @@ import {TrieWrapper} from "../TrieWrapper";
 import trie from "trie-prefix-tree";
 import CardsRepository from "./cards.repository";
 import {Observable} from "rxjs";
-import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
-import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
-import {ProgressRowService} from "../schedule/progress-row.service";
+import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
+import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
+import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
 
 export class TrieService {
     public trie$: Observable<TrieWrapper>;
@@ -16,8 +16,8 @@ export class TrieService {
             wordRecognitionProgressService
         }: {
             cardsService: CardsRepository,
-            pronunciationProgressService: PronunciationProgressService,
-            wordRecognitionProgressService: WordRecognitionProgressService
+            pronunciationProgressService: PronunciationProgressRepository,
+            wordRecognitionProgressService: WordRecognitionProgressRepository
         }
     ) {
         const t = new TrieWrapper(trie([]));
@@ -27,7 +27,7 @@ export class TrieService {
         [
             pronunciationProgressService,
             wordRecognitionProgressService
-        ].map((progressService: ProgressRowService<any>) =>
+        ].map((progressService: IndexedRowsRepository<any>) =>
             progressService.addRecords$.subscribe(records => {
                 t.addWords(...records.map(record => record.word));
             })

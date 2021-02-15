@@ -21,7 +21,6 @@ export class Segment {
             trie,
             trieElementSizes,
             segments,
-            c => !isChineseCharacter(c)
         )
     }
 
@@ -45,7 +44,6 @@ export class Segment {
         t: ITrie,
         uniqueLengths: number[],
         segments: Segment[],
-        characterFilterFunc: (c: string) => boolean
     ): TabulatedSentences {
         const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
         const characterElements = flatten(segments.map(segment => {

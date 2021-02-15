@@ -1,6 +1,6 @@
 import CardsRepository from "../Manager/cards.repository";
-import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
-import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
+import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
+import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {OpenDocumentsService} from "../Manager/open-documents.service";
 
 export class CardCreationService {
@@ -12,8 +12,8 @@ export class CardCreationService {
             openDocumentsService
         }: {
             cardService: CardsRepository,
-            pronunciationProgressService: PronunciationProgressService,
-            wordRecognitionService: WordRecognitionProgressService,
+            pronunciationProgressService: PronunciationProgressRepository,
+            wordRecognitionService: WordRecognitionProgressRepository,
             openDocumentsService: OpenDocumentsService
         }) {
         function putWords(records: {word: string}[]) {

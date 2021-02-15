@@ -455,7 +455,9 @@ $character-timing-section-padding: $padding;
   align-items: center;
 
   & > #quiz-card-image-placeholder {
+    /*
     width: 100%;
+    */
   }
   & > iframe {
     width: 100%;

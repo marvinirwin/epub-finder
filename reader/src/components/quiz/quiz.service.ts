@@ -12,9 +12,12 @@ import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/Manager/open-documents.service";
 import {observableLastValue} from "../../services/settings.service";
 import {ICard} from "../../lib/Interfaces/ICard";
+import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
+import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 
 export class QuizService {
     quizCard: QuizCard;
+    currentScheduleRow$: Observable<ScheduleRow<NormalizedScheduleRowData>>
 
     constructor(
         {
@@ -31,10 +34,10 @@ export class QuizService {
             openDocumentsService: OpenDocumentsService
         }
     ) {
-        const currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
+        this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
             map(rows => rows[0]),
         );
-        const currentWord$ = currentScheduleRow$.pipe(map(row => row?.word));
+        const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
             'example-sentences',
             combineLatest([

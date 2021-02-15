@@ -32,6 +32,16 @@ export class DocumentsService {
             )
     }
 
+    async all_frequency(): Promise<DocumentView[]> {
+        return await this.documentViewRepository
+            .find({
+                    where: [
+                        {for_freq: true, deleted: false},
+                    ]
+                }
+            )
+    }
+
     public async saveRevision(user: User, name: string, filePath: string, documentId: string) {
         if (!await this.belongsToUser(user, documentId)) {
             throw CannotFindDocumentForUser(documentId, user);
@@ -112,8 +122,12 @@ export class DocumentsService {
             {
                 for_testing: true,
                 filename
+            },
+            {
+                for_freq: true,
+                filename
             }
-        ]
+    ]
         if (user) {
             whereConditions.push(
                 {

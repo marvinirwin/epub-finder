@@ -1,6 +1,6 @@
 import {HighlightDifficultyService} from "./highlight-difficulty.service";
 import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.interface";
-import {PronunciationProgressService} from "../schedule/pronunciation-progress.service";
+import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 import {HighlighterService} from "./highlighter.service";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {HighlightDelta} from "./highlight.interface";
@@ -14,7 +14,7 @@ export class HighlightPronunciationProgressService extends HighlightDifficultySe
                     pronunciationProgressService,
                     highlighterService
                 }: {
-        pronunciationProgressService: PronunciationProgressService,
+        pronunciationProgressService: PronunciationProgressRepository,
         highlighterService: HighlighterService
     }) {
         super({

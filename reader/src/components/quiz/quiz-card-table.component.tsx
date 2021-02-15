@@ -3,7 +3,6 @@ import React, {useContext} from "react";
 import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {last5, lastN} from "./last-n";
-import {isLearning, isNew, isToReview} from "../../lib/schedule/ScheduleRow";
 import {sum} from 'lodash';
 import {
     quizCardTableRow,
@@ -24,36 +23,44 @@ export const QuizCardTableComponent = () => {
             <TableHead>
                 <TableRow>
                     <TableCell style={{minWidth: '10em'}}>Word</TableCell>
-                    <TableCell align="right">Recognition</TableCell>
-                    <TableCell align="right">Frequency</TableCell>
-                    <TableCell align="right">Pronunciation</TableCell>
+                    <TableCell>Sort Weight</TableCell>
+                    <TableCell>Due In</TableCell>
+                    <TableCell>Recognition</TableCell>
+                    <TableCell>Frequency</TableCell>
+                    <TableCell>Pronunciation</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
                 {scheduleRows.map(row => {
                     let className;
-                    if (isNew(row)) {
+                    if (row.isNew()) {
                         className = 'new';
                     }
-                    if (isToReview(row)) {
+                    if (row.isLearning()) {
                         className = 'to-review';
                     }
-                    if (isLearning(row)) {
+                    if (row.isLearning()) {
                         className = 'learning'
                     }
                     return (
-                        <TableRow key={row.word} className={`${quizCardTableRow} ${className}`}>
+                        <TableRow key={row.d.word} className={`${quizCardTableRow} ${className}`}>
                             <TableCell
                                 component="th"
                                 scope="row"
                                 className={quizCardTableRowWord}
                             >
-                                <Typography variant={'h6'} >{row.word} </Typography>
+                                <Typography variant={'h6'} >{row.d.word} </Typography>
+                            </TableCell>
+                            <TableCell>
+                                {row.d.finalSortValue}
+                            </TableCell>
+                            <TableCell>
+                                {row.dueIn()}
                             </TableCell>
                             <TableCell
                                 className={quizCardTableRowRecognitions}
                             >{
-                                lastN(1)(row.wordRecognitionRecords)
+                                lastN(1)(row.d.wordRecognitionRecords)
                                     .map(r => `${r.recognitionScore}`)
                                     .join(',')
                             }
@@ -61,12 +68,12 @@ export const QuizCardTableComponent = () => {
                             <TableCell
                                 className={quizCardTableRowCounts}
                             >{
-                                sum(row.wordCountRecords.map(r => r.count))
+                                sum(row.d.wordCountRecords.map(r => r.count))
                             }</TableCell>
                             <TableCell
                                 className={quizCardTableRowLastAnswer}
                             >{
-                                lastN(1)(row.pronunciationRecords)
+                                lastN(1)(row.d.pronunciationRecords)
                                     .map(r => `${r.success ? 'Correct' : 'Incorrect'}`)
                                     .join(',')
                             }</TableCell>

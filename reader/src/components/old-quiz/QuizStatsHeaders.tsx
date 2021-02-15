@@ -8,14 +8,6 @@ export default function QuizStatsHeader({m}: { m: Manager }) {
 
     return <div style={{zIndex: 10, backgroundColor: 'white'}}>
         <Typography variant="subtitle1">
-            <ul>
-                {
-                    scheduledCards.map(scheduledWord => <li className={"quiz-list"} key={scheduledWord.word}>
-                            {scheduledWord.word} {scheduledWord.sortString}
-                        </li>
-                    )
-                }
-            </ul>
         </Typography>
     </div>
 }

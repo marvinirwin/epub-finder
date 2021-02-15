@@ -1,62 +1,73 @@
-import {orderBy, sumBy} from "lodash";
+import {orderBy, sum, sumBy} from "lodash";
 import moment from "moment";
-import {ScheduleRow} from "./schedule-row.interface";
+import {ScheduleRowData} from "./schedule-row.interface";
 import {WordRecognitionRow} from "./word-recognition-row";
+import humanizeDuration from "humanize-duration";
 
-export function wordCount(s: ScheduleRow) {
-    return sumBy(s.wordCountRecords, wordCountRow => wordCountRow.count)
-}
 
-export function wordRecognitionScore(s: ScheduleRow) {
-    return s.wordRecognitionRecords[s.wordRecognitionRecords.length - 1]?.recognitionScore || 0;
-}
 
-export function dueDate(s: ScheduleRow) {
-    return s.wordRecognitionRecords[s.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
-}
-
-export function isNew(s: ScheduleRow) {
-    return s.wordRecognitionRecords.length === 0;
-}
-
-export function isToReview(s: ScheduleRow) {
-    const learning = isLearning(s);
-    if (learning) return false;
-    const myDueDate = dueDate(s);
-    return myDueDate.getTime() < (new Date().getTime());
-}
-
-export function isLearning(s: ScheduleRow) {
-    if (!s.wordRecognitionRecords.length) return false;
-    // Learning records are those whose advance record is on a different day than the last review
-    // Or they just have review records and no advance record
-
-    // The "advance record" is a record which has a change in recognitionScore
-    const mostRecentRecordsFirst = orderBy(s.wordRecognitionRecords, 'timestamp', 'desc');
-    const mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
-    const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
-        return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
-    })
-    const lastRecord = s.wordRecognitionRecords[s.wordRecognitionRecords.length - 1];
-
-    /**
-     * If there are no records then we're for sure not learning
-     */
-    if (!lastRecord) {
-        return false;
+export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
+    constructor(public d: T) {
     }
 
-    /**
-     * If there is a last record, but no advance record we're still learning
-     */
-    if (!advanceRecord) {
-        return true;
+    count() {
+        return sum(this.d.wordCountRecords.map(r => r.count));
     }
 
-    // If the advance record is the last record then we just advanced so we're not learning anymore
-    if (lastRecord === advanceRecord) {
-        return false;
+    dueDate() {
+        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
     }
-    return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
+
+    isNew() {
+        return this.d.wordRecognitionRecords.length === 0;
+    }
+
+    wordRecognitionScore() {
+        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.recognitionScore || 0;
+    }
+
+    isToReview() {
+        if (this.isLearning()) return false;
+        const myDueDate = this.dueDate();
+        return myDueDate.getTime() < (new Date().getTime());
+    }
+
+    isLearning() {
+        if (!this.d.wordRecognitionRecords.length) return false;
+        // Learning records are those whose advance record is on a different day than the last review
+        // Or they just have review records and no advance record
+
+        // The "advance record" is a record which has a change in recognitionScore
+        const mostRecentRecordsFirst = orderBy(this.d.wordRecognitionRecords, 'timestamp', 'desc');
+        const mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
+        const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
+            return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
+        })
+        const lastRecord = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1];
+
+        /**
+         * If there are no records then we're for sure not learning
+         */
+        if (!lastRecord) {
+            return false;
+        }
+
+        /**
+         * If there is a last record, but no advance record we're still learning
+         */
+        if (!advanceRecord) {
+            return true;
+        }
+
+        // If the advance record is the last record then we just advanced so we're not learning anymore
+        if (lastRecord === advanceRecord) {
+            return false;
+        }
+        return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
+    }
+
+    dueIn() {
+        return humanizeDuration(this.dueDate().getTime() - Date.now())
+    }
 }
 

@@ -1,5 +1,5 @@
 import {QuizManager} from "../Manager/QuizManager";
-import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
+import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {QuizResultToRecognitionRows} from "../Pipes/QuizResultToRecognitionRows";
 import {SrmService} from "../srm/srm.service";
 import {ScheduleRowsService} from "../Manager/schedule-rows.service";
@@ -17,7 +17,7 @@ export class QuizResultService {
         srmService: SrmService,
         scheduleRowsService: ScheduleRowsService,
         quizManager: QuizManager,
-        wordRecognitionProgressService: WordRecognitionProgressService,
+        wordRecognitionProgressService: WordRecognitionProgressRepository,
         alertsService: AlertsService,
     }) {
         quizManager.quizResult$.pipe(

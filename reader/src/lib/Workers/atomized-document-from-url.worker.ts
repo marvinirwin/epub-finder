@@ -2,7 +2,7 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../Atomized/atomized-document";
-import {WorkerError} from "./WorkerHelpers";
+import {WorkerError} from "./worker.helpers";
 
 // @ts-ignore
 self.window = self;

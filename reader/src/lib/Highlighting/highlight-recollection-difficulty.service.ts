@@ -3,7 +3,7 @@ import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {HighlighterService} from "./highlighter.service";
 import {HighlightDelta} from "./highlight.interface";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {WordRecognitionProgressService} from "../schedule/word-recognition-progress.service";
+import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {RGBA} from "./color.service";
 import {CORRECT_RECOGNITION_SCORE} from "./Highlighter";
 import {colorForPercentage} from "../color/Range";
@@ -13,7 +13,7 @@ export class HighlightRecollectionDifficultyService extends HighlightDifficultyS
                     wordRecognitionRowService,
                     highlighterService
                 }: {
-        wordRecognitionRowService: WordRecognitionProgressService,
+        wordRecognitionRowService: WordRecognitionProgressRepository,
         highlighterService: HighlighterService
     }) {
         super({

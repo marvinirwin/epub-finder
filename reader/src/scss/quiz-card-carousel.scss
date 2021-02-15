@@ -6,7 +6,6 @@
   justify-content: space-between;
 }
 #quiz-card-image-placeholder {
-  width: 240px;
 }
 .quiz-button-hard  {
   background-color: lightcoral;
@@ -19,4 +18,19 @@
 }
 .quiz-button-hide {
   background-color: lightgrey;
+}
+
+.quiz-card-data-sheet {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  & > div {
+    flex: 1;
+  }
+}
+
+.quiz-card-data-sheet-middle {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
 }

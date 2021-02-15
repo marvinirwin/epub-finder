@@ -22,7 +22,9 @@ export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
         {
             quizCardImageSource ?
                 <img className={"quiz-card-image"} src={quizCardImageSource}/> :
-                <InsertPhoto id={'quiz-card-image-placeholder'}/>
+                <IconButton color='primary'>
+                    <InsertPhoto id={'quiz-card-image-placeholder'}/>
+                </IconButton>
         }
 
     </EditableOnClick>;

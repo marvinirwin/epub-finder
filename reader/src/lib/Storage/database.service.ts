@@ -1,20 +1,21 @@
 import Dexie from "dexie";
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {ICard} from "../Interfaces/ICard";
 import {Setting} from "../Interfaces/Setting";
 import {CreatedSentence} from "../Interfaces/CreatedSentence";
 import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.interface";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {BasicDocument} from "../../types";
+import {IgnoredWord} from "../schedule/ignored-word.interface";
 
 
 export class DatabaseService extends Dexie {
-    static CURRENT_VERSION = 7;
+    static CURRENT_VERSION = 8;
 
 
     public cards: Dexie.Table<ICard, number>;
     public wordRecognitionRecords: Dexie.Table<WordRecognitionRow, number>;
     public pronunciationRecords: Dexie.Table<PronunciationProgressRow, number>
+    public ignoredWords: Dexie.Table<IgnoredWord, number>
 
     public createdSentences: Dexie.Table<CreatedSentence, number>;
     public settings: Dexie.Table<Setting, string>;
@@ -26,15 +27,17 @@ export class DatabaseService extends Dexie {
             cards: 'id++, learningLanguage, knownLanguage, deck',
             wordRecognitionRecords: 'id++, word, timestamp',
             pronunciationRecords: 'id++, word, timestamp',
+            ignoredWords: 'id++, word, timestamp',
             settings2: 'name, value',
             createdSentences: 'id++, learningLanguage',
-            customDocuments: 'name, html'
+            customDocuments: 'name, html',
         });
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table("cards");
         this.settings = this.table("settings2");
         this.wordRecognitionRecords = this.table("wordRecognitionRecords");
         this.pronunciationRecords = this.table("pronunciationRecords");
+        this.ignoredWords = this.table("ignoredWords");
         this.createdSentences = this.table("createdSentences");
         this.customDocuments = this.table("customDocuments");
     }

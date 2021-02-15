@@ -9,7 +9,7 @@ import {AtomMetadata} from "./Interfaces/atom-metadata.interface.ts/atom-metadat
 import {AudioManager} from "./Manager/AudioManager";
 import CardsRepository from "./Manager/cards.repository";
 import {OpenDocumentsService} from "./Manager/open-documents.service";
-import {QuizComponent, QuizManager} from "./Manager/QuizManager";
+import {QuizManager} from "./Manager/QuizManager";
 import {BrowserInputs} from "./Hotkeys/BrowserInputs";
 import {resolveICardForWord} from "./Pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./Manager/ManagerConnections/Card-Schedule-Quiz";
@@ -39,8 +39,8 @@ import {EditingVideoMetadataService} from "../services/editing-video-metadata.se
 import {SettingsService} from "../services/settings.service";
 import {HotkeysService} from "../services/hotkeys.service";
 import {HighlightPronunciationVideoService} from "../services/highlight-pronunciation-video.service";
-import {WordRecognitionProgressService} from "./schedule/word-recognition-progress.service";
-import {PronunciationProgressService} from "./schedule/pronunciation-progress.service";
+import {WordRecognitionProgressRepository} from "./schedule/word-recognition-progress.repository";
+import {PronunciationProgressRepository} from "./schedule/pronunciation-progress.repository";
 import {QuizResultService} from "./quiz/quiz-result.service";
 import {HighlightPronunciationProgressService} from "./Highlighting/highlight-pronunciation-progress.service";
 import {HighlightRecollectionDifficultyService} from "./Highlighting/highlight-recollection-difficulty.service";
@@ -85,6 +85,7 @@ import {VideoMetadataRepository} from "../services/video-metadata.repository";
 import {VideoMetadataHighlight} from "./Highlighting/video-metadata.highlight";
 import {MousedOverWordHighlightService} from "./Highlighting/moused-over-word-highlight.service";
 import {NotableSubsequencesService} from "./notable-subsequences.service";
+import {IgnoredWordsRepository} from "./schedule/ignored-words.repository";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -97,7 +98,7 @@ function splitTextDataStreams$(textData$: Observable<TabulatedDocuments>) {
     return {
         wordElementMap$: textData$.pipe(map(({wordElementsMap}) => wordElementsMap)),
         wordCounts$: textData$.pipe(map(({wordCounts}) => wordCounts)),
-        documentWordCounts: textData$.pipe(map(({documentWordCounts}) => documentWordCounts)),
+        documentwordCounts: textData$.pipe(map(({documentWordCounts}) => documentWordCounts)),
         wordSentenceMap: textData$.pipe(map(({wordSegmentMap}) => wordSegmentMap)),
         sentenceMap$: textData$.pipe(map(({wordSegmentMap}) => wordSegmentMap))
     }
@@ -123,8 +124,8 @@ export class Manager {
     public visibleElementsService: VisibleService;
     public authManager = new LoggedInUserService();
     public highlighter: Highlighter;
-    public pronunciationProgressService: PronunciationProgressService;
-    public wordRecognitionProgressService: WordRecognitionProgressService;
+    public pronunciationProgressService: PronunciationProgressRepository;
+    public wordRecognitionProgressService: WordRecognitionProgressRepository;
     public introService: IntroService;
     public alertsService = new AlertsService();
     public requestRecordingService: RequestRecordingService;
@@ -137,11 +138,11 @@ export class Manager {
 
     public progressItemsService = new ProgressItemService();
 
-    readingWordElementMap!: Observable<Dictionary<AtomMetadata[]>>;
-    setQuizWord$: Subject<string> = new Subject<string>();
-    characterPageWordElementMap$ = new Subject<Dictionary<AtomMetadata[]>>();
-    readingWordCounts$: Observable<Dictionary<DocumentWordCount[]>>;
-    readingWordSentenceMap: Observable<Dictionary<Segment[]>>;
+    readingwordElementMap!: Observable<Dictionary<AtomMetadata[]>>;
+    setQuizword$: Subject<string> = new Subject<string>();
+    characterPagewordElementMap$ = new Subject<Dictionary<AtomMetadata[]>>();
+    readingwordCounts$: Observable<Dictionary<DocumentWordCount[]>>;
+    readingwordSentenceMap: Observable<Dictionary<Segment[]>>;
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: LibraryService;
     modesService = new ModesService();
@@ -175,8 +176,10 @@ export class Manager {
     public modalService = new ModalService();
     public videoMetadataRepository: VideoMetadataRepository;
     public mousedOverWordHighlightService: MousedOverWordHighlightService;
+    public ignoredWordsRepository: IgnoredWordsRepository;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
+        this.ignoredWordsRepository = new IgnoredWordsRepository({db});
         this.toastMessageService = new ToastMessageService({
             alertsService: this.alertsService
         })
@@ -217,8 +220,8 @@ export class Manager {
         });
         this.documentCheckingOutService = new DocumentCheckingOutService({settingsService: this.settingsService})
         this.droppedFilesService = new DroppedFilesService();
-        this.pronunciationProgressService = new PronunciationProgressService({db});
-        this.wordRecognitionProgressService = new WordRecognitionProgressService({db});
+        this.pronunciationProgressService = new PronunciationProgressRepository({db});
+        this.wordRecognitionProgressService = new WordRecognitionProgressRepository({db});
         this.trieService = new TrieService({
             cardsService: this.cardsRepository,
             pronunciationProgressService: this.pronunciationProgressService,
@@ -245,17 +248,18 @@ export class Manager {
          * wordSentenceMap: Dictionary<AtomizedSentence[]>;
          * sentenceMap: Dictionary<AtomizedSentence[]>;
          */
-        const {wordElementMap$, sentenceMap$, documentWordCounts} = splitTextDataStreams$(
+        const {wordElementMap$, sentenceMap$, documentwordCounts} = splitTextDataStreams$(
             this.openDocumentsService.displayDocumentTabulation$
         );
-        this.readingWordElementMap = wordElementMap$;
-        this.readingWordCounts$ = documentWordCounts;
-        this.readingWordSentenceMap = sentenceMap$;
+        this.readingwordElementMap = wordElementMap$;
+        this.readingwordCounts$ = documentwordCounts;
+        this.readingwordSentenceMap = sentenceMap$;
         this.scheduleRowsService = new ScheduleRowsService({
-            wordCounts$: this.readingWordCounts$,
+            wordCounts$: this.readingwordCounts$,
             recognitionRecordsService: this.wordRecognitionProgressService,
             pronunciationRecordsService: this.pronunciationProgressService,
-            cardsRepository: this.cardsRepository
+            cardsRepository: this.cardsRepository,
+            ignoredWordsRepository: this.ignoredWordsRepository
         });
         this.scheduleManager = new ScheduleService({
                 db,
@@ -291,7 +295,7 @@ export class Manager {
         });
         this.quizManager = new QuizManager();
 
-        new QuizResultService({
+        const s = new QuizResultService({
             srmService: this.scheduleManager.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
@@ -352,14 +356,13 @@ export class Manager {
 
         this.highlighter = new Highlighter({
             highlighterService: this.highlighterService,
-            quizService: this.quizService
         })
 
-        this.readingWordElementMap = combineLatest([
-            this.readingWordElementMap.pipe(
+        this.readingwordElementMap = combineLatest([
+            this.readingwordElementMap.pipe(
                 startWith({})
             ),
-            this.characterPageWordElementMap$.pipe(startWith({}))
+            this.characterPagewordElementMap$.pipe(startWith({}))
         ]).pipe(map((wordElementMaps: Dictionary<AtomMetadata[]>[]) => {
             return mergeDictArrays<AtomMetadata>(...wordElementMaps);
         }));
@@ -403,7 +406,7 @@ export class Manager {
 
 
 
-        new HighlightPronunciationVideoService({
+        const v = new HighlightPronunciationVideoService({
             pronunciationVideoService: this.pronunciationVideoService,
             highlighterService: this.highlighterService,
             wordMetadataMapService: this.wordMetadataMapService
@@ -421,21 +424,21 @@ export class Manager {
             pronunciationVideoService: this.pronunciationVideoService
         })
 
-        new HighlightPronunciationProgressService({
+        const pps = new HighlightPronunciationProgressService({
             pronunciationProgressService: this.pronunciationProgressService,
             highlighterService: this.highlighterService
         });
-        new HighlightRecollectionDifficultyService({
+        const hrds = new HighlightRecollectionDifficultyService({
             wordRecognitionRowService: this.wordRecognitionProgressService,
             highlighterService: this.highlighterService
         });
 
-        new TestHotkeysService({
+        const ths = new TestHotkeysService({
             hotkeyEvents: this.hotkeyEvents,
             pronunciationProgressService: this.pronunciationProgressService
         });
 
-        new CardCreationService({
+        const ccs = new CardCreationService({
             cardService: this.cardsRepository,
             pronunciationProgressService: this.pronunciationProgressService,
             wordRecognitionService: this.wordRecognitionProgressService,
@@ -469,7 +472,7 @@ export class Manager {
             highlighterService: this.highlighterService
         })
 
-        new AtomElementEventsService({
+        const aees = new AtomElementEventsService({
             openDocumentsService: this.openDocumentsService,
             modesService: this.modesService,
             highlighter: this.highlighter,
@@ -481,13 +484,13 @@ export class Manager {
             mousedOverWordHighlightService: this.mousedOverWordHighlightService
         });
 
-        new VideoMetadataHighlight({
+        const vhs = new VideoMetadataHighlight({
             highlighterService: this.highlighterService,
             videoMetadataRepository: this.videoMetadataRepository,
             modesService: this.modesService
         });
 
-        new NotableSubsequencesService({
+        const nss = new NotableSubsequencesService({
             cardsRepository: this.cardsRepository,
             openDocumentsService: this.openDocumentsService
         })

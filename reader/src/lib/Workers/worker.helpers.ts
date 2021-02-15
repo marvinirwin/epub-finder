@@ -1,11 +1,11 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
-import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromSrcDoc';
+import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-src.worker';
 // @ts-ignore
 import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./notable-subsequences.worker';
 // @ts-ignore
-import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./AtomizedDocumentStringFromURL';
+import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker';
 import {InterpolateService} from "@shared/";
 import {SubSequenceReturn} from "../subsequence-return.interface";
 
@@ -21,11 +21,8 @@ export const AtomizeUrl = async (url: string) => {
         .then(handleWorkerError)
 };
 
-export const IdentifySubsequences = async (text: string) => GetWorkerResults<SubSequenceReturn  | WorkerError>(new IdentifySubSequencesWorker(), text)
-    .then((result: SubSequenceReturn | WorkerError) => {
-        if ((result as WorkerError).errorMessage !== undefined) {
-            return {popularStrings: [], characterSet: []};
-        }
+export const IdentifySubsequences = async (text: string) => GetWorkerResults<SubSequenceReturn>(new IdentifySubSequencesWorker(), text)
+    .then((result: SubSequenceReturn) => {
         return result as SubSequenceReturn;
     })
 

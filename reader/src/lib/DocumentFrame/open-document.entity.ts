@@ -7,9 +7,9 @@ import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedDocument} from "../Atomized/atomized-document";
 import {rehydratePage} from "../Atomized/open-document.component";
 import {mergeTabulations} from "../Atomized/merge-tabulations";
-import {TabulatedDocuments} from "../Atomized/tabulated-documents.interface";
+import {TabulatedDocuments, TabulatedSentences} from "../Atomized/tabulated-documents.interface";
 import {flatten} from "lodash";
-import {IdentifySubsequences} from "../Workers/WorkerHelpers";
+import {IdentifySubsequences} from "../Workers/worker.helpers";
 import {SubSequenceReturn} from "../subsequence-return.interface";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
@@ -23,7 +23,7 @@ export class OpenDocument {
     public renderedTabulation$: Observable<TabulatedDocuments>;
 
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
-    public notableSubsequences$: Observable<SubSequenceReturn>;
+    public notableSubsequences$: Observable<TabulatedSentences>;
 
     constructor(
         public id: string,

@@ -1,8 +1,8 @@
-import {ProgressRowService} from "./progress-row.service";
+import {IndexedRowsRepository} from "./indexed-rows.repository";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
 import {DatabaseService} from "../Storage/database.service";
 
-export class PronunciationProgressService extends ProgressRowService<PronunciationProgressRow> {
+export class PronunciationProgressRepository extends IndexedRowsRepository<PronunciationProgressRow> {
     constructor({db}: { db: DatabaseService }) {
         super({
                 db,

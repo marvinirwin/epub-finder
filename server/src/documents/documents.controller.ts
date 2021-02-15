@@ -56,7 +56,7 @@ export class DocumentsController {
                 limits: {
                     files: 1,
                     fields: 1,
-                    fileSize: 1024 * 1024 * 1 // 1MB file size
+                    fileSize: 1024 * 1024 * 3 // 3MB file size
                 }
             }
         )
@@ -104,6 +104,11 @@ export class DocumentsController {
         @Headers('is_test') is_test: string
     ) {
         return this.documentsService.all({user, for_testing: !!is_test})
+    }
+
+    @Get('frequency_documents')
+    async all_frequency() {
+        return this.documentsService.all_frequency()
     }
 
 
