@@ -20,4 +20,8 @@ export class LtDocument {
     get filename() {
         return this.d.filename;
     }
+
+    url() {
+        return `${process.env.PUBLIC_URL}/documents/${this.filename}`
+    }
 }

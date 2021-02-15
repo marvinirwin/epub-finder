@@ -84,8 +84,8 @@ import {ModalService} from "./modal.service";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
 import {VideoMetadataHighlight} from "./highlighting/video-metadata.highlight";
 import {MousedOverWordHighlightService} from "./highlighting/moused-over-word-highlight.service";
-import {NotableSubsequencesService} from "./notable-subsequences.service";
 import {IgnoredWordsRepository} from "./schedule/ignored-words.repository";
+import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -141,7 +141,7 @@ export class Manager {
     readingwordElementMap!: Observable<Dictionary<AtomMetadata[]>>;
     setQuizword$: Subject<string> = new Subject<string>();
     characterPagewordElementMap$ = new Subject<Dictionary<AtomMetadata[]>>();
-    readingwordCounts$: Observable<Dictionary<DocumentWordCount[]>>;
+    readingWordCounts$: Observable<Dictionary<DocumentWordCount[]>>;
     readingwordSentenceMap: Observable<Dictionary<Segment[]>>;
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true);
     library: LibraryService;
@@ -177,6 +177,7 @@ export class Manager {
     public videoMetadataRepository: VideoMetadataRepository;
     public mousedOverWordHighlightService: MousedOverWordHighlightService;
     public ignoredWordsRepository: IgnoredWordsRepository;
+    public frequencyDocumentsRepository: FrequencyDocumentsRepository;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository({db});
@@ -252,21 +253,10 @@ export class Manager {
             this.openDocumentsService.displayDocumentTabulation$
         );
         this.readingwordElementMap = wordElementMap$;
-        this.readingwordCounts$ = documentwordCounts;
+        this.readingWordCounts$ = documentwordCounts;
         this.readingwordSentenceMap = sentenceMap$;
-        this.scheduleRowsService = new ScheduleRowsService({
-            wordCounts$: this.readingwordCounts$,
-            recognitionRecordsService: this.wordRecognitionProgressService,
-            pronunciationRecordsService: this.pronunciationProgressService,
-            cardsRepository: this.cardsRepository,
-            ignoredWordsRepository: this.ignoredWordsRepository
-        });
-        this.scheduleManager = new ScheduleService({
-                db,
-                settingsService: this.settingsService,
-                scheduleRowsService: this.scheduleRowsService
-            }
-        );
+        this.scheduleRowsService = new ScheduleRowsService(this);
+        this.scheduleManager = new ScheduleService(this);
 
         this.videoMetadataRepository = new VideoMetadataRepository({
             cardsRepository: this.cardsRepository
@@ -405,7 +395,6 @@ export class Manager {
             .subscribe(alert => this.alertsService.newAlerts$.next(alert))
 
 
-
         const v = new HighlightPronunciationVideoService({
             pronunciationVideoService: this.pronunciationVideoService,
             highlighterService: this.highlighterService,
@@ -490,11 +479,7 @@ export class Manager {
             modesService: this.modesService
         });
 
-        const nss = new NotableSubsequencesService({
-            cardsRepository: this.cardsRepository,
-            openDocumentsService: this.openDocumentsService
-        })
-
+        this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this)
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

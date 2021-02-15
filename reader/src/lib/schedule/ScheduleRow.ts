@@ -3,6 +3,7 @@ import moment from "moment";
 import {ScheduleRowData} from "./schedule-row.interface";
 import {WordRecognitionRow} from "./word-recognition-row";
 import humanizeDuration from "humanize-duration";
+import {SrmService} from "../srm/srm.service";
 
 
 
@@ -28,8 +29,17 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
 
     isToReview() {
         if (this.isLearning()) return false;
+        return this.isOverDue();
+    }
+
+    public isOverDue() {
         const myDueDate = this.dueDate();
         return myDueDate.getTime() < (new Date().getTime());
+    }
+
+    public hasTwoCorrectRecognitionInARow() {
+        const last2 =  this.d.wordRecognitionRecords.slice(-2);
+        return last2.every(rec => rec.recognitionScore === SrmService.correctScore());
     }
 
     isLearning() {

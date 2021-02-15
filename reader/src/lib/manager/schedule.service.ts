@@ -42,20 +42,9 @@ export class ScheduleService {
         this.yesterday = this.today - 1;
         this.srmService = new SrmService();
 
-        this.sortedScheduleRows$ = combineLatest([
-            scheduleRowsService.indexedScheduleRows$,
-            settingsService.frequencyWeight$
-        ]).pipe(
-            map(([indexedScheduleRows, frequencyWeight]) => {
-                    return ScheduleMathService.sortScheduleRows(
-                        Object.values(indexedScheduleRows)
-                            .filter(row => row.d.word.split('')
-                            .find(isChineseCharacter)),
-                        1 - frequencyWeight,
-                        frequencyWeight,
-                    )
-                }
-            ),
+        this.sortedScheduleRows$ = scheduleRowsService.indexedScheduleRows$.pipe(
+            // Relying on javascript object value ordering behaviour here, bad idea
+            map((rowDict) => Object.values(rowDict) ),
             shareReplay(1)
         )
 

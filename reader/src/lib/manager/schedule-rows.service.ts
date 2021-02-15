@@ -9,31 +9,38 @@ import CardsRepository from "./cards.repository";
 import {IgnoredWordsRepository} from "../schedule/ignored-words.repository";
 import {ScheduleRow} from "../schedule/ScheduleRow";
 import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
+import {ScheduleMathService} from "./schedule-math.service";
+import {isChineseCharacter} from "../interfaces/OldAnkiClasses/Card";
+import {ModesService} from "../modes/modes.service";
+import {SettingsService} from "../../services/settings.service";
 
 export class ScheduleRowsService {
-    public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow>>;
+    public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedScheduleRowData>>>;
 
     constructor({
-                    recognitionRecordsService,
-                    wordCounts$,
-                    pronunciationRecordsService,
+                    wordRecognitionProgressService,
+                    readingWordCounts$,
+                    pronunciationProgressService,
                     cardsRepository,
-                    ignoredWordsRepository
+                    ignoredWordsRepository,
+        settingsService
                 }: {
-        recognitionRecordsService: IndexedRowsRepository<WordRecognitionRow>,
-        pronunciationRecordsService: PronunciationProgressRepository
-        wordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
+        wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
+        pronunciationProgressService: PronunciationProgressRepository
+        readingWordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
         cardsRepository: CardsRepository,
-        ignoredWordsRepository: IgnoredWordsRepository
+        ignoredWordsRepository: IgnoredWordsRepository,
+        settingsService: SettingsService
     }) {
         this.indexedScheduleRows$ = combineLatest([
-            recognitionRecordsService.records$.pipe(startWith({})),
-            wordCounts$.pipe(startWith({})),
-            pronunciationRecordsService.records$,
+            wordRecognitionProgressService.records$.pipe(startWith({})),
+            readingWordCounts$.pipe(startWith({})),
+            pronunciationProgressService.records$,
             cardsRepository.cardIndex$,
-            ignoredWordsRepository.latestRecords$
+            ignoredWordsRepository.latestRecords$,
+            settingsService.frequencyWeight$
         ]).pipe(
-            map(([wordRecognitionRowIndex, wordCounts, pronunciationRowIndex, cardIndex, ignoredWords]) => {
+            map(([wordRecognitionRowIndex, wordCounts, pronunciationRowIndex, cardIndex, ignoredWords, frequencyWeight]) => {
                 const scheduleRows: ds_Dict<ScheduleRowData> = {};
                 const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
@@ -63,10 +70,17 @@ export class ScheduleRowsService {
                     scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
+                return Object.fromEntries(ScheduleMathService.sortScheduleRows(
+                    Object.values(scheduleRows).map(r => new ScheduleRow(r)),
+                    1 - frequencyWeight,
+                    frequencyWeight,
+                ).entries())
+/*
                 return Object.fromEntries(Object.entries(scheduleRows).map(([word, scheduleRowData]) => [
                     word,
                     new ScheduleRow(scheduleRowData)
                 ]));
+*/
             }),
             shareReplay(1)
         );

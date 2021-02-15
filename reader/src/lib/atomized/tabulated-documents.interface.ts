@@ -7,6 +7,7 @@ import {XMLDocumentNode} from "../interfaces/XMLDocumentNode";
 export interface TabulatedDocuments extends TabulatedSentences {
     documentWordCounts: Dictionary<DocumentWordCount[]>;
 }
+
 export interface TabulatedSentences {
     wordElementsMap: Dictionary<AtomMetadata[]>;
     wordSegmentMap: Dictionary<Segment[]>;
@@ -14,3 +15,17 @@ export interface TabulatedSentences {
     segments: Segment[];
     atomMetadatas: Map<XMLDocumentNode, AtomMetadata>
 }
+
+export const tabulatedSentenceToTabulatedDocuments = (
+    tabulatedSentences: TabulatedSentences,
+    documentLabel: string
+): TabulatedDocuments => {
+    const entries = Object.entries(tabulatedSentences.wordCounts)
+        .map(([word, count]) =>
+            [word, [{word, count, document: documentLabel}]]);
+
+    return {
+        ...tabulatedSentences,
+        documentWordCounts: Object.fromEntries(entries)
+    };
+};

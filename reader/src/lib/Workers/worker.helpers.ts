@@ -3,11 +3,12 @@ import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-src.worker';
 // @ts-ignore
-import IdentifySubSequencesWorker from 'Worker-loader?name=dist/[name].js!./notable-subsequences.worker';
+import TabulateDocumentsWorker from 'Worker-loader?name=dist/[name].js!./tabulate-document';
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker';
 import {InterpolateService} from "@shared/";
-import {SubSequenceReturn} from "../subsequence-return.interface";
+import {TabulateDocumentDto} from "./tabulate-document.dto";
+import {TabulatedDocuments, TabulatedSentences} from "../atomized/tabulated-documents.interface";
 
 export type WorkerError = { errorMessage: string };
 
@@ -21,9 +22,9 @@ export const AtomizeUrl = async (url: string) => {
         .then(handleWorkerError)
 };
 
-export const IdentifySubsequences = async (text: string) => GetWorkerResults<SubSequenceReturn>(new IdentifySubSequencesWorker(), text)
-    .then((result: SubSequenceReturn) => {
-        return result as SubSequenceReturn;
+export const TabulateDocuments = async (dto: TabulateDocumentDto) => GetWorkerResults<TabulatedDocuments>(new TabulateDocumentsWorker(), dto)
+    .then((result: TabulatedDocuments) => {
+        return result;
     })
 
 
