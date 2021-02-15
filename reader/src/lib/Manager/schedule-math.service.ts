@@ -6,7 +6,14 @@ function getInverseLogNormalValue(normalCount: number) {
     if (normalCount === 0) {
         return 0;
     }
-    return /*normalCount - */Math.log(normalCount);
+    return normalCount;
+/*
+    const number = Math.log(normalCount);
+    if (number < 0) {
+        debugger;console.log();
+    }
+    return number;
+*/
 }
 
 function getSortValue<T>(normalizedValue: number, weight: number, value: T): SortValue<T> {
@@ -83,27 +90,10 @@ export class ScheduleMathService {
     }
 
     private static normalize(val: number, min: number, max: number) {
-        return (val - min) / (max - min)
-    }
-
-
-    private static addValuesMappedToNumbers<T>(...valueNumberMaps: Map<T, number>[]) {
-        const resultMap = new Map<T, number>();
-        const usedSet = new Set<T>();
-        valueNumberMaps.forEach((valueNumberMap: Map<T, number>) => {
-            valueNumberMap.forEach((numericalValue, value) => {
-                if (usedSet.has(value)) {
-                    return;
-                }
-                usedSet.add(value);
-                resultMap.set(value, sum(valueNumberMaps.map(map => map.get(value))) || 0);
-            })
-        });
-        return resultMap;
-    }
-
-    private static orderMappedValues<T>(valueNumberMap: Map<T, number>): T[] {
-        return orderBy([...valueNumberMap.entries()], ([, n]) => n, 'desc')
-            .map(([value]) => value)
+        const v = (val - min) / (max - min);
+        if (v < 0 ) {
+            debugger;console.log();
+        }
+        return v
     }
 }
