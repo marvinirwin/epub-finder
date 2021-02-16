@@ -13,6 +13,7 @@ import {ScheduleMathService} from "./schedule-math.service";
 import {isChineseCharacter} from "../interfaces/OldAnkiClasses/Card";
 import {ModesService} from "../modes/modes.service";
 import {SettingsService} from "../../services/settings.service";
+import {AllWordsRepository} from "../all-words.repository";
 
 export class ScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedScheduleRowData>>>;
@@ -23,24 +24,30 @@ export class ScheduleRowsService {
                     pronunciationProgressService,
                     cardsRepository,
                     ignoredWordsRepository,
-        settingsService
+        settingsService,
+        allWordsRepository
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
         readingWordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
         cardsRepository: CardsRepository,
         ignoredWordsRepository: IgnoredWordsRepository,
-        settingsService: SettingsService
+        settingsService: SettingsService,
+        allWordsRepository: AllWordsRepository
     }) {
-        this.indexedScheduleRows$ = combineLatest([
+        const progress$ = combineLatest([
             wordRecognitionProgressService.records$.pipe(startWith({})),
-            readingWordCounts$.pipe(startWith({})),
             pronunciationProgressService.records$,
+        ])
+        this.indexedScheduleRows$ = combineLatest([
+            progress$,
+            readingWordCounts$.pipe(startWith({})),
             cardsRepository.cardIndex$,
             ignoredWordsRepository.latestRecords$,
-            settingsService.frequencyWeight$
+            settingsService.frequencyWeight$,
+            allWordsRepository.all$
         ]).pipe(
-            map(([wordRecognitionRowIndex, wordCounts, pronunciationRowIndex, cardIndex, ignoredWords, frequencyWeight]) => {
+            map(([[wordRecognitionRowIndex, pronunciationRowIndex], wordCounts, cardIndex, ignoredWords, frequencyWeight, allWords]) => {
                 const scheduleRows: ds_Dict<ScheduleRowData> = {};
                 const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
@@ -53,6 +60,10 @@ export class ScheduleRowsService {
                     }
                     return scheduleRows[word];
                 };
+
+                allWords.forEach(word => {
+                    ensureScheduleRow(word)
+                })
 
                 /**
                  * Prevent cards created only for visual purposes from showing up in the quiz rows

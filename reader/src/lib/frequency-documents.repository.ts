@@ -1,13 +1,11 @@
 import {BehaviorSubject, Observable} from "rxjs";
-import {LtDocument} from "@shared/*";
+import {LtDocument} from "@shared/";
 import axios from "axios";
 import {DocumentViewDto} from "../../../server/src/documents/document-view.dto";
 import {mapFromId, mapMap, mergeMaps} from "./map.module";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
 import {ScheduleRowsService} from "./manager/schedule-rows.service";
-import {ScheduleRow} from "./schedule/ScheduleRow";
-import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {map, shareReplay} from "rxjs/operators";
 
 export class FrequencyDocumentsRepository {

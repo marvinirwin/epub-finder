@@ -8,7 +8,9 @@ import {SrmService} from "../srm/srm.service";
 
 
 export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
+    private _dueDate: Date;
     constructor(public d: T) {
+        this._dueDate = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
     }
 
     count() {
@@ -16,7 +18,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     dueDate() {
-        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
+        return this._dueDate;
     }
 
     isNew() {

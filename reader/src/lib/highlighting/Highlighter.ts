@@ -34,12 +34,6 @@ export class Highlighter {
         highlighterService: HighlighterService
     }) {
         const s = highlighterService;
-/*
-        s.singleHighlight(
-            quizService.quizCard.word$.pipe(map(HighlighterService.wordToMap([28, 176, 246, 0.5]))),
-            [0, 'QUIZ_WORD_HIGHLIGHT']
-        );
-*/
         s.timedHighlight(
             this.deletedCards$.pipe(map(timeWordsMap(500, [234, 43, 43, 0.5]))),
             s.highlightMap$,

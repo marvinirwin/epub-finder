@@ -59,18 +59,17 @@ export class ScheduleMathService {
             if (minValue > rowValue) {
                 minValue = rowValue;
             }
+        });
+        return scheduleRows.map(row => {
+            return [
+                ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
+                row
+            ];
         })
-        return scheduleRows.map(row => [
-            ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
-            row
-        ])
     }
 
     private static normalize(val: number, min: number, max: number) {
         const v = (val - min) / (max - min);
-        if (v < 0 ) {
-            debugger;console.log();
-        }
         return v
     }
 }

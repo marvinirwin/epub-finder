@@ -86,6 +86,8 @@ import {VideoMetadataHighlight} from "./highlighting/video-metadata.highlight";
 import {MousedOverWordHighlightService} from "./highlighting/moused-over-word-highlight.service";
 import {IgnoredWordsRepository} from "./schedule/ignored-words.repository";
 import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
+import {AllWordsRepository} from "./all-words.repository";
+import {QuizHighlightService} from "./highlighting/quiz-highlight.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -148,7 +150,7 @@ export class Manager {
     modesService = new ModesService();
     pronunciationVideoService = new PronunciationVideoService();
     public editingVideoMetadataService: EditingVideoMetadataService;
-    private highlighterService: HighlighterService;
+    public highlighterService: HighlighterService;
     settingsService: SettingsService;
     hotkeysService: HotkeysService
     temporaryHighlightService: TemporaryHighlightService;
@@ -178,9 +180,12 @@ export class Manager {
     public mousedOverWordHighlightService: MousedOverWordHighlightService;
     public ignoredWordsRepository: IgnoredWordsRepository;
     public frequencyDocumentsRepository: FrequencyDocumentsRepository;
+    public allWordsRepository: AllWordsRepository;
+    private quizHighlightService: QuizHighlightService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository({db});
+        this.allWordsRepository = new AllWordsRepository();
         this.toastMessageService = new ToastMessageService({
             alertsService: this.alertsService
         })
@@ -480,6 +485,7 @@ export class Manager {
         });
 
         this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this)
+        this.quizHighlightService = new QuizHighlightService( this )
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

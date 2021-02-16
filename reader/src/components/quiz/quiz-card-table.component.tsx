@@ -31,7 +31,7 @@ export const QuizCardTableComponent = () => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {scheduleRows.map(row => {
+                {scheduleRows.slice(0, 100).map(row => {
                     let className;
                     if (row.isNew()) {
                         className = 'new';
