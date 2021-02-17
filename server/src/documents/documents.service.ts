@@ -36,7 +36,7 @@ export class DocumentsService {
         return await this.documentViewRepository
             .find({
                     where: [
-                        {for_freq: true, deleted: false},
+                        {for_frequency: true, deleted: false},
                     ]
                 }
             )
@@ -124,7 +124,7 @@ export class DocumentsService {
                 filename
             },
             {
-                for_freq: true,
+                for_frequency: true,
                 filename
             }
     ]

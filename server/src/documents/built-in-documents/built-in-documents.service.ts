@@ -23,21 +23,28 @@ export class BuiltInDocumentsService implements OnModuleInit {
     }
 
     private async insertDocumentsInDocumentsDir() {
-        const builtInPaths = (await readPathsInDir(process.env.BUILT_IN_DOCUMENTS_DIR))
+        const builtInDocumentPaths = (await readPathsInDir(`${ process.env.DOCUMENTS_DIR }/built-in`))
             .map(filePath => new BuiltInDocument({
                 filePath,
                 global: true,
                 for_testing: false
             }));
-        const testPaths = (await readPathsInDir(process.env.TEST_DOCUMENTS_DIR))
+        const testDocumentPaths = (await readPathsInDir(`${ process.env.DOCUMENTS_DIR }/test`))
             .map(filePath => new BuiltInDocument({
                 filePath,
                 global: false,
                 for_testing: true
             }));
+        const frequencyDocumentPaths = (await readPathsInDir(`${ process.env.DOCUMENTS_DIR }/frequency`))
+            .map(filePath => new BuiltInDocument({
+                filePath,
+                global: false,
+                for_frequency: true
+            }));
         [
-            ...builtInPaths,
-            ...testPaths
+            ...builtInDocumentPaths,
+            ...testDocumentPaths,
+            ...frequencyDocumentPaths
         ].map(document => document.upsert({
             documentRepository: this.documentRepository,
             documentViewRepository: this.documentViewRepository

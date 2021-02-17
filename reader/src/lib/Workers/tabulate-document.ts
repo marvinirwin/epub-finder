@@ -16,8 +16,8 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (ev) => {
     const {trie, d}: TabulateDocumentDto = ev.data;
     const response = await fetch(d.url());
-    const characters = new TextDecoder().decode(await response.arrayBuffer());
-    const doc = AtomizedDocument.atomizeDocument(InterpolateExampleSentencesService.interpolate([characters]));
+    const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
+    const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
         trie.t,
         uniq(trie.t.getWords().map((word: string) => word.length)),

@@ -12,8 +12,9 @@ export class BuiltInDocument {
     constructor(
         public config: {
             filePath: string,
-            global: boolean,
-            for_testing: boolean
+            global?: boolean,
+            for_testing?: boolean,
+            for_frequency?: boolean
         }) {
     }
 
@@ -44,7 +45,8 @@ export class BuiltInDocument {
         const exactlyTheSameVersion = await documentViewRepository.findOne({
             name: name,
             global: this.config.global,
-            for_testing: this.config.for_testing
+            for_testing: this.config.for_testing,
+            for_frequency: this.config.for_frequency
         });
         if (exactlyTheSameVersion) {
             return;

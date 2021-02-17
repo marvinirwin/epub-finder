@@ -2,7 +2,7 @@ import {ReplaySubject} from "rxjs";
 import React from "react";
 import {FileChooser} from "../components/directory/upload.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
-import {DocumentSelect} from "./document-select.component";
+import {DocumentSelect} from "./reading-document-select.component";
 import {ToggleTranslate} from "../components/directory/toggle-translate";
 import {TogglePinyin} from "../components/directory/toggle-pinyin";
 import {ManualTestModal} from "../components/modals/manual-test-modal.component";

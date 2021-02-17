@@ -16,13 +16,6 @@ export const DocumentSelect = () => {
                       }}
                       key={document.id()}
             >
-                {/*
-                <ListItemAvatar>
-                    <Avatar className={classes.avatar}>
-                        <PersonIcon/>
-                    </Avatar>
-                </ListItemAvatar>
-*/}
                 <ListItemText primary={document.name}/>
             </ListItem>
         ))}

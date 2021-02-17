@@ -36,7 +36,7 @@ export class Document {
     for_testing: boolean = false;
 
     @Column({default: false})
-    for_freq: boolean = false;
+    for_frequency: boolean = false;
 
     @Column({default: false})
     deleted: boolean = false;

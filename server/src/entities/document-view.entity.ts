@@ -14,7 +14,7 @@ import {User} from "./user.entity";
         b.filename,
         b.hash,
         b.for_testing,
-        b.for_freq
+        b.for_frequency
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at
@@ -56,7 +56,7 @@ export class DocumentView  {
     for_testing: boolean;
 
     @Column()
-    for_freq: boolean;
+    for_frequency: boolean;
 
     rootId() {
         return this.document_id || this.id;
