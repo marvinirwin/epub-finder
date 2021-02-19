@@ -19,8 +19,8 @@ ctx.onmessage = async (ev) => {
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
-        trie.t,
-        uniq(trie.t.getWords().map((word: string) => word.length)),
+        trie,
+        uniq(trie.getWords().map((word: string) => word.length)),
         doc.segments(),
     ), d.name);
     ctx.postMessage(tabulated);
