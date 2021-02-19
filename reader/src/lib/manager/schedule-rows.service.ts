@@ -85,13 +85,7 @@ export class ScheduleRowsService {
                     Object.values(scheduleRows).map(r => new ScheduleRow(r)),
                     1 - frequencyWeight,
                     frequencyWeight,
-                ).entries())
-/*
-                return Object.fromEntries(Object.entries(scheduleRows).map(([word, scheduleRowData]) => [
-                    word,
-                    new ScheduleRow(scheduleRowData)
-                ]));
-*/
+                ).map(row => [row.d.word, row]))
             }),
             shareReplay(1)
         );
