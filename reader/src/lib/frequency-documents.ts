@@ -19,7 +19,7 @@ export class FrequencyDocument {
             scheduleRows$,
             wordTrie$.pipe(
                 switchMap(wordTrie => TabulateDocuments(
-                    {trie: wordTrie.t, d: frequencyDocument}
+                    {trieWords: wordTrie.t.getWords(), d: frequencyDocument.d}
                 )),
                 shareReplay(1)
             ),

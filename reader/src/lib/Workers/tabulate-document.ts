@@ -7,6 +7,7 @@ import {Segment} from "../atomized/segment";
 import {uniq} from "lodash";
 import {TabulateDocumentDto} from "./tabulate-document.dto";
 import {tabulatedSentenceToTabulatedDocuments} from "../atomized/tabulated-documents.interface";
+import trie from "trie-prefix-tree";
 
 // @ts-ignore
 self.window = self;
@@ -14,13 +15,14 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {trie, d}: TabulateDocumentDto = ev.data;
-    const response = await fetch(d.url());
+    const {trieWords, d}: TabulateDocumentDto = ev.data;
+    const t = trie(trieWords)
+    const response = await fetch(`${process.env.PUBLIC_URL}/documents/${d.filename}`);
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
-        trie,
-        uniq(trie.getWords().map((word: string) => word.length)),
+        t,
+        uniq(t.getWords().map((word: string) => word.length)),
         doc.segments(),
     ), d.name);
     ctx.postMessage(tabulated);

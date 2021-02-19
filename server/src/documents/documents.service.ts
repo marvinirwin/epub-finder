@@ -25,8 +25,8 @@ export class DocumentsService {
         return await this.documentViewRepository
             .find({
                     where: [
-                        {creator_id: user?.id, deleted: false},
-                        {deleted: false, for_testing: for_testing},
+                        {creator_id: user?.id, deleted: false, for_frequency: false},
+                        {deleted: false, for_testing: for_testing, for_frequency: false},
                     ]
                 }
             )

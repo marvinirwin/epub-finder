@@ -14,7 +14,6 @@ export class Segment {
     private _translation: string | undefined;
     private _previousWords = new Set<string>();
     public _popperInstance: any;
-    public newWords$ = new ReplaySubject<Set<string>>(1);
 
     public static tabulateSentences(segments: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
         return Segment.tabulate(

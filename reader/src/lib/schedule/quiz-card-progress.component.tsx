@@ -12,7 +12,7 @@ import {
 
 export const QuizCardProgress = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);
-    const frequencyDocuments = [...(useObservableState(m.frequencyDocumentsRepository.all$) || new Map()).values()];
+    const frequencyDocuments = [...(useObservableState(m.frequencyDocumentsRepository.selected$) || new Map()).values()];
     // Now list them
     return <div>
         {
@@ -30,12 +30,11 @@ export const FrequencyDocumentInfo = ({frequencyDocument}: { frequencyDocument: 
         {
             progress && <div
                 className={frequencyDocumentProgress}
-                id={`${frequencyDocumentProgressPrefix}${frequencyDocument.frequencyDocument.name}`
-                }>
+                id={`${frequencyDocumentProgressPrefix}${frequencyDocument.frequencyDocument.name}` }>
                 <div>{frequencyDocument.frequencyDocument.name}</div>
-                <div>Unrecognized: <span className={unrecognizedCount}>{progress.readabilityState.unrecognized}</span></div>
-                <div>Somewhat Recognized: <span className={somewhatRecognizedCount}>{progress.readabilityState.somewhatRecognized}</span></div>
-                <div>Recognized: <span className={recognizedCount}>{progress.readabilityState.fullRecognition}</span></div>
+                <div>Unrecognized: <span className={unrecognizedCount}>{progress.readabilityState.unrecognized.length}</span></div>
+                <div>Somewhat Recognized: <span className={somewhatRecognizedCount}>{progress.readabilityState.somewhatRecognized.length}</span></div>
+                <div>Recognized: <span className={recognizedCount}>{progress.readabilityState.fullRecognition.length}</span></div>
             </div>}
     </div>
 }
