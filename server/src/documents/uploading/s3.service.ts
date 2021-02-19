@@ -1,6 +1,7 @@
 import {BucketConfig} from "../bucket-config.interface";
 import AWS from "aws-sdk";
 import * as stream from "stream";
+import {v4 as uuidv4} from 'uuid';
 
 const inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
 const inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;
@@ -25,13 +26,24 @@ export const outputConfig: BucketConfig = {
     bucket
 };
 
+const streamToString = stream => {
+    const chunks = []
+    return new Promise<string>((resolve, reject) => {
+        stream.on('data', chunk => chunks.push(chunk))
+        stream.on('error', reject)
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
+    })
+};
+
 export function readStream(filename: string): Promise<stream.Readable> {
     return new Promise((resolve, reject) => {
         const o = s3.getObject({Bucket: bucket, Key: filename})
             .on('error', e => reject(e));
         resolve(o.createReadStream())
     })
-}
+};
+
+export const getS3FileString = (filename: string) => readStream(filename).then(streamToString)
 
 
 export async function copyS3WithExtension(file: { originalname: string; bucket: string; key: string; location: string }, ext: string) {
@@ -41,3 +53,12 @@ export async function copyS3WithExtension(file: { originalname: string; bucket: 
         Key: `${file.key}.${ext}`
     }).promise()
 }
+
+export const uploadToS3 = (content: Buffer) => s3.upload(
+    {
+        Bucket: inputConfig.bucket,
+        Key: uuidv4(),
+        Body: content,
+        ACL: 'public-read'
+    }
+).promise();

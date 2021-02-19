@@ -6,3 +6,6 @@ export const quizCardTableRowWord = "quizCardTableRowWord";
 export const quizCardTableRowRecognitions = 'quizCardTableRowRecognitions';
 export const quizCardTableRowCounts = 'quizCardTableRowCounts';
 export const quizCardTableRowLastAnswer = 'quizCardTableRowLastAnswer';
+export const fileChooser = 'btn-upload';
+
+export const uploadProgressBar = 'uploadProgressBar';

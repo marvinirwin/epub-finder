@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import {documentSelectionRow, LIBRARY, PAGES} from '@shared/*'
+import {documentSelectionRow, LIBRARY, PAGES, UPLOAD_LEARNING_MATERIAL} from '@shared/*'
 
 export class DirectoryPom {
     public static visitPage(page: PAGES) {
@@ -33,6 +33,7 @@ export class DirectoryPom {
     }
 
     public static EnterLibrary() {
+        DirectoryPom.CloseAllDialogs()
         cy.get(`#${LIBRARY}`).click()
     }
 
@@ -78,7 +79,8 @@ export class DirectoryPom {
     }
 
     public static openUploadDialog() {
-        cy.get('#uploadLearningMaterial').click();
+        cy.wait(1000);
+        cy.get(`#${UPLOAD_LEARNING_MATERIAL}`).click();
     }
 
     public static CloseAllDialogs() {

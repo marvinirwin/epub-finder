@@ -3,6 +3,7 @@ import {ManagerContext} from "../../App";
 import {Box, Button, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {BorderLinearProgress} from "../progress/BorderLinearProgress";
+import {fileChooser, uploadProgressBar} from "@shared/";
 
 
 export const FileChooser = () => {
@@ -30,7 +31,7 @@ export const FileChooser = () => {
             </Typography>
             <div className="mg20">
                 {currentFile && (
-                    <Box className="mb25" display="flex" alignItems="center">
+                    <Box className={`mb25 ${uploadProgressBar}`} display="flex" alignItems="center">
                         <Box width="100%" mr={1}>
                             <BorderLinearProgress/>
                         </Box>
@@ -39,7 +40,7 @@ export const FileChooser = () => {
 
                 <label htmlFor="btn-upload">
                     <input
-                        id="btn-upload"
+                        id={fileChooser}
                         name="btn-upload"
                         style={{display: 'none'}}
                         type="file"

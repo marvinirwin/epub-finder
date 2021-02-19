@@ -1,7 +1,8 @@
 import {parse} from "path";
-import {inputConfig, outputConfig} from "./s3.service";
+import {getS3FileString, inputConfig, outputConfig, uploadToS3} from "./s3.service";
 import {S3File} from "./cloud-convert/job-output.service";
 import {ConversionProcess} from "./cloud-convert/conversion-process";
+import {InterpolateService} from "../../shared";
 
 /**
  * WHat's a word describing documents which are ready for insertion?
@@ -13,12 +14,13 @@ export class S3UploadedFile {
     constructor(
         public file: { originalname: string; bucket: string; key: string; location: string },
         public isSandboxFile: boolean
-    ) {}
+    ) {
+    }
 
     formatChain(): string[] {
-        switch(this.ext()) {
+        switch (this.ext()) {
             case "pdf":
-                return ["pdf", "docx", "html"];
+                return ["pdf", "html"];
             case "docx":
                 return ["docx", "html"];
             case "txt":
@@ -27,6 +29,7 @@ export class S3UploadedFile {
                 throw new Error(`No format chain found for ${this.ext()}`);
         }
     }
+
     ext() {
         return parse(this.file.originalname).ext.replace(".", "");
     }
@@ -51,16 +54,29 @@ export class S3UploadedFile {
                         }
                     ]
                 );
+            case "txt":
+                // Load the file into memory, split it by lines and interpolate it as html
+                const str = await getS3FileString(key);
+                const uploadResult = await uploadToS3(
+                    Buffer.from(InterpolateService.sentences(str.split('\n')), 'utf8')
+                )
+                return new S3UploadedFile(
+                    {
+                        originalname: `${parse(this.file.originalname).name}.html`,
+                        bucket: inputConfig.bucket,
+                        key: uploadResult.Key,
+                        location: inputConfig.region,
+                    },
+                    this.isSandboxFile
+                ).output()
             case "pdf":
             case "docx":
-            case "txt":
                 return new ConversionProcess(this).convert();
             default:
                 throw new Error(`Cannot upload file with extension: ${ext}`);
         }
     }
 };
-
 
 
 export class UploadOutput {

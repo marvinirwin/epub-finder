@@ -51,12 +51,15 @@ export class BuiltInDocument {
         if (exactlyTheSameVersion) {
             return;
         }
-        const convertedFile = await UploadToS3Service.upload( this.config.filePath, true );
+        const convertedFile = await UploadToS3Service.upload(
+            this.config.filePath,
+            !!this.config.for_testing
+        );
 
-/*
-        const presentButDifferentVersion = await documentViewRepository
-            .findOne({name: name, creator_id: null});
-*/
+        /*
+                const presentButDifferentVersion = await documentViewRepository
+                    .findOne({name: name, creator_id: null});
+        */
 
         const baseEntity: Partial<Document> = {
             name: name,
@@ -69,15 +72,15 @@ export class BuiltInDocument {
 
         console.log(`Inserting ${name} for the first time`);
         await documentRepository.insert(baseEntity);
-/*
-        if (presentButDifferentVersion) {
-            console.log(`Hash is different, updating ${presentButDifferentVersion.name}`);
-            await documentRepository.insert({
-                ...baseEntity,
-                document_id: presentButDifferentVersion.rootId()
-            });
-        } else {
-        }
-*/
+        /*
+                if (presentButDifferentVersion) {
+                    console.log(`Hash is different, updating ${presentButDifferentVersion.name}`);
+                    await documentRepository.insert({
+                        ...baseEntity,
+                        document_id: presentButDifferentVersion.rootId()
+                    });
+                } else {
+                }
+        */
     }
 }
