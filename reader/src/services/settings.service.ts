@@ -45,6 +45,7 @@ export class SettingsService {
     public componentPath$: ReplaySubject<string>;
     public manualIsRecording$: ReplaySubject<boolean>;
     public spokenLanguage$: ReplaySubject<string>;
+    public selectedFrequencyDocuments$: ReplaySubject<string[]>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -83,6 +84,8 @@ export class SettingsService {
         this.manualIsRecording$ = this.createSetting$<boolean>('manualIsRecording', false, 'indexedDB')
 
         this.frequencyWeight$ = this.createSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+
+        this.selectedFrequencyDocuments$ = this.createSetting$<string[]>('selectedFrequencyDocuments', [], 'indexedDB')
     }
 
     public createSetting$<T>(

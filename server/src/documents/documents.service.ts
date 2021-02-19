@@ -32,14 +32,15 @@ export class DocumentsService {
             )
     }
 
-    async all_frequency(): Promise<DocumentView[]> {
-        return await this.documentViewRepository
+    async all_frequency({for_testing}:{for_testing?: boolean}): Promise<DocumentView[]> {
+        const documentViews = await this.documentViewRepository
             .find({
                     where: [
-                        {for_frequency: true, deleted: false},
+                        {for_frequency: true, deleted: false, for_testing},
                     ]
                 }
-            )
+            );
+        return documentViews
     }
 
     public async saveRevision(user: User, name: string, filePath: string, documentId: string) {

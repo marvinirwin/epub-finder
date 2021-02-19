@@ -106,9 +106,11 @@ export class DocumentsController {
         return this.documentsService.all({user, for_testing: !!is_test})
     }
 
-    @Get('frequency_documents')
-    async all_frequency() {
-        return this.documentsService.all_frequency()
+    @Get('frequency-documents')
+    async all_frequency(
+        @Headers('is_test') is_test: string
+    ) {
+        return this.documentsService.all_frequency({for_testing: !!is_test})
     }
 
 

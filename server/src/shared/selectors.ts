@@ -7,5 +7,15 @@ export const quizCardTableRowRecognitions = 'quizCardTableRowRecognitions';
 export const quizCardTableRowCounts = 'quizCardTableRowCounts';
 export const quizCardTableRowLastAnswer = 'quizCardTableRowLastAnswer';
 export const fileChooser = 'btn-upload';
-
 export const uploadProgressBar = 'uploadProgressBar';
+export const frequencyDocumentProgress = 'frequencyDocumentProgress';
+export const frequencyDocumentProgressPrefix = 'frequencyDocumentProgress';
+export const QUIZ_BUTTON_HARD = 'quiz-button-hard';
+export const QUIZ_BUTTON_MEDIUM = 'quiz-button-medium';
+export const QUIZ_BUTTON_EASY = 'quiz-button-easy';
+export const QUIZ_BUTTON_IGNORE = 'quiz-button-hide';
+export const unrecognizedCount = 'unrecognized-count';
+export const somewhatRecognizedCount = 'somehwat-recognized-count';
+export const recognizedCount = 'recognized-count';
+export const frequencyDocumentList = 'frequencyDocumentList'
+export const frequencyDocumentSelectRow = 'frequencyDocumentSelectRow';

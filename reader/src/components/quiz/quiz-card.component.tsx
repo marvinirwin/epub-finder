@@ -10,15 +10,12 @@ import {observableLastValue} from "../../services/settings.service";
 import {uniq, flatten} from "lodash";
 import {QuizCardCurrentCardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
 import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
+import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM} from "@shared/";
 
-const QUIZ_BUTTON_HARD = 'quiz-button-hard';
-const QUIZ_BUTTON_EASY = 'quiz-button-easy';
-const QUIZ_BUTTON_IGNORE = 'quiz-button-hide';
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
     const word = useObservableState(quizCard.word$);
     const m = useContext(ManagerContext);
-    const QUIZ_BUTTON_MEDIUM = 'quiz-button-medium';
     useSubscription(
         m.audioManager.audioRecorder.currentRecognizedText$,
         async recognizedText => {

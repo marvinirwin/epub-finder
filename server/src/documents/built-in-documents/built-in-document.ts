@@ -44,9 +44,9 @@ export class BuiltInDocument {
         const name = this.documentLabel();
         const exactlyTheSameVersion = await documentViewRepository.findOne({
             name: name,
-            global: this.config.global,
-            for_testing: this.config.for_testing,
-            for_frequency: this.config.for_frequency
+            global: !!this.config.global,
+            for_testing: !!this.config.for_testing,
+            for_frequency: !!this.config.for_frequency
         });
         if (exactlyTheSameVersion) {
             return;
@@ -56,31 +56,18 @@ export class BuiltInDocument {
             !!this.config.for_testing
         );
 
-        /*
-                const presentButDifferentVersion = await documentViewRepository
-                    .findOne({name: name, creator_id: null});
-        */
-
         const baseEntity: Partial<Document> = {
             name: name,
             hash: await HashService.hashS3(convertedFile.index().s3Key),
             global: this.config.global,
             creator_id: undefined,
             for_testing: this.config.for_testing,
+            for_frequency: true,
             filename: convertedFile.index().s3Key
         };
 
         console.log(`Inserting ${name} for the first time`);
         await documentRepository.insert(baseEntity);
-        /*
-                if (presentButDifferentVersion) {
-                    console.log(`Hash is different, updating ${presentButDifferentVersion.name}`);
-                    await documentRepository.insert({
-                        ...baseEntity,
-                        document_id: presentButDifferentVersion.rootId()
-                    });
-                } else {
-                }
-        */
+        console.log(`Inserted ${name} for the first time`);
     }
 }

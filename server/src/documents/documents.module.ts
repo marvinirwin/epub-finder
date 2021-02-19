@@ -6,7 +6,7 @@ import {DocumentsController} from "./documents.controller";
 import {DocumentsService} from "./documents.service";
 import {User} from "../entities/user.entity";
 import {HashService} from "./uploading/hash.service";
-import {BuiltInDocumentsService} from "./built-in-documents/built-in-documents.service";
+import {UploadOnStartupService} from "./built-in-documents/upload-on-startup.service";
 
 @Module({
     imports: [
@@ -18,7 +18,7 @@ import {BuiltInDocumentsService} from "./built-in-documents/built-in-documents.s
     providers: [
         DocumentsService,
         HashService,
-        BuiltInDocumentsService
+        UploadOnStartupService
     ]
 })
 export class DocumentsModule {}

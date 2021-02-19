@@ -1,5 +1,12 @@
 /// <reference types="cypress" />
-import {documentSelectionRow, LIBRARY, PAGES, UPLOAD_LEARNING_MATERIAL} from '@shared/*'
+import {
+    documentSelectionRow,
+    frequencyDocumentList,
+    LIBRARY,
+    PAGES,
+    QUIZ_NODE,
+    UPLOAD_LEARNING_MATERIAL
+} from '@shared/*'
 
 export class DirectoryPom {
     public static visitPage(page: PAGES) {
@@ -7,7 +14,7 @@ export class DirectoryPom {
     }
 
     public static goToQuiz() {
-        cy.get('#quiz.tree-menu-node').click();
+        cy.get(`#${QUIZ_NODE}`).click();
     }
 
     public static SubmitManualSpeechRecognition(result: string) {
@@ -93,5 +100,15 @@ export class DirectoryPom {
         DirectoryPom.CloseAllDialogs()
         DirectoryPom.EnterLibrary()
         cy.contains(`.${documentSelectionRow}`, documentName).click()
+    }
+
+    static selectFrequencyDocuments(...frequencyDocumentNames: string[]) {
+        DirectoryPom.CloseAllDialogs()
+        DirectoryPom.EnterLibrary();
+        frequencyDocumentNames.forEach(frequencyDocumentName => {
+            cy.get(frequencyDocumentList)
+                .find(`#${frequencyDocumentName}`)
+                .click()
+        })
     }
 }

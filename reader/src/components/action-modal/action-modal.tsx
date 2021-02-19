@@ -4,8 +4,8 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import {Card, Dialog} from "@material-ui/core";
-import {NavModal} from "../../lib/modal.service";
 import {useObservableState} from "observable-hooks";
+import {NavModal} from "../../lib/nav-modal";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
