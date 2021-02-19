@@ -27,13 +27,12 @@ export class UploadOnStartupService implements OnModuleInit {
             .then(paths => paths.map(filePath => new BuiltInDocument({
                 filePath,
                 ...props,
-                global: true,
-                for_testing: false
             })))
 
         const builtInReadingDocuments = await getBuiltInDocumentsInPath(
             process.env.READING_DOCUMENTS_DIR,
-            {global: true}
+            {
+                global: true}
         )
         const testReadingDocumentPaths = await getBuiltInDocumentsInPath(
             process.env.TEST_READING_DOCUMENTS_DIR,
@@ -45,7 +44,10 @@ export class UploadOnStartupService implements OnModuleInit {
         );
         const testFrequencyDocumentPaths = await getBuiltInDocumentsInPath(
             process.env.TEST_FREQUENCY_DOCUMENTS_DIR,
-            {for_frequency: true,for_testing: true}
+            {
+                for_frequency: true,
+                for_testing: true
+            }
         );
 
         [

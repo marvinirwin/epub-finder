@@ -59,10 +59,10 @@ export class BuiltInDocument {
         const baseEntity: Partial<Document> = {
             name: name,
             hash: await HashService.hashS3(convertedFile.index().s3Key),
-            global: this.config.global,
+            global: !!this.config.global,
             creator_id: undefined,
             for_testing: this.config.for_testing,
-            for_frequency: true,
+            for_frequency: this.config.for_frequency,
             filename: convertedFile.index().s3Key
         };
 

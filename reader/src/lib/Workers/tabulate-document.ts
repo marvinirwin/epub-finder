@@ -23,7 +23,6 @@ ctx.onmessage = async (ev) => {
         uniq(trie.t.getWords().map((word: string) => word.length)),
         doc.segments(),
     ), d.name);
-    debugger;
     ctx.postMessage(tabulated);
 /*
     try {
