@@ -1,6 +1,6 @@
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
-import {TabulatedDocuments} from "./atomized/tabulated-documents.interface";
+import {TabulatedDocuments} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 import { sum } from "lodash";
 
 export interface WordReadabilityRecord {

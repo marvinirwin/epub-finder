@@ -1,4 +1,4 @@
-import {Segment} from "../lib/atomized/segment";
+import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
 import {combineLatest, Observable} from "rxjs";
 import {Modes, ModesService} from "../lib/modes/modes.service";
 import {debounceTime, shareReplay, startWith, switchMap} from "rxjs/operators";

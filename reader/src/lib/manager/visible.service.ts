@@ -5,8 +5,8 @@ import {combineLatest, Observable} from "rxjs";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
 import {QuizService} from "../../components/quiz/quiz.service";
 import {map, shareReplay, switchMap, tap} from "rxjs/operators";
-import {AtomizedDocument} from "../atomized/atomized-document";
-import {Segment} from "../atomized/segment";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {QUIZ_NODE, READING_NODE} from "@shared/";
 

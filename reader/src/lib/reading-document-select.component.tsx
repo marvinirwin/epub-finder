@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {List, ListItem, ListItemAvatar, ListItemText} from "@material-ui/core";
+import {List, ListItem, ListItemAvatar, ListItemText, ListSubheader} from "@material-ui/core";
 import {ManagerContext} from "../App";
 import {useObservableState} from "observable-hooks";
 import {documentSelectionRow, frequencyDocumentSelectRow, LtDocument} from "@shared/";
@@ -8,7 +8,13 @@ import {FrequencyDocument} from "./frequency-documents";
 const ReadingDocumentList = () => {
     const m = useContext(ManagerContext);
     const books = useObservableState(m.documentRepository.collection$);
-    return <List>
+    return <List
+        subheader={
+            <ListSubheader>
+                Select a document to read
+            </ListSubheader>
+        }
+    >
         {[...(books?.values() || [])].map((document: LtDocument) => (
             <ListItem button
                       className={documentSelectionRow}
@@ -27,7 +33,13 @@ function FrequencyDocumentList() {
     const m = useContext(ManagerContext);
     const books = useObservableState(m.frequencyDocumentsRepository.all$);
     const selectedDocuments = useObservableState(m.settingsService.selectedFrequencyDocuments$) || [];
-    return <List>
+    return <List
+        subheader={
+            <ListSubheader>
+                Track vocab progress
+            </ListSubheader>
+        }
+    >
         {[...(books?.values() || [])].map((document: FrequencyDocument) => {
             const documentId = document.frequencyDocument.id();
             const documentSelected = selectedDocuments.includes(documentId);

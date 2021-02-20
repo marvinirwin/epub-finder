@@ -1,19 +1,22 @@
 import {Dictionary} from "lodash";
-import {AtomMetadata} from "../interfaces/atom-metadata.interface.ts/atom-metadata";
+import {AtomMetadata} from "../../../../reader/src/lib/interfaces/atom-metadata.interface.ts/atom-metadata";
 import {Segment} from "./segment";
-import {DocumentWordCount} from "../interfaces/DocumentWordCount";
-import {XMLDocumentNode} from "../interfaces/XMLDocumentNode";
+import {DocumentWordCount} from "../../../../reader/src/lib/interfaces/DocumentWordCount";
+import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
 
-export interface TabulatedDocuments extends TabulatedSentences {
+export type TabulatedDocuments  = TabulatedSentences & {
     documentWordCounts: Dictionary<DocumentWordCount[]>;
 }
 
-export interface TabulatedSentences {
+export type TabulatedSentences = SerializedTabulation & {
     wordElementsMap: Dictionary<AtomMetadata[]>;
     wordSegmentMap: Dictionary<Segment[]>;
-    wordCounts: Dictionary<number>;
     segments: Segment[];
     atomMetadatas: Map<XMLDocumentNode, AtomMetadata>
+}
+
+export interface SerializedTabulation {
+    wordCounts: Dictionary<number>;
 }
 
 export const tabulatedSentenceToTabulatedDocuments = (

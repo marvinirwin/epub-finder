@@ -1,6 +1,6 @@
 import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {Segment} from "../../atomized/segment";
+import {Segment} from "../../../../../server/src/shared/tabulate-documents/segment";
 import {flatten, maxBy} from "lodash";
 import CardsRepository from "../../manager/cards.repository";
 import {ElementAtomMetadataIndex} from "../../../services/element-atom-metadata.index";

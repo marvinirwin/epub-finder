@@ -1,9 +1,10 @@
-import {getIndexOfEl} from "../Util/getIndexOfEl";
+import {getIndexOfEl} from "../../../../reader/src/lib/Util/getIndexOfEl";
 import {Dictionary, uniqueId, flatten} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
 import {Segment} from "./segment";
-import {XMLDocumentNode} from "../interfaces/XMLDocumentNode";
-import {annotatedAndTranslated, InterpolateService} from "@shared/";
+import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
+import { annotatedAndTranslated } from "../selectors";
+import { InterpolateService } from "../interpolate.service";
 
 export function createPopperElement(document1: XMLDocument) {
     const popperEl = document1.createElement('div');

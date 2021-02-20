@@ -32,15 +32,14 @@ function AppDirectory(
         ReadingNode(m),
         [
             ReadingNode(m, selectedComponent === 'reading'),
-            SpeechPracticeNode,
             [
                 LanguageSelectNode(m)
             ],
             SignInWithNode(profile),
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
-            uploadNode(m),
             LibraryNode(m),
+            uploadNode(m),
             SettingsNode(m),
             TestingUtilsNode(m),
             QuizCarouselNode(),
@@ -48,7 +47,9 @@ function AppDirectory(
                 RecognizeSpeechNode(m),
                 {...QuizCarouselNode(), moveDirectory: false},
                 QuizScheduleNode(),
+                SettingsNode(m),
             ],
+            SpeechPracticeNode,
         ] as ArrayToTreeParams<TreeMenuNode>
     );
 }

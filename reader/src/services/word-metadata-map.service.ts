@@ -6,7 +6,7 @@ import {XMLDocumentNode} from "../lib/interfaces/XMLDocumentNode";
 import {safePushMapSet, safePushSet} from "./safe-push";
 import {VisibleService} from "../lib/manager/visible.service";
 import {ElementAtomMetadataIndex} from "./element-atom-metadata.index";
-import {Segment} from "../lib/atomized/segment";
+import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
 
 export class WordMetadataMapService {
     public visibleWordMetadataMap$: Observable<Dictionary<Set<AtomMetadata>>>;

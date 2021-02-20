@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "../atomized/atomized-document";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
 import {WorkerError} from "./worker.helpers";
 
 // @ts-ignore

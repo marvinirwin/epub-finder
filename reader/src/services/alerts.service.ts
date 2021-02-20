@@ -24,11 +24,11 @@ export class AlertsService {
         });
         axios.interceptors.request.use(
             request => {
-                request.headers[this._testing] = '1'
+                request.headers[this._testing] = TESTING ? '1' : ''
                 return request;
             },
             request => {
-                request.headers[this._testing] = '1'
+                request.headers[this._testing] = TESTING ? '1' : ''
                 return request;
             }
         )

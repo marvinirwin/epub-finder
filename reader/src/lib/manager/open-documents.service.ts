@@ -1,10 +1,10 @@
 import {combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {Website} from "../Website/Website";
-import {Segment} from "../atomized/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {DeltaScan, DeltaScanner, ds_Dict, flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {mergeDictArrays} from "../Util/mergeAnnotationDictionary";
-import {AtomizedDocument} from "../atomized/atomized-document";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
@@ -12,8 +12,8 @@ import {filterMap, mapMap, mapToArray} from "../map.module";
 import {LibraryService} from "./library.service";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../document-frame/document-sources.service";
-import {TabulatedDocuments} from "../atomized/tabulated-documents.interface";
-import {mergeTabulations} from "../atomized/merge-tabulations";
+import {TabulatedDocuments} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+import {mergeTabulations} from "../../../../server/src/shared/tabulate-documents/merge-tabulations";
 import {DocumentRepository} from "../documents/document.repository";
 import {TrieWrapper} from "../TrieWrapper";
 

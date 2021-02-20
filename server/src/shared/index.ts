@@ -2,3 +2,8 @@ export {InterpolateService} from './interpolate.service';
 export {LtDocument} from './lt-document.class'
 export * from './selectors';
 export * from './components';
+export * from './tabulate-documents/segment'
+export * from './tabulate-documents/atomized-document'
+export * from './tabulate-documents/compute-element-index-map'
+export * from './tabulate-documents/merge-tabulations'
+export * from './tabulate-documents/tabulated-documents.interface'

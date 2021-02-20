@@ -1,28 +1,18 @@
-import {ITrie} from "../interfaces/Trie";
+import {ITrie} from "../../../../reader/src/lib/interfaces/Trie";
 import {Dictionary, flatten, uniq} from "lodash";
-import {AtomMetadata} from "../interfaces/atom-metadata.interface.ts/atom-metadata";
-import {IWordInProgress} from "../interfaces/Annotation/IWordInProgress";
-import {IPositionedWord} from "../interfaces/Annotation/IPositionedWord";
+import {AtomMetadata} from "../../../../reader/src/lib/interfaces/atom-metadata.interface.ts/atom-metadata";
+import {IWordInProgress} from "../../../../reader/src/lib/interfaces/Annotation/IWordInProgress";
+import {IPositionedWord} from "../../../../reader/src/lib/interfaces/Annotation/IPositionedWord";
 import {AtomizedDocument} from "./atomized-document";
-import {XMLDocumentNode} from "../interfaces/XMLDocumentNode";
-import {isChineseCharacter} from "../interfaces/OldAnkiClasses/Card";
+import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
+import {isChineseCharacter} from "../../../../reader/src/lib/interfaces/OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
 import {TabulatedSentences} from "./tabulated-documents.interface";
-import {safePushSet} from "../../services/safe-push";
+import {safePushSet} from "../../../../reader/src/services/safe-push";
 
 export class Segment {
     private _translation: string | undefined;
-    private _previousWords = new Set<string>();
     public _popperInstance: any;
-
-    public static tabulateSentences(segments: Segment[], trie: ITrie, trieElementSizes: number[]): TabulatedSentences {
-        return Segment.tabulate(
-            trie,
-            trieElementSizes,
-            segments,
-        )
-    }
-
     translatableText: string;
     popperElement: XMLDocumentNode;
     translated = false;
@@ -41,7 +31,6 @@ export class Segment {
 
     public static tabulate(
         t: ITrie,
-        uniqueLengths: number[],
         segments: Segment[],
     ): TabulatedSentences {
         const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
@@ -49,7 +38,7 @@ export class Segment {
             segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
         })).filter(n => (n.textContent as string).trim());
-        uniqueLengths = uniq(uniqueLengths.concat(1));
+        const uniqueLengths = uniq(t.getWords().map(word => word.length).concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
         const wordSegmentMap: Dictionary<Set<Segment>> = {};

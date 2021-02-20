@@ -1,12 +1,12 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "../atomized/atomized-document";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
 import {InterpolateExampleSentencesService} from "../../components/example-sentences/interpolate-example-sentences.service";
-import {Segment} from "../atomized/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {uniq} from "lodash";
 import {TabulateDocumentDto} from "./tabulate-document.dto";
-import {tabulatedSentenceToTabulatedDocuments} from "../atomized/tabulated-documents.interface";
+import {tabulatedSentenceToTabulatedDocuments} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 import trie from "trie-prefix-tree";
 
 // @ts-ignore

@@ -8,7 +8,7 @@ import TabulateDocumentsWorker from 'Worker-loader?name=dist/[name].js!./tabulat
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker';
 import {InterpolateService} from "@shared/";
 import {TabulateDocumentDto} from "./tabulate-document.dto";
-import {TabulatedDocuments, TabulatedSentences} from "../atomized/tabulated-documents.interface";
+import {TabulatedDocuments, TabulatedSentences} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 
 export type WorkerError = { errorMessage: string };
 

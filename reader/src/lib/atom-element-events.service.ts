@@ -9,7 +9,7 @@ import {BrowserInputs} from "./hotkeys/BrowserInputs";
 import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./highlighting/Highlighter";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
-import {Segment} from "./atomized/segment";
+import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
 import CardsRepository from "./manager/cards.repository";
 import {AtomMetadata} from "./interfaces/atom-metadata.interface.ts/atom-metadata";
 import {ICard} from "./interfaces/ICard";

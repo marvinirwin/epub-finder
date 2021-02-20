@@ -11,7 +11,8 @@
     "scripts": {
         "start": "nest start -p tsconfig.json",
         "build": "nest build -p tsconfig.json",
-        "watch": "nest start --watch -p tsconfig.json"
+        "watch": "nest start --watch -p tsconfig.json",
+        "test": "jest "
     },
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",

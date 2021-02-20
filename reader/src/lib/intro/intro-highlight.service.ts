@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {Segment} from "../atomized/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {filter, map, take} from "rxjs/operators";
 import {flatten, chunk} from "lodash";

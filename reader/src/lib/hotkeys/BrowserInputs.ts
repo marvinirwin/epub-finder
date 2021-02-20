@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {Segment} from "../atomized/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {HotkeyModes} from "./HotkeyModes";

@@ -1,19 +1,17 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Segment} from "../atomized/segment";
+import {map, shareReplay} from "rxjs/operators";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {TrieWrapper} from "../TrieWrapper";
 import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {AtomizedDocument} from "../atomized/atomized-document";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
 import {rehydratePage} from "../atomized/open-document.component";
-import {mergeTabulations} from "../atomized/merge-tabulations";
+import {mergeTabulations} from "../../../../server/src/shared/tabulate-documents/merge-tabulations";
 import {
     TabulatedDocuments,
-    TabulatedSentences,
     tabulatedSentenceToTabulatedDocuments
-} from "../atomized/tabulated-documents.interface";
+} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 import {flatten} from "lodash";
-import {TabulateDocuments} from "../Workers/worker.helpers";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
@@ -44,10 +42,10 @@ export class OpenDocument {
             trie$,
         ]).pipe(
             map(([segments, trie]) => {
-                    const tabulatedSentences = mergeTabulations(Segment.tabulateSentences(
-                        segments,
+                    const tabulatedSentences = mergeTabulations(Segment.tabulate(
                         trie.t,
-                        trie.uniqueLengths()
+                        trie.uniqueLengths(),
+                        segments,
                     ));
 
                     return tabulatedSentenceToTabulatedDocuments(tabulatedSentences, this.label);

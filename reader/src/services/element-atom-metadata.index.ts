@@ -5,7 +5,7 @@ import {OpenDocumentsService} from "../lib/manager/open-documents.service";
 import {VisibleService} from "../lib/manager/visible.service";
 import {AtomMetadata} from "../lib/interfaces/atom-metadata.interface.ts/atom-metadata";
 import {XMLDocumentNode} from "../lib/interfaces/XMLDocumentNode";
-import {TabulatedDocuments} from "../lib/atomized/tabulated-documents.interface";
+import {TabulatedDocuments} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>;
