@@ -27,13 +27,14 @@ function computeSimilarityTabulation(doc1: SerializedTabulation, doc2: Serialize
     return {
         hasInCommon: Object.fromEntries(
             Object.entries(doc1.wordCounts)
-                .map(([word, count]) => [word, doc2.wordCounts[word] || count])
+                .map(([word, count]) => [word, doc2.wordCounts[word]])
                 .filter(([word, count]) => !!count)
         ),
         doesNotHaveInCommon: Object.fromEntries(
             Object.entries(doc2.wordCounts)
-                .map(([word, count]) => [word, doc1.wordCounts[word] || count])
+                .map(([word, count]) => [word, doc1.wordCounts[word]])
                 .filter(([ word, count ]) => !count)
+                .map(([word]) => [word, doc2.wordCounts[word] ])
         ),
     }
 }
@@ -57,7 +58,11 @@ describe('Comparing the word frequencies of two documents', () => {
                 tabulatedSimplifiedChineseDocuments
             )
         ).toMatchObject({
-            hasInCommon: tabulatedSimplifiedChineseDocuments2.wordCounts,
+            hasInCommon: {
+                '天气' : 1,
+                '天' : 3,
+                '气' : 1
+            },
             doesNotHaveInCommon: {
                 '今天': 2,
                 '今': 2
