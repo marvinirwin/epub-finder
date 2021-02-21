@@ -19,3 +19,6 @@ export const somewhatRecognizedCount = 'somehwat-recognized-count';
 export const recognizedCount = 'recognized-count';
 export const frequencyDocumentList = 'frequencyDocumentList'
 export const frequencyDocumentSelectRow = 'frequencyDocumentSelectRow';
+export const hsk1Node = 'hsk1Node';
+export const testNode1 = "闽中奇构";
+export const testNode2 = "这辈子";

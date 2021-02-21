@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import {
     documentSelectionRow,
-    frequencyDocumentList,
+    frequencyDocumentList, GRAPH,
     LIBRARY,
     PAGES,
     QUIZ_NODE,
@@ -97,18 +97,21 @@ export class DirectoryPom {
     }
 
     public static SelectDocumentToRead(documentName: string) {
-        DirectoryPom.CloseAllDialogs()
         DirectoryPom.EnterLibrary()
         cy.contains(`.${documentSelectionRow}`, documentName).click()
     }
 
     static selectFrequencyDocuments(...frequencyDocumentNames: string[]) {
-        DirectoryPom.CloseAllDialogs()
         DirectoryPom.EnterLibrary();
         frequencyDocumentNames.forEach(frequencyDocumentName => {
             cy.get(frequencyDocumentList)
                 .find(`#${frequencyDocumentName}`)
                 .click()
         })
+    }
+
+    static goToGraph() {
+        DirectoryPom.CloseAllDialogs()
+        cy.get(`#${GRAPH}`).click()
     }
 }

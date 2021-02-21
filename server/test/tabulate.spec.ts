@@ -28,7 +28,7 @@ describe('document tabulation', () => {
                 {where: {name: "Test Html"}},
                 ['今天', '今', '天']
             );
-            expect(tabulation.wordCounts).toMatchObject({'今天': 1, '今': 1, '天'});
+            expect(tabulation.wordCounts).toMatchObject({'今天': 1, '今': 1, '天': 1});
         }
     )
 })
