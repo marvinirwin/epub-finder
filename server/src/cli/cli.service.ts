@@ -6,7 +6,7 @@ import {SimilarityEdge} from "../entities/count-edge.entity";
 import {SimilarityEdgeVersion} from "../entities/count-edge.version.entity";
 import {DocumentSimilarityService} from "../documents/similarity/document-similarity.service";
 import {Inject} from "@nestjs/common";
-import {ChineseVocabService} from "../documents/similarity/chinese-vocab.service";
+import {ChineseVocabService} from "../shared/tabulate-documents/chinese-vocab.service";
 
 export class CliService {
     constructor(
