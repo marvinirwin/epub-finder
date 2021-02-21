@@ -46,6 +46,7 @@
         "clockwork": "^0.1.4",
         "cloudconvert": "^2.1.6",
         "collections": "^5.1.11",
+        "command-line-args": "^5.1.1",
         "compression": "^1.7.4",
         "connect-typeorm": "^1.1.4",
         "dotenv": "^8.2.0",
@@ -93,6 +94,7 @@
         "rxjs": "^6.6.3",
         "stripe": "^8.132.0",
         "swagger-ui-express": "^4.1.4",
+        "trie-prefix-tree": "^1.5.1",
         "typeorm": "^0.2.26",
         "typeorm-store": "^1.2.0",
         "uuid": "^8.3.2",
@@ -101,6 +103,7 @@
         "winston": "^3.2.1"
     },
     "devDependencies": {
+        "@nestjs/testing": "^7.6.12",
         "@types/async": "^3.0.2",
         "@types/bcrypt-nodejs": "^0.0.30",
         "@types/bluebird": "^3.5.27",

@@ -19,22 +19,24 @@ const tabulatedSimplifiedChineseDocuments2: SerializedTabulation = {
 };
 
 interface SimilarityResults {
-    hasInCommon: {[word: string]: number}
-    doesNotHaveInCommon: {[word: string]: number}
+    knownWords: {[word: string]: number}
+    unknownWords: {[word: string]: number}
 }
 
-function computeSimilarityTabulation(doc1: SerializedTabulation, doc2: SerializedTabulation): SimilarityResults {
+function computeSimilarityTabulation(knownDocument: SerializedTabulation, unknownDocument: SerializedTabulation): SimilarityResults {
     return {
-        hasInCommon: Object.fromEntries(
-            Object.entries(doc1.wordCounts)
-                .map(([word, count]) => [word, doc2.wordCounts[word]])
+        // @ts-ignore
+        knownWords: Object.fromEntries(
+            Object.entries(knownDocument.wordCounts)
+                .map(([word, count]) => [word, unknownDocument.wordCounts[word]])
                 .filter(([word, count]) => !!count)
         ),
-        doesNotHaveInCommon: Object.fromEntries(
-            Object.entries(doc2.wordCounts)
-                .map(([word, count]) => [word, doc1.wordCounts[word]])
+        // @ts-ignore
+        unknownWords: Object.fromEntries(
+            Object.entries(unknownDocument.wordCounts)
+                .map(([word, count]) => [word, knownDocument.wordCounts[word]])
                 .filter(([ word, count ]) => !count)
-                .map(([word]) => [word, doc2.wordCounts[word] ])
+                .map(([word]) => [word, unknownDocument.wordCounts[word] ])
         ),
     }
 }
@@ -49,24 +51,24 @@ describe('Comparing the word frequencies of two documents', () => {
                 tabulatedSimplifiedChineseDocuments2
             )
         ).toMatchObject({
-            hasInCommon: tabulatedSimplifiedChineseDocuments2.wordCounts,
-            doesNotHaveInCommon: {}
-        })
+            knownWords: tabulatedSimplifiedChineseDocuments2.wordCounts,
+            unknownWords: {}
+        } as SimilarityResults)
         expect(
             computeSimilarityTabulation(
                 tabulatedSimplifiedChineseDocuments2,
                 tabulatedSimplifiedChineseDocuments
             )
         ).toMatchObject({
-            hasInCommon: {
+            knownWords: {
                 '天气' : 1,
                 '天' : 3,
                 '气' : 1
             },
-            doesNotHaveInCommon: {
+            unknownWords: {
                 '今天': 2,
                 '今': 2
             }
-        })
+        } as SimilarityResults)
     })
 })

@@ -7,6 +7,7 @@ import {DocumentsService} from "./documents.service";
 import {User} from "../entities/user.entity";
 import {HashService} from "./uploading/hash.service";
 import {UploadOnStartupService} from "./built-in-documents/upload-on-startup.service";
+import {TabulateService} from "./similarity/tabulate.service";
 
 @Module({
     imports: [
@@ -18,7 +19,8 @@ import {UploadOnStartupService} from "./built-in-documents/upload-on-startup.ser
     providers: [
         DocumentsService,
         HashService,
-        UploadOnStartupService
+        UploadOnStartupService,
+        TabulateService
     ]
 })
 export class DocumentsModule {}

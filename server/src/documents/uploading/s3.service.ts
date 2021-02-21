@@ -35,7 +35,7 @@ const streamToString = stream => {
     })
 };
 
-export function readStream(filename: string): Promise<stream.Readable> {
+export function s3ReadStream(filename: string): Promise<stream.Readable> {
     return new Promise((resolve, reject) => {
         const o = s3.getObject({Bucket: bucket, Key: filename})
             .on('error', e => reject(e));
@@ -43,7 +43,7 @@ export function readStream(filename: string): Promise<stream.Readable> {
     })
 };
 
-export const getS3FileString = (filename: string) => readStream(filename).then(streamToString)
+export const getS3FileString = (filename: string) => s3ReadStream(filename).then(streamToString)
 
 
 export async function copyS3WithExtension(file: { originalname: string; bucket: string; key: string; location: string }, ext: string) {

@@ -22,7 +22,7 @@ import {FileInterceptor} from "@nestjs/platform-express";
 import {HashService} from "./uploading/hash.service";
 import multerS3 from 'multer-s3';
 import {v4 as uuidv4} from 'uuid';
-import {readStream, s3} from "./uploading/s3.service";
+import {s3ReadStream, s3} from "./uploading/s3.service";
 import {AnonymousGuard} from "../guards/anonymous.guard";
 import {DocumentViewDto} from "./document-view.dto";
 import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
@@ -139,7 +139,7 @@ export class DocumentsController {
                 return reject(new HttpException(`Cannot find document ${filename} for user ${user?.id}`, 404));
             }
 
-            (await readStream(filename)).pipe(response)
+            (await s3ReadStream(filename)).pipe(response)
             resolve()
         })
     }

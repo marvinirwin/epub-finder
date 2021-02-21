@@ -22,7 +22,6 @@ ctx.onmessage = async (ev) => {
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
         t,
-        uniq(t.getWords().map((word: string) => word.length)),
         doc.segments(),
     ), d.name);
     ctx.postMessage(tabulated);

@@ -8,6 +8,7 @@ import {JsonCache} from "../entities/json-cache.entity";
 import {Repository} from "typeorm";
 import debug from 'debug'
 import {ImageObject} from "@azure/cognitiveservices-imagesearch/src/models/index";
+
 const d = debug('service:image-search');
 
 export const imageSearchEndPoint = process.env.AZURE_IMAGE_SEARCH_ENDPOINT;
@@ -36,12 +37,10 @@ export class ImageSearchService {
         return  (await client.images.search(term, options)).value
     }
     async lookupCacheEntry(imageSearchRequestDto: ImageSearchRequestDto): Promise<ImageSearchRequestDto | undefined> {
-        const conditions = {
+        const cacheEntry = await this.jsonCacheRepository.findOne({
             service: this._service,
             key_hash: sha1([imageSearchRequestDto])
-        };
-        const cacheEntry = await this.jsonCacheRepository.findOne(conditions);
-        d(conditions);
+        });
         if (cacheEntry) {
             // Kind of inefficient, since it will probably be stringified again again
             return JSON.parse(cacheEntry.value);
