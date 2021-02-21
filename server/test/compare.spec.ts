@@ -1,4 +1,6 @@
 import {SerializedTabulation} from "../src/shared";
+import {SimilarityResults} from "../src/shared/compre-similarity-result";
+import {computeSimilarityTabulation} from "../src/shared/similarity-result.interface";
 
 const tabulatedSimplifiedChineseDocuments: SerializedTabulation = {
     wordCounts: {
@@ -17,29 +19,6 @@ const tabulatedSimplifiedChineseDocuments2: SerializedTabulation = {
         '气' : 3
     }
 };
-
-interface SimilarityResults {
-    knownWords: {[word: string]: number}
-    unknownWords: {[word: string]: number}
-}
-
-function computeSimilarityTabulation(knownDocument: SerializedTabulation, unknownDocument: SerializedTabulation): SimilarityResults {
-    return {
-        // @ts-ignore
-        knownWords: Object.fromEntries(
-            Object.entries(knownDocument.wordCounts)
-                .map(([word, count]) => [word, unknownDocument.wordCounts[word]])
-                .filter(([word, count]) => !!count)
-        ),
-        // @ts-ignore
-        unknownWords: Object.fromEntries(
-            Object.entries(unknownDocument.wordCounts)
-                .map(([word, count]) => [word, knownDocument.wordCounts[word]])
-                .filter(([ word, count ]) => !count)
-                .map(([word]) => [word, unknownDocument.wordCounts[word] ])
-        ),
-    }
-}
 
 
 

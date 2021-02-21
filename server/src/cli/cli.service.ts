@@ -4,15 +4,17 @@ import {DocumentView} from "../entities/document-view.entity";
 import {Repository} from "typeorm";
 import {SimilarityEdge} from "../entities/count-edge.entity";
 import {SimilarityEdgeVersion} from "../entities/count-edge.version.entity";
+import {DocumentSimilarityService} from "../documents/similarity/document-similarity.service";
+import {Inject} from "@nestjs/common";
 
 export class CliService {
     constructor(
-        @InjectRepository(DocumentView)
-        private documentViewRepository: Repository<DocumentView>,
+        @Inject(DocumentSimilarityService)
+        private documentSimilarityService: DocumentSimilarityService
     ) {
     }
 
-    exec(customArgv?: string[]) {
+    async exec(customArgv?: string[]) {
         const args = commandLineArgs(
             {
                 documents: {
@@ -24,5 +26,12 @@ export class CliService {
             }
         );
         const [doc1Name, doc2Name] = args.documents;
+        console.log(
+            await this.documentSimilarityService.compareDocumentsByName(
+                doc1Name,
+                doc2Name,
+
+            )
+        )
     }
 }
