@@ -6,24 +6,24 @@ import {OpenDocumentsService} from "../manager/open-documents.service";
 export class CardCreationService {
     constructor(
         {
-            cardService,
+            cardsRepository,
             pronunciationProgressService,
-            wordRecognitionService,
+            wordRecognitionProgressService,
             openDocumentsService
         }: {
-            cardService: CardsRepository,
+            cardsRepository: CardsRepository,
             pronunciationProgressService: PronunciationProgressRepository,
-            wordRecognitionService: WordRecognitionProgressRepository,
+            wordRecognitionProgressService: WordRecognitionProgressRepository,
             openDocumentsService: OpenDocumentsService
         }) {
         function putWords(records: {word: string}[]) {
-            cardService.putSyntheticWords(records.map(r => r.word))
+            cardsRepository.putSyntheticWords(records.map(r => r.word))
         }
         pronunciationProgressService.addRecords$.subscribe(putWords);
-        wordRecognitionService.addRecords$.subscribe(putWords);
+        wordRecognitionProgressService.addRecords$.subscribe(putWords);
         openDocumentsService.displayDocumentTabulation$
             .subscribe(tabulation => {
-                cardService.putSyntheticWords(Object.keys(tabulation.wordCounts))
+                cardsRepository.putSyntheticWords(Object.keys(tabulation.wordCounts))
             })
     }
 }

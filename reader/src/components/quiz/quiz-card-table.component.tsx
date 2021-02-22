@@ -3,7 +3,7 @@ import React, {useContext} from "react";
 import {Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {last5, lastN} from "./last-n";
-import {sum} from 'lodash';
+import {sum, round} from 'lodash';
 import {
     quizCardTableRow,
     quizCardTableRowCounts,
@@ -31,7 +31,7 @@ export const QuizCardTableComponent = () => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {scheduleRows.slice(0, 100).map(row => {
+                {scheduleRows.filter(r => r.count() > 0).slice(0, 100).map(row => {
                     let className;
                     if (row.isNew()) {
                         className = 'new';
@@ -52,7 +52,7 @@ export const QuizCardTableComponent = () => {
                                 <Typography variant={'h6'} >{row.d.word} </Typography>
                             </TableCell>
                             <TableCell>
-                                {row.d.finalSortValue || 0}
+                                Count/Length: {round(row.d.count.weightedInverseLogNormalValue || 0, 2)} Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}
                             </TableCell>
                             <TableCell>
                                 {row.dueIn()}

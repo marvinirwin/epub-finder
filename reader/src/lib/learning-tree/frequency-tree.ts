@@ -1,19 +1,34 @@
-import {LtDocument, SerializedTabulation} from "@shared/*";
+import {SerializedTabulation} from "@shared/*";
 import {orderBy, sum} from "lodash";
 import {computeSimilarityTabulation} from "../../../../server/src/shared/similarity-result.interface";
 import {ds_Tree} from "../../services/tree.service";
 import memoize from 'memoizee';
+import {TabulatedFrequencyDocument} from "./tabulated-frequency-document";
 
 
-
-export class LearningTree {
-    public static memoizedSimilarityTabulation = memoize((t1, t2) => computeSimilarityTabulation(t1, t2))
+export class FrequencyTree {
+    public static memoizedSimilarityTabulation = memoize((
+        t1: SerializedTabulation,
+        t2: SerializedTabulation,
+        vocab: SerializedTabulation
+    ) => {
+        return computeSimilarityTabulation(
+            {
+                wordCounts: {
+                    ...t1.wordCounts,
+                    ...vocab.wordCounts
+                }
+            },
+            t2
+        );
+    })
     public tree: ds_Tree<TabulatedFrequencyDocument>;
     private availableSet: Set<TabulatedFrequencyDocument>;
 
     constructor(
         public tabulatedFrequencyDocuments: TabulatedFrequencyDocument[],
-        public root: TabulatedFrequencyDocument
+        public root: TabulatedFrequencyDocument,
+        public knownWords: SerializedTabulation,
     ) {
         const pushNodeToStack = (f: TabulatedFrequencyDocument): ds_Tree<TabulatedFrequencyDocument> => ({
             value: f,
@@ -36,12 +51,16 @@ export class LearningTree {
     }
 
     private getNClosestNeighbors(root: TabulatedFrequencyDocument, n: number = 3) {
-        function frequencyDocumentTabulationDistance(tabulation: SerializedTabulation, tabulation2: SerializedTabulation) {
-            const difference = LearningTree.memoizedSimilarityTabulation(tabulation, tabulation2);
+        const frequencyDocumentTabulationDistance = (tabulation: SerializedTabulation, tabulation2: SerializedTabulation) => {
+            const difference = FrequencyTree.memoizedSimilarityTabulation(
+                tabulation,
+                tabulation2,
+                this.knownWords
+            );
             const knownWordsSum = sum(Object.values(difference.knownWords));
             const unknownWordsSum = sum(Object.values(difference.unknownWords));
             return unknownWordsSum / (unknownWordsSum + knownWordsSum);
-        }
+        };
 
         return orderBy(
             [...this.availableSet.values()],
@@ -50,11 +69,3 @@ export class LearningTree {
     }
 }
 
-
-export class TabulatedFrequencyDocument {
-    constructor(
-        public frequencyDocument: LtDocument,
-        public tabulation: SerializedTabulation
-    ) {
-    }
-}

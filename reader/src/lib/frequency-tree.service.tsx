@@ -5,12 +5,14 @@ import {SimilarityResults} from "../../../server/src/shared/compre-similarity-re
 import {SettingsService} from "../services/settings.service";
 import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
 import {map} from "rxjs/operators";
-import {LearningTree, TabulatedFrequencyDocument} from "./learning-tree/learning-tree";
+import {FrequencyTree} from "./learning-tree/frequency-tree";
+import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
+import {VocabService} from "./vocab.service";
 
 
 export type FrequencyDocumentNodeArgs = {
     frequencyNode: ds_Tree<TabulatedFrequencyDocument>,
-    similarity: SimilarityResults
+    similarity: SimilarityResults | undefined
 };
 
 export class FrequencyTreeService {
@@ -19,29 +21,37 @@ export class FrequencyTreeService {
     constructor(
         {
             settingsService,
-            frequencyDocumentsRepository
+            frequencyDocumentsRepository,
+            vocabService
         }:
             {
                 settingsService: SettingsService,
-                frequencyDocumentsRepository: FrequencyDocumentsRepository
+                frequencyDocumentsRepository: FrequencyDocumentsRepository,
+                vocabService: VocabService
             }
     ) {
-/*
-        const similarity = memoize((f1: SerializedTabulation, f2: SerializedTabulation) => computeSimilarityTabulation(f1, f2));
-*/
+        /*
+                const similarity = memoize((f1: SerializedTabulation, f2: SerializedTabulation) => computeSimilarityTabulation(f1, f2));
+        */
         this.tree$ = combineLatest(
             [
                 frequencyDocumentsRepository.allTabulated$,
-                settingsService.progressTreeRootId$
+                settingsService.progressTreeRootId$,
+                vocabService.vocab$
             ]
-        ).pipe(map(([allFrequencyDocuments, rootId]) => {
+        ).pipe(map(([
+                        allFrequencyDocuments,
+                        rootId,
+                        vocab
+                    ]) => {
             const rootNode = allFrequencyDocuments
                     .find(d => d.frequencyDocument.id() === rootId) ||
                 allFrequencyDocuments[0];
             if (!rootNode) return;
-            return new LearningTree(
+            return new FrequencyTree(
                 allFrequencyDocuments,
-                rootNode
+                rootNode,
+                vocab
             ).tree
             // For each frequency doc calculate its distance to the others, oh this is n^2, I'll memo it
         }))

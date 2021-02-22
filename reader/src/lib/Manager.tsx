@@ -89,6 +89,7 @@ import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
 import {AllWordsRepository} from "./all-words.repository";
 import {QuizHighlightService} from "./highlighting/quiz-highlight.service";
 import {FrequencyTreeService} from "./frequency-tree.service";
+import {VocabService} from "./vocab.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -184,6 +185,7 @@ export class Manager {
     public allWordsRepository: AllWordsRepository;
     public progressTreeService: FrequencyTreeService;
     public quizHighlightService: QuizHighlightService;
+    public vocabService: VocabService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -305,10 +307,7 @@ export class Manager {
             openDocumentsService: this.openDocumentsService,
             quizService: this.quizService
         });
-        this.elementAtomMetadataIndex = new ElementAtomMetadataIndex({
-            openDocumentsService: this.openDocumentsService,
-            visibleElementsService: this.visibleElementsService
-        })
+        this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)
         this.wordMetadataMapService = new WordMetadataMapService({
             visibleElementsService: this.visibleElementsService,
             aggregateElementIndexService: this.elementAtomMetadataIndex
@@ -319,9 +318,7 @@ export class Manager {
             }
         )
 
-        this.highlighter = new Highlighter({
-            highlighterService: this.highlighterService,
-        })
+        this.highlighter = new Highlighter(this)
 
         this.readingwordElementMap = combineLatest([
             this.readingwordElementMap.pipe(
@@ -358,12 +355,7 @@ export class Manager {
                 this.highlighter.highlightWithDifficulty$.next({})
         });
 
-        this.goalsService = new GoalsService({
-            settingsService: this.settingsService,
-            recognitionRecordsService: this.wordRecognitionProgressService,
-            pronunciationRecordsService: this.pronunciationProgressService
-        })
-
+        this.goalsService = new GoalsService(this)
 
         this.audioRecordingService.audioRecorder.audioSource
             .errors$.pipe(AlertsService.pipeToColor('warning'))
@@ -397,20 +389,10 @@ export class Manager {
             highlighterService: this.highlighterService
         });
 
-        const ths = new TestHotkeysService({
-            hotkeyEvents: this.hotkeyEvents,
-            pronunciationProgressService: this.pronunciationProgressService
-        });
+        const ths = new TestHotkeysService(this);
 
-        const ccs = new CardCreationService({
-            cardService: this.cardsRepository,
-            pronunciationProgressService: this.pronunciationProgressService,
-            wordRecognitionService: this.wordRecognitionProgressService,
-            openDocumentsService: this.openDocumentsService,
-        })
-        this.introSeriesService = new IntroSeriesService({
-            settingsService: this.settingsService
-        });
+        const ccs = new CardCreationService(this)
+        this.introSeriesService = new IntroSeriesService(this);
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
             renderedSegments$: this.openDocumentsService.renderedSegments$
@@ -432,9 +414,7 @@ export class Manager {
             loggedInUserService: this.authManager
         });
 
-        this.mousedOverWordHighlightService = new MousedOverWordHighlightService({
-            highlighterService: this.highlighterService
-        })
+        this.mousedOverWordHighlightService = new MousedOverWordHighlightService(this)
 
         const aees = new AtomElementEventsService({
             openDocumentsService: this.openDocumentsService,
@@ -455,8 +435,10 @@ export class Manager {
         });
 
         this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this);
+        this.vocabService = new VocabService(this)
         this.progressTreeService = new FrequencyTreeService(this);
         this.quizHighlightService = new QuizHighlightService( this )
+
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

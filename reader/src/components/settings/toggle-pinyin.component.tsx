@@ -3,7 +3,7 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {FormControlLabel, ListItem, Switch} from "@material-ui/core";
 
-export const TogglePinyin = () => {
+export const TogglePinyinComponent = () => {
     const m = useContext(ManagerContext);
     const showPinyin = useObservableState(m.settingsService.showRomanization$)
     return <ListItem>
@@ -12,6 +12,7 @@ export const TogglePinyin = () => {
                 <Switch checked={!!showPinyin}
                         onChange={() => m.settingsService.showRomanization$.next(!showPinyin)}
                 />}
-            label="Show Pinyin"/>
+            label="Show Pinyin"
+        />
     </ListItem>
 }

@@ -17,16 +17,16 @@ export class GoalsService {
     private dailyProgress$: Observable<number>;
     constructor({
         settingsService,
-                    recognitionRecordsService,
-                    pronunciationRecordsService
+                    wordRecognitionProgressService,
+                    pronunciationProgressService
                 }: {
         settingsService: SettingsService,
-        recognitionRecordsService: IndexedRowsRepository<WordRecognitionRow>,
-        pronunciationRecordsService: PronunciationProgressRepository
+        wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
+        pronunciationProgressService: PronunciationProgressRepository
     }) {
         this.dailyProgress$ = combineLatest([
-            recognitionRecordsService.records$,
-            pronunciationRecordsService.records$
+            wordRecognitionProgressService.records$,
+            pronunciationProgressService.records$
         ]).pipe(
             map(([recognition, pronunciation]) => {
                 /**

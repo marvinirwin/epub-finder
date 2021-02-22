@@ -47,6 +47,10 @@ export class SettingsService {
     public spokenLanguage$: ReplaySubject<string>;
     public selectedFrequencyDocuments$: ReplaySubject<string[]>;
     public progressTreeRootId$: ReplaySubject<string>;
+    /**
+     * Either the Id of a frequency document, or blank to use recognition progress
+     */
+    public selectedVocabulary$: ReplaySubject<string>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -89,6 +93,8 @@ export class SettingsService {
         this.selectedFrequencyDocuments$ = this.createSetting$<string[]>('selectedFrequencyDocuments', [], 'indexedDB')
 
         this.progressTreeRootId$ = this.createSetting$<string>('progressTreeRoot', '', 'url')
+
+        this.selectedVocabulary$ = this.createSetting$<string>('selectedVocabulary', '', 'indexedDB')
     }
 
     public createSetting$<T>(

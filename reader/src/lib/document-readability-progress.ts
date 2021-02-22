@@ -19,6 +19,7 @@ export interface ReadabilityState {
     unrecognized: WordReadabilityRecord[];
 }
 
+
 export class DocumentReadabilityProgress {
     readabilityState: ReadabilityState;
     constructor(
@@ -43,11 +44,11 @@ export class DocumentReadabilityProgress {
             .forEach(([word, count]) => {
                 const scheduleRow = scheduleRows.get(word);
                 const readabilityRecord = {word, scheduleRow, count, totalWordCount};
-                if (!scheduleRow || !scheduleRow.hasTwoCorrectRecognitionInARow()) {
+                if (!scheduleRow || scheduleRow.isUnrecognized()) {
                     unrecognized.push(readabilityRecord);
                     return;
                 }
-                if (scheduleRow.hasTwoCorrectRecognitionInARow() && scheduleRow.isOverDue()) {
+                if (scheduleRow.isUnrecognized()) {
                     somewhatRecognized.push(readabilityRecord);
                     return;
                 }

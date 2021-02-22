@@ -15,7 +15,8 @@ describe('Quiz Cards', () => {
         card.characters().should('contain', characters);
         card.editDescription('test');
         card.selectNewImage()
-    })
+    });
+    it('')
 })
 
 

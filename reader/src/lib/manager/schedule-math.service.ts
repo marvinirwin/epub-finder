@@ -12,11 +12,11 @@ export class ScheduleMathService {
     ): ScheduleRow<NormalizedScheduleRowData>[] {
         const scheduleRowNormalizedDateMap = new Map<ScheduleRow, number>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
-            row => row.dueDate().getTime()
+            row => row.dueDate().getTime() * -1
         ).map(([n, row]) => {
             return [
                 row,
-                1 - n
+                n
             ];
         }));
 
@@ -42,7 +42,10 @@ export class ScheduleMathService {
             } as NormalizedScheduleRowData;
         })
 
-        return orderBy(sortableScheduleRows.map(r => new ScheduleRow<NormalizedScheduleRowData>(r)), r => r.d.finalSortValue, 'desc')
+        return orderBy(
+            sortableScheduleRows.map(r => new ScheduleRow<NormalizedScheduleRowData>(r)),
+                r => r.d.finalSortValue,
+            'desc')
     }
 
     private static normalizeScheduleRows<T>(

@@ -9,7 +9,8 @@ export const LanguageSelect = () => {
     const readingLanguageCode = useObservableState(m.settingsService.readingLanguage$) || '';
     const spokenLanguageCode = useObservableState(m.settingsService.spokenLanguage$) || '';
     const potentialSpokenLanguageCode = useObservableState(m.languageConfigsService.potentialLearningSpoken$) || [];
-    return <Fragment><InputLabel id="reading-language-select-label">Script</InputLabel>
+    return <Fragment>
+        <InputLabel id="reading-language-select-label">Script</InputLabel>
         <Select
             labelId="reading-language-select-label"
             value={readingLanguageCode}

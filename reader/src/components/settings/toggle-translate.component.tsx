@@ -3,7 +3,7 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {FormControlLabel, ListItem, Switch} from "@material-ui/core";
 
-export const ToggleTranslate = () => {
+export const ToggleTranslateComponent = () => {
     const m = useContext(ManagerContext);
     const showTranslations = useObservableState(m.settingsService.showTranslation$)
     return <ListItem>
