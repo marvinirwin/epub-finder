@@ -1,4 +1,4 @@
-import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
+import {XMLDocumentNode} from "../XMLDocumentNode";
 
 /**
  * Assigns every element an index, which will function as its "path" and a list of these paths will become a "section"

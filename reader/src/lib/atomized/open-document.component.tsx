@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {useObservableState} from "observable-hooks";
 import {InnerHTMLIFrame} from "../../components/frame/innerHTMLIFrame";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
-import {XMLDocumentNode} from "../interfaces/XMLDocumentNode";
+import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import { annotatedAndTranslated } from '@shared/';
 

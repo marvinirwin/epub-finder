@@ -4,7 +4,7 @@ import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
 import CardsRepository from "../manager/cards.repository";
 import {sleep} from "../Util/Util";
-import {isChineseCharacter} from "../interfaces/OldAnkiClasses/Card";
+import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
 
 export function removePunctuation(withPunctuation: string) {
     return withPunctuation.split('').filter(c => {

@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {ICard} from "../interfaces/ICard";
+import {ICard} from "../../../../server/src/shared/ICard";
 import {map, withLatestFrom} from "rxjs/operators";
 import {cardForWord} from "../Util/Util";
 

@@ -1,8 +1,8 @@
 import {Dictionary} from "lodash";
-import {AtomMetadata} from "../../../../reader/src/lib/interfaces/atom-metadata.interface.ts/atom-metadata";
+import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {Segment} from "./segment";
-import {DocumentWordCount} from "../../../../reader/src/lib/interfaces/DocumentWordCount";
-import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
+import {DocumentWordCount} from "../DocumentWordCount";
+import {XMLDocumentNode} from "../XMLDocumentNode";
 
 export type TabulatedDocuments  = TabulatedSentences & {
     documentWordCounts: Dictionary<DocumentWordCount[]>;

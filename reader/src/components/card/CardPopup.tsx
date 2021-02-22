@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Manager} from "../../lib/Manager";
-import {ICard} from "../../lib/interfaces/ICard";
+import {ICard} from "../../../../server/src/shared/ICard";
 import {EditingCard} from "../../lib/reactive-classes/EditingCard";
 
 export function CardPopup({text, card, getImages, m}: { text: string, card: ICard, getImages: ((s: string) => Promise<string[]>) | undefined, m: Manager }) {

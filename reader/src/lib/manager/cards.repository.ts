@@ -1,8 +1,8 @@
 import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from "rxjs";
-import {getIsMeFunction, ICard} from "../interfaces/ICard";
+import {getIsMeFunction, ICard} from "../../../../server/src/shared/ICard";
 import {Dictionary, orderBy} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
-import {Settings} from "../interfaces/Message";
+import {Settings} from "../../../../server/src/shared/Message";
 import {DatabaseService} from "../Storage/database.service";
 import {cardForWord} from "../Util/Util";
 import {observableLastValue} from "../../services/settings.service";

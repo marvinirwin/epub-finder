@@ -3,8 +3,8 @@ import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 import {mergeMaps} from "../lib/map.module";
 import {OpenDocumentsService} from "../lib/manager/open-documents.service";
 import {VisibleService} from "../lib/manager/visible.service";
-import {AtomMetadata} from "../lib/interfaces/atom-metadata.interface.ts/atom-metadata";
-import {XMLDocumentNode} from "../lib/interfaces/XMLDocumentNode";
+import {AtomMetadata} from "../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
+import {XMLDocumentNode} from "../../../server/src/shared/XMLDocumentNode";
 import {TabulatedDocuments} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 
 

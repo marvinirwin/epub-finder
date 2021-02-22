@@ -1,8 +1,8 @@
-import {getIndexOfEl} from "../../../../reader/src/lib/Util/getIndexOfEl";
+import {getIndexOfEl} from "../getIndexOfEl";
 import {Dictionary, uniqueId, flatten} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
 import {Segment} from "./segment";
-import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
+import {XMLDocumentNode} from "../XMLDocumentNode";
 import { annotatedAndTranslated } from "../selectors";
 import { InterpolateService } from "../interpolate.service";
 

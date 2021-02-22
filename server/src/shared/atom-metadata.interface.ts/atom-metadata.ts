@@ -1,9 +1,8 @@
 import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {Segment} from "../../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "../tabulate-documents/segment";
 import {flatten, maxBy} from "lodash";
-import CardsRepository from "../../manager/cards.repository";
-import {ElementAtomMetadataIndex} from "../../../services/element-atom-metadata.index";
+import CardsRepository from "../../../../reader/src/lib/manager/cards.repository";
 import {ICard} from "../ICard";
 
 export class AtomMetadata {

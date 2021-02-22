@@ -3,7 +3,7 @@ import {ManagerContext} from "../../../App";
 import {ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 import {Mic} from "@material-ui/icons";
 import {useObservableState} from "observable-hooks";
-import {RecordRequest} from "../../../lib/interfaces/RecordRequest";
+import {RecordRequest} from "../../../../../server/src/shared/RecordRequest";
 import {removePunctuation} from "../../../lib/highlighting/temporary-highlight.service";
 
 export const SpeakMode: React.FunctionComponent = ({...props}) => {

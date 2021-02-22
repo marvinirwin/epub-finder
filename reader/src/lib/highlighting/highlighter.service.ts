@@ -9,10 +9,10 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {LtElement} from "./Highlighter";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
-import {AtomMetadata} from "../interfaces/atom-metadata.interface.ts/atom-metadata";
+import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {map, shareReplay, tap} from "rxjs/operators";
 import debug from 'debug';
-import {safePushMap} from "../../services/safe-push";
+import {safePushMap} from "../../../../server/src/shared/safe-push";
 const d = debug('highlight:highlighter');
 
 // Priority, highlighterName

@@ -11,7 +11,7 @@ import {ScheduleService} from "../../lib/manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {observableLastValue} from "../../services/settings.service";
-import {ICard} from "../../lib/interfaces/ICard";
+import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 

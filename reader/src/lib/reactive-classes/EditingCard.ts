@@ -1,5 +1,5 @@
 import {combineLatest, Observable, of, race, ReplaySubject, Subject, timer} from "rxjs";
-import {ICard} from "../interfaces/ICard";
+import {ICard} from "../../../../server/src/shared/ICard";
 import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
 import {flatten, memoize} from "lodash";

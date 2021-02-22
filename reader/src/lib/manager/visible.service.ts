@@ -1,6 +1,6 @@
 import {ds_Dict, flattenTree} from "../Tree/DeltaScanner";
 import {Dictionary, flatten} from "lodash";
-import {AtomMetadata} from "../interfaces/atom-metadata.interface.ts/atom-metadata";
+import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {combineLatest, Observable} from "rxjs";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService, READING_DOCUMENT_NODE_LABEL} from "./open-documents.service";
 import {QuizService} from "../../components/quiz/quiz.service";

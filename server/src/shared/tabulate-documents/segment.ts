@@ -1,14 +1,14 @@
-import {ITrie} from "../../../../reader/src/lib/interfaces/Trie";
+import {ITrie} from "../Trie";
 import {Dictionary, flatten, uniq} from "lodash";
-import {AtomMetadata} from "../../../../reader/src/lib/interfaces/atom-metadata.interface.ts/atom-metadata";
-import {IWordInProgress} from "../../../../reader/src/lib/interfaces/Annotation/IWordInProgress";
-import {IPositionedWord} from "../../../../reader/src/lib/interfaces/Annotation/IPositionedWord";
+import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
+import {IWordInProgress} from "../Annotation/IWordInProgress";
+import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {AtomizedDocument} from "./atomized-document";
-import {XMLDocumentNode} from "../../../../reader/src/lib/interfaces/XMLDocumentNode";
-import {isChineseCharacter} from "../../../../reader/src/lib/interfaces/OldAnkiClasses/Card";
+import {XMLDocumentNode} from "../XMLDocumentNode";
+import {isChineseCharacter} from "../OldAnkiClasses/Card";
 import {ReplaySubject} from "rxjs";
 import {TabulatedSentences} from "./tabulated-documents.interface";
-import {safePushSet} from "../../../../reader/src/services/safe-push";
+import {safePushSet} from "../safe-push";
 
 export class Segment {
     private _translation: string | undefined;
