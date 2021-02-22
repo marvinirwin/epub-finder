@@ -182,8 +182,11 @@ export class AtomizedDocument {
             switch (node.nodeType) {
                 case 1: // Element node
                     const el = node;
+                    // @ts-ignore
                     AtomizedDocument.replaceHrefOrSource(el, "src");
+                    // @ts-ignore
                     if (el.localName === "link") {
+                        // @ts-ignore
                         AtomizedDocument.replaceHrefOrSource(el, "href");
                     }
                 case 9: // Document node

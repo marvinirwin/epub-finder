@@ -52,7 +52,7 @@ export const QuizCardTableComponent = () => {
                                 <Typography variant={'h6'} >{row.d.word} </Typography>
                             </TableCell>
                             <TableCell>
-                                {row.d.finalSortValue}
+                                {row.d.finalSortValue || 0}
                             </TableCell>
                             <TableCell>
                                 {row.dueIn()}
@@ -68,7 +68,7 @@ export const QuizCardTableComponent = () => {
                             <TableCell
                                 className={quizCardTableRowCounts}
                             >{
-                                sum(row.d.wordCountRecords.map(r => r.count))
+                                sum(row.d.wordCountRecords.map(r => r.count)) || 0
                             }</TableCell>
                             <TableCell
                                 className={quizCardTableRowLastAnswer}
