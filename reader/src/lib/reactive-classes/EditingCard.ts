@@ -2,7 +2,6 @@ import {combineLatest, Observable, of, race, ReplaySubject, Subject, timer} from
 import {ICard} from "../../../../server/src/shared/ICard";
 import {flatMap, map, mapTo, shareReplay, skip, switchMap,} from "rxjs/operators";
 import {IndexDBManager} from "../Storage/StorageManagers";
-import {flatten, memoize} from "lodash";
 import CardsRepository from "../manager/cards.repository";
 
 

@@ -1,8 +1,9 @@
 import {LtDocument, SerializedTabulation} from "@shared/*";
-import {orderBy, memoize, sum} from "lodash";
+import {orderBy, sum} from "lodash";
 import {computeSimilarityTabulation} from "../../../../server/src/shared/similarity-result.interface";
 import {ds_Tree} from "../../services/tree.service";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import memoize from 'memoizee';
+
 
 
 export class LearningTree {

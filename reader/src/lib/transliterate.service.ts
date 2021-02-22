@@ -1,6 +1,6 @@
 import {TransliterateResponseDto, TransliterateRequestDto} from "@server/";
 import axios, { AxiosResponse } from "axios";
-import {memoize} from 'lodash';
+import memoize from 'memoizee';
 
 
 export const transliterate = memoize((d: TransliterateRequestDto) => axios.post(

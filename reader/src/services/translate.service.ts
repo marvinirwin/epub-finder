@@ -1,5 +1,5 @@
 import axios from "axios";
-import {memoize} from 'lodash';
+import memoize from 'memoizee';
 
 export interface TranslateRequest extends TranslateConfig {
     text: string

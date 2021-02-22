@@ -1,4 +1,3 @@
-import {Profile} from "../../../lib/auth/loggedInUserService";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import React, {useContext} from "react";
 import {AccountCircle, Settings} from "@material-ui/icons";

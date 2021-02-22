@@ -12,12 +12,12 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
                 {value.frequencyDocument.name}
             </Typography>
             <Typography>
-{/*
                 {JSON.stringify(similarity.unknownWords, null, '\t')}
-*/}
+{/*
                 {
                     sum(Object.values(similarity.unknownWords))
                 }
+*/}
             </Typography>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '24px'}}>
                 {Object.values(frequencyNode.children || {}).map(child =>
