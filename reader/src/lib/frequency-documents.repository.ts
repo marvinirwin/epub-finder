@@ -11,10 +11,10 @@ import {observableLastValue, SettingsService} from "../services/settings.service
 import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
 
 export class FrequencyDocumentsRepository {
-    all$ = new BehaviorSubject<Map<string, FrequencyDocument>>(new Map());
-    allTabulated$: Observable<TabulatedFrequencyDocument[]>
-    selected$: Observable<Map<string, FrequencyDocument>>;
-    private selectedTabulated$: Observable<TabulatedFrequencyDocument>;
+    public all$ = new BehaviorSubject<Map<string, FrequencyDocument>>(new Map());
+    public allTabulated$: Observable<TabulatedFrequencyDocument[]>
+    public selected$: Observable<Map<string, FrequencyDocument>>;
+    public selectedTabulated$: Observable<TabulatedFrequencyDocument[]>;
 
     constructor(
         {
@@ -50,7 +50,7 @@ export class FrequencyDocumentsRepository {
                     this.all$.next(mergeMaps(frequencyDocuments, this.all$.getValue()));
                 }
             );
-        const tabulate = (all$1: Observable<Map<string, FrequencyDocument>>) => all$1
+        const tabulate = (all$1: Observable<FrequencyDocument[]>) => all$1
             .pipe(
                 switchMap(all =>
                     combineLatest([...all.values()]
@@ -67,9 +67,6 @@ export class FrequencyDocumentsRepository {
                     )
                 )
             );
-
-        this.allTabulated$ = tabulate(this.all$);
-        this.selectedTabulated$ = tabulate(this.selected$)
         this.selected$ = combineLatest([
             this.all$,
             settingsService.selectedFrequencyDocuments$
@@ -86,6 +83,9 @@ export class FrequencyDocumentsRepository {
             }),
             shareReplay(1)
         )
+
+        this.allTabulated$ = tabulate(this.all$.pipe(map(frequencyDocumentMap => Array.from(frequencyDocumentMap.values()))));
+        this.selectedTabulated$ = tabulate(this.selected$.pipe(map(frequencyDocumentMap => Array.from(frequencyDocumentMap.values()))))
     }
 }
 

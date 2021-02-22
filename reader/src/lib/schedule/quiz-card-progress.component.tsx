@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {QuizCard} from "../../components/quiz/quiz-card.interface";
 import {useObservableState} from "observable-hooks";
@@ -9,6 +9,7 @@ import {
     somewhatRecognizedCount,
     unrecognizedCount,
 } from "@shared/";
+import {Card, Paper} from "@material-ui/core";
 
 export const QuizCardProgress = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);
@@ -26,15 +27,20 @@ export const QuizCardProgress = ({quizCard}: { quizCard: QuizCard }) => {
 
 export const FrequencyDocumentInfo = ({frequencyDocument}: { frequencyDocument: FrequencyDocument }) => {
     const progress = useObservableState(frequencyDocument.progress$)
-    return <div>
+    return <Paper
+        className={frequencyDocumentProgress}
+        id={`${frequencyDocumentProgressPrefix}${frequencyDocument.frequencyDocument.name}`}>
         {
-            progress && <div
-                className={frequencyDocumentProgress}
-                id={`${frequencyDocumentProgressPrefix}${frequencyDocument.frequencyDocument.name}` }>
+            progress && <Fragment>
                 <div>{frequencyDocument.frequencyDocument.name}</div>
-                <div>Unrecognized: <span className={unrecognizedCount}>{progress.readabilityState.unrecognized.length}</span></div>
-                <div>Somewhat Recognized: <span className={somewhatRecognizedCount}>{progress.readabilityState.somewhatRecognized.length}</span></div>
-                <div>Recognized: <span className={recognizedCount}>{progress.readabilityState.fullRecognition.length}</span></div>
-            </div>}
-    </div>
+                <div>Unrecognized: <span
+                    className={unrecognizedCount}>{progress.readabilityState.unrecognized.length}</span></div>
+                <div>Somewhat Recognized: <span
+                    className={somewhatRecognizedCount}>{progress.readabilityState.somewhatRecognized.length}</span>
+                </div>
+                <div>Recognized: <span
+                    className={recognizedCount}>{progress.readabilityState.fullRecognition.length}</span></div>
+            </Fragment>
+        }
+    </Paper>
 }

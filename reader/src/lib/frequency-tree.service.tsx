@@ -35,7 +35,7 @@ export class FrequencyTreeService {
         */
         this.tree$ = combineLatest(
             [
-                frequencyDocumentsRepository.allTabulated$,
+                frequencyDocumentsRepository.selectedTabulated$,
                 settingsService.progressTreeRootId$,
                 vocabService.vocab$
             ]
