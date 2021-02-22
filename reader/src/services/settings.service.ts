@@ -92,7 +92,7 @@ export class SettingsService {
 
         this.selectedFrequencyDocuments$ = this.createSetting$<string[]>('selectedFrequencyDocuments', [], 'indexedDB')
 
-        this.progressTreeRootId$ = this.createSetting$<string>('progressTreeRoot', '', 'url')
+        this.progressTreeRootId$ = this.createSetting$<string>('progressTreeRoot', '', 'indexedDB')
 
         this.selectedVocabulary$ = this.createSetting$<string>('selectedVocabulary', '', 'indexedDB')
     }

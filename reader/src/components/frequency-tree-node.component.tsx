@@ -1,31 +1,36 @@
 import React, {useContext} from "react";
 import {FrequencyTree} from "../lib/learning-tree/frequency-tree";
-import {Card, Paper, Typography} from "@material-ui/core";
+import {Card, Paper, Typography, Button} from "@material-ui/core";
 import {FrequencyDocumentNodeArgs} from "../lib/frequency-tree.service";
-import { sum } from "lodash";
+import {sum} from "lodash";
 import {TabulatedFrequencyDocument} from "../lib/learning-tree/tabulated-frequency-document";
 import {ManagerContext} from "../App";
 import {useObservableState} from "observable-hooks";
 import {SerializedTabulation} from "@shared/*";
 
 export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
-    ({frequencyNode,  similarity}) => {
+    ({frequencyNode, similarity}) => {
         const value = frequencyNode.value as TabulatedFrequencyDocument;
         const m = useContext(ManagerContext);
         const vocab = useObservableState(m.vocabService.vocab$) || {wordCounts: {}};
-        return <Paper id={value.frequencyDocument.name} style={{margin: '24px'}}>
-            <Typography variant="h6"  style={{margin: '24px'}}>
+        return <Paper
+            id={value.frequencyDocument.name}
+            style={{margin: '24px'}}
+        >
+            <Button style={{margin: '24px'}}
+                    onClick={() => m.settingsService.progressTreeRootId$.next(value.frequencyDocument.id())}
+            >
                 {value.frequencyDocument.name}
-            </Typography>
+            </Button>
             <div style={{margin: '24px', display: 'flex', flexFlow: 'row wrap'}}>
                 {Object.entries(similarity?.unknownWords || {}).map(([word, count]) => <span
                     style={{margin: '8px'}}
                     key={word}>{word}: {count}
                 </span>)}
-{/*
+                {/*
                 {similarity && JSON.stringify(similarity.unknownWords, null, '\t')}
 */}
-{/*
+                {/*
                 {
                     sum(Object.values(similarity.unknownWords))
                 }

@@ -14,6 +14,7 @@ export class FrequencyDocumentsRepository {
     all$ = new BehaviorSubject<Map<string, FrequencyDocument>>(new Map());
     allTabulated$: Observable<TabulatedFrequencyDocument[]>
     selected$: Observable<Map<string, FrequencyDocument>>;
+    private selectedTabulated$: Observable<TabulatedFrequencyDocument>;
 
     constructor(
         {
@@ -49,7 +50,7 @@ export class FrequencyDocumentsRepository {
                     this.all$.next(mergeMaps(frequencyDocuments, this.all$.getValue()));
                 }
             );
-        this.allTabulated$ = this.all$
+        const tabulate = (all$1: Observable<Map<string, FrequencyDocument>>) => all$1
             .pipe(
                 switchMap(all =>
                     combineLatest([...all.values()]
@@ -65,7 +66,10 @@ export class FrequencyDocumentsRepository {
                         )
                     )
                 )
-            )
+            );
+
+        this.allTabulated$ = tabulate(this.all$);
+        this.selectedTabulated$ = tabulate(this.selected$)
         this.selected$ = combineLatest([
             this.all$,
             settingsService.selectedFrequencyDocuments$
