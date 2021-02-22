@@ -21,7 +21,7 @@ const ProgressTree = () => {
                 tree.value?.tabulation
             )}
         /> :
-        <Typography>No frequency tree enabled</Typography>
+        <Typography>Frequency tree not found</Typography>
 };
 
 export const FrequencyTreeMenuNode = (): TreeMenuNode => ({

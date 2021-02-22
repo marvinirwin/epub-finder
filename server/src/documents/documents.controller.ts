@@ -56,7 +56,7 @@ export class DocumentsController {
                 limits: {
                     files: 1,
                     fields: 1,
-                    fileSize: 1024 * 1024 * 3 // 3MB file size
+                    fileSize: 1024 * 1024 * 5 // 3MB file size
                 }
             }
         )
