@@ -1,6 +1,6 @@
 import {combineLatest, from, Observable} from "rxjs";
 import {DocumentReadabilityProgress} from "./document-readability-progress";
-import {LtDocument} from "@shared/";
+import {LtDocument, SerializedTabulation} from "@shared/";
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {TrieObservable} from "./manager/open-documents.service";
@@ -9,23 +9,27 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 
 export class FrequencyDocument {
     progress$: Observable<DocumentReadabilityProgress>;
+    tabulation$: Observable<SerializedTabulation>;
 
     constructor(
         public frequencyDocument: LtDocument,
         private scheduleRows$: Observable<Map<string, ScheduleRow<NormalizedScheduleRowData>>>,
         private wordTrie$: TrieObservable
     ) {
+        this.tabulation$ = wordTrie$.pipe(
+            switchMap(wordTrie => TabulateDocuments(
+                {trieWords: wordTrie.t.getWords(), d: frequencyDocument.d}
+            )),
+            shareReplay(1)
+        );
         this.progress$ = combineLatest([
             scheduleRows$,
-            wordTrie$.pipe(
-                switchMap(wordTrie => TabulateDocuments(
-                    {trieWords: wordTrie.t.getWords(), d: frequencyDocument.d}
-                )),
-                shareReplay(1)
-            ),
+            this.tabulation$,
         ]).pipe(
             map(([scheduleRows, tabulatedDocument]) => {
-                return new DocumentReadabilityProgress({scheduleRows, tabulatedDocument})
+                return new DocumentReadabilityProgress(
+                    {scheduleRows, tabulatedDocument}
+                    )
             }),
             shareReplay(1)
         )

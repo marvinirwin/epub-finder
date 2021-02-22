@@ -5,12 +5,10 @@ import {AccountCircle} from "@material-ui/icons";
 import {AUTH} from "@shared/";
 
 
-export function SignInWithNode(profile: Profile | undefined): TreeMenuNode {
-    return {
-        name: AUTH,
-        label: 'Sign In With',
-        action: () => window.location.href = `${process.env.PUBLIC_URL}/auth/keycloak`,
-        hidden: !!profile?.email,
-        LeftIcon: () => <AccountCircle/>
-    };
-}
+export const SignInWithNode = (profile: Profile | undefined): TreeMenuNode => ({
+    name: AUTH,
+    label: 'Sign In With',
+    action: () => window.location.href = `${process.env.PUBLIC_URL}/auth/keycloak`,
+    hidden: !!profile?.email,
+    LeftIcon: () => <AccountCircle/>
+});

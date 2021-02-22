@@ -8,9 +8,11 @@ import {TrieService} from "./manager/trie.service";
 import {ScheduleRowsService} from "./manager/schedule-rows.service";
 import {map, shareReplay} from "rxjs/operators";
 import {observableLastValue, SettingsService} from "../services/settings.service";
+import {TabulatedFrequencyDocument} from "./learning-tree/learning-tree";
 
 export class FrequencyDocumentsRepository {
     all$ = new BehaviorSubject<Map<string, FrequencyDocument>>(new Map());
+    allTabulated$: Observable<Map<string, TabulatedFrequencyDocument>>
     selected$: Observable<Map<string, FrequencyDocument>>;
 
     constructor(

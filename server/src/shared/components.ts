@@ -6,7 +6,7 @@ export const RECOGNIZE_SPEECH = 'recognizeSpeech';
 export const WATCH_PRONUNCIATION = 'watchPronunciation';
 export const UPLOAD_LEARNING_MATERIAL = 'uploadLearningMaterial';
 export const LIBRARY = 'library';
-export const GRAPH = 'graph';
+export const PROGRESS_TREE = 'graph';
 export const SETTINGS = 'settings';
 export const TESTING_UTILS = 'manual-speech-recognition';
 export const QUIZ_NODE = 'quiz-carousel';
@@ -25,4 +25,4 @@ export type PAGES =
     typeof TESTING_UTILS |
     typeof QUIZ_NODE |
     typeof QUIZ_SCHEDULE |
-    typeof GRAPH;
+    typeof PROGRESS_TREE;

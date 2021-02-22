@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import {
     documentSelectionRow,
-    frequencyDocumentList, GRAPH,
+    frequencyDocumentList, PROGRESS_TREE,
     LIBRARY,
     PAGES,
     QUIZ_NODE,
@@ -112,6 +112,6 @@ export class DirectoryPom {
 
     static goToGraph() {
         DirectoryPom.CloseAllDialogs()
-        cy.get(`#${GRAPH}`).click()
+        cy.get(`#${PROGRESS_TREE}`).click()
     }
 }
