@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const SpeechPractice = () => {
     const m = useContext(ManagerContext);
     const classes = useStyles();
-    const isRecording = useObservableState(m.audioManager.audioRecorder.isRecording$);
+    const isRecording = useObservableState(m.audioRecordingService.audioRecorder.isRecording$);
     const recordingClassName = isRecording ? 'recording' : '';
     const [micRef, setMicRef] = useState<SVGSVGElement | null>()
     useEffect(() => {
@@ -32,7 +32,7 @@ export const SpeechPractice = () => {
     }, [micRef]);
 
     const record = useCallback(() => {
-        m.audioManager.audioRecorder.recordRequest$.next(new RecordRequest(``));
+        m.audioRecordingService.audioRecorder.recordRequest$.next(new RecordRequest(``));
     }, [])
 
     useEffect(() => {

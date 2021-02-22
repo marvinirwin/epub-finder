@@ -6,13 +6,13 @@ import {firstMap, mapFromId, mapMap, mergeMaps} from "./map.module";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
 import {ScheduleRowsService} from "./manager/schedule-rows.service";
-import {map, shareReplay} from "rxjs/operators";
+import {map, shareReplay, switchMap} from "rxjs/operators";
 import {observableLastValue, SettingsService} from "../services/settings.service";
 import {TabulatedFrequencyDocument} from "./learning-tree/learning-tree";
 
 export class FrequencyDocumentsRepository {
     all$ = new BehaviorSubject<Map<string, FrequencyDocument>>(new Map());
-    allTabulated$: Observable<Map<string, TabulatedFrequencyDocument>>
+    allTabulated$: Observable<TabulatedFrequencyDocument[]>
     selected$: Observable<Map<string, FrequencyDocument>>;
 
     constructor(
@@ -49,6 +49,23 @@ export class FrequencyDocumentsRepository {
                     this.all$.next(mergeMaps(frequencyDocuments, this.all$.getValue()));
                 }
             );
+        this.allTabulated$ = this.all$
+            .pipe(
+                switchMap(all =>
+                    combineLatest([...all.values()]
+                        .map(d => d.tabulation$
+                            .pipe(
+                                map(tabulation => (
+                                    new TabulatedFrequencyDocument(
+                                        d.frequencyDocument,
+                                        tabulation
+                                    )
+                                ))
+                            )
+                        )
+                    )
+                )
+            )
         this.selected$ = combineLatest([
             this.all$,
             settingsService.selectedFrequencyDocuments$

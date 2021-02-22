@@ -33,7 +33,7 @@ export class CliService {
             await this.documentSimilarityService.compareDocumentsByName(
                 doc1Name,
                 doc2Name,
-                await this.chineseVocabService.vocab
+                await ChineseVocabService.vocab()
             )
         )
     }

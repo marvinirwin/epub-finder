@@ -25,7 +25,7 @@ export const ProgressItemComponent: React.FC<{progressItem: ProgressItem}> = ({p
 
 export const LoadingBackdrop = () => {
     const m = useContext(ManagerContext);
-    const thingsInProgress =  useObservableState(m.progressItemsService.progressItems$);
+    const thingsInProgress =  useObservableState(m.progressItemService.progressItems$);
     const classes = useStyles();
     return <Backdrop className={classes.backdrop} open={!!thingsInProgress?.size}>
         <CircularProgress id={'global-loading-spinner'} color="inherit" />

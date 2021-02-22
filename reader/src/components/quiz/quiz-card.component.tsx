@@ -17,7 +17,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const word = useObservableState(quizCard.word$);
     const m = useContext(ManagerContext);
     useSubscription(
-        m.audioManager.audioRecorder.currentRecognizedText$,
+        m.audioRecordingService.audioRecorder.currentRecognizedText$,
         async recognizedText => {
             if (!word) {
                 return;

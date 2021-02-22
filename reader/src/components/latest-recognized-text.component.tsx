@@ -5,7 +5,7 @@ import {Typography} from "@material-ui/core";
 
 export const LatestRecognizedText = () => {
     const m = useContext(ManagerContext)
-    const recorder = m.audioManager.audioRecorder;
+    const recorder = m.audioRecordingService.audioRecorder;
 
     const recognizedText = useObservableState(recorder.currentRecognizedText$, '');
     const currentRomanized = useObservableState(m.speechPracticeService.romanization$);

@@ -15,7 +15,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
         name: RECOGNIZE_SPEECH,
         LeftIcon: () => {
             const m = useContext(ManagerContext);
-            const isRecording = useObservableState(m.audioManager.audioRecorder.isRecording$);
+            const isRecording = useObservableState(m.audioRecordingService.audioRecorder.isRecording$);
             return <RecordVoiceOver color={isRecording ? 'primary' : 'disabled'}/>;
         },
         label: 'Speak',
@@ -31,7 +31,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
                     // Add a highlight for each of these characters
                     m.highlighter.createdCards$.next(word.split(' '));
                 })
-                m.audioManager.audioRecorder.recordRequest$.next(recordRequest)
+                m.audioRecordingService.audioRecorder.recordRequest$.next(recordRequest)
             },
 
         props: {

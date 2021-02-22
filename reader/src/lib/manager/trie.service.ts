@@ -11,19 +11,19 @@ export class TrieService {
 
     constructor(
         {
-            cardsService,
+            cardsRepository,
             pronunciationProgressService,
             wordRecognitionProgressService
         }: {
-            cardsService: CardsRepository,
+            cardsRepository: CardsRepository,
             pronunciationProgressService: PronunciationProgressRepository,
             wordRecognitionProgressService: WordRecognitionProgressRepository
         }
     ) {
         const t = new TrieWrapper(trie([]));
         this.trie$ = t.changeSignal$;
-        cardsService.newWords$.subscribe(words => t.addWords(...words));
-        cardsService.deleteWords.subscribe(words => t.removeWords(...words));
+        cardsRepository.newWords$.subscribe(words => t.addWords(...words));
+        cardsRepository.deleteWords.subscribe(words => t.removeWords(...words));
         [
             pronunciationProgressService,
             wordRecognitionProgressService

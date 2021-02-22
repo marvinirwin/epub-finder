@@ -10,7 +10,7 @@ export const SpeechRecognitionSnackbar = () => {
     const m = useContext(ManagerContext);
     const [latestRecognizedText, setLatestRecognizedText,] = useState<string>('')
     useSubscription(
-        m.audioManager.audioRecorder.currentRecognizedText$,
+        m.audioRecordingService.audioRecorder.currentRecognizedText$,
         v => v && setLatestRecognizedText(v)
     )
 
