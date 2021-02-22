@@ -16,11 +16,12 @@ export function createPopperElement(document1: XMLDocument) {
 }
 
 export class AtomizedDocument {
-    public static getPopperId(popperId: string) {
+    document: XMLDocument;
+    static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
 
-    public static atomizeDocument(xmlsource: string): AtomizedDocument {
+    static atomizeDocument(xmlsource: string): AtomizedDocument {
         const doc = new AtomizedDocument(AtomizedDocument.getDomParser()
             .parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
@@ -29,7 +30,7 @@ export class AtomizedDocument {
         return doc;
     }
 
-    public static find(document: XMLDocument, cb: (n: Node) => boolean): Node | undefined {
+    static find(document: XMLDocument, cb: (n: Node) => boolean): Node | undefined {
         function walk(node: Node, cb: (n: Node) => any): Node | undefined {
             if (cb(node)) {
                 return node;
@@ -65,7 +66,7 @@ export class AtomizedDocument {
         });
     }
 
-    public static fromAtomizedString(atomizedString: string) {
+    static fromAtomizedString(atomizedString: string) {
         try {
             return new AtomizedDocument(
                 AtomizedDocument.getDomParser().parseFromString(atomizedString)
@@ -75,7 +76,7 @@ export class AtomizedDocument {
         }
     }
 
-    public static getDomParser() {
+    static getDomParser() {
         return new DOMParser({
             errorHandler: {
                 warning: w => {
@@ -89,17 +90,18 @@ export class AtomizedDocument {
         });
     }
 
-    private static replaceHrefOrSource(el: Element, qualifiedName: string) {
+    static replaceHrefOrSource(el: Element, qualifiedName: string) {
         const currentSource = el.getAttribute(qualifiedName);
         if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(qualifiedName, `${process.env.PUBLIC_URL}/${currentSource}`);
         }
     }
 
-    constructor(public document: XMLDocument) {
+    constructor(document: XMLDocument) {
+        this.document = document;
     }
 
-    private getTextElements(doc: Document) {
+    getTextElements(doc: Document) {
         const leaves: Element[] = [];
 
         function walk(node: Node, cb: (n: Node) => any) {
@@ -125,17 +127,18 @@ export class AtomizedDocument {
         }
 
         walk(doc, (node: Node) => {
-            const text = (node.textContent as string).trim();
+            const text = (node.textContent).trim();
             if (text) {
-                leaves.push(node as Element);
+                // @ts-ignore
+                leaves.push(node);
             }
         })
         return leaves;
     }
 
-    private makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
+    makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
         const document1 = this.document;
-        const nodeValue = textNode.nodeValue as string;
+        const nodeValue = textNode.nodeValue;
         const newParent = this.replaceTextNodeWithSubTextNode(
             textNode,
             nodeValue
@@ -147,13 +150,14 @@ export class AtomizedDocument {
         const {popperEl, popperId} = createPopperElement(document1);
         newParent.setAttribute('popper-id', popperId);
         newParent.setAttribute("class", annotatedAndTranslated);
-        (this.findPopperContainer() as Node).insertBefore(popperEl, popperEl.firstChild);
-        return newParent as unknown as XMLDocumentNode;
+        (this.findPopperContainer()).insertBefore(popperEl, popperEl.firstChild);
+        // @ts-ignore
+        return newParent;
     }
 
-    private replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
+    replaceTextNodeWithSubTextNode(textNode: Element, newSubStrings: string[], newTagType: string) {
         const indexOfMe = getIndexOfEl(textNode);
-        (textNode.parentNode as Element).removeChild(textNode);
+        (textNode.parentNode).removeChild(textNode);
         const newParent = this.document.createElement('span');
         newSubStrings.forEach((string, index) => {
             // I'll probably need to do labelling later so the data can be rehydrated
@@ -164,7 +168,7 @@ export class AtomizedDocument {
             mark.insertBefore(textNode, null);
             newParent.insertBefore(mark, null)
         })
-        const oldParent = textNode.parentNode as Element;
+        const oldParent = textNode.parentNode;
         oldParent.insertBefore(
             newParent,
             oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null
@@ -172,12 +176,12 @@ export class AtomizedDocument {
         return newParent;
     }
 
-    private replaceDocumentSources(doc: Document) {
+    replaceDocumentSources(doc: Document) {
         const walk = (node: Node) => {
             let child, next;
             switch (node.nodeType) {
                 case 1: // Element node
-                    const el = node as Element;
+                    const el = node;
                     AtomizedDocument.replaceHrefOrSource(el, "src");
                     if (el.localName === "link") {
                         AtomizedDocument.replaceHrefOrSource(el, "href");
@@ -196,19 +200,20 @@ export class AtomizedDocument {
         return doc;
     }
 
-    private createMarksUnderLeaves(textNodes: Element[]) {
+    createMarksUnderLeaves(textNodes: Element[]) {
         for (let i = 0; i < textNodes.length; i++) {
             this.makeTextNodeRehydratable(textNodes[i]);
         }
     }
 
-    public segments(): Segment[] {
+    segments(): Segment[] {
         try {
             const segmentElements = this.document.getElementsByClassName(annotatedAndTranslated)
             const atomized = new Array(segmentElements.length);
             for (let i = 0; i < segmentElements.length; i++) {
                 const segmentElement = segmentElements[i];
-                atomized[i] = new Segment(segmentElement as unknown as XMLDocumentNode);
+                // @ts-ignore
+                atomized[i] = new Segment(segmentElement);
             }
             return atomized;
         } catch (e) {
@@ -217,24 +222,24 @@ export class AtomizedDocument {
         }
     }
 
-    public headInnerHTML() {
+    headInnerHTML() {
         const head = this.findHead();
-        return (new XMLSerializer()).serializeToString(head as Node)
+        return (new XMLSerializer()).serializeToString(head)
     }
 
-    private findHead() {
+    findHead() {
         return AtomizedDocument.find(this.document, n => {
             // @ts-ignore
             return n.tagName === 'head';
         });
     }
 
-    public bodyInnerHTML() {
+    bodyInnerHTML() {
         const body = this.findBody();
-        return (new XMLSerializer()).serializeToString(body as Node)
+        return (new XMLSerializer()).serializeToString(body)
     }
 
-    private findBody(): Element {
+    findBody(): Element {
         // @ts-ignore
         return AtomizedDocument.find(this.document, n => {
             // @ts-ignore
@@ -242,7 +247,7 @@ export class AtomizedDocument {
         });
     }
 
-    private ensurePopperContainer() {
+    ensurePopperContainer() {
         if (!this.findPopperContainer()) {
             const popperEl = this.document.createElement('div');
             popperEl.setAttribute("class", "popper-container");
@@ -259,7 +264,7 @@ export class AtomizedDocument {
         });
     }
 
-    private findPopperContainer() {
+    findPopperContainer() {
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
@@ -269,7 +274,7 @@ export class AtomizedDocument {
     }
 
 
-    public toString() {
+    toString() {
         return new XMLSerializer().serializeToString(this.document);
     }
 }

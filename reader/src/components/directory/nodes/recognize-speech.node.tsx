@@ -1,7 +1,7 @@
 import {SpeakMode} from "../modes/speak-mode.component";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import {Manager} from "../../../lib/Manager";
-import {RecordRequest} from "../../../../../server/src/shared/RecordRequest";
+import {RecordRequest} from "../../../lib/Util/RecordRequest";
 import {removePunctuation} from "../../../lib/highlighting/temporary-highlight.service";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../../App";

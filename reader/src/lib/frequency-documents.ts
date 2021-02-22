@@ -26,10 +26,16 @@ export class FrequencyDocument {
             scheduleRows$,
             this.tabulation$,
         ]).pipe(
-            map(([scheduleRows, tabulatedDocument]) => {
+            map(([
+                     scheduleRows,
+                     tabulatedDocument
+                 ]) => {
                 return new DocumentReadabilityProgress(
-                    {scheduleRows, tabulatedDocument}
-                    )
+                    {
+                        scheduleRows,
+                        tabulatedDocument
+                    }
+                )
             }),
             shareReplay(1)
         )

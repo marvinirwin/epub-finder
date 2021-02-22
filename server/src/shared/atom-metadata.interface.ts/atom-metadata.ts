@@ -6,13 +6,15 @@ import CardsRepository from "../../../../reader/src/lib/manager/cards.repository
 import {ICard} from "../ICard";
 
 export class AtomMetadata {
-    constructor(public m: {
+    m: { words: IPositionedWord[]; char: string; element: XMLDocumentNode; i: number; parent: Segment };
+    constructor(m: {
         words: IPositionedWord[];
         char: string;
         element: XMLDocumentNode;
         i: number;
         parent: Segment;
     }) {
+        this.m = m;
 
     }
 
@@ -36,19 +38,19 @@ export class AtomMetadata {
     }
 
 
-    public get words() : IPositionedWord[] {
+    get words() : IPositionedWord[] {
         return this.m.words
     };
-    public get char(): string {
+    get char(): string {
         return this.m.char
     };
-    public get element(): XMLDocumentNode {
+    get element(): XMLDocumentNode {
         return this.m.element
     };
-    public get i(): number {
+    get i(): number {
         return this.m.i
     };
-    public get parent(): Segment {
+    get parent(): Segment {
         return this.m.parent;
     };
 }

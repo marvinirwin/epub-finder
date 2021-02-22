@@ -24,7 +24,7 @@ import EditingCardManager from "./manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./manager/manager-connections/Card-Page-EditingCard-CardDB-Audio";
 import {ProgressManager} from "./manager/ProgressManager";
 import {AppContext} from "./app-context/AppContext";
-import {RecordRequest} from "../../../server/src/shared/RecordRequest";
+import {RecordRequest} from "./Util/RecordRequest";
 import {resolveICardForWords} from "./pipes/ResultICardForWords";
 import {DocumentWordCount} from "../../../server/src/shared/DocumentWordCount";
 import {Highlighter} from "./highlighting/Highlighter";
@@ -207,7 +207,6 @@ export class Manager {
             activeSentenceService: this.activeSentenceService,
             settings$: this.settingsService,
         });
-        this.progressTreeService = new FrequencyTreeService(this);
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardsRepository = new CardsRepository({databaseService: db});
         this.libraryService = new LibraryService(this);
@@ -455,7 +454,8 @@ export class Manager {
             modesService: this.modesService
         });
 
-        this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this)
+        this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this);
+        this.progressTreeService = new FrequencyTreeService(this);
         this.quizHighlightService = new QuizHighlightService( this )
 
         this.hotkeyEvents.startListeners();

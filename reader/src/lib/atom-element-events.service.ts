@@ -9,10 +9,8 @@ import {BrowserInputs} from "./hotkeys/BrowserInputs";
 import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./highlighting/Highlighter";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
-import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/*";
 import CardsRepository from "./manager/cards.repository";
-import {AtomMetadata} from "../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
-import {ICard} from "../../../server/src/shared/ICard";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
 import {MousedOverWordHighlightService} from "./highlighting/moused-over-word-highlight.service";
 

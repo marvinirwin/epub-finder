@@ -1,13 +1,10 @@
 import {combineLatest, Observable} from "rxjs";
 import {ds_Tree} from "../services/tree.service";
-import {SerializedTabulation} from "@shared/*";
 import React from "react";
 import {SimilarityResults} from "../../../server/src/shared/compre-similarity-result";
 import {SettingsService} from "../services/settings.service";
 import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
 import {map} from "rxjs/operators";
-import {memoize} from 'lodash';
-import {computeSimilarityTabulation} from "../../../server/src/shared/similarity-result.interface";
 import {LearningTree, TabulatedFrequencyDocument} from "./learning-tree/learning-tree";
 
 

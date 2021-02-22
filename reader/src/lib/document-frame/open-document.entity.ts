@@ -44,7 +44,6 @@ export class OpenDocument {
             map(([segments, trie]) => {
                     const tabulatedSentences = mergeTabulations(Segment.tabulate(
                         trie.t,
-                        trie.uniqueLengths(),
                         segments,
                     ));
 

@@ -16,6 +16,7 @@ export const computeElementIndexMap = (d: XMLDocument) => {
             childIndex++;
         }
     }
-    walk(d.documentElement as unknown as XMLDocumentNode);
+    // @ts-ignore
+    walk(d.documentElement);
     return m;
 }

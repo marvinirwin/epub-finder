@@ -6,30 +6,32 @@ import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {AtomizedDocument} from "./atomized-document";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
-import {ReplaySubject} from "rxjs";
 import {TabulatedSentences} from "./tabulated-documents.interface";
 import {safePushSet} from "../safe-push";
 
 export class Segment {
-    private _translation: string | undefined;
-    public _popperInstance: any;
+    _translation: string | undefined;
+    _popperInstance: any;
     translatableText: string;
     popperElement: XMLDocumentNode;
     translated = false;
+    element: XMLDocumentNode;
 
     constructor(
-        public element: XMLDocumentNode
+        element: XMLDocumentNode
     ) {
+        this.element = element;
         this.translatableText = this.element.textContent || '';
-        this.popperElement = (element.ownerDocument as XMLDocument)
+        // @ts-ignore
+        this.popperElement = element.ownerDocument
             .getElementById(
                 AtomizedDocument.getPopperId(
-                    this.element.getAttribute('popper-id') as string
+                    this.element.getAttribute('popper-id')
                 )
-            ) as unknown as XMLDocumentNode;
+            );
     }
 
-    public static tabulate(
+    static tabulate(
         t: ITrie,
         segments: Segment[],
     ): TabulatedSentences {
@@ -37,7 +39,7 @@ export class Segment {
         const characterElements = flatten(segments.map(segment => {
             segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
-        })).filter(n => (n.textContent as string).trim());
+        })).filter(n => (n.textContent).trim());
         const uniqueLengths = uniq(t.getWords().map(word => word.length).concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
@@ -46,7 +48,7 @@ export class Segment {
         let wordsInProgress: IWordInProgress[] = [];
         const textContent = characterElements.map(node => node.textContent).join('');
         for (let i = 0; i < characterElements.length; i++) {
-            const currentMark = characterElements[i] as unknown as XMLDocumentNode;
+            const currentMark = characterElements[i];
             wordsInProgress = wordsInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
@@ -91,11 +93,11 @@ export class Segment {
             });
 
             const atomMetadata = new AtomMetadata({
-                char: (textContent as string)[i],
+                char: (textContent)[i],
                 words,
                 element: currentMark,
                 i,
-                parent: elementSegmentMap.get(currentMark) as Segment
+                parent: elementSegmentMap.get(currentMark)
             });
             atomMetadatas.set(currentMark, atomMetadata);
             atomMetadata.words.forEach(word => {
@@ -116,38 +118,40 @@ export class Segment {
             wordSegmentMap: segmentDictionary,
             segments,
             atomMetadatas
-        } as TabulatedSentences;
+        };
     }
 
     getSentenceHTMLElement(): HTMLElement {
-        return this.element as unknown as HTMLElement;
+        // @ts-ignore
+        return this.element;
     }
 
     getPopperHTMLElement(): HTMLElement {
-        return this.popperElement as unknown as HTMLElement;
+        // @ts-ignore
+        return this.popperElement;
     }
 
     async getTranslation(): Promise<string> {
         if (this.translated) {
-            return this._translation as string;
+            return this._translation;
         } else {
             this.translated = true;
             return this.translatableText;
         }
     }
 
-    public destroy() {
+    destroy() {
         this.element.parentNode.removeChild(this.element);
         this.popperElement.parentNode.removeChild(this.popperElement);
     }
 
-    public showPopper() {
+    showPopper() {
         this.getPopperHTMLElement().setAttribute('data-show', '');
     }
 
-    public hidePopper() {
-        this._popperInstance?.destroy()
-        this.getPopperHTMLElement().removeAttribute('data-show');
+    hidePopper() {
+        const v = this._popperInstance?.destroy()
+        const t = this.getPopperHTMLElement().removeAttribute('data-show');
     }
 
     get children(): XMLDocumentNode[] {

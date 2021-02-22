@@ -1,9 +1,8 @@
 import {AppBar, createStyles, fade, IconButton, TextField, Theme, Toolbar, Typography} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
-import Dialog from "@material-ui/core/Dialog";
 import React from "react";
-import {ImageSearchRequest} from "../server/src/shared/IImageRequest";
+import {ImageSearchRequest} from "@shared/*";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>

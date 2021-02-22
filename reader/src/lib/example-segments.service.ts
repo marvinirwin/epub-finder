@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/*";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 
 export class ExampleSegmentsService {

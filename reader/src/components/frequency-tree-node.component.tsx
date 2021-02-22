@@ -4,7 +4,7 @@ import {Typography} from "@material-ui/core";
 import {FrequencyDocumentNodeArgs} from "../lib/frequency-tree.service";
 
 export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
-    ({frequencyNode, parent, similarity}) => {
+    ({frequencyNode,  similarity}) => {
         const value = frequencyNode.value as TabulatedFrequencyDocument;
         return <div id={value.frequencyDocument.name}>
             <Typography>
@@ -17,7 +17,6 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
                 {Object.values(frequencyNode.children || {}).map(child =>
                     <FrequencyTreeNode
                         frequencyNode={child}
-                        parent={frequencyNode}
                         similarity={LearningTree.memoizedSimilarityTabulation(
                             frequencyNode.value?.tabulation,
                             child.value?.tabulation

@@ -1,6 +1,9 @@
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
-import {TabulatedDocuments} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+import {
+    SerializedTabulation,
+    TabulatedDocuments
+} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 import { sum } from "lodash";
 
 export interface WordReadabilityRecord {
@@ -24,7 +27,7 @@ export class DocumentReadabilityProgress {
             tabulatedDocument,
         }: {
             scheduleRows: Map<string, ScheduleRow<NormalizedScheduleRowData>>,
-            tabulatedDocument: TabulatedDocuments
+            tabulatedDocument: SerializedTabulation
         }
     ) {
         // Now take any word which was recognized twice in a row and mark it as complete

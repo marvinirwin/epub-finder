@@ -2,7 +2,7 @@ import {ReplaySubject} from "rxjs";
 
 
 export class RecordRequest {
-    public sentence: Promise<string>;
+     sentence: Promise<string>;
     public resolveSentence!: ((value: string) => void);
     public rejectSentence!: ((reason?: any) => void);
     public recording$ = new ReplaySubject<boolean>(1);
