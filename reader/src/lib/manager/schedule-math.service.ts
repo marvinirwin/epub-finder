@@ -2,6 +2,7 @@ import {ScheduleRow} from "../schedule/ScheduleRow";
 import {orderBy} from "lodash";
 import {NormalizedScheduleRowData} from "../schedule/schedule-row.interface";
 import {getSortValue} from "./sort-value.interface";
+import {NormalizedValue} from "./normalized-value.interface";
 
 export class ScheduleMathService {
 
@@ -10,9 +11,9 @@ export class ScheduleMathService {
         dateWeight: number,
         countWeight: number,
     ): ScheduleRow<NormalizedScheduleRowData>[] {
-        const scheduleRowNormalizedDateMap = new Map<ScheduleRow, number>(ScheduleMathService.normalizeScheduleRows(
+        const scheduleRowNormalizedDateMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
-            row => row.dueDate().getTime() * -1
+            row => row.dueDate().getTime()
         ).map(([n, row]) => {
             return [
                 row,
@@ -20,7 +21,7 @@ export class ScheduleMathService {
             ];
         }));
 
-        const scheduleRowNormalizedCountMap = new Map<ScheduleRow, number>(ScheduleMathService.normalizeScheduleRows(
+        const scheduleRowNormalizedCountMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
             row => row.count()
         ).map(([n, row]) => [
@@ -29,16 +30,18 @@ export class ScheduleMathService {
         ]));
 
         const sortableScheduleRows: NormalizedScheduleRowData[] = scheduleRows.map(scheduleRow => {
-            const normalCount = scheduleRowNormalizedCountMap.get(scheduleRow) as number;
-            const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as number;
-            const countSortValue = getSortValue<number>(normalCount, countWeight, scheduleRow.count());
-            const dueDateSortValue = getSortValue<Date>(normalDate, dateWeight, scheduleRow.dueDate());
+            const normalCount = scheduleRowNormalizedCountMap.get(scheduleRow) as NormalizedValue;
+            const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as NormalizedValue;
+            const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, scheduleRow.count());
+            const dueDateSortValue = getSortValue<Date>(normalDate.normalizedValue, dateWeight, scheduleRow.dueDate());
             return {
                 ...scheduleRow.d,
                 count: countSortValue,
                 dueDate: dueDateSortValue,
                 finalSortValue: ((countSortValue.weightedInverseLogNormalValue * (scheduleRow.d.word.length)) +
-                    dueDateSortValue.weightedInverseLogNormalValue)
+                    dueDateSortValue.weightedInverseLogNormalValue),
+                normalizedCount: normalCount,
+                normalizedDate: normalDate
             } as NormalizedScheduleRowData;
         })
 
@@ -51,7 +54,7 @@ export class ScheduleMathService {
     private static normalizeScheduleRows<T>(
         scheduleRows: T[],
         valueFunction: (r: T) => number
-    ): [number, T][] {
+    ): [NormalizedValue, T][] {
         let maxValue = Number.MIN_SAFE_INTEGER;
         let minValue = Number.MAX_SAFE_INTEGER;
         scheduleRows.forEach(row => {
@@ -65,14 +68,18 @@ export class ScheduleMathService {
         });
         return scheduleRows.map(row => {
             return [
-                ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
+                {
+                    normalizedValue: ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
+                    value: valueFunction(row),
+                    min: minValue,
+                    max: maxValue,
+                },
                 row
             ];
         })
     }
 
     private static normalize(val: number, min: number, max: number) {
-        const v = (val - min) / (max - min);
-        return v
+        return (val - min) / (max - min)
     }
 }
