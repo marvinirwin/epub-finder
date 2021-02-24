@@ -31,7 +31,7 @@ export const QuizCardTableComponent = () => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {scheduleRows.filter(r => r.count() > 0).slice(0, 100).map(row => {
+                {scheduleRows.slice(0, 100).map(row => {
                     let className;
                     if (row.isNew()) {
                         className = 'new';
@@ -51,12 +51,14 @@ export const QuizCardTableComponent = () => {
                             >
                                 <Typography variant={'h6'} >{row.d.word} </Typography>
                             </TableCell>
+{/*
                             <TableCell>
                                 Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}
                                 {JSON.stringify(row.d.normalizedDate, null, '\t')}
                             </TableCell>
+*/}
                             <TableCell>
-                                {row.dueIn()}
+                                {`${row.dueIn()} ${+row.dueDate() < 0 ? ' ago' : ''}`}
                             </TableCell>
                             <TableCell
                                 className={quizCardTableRowRecognitions}
@@ -75,7 +77,7 @@ export const QuizCardTableComponent = () => {
                                 className={quizCardTableRowLastAnswer}
                             >{
                                 lastN(1)(row.d.pronunciationRecords)
-                                    .map(r => `${r.success ? 'Correct' : 'Incorrect'}`)
+                                    .map(r => `${r.success ? 'Correct' : ''}`)
                                     .join(',')
                             }</TableCell>
                         </TableRow>
