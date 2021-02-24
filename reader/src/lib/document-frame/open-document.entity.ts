@@ -63,9 +63,10 @@ export class OpenDocument {
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
-        const sentences = printExecTime("Rehydration", () => {
-            return rehydratePage(body.ownerDocument as HTMLDocument);
-        });
+        const sentences = rehydratePage(body.ownerDocument as HTMLDocument);
+        /*printExecTime("Rehydration", () => {
+            return
+        });*/
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSegments$.next(sentences);
     }

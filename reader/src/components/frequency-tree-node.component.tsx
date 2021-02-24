@@ -2,7 +2,6 @@ import React, {useContext} from "react";
 import {FrequencyTree} from "../lib/learning-tree/frequency-tree";
 import {Card, Paper, Typography, Button} from "@material-ui/core";
 import {FrequencyDocumentNodeArgs} from "../lib/frequency-tree.service";
-import {sum} from "lodash";
 import {TabulatedFrequencyDocument} from "../lib/learning-tree/tabulated-frequency-document";
 import {ManagerContext} from "../App";
 import {useObservableState} from "observable-hooks";
@@ -39,6 +38,7 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '24px'}}>
                 {Object.values(frequencyNode.children || {}).map(child =>
                     <FrequencyTreeNode
+                        key={Math.random()}
                         frequencyNode={child}
                         similarity={FrequencyTree.memoizedSimilarityTabulation(
                             frequencyNode.value?.tabulation as SerializedTabulation,

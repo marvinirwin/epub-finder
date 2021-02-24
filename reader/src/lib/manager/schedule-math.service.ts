@@ -47,7 +47,7 @@ export class ScheduleMathService {
 
         return orderBy(
             sortableScheduleRows.map(r => new ScheduleRow<NormalizedScheduleRowData>(r)),
-                r => r.d.finalSortValue,
+            r => r.d.finalSortValue,
             'desc')
     }
 

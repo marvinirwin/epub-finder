@@ -39,7 +39,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
     );
 
     // @ts-ignore
-    const box = useResizeObserver(pronunciationSectionsContainer)
+    const box = useResizeObserver(pronunciationSectionsContainer, 500)
     const sectionWidth = box?.width;
     const sectionLengthMs = sectionWidth ? sectionWidth * 5 : undefined;
     const chunkedCharacterTimings = useChunkedCharacterTimings(

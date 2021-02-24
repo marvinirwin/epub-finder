@@ -30,7 +30,7 @@ export const ExpandableContainer: React.FC<{ shouldShow: boolean, hideDelay?: nu
     const ref = useRef<HTMLElement>();
     const [styles, setStyles] = useState({});
     // @ts-ignore
-    const DOMRect = useResizeObserver(ref);
+    const DOMRect = useResizeObserver(ref, 500);
 
     const [isCleared, clearTimeoutRef] = useConditionalTimeout(() => {
         setStyles({
