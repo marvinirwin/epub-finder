@@ -9,7 +9,6 @@ export function QuizCarouselNode(): TreeMenuNode {
     return {
         name: QUIZ_NODE,
         label: 'Quiz',
-        moveDirectory: true,
         LeftIcon: () => <AmpStories/>,
         Component: () => <QuizCardCarousel/>
     };

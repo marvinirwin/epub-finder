@@ -2,11 +2,9 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
-import {InterpolateExampleSentencesService} from "../../components/example-sentences/interpolate-example-sentences.service";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
-import {uniq} from "lodash";
 import {TabulateDocumentDto} from "./tabulate-document.dto";
-import {tabulatedSentenceToTabulatedDocuments} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+import {tabulatedSentenceToTabulatedDocuments} from "@shared/";
 import trie from "trie-prefix-tree";
 
 // @ts-ignore
@@ -15,15 +13,14 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {trieWords, d}: TabulateDocumentDto = ev.data;
-    const t = trie(trieWords)
-    const response = await fetch(`${process.env.PUBLIC_URL}/documents/${d.filename}`);
+    const {trieWords, d: {filename, name}}: TabulateDocumentDto = ev.data;
+    const response = await fetch(`${process.env.PUBLIC_URL}/documents/${filename}`);
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
-        t,
+        trie(trieWords),
         doc.segments(),
-    ), d.name);
+    ), name);
     ctx.postMessage(tabulated);
 /*
     try {

@@ -46,12 +46,7 @@ function AppDirectory(
             SettingsNode(m),
             TestingUtilsNode(m),
             QuizCarouselNode(),
-            [
-                RecognizeSpeechNode(m),
-                {...QuizCarouselNode(), moveDirectory: false},
-                QuizScheduleNode(),
-                SettingsNode(m),
-            ],
+            QuizScheduleNode(),
             SpeechPracticeNode,
         ] as ArrayToTreeParams<TreeMenuNode>
     );
