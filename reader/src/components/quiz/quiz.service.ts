@@ -35,7 +35,11 @@ export class QuizService {
         }
     ) {
         this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
-            map(rows => rows[0]),
+            map(rows => rows
+                .filter(r => r.dueDate() < new Date())
+                .filter(r => r.count() > 0)
+                [0]
+            ),
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
@@ -46,8 +50,8 @@ export class QuizService {
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
                     if (!currentWord) return [];
-                    const newVar = Array.from(sentenceMap.get(currentWord) || new Set<string>());
-                    return uniq(newVar.map(a => a)).slice(0, 10)
+                    const wordSet = Array.from(sentenceMap.get(currentWord) || new Set<string>());
+                    return uniq(wordSet.map(a => a)).slice(0, 10)
                 }),
                 shareReplay(1)
             ),

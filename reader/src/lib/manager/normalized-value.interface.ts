@@ -3,4 +3,5 @@ export interface NormalizedValue {
     min: number;
     max: number;
     normalizedValue: number;
+    offset: number;
 }

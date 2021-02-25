@@ -80,17 +80,23 @@ export class ScheduleRowsService {
                 Object.entries(wordCounts).filter(
                     ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
                 ).forEach(([word, wordCountRecords]) => {
-                    ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
+                    if (scheduleRows[word]) {
+                        scheduleRows[word].wordCountRecords.push(...wordCountRecords)
+                    }
                 });
                 Object.entries(pronunciationRowIndex).forEach(([word, pronunciationRecords]) => {
-                    ensureScheduleRow(word).pronunciationRecords.push(...pronunciationRecords);
+                    if (scheduleRows[word]) {
+                        scheduleRows[word].pronunciationRecords.push(...pronunciationRecords);
+                    }
                 });
                 Object.entries(wordRecognitionRowIndex).forEach(([word, wordRecognitionRecords]) => {
                     scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
                 return Object.fromEntries(ScheduleMathService.sortScheduleRows(
-                    Object.values(scheduleRows).map(r => new ScheduleRow(r)),
+                    Object.values(scheduleRows)
+                        .map(r => new ScheduleRow(r))
+                        ,
                     {
                         dateWeight,
                         countWeight: frequencyWeight,

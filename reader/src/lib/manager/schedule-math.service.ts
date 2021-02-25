@@ -20,7 +20,7 @@ export class ScheduleMathService {
     ): ScheduleRow<NormalizedScheduleRowData>[] {
         const scheduleRowNormalizedDateMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
-            row => row.dueDate().getTime()
+            row => row.dueDate().getTime() * -1
         ).map(([n, row]) => {
             return [
                 row,
@@ -51,17 +51,27 @@ export class ScheduleMathService {
             const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as NormalizedValue;
             const normalLength = scheduleRowNormalizedLength.get(scheduleRow) as NormalizedValue;
             const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, scheduleRow.count());
-            const dueDateSortValue = getSortValue<Date>(normalDate.normalizedValue, dateWeight, scheduleRow.dueDate());
-            const lengthSortValue = getSortValue<number>(normalLength.normalizedValue, dateWeight, scheduleRow.d.word.length);
+            const dueDateSortValue = getSortValue<Date>(
+                normalDate.normalizedValue,
+                dateWeight,
+                scheduleRow.dueDate()
+            );
+            const lengthSortValue = getSortValue<number>(
+                normalLength.normalizedValue,
+                wordLengthWeight,
+                scheduleRow.d.word.length
+            );
+            if (scheduleRow.d.word === '沙乌地阿拉伯') {
+                debugger;console.log();
+            }
             return {
                 ...scheduleRow.d,
                 count: countSortValue,
                 dueDate: dueDateSortValue,
                 length: lengthSortValue,
-                // TODO maybe add the length weight to config values
                 finalSortValue: (
                     countSortValue.weightedInverseLogNormalValue +
-                    (1 - dueDateSortValue.weightedInverseLogNormalValue) +
+                    (dueDateSortValue.weightedInverseLogNormalValue) +
                     lengthSortValue.weightedInverseLogNormalValue
                 ),
                 normalizedCount: normalCount,
@@ -81,6 +91,7 @@ export class ScheduleMathService {
     ): [NormalizedValue, T][] {
         let maxValue = Number.MIN_SAFE_INTEGER;
         let minValue = Number.MAX_SAFE_INTEGER;
+        let offset = 0;
         scheduleRows.forEach(row => {
             const rowValue = valueFunction(row) || 0;
             if (maxValue < rowValue) {
@@ -90,13 +101,22 @@ export class ScheduleMathService {
                 minValue = rowValue;
             }
         });
+        if (minValue < 0) {
+            offset = Math.abs(minValue);
+        }
         return scheduleRows.map(row => {
+            const normalizedValue = ScheduleMathService.normalize(
+                valueFunction(row) + offset || 0,
+                minValue + offset,
+                maxValue + offset
+            );
             return [
                 {
-                    normalizedValue: ScheduleMathService.normalize(valueFunction(row) || 0, minValue, maxValue),
-                    value: valueFunction(row),
-                    min: minValue,
-                    max: maxValue,
+                    normalizedValue,
+                    value: valueFunction(row) + offset,
+                    min: minValue + offset,
+                    max: maxValue + offset,
+                    offset
                 },
                 row
             ];
