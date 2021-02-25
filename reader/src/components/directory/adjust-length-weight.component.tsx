@@ -8,7 +8,7 @@ export const AdjustLengthWeight = () => {
     const wordLengthWeight = useObservableState(m.settingsService.wordLengthWeight$) || 0;
     return <ListItem>
         <Typography gutterBottom>
-            How much word frequency influences the flashcard order
+            How much word length influences the flashcard order
         </Typography>
         <Slider
             value={wordLengthWeight}
