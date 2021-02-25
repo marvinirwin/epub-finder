@@ -51,12 +51,11 @@ export const QuizCardTableComponent = () => {
                             >
                                 <Typography variant={'h6'} >{row.d.word} </Typography>
                             </TableCell>
-{/*
                             <TableCell>
                                 Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}
-                                {JSON.stringify(row.d.normalizedDate, null, '\t')}
+                                <br/>
+                                Count: {round(row.d.count.weightedInverseLogNormalValue || 0, 2)}
                             </TableCell>
-*/}
                             <TableCell>
                                 {`${row.dueIn()} ${+row.dueDate() < 0 ? ' ago' : ''}`}
                             </TableCell>

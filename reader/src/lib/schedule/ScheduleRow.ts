@@ -80,7 +80,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public dueIn() {
-        return humanizeDuration(this.dueDate().getTime() - Date.now())
+        return humanizeDuration(this.dueDate().getTime() - Date.now(), {largest: 3})
     }
 
     public isUnrecognized() {

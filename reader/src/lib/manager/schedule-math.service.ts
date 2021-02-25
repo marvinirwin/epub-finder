@@ -38,8 +38,11 @@ export class ScheduleMathService {
                 ...scheduleRow.d,
                 count: countSortValue,
                 dueDate: dueDateSortValue,
-                finalSortValue: ((countSortValue.weightedInverseLogNormalValue * (scheduleRow.d.word.length)) +
-                    dueDateSortValue.weightedInverseLogNormalValue),
+                // TODO maybe add the length weight to config values
+                finalSortValue: (
+                    (countSortValue.weightedInverseLogNormalValue * (scheduleRow.d.word.length)) +
+                    (1 - dueDateSortValue.weightedInverseLogNormalValue)
+                ),
                 normalizedCount: normalCount,
                 normalizedDate: normalDate
             } as NormalizedScheduleRowData;
