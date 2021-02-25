@@ -10,8 +10,6 @@ import {IgnoredWordsRepository} from "../schedule/ignored-words.repository";
 import {ScheduleRow} from "../schedule/ScheduleRow";
 import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
 import {ScheduleMathService} from "./schedule-math.service";
-import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
-import {ModesService} from "../modes/modes.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
 
@@ -24,8 +22,8 @@ export class ScheduleRowsService {
                     pronunciationProgressService,
                     cardsRepository,
                     ignoredWordsRepository,
-        settingsService,
-        allWordsRepository
+                    settingsService,
+                    allWordsRepository
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
@@ -44,10 +42,21 @@ export class ScheduleRowsService {
             readingWordCounts$.pipe(startWith({})),
             cardsRepository.cardIndex$,
             ignoredWordsRepository.latestRecords$,
-            settingsService.frequencyWeight$,
+            combineLatest([
+                settingsService.frequencyWeight$,
+                settingsService.dateWeight$,
+                settingsService.wordLengthWeight$
+            ]),
             allWordsRepository.all$
         ]).pipe(
-            map(([[wordRecognitionRowIndex, pronunciationRowIndex], wordCounts, cardIndex, ignoredWords, frequencyWeight, allWords]) => {
+            map(([
+                     [wordRecognitionRowIndex, pronunciationRowIndex],
+                     wordCounts,
+                     cardIndex,
+                     ignoredWords,
+                     [frequencyWeight, dateWeight, wordLengthWeight],
+                     allWords
+                 ]) => {
                 const scheduleRows: ds_Dict<ScheduleRowData> = {};
                 const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
@@ -71,7 +80,6 @@ export class ScheduleRowsService {
                 Object.entries(wordCounts).filter(
                     ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
                 ).forEach(([word, wordCountRecords]) => {
-                    const w = cardIndex[word];
                     ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords);
                 });
                 Object.entries(pronunciationRowIndex).forEach(([word, pronunciationRecords]) => {
@@ -83,8 +91,11 @@ export class ScheduleRowsService {
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
                 return Object.fromEntries(ScheduleMathService.sortScheduleRows(
                     Object.values(scheduleRows).map(r => new ScheduleRow(r)),
-                    1 - frequencyWeight,
-                    frequencyWeight,
+                    {
+                        dateWeight,
+                        countWeight: frequencyWeight,
+                        wordLengthWeight
+                    }
                 ).map(row => [row.d.word, row]))
             }),
             shareReplay(1)

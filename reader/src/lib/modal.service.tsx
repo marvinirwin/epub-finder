@@ -8,6 +8,8 @@ import {ManualTestModal} from "../components/modals/manual-test-modal.component"
 import {AdjustFrequencyWeight} from "../components/directory/adjust-frequency-weight.component";
 import {NavModal} from "./nav-modal";
 import {SetVocab} from "../components/settings/set-vocab.component";
+import {AdjustDateWeight} from "../components/directory/adjust-date-weight.component";
+import {AdjustLengthWeight} from "../components/directory/adjust-length-weight.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -36,6 +38,8 @@ export class ModalService {
                 <ToggleTranslateComponent/>
                 <TogglePinyinComponent/>
                 <AdjustFrequencyWeight/>
+                <AdjustDateWeight/>
+                <AdjustLengthWeight/>
                 <SetVocab/>
             </div>
         );

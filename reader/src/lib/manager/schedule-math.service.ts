@@ -8,8 +8,15 @@ export class ScheduleMathService {
 
     public static sortScheduleRows(
         scheduleRows: ScheduleRow [],
-        dateWeight: number,
-        countWeight: number,
+        {
+            dateWeight,
+            countWeight,
+            wordLengthWeight,
+        }: {
+            dateWeight: number,
+            countWeight: number,
+            wordLengthWeight: number,
+        }
     ): ScheduleRow<NormalizedScheduleRowData>[] {
         const scheduleRowNormalizedDateMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
@@ -29,19 +36,33 @@ export class ScheduleMathService {
             n,
         ]));
 
+        const scheduleRowNormalizedLength = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
+            scheduleRows,
+            row => row.d.word.length
+        ).map(([n, row]) => {
+            return [
+                row,
+                n
+            ];
+        }));
+
         const sortableScheduleRows: NormalizedScheduleRowData[] = scheduleRows.map(scheduleRow => {
             const normalCount = scheduleRowNormalizedCountMap.get(scheduleRow) as NormalizedValue;
             const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as NormalizedValue;
+            const normalLength = scheduleRowNormalizedLength.get(scheduleRow) as NormalizedValue;
             const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, scheduleRow.count());
             const dueDateSortValue = getSortValue<Date>(normalDate.normalizedValue, dateWeight, scheduleRow.dueDate());
+            const lengthSortValue = getSortValue<number>(normalLength.normalizedValue, dateWeight, scheduleRow.d.word.length);
             return {
                 ...scheduleRow.d,
                 count: countSortValue,
                 dueDate: dueDateSortValue,
+                length: lengthSortValue,
                 // TODO maybe add the length weight to config values
                 finalSortValue: (
-                    (countSortValue.weightedInverseLogNormalValue * (scheduleRow.d.word.length)) +
-                    (1 - dueDateSortValue.weightedInverseLogNormalValue)
+                    countSortValue.weightedInverseLogNormalValue +
+                    (1 - dueDateSortValue.weightedInverseLogNormalValue) +
+                    lengthSortValue.weightedInverseLogNormalValue
                 ),
                 normalizedCount: normalCount,
                 normalizedDate: normalDate

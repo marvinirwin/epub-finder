@@ -55,6 +55,8 @@ export const QuizCardTableComponent = () => {
                                 Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}
                                 <br/>
                                 Count: {round(row.d.count.weightedInverseLogNormalValue || 0, 2)}
+                                <br/>
+                                Length: {round(row.d.length.weightedInverseLogNormalValue || 0, 2)}
                             </TableCell>
                             <TableCell>
                                 {`${row.dueIn()} ${+row.dueDate() < 0 ? ' ago' : ''}`}

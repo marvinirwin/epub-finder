@@ -16,6 +16,7 @@ export interface ScheduleRowData {
 export interface NormalizedScheduleRowData extends ScheduleRowData {
     count: SortValue<number>;
     dueDate: SortValue<Date>;
+    length: SortValue<number>;
     finalSortValue: number;
     normalizedCount: NormalizedValue,
     normalizedDate: NormalizedValue,

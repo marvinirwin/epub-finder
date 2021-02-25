@@ -51,6 +51,8 @@ export class SettingsService {
      * Either the Id of a frequency document, or blank to use recognition progress
      */
     public selectedVocabulary$: ReplaySubject<string>;
+    public dateWeight$: ReplaySubject<number>;
+    public wordLengthWeight$: ReplaySubject<number>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -89,6 +91,10 @@ export class SettingsService {
         this.manualIsRecording$ = this.createSetting$<boolean>('manualIsRecording', false, 'indexedDB')
 
         this.frequencyWeight$ = this.createSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+
+        this.dateWeight$ = this.createSetting$<number>('dateWeight', 0.5, 'indexedDB');
+
+        this.wordLengthWeight$ = this.createSetting$<number>('wordLengthWeight', 0.5, 'indexedDB');
 
         this.selectedFrequencyDocuments$ = this.createSetting$<string[]>('selectedFrequencyDocuments', [], 'indexedDB')
 
