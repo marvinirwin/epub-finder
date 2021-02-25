@@ -25,7 +25,8 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             const exampleSegments = await observableLastValue(m.exampleSentencesService.exampleSegmentMap$);
             const pronouncedQuizWord = recognizedText.includes(word);
             const pronouncedTextIsInExampleSegments = uniq(
-                flatten(Array.from(exampleSegments.values()))).map(segment => segment.translatableText)
+                flatten(Array.from(exampleSegments.values()).map(set => Array.from(set.values())))
+            ).map(segment => segment)
                 .find(segmentText => segmentText.includes(recognizedText))
             if (pronouncedQuizWord && pronouncedTextIsInExampleSegments) {
                 m.hotkeyEvents.quizResultEasy$.next()

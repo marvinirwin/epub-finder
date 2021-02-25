@@ -39,7 +39,8 @@ export class VocabService {
                             Object.values(indexedScheduleRows)
                                 .filter(row => row.isSomewhatRecognized() || row.isRecognized())
                                 .map(row => [row.d.word, 1])
-                        )
+                        ),
+                        wordSegmentStringsMap: new Map()
                     }
                 }
                 return selectedTabulation.tabulation

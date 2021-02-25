@@ -3,12 +3,14 @@ import {GetWorkerResults} from "../Util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-src.worker';
 // @ts-ignore
-import TabulateDocumentsWorker from 'Worker-loader?name=dist/[name].js!./tabulate-document';
+import TabulateRemoteDocumentWorker from 'Worker-loader?name=dist/[name].js!./tabulate-remote-document.worker';
+// @ts-ignore
+import TabulateLocalDocumentWorker from 'Worker-loader?name=dist/[name].js!./tabulate-local-document.worker';
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker';
-import {InterpolateService} from "@shared/";
-import {TabulateDocumentDto} from "./tabulate-document.dto";
-import {TabulatedDocuments, TabulatedSentences} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+import {InterpolateService, SerializedTabulation} from "@shared/";
+import {TabulateRemoteDocumentDto} from "./tabulate-remote-document.dto";
+import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 
 export type WorkerError = { errorMessage: string };
 
@@ -22,8 +24,13 @@ export const AtomizeUrl = async (url: string) => {
         .then(handleWorkerError)
 };
 
-export const TabulateDocuments = async (dto: TabulateDocumentDto) => GetWorkerResults<TabulatedDocuments>(new TabulateDocumentsWorker(), dto)
-    .then((result: TabulatedDocuments) => {
+export const TabulateRemoteDocument = async (dto: TabulateRemoteDocumentDto) => GetWorkerResults<SerializedTabulation>(new TabulateRemoteDocumentWorker(), dto)
+    .then((result: SerializedTabulation) => {
+        return result;
+    })
+
+export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) => GetWorkerResults<SerializedTabulation>(new TabulateLocalDocumentWorker(), dto)
+    .then((result: SerializedTabulation) => {
         return result;
     })
 

@@ -4,7 +4,7 @@ import {LtDocument, SerializedTabulation} from "@shared/";
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {TrieObservable} from "./manager/open-documents.service";
-import {TabulateDocuments} from "./Workers/worker.helpers";
+import {TabulateRemoteDocument} from "./Workers/worker.helpers";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 
 export class FrequencyDocument {
@@ -17,7 +17,7 @@ export class FrequencyDocument {
         private wordTrie$: TrieObservable
     ) {
         this.tabulation$ = wordTrie$.pipe(
-            switchMap(wordTrie => TabulateDocuments(
+            switchMap(wordTrie => TabulateRemoteDocument(
                 {trieWords: wordTrie.t.getWords(), d: frequencyDocument.d}
             )),
             shareReplay(1)

@@ -8,11 +8,12 @@ import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents
 import {rehydratePage} from "../atomized/open-document.component";
 import {mergeTabulations} from "../../../../server/src/shared/tabulate-documents/merge-tabulations";
 import {
+    SerializedTabulation,
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
 } from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
 import {flatten} from "lodash";
-import {TabulateDocuments} from "../Workers/worker.helpers";
+import {TabulateLocalDocument, TabulateRemoteDocument} from "../Workers/worker.helpers";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
@@ -23,7 +24,7 @@ export class OpenDocument {
     public name: string;
     public renderedSegments$ = new ReplaySubject<Segment[]>(1)
     public renderedTabulation$: Observable<TabulatedDocuments>;
-    public virtualTabulation$: Observable<TabulatedDocuments>;
+    public virtualTabulation$: Observable<SerializedTabulation>;
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
 
     /*
@@ -53,28 +54,22 @@ export class OpenDocument {
             ),
             shareReplay(1),
         );
-        this.virtualTabulation$ = this.trie$.pipe(
-                switchMap(trie => {
-                    return TabulateDocuments({
+        this.virtualTabulation$ = combineLatest([
+            this.trie$,
+            this.atomizedDocument$
+        ]).pipe(
+                switchMap(([trie, document]) => {
+                    return TabulateLocalDocument({
+                        label,
                         trieWords: trie.t.getWords(),
-                        d: {filename: this.}
+                        src: document._originalSrc
                     })
                 })
             );
-        /*
-                this.notableSubsequences$ = this.renderedSegments$.pipe(
-                    map(segments => segments.map(segment => segment.translatableText).join('')),
-                    switchMap(TabulateDocuments),
-                    shareReplay(1),
-                )
-        */
     }
 
     async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
         const sentences = rehydratePage(body.ownerDocument as HTMLDocument);
-        /*printExecTime("Rehydration", () => {
-            return
-        });*/
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSegments$.next(sentences);
     }
