@@ -4,7 +4,7 @@ import {Segment} from "@shared/*";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 
 export class ExampleSegmentsService {
-    exampleSegmentMap$: Observable<Map<string, Segment[]>>
+    exampleSegmentMap$: Observable<Map<string, Set<string>>>
 
     constructor(
         {
@@ -13,9 +13,9 @@ export class ExampleSegmentsService {
             openDocumentsService: OpenDocumentsService
         }
     ) {
-        this.exampleSegmentMap$ = openDocumentsService.displayDocumentTabulation$.pipe(
-            map((sentenceMaps) => {
-                    return new Map(Object.entries(sentenceMaps.wordSegmentMap));
+        this.exampleSegmentMap$ = openDocumentsService.virtualDocumentTabulation$.pipe(
+            map((tabulation) => {
+                    return tabulation.wordSegmentStringsMap()
                 }
             ),
             shareReplay(1)

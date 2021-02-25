@@ -46,7 +46,8 @@ export class QuizService {
             ]).pipe(
                 map(([sentenceMap, currentWord]) => {
                     if (!currentWord) return [];
-                    return uniq((sentenceMap.get(currentWord) || []).map(a => a.translatableText)).slice(0, 10)
+                    const newVar = Array.from(sentenceMap.get(currentWord) || new Set<string>());
+                    return uniq(newVar.map(a => a)).slice(0, 10)
                 }),
                 shareReplay(1)
             ),

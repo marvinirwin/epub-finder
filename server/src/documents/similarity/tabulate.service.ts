@@ -38,7 +38,8 @@ export class TabulateService {
                         atomizedDocument.segments(),
                     );
                     return {
-                        wordCounts: tabulation.wordCounts
+                        wordCounts: tabulation.wordCounts,
+                        wordSegmentStringsMap: new Map()
                     };
                 }
             }

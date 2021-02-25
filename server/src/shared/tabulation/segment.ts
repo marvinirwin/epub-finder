@@ -117,7 +117,8 @@ export class Segment {
             wordCounts,
             wordSegmentMap: segmentDictionary,
             segments,
-            atomMetadatas
+            atomMetadatas,
+            wordSegmentStringsMap: new Map(Object.entries(segmentDictionary).map(([word, segments]) => [word, new Set(segments.map(segment => segment.translatableText))]))
         };
     }
 

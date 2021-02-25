@@ -1,6 +1,6 @@
 import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {Segment} from "../tabulate-documents/segment";
+import {Segment} from "../tabulation/segment";
 import {flatten, maxBy} from "lodash";
 import CardsRepository from "../../../../reader/src/lib/manager/cards.repository";
 import {ICard} from "../ICard";

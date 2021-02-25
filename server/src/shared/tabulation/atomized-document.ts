@@ -17,6 +17,8 @@ export function createPopperElement(document1: XMLDocument) {
 
 export class AtomizedDocument {
     document: XMLDocument;
+    _originalSrc: string;
+
     static getPopperId(popperId: string) {
         return `translate-popper_${popperId}`;
     }
@@ -98,6 +100,7 @@ export class AtomizedDocument {
     }
 
     constructor(document: XMLDocument) {
+        this._originalSrc = new XMLSerializer().serializeToString(document);
         this.document = document;
     }
 

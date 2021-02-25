@@ -3,7 +3,7 @@ import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {
     SerializedTabulation,
     TabulatedDocuments
-} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+} from "@shared/";
 import { sum } from "lodash";
 
 export interface WordReadabilityRecord {

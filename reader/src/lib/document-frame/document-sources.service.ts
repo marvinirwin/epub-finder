@@ -1,8 +1,8 @@
 import {merge, Observable} from "rxjs";
-import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
 import {AtomizedStringsForRawHTML} from "../pipes/AtomizedStringsForRawHTML";
 import {map, shareReplay} from "rxjs/operators";
 import {AtomizedStringsForURL} from "../pipes/AtomizedStringsForURL";
+import {AtomizedDocument} from "../../../../server/src/shared/tabulation/atomized-document";
 
 export type AtomizedDocumentSources = {
     atomizedDocument$?: Observable<AtomizedDocument>,
