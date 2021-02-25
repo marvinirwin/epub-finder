@@ -24,7 +24,8 @@ export class SrmService {
         2 * DAY_IN_MILLISECONDS,
         3 * DAY_IN_MILLISECONDS,
         8 * DAY_IN_MILLISECONDS,
-        17 * DAY_IN_MILLISECONDS
+        17 * DAY_IN_MILLISECONDS,
+        32 * DAY_IN_MILLISECONDS,
     ];
 
     constructor() { }
@@ -59,7 +60,7 @@ export class SrmService {
             if (newProgress < this.maxProgress) {
                 dueTimestamp = now.getTime() + SrmService.intervals[previousProgress];
             } else {
-                dueTimestamp = moment(now).add(1, 'month').toDate().getTime();
+                dueTimestamp = moment(now).add(6, 'month').toDate().getTime();
             }
         }
         return {
