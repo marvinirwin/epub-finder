@@ -15,9 +15,7 @@ import {
 
 export const QuizCardTableComponent = () => {
     const m = useContext(ManagerContext);
-    const scheduleRows = useObservableState(
-        m.scheduleManager.sortedScheduleRows$
-    ) || [];
+    const scheduleRows = useObservableState(m.scheduleManager.sortedScheduleRows$) || [];
     return <TableContainer component={Paper}>
         <Table aria-label="simple table">
             <TableHead>

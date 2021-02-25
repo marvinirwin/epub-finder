@@ -15,6 +15,10 @@ import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 
+export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
+    .filter(r => r.dueDate() < new Date())
+    .filter(r => r.count() > 0);
+
 export class QuizService {
     quizCard: QuizCard;
     currentScheduleRow$: Observable<ScheduleRow<NormalizedScheduleRowData>>
@@ -35,11 +39,7 @@ export class QuizService {
         }
     ) {
         this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
-            map(rows => rows
-                .filter(r => r.dueDate() < new Date())
-                .filter(r => r.count() > 0)
-                [0]
-            ),
+            map(rows => filterQuizRows(rows)[0]),
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(

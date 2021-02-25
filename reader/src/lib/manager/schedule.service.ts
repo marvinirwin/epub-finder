@@ -11,6 +11,7 @@ import {ScheduleMathService} from "./schedule-math.service";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
 import {ScheduleRow} from "../schedule/ScheduleRow";
 import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
+import {filterQuizRows} from "../../components/quiz/quiz.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -45,6 +46,7 @@ export class ScheduleService {
         this.sortedScheduleRows$ = scheduleRowsService.indexedScheduleRows$.pipe(
             // Relying on javascript object value ordering behaviour here, bad idea
             map((rowDict) => Object.values(rowDict) ),
+            map(filterQuizRows),
             shareReplay(1)
         )
 
