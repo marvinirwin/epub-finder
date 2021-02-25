@@ -17,6 +17,7 @@ export type TabulatedSentences = SerializedTabulation & {
 
 export interface SerializedTabulation {
     wordCounts: Dictionary<number>;
+    wordSegmentStringsMap: Map<string, Set<string>>;
 }
 
 export const tabulatedSentenceToTabulatedDocuments = (

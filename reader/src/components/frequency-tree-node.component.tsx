@@ -11,7 +11,7 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
     ({frequencyNode, similarity}) => {
         const value = frequencyNode.value as TabulatedFrequencyDocument;
         const m = useContext(ManagerContext);
-        const vocab = useObservableState(m.vocabService.vocab$) || {wordCounts: {}};
+        const vocab = useObservableState(m.vocabService.vocab$) || {wordCounts: {}, wordSegmentStringsMap: new Map()};
         return <Paper
             id={value.frequencyDocument.name}
             style={{margin: '24px'}}

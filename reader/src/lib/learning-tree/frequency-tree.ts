@@ -16,8 +16,9 @@ export class FrequencyTree {
             {
                 wordCounts: {
                     ...t1.wordCounts,
-                    ...vocab.wordCounts
-                }
+                    ...vocab.wordCounts,
+                },
+                wordSegmentStringsMap: new Map()
             },
             t2
         );

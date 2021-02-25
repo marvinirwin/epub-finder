@@ -1,4 +1,4 @@
-import {SerializedTabulation} from "./tabulated-documents.interface";
+import {SerializedTabulation} from "../tabulate-documents/tabulated-documents.interface";
 import {flatten} from "@nestjs/common";
 import {safePushMapSet} from "../safe-push";
 
