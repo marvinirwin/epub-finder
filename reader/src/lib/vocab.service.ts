@@ -1,4 +1,4 @@
-import {SerializedTabulation} from "@shared/*";
+import {SerializedTabulation} from "@shared/";
 import {combineLatest, Observable} from "rxjs";
 import {SettingsService} from "../services/settings.service";
 import {FrequencyDocumentsRepository} from "./frequency-documents.repository";

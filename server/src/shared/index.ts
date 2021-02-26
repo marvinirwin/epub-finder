@@ -8,3 +8,4 @@ export * from './tabulate-documents/compute-element-index-map'
 export * from './tabulate-documents/merge-tabulations'
 export * from './tabulate-documents/tabulated-documents.interface'
 export * from './IImageRequest'
+export {mergeDocumentWordCounts} from "./tabulate-documents/merge-document-word-counts";

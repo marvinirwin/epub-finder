@@ -1,4 +1,4 @@
-import {SerializedTabulation} from "@shared/*";
+import {SerializedTabulation} from "@shared/";
 import {orderBy, sum} from "lodash";
 import {computeSimilarityTabulation} from "../../../../server/src/shared/similarity-result.interface";
 import {ds_Tree} from "../../services/tree.service";

@@ -1,19 +1,19 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/";
 import {TrieWrapper} from "../TrieWrapper";
 import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
+import {AtomizedDocument} from "@shared/";
 import {rehydratePage} from "../atomized/open-document.component";
-import {mergeTabulations} from "../../../../server/src/shared/tabulate-documents/merge-tabulations";
 import {
     SerializedTabulation,
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
-} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+} from "@shared/";
 import {flatten} from "lodash";
 import {TabulateLocalDocument, TabulateRemoteDocument} from "../Workers/worker.helpers";
+import {mergeTabulations} from "../merge-tabulations";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));

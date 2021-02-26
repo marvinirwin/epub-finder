@@ -5,7 +5,7 @@ import {FrequencyDocumentNodeArgs} from "../lib/frequency-tree.service";
 import {TabulatedFrequencyDocument} from "../lib/learning-tree/tabulated-frequency-document";
 import {ManagerContext} from "../App";
 import {useObservableState} from "observable-hooks";
-import {SerializedTabulation} from "@shared/*";
+import {SerializedTabulation} from "@shared/";
 
 export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
     ({frequencyNode, similarity}) => {

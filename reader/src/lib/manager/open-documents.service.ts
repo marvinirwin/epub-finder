@@ -1,7 +1,7 @@
 import {combineLatest, merge, Observable, of} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Website} from "../Website/Website";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/";
 import {flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
@@ -12,11 +12,11 @@ import {AtomizedDocumentSources, DocumentSourcesService} from "../document-frame
 import {
     SerializedTabulation,
     TabulatedDocuments
-} from "../../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
-import {mergeTabulations} from "../../../../server/src/shared/tabulate-documents/merge-tabulations";
+} from "@shared/";
 import {DocumentRepository} from "../documents/document.repository";
 import {TrieWrapper} from "../TrieWrapper";
 import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
+import {mergeTabulations} from "../merge-tabulations";
 
 
 export type TrieObservable = Observable<TrieWrapper>;

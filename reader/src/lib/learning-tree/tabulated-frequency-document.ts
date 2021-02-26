@@ -1,4 +1,4 @@
-import {LtDocument, SerializedTabulation} from "@shared/*";
+import {LtDocument, SerializedTabulation} from "@shared/";
 
 export class TabulatedFrequencyDocument {
     constructor(
