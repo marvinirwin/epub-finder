@@ -53,6 +53,7 @@ export class SettingsService {
     public selectedVocabulary$: ReplaySubject<string>;
     public dateWeight$: ReplaySubject<number>;
     public wordLengthWeight$: ReplaySubject<number>;
+    public scheduleTableWordFilterValue$: ReplaySubject<string>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -101,6 +102,8 @@ export class SettingsService {
         this.progressTreeRootId$ = this.createSetting$<string>('progressTreeRoot', '', 'indexedDB')
 
         this.selectedVocabulary$ = this.createSetting$<string>('selectedVocabulary', '', 'indexedDB')
+
+        this.scheduleTableWordFilterValue$ = this.createSetting$<string>('scheduleTableWordFilterValue', '', 'indexedDB')
     }
 
     public createSetting$<T>(

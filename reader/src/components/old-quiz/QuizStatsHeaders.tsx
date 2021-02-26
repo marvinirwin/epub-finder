@@ -4,7 +4,7 @@ import {Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 
 export default function QuizStatsHeader({m}: { m: Manager }) {
-    const scheduledCards = useObservableState(m.scheduleManager.wordQuizList$, []);
+    const scheduledCards = useObservableState(m.scheduleService.wordQuizList$, []);
 
     return <div style={{zIndex: 10, backgroundColor: 'white'}}>
         <Typography variant="subtitle1">
