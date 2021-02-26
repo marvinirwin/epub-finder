@@ -49,9 +49,6 @@ export class OpenDocumentsService {
     ) {
 
         this.sourceDocuments$ = config.documentRepository.collection$.pipe(
-            /*
-                        map(documents => filterMap(documents, (key, d) => !d.deleted)),
-            */
             map(documents => {
                 return mapMap(
                     documents,
@@ -111,7 +108,7 @@ export class OpenDocumentsService {
             shareReplay(1)
         );
 
-        const getDisplayDocumentTabulation$ = <T>(mapFn: (d: OpenDocument) => Observable<T>, nodeLabel: string) => {
+        const getDocumentTabulation = <T>(mapFn: (d: OpenDocument) => Observable<T>, nodeLabel: string) => {
             return this.openDocumentTree.mapWith(mapFn)
                 .updates$.pipe(
                     switchMap(({sourced}) => {
@@ -122,14 +119,15 @@ export class OpenDocumentsService {
                 );
         }
 
-        this.displayDocumentTabulation$ = getDisplayDocumentTabulation$(document => document.renderedTabulation$, READING_DOCUMENT_NODE_LABEL)
+        this.displayDocumentTabulation$ = getDocumentTabulation(document => document.renderedTabulation$, READING_DOCUMENT_NODE_LABEL)
             .pipe(
                 map((documentTabulations: TabulatedDocuments[]) =>
                     mergeTabulations(...documentTabulations),
                 ),
                 shareReplay(1)
             );
-        this.virtualDocumentTabulation$ = getDisplayDocumentTabulation$(document => document.virtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
+
+        this.virtualDocumentTabulation$ = getDocumentTabulation(document => document.virtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
             .pipe(
                 map((documentTabulations: SerializedTabulation[]) =>
                     new SerializedTabulationAggregate(documentTabulations)

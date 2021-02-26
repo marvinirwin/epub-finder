@@ -18,7 +18,8 @@ export function mergeTabulations<T extends TabulatedSentences>(...sentenceInfos:
         wordCounts: {},
         segments: [],
         documentWordCounts: {},
-        atomMetadatas: new Map()
+        atomMetadatas: new Map(),
+        wordSegmentStringsMap: new Map()
     };
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
