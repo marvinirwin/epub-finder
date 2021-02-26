@@ -7,7 +7,7 @@ import {ManagerContext} from "../../App";
 export const QuizCardTableToolbar = () => {
     const m = useContext(ManagerContext);
     const filterValue = useObservableState(m.settingsService.scheduleTableWordFilterValue$) || ''
-    return <Toolbar>
+    return <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
         <Typography variant="h6" component="div">
             Quiz Schedule
         </Typography>

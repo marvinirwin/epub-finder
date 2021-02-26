@@ -4,6 +4,7 @@ import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {SettingsService} from "../services/settings.service";
 import {debounceTime, map, shareReplay} from "rxjs/operators";
+import {filterQuizRows} from "../components/quiz/quiz.service";
 
 export class FilterScheduleTableRowsService {
     public filteredScheduleRows$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
@@ -22,6 +23,7 @@ export class FilterScheduleTableRowsService {
             map(([scheduleTableWordFilterValue, sortedScheduleRows]) => {
                 return sortedScheduleRows.filter(row => row.d.word.includes(scheduleTableWordFilterValue))
             }),
+            map(filterQuizRows),
             shareReplay(1)
         )
     }

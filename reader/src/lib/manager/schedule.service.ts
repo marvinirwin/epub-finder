@@ -46,7 +46,6 @@ export class ScheduleService {
         this.sortedScheduleRows$ = scheduleRowsService.indexedScheduleRows$.pipe(
             // Relying on javascript object value ordering behaviour here, bad idea
             map((rowDict) => Object.values(rowDict) ),
-            map(filterQuizRows),
             shareReplay(1)
         )
 

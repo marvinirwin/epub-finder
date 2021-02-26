@@ -61,9 +61,6 @@ export class ScheduleMathService {
                 wordLengthWeight,
                 scheduleRow.d.word.length
             );
-            if (scheduleRow.d.word === '沙乌地阿拉伯') {
-                debugger;console.log();
-            }
             return {
                 ...scheduleRow.d,
                 count: countSortValue,
