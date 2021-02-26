@@ -2,7 +2,6 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Segment} from "@shared/";
 import {TrieWrapper} from "../TrieWrapper";
-import {printExecTime} from "../Util/Timer";
 import {ds_Dict} from "../Tree/DeltaScanner";
 import {AtomizedDocument} from "@shared/";
 import {rehydratePage} from "../atomized/open-document.component";
@@ -48,7 +47,6 @@ export class OpenDocument {
                         trie.t,
                         segments,
                     ));
-
                     return tabulatedSentenceToTabulatedDocuments(tabulatedSentences, this.label);
                 }
             ),
