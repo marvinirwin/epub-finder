@@ -12,7 +12,7 @@ export const SignupLogin = () => {
 
     function login(email: string, password: string) {
         axios.post(
-            '/auth/login',
+            '/languagetrainer-auth/login',
             {email, password})
             .then(() => m.authManager.fetchProfile())
     }
@@ -33,7 +33,7 @@ export const SignupLogin = () => {
                 let email = emailRef.value;
                 let password = passwordRef.value;
                 axios.post(
-                    '/auth/signup',
+                    '/languagetrainer-auth/signup',
                     {
                         email: email,
                         password: password

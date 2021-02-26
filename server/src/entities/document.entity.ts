@@ -38,6 +38,9 @@ export class Document {
     @Column({default: false})
     for_frequency: boolean = false;
 
+    @Column({default: true})
+    for_reading: boolean = true;
+
     @Column({default: false})
     deleted: boolean = false;
 

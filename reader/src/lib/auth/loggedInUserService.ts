@@ -35,7 +35,7 @@ export class LoggedInUserService {
     }
 
     public async signOut() {
-        await axios.get(`${process.env.PUBLIC_URL}/auth/logout`)
+        await axios.get(`${process.env.PUBLIC_URL}/languagetrainer-auth/logout`)
         this.profile$.next(undefined);
     }
 }

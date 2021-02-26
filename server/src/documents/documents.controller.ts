@@ -103,14 +103,14 @@ export class DocumentsController {
         @UserFromReq() user: User | undefined,
         @Headers('is_test') is_test: string
     ) {
-        return this.documentsService.all({user, for_testing: !!is_test, })
+        return this.documentsService.allReading({user, for_testing: !!is_test, })
     }
 
     @Get('frequency-documents')
     async all_frequency(
         @Headers('is_test') is_test: string
     ) {
-        return this.documentsService.all_frequency({for_testing: !!is_test})
+        return this.documentsService.allFrequency({for_testing: !!is_test})
     }
 
 

@@ -15,7 +15,6 @@ sudo docker run \
 -e DB_ADDR=$DB_ADDR \
 -e DB_VENDOR=POSTGRES \
 -e PROXY_ADDRESS_FORWARDING=true \
--e KEYCLOAK_FRONTEND_URL=https://languagetrainer.app/keycloak \
 quay.io/keycloak/keycloak:12.0.2
 
 # Create Realm LanguageTrainer

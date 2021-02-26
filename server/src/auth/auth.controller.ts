@@ -7,7 +7,7 @@ import {Public} from "src/decorators/public";
 import {UserFromReq} from "../decorators/userFromReq";
 import {KeycloakGuard} from "../guards/keycloak.guard";
 import {LoginGuard} from "../guards/login.guard";
-@Controller("/auth")
+@Controller("/languagetrainer-auth")
 export class AuthController {
     constructor(
         private readonly userService: UsersService

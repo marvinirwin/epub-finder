@@ -9,7 +9,7 @@ module.exports = function(app) {
         })
     );
     app.use(
-        '/auth/*',
+        '/languagetrainer-auth/*',
         createProxyMiddleware({
             target: 'http://localhost:3001',
             changeOrigin: true,

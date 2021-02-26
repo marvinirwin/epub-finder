@@ -21,18 +21,18 @@ export class DocumentsService {
     ) {
     }
 
-    async all({user, for_testing}:{user?: User | undefined, for_testing?: boolean}): Promise<DocumentView[]> {
+    async allReading({user, for_testing}:{user?: User | undefined, for_testing?: boolean}): Promise<DocumentView[]> {
         return await this.documentViewRepository
             .find({
                     where: [
-                        {creator_id: user?.id, deleted: false, for_frequency: false},
-                        {deleted: false, for_testing: for_testing, for_frequency: false},
+                        {creator_id: user?.id, deleted: false, for_reading: true},
+                        {deleted: false, for_testing: for_testing, for_reading: true},
                     ]
                 }
             )
     }
 
-    async all_frequency({for_testing}:{for_testing?: boolean}): Promise<DocumentView[]> {
+    async allFrequency({for_testing}:{for_testing?: boolean}): Promise<DocumentView[]> {
         const documentViews = await this.documentViewRepository
             .find({
                     where: [
@@ -127,6 +127,10 @@ export class DocumentsService {
             {
                 for_frequency: true,
                 filename
+            },
+            {
+                for_reading: true,
+                filename
             }
     ]
         if (user) {
@@ -141,6 +145,7 @@ export class DocumentsService {
             where: whereConditions
         });
     }
+
     public async byName(name: string, user: User) {
         return await this.documentViewRepository.findOne({
             name,
