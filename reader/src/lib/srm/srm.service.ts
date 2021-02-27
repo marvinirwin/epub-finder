@@ -9,8 +9,8 @@ const MINUTE_IN_MILLISECONDS = 60 * 1000;
 const FLOOR = 0;
 
 export const RecognitionMap: {[key: string]: SuperMemoGrade} = {
-    easy: 2,
-    medium: 1,
+    easy: 5,
+    medium: 2,
     hard: 0
 }
 

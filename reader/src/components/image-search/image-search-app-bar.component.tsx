@@ -47,7 +47,7 @@ export const ImageSearchAppBar = (
     }
     ) => {
     const classes = useStyles();
-    return <AppBar className={'image-search-app-bar'}>
+    return <AppBar className={'image-search-app-bar'} position={'sticky'}>
         <Toolbar className={'image-search-toolbar'}>
             <Typography variant="h6" noWrap className={'image-search-term'}>
                 {imageRequest?.term}
