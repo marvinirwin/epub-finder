@@ -1,17 +1,39 @@
 import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../../../../server/src/shared/ICard";
-import {Dictionary, orderBy} from "lodash";
+import {Dictionary, orderBy, maxBy, flatten} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../../../../server/src/shared/Message";
 import {DatabaseService} from "../Storage/database.service";
 import {cardForWord} from "../Util/Util";
 import {observableLastValue} from "../../services/settings.service";
+import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 
 const highestPriorityCard = (c1: ICard, c2: ICard) => {
 /*
     const ordered = orderBy([c1, c2], ['id', 'timestamp'], ['desc', 'desc']);
 */
     return ([c1,c2]).find(c => c.id) || c1;
+}
+
+export const priorityMouseoverHighlightWord = (
+    {
+        cardsRepository,
+        atomMetadata
+    }: {
+    cardsRepository: CardsRepository,
+    atomMetadata: AtomMetadata
+}
+): ICard | undefined => {
+    const cardMap = cardsRepository.all$.getValue();
+    return maxBy(
+        flatten(
+            atomMetadata.words
+                .map(word => {
+                    const cardMapElement = cardMap[word.word] || [];
+                    return cardMapElement
+                        .filter(v => !v.highlightOnly);
+                })
+        ), c => c.learningLanguage.length);
 }
 
 export default class CardsRepository {

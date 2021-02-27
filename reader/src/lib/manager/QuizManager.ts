@@ -20,7 +20,7 @@ export class QuizManager {
 
     completeQuiz(word : string, recognitionScore : SuperMemoGrade ) {
         this.quizResult$.next({
-            score: recognitionScore,
+            grade: recognitionScore,
             word
         });
 

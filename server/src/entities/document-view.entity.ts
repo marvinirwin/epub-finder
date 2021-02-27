@@ -15,7 +15,7 @@ import {User} from "./user.entity";
         b.hash,
         b.for_testing,
         b.for_frequency,
-        b.for_reading,
+        b.for_reading
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at

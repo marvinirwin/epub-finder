@@ -3,6 +3,7 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {flatten} from "lodash";
 import {SignupLogin} from "../directory/nodes/signup-login.component";
+import {priorityMouseoverHighlightWord} from "../../lib/manager/cards.repository";
 
 export const ManualTestModal = () => {
     const m = useContext(ManagerContext);
@@ -33,11 +34,14 @@ export const ManualTestModal = () => {
         <button
             id={'manual-mouseover-highlight-button'}
             onClick={() => {
-                m.mousedOverWordHighlightService.mousedOverWord$.next(
-                    m.elementAtomMetadataIndex.metadataForElement(
-                        nodes[parseInt(manualMouseoverHighlight?.value as string)]
-                    ).priorityMouseoverHighlightWord(m)?.learningLanguage || ''
-                )
+                const atomMetadata = m.elementAtomMetadataIndex.metadataForElement(
+                    nodes[parseInt(manualMouseoverHighlight?.value as string)]
+                );
+                if (atomMetadata) {
+                    m.mousedOverWordHighlightService.mousedOverWord$.next(
+                        priorityMouseoverHighlightWord({atomMetadata, cardsRepository: m.cardsRepository})?.learningLanguage || ''
+                    )
+                }
 
             }}
         />

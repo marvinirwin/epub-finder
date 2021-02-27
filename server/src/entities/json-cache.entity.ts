@@ -10,6 +10,6 @@ export class JsonCache {
     key_hash: string;
     @Column("text")
     value: string;
-    @Column("text")
+    @Column("text", {default: ''})
     key: string;
 }

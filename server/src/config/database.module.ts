@@ -21,9 +21,8 @@ export const DatabaseModule = TypeOrmModule.forRoot({
     migrationsRun: process.env.TYPEORM_MIGRATIONS_RUN === 'true',
     seeds: [`src/db/seeds/*.seed.ts`],
     cli: {
-        migrationsDir: 'src/db/migrations',
-        entitiesDir: 'src/db/entities',
+        migrationsDir: 'src/migrations',
+        entitiesDir: 'src/entities',
     },
     synchronize: true,
-    logging: !!process.env.TYPEORM_LOGGING
 });

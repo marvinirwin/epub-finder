@@ -13,7 +13,7 @@ config({path: '.env'});
 
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {logger: true});
     const { httpAdapter } = app.get(HttpAdapterHost);
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter))

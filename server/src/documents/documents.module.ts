@@ -8,10 +8,12 @@ import {User} from "../entities/user.entity";
 import {HashService} from "./uploading/hash.service";
 import {UploadOnStartupService} from "./built-in-documents/upload-on-startup.service";
 import {TabulateService} from "./similarity/tabulate.service";
+import {CacheService} from "../util/cache.service";
+import {JsonCache} from "../entities/json-cache.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Document, DocumentView, User]),
+        TypeOrmModule.forFeature([Document, DocumentView, User, JsonCache]),
     ],
     controllers: [
         DocumentsController
@@ -20,7 +22,8 @@ import {TabulateService} from "./similarity/tabulate.service";
         DocumentsService,
         HashService,
         UploadOnStartupService,
-        TabulateService
+        TabulateService,
+        CacheService
     ]
 })
 export class DocumentsModule {}

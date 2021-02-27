@@ -27,7 +27,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public wordRecognitionScore() {
-        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.recognitionScore || 0;
+        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.grade || 0;
     }
 
     public isToReview() {
@@ -42,7 +42,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
 
     public hasNRecognizedInARow(n=2) {
         const last2 =  this.d.wordRecognitionRecords.slice(n * -1);
-        return last2.every(rec => rec.recognitionScore === SrmService.correctScore());
+        return last2.every(rec => rec.grade === SrmService.correctScore());
     }
 
     public isLearning() {
@@ -54,7 +54,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
         const mostRecentRecordsFirst = orderBy(this.d.wordRecognitionRecords, 'timestamp', 'desc');
         const mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
         const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
-            return mostRecentRecord.recognitionScore > temporallyPrecedingRecord.recognitionScore;
+            return mostRecentRecord.grade > temporallyPrecedingRecord.grade;
         })
         const lastRecord = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1];
 

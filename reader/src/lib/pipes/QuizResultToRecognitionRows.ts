@@ -19,14 +19,14 @@ export const QuizResultToRecognitionRows =
                     const previousRecords = wordScheduleRowDict[scorePair.word]?.d.wordRecognitionRecords || []
                     const nextRecognitionRecord = ms.getNextRecognitionRecord(
                         previousRecords,
-                        scorePair.score,
+                        scorePair.grade,
                     );
                     return {
                         word: scorePair.word,
                         timestamp: new Date(),
                         ...nextRecognitionRecord,
                         nextDueDate: moment().add(nextRecognitionRecord.interval, 'day').toDate(),
-                        grade: scorePair.score
+                        grade: scorePair.grade
                     };
                 })
             )
