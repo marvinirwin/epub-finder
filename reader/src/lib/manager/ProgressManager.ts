@@ -16,8 +16,8 @@ export class HSKLevel {
     protected getWordScore(word: string, wordScores: Dictionary<WordRecognitionRow>) {
         const wordScore = wordScores[word];
         if (!wordScore) return 0;
-        if (wordScore.recognitionScore > 10) return 10;
-        return wordScore.recognitionScore;
+        if (wordScore.grade > 10) return 10;
+        return wordScore.grade;
     }
 
     public progress$: Observable<number>;
@@ -107,7 +107,7 @@ export class Progress {
                 const missingWords = new Set<string>(Object.keys(weightedWords));
                 Object.entries(wordRecognitionWords).forEach(([word, recognitionRows]) => {
                     // If the last one is positive, we're good
-                    const correctToday =  recognitionRows[recognitionRows.length - 1].recognitionScore >= CORRECT_RECOGNITION_SCORE;
+                    const correctToday =  recognitionRows[recognitionRows.length - 1].grade >= CORRECT_RECOGNITION_SCORE;
                     if (correctToday) {
                         missingWords.delete(word);
                     }

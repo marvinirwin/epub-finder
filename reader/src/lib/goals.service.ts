@@ -36,7 +36,7 @@ export class GoalsService {
                 const wordsRecognizedToday = Object.values(recognition)
                     .filter(recordsForword => recordsForword
                         .find(r =>
-                            r.recognitionScore === RecognitionMap.easy &&
+                            r.grade >= 3 &&
                             isInToday(r.timestamp)
                         )
                     );

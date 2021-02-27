@@ -17,7 +17,7 @@ export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]
 };
 
 
-export const CORRECT_RECOGNITION_SCORE = 2;
+export const CORRECT_RECOGNITION_SCORE = 3;
 
 /**
  * TODO probably execute all these things in a try since elements may disappear

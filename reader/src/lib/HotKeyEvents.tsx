@@ -3,6 +3,7 @@ import {of, Subject} from "rxjs";
 import {switchMap, withLatestFrom} from "rxjs/operators";
 import {RecognitionMap} from "./srm/srm.service";
 import {Hotkeys} from "./hotkeys/hotkeys.interface";
+import {SuperMemoGrade} from "supermemo";
 
 export class HotKeyEvents {
 
@@ -82,7 +83,7 @@ export class HotKeyEvents {
         });
 
 
-        function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: number) {
+        function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: SuperMemoGrade) {
             quizResultEasy$2.pipe(
                 withLatestFrom(m.quizService.quizCard.word$)
             ).subscribe(([_, word]) => {

@@ -86,7 +86,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
                     <HotkeyWrapper action={"MARK_AS_KNOWN"}>
                         <IconButton aria-label="done" onClick={() => characters && m.quizManager.quizResult$.next({
                             word: characters,
-                            score: 2
+                            grade: 2
                         })}>
                             <Done fontSize="small"/>
                         </IconButton>

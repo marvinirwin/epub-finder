@@ -50,7 +50,7 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
                 className={quizCardTableRowRecognitions}
             >{
                 lastN(1)(row.d.wordRecognitionRecords)
-                    .map(r => `${r.recognitionScore}`)
+                    .map(r => `${r.grade}`)
                     .join(',')
             }
             </TableCell>

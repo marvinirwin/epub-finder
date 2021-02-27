@@ -1,10 +1,11 @@
 import {Observable, Subject} from "rxjs";
 import {ICard} from "../../../../server/src/shared/ICard";
 import {AlertsService} from "../../services/alerts.service";
+import {SuperMemoGrade} from "supermemo";
 
 export interface QuizResult {
     word: string;
-    score: number;
+    grade: SuperMemoGrade;
 }
 
 export enum QuizComponent {
@@ -16,10 +17,8 @@ export class QuizManager {
     quizResult$ = new Subject<QuizResult>();
     requestNextCard$ = new Subject<void>();
 
-    constructor() {
-    }
 
-    completeQuiz(word : string, recognitionScore : number ) {
+    completeQuiz(word : string, recognitionScore : SuperMemoGrade ) {
         this.quizResult$.next({
             score: recognitionScore,
             word

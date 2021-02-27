@@ -27,7 +27,7 @@ export class HighlightRecollectionDifficultyService extends HighlightDifficultyS
                         let correct = 0;
                         for (let i = row.length - 1; i >= 0; i--) {
                             const wordRecognitionRecord = row[i];
-                            if (wordRecognitionRecord.recognitionScore >= CORRECT_RECOGNITION_SCORE) {
+                            if (wordRecognitionRecord.grade >= CORRECT_RECOGNITION_SCORE) {
                                 correct++;
                             } else {
                                 break;

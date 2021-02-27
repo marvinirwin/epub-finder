@@ -46,6 +46,7 @@
     "react-tooltip": "^4.2.6",
     "rxjs": "^6.5.5",
     "socket.io-client": "^3.0.3",
+    "supermemo": "^2.0.17",
     "trie-prefix-tree": "^1.5.1",
     "ts-jest": "^26.1.1",
     "typescript": "^3.7.5",
