@@ -5,6 +5,7 @@ import {Observable} from "rxjs";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
+import {AllWordsRepository} from "../all-words.repository";
 
 export class TrieService {
     public trie$: Observable<TrieWrapper>;
@@ -13,11 +14,13 @@ export class TrieService {
         {
             cardsRepository,
             pronunciationProgressService,
-            wordRecognitionProgressService
+            wordRecognitionProgressService,
+            allWordsRepository
         }: {
             cardsRepository: CardsRepository,
             pronunciationProgressService: PronunciationProgressRepository,
-            wordRecognitionProgressService: WordRecognitionProgressRepository
+            wordRecognitionProgressService: WordRecognitionProgressRepository,
+            allWordsRepository: AllWordsRepository
         }
     ) {
         const t = new TrieWrapper(trie([]));
@@ -32,6 +35,7 @@ export class TrieService {
                 t.addWords(...records.map(record => record.word));
             })
         )
+        allWordsRepository.all$.subscribe(words => t.addWords(...words))
 
     }
 }

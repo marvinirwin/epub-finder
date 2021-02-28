@@ -4,7 +4,6 @@ import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
 import {ScheduleRow} from "./schedule/ScheduleRow";
 import {SettingsService} from "../services/settings.service";
 import {debounceTime, map, shareReplay} from "rxjs/operators";
-import {filterQuizRows} from "../components/quiz/quiz.service";
 
 export class FilterScheduleTableRowsService {
     public filteredScheduleRows$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
@@ -17,13 +16,27 @@ export class FilterScheduleTableRowsService {
     }) {
         this.filteredScheduleRows$ = combineLatest([
             settingsService.scheduleTableWordFilterValue$,
+            settingsService.scheduleTableShowUnderDue$,
+            settingsService.scheduleTableShowUncounted$,
             scheduleService.sortedScheduleRows$
         ]).pipe(
             debounceTime(500),
-            map(([scheduleTableWordFilterValue, sortedScheduleRows]) => {
-                return sortedScheduleRows.filter(row => row.d.word.includes(scheduleTableWordFilterValue))
+            map(([scheduleTableWordFilterValue, showUnderDue, showUncounted, sortedScheduleRows]) => {
+                const now = new Date();
+                const filterFuncs: ((r: ScheduleRow<NormalizedScheduleRowData>) => boolean)[] = [
+                    row => row.d.word.includes(scheduleTableWordFilterValue)
+                ];
+                if (!showUnderDue) {
+                    filterFuncs.push(r => r.dueDate() > now);
+                }
+                if (!showUncounted) {
+                    filterFuncs.push(r => r.count() > 0)
+                }
+                return sortedScheduleRows.filter(row => filterFuncs.every(filterFunc => filterFunc(row)))
             }),
+/*
             map(filterQuizRows),
+*/
             shareReplay(1)
         )
     }

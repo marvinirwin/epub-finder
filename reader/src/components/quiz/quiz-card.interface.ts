@@ -7,4 +7,6 @@ export interface QuizCard {
     word$: Observable<string | undefined>,
     image$: EditableValue<string | undefined>
     description$: EditableValue<string | undefined>
+    romanization$: Observable<string | undefined>,
+    translation$: Observable<string | undefined>
 }

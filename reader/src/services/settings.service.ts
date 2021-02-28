@@ -54,6 +54,8 @@ export class SettingsService {
     public dateWeight$: ReplaySubject<number>;
     public wordLengthWeight$: ReplaySubject<number>;
     public scheduleTableWordFilterValue$: ReplaySubject<string>;
+    public scheduleTableShowUncounted$: ReplaySubject<boolean>;
+    public scheduleTableShowUnderDue$: ReplaySubject<boolean>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -104,6 +106,9 @@ export class SettingsService {
         this.selectedVocabulary$ = this.createSetting$<string>('selectedVocabulary', '', 'indexedDB')
 
         this.scheduleTableWordFilterValue$ = this.createSetting$<string>('scheduleTableWordFilterValue', '', 'indexedDB')
+
+        this.scheduleTableShowUncounted$ = this.createSetting$<boolean>('scheduleTableShowUncounted', false, 'indexedDB')
+        this.scheduleTableShowUnderDue$ = this.createSetting$<boolean>('scheduleTableShowUnderDue', false, 'indexedDB')
     }
 
     public createSetting$<T>(

@@ -22,7 +22,7 @@ export class SpeechPracticeService {
 
         this.romanization$ = combineLatest([
             this.learningLanguage$,
-            languageConfigsService.learningToLatinTransliterate$
+            languageConfigsService.learningToLatinTransliterateFn$
         ]).pipe(
             switchMap(async ([learningLanguageText, transliterateFn]) => {
                 if (transliterateFn && learningLanguageText) {
@@ -33,7 +33,7 @@ export class SpeechPracticeService {
         )
         this.translation$ = combineLatest([
             this.learningLanguage$,
-            languageConfigsService.learningToKnownTranslate$
+            languageConfigsService.learningToKnownTranslateFn$
         ]).pipe(
             switchMap(async ([learningLanguageText, translateFn]) => {
                 if (translateFn && learningLanguageText) {

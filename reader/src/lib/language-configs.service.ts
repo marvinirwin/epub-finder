@@ -11,8 +11,8 @@ type PossibleStringFetcher = ((text: string) => Promise<string>) | undefined;
 
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleStringFetcher>;
-    public learningToKnownTranslate$: Observable<PossibleStringFetcher>;
-    public learningToLatinTransliterate$: Observable<PossibleStringFetcher>;
+    public learningToKnownTranslateFn$: Observable<PossibleStringFetcher>;
+    public learningToLatinTransliterateFn$: Observable<PossibleStringFetcher>;
     public latinToLearningTransliterate$: Observable<PossibleStringFetcher>;
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>;
 
@@ -44,7 +44,7 @@ export class LanguageConfigsService {
                 })
             }
         });
-        this.learningToKnownTranslate$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.learningToKnownTranslateFn$ = h((knownLanguageCode, learningLanguageCode) => {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {
@@ -263,7 +263,7 @@ export class LanguageConfigsService {
             }
         })
         let supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
-        this.learningToLatinTransliterate$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.learningToLatinTransliterateFn$ = h((knownLanguageCode, learningLanguageCode) => {
             const goesToLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
                 return code.toLowerCase() === learningLanguageCode.toLowerCase() &&
                     script2 === 'Latn'

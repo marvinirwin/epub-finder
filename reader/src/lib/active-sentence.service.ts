@@ -19,8 +19,8 @@ export class ActiveSentenceService {
             this.activeSentence$,
             settingsService.showTranslation$,
             settingsService.showRomanization$,
-            languageConfigsService.learningToKnownTranslate$,
-            languageConfigsService.learningToLatinTransliterate$
+            languageConfigsService.learningToKnownTranslateFn$,
+            languageConfigsService.learningToLatinTransliterateFn$
 
         ]).subscribe(async (
             [

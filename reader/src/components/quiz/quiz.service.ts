@@ -1,7 +1,7 @@
-import {combineLatest, Observable} from "rxjs";
+import {combineLatest, Observable, of} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
-import {distinctUntilChanged, map, shareReplay, tap} from "rxjs/operators";
+import {distinctUntilChanged, map, shareReplay, switchMap, tap} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
@@ -14,6 +14,8 @@ import {observableLastValue} from "../../services/settings.service";
 import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
+import {LanguageConfigsService} from "../../lib/language-configs.service";
+import {fetchTranslation} from "../../services/translate.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -29,13 +31,15 @@ export class QuizService {
             cardService,
             scheduleService,
             exampleSentencesService,
-            openDocumentsService
+            openDocumentsService,
+            languageConfigsService
         }: {
             trie$: Observable<TrieWrapper>,
             cardService: CardsRepository
             scheduleService: ScheduleService,
             exampleSentencesService: ExampleSegmentsService,
-            openDocumentsService: OpenDocumentsService
+            openDocumentsService: OpenDocumentsService,
+            languageConfigsService: LanguageConfigsService
         }
     ) {
         this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
@@ -102,6 +106,23 @@ export class QuizService {
                 description => {
                     update({knownLanguage: [description || '']});
                 }),
+            romanization$: combineLatest([
+                languageConfigsService.learningToLatinTransliterateFn$,
+                currentWord$
+            ]).pipe(
+                switchMap((
+                    [transliterateFn, currentWord]
+                ) => transliterateFn ? transliterateFn(currentWord) : of(undefined))
+            ),
+            translation$: combineLatest([
+                languageConfigsService.learningToKnownTranslateFn$,
+                currentWord$
+            ]).pipe(
+                switchMap(
+                    ([translateFn, currentWord]) =>
+                        translateFn ? translateFn(currentWord) : of(undefined)
+                )
+            )
         }
     }
 }

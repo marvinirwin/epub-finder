@@ -94,9 +94,7 @@ export class ScheduleRowsService {
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
                 return Object.fromEntries(ScheduleMathService.sortScheduleRows(
-                    Object.values(scheduleRows)
-                        .map(r => new ScheduleRow(r))
-                        ,
+                    Object.values(scheduleRows).map(r => new ScheduleRow(r)),
                     {
                         dateWeight,
                         countWeight: frequencyWeight,

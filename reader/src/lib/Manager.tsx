@@ -18,7 +18,7 @@ import {CardPage} from "./manager/manager-connections/Card-Page";
 import {InputQuiz} from "./manager/manager-connections/Input-Quiz";
 import {ScheduleQuiz} from "./manager/manager-connections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./manager/CreatedSentenceManager";
-import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/";
 import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
 import EditingCardManager from "./manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./manager/manager-connections/Card-Page-EditingCard-CardDB-Audio";
@@ -293,13 +293,13 @@ export class Manager {
             openDocumentsService: this.openDocumentsService,
             settingsService: this.settingsService
         });
-        // this.visibleSentencesService = new VisibleSentencesService({readingDocumentService: this.readingDocumentService})
         this.quizService = new QuizService({
             scheduleService: this.scheduleService,
             exampleSentencesService: this.exampleSentencesService,
             trie$: this.trieService.trie$,
             cardService: this.cardsRepository,
-            openDocumentsService: this.openDocumentsService
+            openDocumentsService: this.openDocumentsService,
+            languageConfigsService: this.languageConfigsService
         })
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
