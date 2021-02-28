@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import {EditingCard} from "../../lib/reactive-classes/EditingCard";
 import ImageList from "./CardImageList";
 import EditCardEnglish from "./EditCardEnglish";
-import {TutorialPopper} from "../popover/Tutorial";
+import {TutorialPopper} from "../popover/tutorial-popper.component";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Manager} from "../../lib/Manager";
 import {IconButton} from "@material-ui/core";

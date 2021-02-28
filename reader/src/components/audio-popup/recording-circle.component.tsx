@@ -3,7 +3,7 @@ import {Typography} from "@material-ui/core";
 import React from "react";
 import {useObservableState} from "observable-hooks";
 
-export default function RecordingCircle({r}: {r: AudioRecorder}) {
+export default function RecordingCircleComponent({r}: {r: AudioRecorder}) {
     const isRecording = useObservableState(r.isRecording$);
     return <div className="led-container">
         <div className="led-box">

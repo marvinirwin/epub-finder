@@ -1,6 +1,6 @@
 import {createStyles, LinearProgress, Theme, withStyles} from "@material-ui/core";
 
-export const BorderLinearProgress = withStyles((theme: Theme) =>
+export const BorderLinearProgressComponent = withStyles((theme: Theme) =>
     createStyles({
         root: {
             height: 10,

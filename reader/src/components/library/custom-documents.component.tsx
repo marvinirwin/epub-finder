@@ -3,7 +3,7 @@ import React from "react";
 import {useObservableState} from "observable-hooks";
 import {EditingDocument} from "../../lib/editing-documents/editing-document";
 
-export const CustomDocument: React.FunctionComponent<{ editingDocument: EditingDocument }> = ({editingDocument}) => {
+export const CustomDocumentsComponent: React.FunctionComponent<{ editingDocument: EditingDocument }> = ({editingDocument}) => {
     const rawText = useObservableState(editingDocument.text$) || '';
     const rawName = useObservableState(editingDocument.name$) || '';
     return <Paper>

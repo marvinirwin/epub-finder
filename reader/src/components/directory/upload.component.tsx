@@ -2,7 +2,7 @@ import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {Box, Button, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
-import {BorderLinearProgress} from "../progress/BorderLinearProgress";
+import {BorderLinearProgressComponent} from "../progress/border-linear-progress.component";
 import {fileChooser, uploadProgressBar} from "@shared/";
 
 
@@ -33,7 +33,7 @@ export const FileChooser = () => {
                 {currentFile && (
                     <Box className={`mb25 ${uploadProgressBar}`} display="flex" alignItems="center">
                         <Box width="100%" mr={1}>
-                            <BorderLinearProgress/>
+                            <BorderLinearProgressComponent/>
                         </Box>
                     </Box>)
                 }

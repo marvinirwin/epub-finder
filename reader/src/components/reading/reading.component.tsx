@@ -1,7 +1,7 @@
 import React, {useContext, useMemo, useState} from "react";
 import {Manager} from "../../lib/Manager";
 import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
-import AudioRecorder from "../audio-popup/AudioRecorder";
+import AudioRecorderComponent from "../audio-popup/audio-recorder.component";
 import {ExpandableContainer} from "../containers/expandable-container";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../main";

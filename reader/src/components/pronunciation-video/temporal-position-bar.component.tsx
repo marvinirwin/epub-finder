@@ -1,6 +1,6 @@
 import React from "react";
 
-export const TemporalPositionBar: React.FunctionComponent<{ color: string, position: number | undefined }> = ({position, color}) => {
+export const TemporalPositionBarComponent: React.FunctionComponent<{ color: string, position: number | undefined }> = ({position, color}) => {
     return position !== undefined ?
         <div style={{
             position: 'absolute',

@@ -1,6 +1,6 @@
 import React from "react";
 
-export const HighlightBar: React.FunctionComponent<{setHighlightBar: (bar: HTMLDivElement) => void}> = ({setHighlightBar}) => {
+export const HighlightBarComponent: React.FunctionComponent<{setHighlightBar: (bar: HTMLDivElement) => void}> = ({setHighlightBar}) => {
     return <div ref={setHighlightBar} style={{
         position: 'absolute',
         backgroundColor: 'blue',

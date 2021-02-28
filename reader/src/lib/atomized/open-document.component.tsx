@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {useObservableState} from "observable-hooks";
-import {InnerHTMLIFrame} from "../../components/frame/innerHTMLIFrame";
+import {InnerHtmlFrameComponent} from "../../components/frame/inner-html-frame.component";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {OpenDocument} from "../document-frame/open-document.entity";
@@ -11,7 +11,7 @@ export const OpenDocumentComponent =
     React.forwardRef<HTMLIFrameElement,
         { openedDocument: OpenDocument } & React.HTMLProps<HTMLIFrameElement>>(({openedDocument, ...props}, ref) => {
         const document = useObservableState(openedDocument.atomizedDocument$)
-        return <InnerHTMLIFrame
+        return <InnerHtmlFrameComponent
             {...props}
             title={openedDocument.label}
             bodyText={document?.bodyInnerHTML() || ''}

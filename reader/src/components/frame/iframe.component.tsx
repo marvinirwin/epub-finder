@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 
-export const Iframe = React.forwardRef<HTMLIFrameElement, {title: string} & React.HTMLProps<HTMLIFrameElement>>(({ children,title, ...props }, ref) => {
+export const IframeComponent = React.forwardRef<HTMLIFrameElement, {title: string} & React.HTMLProps<HTMLIFrameElement>>(({ children,title, ...props }, ref) => {
     const [contentRef, setContentRef] = useState<HTMLIFrameElement | null>()
     const head = contentRef?.contentWindow?.document.head;
     const body = contentRef?.contentWindow?.document.body;

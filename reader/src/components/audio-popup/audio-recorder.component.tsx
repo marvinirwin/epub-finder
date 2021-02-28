@@ -1,7 +1,7 @@
 import React, {useContext, useState} from "react";
 import {LinearProgress, Typography} from "@material-ui/core";
 import {Manager} from "../../lib/Manager";
-import {TutorialPopper} from "../popover/Tutorial";
+import {TutorialPopper} from "../popover/tutorial-popper.component";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext} from "../main";
 
@@ -13,7 +13,7 @@ export const SLIM_CARD_CONTENT = {
     paddingLeft: '5px'
 };
 
-export default function AudioRecorder({m}: { m: Manager }) {
+export default function AudioRecorderComponent({m}: { m: Manager }) {
     const recorder = m.audioRecordingService.audioRecorder;
     const isRecording = useObservableState(recorder.isRecording$);
 

@@ -5,7 +5,7 @@ import {OpenDocumentsService} from "./manager/open-documents.service";
 import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
 import {XMLDocumentNode} from "../../../server/src/shared/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
-import {BrowserInputs} from "./hotkeys/BrowserInputs";
+import {BrowserInputs} from "./hotkeys/browser-inputs";
 import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./highlighting/Highlighter";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";

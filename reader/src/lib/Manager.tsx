@@ -4,13 +4,13 @@ import {debounceTime, map, shareReplay, startWith, switchMap, tap} from "rxjs/op
 import {DatabaseService} from "./Storage/database.service";
 import React from "react";
 import {ICard} from "../../../server/src/shared/ICard";
-import {IndexDBManager} from "./Storage/StorageManagers";
+import {IndexDBManager} from "./Storage/indexed-db";
 import {AtomMetadata} from "../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {AudioManager} from "./manager/AudioManager";
 import CardsRepository from "./manager/cards.repository";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 import {QuizManager} from "./manager/QuizManager";
-import {BrowserInputs} from "./hotkeys/BrowserInputs";
+import {BrowserInputs} from "./hotkeys/browser-inputs";
 import {resolveICardForWord} from "./pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./manager/manager-connections/Card-Schedule-Quiz";
 import {InputPage} from "./manager/manager-connections/Input-Page";

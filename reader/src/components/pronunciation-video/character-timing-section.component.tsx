@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {usePlaceHighlightBar} from "./usePlaceHighlightBar";
-import {TemporalPositionBar} from "./TemporalPositionBar";
-import {HighlightBar} from "./HighlightBar";
+import {TemporalPositionBarComponent} from "./temporal-position-bar.component";
+import {HighlightBarComponent} from "./highlight-bar.component";
 import {VideoCharacter} from "./video-character.interface";
 import {ManagerContext} from "../../App";
 import {useObservableState, useSubscription} from "observable-hooks";
@@ -15,7 +15,7 @@ export type Percentage = number;
 const urlParams = new URLSearchParams(window.location.search);
 const editMode = !!urlParams.get('edit')
 
-export const CharacterTimingSection: React.FunctionComponent<{
+export const CharacterTimingSectionComponent: React.FunctionComponent<{
     characterTimings: VideoCharacter[],
     videoMetaData: VideoMetadata,
     chunkSizeMs: number,
@@ -147,11 +147,11 @@ export const CharacterTimingSection: React.FunctionComponent<{
 
     >
         <canvas ref={setCanvasRef}/>
-        <HighlightBar setHighlightBar={setHighlightBar}/>
-        <TemporalPositionBar
+        <HighlightBarComponent setHighlightBar={setHighlightBar}/>
+        <TemporalPositionBarComponent
             position={hoverBarFraction ? ((hoverBarFraction * canvasWidth) + 24 ) : undefined}
             color={'blue'}/>
-        <TemporalPositionBar
+        <TemporalPositionBarComponent
             position={progressBarFraction ? (progressBarFraction * canvasWidth) + 24 : undefined}
             color={'black'}/>
         <div ref={setSectionContainer} className={'character-timing-section'}>

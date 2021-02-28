@@ -1,10 +1,10 @@
 import React, {useEffect, useState, Fragment} from 'react'
-import {Iframe} from './iframe'
+import {IframeComponent} from './iframe.component'
 import {BodyStyle} from "../../lib/document-frame/atomized-document-style.service";
 
 export type IFrameRenderHandler = (head: HTMLTitleElement, body: HTMLDivElement) => void;
 
-export const InnerHTMLIFrame = React.forwardRef<HTMLIFrameElement,
+export const InnerHtmlFrameComponent = React.forwardRef<HTMLIFrameElement,
     {
         headText: string,
         bodyText: string,
@@ -20,11 +20,11 @@ export const InnerHTMLIFrame = React.forwardRef<HTMLIFrameElement,
             renderHandler(headRef, bodyRef);
         }
     }, [headText, bodyText, headRef, bodyRef]);
-    return <Iframe title={title} {...props} ref={ref}>
+    return <IframeComponent title={title} {...props} ref={ref}>
         <Fragment>
             <title ref={setHeadRef}>Ref</title>
             <style>{BodyStyle}</style>
         </Fragment>
         <div ref={setBodyRef} dangerouslySetInnerHTML={{__html: bodyText}}/>
-    </Iframe>
+    </IframeComponent>
 });

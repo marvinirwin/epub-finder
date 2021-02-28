@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
     }
 }));
-export default function MultiGraph({plots}: {plots: number[][]}) {
+export default function MultiGraphComponent({plots}: {plots: number[][]}) {
     const classes = useStyles();
     const [ rev, setRev ] = useState(0)
     useEffect(() => {

@@ -2,7 +2,7 @@ import {Manager} from "../../lib/Manager";
 import React, {useEffect, useRef, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";
-import {CharacterTimingSection} from "./CharacterTimingSection";
+import {CharacterTimingSectionComponent} from "./character-timing-section.component";
 import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {PronunciationVideo} from "./pronunciation-video.component";
 import {useDebouncedFn, useResizeObserver} from "beautiful-react-hooks";
@@ -118,7 +118,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
 
                     const highlightBarPoints = section.highlightBarPoints();
 
-                    return <CharacterTimingSection
+                    return <CharacterTimingSectionComponent
                         sectionWidth={box?.width}
                         normalMax={max}
                         key={lineIndex}

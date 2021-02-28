@@ -1,57 +1,6 @@
 import {DatabaseService} from "./database.service";
 import Dexie from "dexie";
 
-export class LocalStorageManager {
-    constructor(public localStorageKey: string) {
-    }
-
-    getLocalStorageArray(): any[] {
-
-        const a = this.tryParseLocalstorage();
-        if (!Array.isArray(a)) {
-            return [];
-        }
-        return a;
-    }
-
-    private tryParseLocalstorage(): any {
-        try {
-            return JSON.parse(localStorage.getItem(this.localStorageKey) || '');
-        } catch (e) {
-            return undefined;
-        }
-    }
-
-    load<T>(create: (a: any) => T) {
-        const stored = this.getLocalStorageArray();
-        return stored.map(create);
-    }
-
-    upsert(isMe: (a: any) => boolean, meSerialized: any) {
-        const serializedInstances = this.getLocalStorageArray();
-        const currentMe = serializedInstances.find(serializedObject => isMe(serializedObject))
-        if (currentMe) {
-
-            const i = serializedInstances.indexOf(currentMe);
-            serializedInstances[i] = meSerialized;
-        } else {
-            serializedInstances.push(meSerialized);
-        }
-        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
-    }
-
-    delete(isMe: (a: any) => boolean) {
-        const serializedInstances = this.getLocalStorageArray();
-        const currentMe = serializedInstances.filter(serializedObject => isMe(serializedObject))
-        if (currentMe) {
-            const i = serializedInstances.indexOf(currentMe);
-            serializedInstances.splice(i, 1);
-        } else {
-            throw new Error("Not found in array, cannot delete")
-        }
-        localStorage.setItem(this.localStorageKey, JSON.stringify(serializedInstances));
-    }
-}
 
 export class IndexDBManager<T> {
     constructor(

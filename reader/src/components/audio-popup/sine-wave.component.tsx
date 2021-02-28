@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
         width: '40px'
     },
 }));
-export default function SineWave({r}: { r: AudioRecorder }) {
+export default function SineWaveComponent({r}: { r: AudioRecorder }) {
     const classes = useStyles();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 /*

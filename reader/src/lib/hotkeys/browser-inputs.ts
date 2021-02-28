@@ -3,7 +3,7 @@ import {Dictionary} from "lodash";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {filter} from "rxjs/operators";
 import {ds_Dict} from "../Tree/DeltaScanner";
-import {HotkeyModes} from "./HotkeyModes";
+import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
 import {SettingsService} from "../../services/settings.service";
 import {popperGenerator} from "@popperjs/core";
@@ -49,7 +49,6 @@ export function hotkeyMode(t: HTMLElement | Document | null): HotkeyModes {
             return HotkeyModes.Reading;
     }
 }
-
 
 export function isListening(keyMode: HotkeyModes, actionListeningFor: keyof Hotkeys<any>) {
     switch (keyMode) {
