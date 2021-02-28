@@ -4,7 +4,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import {ds_Dict} from "../../lib/Tree/DeltaScanner";
+import {ds_Dict} from "../../lib/delta-scan/delta-scan.module";
 import DeleteIcon from '@material-ui/icons/Delete';
 import {ListItemIcon} from "@material-ui/core";
 import PlayListAddIcon from "@material-ui/icons/PlaylistAdd";

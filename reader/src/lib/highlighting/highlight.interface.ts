@@ -2,7 +2,7 @@ import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
 import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {RGBA} from "./color.service";
 

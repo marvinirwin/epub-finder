@@ -1,6 +1,6 @@
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay, startWith} from "rxjs/operators";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";

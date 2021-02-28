@@ -2,7 +2,7 @@ import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from
 import {Dictionary} from "lodash";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
 import {filter} from "rxjs/operators";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
 import {SettingsService} from "../../services/settings.service";

@@ -1,6 +1,6 @@
 import {ReplaySubject} from "rxjs";
 import {map} from "rxjs/operators";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";

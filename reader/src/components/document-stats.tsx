@@ -3,7 +3,7 @@ import React from "react";
 import {useObservableState} from "observable-hooks";
 import HSK1 from "../lib/hsk/hsk-level-1.json";
 import {HSKWord} from "../lib/manager/ProgressManager";
-import {ds_Dict} from "../lib/Tree/DeltaScanner";
+import {ds_Dict} from "../lib/delta-scan/delta-scan.module";
 import { flatten, orderBy } from "lodash";
 import {isChineseCharacter} from "../../../server/src/shared/OldAnkiClasses/Card";
 import {OpenDocument} from "../lib/document-frame/open-document.entity";

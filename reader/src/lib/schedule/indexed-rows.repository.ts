@@ -1,5 +1,5 @@
 import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {filter, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {orderBy} from "lodash";
 import {DatabaseService} from "../Storage/database.service";

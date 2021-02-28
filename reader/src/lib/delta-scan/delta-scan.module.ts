@@ -98,6 +98,18 @@ export class DeltaScanner<T, U extends string = string> {
     }
 }
 
+export class NamedDeltaScanner<T extends Named, U extends string = string> extends DeltaScanner<T, U> {
+    dict$: Observable<ds_Dict<T>>
+
+    constructor() {
+        super();
+        this.dict$ = this.updates$.pipe(
+            flattenTreeIntoDict(undefined),
+            shareReplay(1)
+        )
+    }
+}
+
 function MapTree<T, U>(node: ds_Tree<T>, mapFunc: DeltaScanMapFunc<T, U>): ds_Tree<U> {
     const newChildren = Object.fromEntries(
         Object.entries(node.children || {})

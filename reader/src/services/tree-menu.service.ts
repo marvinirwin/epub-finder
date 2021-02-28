@@ -1,10 +1,10 @@
 // A tree menu is a path and a ds_Tree with a computed property selectdObject
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {DeltaScanner, ds_Dict} from "../lib/Tree/DeltaScanner";
 import {map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
 import {TreeMenuNode} from "../components/directory/tree-menu-node.interface";
 import {SettingsService} from "./settings.service";
+import {DeltaScanner, ds_Dict} from "../lib/delta-scan/delta-scan.module";
 
 export type TreeMenuProps<T> = { value: T };
 

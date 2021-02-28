@@ -1,5 +1,5 @@
 import {ReplaySubject} from "rxjs";
-import {ds_Dict, IndexedByNumber} from "../Tree/DeltaScanner";
+import {ds_Dict, IndexedByNumber} from "../delta-scan/delta-scan.module";
 import { DocumentViewDto } from "@server/*";
 
 /**

@@ -2,7 +2,7 @@ import {merge, Subject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Modes, ModesService} from "./modes/modes.service";
 import {OpenDocumentsService} from "./manager/open-documents.service";
-import {ds_Dict, flattenTree} from "./Tree/DeltaScanner";
+import {ds_Dict, flattenTree} from "./delta-scan/delta-scan.module";
 import {XMLDocumentNode} from "../../../server/src/shared/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
 import {BrowserInputs} from "./hotkeys/browser-inputs";

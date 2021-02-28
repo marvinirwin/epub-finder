@@ -1,6 +1,6 @@
 import {DatabaseService} from "../lib/Storage/database.service";
 import {Observable, ReplaySubject, Subject} from "rxjs";
-import {ds_Dict} from "../lib/Tree/DeltaScanner";
+import {ds_Dict} from "../lib/delta-scan/delta-scan.module";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {distinct, distinctUntilChanged, skip, take} from "rxjs/operators";
 import {HistoryService} from "../lib/history.service";

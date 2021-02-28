@@ -2,7 +2,7 @@ import {combineLatest, merge, Observable, of} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Website} from "../Website/Website";
 import {Segment} from "@shared/";
-import {flattenTree, NamedDeltaScanner} from "../Tree/DeltaScanner";
+import {flattenTree, NamedDeltaScanner} from "../delta-scan/delta-scan.module";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";

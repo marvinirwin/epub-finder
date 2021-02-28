@@ -1,4 +1,4 @@
-import {ds_Dict, flattenTree} from "../Tree/DeltaScanner";
+import {ds_Dict, flattenTree} from "../delta-scan/delta-scan.module";
 import {Dictionary, flatten} from "lodash";
 import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {combineLatest, Observable} from "rxjs";

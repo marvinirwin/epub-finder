@@ -2,7 +2,7 @@ import {HighlightDifficultyService} from "./highlight-difficulty.service";
 import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.interface";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 import {HighlighterService} from "./highlighter.service";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HighlightDelta} from "./highlight.interface";
 import {RGBA} from "./color.service";
 import {colorForPercentage} from "../color/Range";

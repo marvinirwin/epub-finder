@@ -1,5 +1,5 @@
 import {combineLatest, Observable} from "rxjs";
-import {DeltaScan, flattenTree} from "../Tree/DeltaScanner";
+import {DeltaScan, flattenTree} from "../delta-scan/delta-scan.module";
 
 
 /**

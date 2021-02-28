@@ -1,7 +1,7 @@
 import {combineLatest, Observable} from "rxjs";
 import {Dictionary, sum} from 'lodash';
 import {map} from "rxjs/operators";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {CORRECT_RECOGNITION_SCORE} from "../highlighting/Highlighter";
 import HSK1 from '../hsk/hsk-level-1.json';
 import {WordRecognitionRow} from "../schedule/word-recognition-row";

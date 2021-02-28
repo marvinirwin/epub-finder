@@ -1,4 +1,4 @@
-import {ds_Dict} from "../../lib/Tree/DeltaScanner";
+import {ds_Dict} from "../../lib/delta-scan/delta-scan.module";
 import List from "@material-ui/core/List";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import ListItem from "@material-ui/core/ListItem";

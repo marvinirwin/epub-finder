@@ -2,7 +2,7 @@ import {HighlightDifficultyService} from "./highlight-difficulty.service";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {HighlighterService} from "./highlighter.service";
 import {HighlightDelta} from "./highlight.interface";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {RGBA} from "./color.service";
 import {CORRECT_RECOGNITION_SCORE} from "./Highlighter";

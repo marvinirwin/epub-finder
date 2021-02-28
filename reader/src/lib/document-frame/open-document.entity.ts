@@ -2,7 +2,7 @@ import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Segment} from "@shared/";
 import {TrieWrapper} from "../TrieWrapper";
-import {ds_Dict} from "../Tree/DeltaScanner";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {AtomizedDocument} from "@shared/";
 import {rehydratePage} from "../atomized/open-document.component";
 import {
