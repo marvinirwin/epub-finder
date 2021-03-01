@@ -28,11 +28,11 @@ export const QuizCardScheduleRowDisplay = (
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
         </div>
         <div style={{marginTop: '24px'}}>
-            <Typography variant='overline'>
+            <Typography variant='h4'>
                 {romanization}
             </Typography>
             <br/>
-            <Typography variant='overline'>
+            <Typography variant='h4'>
                 {translation}
             </Typography>
         </div>
