@@ -109,6 +109,7 @@ export class SettingsService {
 
         this.scheduleTableShowUncounted$ = this.createSetting$<boolean>('scheduleTableShowUncounted', false, 'indexedDB')
         this.scheduleTableShowUnderDue$ = this.createSetting$<boolean>('scheduleTableShowUnderDue', false, 'indexedDB')
+
     }
 
     public createSetting$<T>(

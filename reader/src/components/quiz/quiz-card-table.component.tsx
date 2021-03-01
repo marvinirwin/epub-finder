@@ -24,7 +24,7 @@ export const QuizCardTableComponent = () => {
     return <div>
         <QuizCardTableToolbar/>
         <TableContainer component={Paper}>
-        <Table aria-label="simple table">
+        <Table>
             <QuizCardTableHead/>
             <TableBody>
                 {scheduleRows.slice(0, 100).map(row => <QuizCardTableRow row={row} key={row.d.word}/>)}

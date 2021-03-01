@@ -1,5 +1,5 @@
 export {InterpolateService} from './interpolate.service';
-export {LtDocument} from './lt-document.class'
+export {LtDocument} from './lt-document'
 export * from './selectors';
 export * from './components';
 export * from './tabulate-documents/segment'
