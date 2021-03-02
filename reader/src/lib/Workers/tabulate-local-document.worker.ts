@@ -1,9 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument} from "@shared/";
-import {Segment, SerializedTabulation, tabulatedSentenceToTabulatedDocuments} from "@shared/";
-import trie from "trie-prefix-tree";
+import {AtomizedDocument, Segment, SerializedTabulation, tabulatedSentenceToTabulatedDocuments} from "@shared/";
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
@@ -15,10 +13,9 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (ev) => {
     const {trieWords, src, label}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
-    const t = new SetWithUniqueLengths(trieWords);
     const segments = doc.segments();
     const tabulatedSentences = Segment.tabulate(
-        t,
+        new SetWithUniqueLengths(trieWords),
         segments,
     );
     try {
