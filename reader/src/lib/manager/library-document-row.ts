@@ -1,5 +1,5 @@
-import {observableLastValue, SettingsService} from "../../../reader/src/services/settings.service";
-import {LtDocument} from "./lt-document";
+import {observableLastValue, SettingsService} from "../../services/settings.service";
+import {LtDocument} from "@shared/";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 
@@ -7,7 +7,7 @@ export class LibraryDocumentRow {
     selectedForFrequency$: Observable<boolean>;
     selectedForReading$: Observable<boolean>;
     private settingsService: SettingsService;
-    private ltDocument: LtDocument;
+    public ltDocument: LtDocument;
 
     constructor(
         {

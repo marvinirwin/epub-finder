@@ -59,7 +59,7 @@ export class OpenDocument {
                 switchMap(([trie, document]) => {
                     return TabulateLocalDocument({
                         label,
-                        trieWords: trie.t.getWords(),
+                        trieWords: Array.from(trie.t.values()),
                         src: document._originalSrc
                     })
                 })

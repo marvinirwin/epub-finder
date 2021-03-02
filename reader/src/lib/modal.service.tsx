@@ -10,6 +10,7 @@ import {NavModal} from "./nav-modal";
 import {SetVocab} from "../components/settings/set-vocab.component";
 import {AdjustDateWeight} from "../components/directory/adjust-date-weight.component";
 import {AdjustLengthWeight} from "../components/directory/adjust-length-weight.component";
+import {LibraryTable} from "../components/library/library-table.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -29,7 +30,7 @@ export class ModalService {
         );
         this.documentSelect = new NavModal(
             'documentSelect',
-            () => <DocumentSelect/>
+            () => <LibraryTable/>
         );
 
         this.settings = new NavModal(

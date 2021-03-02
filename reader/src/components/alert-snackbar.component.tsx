@@ -13,8 +13,8 @@ export const AlertSnackbar = () => {
         onClose={e => m.alertsService.alertMessagesVisible$.next(false)}>
         <div>
             {
-                (alertMessages || []).map(({alert: {msg, severity}}) =>
-                    <Alert key={msg} severity={severity}>
+                (alertMessages || []).map(({alert: {msg, severity}}, index) =>
+                    <Alert key={index} severity={severity}>
                         {msg}
                     </Alert>
                 )

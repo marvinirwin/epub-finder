@@ -5,6 +5,7 @@ import {AtomizedDocument} from "@shared/";
 import {Segment, SerializedTabulation, tabulatedSentenceToTabulatedDocuments} from "@shared/";
 import trie from "trie-prefix-tree";
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
+import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
 // @ts-ignore
 self.window = self;
@@ -14,7 +15,7 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (ev) => {
     const {trieWords, src, label}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
-    const t = trie(trieWords);
+    const t = new SetWithUniqueLengths(trieWords);
     const segments = doc.segments();
     const tabulatedSentences = Segment.tabulate(
         t,

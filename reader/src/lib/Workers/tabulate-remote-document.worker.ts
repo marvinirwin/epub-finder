@@ -4,6 +4,7 @@
 import {TabulateRemoteDocumentDto} from "./tabulate-remote-document.dto";
 import {AtomizedDocument,Segment,tabulatedSentenceToTabulatedDocuments} from "@shared/";
 import trie from "trie-prefix-tree";
+import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
 // @ts-ignore
 self.window = self;
@@ -16,7 +17,7 @@ ctx.onmessage = async (ev) => {
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
-        trie(trieWords),
+        new SetWithUniqueLengths(),
         doc.segments(),
     ), name);
     ctx.postMessage(tabulated);

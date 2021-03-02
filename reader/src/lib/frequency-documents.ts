@@ -18,7 +18,7 @@ export class FrequencyDocument {
     ) {
         this.tabulation$ = wordTrie$.pipe(
             switchMap(wordTrie => TabulateRemoteDocument(
-                {trieWords: wordTrie.t.getWords(), d: frequencyDocument.d}
+                {trieWords: Array.from(wordTrie.t.values()), d: frequencyDocument.d}
             )),
             shareReplay(1)
         );

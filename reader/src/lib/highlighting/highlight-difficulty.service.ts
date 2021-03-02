@@ -17,10 +17,12 @@ export class HighlightDifficultyService<T> {
             highlightPath: HighlighterPath
         }) {
 
+/*
         highlighterService.singleHighlight(
             rows$.pipe(map(getHighlightDelta)),
             highlightPath
         );
+*/
     };
 
     static clamp(min: number, max: number, v: number) {

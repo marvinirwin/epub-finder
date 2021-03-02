@@ -1,6 +1,4 @@
 import {uniq, flatten} from "lodash";
-import {ITrie} from "../../../../server/src/shared/Trie";
-import axios from "axios";
 import {ICard} from "../../../../server/src/shared/ICard";
 
 export function cardForWord(word: string): ICard {
@@ -17,12 +15,6 @@ export function cardForWord(word: string): ICard {
 }
 
 export const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n))
-
-export function getUniqueLengths(t: ITrie): number[] {
-    const words = t.getWords(false);
-    return uniq(words.map(w => w.length));
-}
-
 
 /**
  * Changed this to split on linebreak because I'm lazy for now

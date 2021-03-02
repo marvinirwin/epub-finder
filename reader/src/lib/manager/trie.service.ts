@@ -6,6 +6,7 @@ import {PronunciationProgressRepository} from "../schedule/pronunciation-progres
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
 import {AllWordsRepository} from "../all-words.repository";
+import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
 export class TrieService {
     public trie$: Observable<TrieWrapper>;
@@ -23,7 +24,7 @@ export class TrieService {
             allWordsRepository: AllWordsRepository
         }
     ) {
-        const t = new TrieWrapper(trie([]));
+        const t = new TrieWrapper(new SetWithUniqueLengths());
         this.trie$ = t.changeSignal$;
         cardsRepository.newWords$.subscribe(words => t.addWords(...words));
         cardsRepository.deleteWords.subscribe(words => t.removeWords(...words));

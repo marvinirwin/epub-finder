@@ -1,4 +1,3 @@
-import {ITrie} from "../Trie";
 import {Dictionary, flatten, uniq} from "lodash";
 import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {IWordInProgress} from "../Annotation/IWordInProgress";
@@ -8,6 +7,7 @@ import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
 import {TabulatedSentences} from "./tabulated-documents.interface";
 import {safePushSet} from "../safe-push";
+import {SetWithUniqueLengths} from "./set-with-unique-lengths";
 
 export class Segment {
     _translation: string | undefined;
@@ -32,7 +32,7 @@ export class Segment {
     }
 
     static tabulate(
-        t: ITrie,
+        t: SetWithUniqueLengths,
         segments: Segment[],
     ): TabulatedSentences {
         const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
@@ -40,7 +40,7 @@ export class Segment {
             segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
         })).filter(n => (n.textContent).trim());
-        const uniqueLengths = uniq(t.getWords().map(word => word.length).concat(1));
+        const uniqueLengths = uniq(Array.from(t.uniqueLengths).concat(1));
         const wordCounts: Dictionary<number> = {};
         const wordElementsMap: Dictionary<AtomMetadata[]> = {};
         const wordSegmentMap: Dictionary<Set<Segment>> = {};
@@ -55,7 +55,7 @@ export class Segment {
             }).filter(w => w.lengthRemaining > 0);
             const potentialWords = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
             const wordsWhichStartHere: string[] = potentialWords.reduce((acc: string[], potentialWord) => {
-                if (t.hasWord(potentialWord)) {
+                if (t.has(potentialWord)) {
                     safePushSet(wordSegmentMap, potentialWord, elementSegmentMap.get(currentMark))
                     acc.push(potentialWord);
                 }

@@ -1,5 +1,5 @@
 import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
-import {ITrie} from "../../../server/src/shared/Trie";
+import {SetWithUniqueLengths} from "../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
 export class TrieWrapper {
     public changeSignal$ = new ReplaySubject<TrieWrapper>(1);
@@ -8,7 +8,7 @@ export class TrieWrapper {
     private lengths: { [key: number]: number } = {};
     private wordSet = new Set<string>();
 
-    constructor(public t: ITrie) {
+    constructor(public t: SetWithUniqueLengths) {
         this.changeSignal$.next(this);
     }
 
@@ -22,7 +22,7 @@ export class TrieWrapper {
             }
             // Can't add empty strings to trie or it will throw "expected string got string" error I think
             if (w.length) {
-                this.t.addWord(w);
+                this.t.add(w);
             }
         })
         if (newWords.length) {
@@ -37,7 +37,7 @@ export class TrieWrapper {
                 this.lengths[w.length]--;
                 this.wordSet.delete(w);
             }
-            this.t.removeWord(w);
+            this.t.delete(w);
         })
 
 
