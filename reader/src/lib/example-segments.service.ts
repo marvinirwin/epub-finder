@@ -1,6 +1,5 @@
 import {Observable} from "rxjs";
-import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Segment} from "@shared/";
+import {map, shareReplay} from "rxjs/operators";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 
 export class ExampleSegmentsService {
@@ -15,7 +14,7 @@ export class ExampleSegmentsService {
     ) {
         this.exampleSegmentMap$ = openDocumentsService.virtualDocumentTabulation$.pipe(
             map((tabulation) => {
-                    return tabulation.wordSegmentStringsMap()
+                return tabulation.wordSegmentStringsMap()
                 }
             ),
             shareReplay(1)
