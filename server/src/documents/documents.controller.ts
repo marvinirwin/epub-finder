@@ -1,5 +1,7 @@
 import {Response} from "express";
+import {Document} from '../entities/document.entity';
 import {
+    Body,
     Controller,
     Delete,
     Get,
@@ -7,14 +9,14 @@ import {
     Headers,
     HttpCode, HttpException,
     HttpStatus,
-    Param,
+    Param, Post,
     Put,
     Res,
     UploadedFile,
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {DocumentsService} from "./documents.service";
+import {DocumentsService, DocumentUpdateDto} from "./documents.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
@@ -142,5 +144,26 @@ export class DocumentsController {
             (await s3ReadStream(filename)).pipe(response)
             resolve()
         })
+    }
+
+    @Post('update/:filename')
+    update(
+        @Param('filename') filename: string,
+        @Body() documentUpdateDto: DocumentUpdateDto,
+        @UserFromReq() user: User | undefined
+    ) {
+        // Check if we're allowed to modify this file
+        if (!user)) {
+            throw new HttpException("Not authorized to update document", 401)
+        }
+        return this.documentsService.update(
+            {
+                for_frequency: documentUpdateDto.for_frequency,
+                name: documentUpdateDto.name,
+                for_reading: documentUpdateDto.for_reading,
+                global: documentUpdateDto.global,
+                id: documentUpdateDto.id
+            }
+        )
     }
 }

@@ -1,3 +1,4 @@
+import {Document} from './document.entity';
 import {
     Entity,
     Column,
@@ -11,6 +12,7 @@ import {
 
 import bcrypt from 'bcrypt';
 import {DocumentView} from "./document-view.entity";
+import {DocumentUpdateDto} from "../documents/documents.service";
 
 @Entity()
 export class User {
@@ -53,6 +55,10 @@ export class User {
                 resolve(false);
             })
         });
+    }
+
+    isAllowedToModifyDocument(documentUpdate: DocumentUpdateDto) {
+        return documentUpdate. === this.id;
     }
 }
 

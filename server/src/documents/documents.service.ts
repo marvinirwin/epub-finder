@@ -5,9 +5,18 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {basename} from "path";
 import {HashService} from "./uploading/hash.service";
+import {HttpException} from "@nestjs/common";
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(`Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`);
+}
+
+export interface DocumentUpdateDto {
+    for_frequency: boolean;
+    name: string;
+    for_reading: boolean;
+    global: boolean;
+    id: string;
 }
 
 export class DocumentsService {
@@ -151,5 +160,17 @@ export class DocumentsService {
             name,
             creator_id: user.id
         });
+    }
+
+    public async update(user: User, d: DocumentUpdateDto) {
+        const currentEntry = await this.documentViewRepository.findOne(d.id);
+        if ()
+        if (!currentEntry) {
+            // TTODO what status is this?
+            throw new HttpException(`Unknown document id ${d.id}`, 500);
+        }
+        // Will this be mad because the id property will also be spread in?
+        // Don't I have to use the document_id prop?
+        return await this.documentRepository.insert({...currentEntry, ...d})
     }
 }

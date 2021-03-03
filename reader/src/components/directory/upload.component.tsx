@@ -9,7 +9,13 @@ import {fileChooser, uploadProgressBar} from "@shared/";
 export const FileChooser = () => {
     const m = useContext(ManagerContext);
     const currentFile = useObservableState(m.uploadingDocumentsService.currentUploadingFile$)
-    return <Fragment>
+    return <div>
+        <div>
+            <textarea>
+
+            </textarea>
+        </div>
+        <div>
             <Typography
                 variant={'h3'}
                 color="textSecondary"
@@ -53,17 +59,12 @@ export const FileChooser = () => {
                     <Button
                         className="btn-choose"
                         variant="outlined"
-                        component="span" >
+                        component="span">
                         Upload
                     </Button>
                 </label>
-
-                {/*
-                <Typography variant="subtitle2" className={`upload-message ${"isError" ? "error" : ""}`}>
-                    {}
-                </Typography>
-*/}
             </div>
 
-    </Fragment>
+        </div>
+    </div>
 }
