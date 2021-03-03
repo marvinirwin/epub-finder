@@ -157,6 +157,7 @@ export class DocumentsController {
             throw new HttpException("Not authorized to update document", 401)
         }
         return this.documentsService.update(
+            user,
             {
                 for_frequency: documentUpdateDto.for_frequency,
                 name: documentUpdateDto.name,

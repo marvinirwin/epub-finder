@@ -164,10 +164,12 @@ export class DocumentsService {
 
     public async update(user: User, d: DocumentUpdateDto) {
         const currentEntry = await this.documentViewRepository.findOne(d.id);
-        if ()
         if (!currentEntry) {
             // TTODO what status is this?
             throw new HttpException(`Unknown document id ${d.id}`, 500);
+        }
+        if (currentEntry.creator_id !== user.id) {
+            throw new HttpException(`Not authorized to modify id ${d.id}`, 401);
         }
         // Will this be mad because the id property will also be spread in?
         // Don't I have to use the document_id prop?

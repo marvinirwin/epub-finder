@@ -56,9 +56,5 @@ export class User {
             })
         });
     }
-
-    isAllowedToModifyDocument(documentUpdate: DocumentUpdateDto) {
-        return documentUpdate. === this.id;
-    }
 }
 
