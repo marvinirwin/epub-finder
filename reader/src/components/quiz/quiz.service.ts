@@ -1,7 +1,7 @@
 import {combineLatest, Observable, of} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
@@ -72,14 +72,11 @@ export class QuizService {
             }
         )
 
-        function update(propsToUpdate: Partial<ICard>) {
-            observableLastValue(currentWord$)
-                .then(word => {
-                    cardService.updateICard(
-                        word,
-                        propsToUpdate
-                    )
-                })
+        function update(propsToUpdate: Partial<ICard>, word: string) {
+            cardService.updateICard(
+                word,
+                propsToUpdate
+            )
         }
 
         this.quizCard = {
@@ -94,18 +91,26 @@ export class QuizService {
                         }),
                         shareReplay(1),
                     ),
-                imageSrc => {
-                    update({photos: [imageSrc || '']});
-                }),
+                imageSrc$ => imageSrc$
+                    .pipe(
+                        withLatestFrom(currentWord$),
+                        debounceTime(1000),
+                    ).subscribe(([imageSrc, word]) => update({photos: [imageSrc || '']}, word))
+            ),
             description$: new EditableValue<string | undefined>(
                 resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
                     .pipe(
                         map(c => c?.knownLanguage?.[0]),
                         shareReplay(1)
                     ),
-                description => {
-                    update({knownLanguage: [description || '']});
-                }),
+                description$ =>
+                    description$.pipe(
+                        withLatestFrom(currentWord$),
+                        debounceTime(1000)
+                    ).subscribe(([description, word]) => {
+                        update({knownLanguage: [description || '']}, word)
+                    })
+            ),
             romanization$: combineLatest([
                 languageConfigsService.learningToLatinTransliterateFn$,
                 currentWord$

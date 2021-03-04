@@ -4,9 +4,9 @@ export class EditableValue<T> {
     setValue$ = new ReplaySubject<T>(1)
     constructor(
         public value$: Observable<T>,
-        onChange: (valueChanged: T) => void
+        cb: (valueChanged$: Observable<T>) => void,
     ) {
-        this.setValue$.subscribe(onChange);
+        cb(this.setValue$)
     }
     public set(v: T) {
         this.setValue$.next(v)
