@@ -1,7 +1,7 @@
 import {combineLatest, Observable, of} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
@@ -10,16 +10,27 @@ import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
-import {observableLastValue} from "../../services/settings.service";
 import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {fetchTranslation} from "../../services/translate.service";
+import {QuizCardFields} from "./quiz-card-fields.interface";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
+
+type HiddenQuizFields = (keyof QuizCardFields)[];
+
+export const hiddenDefinition: HiddenQuizFields = [
+    'definition',
+    'description',
+];
+export const hiddenCharacter: HiddenQuizFields = [
+    'learningLanguage'
+];
+
+export const computeRandomHiddenQuizFields = () => Math.random() > 0.5 ? hiddenDefinition : hiddenCharacter;
 
 export class QuizService {
     quizCard: QuizCard;
@@ -127,6 +138,11 @@ export class QuizService {
                     ([translateFn, currentWord]) =>
                         translateFn ? translateFn(currentWord) : of(undefined)
                 )
+            ),
+            // I should make "hidden" deterministic somehow
+            // I'll worry about that later
+            hidden$: currentWord$.pipe(
+                map(word => computeRandomHiddenQuizFields())
             )
         }
     }
