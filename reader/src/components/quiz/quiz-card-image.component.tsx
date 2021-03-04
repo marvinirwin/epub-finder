@@ -9,6 +9,7 @@ import {IconButton} from "@material-ui/core";
 
 export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
     const quizCardImageSource = useObservableState(quizCard.image$.value$);
+    const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
     const m = useContext(ManagerContext);
     return <EditableOnClick onEditClicked={async () => {
         const searchTerm = await observableLastValue(quizCard.word$);
@@ -20,7 +21,7 @@ export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
         }
     }}>
         {
-            quizCardImageSource ?
+            !hiddenFields.has('picture') && quizCardImageSource ?
                 <img className={"quiz-card-image"} src={quizCardImageSource}/> :
                 <IconButton color='primary'>
                     <InsertPhoto id={'quiz-card-image-placeholder'}/>

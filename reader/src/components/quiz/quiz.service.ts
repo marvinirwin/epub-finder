@@ -14,21 +14,11 @@ import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {QuizCardFields} from "./quiz-card-fields.interface";
+import {hiddenCharacter, hiddenDefinition} from "./hidden-quiz-fields";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
-
-type HiddenQuizFields = (keyof QuizCardFields)[];
-
-export const hiddenDefinition: HiddenQuizFields = [
-    'definition',
-    'description',
-];
-export const hiddenCharacter: HiddenQuizFields = [
-    'learningLanguage'
-];
 
 export const computeRandomHiddenQuizFields = () => Math.random() > 0.5 ? hiddenDefinition : hiddenCharacter;
 
@@ -141,7 +131,7 @@ export class QuizService {
             ),
             // I should make "hidden" deterministic somehow
             // I'll worry about that later
-            hidden$: currentWord$.pipe(
+            hiddenFields$: currentWord$.pipe(
                 map(word => computeRandomHiddenQuizFields())
             )
         }

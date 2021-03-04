@@ -18,6 +18,7 @@ export const QuizCardScheduleRowDisplay = (
     const description = useObservableState(quizCard.description$.value$);
     const romanization = useObservableState(quizCard.romanization$);
     const translation = useObservableState(quizCard.translation$);
+    const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
     return <div>
         <div style={{marginTop: '24px'}}>
             Due in: {scheduleRow.dueIn()}

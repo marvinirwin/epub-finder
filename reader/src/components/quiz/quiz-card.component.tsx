@@ -32,6 +32,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                 m.hotkeyEvents.quizResultEasy$.next()
             }
         })
+    const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
     return <Paper className='quiz-card' {...props}>
         <div className={'quiz-card-data-sheet'}>
             <div>
@@ -39,7 +40,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
                 <QuizCardImage quizCard={quizCard}/>
-                <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>
+                {!hiddenFields.has('learningLanguage') && <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>}
             </div>
             <div>
                 <QuizCardCurrentCardInfo quizCard={quizCard}/>
