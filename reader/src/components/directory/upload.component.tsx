@@ -1,23 +1,43 @@
-import React, {useContext, Fragment} from "react";
+import React, {useContext, Fragment, useState} from "react";
 import {ManagerContext} from "../../App";
-import {Box, Button, Typography} from "@material-ui/core";
+import {Box, Button, Input, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {BorderLinearProgressComponent} from "../progress/border-linear-progress.component";
 import {fileChooser, uploadProgressBar} from "@shared/";
 
 
+const uploadText = (param: { text: string; title: string }) => {
+
+};
+
+export const UploadText = () => {
+    const m = useContext(ManagerContext);
+    const [text, setText] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    return <div>
+        <Typography
+            variant={'h5'}
+            color="textSecondary"
+            gutterBottom
+        >
+            Use text as learning material
+        </Typography>
+        <Input value={title} onChange={v => setTitle(v.target.value || '')} placeholder={'name'}/>
+        <textarea style={{width: '500px', height: '240px'}} onChange={v => setText(v.target.value || '')} value={text} />
+        <Button onClick={() => m.droppedFilesService.uploadFileRequests$.next([new File([text], `${title}.txt`)])}>
+            Upload Text
+        </Button>
+    </div>
+}
+
 export const FileChooser = () => {
     const m = useContext(ManagerContext);
     const currentFile = useObservableState(m.uploadingDocumentsService.currentUploadingFile$)
     return <div>
-        <div>
-            <textarea>
-
-            </textarea>
-        </div>
+        <UploadText/>
         <div>
             <Typography
-                variant={'h3'}
+                variant={'h5'}
                 color="textSecondary"
                 gutterBottom
             >

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
         },
         card: {
-            padding: theme.spacing(5)
+            padding: theme.spacing(5),
             /*
                         border: '2px solid #000',
                         boxShadow: theme.shadows[5],
@@ -50,7 +50,7 @@ export const ActionModal: React.FC<{
                 timeout: 500,
             }}
         >
-            <Card className={classes.card}>
+            <Card className={classes.card} style={{overflow: 'auto'}}>
                 {children}
             </Card>
         </Dialog>

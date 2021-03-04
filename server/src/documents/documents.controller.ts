@@ -153,7 +153,7 @@ export class DocumentsController {
         @UserFromReq() user: User | undefined
     ) {
         // Check if we're allowed to modify this file
-        if (!user)) {
+        if (!user) {
             throw new HttpException("Not authorized to update document", 401)
         }
         return this.documentsService.update(

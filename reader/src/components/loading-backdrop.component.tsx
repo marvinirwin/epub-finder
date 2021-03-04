@@ -4,7 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Backdrop, CircularProgress, createStyles, Theme, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {loadingBackdropTypography} from '@shared/';
-import {ProgressItem} from './progress-item'
+import {ProgressItemComponent} from "./progress-item.component";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -15,13 +15,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-
-export const ProgressItemComponent: React.FC<{progressItem: ProgressItem}> = ({progressItem}) => {
-    const t = useObservableState(progressItem.text$) || '';
-    return <Typography>
-        {t}
-    </Typography>
-}
 
 export const LoadingBackdrop = () => {
     const m = useContext(ManagerContext);
