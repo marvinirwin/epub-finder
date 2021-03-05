@@ -23,3 +23,6 @@ export const hsk1Node = 'hsk1Node';
 export const testNode1 = "闽中奇构";
 export const testNode2 = "这辈子";
 export const filterScheduleRows = 'filterScheduleRows';
+export const manualHotkeyInput = 'manualHotkeyInput';
+export const submitManualHotkeyButton = 'submitManualHotkeyButton';
+export const manualQuizHiddenFieldConfigId = 'manualQuizHiddenFieldConfigId';

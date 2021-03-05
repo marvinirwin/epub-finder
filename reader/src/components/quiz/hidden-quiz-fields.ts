@@ -5,6 +5,6 @@ export const hiddenDefinition: HiddenQuizFields = new Set([
     'definition',
     'description',
 ]);
-export const hiddenCharacter: HiddenQuizFields = new Set([
+export const hiddenLearningLanguage: HiddenQuizFields = new Set([
     'learningLanguage'
 ]);

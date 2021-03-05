@@ -30,13 +30,13 @@ export const SignupLogin = () => {
         <input id={'signup-password'} ref={setPassword} type="password" disabled={false}/>
         <button id={'signup-button'} onClick={() => {
             if (emailRef && passwordRef) {
-                let email = emailRef.value;
-                let password = passwordRef.value;
+                const email = emailRef.value;
+                const password = passwordRef.value;
                 axios.post(
                     '/languagetrainer-auth/signup',
                     {
-                        email: email,
-                        password: password
+                        email,
+                        password
                     }
                 ).then(() => {
                     login(email, password);

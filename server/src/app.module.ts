@@ -47,7 +47,7 @@ import { SubtitlesController } from './subtitles/subtitles.controller';
         SessionService,
         UsersService,
     ],
-    controllers: [SubtitlesController],
+    controllers: [],
 })
 export class AppModule {
 }

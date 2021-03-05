@@ -4,7 +4,7 @@ import {LanguageSelect} from "../components/directory/nodes/language-select.comp
 import {DocumentSelect} from "./reading-document-select.component";
 import {ToggleTranslateComponent} from "../components/settings/toggle-translate.component";
 import {TogglePinyinComponent} from "../components/settings/toggle-pinyin.component";
-import {ManualTestModal} from "../components/modals/manual-test-modal.component";
+import {ManualTestModal} from "../components/modals/test-modal/manual-test-modal.component";
 import {AdjustFrequencyWeight} from "../components/directory/adjust-frequency-weight.component";
 import {NavModal} from "./nav-modal";
 import {SetVocab} from "../components/settings/set-vocab.component";

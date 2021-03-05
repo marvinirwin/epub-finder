@@ -114,4 +114,10 @@ export class DirectoryPom {
         DirectoryPom.CloseAllDialogs()
         cy.get(`#${PROGRESS_TREE}`).click()
     }
+
+    static pressHotkey(hotkey: string) {
+        DirectoryPom.CloseAllDialogs();
+        cy.get(`#${manualHotkeyInput}`).clear().type(hotkey);
+        cy.get(`#${submitManualHotkeyButton}`).click();
+    }
 }

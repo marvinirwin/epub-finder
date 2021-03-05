@@ -7,7 +7,7 @@ import {Hotkeys} from "../../lib/hotkeys/hotkeys.interface";
 
 export const HotkeyDirectoryComponent = ({action}: {action: keyof Hotkeys<any>}) => {
     const m = useContext(ManagerContext);
-    const hotkeys = useObservableState(m.hotkeysService.hotkeysWithDefaults$);
+    const hotkeys = useObservableState(m.hotkeysService.hotkeyConfiguration$);
     const defaults = HotKeyEvents.defaultHotkeys();
     return <EditableHotkeyComponent action={action} keyCombo={(hotkeys || defaults)[action]} m={m}/>;
 }

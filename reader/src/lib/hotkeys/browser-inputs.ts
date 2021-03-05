@@ -5,7 +5,7 @@ import {filter} from "rxjs/operators";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
-import {SettingsService} from "../../services/settings.service";
+import {observableLastValue, SettingsService} from "../../services/settings.service";
 import {popperGenerator} from "@popperjs/core";
 import popperOffsets from '@popperjs/core/lib/modifiers/popperOffsets';
 import computeStyles from '@popperjs/core/lib/modifiers/computeStyles';
@@ -60,6 +60,14 @@ export function isListening(keyMode: HotkeyModes, actionListeningFor: keyof Hotk
 }
 
 
+function compareKeySequenceToHotkeyMap(hotkeyMap: Map<string[], Subject<void>>, keysPressed: ds_Dict<boolean>) {
+    hotkeyMap.forEach((subject, keys) => {
+        if (keys.every(key => keysPressed[key])) {
+            subject.next()
+        }
+    })
+}
+
 /**
  * If the key you're listening for is
  */
@@ -75,13 +83,14 @@ export class BrowserInputs {
     showTranslations: boolean = false;
     latestTranslationTarget: Segment | undefined;
     private activeSentenceService: ActiveSentenceService;
-
+    private hotkeys$: Observable<Map<string[], Subject<void>>>;
 
     constructor({hotkeys$, settings$, activeSentenceService}: {
         hotkeys$: Observable<Map<string[], Subject<void>>>,
         settings$: SettingsService,
-        activeSentenceService: ActiveSentenceService
+        activeSentenceService: ActiveSentenceService,
     }) {
+        this.hotkeys$ = hotkeys$;
         this.activeSentenceService = activeSentenceService;
         settings$.showTranslation$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
@@ -96,14 +105,14 @@ export class BrowserInputs {
                 this.keysPressed$
             ]
         ).subscribe(([hotkeyMap, keysPressed]) => {
-            hotkeyMap.forEach((subject, keys) => {
-                if (keys.every(key => keysPressed[key])) {
-                    subject.next()
-                }
-            })
+            compareKeySequenceToHotkeyMap(hotkeyMap, keysPressed);
         })
     }
 
+    async pressHotkey(keys: string[]) {
+        const hotkeys = await observableLastValue(this.hotkeys$);
+        compareKeySequenceToHotkeyMap(hotkeys, keys);
+    }
 
     applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
@@ -144,7 +153,6 @@ export class BrowserInputs {
         if (!this.keyupMap[key]) this.keyupMap[key] = new Subject<KeyboardEvent>()
         return this.keyupMap[key];
     }
-
 
     public applySegmentListeners(atomizedSentences: Segment[]) {
         atomizedSentences.forEach(atomizedSentence => {

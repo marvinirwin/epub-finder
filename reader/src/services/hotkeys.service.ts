@@ -5,11 +5,11 @@ import {SettingsService} from "./settings.service";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 
 export class HotkeysService {
-    public hotkeysWithDefaults$: Observable<Hotkeys<string[]>>;
+    public hotkeyConfiguration$: Observable<Hotkeys<string[]>>;
     private settingsService: SettingsService;
 
     constructor({settingsService}: { settingsService: SettingsService }) {
-        this.hotkeysWithDefaults$ = settingsService.hotkeys$
+        this.hotkeyConfiguration$ = settingsService.hotkeys$
             .pipe(map(hotkeys => ({...HotKeyEvents.defaultHotkeys(), ...hotkeys})));
         this.settingsService = settingsService;
     }

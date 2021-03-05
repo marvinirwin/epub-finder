@@ -1,4 +1,4 @@
-import {Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {OpenDocument} from "../../lib/document-frame/open-document.entity";
 import {EditableValue} from "./editing-value";
 import {HiddenQuizFields} from "./hidden-quiz-fields";
@@ -11,4 +11,5 @@ export interface QuizCard {
     romanization$: Observable<string | undefined>,
     translation$: Observable<string | undefined>
     hiddenFields$: Observable<HiddenQuizFields>
+    hasBeenAnswered$: BehaviorSubject<boolean>
 }

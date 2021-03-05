@@ -1,4 +1,4 @@
-import {combineLatest, Observable, of} from "rxjs";
+import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
@@ -14,17 +14,19 @@ import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {hiddenCharacter, hiddenDefinition} from "./hidden-quiz-fields";
+import {hiddenLearningLanguage, hiddenDefinition} from "./hidden-quiz-fields";
+import {workerData} from "worker_threads";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
 
-export const computeRandomHiddenQuizFields = () => Math.random() > 0.5 ? hiddenDefinition : hiddenCharacter;
+export const computeRandomHiddenQuizFields = () => Math.random() > 0.5 ? hiddenDefinition : hiddenLearningLanguage;
 
 export class QuizService {
     quizCard: QuizCard;
     currentScheduleRow$: Observable<ScheduleRow<NormalizedScheduleRowData>>
+    manualHiddenFieldConfig$ = new ReplaySubject<string>();
 
     constructor(
         {
@@ -131,9 +133,15 @@ export class QuizService {
             ),
             // I should make "hidden" deterministic somehow
             // I'll worry about that later
-            hiddenFields$: currentWord$.pipe(
-                map(word => computeRandomHiddenQuizFields())
-            )
+            hiddenFields$: combineLatest([currentWord$, this.manualHiddenFieldConfig$]).pipe(
+                map(([word, manualFieldConfig]) => {
+                    const m = { hiddenDefinition, hiddenLearningLanguage };
+                    // @ts-ignore
+                    return m[manualFieldConfig] ||
+                        computeRandomHiddenQuizFields()
+                })
+            ),
+            hasBeenAnswered$: new BehaviorSubject<boolean>(false)
         }
     }
 }
