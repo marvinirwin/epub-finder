@@ -26,3 +26,4 @@ export const filterScheduleRows = 'filterScheduleRows';
 export const manualHotkeyInput = 'manualHotkeyInput';
 export const submitManualHotkeyButton = 'submitManualHotkeyButton';
 export const manualQuizHiddenFieldConfigId = 'manualQuizHiddenFieldConfigId';
+export const quizButtonReveal = 'quizButtonReveal'

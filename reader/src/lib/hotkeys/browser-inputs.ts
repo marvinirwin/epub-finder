@@ -60,13 +60,13 @@ export function isListening(keyMode: HotkeyModes, actionListeningFor: keyof Hotk
 }
 
 
-function compareKeySequenceToHotkeyMap(hotkeyMap: Map<string[], Subject<void>>, keysPressed: ds_Dict<boolean>) {
+const compareKeySequenceToHotkeyMap = (hotkeyMap: Map<string[], Subject<void>>, keysPressed: ds_Dict<boolean>) => {
     hotkeyMap.forEach((subject, keys) => {
         if (keys.every(key => keysPressed[key])) {
             subject.next()
         }
     })
-}
+};
 
 /**
  * If the key you're listening for is
@@ -111,7 +111,7 @@ export class BrowserInputs {
 
     async pressHotkey(keys: string[]) {
         const hotkeys = await observableLastValue(this.hotkeys$);
-        compareKeySequenceToHotkeyMap(hotkeys, keys);
+        compareKeySequenceToHotkeyMap(hotkeys, Object.fromEntries(keys.map(key => [key, true])));
     }
 
     applyDocumentListeners(root: HTMLDocument) {

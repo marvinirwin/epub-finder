@@ -11,5 +11,5 @@ export interface QuizCard {
     romanization$: Observable<string | undefined>,
     translation$: Observable<string | undefined>
     hiddenFields$: Observable<HiddenQuizFields>
-    hasBeenAnswered$: BehaviorSubject<boolean>
+    answerIsRevealed$: BehaviorSubject<boolean>
 }

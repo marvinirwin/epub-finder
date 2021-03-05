@@ -1,7 +1,7 @@
 import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq} from "lodash";
@@ -141,7 +141,14 @@ export class QuizService {
                         computeRandomHiddenQuizFields()
                 })
             ),
-            hasBeenAnswered$: new BehaviorSubject<boolean>(false)
+            answerIsRevealed$: new BehaviorSubject<boolean>(false)
         }
+
+        currentWord$
+            .pipe(
+                distinctUntilChanged(),
+                mapTo(false)
+            )
+            .subscribe(this.quizCard.answerIsRevealed$)
     }
 }

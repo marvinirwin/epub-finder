@@ -140,7 +140,8 @@ export class HotKeyEvents {
             RECORD_QUIZ_WORD: ['r'],
             REQUEST_EDIT_WORD: ['e'],
             HIDE_VIDEO: ['v'],
-            PRONUNCIATION_RECORD_SUCCESS: ['p']
+            PRONUNCIATION_RECORD_SUCCESS: ['p'],
+
         }
     }
 }
