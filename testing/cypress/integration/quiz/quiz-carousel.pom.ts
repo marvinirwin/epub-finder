@@ -3,6 +3,8 @@ import {CardList} from "./quiz.document";
 import {DirectoryPom} from "../../support/pom/directory.pom";
 import {QuizCardPom} from "./quiz-card.pom";
 import {ImageSearchPom} from "./image-search.pom";
+import {HiddenQuizFields} from "../../../../server/src/shared/hidden-quiz-fields";
+import {manualQuizHiddenFieldConfigId} from "@shared/*";
 
 const CurrentQuizCard = '#current-quiz-card';
 
@@ -70,6 +72,10 @@ class QuizCarouselPom {
         cy
             .find('.image')
             .should('have.attr', 'src').should('not.include', oldSrc);
+    }
+
+    static setHiddenFields(hiddenDefinition: string) {
+        cy.get(`#${manualQuizHiddenFieldConfigId}`).type(hiddenDefinition)
     }
 }
 

@@ -1,7 +1,7 @@
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {OpenDocument} from "../../lib/document-frame/open-document.entity";
 import {EditableValue} from "./editing-value";
-import {HiddenQuizFields} from "./hidden-quiz-fields";
+import {HiddenQuizFields} from "../../../../server/src/shared/hidden-quiz-fields";
 
 export interface QuizCard {
     exampleSentenceOpenDocument: OpenDocument
