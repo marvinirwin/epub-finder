@@ -9,7 +9,6 @@ import {SpeechModule} from "./speech/speech.module";
 import {ImageSearchModule} from "./image-search/image-search.module";
 import {UsersModule} from "./user/user.module";
 import {ServeStaticModule} from "@nestjs/serve-static";
-import {join} from "path";
 import {SessionService} from "./session/session.service";
 import { AuthModule } from "./auth/auth.module";
 import { UsersService } from "./user/users.service";
@@ -20,6 +19,7 @@ import {ObservableModule} from "./observable/observable.module";
 import {DocumentsModule} from "./documents/documents.module";
 import {VideoMetadataModule} from "./video_metadata/video-metadata.module";
 import {RecordRequestModule} from "./record-request/record-request.module";
+import { SubtitlesController } from './subtitles/subtitles.controller';
 
 @Module({
     imports: [
@@ -41,12 +41,13 @@ import {RecordRequestModule} from "./record-request/record-request.module";
         ObservableModule,
         DocumentsModule,
         VideoMetadataModule,
-        RecordRequestModule
+        RecordRequestModule,
     ],
     providers: [
         SessionService,
         UsersService,
     ],
+    controllers: [SubtitlesController],
 })
 export class AppModule {
 }
