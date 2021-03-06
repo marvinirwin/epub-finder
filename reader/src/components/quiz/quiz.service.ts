@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxjs";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
@@ -14,14 +14,17 @@ import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {hiddenLearningLanguage, hiddenDefinition} from "../../lib/hidden-quiz-fields";
-import {workerData} from "worker_threads";
+import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
 
-export const computeRandomHiddenQuizFields = () => Math.random() > 0.5 ? hiddenDefinition : hiddenLearningLanguage;
+export const computeRandomHiddenQuizFields = () => {
+    return Math.random() > 0.5 ?
+        hiddenDefinition :
+        hiddenLearningLanguage;
+};
 
 export class QuizService {
     quizCard: QuizCard;
@@ -45,6 +48,7 @@ export class QuizService {
             languageConfigsService: LanguageConfigsService
         }
     ) {
+        this.manualHiddenFieldConfig$.next('');
         this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
             map(rows => filterQuizRows(rows)[0]),
         );
@@ -120,7 +124,8 @@ export class QuizService {
             ]).pipe(
                 switchMap((
                     [transliterateFn, currentWord]
-                ) => transliterateFn ? transliterateFn(currentWord) : of(undefined))
+                ) => transliterateFn ? transliterateFn(currentWord) : of(undefined)),
+                shareReplay(1)
             ),
             translation$: combineLatest([
                 languageConfigsService.learningToKnownTranslateFn$,
@@ -129,17 +134,19 @@ export class QuizService {
                 switchMap(
                     ([translateFn, currentWord]) =>
                         translateFn ? translateFn(currentWord) : of(undefined)
-                )
+                ),
+                shareReplay(1)
             ),
             // I should make "hidden" deterministic somehow
             // I'll worry about that later
             hiddenFields$: combineLatest([currentWord$, this.manualHiddenFieldConfig$]).pipe(
                 map(([word, manualFieldConfig]) => {
-                    const m = { hiddenDefinition, hiddenLearningLanguage };
+                    const m = {hiddenDefinition, hiddenLearningLanguage};
                     // @ts-ignore
                     return m[manualFieldConfig] ||
                         computeRandomHiddenQuizFields()
-                })
+                }),
+                shareReplay(1)
             ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false)
         }

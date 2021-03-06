@@ -9,7 +9,6 @@ import {QuizCardScheduleRowDisplay} from "./quiz-card-schedule-row.component";
 
 export const QuizCardCurrentCardInfo = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);
-    const w = useObservableState(quizCard.word$) || '';
     const scheduleRow: ScheduleRow<NormalizedScheduleRowData> | undefined = useObservableState(m.quizService.currentScheduleRow$);
     return <div>
         {

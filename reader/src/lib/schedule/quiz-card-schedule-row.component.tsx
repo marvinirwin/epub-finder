@@ -7,6 +7,7 @@ import {useObservableState} from "observable-hooks";
 import {QuizCard} from "../../components/quiz/quiz-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
+import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
 
 export const QuizCardScheduleRowDisplay = (
     {
@@ -20,6 +21,9 @@ export const QuizCardScheduleRowDisplay = (
     const romanization = useObservableState(quizCard.romanization$);
     const translation = useObservableState(quizCard.translation$);
     const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
+    const isDescriptionHidden = useIsFieldHidden({quizCard, label: 'description'});
+    const isRomanizationHidden = useIsFieldHidden({quizCard, label: 'romanization'});
+    const isDefinitionHidden = useIsFieldHidden({quizCard, label: 'definition'});
     return <div>
         <div style={{marginTop: '24px'}}>
             Due in: {scheduleRow.dueIn()}
@@ -27,27 +31,30 @@ export const QuizCardScheduleRowDisplay = (
         </div>
         <div style={{marginTop: '24px'}}>
             Frequency: {scheduleRow.count()}
+            {DEV && <div>Hidden Fields: {JSON.stringify([...hiddenFields.values()])}</div>}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
         </div>
         <div style={{marginTop: '24px'}}>
             <Typography variant='h4' className={quizCardRomanization}>
-                {romanization}
+                {isRomanizationHidden ? '' : romanization}
             </Typography>
             <br/>
             <Typography variant='h4' className={quizCardTranslation}>
-                {translation}
+                {isDefinitionHidden ? '' : translation}
             </Typography>
         </div>
         <div style={{marginTop: '24px', marginBottom: '24px'}}>
-            <TextField
-                label="Description"
-                inputProps={{className: quizCardDescription}}
-                multiline
-                rows={3}
-                variant="filled"
-                value={description}
-                onChange={e => quizCard.description$.set(e.target.value)}
-            />
+            {
+                isDescriptionHidden ? '' :<TextField
+                    label="Description"
+                    inputProps={{className: quizCardDescription}}
+                    multiline
+                    rows={3}
+                    variant="filled"
+                    value={description}
+                    onChange={e => quizCard.description$.set(e.target.value)}
+                />
+            }
         </div>
     </div>
 }

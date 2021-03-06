@@ -74,20 +74,17 @@ export class QuizCarouselPom {
             .should('have.attr', 'src').should('not.include', oldSrc);
     }
 
-    static setHiddenFields(hiddenDefinition: string) {
-        cy.get(`#${manualQuizHiddenFieldConfigId}`).type(hiddenDefinition)
-    }
 
     static translatedTextShouldBe(s: string) {
-        cy.get(`.${quizCardTranslation}`).should('have.textContent', s);
+        cy.get(`.${quizCardTranslation}`).should('have.text', s);
     }
 
     static descriptionTextShouldBe(s: string) {
-        cy.get(`.${quizCardDescription}`).should('have.textContent', s)
+        cy.get(`.${quizCardDescription}`).should('have.text', s)
     }
 
     static learningLanguageTextShouldBe(s: string) {
-        cy.get(`.${quizCardLearningLanguage}`).should('have.textContent', s)
+        cy.get(`.${quizCardLearningLanguage}`).should('have.text', s)
     }
 
     static reveal() {

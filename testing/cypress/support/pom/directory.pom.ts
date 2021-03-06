@@ -7,7 +7,7 @@ import {
     QUIZ_NODE,
     UPLOAD_LEARNING_MATERIAL,
     manualHotkeyInput,
-    submitManualHotkeyButton, TESTING_UTILS
+    submitManualHotkeyButton, TESTING_UTILS, manualQuizHiddenFieldConfigId
 } from '@shared/*'
 
 export class DirectoryPom {
@@ -125,5 +125,11 @@ export class DirectoryPom {
     static OpenTestingUtils() {
         DirectoryPom.CloseAllDialogs();
         cy.get(`#${TESTING_UTILS}`).click();
+    }
+
+    static SetHiddenFields(hiddenDefinition: string) {
+        DirectoryPom.OpenTestingUtils()
+        cy.get(`#${manualQuizHiddenFieldConfigId}`).type(hiddenDefinition)
+        DirectoryPom.CloseAllDialogs()
     }
 }

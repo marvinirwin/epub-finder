@@ -18,40 +18,6 @@ const defaultHotkeys = {
 }
 
 
-
-
-describe('Quiz Cards', () => {
-    beforeEach(() => {
-    })
-    it('Shows the correct card body', () => {
-        const firstCard = CardList[0];
-        DirectoryPom.goToQuiz();
-        QuizCarouselPom.setHiddenFields('hiddenDefinition');
-        // Assert the definition and description are hidden
-        QuizCarouselPom.definitionTextShouldBe('')
-        QuizCarouselPom.descriptionTextShouldBe('')
-
-        QuizCarouselPom.setHiddenFields('hiddenLearningLanguage');
-        // Assert learning language empty
-        QuizCarouselPom.learningLanguageTextShouldBe('');
-
-        // Now reveal the while card
-        QuizCarouselPom.reveal();
-        QuizCarouselPom.definitionTextShouldBe(firstCard.description);
-        QuizCarouselPom.editDescription('test');
-        QuizCarouselPom.descriptionTextShouldBe(firstCard.description);
-        QuizCarouselPom.learningLanguageTextShouldBe(firstCard.characters);
-        QuizCarouselPom.selectNewImage();
-        QuizCarouselPom.image().should('not.be.empty')
-        DirectoryPom.PressHotkey(defaultHotkeys.quizScore5);
-        // Assert the word is different
-        // Now how do we get back to the original quiz card?
-        QuizCarouselPom.learningLanguageTextShouldBe('');
-        QuizCarouselPom.goToQuizCard(firstCard.characters);
-    });
-})
-
-
 describe('Quiz Cards', () => {
     beforeEach(() => {
     })
@@ -59,12 +25,12 @@ describe('Quiz Cards', () => {
         cy.visitHome();
         const firstCard = CardList[0];
         DirectoryPom.goToQuiz();
-        QuizCarouselPom.setHiddenFields('hiddenDefinition');
+        DirectoryPom.SetHiddenFields('hiddenDefinition');
         // Assert the definition and description are hidden
         QuizCarouselPom.translatedTextShouldBe('')
         QuizCarouselPom.descriptionTextShouldBe('')
 
-        QuizCarouselPom.setHiddenFields('hiddenLearningLanguage');
+        DirectoryPom.SetHiddenFields('hiddenLearningLanguage');
         // Assert learning language empty
         QuizCarouselPom.learningLanguageTextShouldBe('');
 

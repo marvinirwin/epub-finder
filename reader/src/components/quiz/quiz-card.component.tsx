@@ -11,17 +11,16 @@ import {uniq, flatten} from "lodash";
 import {QuizCardCurrentCardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
 import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
 import {
-    QUIZ_BUTTON_EASY,
-    QUIZ_BUTTON_HARD,
-    QUIZ_BUTTON_IGNORE,
-    QUIZ_BUTTON_MEDIUM,
     quizCardLearningLanguage
 } from "@shared/";
+import {QuizCardButtons} from "./quiz-card-buttons.component";
+import {useIsFieldHidden} from "./useIsFieldHidden";
 
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
     const word = useObservableState(quizCard.word$);
     const m = useContext(ManagerContext);
+    const isLearningLanguageHidden = useIsFieldHidden({quizCard, label: 'learningLanguage'})
     useSubscription(
         m.audioRecordingService.audioRecorder.currentRecognizedText$,
         async recognizedText => {
@@ -38,7 +37,6 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                 m.hotkeyEvents.quizResultEasy$.next()
             }
         })
-    const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
     return <Paper className='quiz-card' {...props}>
         <div className={'quiz-card-data-sheet'}>
             <div>
@@ -46,7 +44,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
                 <QuizCardImage quizCard={quizCard}/>
-                {!hiddenFields.has('learningLanguage') && <Typography
+                {!isLearningLanguageHidden && <Typography
                     variant={'h1'}
                     className={quizCardLearningLanguage}
                 >{word || ''}</Typography>}
@@ -56,5 +54,6 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             </div>
         </div>
         <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
+        <QuizCardButtons quizCard={quizCard}/>
     </Paper>
 }

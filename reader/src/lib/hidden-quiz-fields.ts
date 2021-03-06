@@ -4,7 +4,9 @@ export type HiddenQuizFields = Set<keyof QuizCardFields>;
 export const hiddenDefinition: HiddenQuizFields = new Set([
     'definition',
     'description',
+    'romanization'
 ]);
 export const hiddenLearningLanguage: HiddenQuizFields = new Set([
-    'learningLanguage'
+    'learningLanguage',
+    'romanization'
 ]);

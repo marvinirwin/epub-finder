@@ -42,13 +42,11 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
                     Ignore
                 </Button>
             </Fragment> :
-            <Fragment>
-                <Button
-                    id={quizButtonReveal}
-                    onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
-                    Reveal (Space)
-                </Button>
-            </Fragment>
+            <Button
+                id={quizButtonReveal}
+                onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
+                Reveal (Space)
+            </Button>
         }
     </div>
 }
