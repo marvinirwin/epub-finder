@@ -28,6 +28,8 @@ import {s3ReadStream, s3} from "./uploading/s3.service";
 import {AnonymousGuard} from "../guards/anonymous.guard";
 import {DocumentViewDto} from "./document-view.dto";
 import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
+import {RevisionUpdater} from "../revision-updater";
+import {DocumentView} from "../entities/document-view.entity";
 
 @Controller('documents')
 export class DocumentsController {
@@ -152,6 +154,12 @@ export class DocumentsController {
         @Body() documentUpdateDto: DocumentUpdateDto,
         @UserFromReq() user: User | undefined
     ) {
+        const submitter = new RevisionUpdater<Document, DocumentUpdateDto>(
+            r => await this.documentsService.documentRepository.findOne(r.id),
+            documentView => documentView.creator_id === user?.id,
+            (currentVersion, newVersion) =>
+            persistNewVersion: (newVersion: T) => Promise<T>
+        )
         // Check if we're allowed to modify this file
         if (!user) {
             throw new HttpException("Not authorized to update document", 401)

@@ -22,11 +22,11 @@ export interface DocumentUpdateDto {
 export class DocumentsService {
     constructor(
         @InjectRepository(DocumentView)
-        private documentViewRepository: Repository<DocumentView>,
+        public documentViewRepository: Repository<DocumentView>,
         @InjectRepository(Document)
-        private documentRepository: Repository<Document>,
+        public documentRepository: Repository<Document>,
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        public userRepository: Repository<User>,
     ) {
     }
 
@@ -175,4 +175,5 @@ export class DocumentsService {
         // Don't I have to use the document_id prop?
         return await this.documentRepository.insert({...currentEntry, ...d})
     }
+
 }
