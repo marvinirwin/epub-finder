@@ -1,5 +1,5 @@
 import {Response} from "express";
-import {Document} from '../entities/document.entity';
+import {Document, documentRootId} from '../entities/document.entity';
 import {
     Body,
     Controller,
@@ -16,7 +16,7 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {DocumentsService, DocumentUpdateDto} from "./documents.service";
+import {DocumentsService} from "./documents.service";
 import {UserFromReq} from "../decorators/userFromReq";
 import {User} from "../entities/user.entity";
 import {LoggedInGuard} from "../guards/logged-in.guard";
@@ -30,6 +30,7 @@ import {DocumentViewDto} from "./document-view.dto";
 import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
 import {RevisionUpdater} from "../revision-updater";
 import {DocumentView} from "../entities/document-view.entity";
+import {DocumentUpdateDto} from "./document-update.dto";
 
 @Controller('documents')
 export class DocumentsController {
@@ -91,7 +92,7 @@ export class DocumentsController {
                 user,
                 name,
                 output.index().s3Key,
-                existingDocumentWithSameName.rootId()
+                documentRootId(existingDocumentWithSameName)
             )
         }
         const savedDocument = await this.documentsService.saveNew(
@@ -155,10 +156,21 @@ export class DocumentsController {
         @UserFromReq() user: User | undefined
     ) {
         const submitter = new RevisionUpdater<Document, DocumentUpdateDto>(
-            r => await this.documentsService.documentRepository.findOne(r.id),
+            r => this.documentsService.documentRepository.findOne(r.id),
             documentView => documentView.creator_id === user?.id,
-            (currentVersion, newVersion) =>
-            persistNewVersion: (newVersion: T) => Promise<T>
+            (currentVersion, newVersion) => ({
+                ...currentVersion,
+                id: newVersion.id,
+                for_frequency: newVersion.for_frequency,
+                for_reading: newVersion.for_reading,
+                global: newVersion.global,
+                name: newVersion.name
+            }),
+            newVersion => this.documentsService.documentRepository.save(newVersion),
+            newVersion => ({
+                ...newVersion,
+                creator_id: user.id,
+            })
         )
         // Check if we're allowed to modify this file
         if (!user) {

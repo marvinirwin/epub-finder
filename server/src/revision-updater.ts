@@ -1,10 +1,12 @@
+import {QueryDeepPartialEntity} from "typeorm/query-builder/QueryPartialEntity";
+
 export class RevisionUpdater<T, RevisionT extends Partial<T>> {
     constructor(
-        private getCurrentVersion: (newRevision: RevisionT) => Promise<T | undefined>,
-        private isAllowedFn: (currentVersion: T) => Promise<boolean>,
+        private getCurrentVersion: (newRevision: RevisionT) => Promise<T | undefined> | T,
+        private isAllowedFn: (currentVersion: T) => Promise<boolean> | boolean,
         private mergeVersions: (currentVersion: T, newRevision: RevisionT) => T,
-        private persistNewVersion: (newVersion: T) => Promise<T>,
-        private createNewVersion: (newRevision: RevisionT) => Promise<T>
+        private persistNewVersion: (newVersion: Partial<T>) => Promise<T> | T,
+        private createNewVersion: (newRevision: RevisionT) => Promise<Partial<T>> | Partial<T>
     ) {
     }
     public async SubmitRevision(

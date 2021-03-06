@@ -61,8 +61,4 @@ export class DocumentView  {
 
     @Column()
     for_reading: boolean;
-
-    rootId() {
-        return this.document_id || this.id;
-    }
 }

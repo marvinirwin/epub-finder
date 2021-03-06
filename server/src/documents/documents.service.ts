@@ -1,22 +1,15 @@
 import {User} from "../entities/user.entity";
-import {Document} from "../entities/document.entity";
+import {Document, documentRootId} from "../entities/document.entity";
 import {DocumentView} from "../entities/document-view.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {basename} from "path";
 import {HashService} from "./uploading/hash.service";
 import {HttpException} from "@nestjs/common";
+import {DocumentUpdateDto} from "./document-update.dto";
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(`Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`);
-}
-
-export interface DocumentUpdateDto {
-    for_frequency: boolean;
-    name: string;
-    for_reading: boolean;
-    global: boolean;
-    id: string;
 }
 
 export class DocumentsService {
@@ -79,7 +72,7 @@ export class DocumentsService {
 
     public async delete(user: User, documentId: string) {
         const existing = await this.existing(user, documentId);
-        const deletingId = existing.rootId()
+        const deletingId = documentRootId(existing);
         delete existing.id;
         delete existing.created_at;
         return await this.documentRepository.save({

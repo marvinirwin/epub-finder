@@ -12,7 +12,7 @@ import {
 
 import bcrypt from 'bcrypt';
 import {DocumentView} from "./document-view.entity";
-import {DocumentUpdateDto} from "../documents/documents.service";
+import {DocumentUpdateDto} from "../documents/document-update.dto";
 
 @Entity()
 export class User {

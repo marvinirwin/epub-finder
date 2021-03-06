@@ -7,6 +7,7 @@ import {
     PrimaryColumn,
     PrimaryGeneratedColumn
 } from "typeorm";
+import {DocumentClassifierEndpointArn} from "aws-sdk/clients/comprehend";
 
 @Entity()
 export class Document {
@@ -46,8 +47,8 @@ export class Document {
 
     @CreateDateColumn()
     created_at: Date;
-
-    rootId() {
-        return this.document_id || this.id;
-    }
 }
+export const documentRootId = (d: {document_id: string | null, id: string}) => {
+    return d.document_id || d.id
+}
+
