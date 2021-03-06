@@ -45,15 +45,16 @@ export const QuizCardScheduleRowDisplay = (
         </div>
         <div style={{marginTop: '24px', marginBottom: '24px'}}>
             {
-                isDescriptionHidden ? '' :<TextField
-                    label="Description"
-                    inputProps={{className: quizCardDescription}}
-                    multiline
-                    rows={3}
-                    variant="filled"
-                    value={description}
-                    onChange={e => quizCard.description$.set(e.target.value)}
-                />
+                isDescriptionHidden ? '' :
+                    <TextField
+                        label="Description"
+                        inputProps={{className: quizCardDescription}}
+                        multiline
+                        rows={3}
+                        variant="filled"
+                        value={description}
+                        onChange={e => quizCard.description$.set(e.target.value)}
+                    />
             }
         </div>
     </div>
