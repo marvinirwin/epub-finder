@@ -5,7 +5,9 @@ import {
     LIBRARY,
     PAGES,
     QUIZ_NODE,
-    UPLOAD_LEARNING_MATERIAL
+    UPLOAD_LEARNING_MATERIAL,
+    manualHotkeyInput,
+    submitManualHotkeyButton, TESTING_UTILS
 } from '@shared/*'
 
 export class DirectoryPom {
@@ -101,7 +103,7 @@ export class DirectoryPom {
         cy.contains(`.${documentSelectionRow}`, documentName).click()
     }
 
-    static selectFrequencyDocuments(...frequencyDocumentNames: string[]) {
+    static SelectFrequencyDocuments(...frequencyDocumentNames: string[]) {
         DirectoryPom.EnterLibrary();
         frequencyDocumentNames.forEach(frequencyDocumentName => {
             cy.get(frequencyDocumentList)
@@ -110,14 +112,18 @@ export class DirectoryPom {
         })
     }
 
-    static goToGraph() {
+    static OpenProgressTree() {
         DirectoryPom.CloseAllDialogs()
         cy.get(`#${PROGRESS_TREE}`).click()
     }
 
-    static pressHotkey(hotkey: string) {
-        DirectoryPom.CloseAllDialogs();
+    static PressHotkey(hotkey: string) {
+        DirectoryPom.OpenTestingUtils()
         cy.get(`#${manualHotkeyInput}`).clear().type(hotkey);
         cy.get(`#${submitManualHotkeyButton}`).click();
+    }
+    static OpenTestingUtils() {
+        DirectoryPom.CloseAllDialogs();
+        cy.get(`#${TESTING_UTILS}`).click();
     }
 }

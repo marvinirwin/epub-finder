@@ -8,7 +8,13 @@ export const ManualHotkey = () => {
     const m = useContext(ManagerContext);
     const [manualHotkeyText, setManualHotkeyText] = useState('');
     return <div>
-        <input onChange={v => setManualHotkeyText(v.target.value)} id={manualHotkeyInput }/>
-        <button id={submitManualHotkeyButton } onClick={() => m.browserInputs.pressHotkey([manualHotkeyText])}>press manual hotkey</button>
+        <input
+            onChange={v => setManualHotkeyText(v.target.value)}
+            id={manualHotkeyInput}/>
+        <button
+            id={submitManualHotkeyButton}
+            onClick={() => m.browserInputs.pressHotkey([manualHotkeyText])}
+        >press manual hotkey
+        </button>
     </div>
 };

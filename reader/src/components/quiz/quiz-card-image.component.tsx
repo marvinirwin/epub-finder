@@ -6,6 +6,7 @@ import {QuizCard} from "./quiz-card.interface";
 import {ManagerContext} from "../../App";
 import {observableLastValue} from "../../services/settings.service";
 import {IconButton} from "@material-ui/core";
+import {quizCardImage, selectQuizCardImageButton} from "@shared/";
 
 export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
     const quizCardImageSource = useObservableState(quizCard.image$.value$);
@@ -22,8 +23,11 @@ export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
     }}>
         {
             !hiddenFields.has('picture') && quizCardImageSource ?
-                <img className={"quiz-card-image"} src={quizCardImageSource}/> :
-                <IconButton color='primary'>
+                <img
+                    className={quizCardImage}
+                    src={quizCardImageSource}
+                /> :
+                <IconButton color='primary' id={selectQuizCardImageButton}>
                     <InsertPhoto id={'quiz-card-image-placeholder'}/>
                 </IconButton>
         }

@@ -1,4 +1,4 @@
-import {QuizCardFields} from "../../../reader/src/components/quiz/quiz-card-fields.interface";
+import {QuizCardFields} from "../components/quiz/quiz-card-fields.interface";
 
 export type HiddenQuizFields = Set<keyof QuizCardFields>;
 export const hiddenDefinition: HiddenQuizFields = new Set([

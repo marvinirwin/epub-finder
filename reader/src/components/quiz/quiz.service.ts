@@ -14,7 +14,7 @@ import {ICard} from "../../../../server/src/shared/ICard";
 import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interface";
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {hiddenLearningLanguage, hiddenDefinition} from "../../../../server/src/shared/hidden-quiz-fields";
+import {hiddenLearningLanguage, hiddenDefinition} from "../../lib/hidden-quiz-fields";
 import {workerData} from "worker_threads";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows

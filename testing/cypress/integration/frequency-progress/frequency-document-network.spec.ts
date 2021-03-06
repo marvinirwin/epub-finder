@@ -45,14 +45,14 @@ describe('Shows progress on frequency documents', () => {
     })
     it('Opens the default graph', async () => {
         const map = getMap()
-        DirectoryPom.goToGraph();
+        DirectoryPom.OpenProgressTree();
         assertLabelAndCount(hsk1, await compareSimilarity(await map.hsk1, await map.hsk1) );
         assertLabelAndCount(testFrequencyDocument1, await compareSimilarity(await map.hsk1, await map.testFrequencyDocument1) )
         assertLabelAndCount(testFrequencyDocument2, await compareSimilarity(await map.hsk1, await map.testFrequencyDocument2) )
     });
     it('Allows the user to click a node and then see the tree from that node\s perspective', async () => {
         const map = getMap();
-        DirectoryPom.goToGraph();
+        DirectoryPom.OpenProgressTree();
         cy.get(`#${testNode1}`).click();
         assertLabelAndCount(testFrequencyDocument1, await compareSimilarity(await map.testFrequencyDocument1, await map.testFrequencyDocument1))
         assertLabelAndCount(hsk1, await compareSimilarity(await map.testFrequencyDocument1, await map.hsk1))

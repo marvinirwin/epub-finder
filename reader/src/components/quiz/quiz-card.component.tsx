@@ -10,7 +10,13 @@ import {observableLastValue} from "../../services/settings.service";
 import {uniq, flatten} from "lodash";
 import {QuizCardCurrentCardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
 import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
-import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM} from "@shared/";
+import {
+    QUIZ_BUTTON_EASY,
+    QUIZ_BUTTON_HARD,
+    QUIZ_BUTTON_IGNORE,
+    QUIZ_BUTTON_MEDIUM,
+    quizCardLearningLanguage
+} from "@shared/";
 
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
@@ -40,7 +46,10 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
                 <QuizCardImage quizCard={quizCard}/>
-                {!hiddenFields.has('learningLanguage') && <Typography variant={'h1'} className={'quiz-text'}>{word || ''}</Typography>}
+                {!hiddenFields.has('learningLanguage') && <Typography
+                    variant={'h1'}
+                    className={quizCardLearningLanguage}
+                >{word || ''}</Typography>}
             </div>
             <div>
                 <QuizCardCurrentCardInfo quizCard={quizCard}/>

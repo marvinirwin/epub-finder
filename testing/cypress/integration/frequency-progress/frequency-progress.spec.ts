@@ -28,7 +28,7 @@ describe('Shows progress on frequency documents', () => {
     });
     it('Shows the user their progress when they select the frequency documents they want', () => {
         DirectoryPom.goToQuiz();
-        DirectoryPom.selectFrequencyDocuments(testFrequencyDocument1, 'Test Frequency Document 2');
+        DirectoryPom.SelectFrequencyDocuments(testFrequencyDocument1, 'Test Frequency Document 2');
         QuizPom.submitQuizResult(QUIZ_BUTTON_EASY);
         QuizPom.assertFrequencyDocumentProgress(
             testFrequencyDocument1,

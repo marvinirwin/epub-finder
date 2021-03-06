@@ -6,6 +6,7 @@ import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";
 import {QuizCard} from "../../components/quiz/quiz-card.interface";
 import {TextField, Typography} from "@material-ui/core";
+import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 
 export const QuizCardScheduleRowDisplay = (
     {
@@ -29,17 +30,18 @@ export const QuizCardScheduleRowDisplay = (
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
         </div>
         <div style={{marginTop: '24px'}}>
-            <Typography variant='h4'>
+            <Typography variant='h4' className={quizCardRomanization}>
                 {romanization}
             </Typography>
             <br/>
-            <Typography variant='h4'>
+            <Typography variant='h4' className={quizCardTranslation}>
                 {translation}
             </Typography>
         </div>
         <div style={{marginTop: '24px', marginBottom: '24px'}}>
             <TextField
                 label="Description"
+                inputProps={{className: quizCardDescription}}
                 multiline
                 rows={3}
                 variant="filled"

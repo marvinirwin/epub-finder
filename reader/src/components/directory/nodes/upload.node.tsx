@@ -5,7 +5,7 @@ import {AttachFile} from "@material-ui/icons";
 import { UPLOAD_LEARNING_MATERIAL } from "@shared/";
 
 
-export function uploadNode(m: Manager) {
+export function UploadNode(m: Manager) {
     return {
         name: UPLOAD_LEARNING_MATERIAL,
         action: () => m.modalService.fileUpload.open$.next(true),

@@ -8,7 +8,7 @@ import {ReadingNode} from "./nodes/reading.node";
 import {TreeMenuNode} from "./tree-menu-node.interface";
 import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
 import {Profile} from "../../lib/auth/loggedInUserService";
-import {uploadNode} from "./nodes/upload.node";
+import {UploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
 import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
@@ -42,7 +42,7 @@ function AppDirectory(
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
             LibraryNode(m),
-            uploadNode(m),
+            UploadNode(m),
             SettingsNode(m),
             TestingUtilsNode(m),
             QuizCarouselNode(),

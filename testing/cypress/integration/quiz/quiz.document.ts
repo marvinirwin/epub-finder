@@ -1,8 +1,8 @@
-import {documentSelectionRow, fileChooser} from "../constants";
 import {DirectoryPom} from "../../support/pom/directory.pom";
+import {documentSelectionRow, fileChooser} from "@shared/*";
 
 export function UploadLearningDocument() {
-    cy.get(fileChooser).attachFile('test_quiz.html');
+    cy.get(`#${fileChooser}`).attachFile('test_quiz.html');
     DirectoryPom.EnterLibrary()
     cy.get(`${documentSelectionRow}.reading`).contains('test_quiz')
     DirectoryPom.Back()
