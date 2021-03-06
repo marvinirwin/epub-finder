@@ -5,12 +5,24 @@ import {InterpolateExampleSentencesService} from "../../components/example-sente
 import {distinctUntilChanged, map, shareReplay} from "rxjs/operators";
 import {DocumentSourcesService} from "./document-sources.service";
 import {OpenDocument} from "./open-document.entity";
+import {SettingsService} from "../../services/settings.service";
+import {LanguageConfigsService} from "../language-configs.service";
 
 
 export const OpenExampleSentencesFactory = (
-    name: string,
-    sentences$: Observable<string[]>,
-    trie$: Observable<TrieWrapper>,
+    {
+        name,
+        sentences$,
+        trie$,
+        settingsService,
+        languageConfigsService
+    }: {
+        name: string,
+        sentences$: Observable<string[]>,
+        trie$: Observable<TrieWrapper>,
+        settingsService: SettingsService,
+        languageConfigsService: LanguageConfigsService
+    }
 ) => {
     return new OpenDocument(
         name,
@@ -24,6 +36,8 @@ export const OpenExampleSentencesFactory = (
                         shareReplay(1)
                     )
             }),
-        'Example Sentences'
+        'Example Sentences',
+        settingsService,
+        languageConfigsService
     );
 }

@@ -13,6 +13,7 @@ import applyStyles from '@popperjs/core/lib/modifiers/applyStyles';
 import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
 import {ActiveSentenceService} from "../active-sentence.service";
 import {setMouseOverText} from "../../components/translation-popup.component";
+import {LanguageConfigsService} from "../language-configs.service";
 
 const createPopper = popperGenerator({
     defaultModifiers: [
@@ -86,14 +87,15 @@ export class BrowserInputs {
     private activeSentenceService: ActiveSentenceService;
     private hotkeys$: Observable<Map<string[], Subject<void>>>;
 
-    constructor({hotkeys$, settings$, activeSentenceService}: {
+    constructor({hotkeys$, settingsService, activeSentenceService, languageConfigsService}: {
         hotkeys$: Observable<Map<string[], Subject<void>>>,
-        settings$: SettingsService,
+        settingsService: SettingsService,
         activeSentenceService: ActiveSentenceService,
+        languageConfigsService: LanguageConfigsService
     }) {
         this.hotkeys$ = hotkeys$;
         this.activeSentenceService = activeSentenceService;
-        settings$.showTranslation$.subscribe(showTranslations => {
+        settingsService.showTranslation$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
             if (showTranslations) {
                 setMouseOverText(this.latestTranslationTarget?._translation || '')
@@ -155,36 +157,27 @@ export class BrowserInputs {
         return this.keyupMap[key];
     }
 
-    public applySegmentListeners(atomizedSentences: Segment[]) {
-        atomizedSentences.forEach(atomizedSentence => {
+    public applySegmentListeners(segments: Segment[]) {
+        segments.forEach(segment => {
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
-            const sentenceHTMLElement = atomizedSentence.getSentenceHTMLElement();
+            const sentenceHTMLElement = segment.getSentenceHTMLElement();
             sentenceHTMLElement.classList.add('applied-sentence-listener');
-            const popperHTMLElement = atomizedSentence.getPopperHTMLElement();
-            if (!sentenceHTMLElement || !popperHTMLElement) {
+            if (!sentenceHTMLElement) {
                 throw new Error("Cannot find sentenceElement or popperElement")
             }
             sentenceHTMLElement.addEventListener('mouseover', () =>
-                this.activeSentenceService.activeSentence$.next(atomizedSentence)
+                this.activeSentenceService.activeSentence$.next(segment)
             )
 
             const show = () => {
-
-                try {
-                    atomizedSentence._popperInstance = createPopper(sentenceHTMLElement, popperHTMLElement, {
-                        placement: 'bottom-start',
-                        strategy: 'fixed',
-                    });
-                    this.latestTranslationTarget = atomizedSentence;
-                    atomizedSentence.showPopper();
-                } catch (e) {
-                    console.error(e);
-                }
+                segment.getTranslation();
+                this.latestTranslationTarget = segment;
+                setMouseOverText(segment._translation || '')
             }
             const hide = () => {
                 this.latestTranslationTarget = undefined;
-                atomizedSentence.hidePopper();
+                setMouseOverText('')
             }
 
             showEvents.forEach(event => {

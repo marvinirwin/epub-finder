@@ -31,16 +31,6 @@ export class ActiveSentenceService {
                 learningToLatinFn
             ]
         ) => {
-            if (activeSentence?.popperElement) {
-                const els = [
-                    showRomanization && learningToLatinFn &&
-                    await learningToLatinFn(activeSentence.translatableText || ''),
-                    showTranslations && learningToKnownTranslateFn &&
-                    await learningToKnownTranslateFn(activeSentence.translatableText || ''),
-                ].filter(v => v)
-                // @ts-ignore
-                activeSentence.popperElement.innerHTML = `${els.join(`</br></br>`)}`
-            }
         })
     }
 

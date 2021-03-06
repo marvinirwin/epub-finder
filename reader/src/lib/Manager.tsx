@@ -208,7 +208,8 @@ export class Manager {
                 this.hotkeyEvents.hotkeyActions(),
             ),
             activeSentenceService: this.activeSentenceService,
-            settings$: this.settingsService,
+            settingsService: this.settingsService,
+            languageConfigsService: this.languageConfigsService
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardsRepository = new CardsRepository({databaseService: db});
@@ -222,7 +223,8 @@ export class Manager {
             trie$: this.trieService.trie$,
             db,
             settingsService: this.settingsService,
-            documentRepository: this.documentRepository
+            documentRepository: this.documentRepository,
+            languageConfigsService: this.languageConfigsService
         });
 
         this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
@@ -291,7 +293,8 @@ export class Manager {
         this.readingDocumentService = new ReadingDocumentService({
             trie$: this.trieService.trie$,
             openDocumentsService: this.openDocumentsService,
-            settingsService: this.settingsService
+            settingsService: this.settingsService,
+            languageConfigsService: this.languageConfigsService
         });
         this.quizService = new QuizService({
             scheduleService: this.scheduleService,
@@ -299,7 +302,8 @@ export class Manager {
             trie$: this.trieService.trie$,
             cardService: this.cardsRepository,
             openDocumentsService: this.openDocumentsService,
-            languageConfigsService: this.languageConfigsService
+            languageConfigsService: this.languageConfigsService,
+            settingsService: this.settingsService
         })
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(

@@ -2,7 +2,6 @@ import {Dictionary, flatten, uniq} from "lodash";
 import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {IWordInProgress} from "../Annotation/IWordInProgress";
 import {IPositionedWord} from "../Annotation/IPositionedWord";
-import {AtomizedDocument} from "./atomized-document";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
 import {TabulatedSentences} from "./tabulated-documents.interface";
@@ -11,7 +10,6 @@ import {SetWithUniqueLengths} from "./set-with-unique-lengths";
 
 export class Segment {
     _translation: string | undefined;
-    _popperInstance: any;
     translatableText: string;
     popperElement: XMLDocumentNode;
     translated = false;
@@ -136,14 +134,7 @@ export class Segment {
         this.popperElement.parentNode.removeChild(this.popperElement);
     }
 
-    showPopper() {
-        this.getPopperHTMLElement().setAttribute('data-show', '');
-    }
 
-    hidePopper() {
-        const v = this._popperInstance?.destroy()
-        const t = this.getPopperHTMLElement().removeAttribute('data-show');
-    }
 
     get children(): XMLDocumentNode[] {
         return Array.from(this.element.childNodes);

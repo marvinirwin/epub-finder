@@ -17,6 +17,7 @@ import {DocumentRepository} from "../documents/document.repository";
 import {TrieWrapper} from "../TrieWrapper";
 import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
 import {mergeTabulations} from "../merge-tabulations";
+import {LanguageConfigsService} from "../language-configs.service";
 
 
 export type TrieObservable = Observable<TrieWrapper>;
@@ -45,6 +46,7 @@ export class OpenDocumentsService {
             db: DatabaseService;
             settingsService: SettingsService;
             documentRepository: DocumentRepository;
+            languageConfigsService: LanguageConfigsService
         }
     ) {
 
@@ -61,7 +63,9 @@ export class OpenDocumentsService {
                             document.id(),
                             config.trie$,
                             DocumentSourcesService.document(documentSource),
-                            document.name
+                            document.name,
+                            config.settingsService,
+                            config.languageConfigsService
                         );
                         return [
                             id,

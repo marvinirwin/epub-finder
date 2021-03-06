@@ -15,6 +15,7 @@ import {NormalizedScheduleRowData} from "../../lib/schedule/schedule-row.interfa
 import {ScheduleRow} from "../../lib/schedule/ScheduleRow";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
+import {SettingsService} from "../../services/settings.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -38,14 +39,16 @@ export class QuizService {
             scheduleService,
             exampleSentencesService,
             openDocumentsService,
-            languageConfigsService
+            languageConfigsService,
+            settingsService
         }: {
             trie$: Observable<TrieWrapper>,
             cardService: CardsRepository
             scheduleService: ScheduleService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService,
-            languageConfigsService: LanguageConfigsService
+            languageConfigsService: LanguageConfigsService,
+            settingsService: SettingsService
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
@@ -54,19 +57,23 @@ export class QuizService {
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
-            'example-sentences',
-            combineLatest([
-                exampleSentencesService.exampleSegmentMap$,
-                currentWord$
-            ]).pipe(
-                map(([sentenceMap, currentWord]) => {
-                    if (!currentWord) return [];
-                    const wordSet = Array.from(sentenceMap.get(currentWord) || new Set<string>());
-                    return uniq(wordSet.map(a => a)).slice(0, 10)
-                }),
-                shareReplay(1)
-            ),
-            trie$
+            {
+                trie$,
+                settingsService,
+                languageConfigsService,
+                name: 'example-sentences',
+                sentences$: combineLatest([
+                    exampleSentencesService.exampleSegmentMap$,
+                    currentWord$
+                ]).pipe(
+                    map(([sentenceMap, currentWord]) => {
+                        if (!currentWord) return [];
+                        const wordSet = Array.from(sentenceMap.get(currentWord) || new Set<string>());
+                        return uniq(wordSet.map(a => a)).slice(0, 10)
+                    }),
+                    shareReplay(1)
+                ),
+            }
         );
         openDocumentsService.openDocumentTree.appendDelta$.next({
                 nodeLabel: 'root',

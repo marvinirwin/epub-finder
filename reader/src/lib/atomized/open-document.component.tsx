@@ -1,10 +1,7 @@
 import React from 'react'
 import {useObservableState} from "observable-hooks";
 import {InnerHtmlFrameComponent} from "../../components/frame/inner-html-frame.component";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
-import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {OpenDocument} from "../document-frame/open-document.entity";
-import {annotatedAndTranslated} from '@shared/';
 
 
 export const OpenDocumentComponent =
@@ -24,9 +21,3 @@ export const OpenDocumentComponent =
         />
     })
 
-export function rehydratePage(htmlDocument: HTMLDocument): Segment[] {
-    return [...htmlDocument.getElementsByClassName(annotatedAndTranslated)]
-        .map(element => {
-            return new Segment(element as unknown as XMLDocumentNode);
-        })
-}

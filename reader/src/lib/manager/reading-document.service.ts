@@ -5,6 +5,7 @@ import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from "./open-documents.service";
 import {OpenDocument} from "../document-frame/open-document.entity";
+import {LanguageConfigsService} from "../language-configs.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;
@@ -14,12 +15,14 @@ export class ReadingDocumentService {
         {
             trie$,
             openDocumentsService,
-            settingsService
+            settingsService,
+            languageConfigsService
         }:
             {
                 trie$: TrieObservable,
                 openDocumentsService: OpenDocumentsService,
-                settingsService: SettingsService
+                settingsService: SettingsService,
+                languageConfigsService: LanguageConfigsService
             }
     ) {
         this.readingDocument = new OpenDocument(
@@ -31,7 +34,9 @@ export class ReadingDocumentService {
                 }),
                 shareReplay(1)
             ),
-            "Reading Document"
+            "Reading Document",
+            settingsService,
+            languageConfigsService
         );
 
         openDocumentsService.openDocumentTree.appendDelta$.next(

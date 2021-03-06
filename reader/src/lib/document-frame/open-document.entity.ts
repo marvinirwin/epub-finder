@@ -1,25 +1,22 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Segment} from "@shared/";
-import {TrieWrapper} from "../TrieWrapper";
-import {ds_Dict} from "../delta-scan/delta-scan.module";
-import {AtomizedDocument} from "@shared/";
-import {rehydratePage} from "../atomized/open-document.component";
 import {
+    annotatedAndTranslated,
+    AtomizedDocument,
+    Segment,
     SerializedTabulation,
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
 } from "@shared/";
+import {TrieWrapper} from "../TrieWrapper";
+import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {flatten} from "lodash";
-import {TabulateLocalDocument, TabulateRemoteDocument} from "../Workers/worker.helpers";
+import {TabulateLocalDocument} from "../Workers/worker.helpers";
 import {mergeTabulations} from "../merge-tabulations";
-import {BrowserInputs} from "../hotkeys/browser-inputs";
-import {setMouseOverText} from "../../components/translation-popup.component";
-
-function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
-    return flatten(Object.values(segments));
-}
-
+import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
+import {BrowserSegment} from "../browser-segment";
+import {SettingsService} from "../../services/settings.service";
+import {LanguageConfigsService} from "../language-configs.service";
 
 export class OpenDocument {
     public name: string;
@@ -28,15 +25,13 @@ export class OpenDocument {
     public virtualTabulation$: Observable<SerializedTabulation>;
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
 
-    /*
-        public notableSubsequences$: Observable<TabulatedSentences>;
-    */
-
     constructor(
         public id: string,
         public trie$: Observable<TrieWrapper>,
         public atomizedDocument$: Observable<AtomizedDocument>,
-        public label: string
+        public label: string,
+        public settingsService: SettingsService,
+        public languageConfigsService: LanguageConfigsService
     ) {
         this.name = id;
         this.renderedSegments$.next([]);
@@ -58,24 +53,35 @@ export class OpenDocument {
             this.trie$,
             this.atomizedDocument$
         ]).pipe(
-                switchMap(([trie, document]) => {
-                    return TabulateLocalDocument({
-                        label,
-                        trieWords: Array.from(trie.t.values()),
-                        src: document._originalSrc
-                    })
+            switchMap(([trie, document]) => {
+                return TabulateLocalDocument({
+                    label,
+                    trieWords: Array.from(trie.t.values()),
+                    src: document._originalSrc
                 })
-            );
+            })
+        );
     }
 
-    async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement, inputs: BrowserInputs) {
-        const segments = rehydratePage(body.ownerDocument as HTMLDocument);
-        this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
-        segments.forEach(segment => segment.translationCb = translation => {
-            if (inputs.latestTranslationTarget === segment) {
-                setMouseOverText(translation)
+    async handleHTMLHasBeenRendered(
+        {
+            body,
+            head,
+        }:
+            {
+                head: HTMLHeadElement,
+                body: HTMLBodyElement,
             }
-        })
+    ) {
+        const segments = [...(body.ownerDocument as HTMLDocument).getElementsByClassName(annotatedAndTranslated)]
+            .map(element => {
+                return new BrowserSegment({
+                    element: element as unknown as XMLDocumentNode,
+                    languageConfigsService: this.languageConfigsService,
+                    settingsService: this.settingsService
+                });
+            });
+        this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSegments$.next(segments);
     }
 }
