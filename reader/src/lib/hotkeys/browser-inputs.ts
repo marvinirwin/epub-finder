@@ -1,7 +1,7 @@
-import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
 import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
-import {filter} from "rxjs/operators";
+import {filter, switchMap} from "rxjs/operators";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
@@ -14,6 +14,7 @@ import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
 import {ActiveSentenceService} from "../active-sentence.service";
 import {setMouseOverText} from "../../components/translation-popup.component";
 import {LanguageConfigsService} from "../language-configs.service";
+import {BrowserSegment} from "../browser-segment";
 
 const createPopper = popperGenerator({
     defaultModifiers: [
@@ -86,6 +87,7 @@ export class BrowserInputs {
     latestTranslationTarget: Segment | undefined;
     private activeSentenceService: ActiveSentenceService;
     private hotkeys$: Observable<Map<string[], Subject<void>>>;
+    mouseoverSegment$ = new ReplaySubject<BrowserSegment | undefined>(1);
 
     constructor({hotkeys$, settingsService, activeSentenceService, languageConfigsService}: {
         hotkeys$: Observable<Map<string[], Subject<void>>>,
@@ -109,7 +111,13 @@ export class BrowserInputs {
             ]
         ).subscribe(([hotkeyMap, keysPressed]) => {
             compareKeySequenceToHotkeyMap(hotkeyMap, keysPressed);
-        })
+        });
+
+        this.mouseoverSegment$.pipe(
+            switchMap(
+                segment => segment ? segment.mouseoverText$ : of('')
+            )
+        ).subscribe(setMouseOverText);
     }
 
     async pressHotkey(keys: string[]) {
@@ -157,7 +165,7 @@ export class BrowserInputs {
         return this.keyupMap[key];
     }
 
-    public applySegmentListeners(segments: Segment[]) {
+    public applySegmentListeners(segments: BrowserSegment[]) {
         segments.forEach(segment => {
             const showEvents = ['mouseenter', 'focus'];
             const hideEvents = ['mouseleave', 'blur'];
@@ -171,13 +179,10 @@ export class BrowserInputs {
             )
 
             const show = () => {
-                segment.getTranslation();
-                this.latestTranslationTarget = segment;
-                setMouseOverText(segment._translation || '')
+                this.mouseoverSegment$.next(segment);
             }
             const hide = () => {
-                this.latestTranslationTarget = undefined;
-                setMouseOverText('')
+                this.mouseoverSegment$.next(undefined);
             }
 
             showEvents.forEach(event => {

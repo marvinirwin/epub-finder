@@ -20,7 +20,7 @@ import {LanguageConfigsService} from "../language-configs.service";
 
 export class OpenDocument {
     public name: string;
-    public renderedSegments$ = new ReplaySubject<Segment[]>(1)
+    public renderedSegments$ = new ReplaySubject<BrowserSegment[]>(1)
     public renderedTabulation$: Observable<TabulatedDocuments>;
     public virtualTabulation$: Observable<SerializedTabulation>;
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
@@ -64,14 +64,8 @@ export class OpenDocument {
     }
 
     async handleHTMLHasBeenRendered(
-        {
-            body,
-            head,
-        }:
-            {
-                head: HTMLHeadElement,
-                body: HTMLBodyElement,
-            }
+        head: HTMLHeadElement,
+        body: HTMLDivElement,
     ) {
         const segments = [...(body.ownerDocument as HTMLDocument).getElementsByClassName(annotatedAndTranslated)]
             .map(element => {

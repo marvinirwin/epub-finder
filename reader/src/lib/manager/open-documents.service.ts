@@ -18,6 +18,7 @@ import {TrieWrapper} from "../TrieWrapper";
 import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
 import {mergeTabulations} from "../merge-tabulations";
 import {LanguageConfigsService} from "../language-configs.service";
+import {BrowserSegment} from "../browser-segment";
 
 
 export type TrieObservable = Observable<TrieWrapper>;
@@ -37,7 +38,7 @@ export class OpenDocumentsService {
     sourceDocuments$: Observable<Map<string, OpenDocument>>;
     tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>;
     openDocumentBodies$: Observable<HTMLBodyElement>;
-    renderedSegments$: Observable<Segment[]>;
+    renderedSegments$: Observable<BrowserSegment[]>;
     virtualDocumentTabulation$: Observable<SerializedTabulationAggregate>;
 
     constructor(
