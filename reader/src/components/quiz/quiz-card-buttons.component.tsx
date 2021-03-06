@@ -21,17 +21,20 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
                         Hard
                     </Button>
                 </HotkeyWrapper>
-                <Button
-                    className={QUIZ_BUTTON_MEDIUM}
-                    onClick={() => m.hotkeyEvents.quizResultMedium$.next()}>
-                    Medium
-                </Button>
-                <Button
+                <HotkeyWrapper action={"QUIZ_RESULT_MEDIUM"}>
+                    <Button
+                        className={QUIZ_BUTTON_MEDIUM}
+                        onClick={() => m.hotkeyEvents.quizResultMedium$.next()}>
+                        Medium
+                    </Button>
+                </HotkeyWrapper>
+                <HotkeyWrapper action={"QUIZ_RESULT_EASY"}> <Button
                     className={QUIZ_BUTTON_EASY}
                     onClick={() => m.hotkeyEvents.quizResultEasy$.next()}
                 >
                     Easy
                 </Button>
+                </HotkeyWrapper>
                 <Button
                     className={QUIZ_BUTTON_IGNORE}
                     onClick={() => {
@@ -42,11 +45,13 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
                     Ignore
                 </Button>
             </Fragment> :
-            <Button
-                id={quizButtonReveal}
-                onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
-                Reveal (Space)
-            </Button>
+            <HotkeyWrapper action={"ADVANCE_QUIZ"}>
+                <Button
+                    id={quizButtonReveal}
+                    onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
+                    Reveal
+                </Button>
+            </HotkeyWrapper>
         }
     </div>
 }

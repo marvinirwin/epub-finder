@@ -3,12 +3,11 @@ import {Manager} from "../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import {HotKeyEvents} from "../lib/HotKeyEvents";
 import {AppDirectoryService} from "./directory/app-directory-service";
-import {AppContainer} from "./containers/app-container";
 import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./containers/drawer";
 import {ImageSearchComponent} from "./image-search/image-search.component";
-
+import './translation-popup.component';
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)

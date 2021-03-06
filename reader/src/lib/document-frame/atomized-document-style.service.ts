@@ -6,11 +6,14 @@ export const BodyStyle = `
         max-width: 680px;
     }
     body {
-        padding: 8px;
-        padding-top: 24px;
         font-size: 150%;
         font-family: Helvetica, Tahoma, Arial, STXihei, "华文细黑", "Microsoft YaHei", "微软雅黑", SimSun, "宋体", Heiti, "黑体", sans-serif !important;
     }
+    body > * {
+        padding: 8px;
+        padding-top: 24px;
+    }
+    
     @media only screen and (min-width: 903.99px) {
         body > div {
             margin: 0 48px;

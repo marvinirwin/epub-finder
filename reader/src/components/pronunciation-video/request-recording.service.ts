@@ -22,7 +22,7 @@ export class RequestRecordingService {
             .readingDocument
             .renderedSegments$
             .pipe(
-                map(Object.keys),
+                map(sentences => sentences.map(sentence => sentence.translatableText)),
                 shareReplay(1)
             );
         loggedInUserService.isLoggedIn$.subscribe(isLoggedIn => {

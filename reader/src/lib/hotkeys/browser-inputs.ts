@@ -12,6 +12,7 @@ import computeStyles from '@popperjs/core/lib/modifiers/computeStyles';
 import applyStyles from '@popperjs/core/lib/modifiers/applyStyles';
 import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
 import {ActiveSentenceService} from "../active-sentence.service";
+import {setMouseOverText} from "../../components/translation-popup.component";
 
 const createPopper = popperGenerator({
     defaultModifiers: [
@@ -95,9 +96,9 @@ export class BrowserInputs {
         settings$.showTranslation$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
             if (showTranslations) {
-                this.latestTranslationTarget?.showPopper();
+                setMouseOverText(this.latestTranslationTarget?._translation || '')
             } else {
-                this.latestTranslationTarget?.hidePopper();
+                setMouseOverText('')
             }
         });
         combineLatest([

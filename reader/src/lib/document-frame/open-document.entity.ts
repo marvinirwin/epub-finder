@@ -13,6 +13,8 @@ import {
 import {flatten} from "lodash";
 import {TabulateLocalDocument, TabulateRemoteDocument} from "../Workers/worker.helpers";
 import {mergeTabulations} from "../merge-tabulations";
+import {BrowserInputs} from "../hotkeys/browser-inputs";
+import {setMouseOverText} from "../../components/translation-popup.component";
 
 function flattenDictArray<T>(segments: ds_Dict<T[]>): T[] {
     return flatten(Object.values(segments));
@@ -66,10 +68,15 @@ export class OpenDocument {
             );
     }
 
-    async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement) {
-        const sentences = rehydratePage(body.ownerDocument as HTMLDocument);
+    async handleHTMLHasBeenRendered(head: HTMLHeadElement, body: HTMLBodyElement, inputs: BrowserInputs) {
+        const segments = rehydratePage(body.ownerDocument as HTMLDocument);
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
-        this.renderedSegments$.next(sentences);
+        segments.forEach(segment => segment.translationCb = translation => {
+            if (inputs.latestTranslationTarget === segment) {
+                setMouseOverText(translation)
+            }
+        })
+        this.renderedSegments$.next(segments);
     }
 }
 

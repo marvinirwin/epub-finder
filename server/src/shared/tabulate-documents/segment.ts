@@ -16,19 +16,13 @@ export class Segment {
     popperElement: XMLDocumentNode;
     translated = false;
     element: XMLDocumentNode;
+    translationCb: (s: string) => void | undefined;
 
     constructor(
         element: XMLDocumentNode
     ) {
         this.element = element;
         this.translatableText = this.element.textContent || '';
-        // @ts-ignore
-        this.popperElement = element.ownerDocument
-            .getElementById(
-                AtomizedDocument.getPopperId(
-                    this.element.getAttribute('popper-id')
-                )
-            );
     }
 
     static tabulate(
@@ -127,10 +121,6 @@ export class Segment {
         return this.element;
     }
 
-    getPopperHTMLElement(): HTMLElement {
-        // @ts-ignore
-        return this.popperElement;
-    }
 
     async getTranslation(): Promise<string> {
         if (this.translated) {
