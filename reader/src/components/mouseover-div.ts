@@ -8,12 +8,18 @@ document.body.appendChild(mouseFollowingDiv);
 
 export const setMouseOverText = (s: string) => {
     mouseFollowingDiv.innerText = s;
+    if (s) {
+        mouseFollowingDiv.classList.add('has-text')
+    } else {
+        mouseFollowingDiv.classList.remove('has-text')
+    }
 }
 
-// @ts-ignore
-window.onmousemove = (e) => {
-    mouseFollowingDiv.style.left = `${e.clientX}px`;
+export const setMouseOverDivPosition = (e: {clientX: number, clientY: number}) => {
+    mouseFollowingDiv.style.left = `${e.clientX + 15}px`;
     mouseFollowingDiv.style.top = `${e.clientY}px`;
 }
+
+window.onmousemove = setMouseOverDivPosition
 
 

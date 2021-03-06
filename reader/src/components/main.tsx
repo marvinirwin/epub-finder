@@ -7,7 +7,7 @@ import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./containers/drawer";
 import {ImageSearchComponent} from "./image-search/image-search.component";
-import './translation-popup.component';
+import './mouseover-div';
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)

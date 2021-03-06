@@ -1,37 +1,15 @@
 import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject} from "rxjs";
 import {Dictionary} from "lodash";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/";
 import {filter, switchMap} from "rxjs/operators";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
 import {observableLastValue, SettingsService} from "../../services/settings.service";
-import {popperGenerator} from "@popperjs/core";
-import popperOffsets from '@popperjs/core/lib/modifiers/popperOffsets';
-import computeStyles from '@popperjs/core/lib/modifiers/computeStyles';
-import applyStyles from '@popperjs/core/lib/modifiers/applyStyles';
-import eventListeners from '@popperjs/core/lib/modifiers/eventListeners';
 import {ActiveSentenceService} from "../active-sentence.service";
-import {setMouseOverText} from "../../components/translation-popup.component";
+import {setMouseOverText} from "../../components/mouseover-div";
 import {LanguageConfigsService} from "../language-configs.service";
 import {BrowserSegment} from "../browser-segment";
-
-const createPopper = popperGenerator({
-    defaultModifiers: [
-        popperOffsets,
-        computeStyles,
-        applyStyles,
-        eventListeners,
-        {
-            ...eventListeners,
-            options: {
-                resize: false,
-                scroll: false
-            }
-        }
-    ]
-})
-
 
 export function isDocument(t: HTMLElement | Document): t is Document {
     return !t.hasOwnProperty('tagName');
