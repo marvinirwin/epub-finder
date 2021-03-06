@@ -136,7 +136,7 @@ export class HotKeyEvents {
             QUIZ_RESULT_EASY: ['3'],
             QUIZ_RESULT_MEDIUM: ['2'],
             QUIZ_RESULT_HARD: ['1'],
-            ADVANCE_QUIZ: ['Space'],
+            ADVANCE_QUIZ: [' '],
             RECORD_QUIZ_WORD: ['r'],
             REQUEST_EDIT_WORD: ['e'],
             HIDE_VIDEO: ['v'],

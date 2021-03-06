@@ -88,6 +88,7 @@ export class BrowserInputs {
                 this.keysPressed$
             ]
         ).subscribe(([hotkeyMap, keysPressed]) => {
+            debugger;
             compareKeySequenceToHotkeyMap(hotkeyMap, keysPressed);
         });
 

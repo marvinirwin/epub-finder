@@ -13,9 +13,11 @@ export const HotkeyWrapper: React.FunctionComponent<HotkeyWrapperParams> = ({chi
     const mode = isListening(hotkeyMode(handler), action) ?
         'hotkey-active' :
         'hotkey-inactive';
+    const keySequence = config[action] || [];
+    const keysStr = keySequence.map(key => key === ' ' ? 'Space' : key);
 
     return <Badge
-        badgeContent={<span className={mode}>{config[action]}</span>}
+        badgeContent={<span className={mode}>{ keysStr }</span>}
         color="primary" >
         {children}
     </Badge>

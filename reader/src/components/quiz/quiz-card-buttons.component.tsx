@@ -10,7 +10,9 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
     const m = useContext(ManagerContext);
     const word = useObservableState((quizCard.word$));
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
-    useSubscription(m.hotkeyEvents.advanceQuiz$, () => quizCard.answerIsRevealed$.next(true))
+    useSubscription(
+        m.hotkeyEvents.advanceQuiz$,
+        () => quizCard.answerIsRevealed$.next(true))
     return <div className={'quiz-button-row'}>
         {answerIsRevealed ?
             <Fragment>
