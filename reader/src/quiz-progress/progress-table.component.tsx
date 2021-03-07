@@ -46,10 +46,10 @@ const ProgressTableRow: React.FC<{ recognitionRecord: WordRecognitionRow }> = ({
             <Typography>{recognitionRecord.grade} </Typography>
         </TableCell>
         <TableCell component="th" scope="row" >
-            <Typography>{moment(recognitionRecord.timestamp).format('DD hh:mm:ss')} </Typography>
+            <Typography>{moment(recognitionRecord.nextDueDate).format('DD hh:mm:ss')} </Typography>
         </TableCell>
         <TableCell component="th" scope="row" >
-            <Typography>{moment(recognitionRecord.nextDueDate).format('DD hh:mm:ss')} </Typography>
+            <Typography>{moment(recognitionRecord.timestamp).format('DD hh:mm:ss')} </Typography>
         </TableCell>
         <TableCell component="th" scope="row" >
             <Typography>{recognitionRecord.efactor} </Typography>
