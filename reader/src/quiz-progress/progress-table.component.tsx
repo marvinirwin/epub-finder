@@ -30,8 +30,6 @@ const ProgressTableHead: React.FC<{}> = () => {
         <TableRow>
             <TableCell>Word</TableCell>
             <TableCell>Score</TableCell>
-            <TableCell>Next Due Date</TableCell>
-            <TableCell>Timestamp</TableCell>
         </TableRow>
     </TableHead>
 };
@@ -43,12 +41,6 @@ const ProgressTableRow: React.FC<{ recognitionRecord: WordRecognitionRow }> = ({
         </TableCell>
         <TableCell component="th" scope="row" >
             <Typography>{recognitionRecord.grade} </Typography>
-        </TableCell>
-        <TableCell component="th" scope="row" >
-            <Typography>{moment(recognitionRecord.timestamp).format('DD MM YYYY hh:mm:ss')} </Typography>
-        </TableCell>
-        <TableCell component="th" scope="row" >
-            <Typography>{moment(recognitionRecord.nextDueDate).format('DD MM YYYY hh:mm:ss')} </Typography>
         </TableCell>
     </TableRow>
 };
@@ -62,7 +54,9 @@ export const ProgressTableComponent = () => {
             <Table size='small'>
                 <ProgressTableHead/>
                 <TableBody>
-                    {orderBy(recognitionRecords, r => r.timestamp, 'desc').slice(0, 100)
+                    {orderBy(
+                        recognitionRecords.filter(r => r.grade >= 3),
+                        r => r.timestamp, 'desc')
                         .map(recognitionRecord => <ProgressTableRow recognitionRecord={recognitionRecord} key={recognitionRecord.word}/>)}
                 </TableBody>
             </Table>
