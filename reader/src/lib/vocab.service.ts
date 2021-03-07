@@ -1,9 +1,12 @@
 import {SerializedTabulation} from "@shared/";
 import {combineLatest, Observable} from "rxjs";
 import {SettingsService} from "../services/settings.service";
-import {FrequencyDocumentsRepository} from "./frequency-documents.repository";
-import {map, shareReplay} from "rxjs/operators";
+import {FrequencyDocumentsRepository, tabulateFrequencyDocuments} from "./frequency-documents.repository";
+import {map, shareReplay, switchMap} from "rxjs/operators";
 import {ScheduleRowsService} from "./manager/schedule-rows.service";
+import {DocumentRepository} from "./documents/document.repository";
+import {FrequencyDocument} from "./frequency-documents";
+import {TrieService} from "./manager/trie.service";
 
 export class VocabService {
     vocab$: Observable<SerializedTabulation>;
@@ -11,29 +14,49 @@ export class VocabService {
     constructor(
         {
             settingsService,
-            frequencyDocumentsRepository,
-            scheduleRowsService
+            documentRepository,
+            scheduleRowsService,
+            trieService
         }: {
             settingsService: SettingsService,
-            frequencyDocumentsRepository: FrequencyDocumentsRepository,
-            scheduleRowsService: ScheduleRowsService
+            documentRepository: DocumentRepository,
+            scheduleRowsService: ScheduleRowsService,
+            trieService: TrieService
         }
     ) {
+        let observable = combineLatest([
+            documentRepository.collection$,
+            settingsService.selectedVocabulary$
+        ]).pipe(
+            map(([documents, vocabularyDocumentId$]) => {
+                const selectedDocument = documents.get(vocabularyDocumentId$);
+                return selectedDocument ? [
+                    new FrequencyDocument(
+                        selectedDocument,
+                        scheduleRowsService.indexedScheduleRows$
+                            .pipe(
+                                map(indexedScheduleRows =>
+                                    new Map(Object.entries(indexedScheduleRows))
+                                ),
+                                shareReplay(1)
+                            ),
+                        trieService.trie$
+                    )
+                ] : [];
+            }),
+            shareReplay(1)
+        );
         this.vocab$ = combineLatest(
             [
-                frequencyDocumentsRepository.allTabulated$,
-                settingsService.selectedVocabulary$,
+                tabulateFrequencyDocuments(observable),
                 scheduleRowsService.indexedScheduleRows$
             ]
         ).pipe(
             map(([
-                     allTabulated,
-                     selectedFrequencyDocumentId,
+                     [selectedTabulation],
                      indexedScheduleRows
                  ]) => {
-                const selectedTabulation = allTabulated.find(d => d.frequencyDocument.id() === selectedFrequencyDocumentId);
-                // shouldUseFrequencyDocuments
-                if (!selectedFrequencyDocumentId || !selectedTabulation) {
+                if (!selectedTabulation) {
                     return {
                         wordCounts: Object.fromEntries(
                             Object.values(indexedScheduleRows)

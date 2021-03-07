@@ -41,6 +41,15 @@ export class DocumentsController {
 
     }
 
+
+    @Get('')
+    async all(
+        @UserFromReq() user: User | undefined,
+        @Headers('is_test') is_test: string
+    ) {
+        return this.documentsService.allDocuments({user, for_testing: !!is_test, })
+    }
+
     @Put('')
     @UseGuards(AnonymousGuard)
     @UseInterceptors(
@@ -103,30 +112,6 @@ export class DocumentsController {
         return await this.documentsService.byFilename({filename: savedDocument.filename, user})
     }
 
-    @Get('')
-    async all(
-        @UserFromReq() user: User | undefined,
-        @Headers('is_test') is_test: string
-    ) {
-        return this.documentsService.allReading({user, for_testing: !!is_test, })
-    }
-
-    @Get('frequency-documents')
-    async all_frequency(
-        @Headers('is_test') is_test: string
-    ) {
-        return this.documentsService.allFrequency({for_testing: !!is_test})
-    }
-
-
-    @Delete(':id')
-    @UseGuards(LoggedInGuard)
-    async delete(
-        @UserFromReq() user: User,
-        @Param('id') id: string
-    ) {
-        return this.documentsService.delete(user, id)
-    }
 
     @Get(':filename')
     @HttpCode(HttpStatus.OK)

@@ -6,7 +6,7 @@ import {FormControlLabel, ListItem, MenuItem, Select, Switch} from "@material-ui
 export const SetVocab = () => {
     const m = useContext(ManagerContext);
     const selectedVocab = useObservableState(m.settingsService.selectedVocabulary$) || "USE_QUIZ_RESULTS";
-    const frequencyDocuments = useObservableState(m.frequencyDocumentsRepository.all$) || new Map();
+    const allDocuments = useObservableState(m.documentRepository.collection$) || new Map();
     return <ListItem>
         <FormControlLabel
             control={
@@ -22,7 +22,7 @@ export const SetVocab = () => {
                         Use your quiz vocabulary
                     </MenuItem>
                     {
-                        [...frequencyDocuments.values()]
+                        [...allDocuments.values()]
                             .map(c => <MenuItem
                                     key={c.frequencyDocument.id()}
                                     value={c.frequencyDocument.id()}>{c.frequencyDocument.name}

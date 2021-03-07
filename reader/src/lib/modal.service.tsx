@@ -1,7 +1,6 @@
 import React from "react";
 import {FileChooser} from "../components/directory/upload.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
-import {DocumentSelect} from "./reading-document-select.component";
 import {ToggleTranslateComponent} from "../components/settings/toggle-translate.component";
 import {TogglePinyinComponent} from "../components/settings/toggle-pinyin.component";
 import {ManualTestModal} from "../components/modals/test-modal/manual-test-modal.component";

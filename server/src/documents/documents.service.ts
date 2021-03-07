@@ -23,26 +23,15 @@ export class DocumentsService {
     ) {
     }
 
-    async allReading({user, for_testing}:{user?: User | undefined, for_testing?: boolean}): Promise<DocumentView[]> {
+    async allDocuments({user, for_testing}:{user?: User | undefined, for_testing?: boolean}): Promise<DocumentView[]> {
         return await this.documentViewRepository
             .find({
                     where: [
-                        {creator_id: user?.id, deleted: false, for_reading: true},
-                        {deleted: false, for_testing: for_testing, for_reading: true},
+                        {creator_id: user?.id, deleted: false, for_testing},
+                        {global: true, deleted: false, for_testing},
                     ]
                 }
             )
-    }
-
-    async allFrequency({for_testing}:{for_testing?: boolean}): Promise<DocumentView[]> {
-        const documentViews = await this.documentViewRepository
-            .find({
-                    where: [
-                        {for_frequency: true, deleted: false, for_testing},
-                    ]
-                }
-            );
-        return documentViews
     }
 
     public async saveRevision(user: User, name: string, filePath: string, documentId: string) {
