@@ -30,6 +30,9 @@ const ProgressTableHead: React.FC<{}> = () => {
         <TableRow>
             <TableCell>Word</TableCell>
             <TableCell>Score</TableCell>
+            <TableCell>Next Due Date</TableCell>
+            <TableCell>Timestamp</TableCell>
+            <TableCell>EFactor</TableCell>
         </TableRow>
     </TableHead>
 };
@@ -41,6 +44,15 @@ const ProgressTableRow: React.FC<{ recognitionRecord: WordRecognitionRow }> = ({
         </TableCell>
         <TableCell component="th" scope="row" >
             <Typography>{recognitionRecord.grade} </Typography>
+        </TableCell>
+        <TableCell component="th" scope="row" >
+            <Typography>{moment(recognitionRecord.timestamp).format('DD hh:mm:ss')} </Typography>
+        </TableCell>
+        <TableCell component="th" scope="row" >
+            <Typography>{moment(recognitionRecord.nextDueDate).format('DD hh:mm:ss')} </Typography>
+        </TableCell>
+        <TableCell component="th" scope="row" >
+            <Typography>{recognitionRecord.efactor} </Typography>
         </TableCell>
     </TableRow>
 };
