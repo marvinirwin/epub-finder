@@ -1,13 +1,14 @@
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
-import {filter, startWith, tap, withLatestFrom} from "rxjs/operators";
-import {orderBy} from "lodash";
+import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
+import {orderBy, flatten} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
 import {safePush} from "../../../../server/src/shared/safe-push";
 
 export class IndexedRowsRepository<T extends { word: string, id?: number }> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
-    latestRecords$  = new BehaviorSubject<Map<string, T>>(new Map())
+    recordList$: Observable<T[]>;
+    latestRecords$ = new BehaviorSubject<Map<string, T>>(new Map())
     addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1);
     clearRecords$ = new ReplaySubject<void>(1);
 
@@ -40,6 +41,11 @@ export class IndexedRowsRepository<T extends { word: string, id?: number }> {
             }
         });
         this.clearRecords$.subscribe(v => this.records$.next({}));
+        this.recordList$ = this.records$
+            .pipe(
+                map(recordObject => flatten(Object.values(recordObject))),
+                shareReplay(1)
+            );
         this.loadGenerator(load);
     }
 

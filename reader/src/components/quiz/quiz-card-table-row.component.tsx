@@ -24,6 +24,7 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
         className = 'learning'
     }
     return (
+
         <TableRow key={row.d.word} className={`${quizCardTableRow} ${className}`}>
             <TableCell
                 component="th"
@@ -67,5 +68,6 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
                     .join(',')
             }</TableCell>
         </TableRow>
+
     );
 }

@@ -21,6 +21,7 @@ import {LibraryNode} from "./nodes/library.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {TreeMenuNodeItem} from "../tree-menu/tree-menu-node-item.component";
 import {FrequencyTreeMenuNode} from "./nodes/frequency-tree.node";
+import {ProgressNode} from "./nodes/progress.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 export const DEV = new URLSearchParams(window.location.search).has('dev')
@@ -47,6 +48,7 @@ function AppDirectory(
             TestingUtilsNode(m),
             QuizCarouselNode(),
             QuizScheduleNode(),
+            ProgressNode,
             SpeechPracticeNode,
         ] as ArrayToTreeParams<TreeMenuNode>
     );

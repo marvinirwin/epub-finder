@@ -10,7 +10,8 @@ export const PROGRESS_TREE = 'graph';
 export const SETTINGS = 'settings';
 export const TESTING_UTILS = 'manual-speech-recognition';
 export const QUIZ_NODE = 'quiz-carousel';
-export const QUIZ_SCHEDULE = 'quiz-card';
+export const QUIZ_SCHEDULE = 'quiz-schedule';
+export const PROGRESS_NODE = 'PROGRESS_NODE';
 
 export type PAGES =
     typeof SPEECH_PRACTICE |
