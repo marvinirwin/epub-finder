@@ -134,12 +134,15 @@ export class DocumentsController {
         })
     }
 
-    @Post('update/:filename')
-    update(
-        @Param('filename') filename: string,
+    @Post('update')
+    @UseGuards(AnonymousGuard)
+    async update(
         @Body() documentUpdateDto: DocumentUpdateDto,
         @UserFromReq() user: User | undefined
     ) {
+        if (!user) {
+            throw new HttpException("Not authorized to update document", 401)
+        }
         const submitter = new RevisionUpdater<Document, DocumentUpdateDto>(
             r => this.documentsService.documentRepository.findOne(r.id),
             documentView => documentView.creator_id === user?.id,
@@ -156,11 +159,10 @@ export class DocumentsController {
                 ...newVersion,
                 creator_id: user.id,
             })
-        )
+        );
         // Check if we're allowed to modify this file
-        if (!user) {
-            throw new HttpException("Not authorized to update document", 401)
-        }
+        return await submitter.SubmitRevision(documentUpdateDto);
+/*
         return this.documentsService.update(
             user,
             {
@@ -172,5 +174,6 @@ export class DocumentsController {
                 deleted: documentUpdateDto.deleted
             }
         )
+*/
     }
 }

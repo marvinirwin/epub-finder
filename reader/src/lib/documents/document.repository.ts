@@ -25,11 +25,15 @@ export class DocumentRepository {
             )
     }
 
-    public delete(document_id: string) {
-        return axios.delete(
-            `${process.env.PUBLIC_URL}/documents/${document_id}`
+    public delete(ltDocument: LtDocument) {
+        return axios.post(
+            `${process.env.PUBLIC_URL}/documents/update`,
+            {
+                ...ltDocument.d,
+                deleted: true
+            }
         ).then(response => {
-            this.collection$.next(deleteMap(this.collection$.getValue(), document_id))
+            this.collection$.next(deleteMap(this.collection$.getValue(), ltDocument.id()))
             return response?.data;
         })
     }

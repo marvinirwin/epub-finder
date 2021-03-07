@@ -11,11 +11,11 @@ describe('Shows progress on frequency documents', () => {
         cy.clearIndexedDB();
     })
     it('Selects the default frequency documents to use', () => {
-        DirectoryPom.goToQuiz();
+        DirectoryPom.OpenQuiz();
         QuizPom.frequencyDocumentProgressContainer(defaultTestFrequencyDocument).should('exist');
     });
     it('Updates the progress reading that document when a quiz result is submitted', () => {
-        DirectoryPom.goToQuiz();
+        DirectoryPom.OpenQuiz();
         QuizPom.submitQuizResult(QUIZ_BUTTON_EASY);
         QuizPom.assertFrequencyDocumentProgress(
             defaultTestFrequencyDocument,
@@ -27,7 +27,7 @@ describe('Shows progress on frequency documents', () => {
         )
     });
     it('Shows the user their progress when they select the frequency documents they want', () => {
-        DirectoryPom.goToQuiz();
+        DirectoryPom.OpenQuiz();
         DirectoryPom.SelectFrequencyDocuments(testFrequencyDocument1, 'Test Frequency Document 2');
         QuizPom.submitQuizResult(QUIZ_BUTTON_EASY);
         QuizPom.assertFrequencyDocumentProgress(

@@ -33,3 +33,12 @@ export const quizCardTranslation = 'quizCardTranslation';
 export const quizCardRomanization = 'quizCardRomanization';
 export const quizCardDescription = 'quizCardDescription';
 export const quizCardLearningLanguage = 'quiz-text';
+export const uploadTextName = 'uploadTextName';
+export const uploadTextArea = 'uploadTextArea';
+export const uploadTextButton = 'uploadTextButton';
+export const libraryRowToggleFrequency = 'libraryRowToggleFrequency';
+export const libraryRowToggleReading = 'libraryRowToggleReading';
+export const libraryRowDelete = 'libraryRowDelete';
+export const libraryRow = 'libraryRow';
+
+

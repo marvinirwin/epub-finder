@@ -3,12 +3,8 @@ import {ManagerContext} from "../../App";
 import {Box, Button, Input, Typography} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {BorderLinearProgressComponent} from "../progress/border-linear-progress.component";
-import {fileChooser, uploadProgressBar} from "@shared/";
+import {fileChooser, uploadProgressBar, uploadTextArea, uploadTextButton, uploadTextName} from "@shared/";
 
-
-const uploadText = (param: { text: string; title: string }) => {
-
-};
 
 export const UploadText = () => {
     const m = useContext(ManagerContext);
@@ -22,9 +18,27 @@ export const UploadText = () => {
         >
             Use text as learning material
         </Typography>
-        <Input value={title} onChange={v => setTitle(v.target.value || '')} placeholder={'name'}/>
-        <textarea style={{width: '500px', height: '240px'}} onChange={v => setText(v.target.value || '')} value={text} />
-        <Button onClick={() => m.droppedFilesService.uploadFileRequests$.next([new File([text], `${title}.txt`)])}>
+        <Input
+            value={title}
+            onChange={v => setTitle(v.target.value || '')}
+            placeholder={'name'}
+            inputProps={{id: uploadTextName}}
+        />
+        <textarea
+            style={{width: '500px', height: '240px'}}
+            onChange={v => setText(v.target.value || '')}
+            value={text}
+            id={uploadTextArea}
+        />
+        <Button
+            onClick={
+                () => m
+                    .droppedFilesService
+                    .uploadFileRequests$
+                    .next([new File([text], `${title}.txt`)])
+            }
+            id={uploadTextButton}
+        >
             Upload Text
         </Button>
     </div>

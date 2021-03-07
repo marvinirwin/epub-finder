@@ -21,6 +21,6 @@ export class RevisionUpdater<T, RevisionT extends Partial<T>> {
             throw new Error("Not authorized to submit revision")
         }
 
-        return await this.persistNewVersion(await this.mergeVersions(currentVersion, newRevision))
+        return this.persistNewVersion(await this.mergeVersions(currentVersion, newRevision));
     }
 }

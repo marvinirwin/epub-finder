@@ -24,7 +24,7 @@ describe('Quiz Cards', () => {
     it('Shows the correct card body', () => {
         cy.visitHome();
         const firstCard = CardList[0];
-        DirectoryPom.goToQuiz();
+        DirectoryPom.OpenQuiz();
         DirectoryPom.SetHiddenFields('hiddenDefinition');
         // Assert the definition and description are hidden
         QuizCarouselPom.translatedTextShouldBe('')

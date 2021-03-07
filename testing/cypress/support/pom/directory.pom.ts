@@ -15,7 +15,7 @@ export class DirectoryPom {
         cy.visit(`http://localhost:3000/?test=1&skip_intro=1&page=${page}`);
     }
 
-    public static goToQuiz() {
+    public static OpenQuiz() {
         cy.get(`#${QUIZ_NODE}`).click();
     }
 
@@ -41,8 +41,9 @@ export class DirectoryPom {
             .click()
     }
 
-    public static EnterLibrary() {
+    public static OpenLibraryDialog() {
         DirectoryPom.CloseAllDialogs()
+        cy.wait(1000);
         cy.get(`#${LIBRARY}`).click()
     }
 
@@ -87,24 +88,25 @@ export class DirectoryPom {
         })
     }
 
-    public static openUploadDialog() {
+    public static OpenUploadDialog() {
         cy.wait(1000);
         cy.get(`#${UPLOAD_LEARNING_MATERIAL}`).click();
     }
 
     public static CloseAllDialogs() {
         cy.get('body').trigger('keydown', {key: 'Escape'})
-        cy.get('.action-modal').should('not.exist');
+        cy.get('#global-loading-spinner').should('not.be.visible');
         // cy.get('.action-modal > .MuiBackdrop-root').click({force: true});
     }
 
     public static SelectDocumentToRead(documentName: string) {
-        DirectoryPom.EnterLibrary()
+        DirectoryPom.OpenLibraryDialog()
+        cy.wait(1000);
         cy.contains(`.${documentSelectionRow}`, documentName).click()
     }
 
     static SelectFrequencyDocuments(...frequencyDocumentNames: string[]) {
-        DirectoryPom.EnterLibrary();
+        DirectoryPom.OpenLibraryDialog();
         frequencyDocumentNames.forEach(frequencyDocumentName => {
             cy.get(frequencyDocumentList)
                 .find(`#${frequencyDocumentName}`)

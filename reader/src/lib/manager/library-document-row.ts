@@ -2,7 +2,6 @@ import {observableLastValue, SettingsService} from "../../services/settings.serv
 import {LtDocument} from "@shared/";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {ReadingDocumentService} from "./reading-document.service";
 import {DocumentRepository} from "../documents/document.repository";
 import {FrequencyDocumentsRepository} from "../frequency-documents.repository";
 
@@ -51,9 +50,8 @@ export class LibraryDocumentRow {
         }
     }
 
-    async toggleDeleted() {
-
-        // I'm a projection of ltDocuments, I'll need to submit a revision to the repository
+    async delete() {
+        await this.readingDocumentRepository.delete(this.ltDocument)
     }
 
     async toggleUseForFrequency() {

@@ -3,7 +3,7 @@ import {documentSelectionRow, fileChooser} from "@shared/*";
 
 export function UploadLearningDocument() {
     cy.get(`#${fileChooser}`).attachFile('test_quiz.html');
-    DirectoryPom.EnterLibrary()
+    DirectoryPom.OpenLibraryDialog()
     cy.get(`${documentSelectionRow}.reading`).contains('test_quiz')
     DirectoryPom.Back()
 }

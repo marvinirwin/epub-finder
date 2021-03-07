@@ -1,6 +1,4 @@
 import {DatabaseService} from "../Storage/database.service";
-import {ReplaySubject} from "rxjs";
-import { DocumentViewDto} from "@server/*";
 import {SettingsService} from "../../services/settings.service";
 import {DocumentRepository} from "../documents/document.repository";
 
@@ -27,8 +25,5 @@ export class LibraryService {
         this.settingsService.readingDocument$.next(saved.id())
     }
 
-    public async deleteDocument(instanceId: string): Promise<void> {
-        await this.documentRepository.delete(instanceId);
-    }
 }
 
