@@ -59,7 +59,7 @@ export const ProgressTableComponent = () => {
     return <div>
         <ProgressTableToolbar/>
         <TableContainer component={Paper}>
-            <Table>
+            <Table size='small'>
                 <ProgressTableHead/>
                 <TableBody>
                     {orderBy(recognitionRecords, r => r.timestamp, 'desc').slice(0, 100)
