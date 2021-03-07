@@ -68,7 +68,7 @@ import {ScheduleRowsService} from "./manager/schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
 import {VisibleService} from "./manager/visible.service";
-import {TabulatedDocuments} from "../../../server/src/shared/tabulate-documents/tabulated-documents.interface";
+import {TabulatedDocuments} from "@shared/";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";

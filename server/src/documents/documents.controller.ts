@@ -183,7 +183,8 @@ export class DocumentsController {
                 name: documentUpdateDto.name,
                 for_reading: documentUpdateDto.for_reading,
                 global: documentUpdateDto.global,
-                id: documentUpdateDto.id
+                id: documentUpdateDto.id,
+                deleted: documentUpdateDto.deleted
             }
         )
     }

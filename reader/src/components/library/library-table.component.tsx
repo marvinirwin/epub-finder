@@ -25,7 +25,9 @@ export const LibraryTable = () => {
                             key={document.id()}
                             document={new LibraryDocumentRow({
                                 settingsService: m.settingsService,
-                                ltDocument: document
+                                ltDocument: document,
+                                frequencyDocumentRepository: m.frequencyDocumentsRepository,
+                                readingDocumentRepository: m.documentRepository
                             })}
                         />)
                 }

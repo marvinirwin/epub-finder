@@ -18,7 +18,6 @@ export class InterpolateExampleSentencesService {
             `,
             `
             
-<div class="example-sentence-container">
 ${sentences .map(sentence => `<div class="example-sentence">${sentence}</div>` ).join('</br>')}
 </div>
             `

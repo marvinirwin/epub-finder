@@ -4,7 +4,7 @@ import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
 import {EditableValue} from "./editing-value";
-import {uniq} from "lodash";
+import {uniq, orderBy} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
 import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
 import {ScheduleService} from "../../lib/manager/schedule.service";
@@ -68,8 +68,8 @@ export class QuizService {
                 ]).pipe(
                     map(([sentenceMap, currentWord]) => {
                         if (!currentWord) return [];
-                        const wordSet = Array.from(sentenceMap.get(currentWord) || new Set<string>());
-                        return uniq(wordSet.map(a => a)).slice(0, 10)
+                        const exampleSegmentTexts = Array.from(sentenceMap.get(currentWord) || new Set<string>());
+                        return uniq(orderBy(exampleSegmentTexts, v => v.length).map(a => a)).slice(0, 10)
                     }),
                     shareReplay(1)
                 ),

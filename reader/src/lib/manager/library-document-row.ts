@@ -2,21 +2,30 @@ import {observableLastValue, SettingsService} from "../../services/settings.serv
 import {LtDocument} from "@shared/";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
+import {ReadingDocumentService} from "./reading-document.service";
+import {DocumentRepository} from "../documents/document.repository";
+import {FrequencyDocumentsRepository} from "../frequency-documents.repository";
 
 export class LibraryDocumentRow {
     selectedForFrequency$: Observable<boolean>;
     selectedForReading$: Observable<boolean>;
     private settingsService: SettingsService;
+    private readingDocumentRepository: DocumentRepository;
     public ltDocument: LtDocument;
 
     constructor(
         {
             settingsService,
-            ltDocument
+            ltDocument,
+            readingDocumentRepository,
+
         }: {
             settingsService: SettingsService,
             ltDocument: LtDocument
+            readingDocumentRepository: DocumentRepository,
+            frequencyDocumentRepository: FrequencyDocumentsRepository
         }) {
+        this.readingDocumentRepository = readingDocumentRepository;
         this.settingsService = settingsService;
         this.ltDocument = ltDocument;
         this.selectedForReading$ = settingsService.readingDocument$
@@ -41,6 +50,12 @@ export class LibraryDocumentRow {
             this.settingsService.readingDocument$.next(this.ltDocument.id());
         }
     }
+
+    async toggleDeleted() {
+
+        // I'm a projection of ltDocuments, I'll need to submit a revision to the repository
+    }
+
     async toggleUseForFrequency() {
         const mostRecent = await observableLastValue(this.settingsService.selectedFrequencyDocuments$);
         if (mostRecent.includes(this.ltDocument.id())) {
