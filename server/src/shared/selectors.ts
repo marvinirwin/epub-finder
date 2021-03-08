@@ -40,5 +40,8 @@ export const libraryRowToggleFrequency = 'libraryRowToggleFrequency';
 export const libraryRowToggleReading = 'libraryRowToggleReading';
 export const libraryRowDelete = 'libraryRowDelete';
 export const libraryRow = 'libraryRow';
+export const newWordLimitInput = 'newWordLimitInput';
+export const noMoreQuizCards = 'noMoreQuizCards';
+
 
 

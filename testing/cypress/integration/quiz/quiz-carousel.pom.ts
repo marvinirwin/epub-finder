@@ -5,7 +5,7 @@ import {QuizCardPom} from "./quiz-card.pom";
 import {ImageSearchPom} from "./image-search.pom";
 import {HiddenQuizFields} from "../../../../reader/src/lib/hidden-quiz-fields";
 import {
-    manualQuizHiddenFieldConfigId,
+    manualQuizHiddenFieldConfigId, noMoreQuizCards,
     QUIZ_BUTTON_EASY,
     QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE,
     QUIZ_BUTTON_MEDIUM, quizButtonReveal, quizCardDescription,
@@ -89,6 +89,10 @@ export class QuizCarouselPom {
 
     static reveal() {
         cy.get(`#${quizButtonReveal}`)
+    }
+
+    static assertNoQuizCard() {
+        cy.get(`.${noMoreQuizCards}`).should('be.visible')
     }
 }
 

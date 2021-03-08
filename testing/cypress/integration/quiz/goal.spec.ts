@@ -10,7 +10,7 @@ describe('The progress display', () => {
         cy.signupLogin()
     })
     it('Shows the denominator of daily progress correctly', () => {
-        DirectoryPom.EnterSettings();
+        DirectoryPom.OpenSettings();
         DirectoryPom.SetDailyGoal(50);
         DirectoryPom.Back()
         DirectoryPom.DailyProgressLabel().should('contain', 'Daily Progress: 0 / 50')

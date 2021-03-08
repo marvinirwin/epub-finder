@@ -52,7 +52,8 @@ export class DirectoryPom {
             .click()
     }
 
-    public static EnterSettings() {
+    public static OpenSettings() {
+        DirectoryPom.CloseAllDialogs()
         cy.get(`#settings`)
             .click()
     }
