@@ -31,6 +31,8 @@ import {S3UploadedFile, UploadOutput} from "./uploading/s3-uploaded-file";
 import {RevisionUpdater} from "../revision-updater";
 import {DocumentView} from "../entities/document-view.entity";
 import {DocumentUpdateDto} from "./document-update.dto";
+import {LtDocument} from "../shared";
+import {ltDocId} from "../shared/lt-document";
 
 @Controller('documents')
 export class DocumentsController {
@@ -148,11 +150,14 @@ export class DocumentsController {
             documentView => documentView.creator_id === user?.id,
             (currentVersion, newVersion) => ({
                 ...currentVersion,
-                id: newVersion.id,
+                document_id: ltDocId(documentUpdateDto),
                 for_frequency: newVersion.for_frequency,
                 for_reading: newVersion.for_reading,
                 global: newVersion.global,
-                name: newVersion.name
+                name: newVersion.name,
+                deleted: newVersion.deleted,
+                id: undefined,
+                created_at: undefined,
             }),
             newVersion => this.documentsService.documentRepository.save(newVersion),
             newVersion => ({

@@ -2,11 +2,12 @@ import React, {Fragment, useContext} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {FormControlLabel, ListItem, MenuItem, Select, Switch} from "@material-ui/core";
+import {LtDocument} from "@shared/*";
 
 export const SetVocab = () => {
     const m = useContext(ManagerContext);
     const selectedVocab = useObservableState(m.settingsService.selectedVocabulary$) || "USE_QUIZ_RESULTS";
-    const allDocuments = useObservableState(m.documentRepository.collection$) || new Map();
+    const allDocuments: Map<string, LtDocument> = useObservableState(m.documentRepository.collection$) || new Map();
     return <ListItem>
         <FormControlLabel
             control={
@@ -24,8 +25,8 @@ export const SetVocab = () => {
                     {
                         [...allDocuments.values()]
                             .map(c => <MenuItem
-                                    key={c.frequencyDocument.id()}
-                                    value={c.frequencyDocument.id()}>{c.frequencyDocument.name}
+                                    key={c.id()}
+                                    value={c.id()}>{c.name}
                                 </MenuItem>
                             )
                     }

@@ -15,7 +15,7 @@ export class RevisionUpdater<T, RevisionT extends Partial<T>> {
         const currentVersion = await this.getCurrentVersion(newRevision);
         if (!currentVersion) {
             const newVersion = await this.createNewVersion(newRevision);
-            return await this.persistNewVersion(newVersion);
+            return this.persistNewVersion(newVersion);
         }
         if (!await (this.isAllowedFn(currentVersion))) {
             throw new Error("Not authorized to submit revision")

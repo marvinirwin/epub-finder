@@ -25,3 +25,7 @@ export class LtDocument {
         return `${process.env.PUBLIC_URL}/documents/${this.filename}`
     }
 }
+
+export const ltDocId = ({document_id, id}: {id: string, document_id?: string}) => {
+    return document_id || id;
+}

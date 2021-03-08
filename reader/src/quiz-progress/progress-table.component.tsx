@@ -16,10 +16,16 @@ export const ProgressTableComponent = () => {
             <Table size='small'>
                 <ProgressTableHead/>
                 <TableBody>
-                    {orderBy(
-                        recognitionRecords.filter(r => r.grade >= 3),
-                        r => r.timestamp, 'desc')
-                        .map(recognitionRecord => <ProgressTableRow recognitionRecord={recognitionRecord} key={recognitionRecord.word}/>)}
+                    {
+                        orderBy(
+                            recognitionRecords.filter(r => r.grade >= 3),
+                            r => r.timestamp, 'desc')
+                            .map(
+                                recognitionRecord => <ProgressTableRow
+                                    recognitionRecord={recognitionRecord}
+                                    key={recognitionRecord.timestamp.getTime()}
+                                />)
+                    }
                 </TableBody>
             </Table>
         </TableContainer>
