@@ -9,8 +9,7 @@ import {ScheduleRowsService} from "./schedule-rows.service";
 import {SettingsService} from "../../services/settings.service";
 import {ScheduleMathService} from "./schedule-math.service";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
-import {ScheduleRow} from "../schedule/ScheduleRow";
-import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row.interface";
 import {filterQuizRows} from "../../components/quiz/quiz.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;

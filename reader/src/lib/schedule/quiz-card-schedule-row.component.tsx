@@ -1,6 +1,5 @@
-import {NormalizedScheduleRowData} from "./schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "./schedule-row.interface";
 import React, {useEffect, useState} from "react";
-import {ScheduleRow} from "./ScheduleRow";
 import {DEV} from "../../components/directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";

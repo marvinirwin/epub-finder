@@ -1,5 +1,4 @@
-import {ScheduleRow} from "./schedule/ScheduleRow";
-import {NormalizedScheduleRowData} from "./schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row.interface";
 import {
     SerializedTabulation,
     TabulatedDocuments

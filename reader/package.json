@@ -58,7 +58,7 @@
   "scripts": {
     "start": "SKIP_PREFLIGHT_CHECK=true react-app-rewired start",
     "build": "react-app-rewired build ../server/public",
-    "test": "jest --verbose \"--testNamePattern=^Loads the manager without error$\" --runTestsByPath /Users/frodo/PycharmProjects/vocabfinder/reader/src/test/manager?/manager.spec.ts",
+    "test": "jest --verbose ",
     "eject": "react-scripts eject",
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build",

@@ -7,8 +7,7 @@ import {PronunciationProgressRepository} from "../schedule/pronunciation-progres
 import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
 import CardsRepository from "./cards.repository";
 import {IgnoredWordsRepository} from "../schedule/ignored-words.repository";
-import {ScheduleRow} from "../schedule/ScheduleRow";
-import {NormalizedScheduleRowData, ScheduleRowData} from "../schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row.interface";
 import {ScheduleMathService} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";

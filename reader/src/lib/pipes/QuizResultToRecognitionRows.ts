@@ -3,9 +3,9 @@ import {Dictionary} from "lodash";
 import {QuizResult} from "../manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
-import {ScheduleRow} from "../schedule/ScheduleRow";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import moment from "moment";
+import {ScheduleRow} from "../schedule/schedule-row.interface";
 
 export const QuizResultToRecognitionRows =
     (
