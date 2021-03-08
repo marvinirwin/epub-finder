@@ -10,6 +10,7 @@ import {SetVocab} from "../components/settings/set-vocab.component";
 import {AdjustDateWeight} from "../components/directory/adjust-date-weight.component";
 import {AdjustLengthWeight} from "../components/directory/adjust-length-weight.component";
 import {LibraryTable} from "../components/library/library-table.component";
+import {SetQuizWordLimit} from "../components/settings/set-new-quiz-word-limit";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -41,6 +42,7 @@ export class ModalService {
                 <AdjustDateWeight/>
                 <AdjustLengthWeight/>
                 <SetVocab/>
+                <SetQuizWordLimit/>
             </div>
         );
 

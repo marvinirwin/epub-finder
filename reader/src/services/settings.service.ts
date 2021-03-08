@@ -56,6 +56,7 @@ export class SettingsService {
     public scheduleTableWordFilterValue$: ReplaySubject<string>;
     public scheduleTableShowUncounted$: ReplaySubject<boolean>;
     public scheduleTableShowUnderDue$: ReplaySubject<boolean>;
+    public newQuizWordLimit$: ReplaySubject<number>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -109,7 +110,7 @@ export class SettingsService {
 
         this.scheduleTableShowUncounted$ = this.createSetting$<boolean>('scheduleTableShowUncounted', false, 'indexedDB')
         this.scheduleTableShowUnderDue$ = this.createSetting$<boolean>('scheduleTableShowUnderDue', false, 'indexedDB')
-
+        this.newQuizWordLimit$ = this.createSetting$<number>('newQuizWordLimit', 10, 'indexedDB')
     }
 
     public createSetting$<T>(
