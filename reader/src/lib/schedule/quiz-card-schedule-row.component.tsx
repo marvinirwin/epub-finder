@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {DEV} from "../../components/directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";
-import {QuizCard} from "../../components/quiz/quiz-card.interface";
+import {QuizCard} from "../../components/quiz/word-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";

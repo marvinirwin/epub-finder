@@ -1,4 +1,4 @@
-import {QuizCard} from "./quiz-card.interface";
+import {QuizCard} from "./word-card.interface";
 import {useObservableState} from "observable-hooks";
 import {QuizCardFields} from "./quiz-card-fields.interface";
 

@@ -6,7 +6,6 @@ import {ImageSearchPom} from "./image-search.pom";
 import {quizButtonReveal} from "@shared/*";
 import { QuizCarouselPom } from "./quiz-carousel.pom";
 
-const CurrentQuizCard = '#current-quiz-card';
 
 
 const defaultHotkeys = {

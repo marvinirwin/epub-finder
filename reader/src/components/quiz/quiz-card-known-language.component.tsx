@@ -2,7 +2,7 @@ import {EditableOnClick} from "./editable-image.component";
 import {TextField, Typography} from "@material-ui/core";
 import React, {useState} from "react";
 import {useObservableState} from "observable-hooks";
-import {QuizCard} from "./quiz-card.interface";
+import {QuizCard} from "./word-card.interface";
 
 export function QuizCardKnownLanguage({c}: { c: QuizCard }) {
     const description = useObservableState(c.description$.value$);

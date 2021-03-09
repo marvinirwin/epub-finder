@@ -42,6 +42,13 @@ export const libraryRowDelete = 'libraryRowDelete';
 export const libraryRow = 'libraryRow';
 export const newWordLimitInput = 'newWordLimitInput';
 export const noMoreQuizCards = 'noMoreQuizCards';
+export const scheduleRowOpenWordButton = 'scheduleRowOpenWordButton';
+export const wordCardCountRecords = 'wordCardCountRecords'
+export const wordCardRecognitionRows =  'wordCardRecognitionRows '
+export const wordCardDescription =  'wordCardDescription '
+export const wordCardLearningLanguage =  'wordCardLearningLanguage '
+export const wordCardRomanization =  'wordCardRomanization '
+export const wordCardTranslation =  'wordCardTranslation '
 
 
 

@@ -2,16 +2,18 @@ import {EditableOnClick} from "./editable-image.component";
 import {InsertPhoto} from '@material-ui/icons';
 import React, {useCallback, useContext} from "react";
 import {useObservableState} from "observable-hooks";
-import {QuizCard} from "./quiz-card.interface";
+import {QuizCard, WordCard} from "./word-card.interface";
 import {ManagerContext} from "../../App";
 import {observableLastValue} from "../../services/settings.service";
 import {IconButton} from "@material-ui/core";
 import {quizCardImage, selectQuizCardImageButton} from "@shared/";
 import {useIsFieldHidden} from "./useIsFieldHidden";
 
-export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
+export function CardImage({quizCard}: { quizCard: WordCard }) {
     const quizCardImageSource = useObservableState(quizCard.image$.value$);
+/*
     const isImageHidden = useIsFieldHidden({quizCard, label: 'picture'})
+*/
     const m = useContext(ManagerContext);
     return <EditableOnClick onEditClicked={async () => {
         const searchTerm = await observableLastValue(quizCard.word$);
@@ -23,7 +25,7 @@ export function QuizCardImage({quizCard}: { quizCard: QuizCard }) {
         }
     }}>
         {
-            !isImageHidden && quizCardImageSource ?
+            quizCardImageSource ?
                 <img
                     className={quizCardImage}
                     src={quizCardImageSource}

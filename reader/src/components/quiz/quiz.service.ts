@@ -1,7 +1,7 @@
 import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxjs";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
-import {QuizCard} from "./quiz-card.interface";
+import {QuizCard} from "./word-card.interface";
 import {EditableValue} from "./editing-value";
 import {uniq, orderBy} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";

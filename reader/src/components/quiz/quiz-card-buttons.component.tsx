@@ -2,7 +2,7 @@ import {Button, Paper, Typography} from "@material-ui/core";
 import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM, quizButtonReveal} from "@shared/";
 import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
-import {QuizCard} from "./quiz-card.interface";
+import {QuizCard} from "./word-card.interface";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../hotkey-wrapper";
 import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row.interface";

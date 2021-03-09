@@ -7,7 +7,7 @@ import {
     QUIZ_NODE,
     UPLOAD_LEARNING_MATERIAL,
     manualHotkeyInput,
-    submitManualHotkeyButton, TESTING_UTILS, manualQuizHiddenFieldConfigId
+    submitManualHotkeyButton, TESTING_UTILS, manualQuizHiddenFieldConfigId, QUIZ_SCHEDULE
 } from '@shared/*'
 
 export class DirectoryPom {
@@ -134,5 +134,10 @@ export class DirectoryPom {
         DirectoryPom.OpenTestingUtils()
         cy.get(`#${manualQuizHiddenFieldConfigId}`).type(hiddenDefinition)
         DirectoryPom.CloseAllDialogs()
+    }
+
+    static OpenScheduleTable() {
+        DirectoryPom.CloseAllDialogs();
+        cy.get(`#${QUIZ_SCHEDULE}`).click();
     }
 }
