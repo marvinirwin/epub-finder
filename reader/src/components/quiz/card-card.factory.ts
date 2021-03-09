@@ -9,58 +9,65 @@ import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLat
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
     cardService: CardsRepository,
-    update: (propsToUpdate: Partial<ICard>, word: string) => void,
     languageConfigsService: LanguageConfigsService
-) => ({
-    word$: currentWord$,
-    image$: new EditableValue<string | undefined>(
-        resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
-            .pipe(
-                distinctUntilChanged(),
-                map(c => {
-                    return c?.photos?.[0];
-                }),
-                shareReplay(1),
-            ),
-        imageSrc$ => imageSrc$
-            .pipe(
-                withLatestFrom(currentWord$),
-                debounceTime(1000),
-            ).subscribe(([imageSrc, word]) => update({photos: [imageSrc || '']}, word || ''))
-    ),
-    description$: new EditableValue<string | undefined>(
-        resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
-            .pipe(
-                map(c => c?.knownLanguage?.[0]),
-                shareReplay(1)
-            ),
-        description$ =>
-            description$.pipe(
-                withLatestFrom(currentWord$),
-                debounceTime(1000)
-            ).subscribe(([description, word]) => {
-                update({knownLanguage: [description || '']}, word || '')
-            })
-    ),
-    romanization$: combineLatest([
-        languageConfigsService.learningToLatinTransliterateFn$,
-        currentWord$
-    ]).pipe(
-        switchMap((
-            [transliterateFn, currentWord]
-        ) => transliterateFn ? transliterateFn(currentWord || '') : of(undefined)),
-        shareReplay(1)
-    ),
-    translation$: combineLatest([
-        languageConfigsService.learningToKnownTranslateFn$,
-        currentWord$
-    ]).pipe(
-        switchMap(
-            ([translateFn, currentWord]) =>
-                translateFn ? translateFn(currentWord || '') : of(undefined)
+) => {
+    function update(propsToUpdate: Partial<ICard>, word: string) {
+        cardService.updateICard(
+            word,
+            propsToUpdate
+        )
+    }
+    return ({
+        word$: currentWord$,
+        image$: new EditableValue<string | undefined>(
+            resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
+                .pipe(
+                    distinctUntilChanged(),
+                    map(c => {
+                        return c?.photos?.[0];
+                    }),
+                    shareReplay(1),
+                ),
+            imageSrc$ => imageSrc$
+                .pipe(
+                    withLatestFrom(currentWord$),
+                    debounceTime(1000),
+                ).subscribe(([imageSrc, word]) => update({photos: [imageSrc || '']}, word || ''))
         ),
-        shareReplay(1)
-    ),
-    // I should make "hidden" deterministic somehow
-    // I'll worry about that later
-});
+        description$: new EditableValue<string | undefined>(
+            resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
+                .pipe(
+                    map(c => c?.knownLanguage?.[0]),
+                    shareReplay(1)
+                ),
+            description$ =>
+                description$.pipe(
+                    withLatestFrom(currentWord$),
+                    debounceTime(1000)
+                ).subscribe(([description, word]) => {
+                    update({knownLanguage: [description || '']}, word || '')
+                })
+        ),
+        romanization$: combineLatest([
+            languageConfigsService.learningToLatinTransliterateFn$,
+            currentWord$
+        ]).pipe(
+            switchMap((
+                [transliterateFn, currentWord]
+            ) => transliterateFn ? transliterateFn(currentWord || '') : of(undefined)),
+            shareReplay(1)
+        ),
+        translation$: combineLatest([
+            languageConfigsService.learningToKnownTranslateFn$,
+            currentWord$
+        ]).pipe(
+            switchMap(
+                ([translateFn, currentWord]) =>
+                    translateFn ? translateFn(currentWord || '') : of(undefined)
+            ),
+            shareReplay(1)
+        ),
+        // I should make "hidden" deterministic somehow
+        // I'll worry about that later
+    });
+};

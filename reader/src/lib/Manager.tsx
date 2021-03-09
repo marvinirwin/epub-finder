@@ -92,6 +92,7 @@ import {FrequencyTreeService} from "./frequency-tree.service";
 import {VocabService} from "./vocab.service";
 import {FilterScheduleTableRowsService} from "./filter-schedule-table-rows.service";
 import {SortedLimitScheduleRowsService} from "./manager/sorted-limit-schedule-rows.service";
+import {WordCardModalService} from "./word-card-modal.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -189,6 +190,7 @@ export class Manager {
     public vocabService: VocabService;
     public filterScheduleTableRowsService: FilterScheduleTableRowsService;
     sortedLimitScheduleRowsService: SortedLimitScheduleRowsService;
+    wordCardModalService: WordCardModalService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -447,6 +449,10 @@ export class Manager {
         this.progressTreeService = new FrequencyTreeService(this);
         this.quizHighlightService = new QuizHighlightService( this )
         this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(this);
+        this.wordCardModalService = new WordCardModalService({
+            cardService: this.cardsRepository,
+            languageConfigsService: this.languageConfigsService
+        })
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

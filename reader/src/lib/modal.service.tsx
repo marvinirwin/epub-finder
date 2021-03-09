@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React from "react";
 import {FileChooser} from "../components/directory/upload.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
 import {ToggleTranslateComponent} from "../components/settings/toggle-translate.component";
@@ -11,12 +11,7 @@ import {AdjustDateWeight} from "../components/directory/adjust-date-weight.compo
 import {AdjustLengthWeight} from "../components/directory/adjust-length-weight.component";
 import {LibraryTable} from "../components/library/library-table.component";
 import {SetQuizWordLimit} from "../components/settings/set-new-quiz-word-limit";
-import {ManagerContext} from "../App";
-
-function WordCardDisplay() {
-    const m = useContext(ManagerContext);
-    return ;
-}
+import {WordCardDisplay} from "./word-card.modal.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -24,6 +19,7 @@ export class ModalService {
     public documentSelect: NavModal;
     public settings: NavModal;
     public testingUtils: NavModal;
+    public wordPaperDisplay: NavModal;
 
     constructor() {
         this.fileUpload = new NavModal(
@@ -60,7 +56,7 @@ export class ModalService {
 
         this.wordPaperDisplay = new NavModal(
             'wordPaperDisplay',
-            <WordCardDisplay/>
+            WordCardDisplay
         )
     }
 

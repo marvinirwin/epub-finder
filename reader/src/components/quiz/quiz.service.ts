@@ -87,17 +87,10 @@ export class QuizService {
             }
         )
 
-        function update(propsToUpdate: Partial<ICard>, word: string) {
-            cardService.updateICard(
-                word,
-                propsToUpdate
-            )
-        }
 
         const wordCard = wordCardFactory(
             currentWord$,
             cardService,
-            update,
             languageConfigsService
         );
 
