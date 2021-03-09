@@ -1,5 +1,5 @@
 import {NormalizedScheduleRowData, ScheduleRow} from "./schedule-row.interface";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {DEV} from "../../components/directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";
@@ -7,9 +7,7 @@ import {QuizCard} from "../../components/quiz/word-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
-import {format} from 'date-fns';
-
-const formatDueDate = (d: Date) => format(d, 'LLL do hbbb')
+import {formatDueDate} from "./format-due-date";
 
 export const QuizCardScheduleRowDisplay = (
     {
