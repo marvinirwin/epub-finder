@@ -17,6 +17,4 @@ export interface WordCard {
     description$: EditableValue<string | undefined>
     romanization$: Observable<string | undefined>,
     translation$: Observable<string | undefined>,
-    wordCountRecords: Observable<DocumentWordCount[]>;
-    wordRecognitionRecords: Observable<WordRecognitionRow>;
 }

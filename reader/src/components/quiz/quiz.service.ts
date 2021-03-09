@@ -1,11 +1,9 @@
-import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from "rxjs";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
-import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, map, mapTo, shareReplay} from "rxjs/operators";
 import {QuizCard} from "./word-card.interface";
-import {EditableValue} from "./editing-value";
-import {uniq, orderBy} from "lodash";
+import {orderBy, uniq} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
-import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {ICard} from "../../../../server/src/shared/ICard";
@@ -15,6 +13,7 @@ import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
 import {SettingsService} from "../../services/settings.service";
 import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
+import {wordCardFactory} from "./card-card.factory";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -22,11 +21,11 @@ export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) =
 
 export const computeRandomHiddenQuizFields = () => {
     return hiddenDefinition;
-/*
-    return Math.random() > 0.5 ?
-        hiddenDefinition :
-        hiddenLearningLanguage;
-*/
+    /*
+        return Math.random() > 0.5 ?
+            hiddenDefinition :
+            hiddenLearningLanguage;
+    */
 };
 
 export class QuizService {
@@ -95,59 +94,15 @@ export class QuizService {
             )
         }
 
+        const wordCard = wordCardFactory(
+            currentWord$,
+            cardService,
+            update,
+            languageConfigsService
+        );
+
         this.quizCard = {
-            exampleSentenceOpenDocument: openExampleSentencesDocument,
-            word$: currentWord$,
-            image$: new EditableValue<string | undefined>(
-                resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
-                    .pipe(
-                        distinctUntilChanged(),
-                        map(c => {
-                            return c?.photos?.[0];
-                        }),
-                        shareReplay(1),
-                    ),
-                imageSrc$ => imageSrc$
-                    .pipe(
-                        withLatestFrom(currentWord$),
-                        debounceTime(1000),
-                    ).subscribe(([imageSrc, word]) => update({photos: [imageSrc || '']}, word))
-            ),
-            description$: new EditableValue<string | undefined>(
-                resolveICardForWordLatest(cardService.cardIndex$, currentWord$)
-                    .pipe(
-                        map(c => c?.knownLanguage?.[0]),
-                        shareReplay(1)
-                    ),
-                description$ =>
-                    description$.pipe(
-                        withLatestFrom(currentWord$),
-                        debounceTime(1000)
-                    ).subscribe(([description, word]) => {
-                        update({knownLanguage: [description || '']}, word)
-                    })
-            ),
-            romanization$: combineLatest([
-                languageConfigsService.learningToLatinTransliterateFn$,
-                currentWord$
-            ]).pipe(
-                switchMap((
-                    [transliterateFn, currentWord]
-                ) => transliterateFn ? transliterateFn(currentWord) : of(undefined)),
-                shareReplay(1)
-            ),
-            translation$: combineLatest([
-                languageConfigsService.learningToKnownTranslateFn$,
-                currentWord$
-            ]).pipe(
-                switchMap(
-                    ([translateFn, currentWord]) =>
-                        translateFn ? translateFn(currentWord) : of(undefined)
-                ),
-                shareReplay(1)
-            ),
-            // I should make "hidden" deterministic somehow
-            // I'll worry about that later
+            ...wordCard,
             hiddenFields$: combineLatest([currentWord$.pipe(distinctUntilChanged()), this.manualHiddenFieldConfig$]).pipe(
                 map(([word, manualFieldConfig]) => {
                     const m = {hiddenDefinition, hiddenLearningLanguage};
@@ -157,7 +112,8 @@ export class QuizService {
                 }),
                 shareReplay(1)
             ),
-            answerIsRevealed$: new BehaviorSubject<boolean>(false)
+            answerIsRevealed$: new BehaviorSubject<boolean>(false),
+            exampleSentenceOpenDocument: openExampleSentencesDocument,
         }
 
         currentWord$
