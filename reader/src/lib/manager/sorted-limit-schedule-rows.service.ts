@@ -31,7 +31,7 @@ export class SortedLimitScheduleRowsService {
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit]) => {
                 const wordsToReview = sortedScheduleRows.filter(
-                    r => r.isToReview()
+                    r => r.d.wordCountRecords.length && r.isToReview()
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
                     r => r.isLearnedToday()
@@ -40,7 +40,7 @@ export class SortedLimitScheduleRowsService {
                     r => r.isLearningOrReviewing()
                 )
                 const wordsWhichHaventBeenStarted = sortedScheduleRows.filter(
-                    scheduleRow => !scheduleRow.isUnlearned()
+                    scheduleRow => scheduleRow.d.wordCountRecords.length && !scheduleRow.isUnlearned()
                 ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
                 return {
