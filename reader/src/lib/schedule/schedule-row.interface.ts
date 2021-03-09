@@ -6,6 +6,8 @@ import moment from "moment";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
 import humanizeDuration from "humanize-duration";
+import {isSameDay} from 'date-fns';
+import {last} from "rxjs/operators";
 
 export interface ScheduleRowData {
     wordCountRecords: DocumentWordCount[];
@@ -57,7 +59,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public isToReview() {
-        if (this.isLearning()) return false;
+        if (this.isLearningOrReviewing()) return false;
         return this.isOverDue();
     }
 
@@ -71,8 +73,15 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
         return last2.every(rec => rec.grade === SrmService.correctScore());
     }
 
-    public isLearning() {
+    static lastNRecords<T>(r: T[], n: number) {
+        return r.slice(n * -1)
+    }
+
+    public isLearningOrReviewing() {
         if (!this.d.wordRecognitionRecords.length) return false;
+        if (!this.isOverDue()) {
+            return false;
+        }
         // Learning records are those whose advance record is on a different day than the last review
         // Or they just have review records and no advance record
 
@@ -119,5 +128,21 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
 
     public isRecognized() {
         return !this.isUnrecognized() && !this.isSomewhatRecognized()
+    }
+
+    isLearnedToday() {
+        const lastTwoRecords = ScheduleRow.lastNRecords(
+            this.d.wordRecognitionRecords,
+            2
+        );
+        return lastTwoRecords
+            .every(
+                r => r.grade >= 3 &&
+                isSameDay(r.timestamp, new Date()) &&
+                (r.nextDueDate || 0) > new Date()
+            );
+    }
+    isUnlearned() {
+        return this.d.wordRecognitionRecords.length === 0;
     }
 }

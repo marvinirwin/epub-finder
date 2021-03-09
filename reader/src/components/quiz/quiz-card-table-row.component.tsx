@@ -16,10 +16,10 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
     if (row.isNew()) {
         className = 'new';
     }
-    if (row.isLearning()) {
+    if (row.isLearningOrReviewing()) {
         className = 'to-review';
     }
-    if (row.isLearning()) {
+    if (row.isLearningOrReviewing()) {
         className = 'learning'
     }
     return (

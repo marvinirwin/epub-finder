@@ -2,7 +2,7 @@ import React, {Fragment, useContext} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {FormControlLabel, Input, ListItem, MenuItem, Select, Switch, TextField} from "@material-ui/core";
-import {LtDocument, newWordLimitInput} from "@shared/*";
+import {LtDocument, newWordLimitInput} from "@shared/";
 
 export const SetQuizWordLimit = () => {
     const m = useContext(ManagerContext);

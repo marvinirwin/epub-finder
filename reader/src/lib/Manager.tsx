@@ -91,6 +91,7 @@ import {QuizHighlightService} from "./highlighting/quiz-highlight.service";
 import {FrequencyTreeService} from "./frequency-tree.service";
 import {VocabService} from "./vocab.service";
 import {FilterScheduleTableRowsService} from "./filter-schedule-table-rows.service";
+import {SortedLimitScheduleRowsService} from "./manager/sorted-limit-schedule-rows.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -187,6 +188,7 @@ export class Manager {
     public quizHighlightService: QuizHighlightService;
     public vocabService: VocabService;
     public filterScheduleTableRowsService: FilterScheduleTableRowsService;
+    sortedLimitScheduleRowsService: SortedLimitScheduleRowsService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -296,8 +298,9 @@ export class Manager {
             settingsService: this.settingsService,
             languageConfigsService: this.languageConfigsService
         });
+        this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
         this.quizService = new QuizService({
-            scheduleService: this.scheduleService,
+            sortedLimitScheduleRowsService: this.sortedLimitScheduleRowsService,
             exampleSentencesService: this.exampleSentencesService,
             trie$: this.trieService.trie$,
             cardService: this.cardsRepository,
@@ -437,6 +440,7 @@ export class Manager {
             videoMetadataRepository: this.videoMetadataRepository,
             modesService: this.modesService
         });
+
 
         this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this);
         this.vocabService = new VocabService(this)

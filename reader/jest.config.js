@@ -3,5 +3,10 @@ module.exports = {
   testEnvironment: 'node',
   "setupFiles": [
     "fake-indexeddb/auto"
-  ]
+  ],
+  globals: {
+    'ts-jest': {
+      tsconfig: './tsconfig.json'
+    }
+  }
 };

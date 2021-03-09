@@ -10,6 +10,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
     const m = useContext(ManagerContext);
     const word = useObservableState((quizCard.word$));
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
+    const rowInfo = useObservableState(m.sortedLimitScheduleRowsService.sortedLimitedScheduleRows$);
     useSubscription(
         m.hotkeyEvents.advanceQuiz$,
         () => quizCard.answerIsRevealed$.next(true))
@@ -47,13 +48,16 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
                     Ignore
                 </Button>
             </Fragment> :
-            <HotkeyWrapper action={"ADVANCE_QUIZ"}>
-                <Button
-                    id={quizButtonReveal}
-                    onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
-                    Reveal
-                </Button>
-            </HotkeyWrapper>
+            <Fragment>
+                <HotkeyWrapper action={"ADVANCE_QUIZ"}>
+                    <Button
+                        id={quizButtonReveal}
+                        onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
+                        Reveal
+                    </Button>
+                </HotkeyWrapper>
+            </Fragment>
+
         }
     </div>
 }

@@ -1,5 +1,4 @@
 import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxjs";
-import {TrieWrapper} from "../../lib/TrieWrapper";
 import {OpenExampleSentencesFactory} from "../../lib/document-frame/open-example-sentences-document.factory";
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
 import {QuizCard} from "./quiz-card.interface";
@@ -7,23 +6,27 @@ import {EditableValue} from "./editing-value";
 import {uniq, orderBy} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
 import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
-import {ScheduleService} from "../../lib/manager/schedule.service";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {ICard} from "../../../../server/src/shared/ICard";
+import {TrieWrapper} from "../../lib/TrieWrapper";
 import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row.interface";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
 import {SettingsService} from "../../services/settings.service";
+import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
 
 export const computeRandomHiddenQuizFields = () => {
+    return hiddenDefinition;
+/*
     return Math.random() > 0.5 ?
         hiddenDefinition :
         hiddenLearningLanguage;
+*/
 };
 
 export class QuizService {
@@ -35,7 +38,7 @@ export class QuizService {
         {
             trie$,
             cardService,
-            scheduleService,
+            sortedLimitScheduleRowsService,
             exampleSentencesService,
             openDocumentsService,
             languageConfigsService,
@@ -43,7 +46,7 @@ export class QuizService {
         }: {
             trie$: Observable<TrieWrapper>,
             cardService: CardsRepository
-            scheduleService: ScheduleService,
+            sortedLimitScheduleRowsService: SortedLimitScheduleRowsService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService,
             languageConfigsService: LanguageConfigsService,
@@ -51,8 +54,8 @@ export class QuizService {
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
-        this.currentScheduleRow$ = scheduleService.sortedScheduleRows$.pipe(
-            map(rows => filterQuizRows(rows)[0]),
+        this.currentScheduleRow$ = sortedLimitScheduleRowsService.sortedLimitedScheduleRows$.pipe(
+            map(rows => filterQuizRows(rows.limitedScheduleRows)[0]),
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
@@ -145,7 +148,7 @@ export class QuizService {
             ),
             // I should make "hidden" deterministic somehow
             // I'll worry about that later
-            hiddenFields$: combineLatest([currentWord$, this.manualHiddenFieldConfig$]).pipe(
+            hiddenFields$: combineLatest([currentWord$.pipe(distinctUntilChanged()), this.manualHiddenFieldConfig$]).pipe(
                 map(([word, manualFieldConfig]) => {
                     const m = {hiddenDefinition, hiddenLearningLanguage};
                     // @ts-ignore

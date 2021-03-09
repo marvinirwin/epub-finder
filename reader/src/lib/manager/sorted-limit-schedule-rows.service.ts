@@ -1,10 +1,20 @@
 import {SettingsService} from "../../services/settings.service";
 import {ScheduleService} from "./schedule.service";
-import set = Reflect.set;
-import {combineLatest} from "rxjs";
-import {map} from "rxjs/operators";
+import {combineLatest, Observable} from "rxjs";
+import {map, shareReplay} from "rxjs/operators";
+import {orderBy} from "lodash";
+import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row.interface";
+
+type LimitedScheduleRows = {
+    wordsToReview: ScheduleRow<NormalizedScheduleRowData>[];
+    limitedScheduleRows: ScheduleRow<NormalizedScheduleRowData>[];
+    wordsLearnedToday: ScheduleRow<NormalizedScheduleRowData>[];
+    wordsReviewingOrLearning: ScheduleRow<NormalizedScheduleRowData>[];
+    wordsWhichHaventBeenStarted: ScheduleRow<NormalizedScheduleRowData>[]
+};
 
 export class SortedLimitScheduleRowsService {
+    sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>;
     constructor(
         {
             settingsService,
@@ -17,11 +27,39 @@ export class SortedLimitScheduleRowsService {
     ) {
         this.sortedLimitedScheduleRows$ = combineLatest([
             scheduleService.sortedScheduleRows$,
-            settingsService.newQuizWordLimit$
+            settingsService.newQuizWordLimit$,
         ]).pipe(
-            map(([sortedScheduleRows, newQuizWordLimit$]) => {
-                // UnlearnedWords =
-            })
+            map(([sortedScheduleRows, newQuizWordLimit]) => {
+                const wordsToReview = sortedScheduleRows.filter(
+                    r => r.isToReview()
+                );
+                const wordsLearnedToday = sortedScheduleRows.filter(
+                    r => r.isLearnedToday()
+                );
+                const wordsReviewingOrLearning = sortedScheduleRows.filter(
+                    r => r.isLearningOrReviewing()
+                )
+                const wordsWhichHaventBeenStarted = sortedScheduleRows.filter(
+                    scheduleRow => !scheduleRow.isUnlearned()
+                ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
+
+                return {
+                    wordsToReview,
+                    wordsLearnedToday,
+                    wordsReviewingOrLearning,
+                    wordsWhichHaventBeenStarted,
+                    limitedScheduleRows: orderBy(
+                        [
+                            ...wordsToReview,
+                            ...wordsReviewingOrLearning,
+                            ...wordsWhichHaventBeenStarted
+                        ],
+                        r => r.d.finalSortValue,
+                        'desc'
+                    )
+                }
+            }),
+            shareReplay(1)
         )
     }
 }

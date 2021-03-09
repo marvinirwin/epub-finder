@@ -1,5 +1,5 @@
-import React, {useContext} from "react";
-import {Button, Paper, Typography} from "@material-ui/core";
+import React, {useContext, Fragment} from "react";
+import {Paper, Typography} from "@material-ui/core";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
 import {QuizCard} from "./quiz-card.interface";
@@ -7,14 +7,13 @@ import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";
 import {QuizCardImage} from "./quiz-card-image.component";
 import {observableLastValue} from "../../services/settings.service";
-import {uniq, flatten} from "lodash";
+import {flatten, uniq} from "lodash";
 import {QuizCardCurrentCardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
 import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
-import {
-    quizCardLearningLanguage
-} from "@shared/";
+import {quizCardLearningLanguage} from "@shared/";
 import {QuizCardButtons} from "./quiz-card-buttons.component";
 import {useIsFieldHidden} from "./useIsFieldHidden";
+import {EmptyQuizCard} from "./empty-quiz-card.component";
 
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
@@ -38,22 +37,30 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             }
         })
     return <Paper className='quiz-card' {...props}>
-        <div className={'quiz-card-data-sheet'}>
-            <div>
-                <QuizCardProgress quizCard={quizCard}/>
-            </div>
-            <div className={'quiz-card-data-sheet-middle'}>
-                <QuizCardImage quizCard={quizCard}/>
-                {!isLearningLanguageHidden && <Typography
-                    variant={'h1'}
-                    className={quizCardLearningLanguage}
-                >{word || ''}</Typography>}
-            </div>
-            <div>
-                <QuizCardCurrentCardInfo quizCard={quizCard}/>
-            </div>
-        </div>
-        <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
-        <QuizCardButtons quizCard={quizCard}/>
+        {
+            word ?
+                <Fragment>
+                    <div className={'quiz-card-data-sheet'}>
+                        <div>
+                            <QuizCardProgress quizCard={quizCard}/>
+                        </div>
+                        <div className={'quiz-card-data-sheet-middle'}>
+                            <QuizCardImage quizCard={quizCard}/>
+                            {!isLearningLanguageHidden && <Typography
+                                variant={'h1'}
+                                className={quizCardLearningLanguage}
+                            >{word || ''}</Typography>}
+                        </div>
+                        <div>
+                            <QuizCardCurrentCardInfo quizCard={quizCard}/>
+                        </div>
+                    </div>
+                    <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
+                    <QuizCardButtons quizCard={quizCard}/>
+                </Fragment> :
+                <EmptyQuizCard/>
+        }
+
+
     </Paper>
 }

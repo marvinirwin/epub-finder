@@ -7,6 +7,9 @@ import {QuizCard} from "../../components/quiz/quiz-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
+import {format} from 'date-fns';
+
+const formatDueDate = (d: Date) => format(d, 'LLL do hbbb')
 
 export const QuizCardScheduleRowDisplay = (
     {
@@ -26,6 +29,8 @@ export const QuizCardScheduleRowDisplay = (
     return <div>
         <div style={{marginTop: '24px'}}>
             Due in: {scheduleRow.dueIn()}
+            <br/>
+            Due Date: {formatDueDate(scheduleRow.dueDate())}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.dueDate}/>}
         </div>
         <div style={{marginTop: '24px'}}>
