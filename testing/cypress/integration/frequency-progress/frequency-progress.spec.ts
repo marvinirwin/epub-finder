@@ -1,6 +1,6 @@
 import {QUIZ_BUTTON_EASY} from "@shared/*";
 import {DirectoryPom} from "../../support/pom/directory.pom";
-import {QuizPom} from "../../support/pom/quiz.pom";
+import {QuizCarouselPom} from "../quiz/quiz-carousel.pom";
 
 const defaultTestFrequencyDocument = 'Default Test Frequency Document';
 const testFrequencyDocument1 = 'Test Frequency Document 1';
@@ -12,12 +12,12 @@ describe('Shows progress on frequency documents', () => {
     })
     it('Selects the default frequency documents to use', () => {
         DirectoryPom.OpenQuiz();
-        QuizPom.frequencyDocumentProgressContainer(defaultTestFrequencyDocument).should('exist');
+        QuizCarouselPom.frequencyDocumentProgressContainer(defaultTestFrequencyDocument).should('exist');
     });
     it('Updates the progress reading that document when a quiz result is submitted', () => {
         DirectoryPom.OpenQuiz();
-        QuizPom.submitQuizResult(QUIZ_BUTTON_EASY);
-        QuizPom.assertFrequencyDocumentProgress(
+        QuizCarouselPom.submitQuizResult(QUIZ_BUTTON_EASY);
+        QuizCarouselPom.assertFrequencyDocumentProgress(
             defaultTestFrequencyDocument,
             {
                 somewhatRecognizedCount: 1,
@@ -29,8 +29,8 @@ describe('Shows progress on frequency documents', () => {
     it('Shows the user their progress when they select the frequency documents they want', () => {
         DirectoryPom.OpenQuiz();
         DirectoryPom.SelectFrequencyDocuments(testFrequencyDocument1, 'Test Frequency Document 2');
-        QuizPom.submitQuizResult(QUIZ_BUTTON_EASY);
-        QuizPom.assertFrequencyDocumentProgress(
+        QuizCarouselPom.submitQuizResult(QUIZ_BUTTON_EASY);
+        QuizCarouselPom.assertFrequencyDocumentProgress(
             testFrequencyDocument1,
             {
                 somewhatRecognizedCount: 1,
@@ -38,7 +38,7 @@ describe('Shows progress on frequency documents', () => {
                 unrecognizedCount: 1
             }
         );
-        QuizPom.assertFrequencyDocumentProgress(
+        QuizCarouselPom.assertFrequencyDocumentProgress(
             defaultTestFrequencyDocument,
             {
                 somewhatRecognizedCount: 1,

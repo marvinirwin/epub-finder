@@ -82,36 +82,14 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
         if (!this.isOverDue()) {
             return false;
         }
-        // Learning records are those whose advance record is on a different day than the last review
-        // Or they just have review records and no advance record
-
-        // The "advance record" is a record which has a change in recognitionScore
-        const mostRecentRecordsFirst = orderBy(this.d.wordRecognitionRecords, 'timestamp', 'desc');
-        const mostRecentRecord: WordRecognitionRow = mostRecentRecordsFirst[0];
-        const advanceRecord = mostRecentRecordsFirst.find(temporallyPrecedingRecord => {
-            return mostRecentRecord.grade > temporallyPrecedingRecord.grade;
-        })
         const lastRecord = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1];
-
-        /**
-         * If there are no records then we're for sure not learning
-         */
-        if (!lastRecord) {
-            return false;
-        }
-
-        /**
-         * If there is a last record, but no advance record we're still learning
-         */
-        if (!advanceRecord) {
-            return true;
-        }
-
-        // If the advance record is the last record then we just advanced so we're not learning anymore
-        if (lastRecord === advanceRecord) {
-            return false;
-        }
-        return !moment(lastRecord.timestamp).isSame(moment(advanceRecord.timestamp), 'day')
+        const last2Records = ScheduleRow.lastNRecords(this.d.wordRecognitionRecords, 2);
+        return last2Records.length === 2 &&
+            last2Records
+                .every(record =>
+                    isSameDay(lastRecord.nextDueDate || new Date(),
+                        record.nextDueDate || new Date()
+                    ) && record.grade >= 3)
     }
 
     public dueIn() {

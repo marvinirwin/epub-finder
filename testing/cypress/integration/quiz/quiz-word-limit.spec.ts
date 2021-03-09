@@ -1,6 +1,5 @@
 import {DirectoryPom} from "../../support/pom/directory.pom";
 import {QuizCarouselPom} from "./quiz-carousel.pom";
-import {QuizPom} from "../../support/pom/quiz.pom";
 import {newWordLimitInput, QUIZ_BUTTON_EASY} from "@shared/*";
 
 class SettingsPom {
@@ -16,9 +15,9 @@ describe(`Limiting a user's new words every day`, () => {
         SettingsPom.SetNewQuizWordLimit(2);
         DirectoryPom.OpenQuiz();
         QuizCarouselPom.reveal();
-        QuizPom.submitQuizResult(QUIZ_BUTTON_EASY)
+        QuizCarouselPom.submitQuizResult(QUIZ_BUTTON_EASY)
         QuizCarouselPom.reveal();
-        QuizPom.submitQuizResult(QUIZ_BUTTON_EASY)
+        QuizCarouselPom.submitQuizResult(QUIZ_BUTTON_EASY)
         QuizCarouselPom.assertNoQuizCard();
     })
 })

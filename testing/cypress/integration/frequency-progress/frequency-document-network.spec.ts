@@ -1,6 +1,5 @@
 import {hsk1Node, QUIZ_BUTTON_EASY, testNode1, testNode2} from "@shared/*";
 import {DirectoryPom} from "../../support/pom/directory.pom";
-import {QuizPom} from "../../support/pom/quiz.pom";
 import {SimilarityResults} from "../../../../server/src/shared/compre-similarity-result";
 import {TabulateChineseText} from "../../../../server/src/shared/tabulate-documents/tabulate-chinese-string";
 import Chainable = Cypress.Chainable;

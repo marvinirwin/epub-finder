@@ -5,11 +5,21 @@ import {QuizCardPom} from "./quiz-card.pom";
 import {ImageSearchPom} from "./image-search.pom";
 import {HiddenQuizFields} from "../../../../reader/src/lib/hidden-quiz-fields";
 import {
-    manualQuizHiddenFieldConfigId, noMoreQuizCards,
+    frequencyDocumentProgressPrefix,
+    manualQuizHiddenFieldConfigId,
+    noMoreQuizCards,
     QUIZ_BUTTON_EASY,
-    QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE,
-    QUIZ_BUTTON_MEDIUM, quizButtonReveal, quizCardDescription,
-    quizCardImage, quizCardLearningLanguage, quizCardTranslation
+    QUIZ_BUTTON_HARD,
+    QUIZ_BUTTON_IGNORE,
+    QUIZ_BUTTON_MEDIUM,
+    quizButtonReveal,
+    quizCardDescription,
+    quizCardImage,
+    quizCardLearningLanguage,
+    quizCardTranslation,
+    recognizedCount,
+    somewhatRecognizedCount,
+    unrecognizedCount
 } from "@shared/*";
 
 
@@ -20,6 +30,8 @@ export const defaultHotkeys = {
     quizScore2: '2',
     quizScore1: '1',
 }
+
+type RecognizedCounts = { recognizedCount: number, somewhatRecognizedCount: number, unrecognizedCount: number };
 
 
 export class QuizCarouselPom {
@@ -93,6 +105,36 @@ export class QuizCarouselPom {
 
     static assertNoQuizCard() {
         cy.get(`.${noMoreQuizCards}`).should('be.visible')
+    }
+
+
+    static submitQuizResult(
+        difficulty: typeof QUIZ_BUTTON_HARD |
+            typeof QUIZ_BUTTON_MEDIUM |
+            typeof QUIZ_BUTTON_EASY |
+            typeof QUIZ_BUTTON_IGNORE
+    ) {
+        cy.get(`.${difficulty}`).click();
+    }
+
+    static frequencyDocumentProgressContainer(documentName: string) {
+        return cy.get(`${frequencyDocumentProgressPrefix}${documentName}`);
+    }
+
+    static assertFrequencyDocumentProgress(
+        documentName: string,
+        counts: RecognizedCounts
+    ) {
+        const assertCount = (selector: string,
+                             count: number) => {
+            QuizCarouselPom.frequencyDocumentProgressContainer(documentName)
+                .find(`.${selector}`)
+                .should('contain', count)
+        };
+
+        assertCount(recognizedCount, counts.recognizedCount);
+        assertCount(unrecognizedCount, counts.unrecognizedCount);
+        assertCount(somewhatRecognizedCount, counts.somewhatRecognizedCount);
     }
 }
 

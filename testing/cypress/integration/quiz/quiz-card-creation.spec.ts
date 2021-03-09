@@ -7,7 +7,6 @@ import {
     quizCardTableRowRecognitions,
     quizCardTableRowWord
 } from "@shared/";
-import {QuizPom} from "../../support/pom/quiz.pom";
 
 describe('quiz card creation', () => {
     it('Does not create cards which are not from the language being studied', () => {
