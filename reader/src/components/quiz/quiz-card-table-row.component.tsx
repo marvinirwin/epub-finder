@@ -9,22 +9,17 @@ import {
 } from "@shared/";
 import {round, sum} from "lodash";
 import {lastN} from "./last-n";
-import React from "react";
+import React, {useContext} from "react";
+import {ManagerContext} from "../../App";
 
 export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRowData> }> = ({row}) => {
-    let className;
-    if (row.isNew()) {
-        className = 'new';
-    }
-    if (row.isLearningOrReviewing()) {
-        className = 'to-review';
-    }
-    if (row.isLearningOrReviewing()) {
-        className = 'learning'
-    }
+    const m = useContext(ManagerContext);
     return (
-
-        <TableRow key={row.d.word} className={`${quizCardTableRow} ${className}`}>
+        <TableRow
+            key={row.d.word}
+            className={`${quizCardTableRow}`}
+            onClick={() => m.wordCardModalService.word$.next(row.d.word)}
+        >
             <TableCell
                 component="th"
                 scope="row"

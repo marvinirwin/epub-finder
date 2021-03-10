@@ -18,9 +18,8 @@ import {
     quizCardRomanization,
     quizCardTranslation,
     wordCardRomanization, wordCardTranslation
-} from "@shared/*";
+} from "@shared/";
 import {useObservableState} from "observable-hooks";
-import {QuizCardScheduleRowDisplay} from "../lib/schedule/quiz-card-schedule-row.component";
 import {ManagerContext} from "../App";
 import {NormalizedScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row.interface";
 import {formatDueDate} from "../lib/schedule/format-due-date";
