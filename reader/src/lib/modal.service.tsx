@@ -66,7 +66,8 @@ export class ModalService {
             this.languageSelect,
             this.documentSelect,
             this.settings,
-            this.testingUtils
+            this.testingUtils,
+            this.wordPaperDisplay
         ]
     }
 }

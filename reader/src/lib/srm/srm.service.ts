@@ -29,7 +29,7 @@ export class SrmService {
         previousRows: WordRecognitionRow[],
         score: SuperMemoGrade,
     ): SuperMemoItem {
-        const mostRecentRow: SuperMemoItem = previousRows[previousRows.length] || {
+        const mostRecentRow: SuperMemoItem = previousRows[previousRows.length - 1] || {
             interval: 0,
             repetition: 0,
             efactor: 2.5,

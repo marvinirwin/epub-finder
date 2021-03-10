@@ -64,11 +64,11 @@ export class SettingsService {
         this.drawerClosed$ = this.createSetting$<boolean>('drawerClosed', false, 'indexedDB');
         this.checkedOutDocuments$ = this.createSetting$<ds_Dict<boolean>>('checkedOutDocuments', {'cat-likes-tea': true}, 'indexedDB')
 
-        this.playbackStartPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbs', '0', 'url'));
+        this.playbackStartPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbs', '0', 'indexedDB'));
 
-        this.playbackEndPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbe', '0', 'url'));
+        this.playbackEndPercent$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('pbe', '0', 'indexedDB'));
 
-        this.playbackSpeed$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('playbackSpeed', '0.5', 'url'))
+        this.playbackSpeed$ = MapSubject.StringifyMapSubject<number>(this.createSetting$<string>('playbackSpeed', '0.5', 'indexedDB'))
 
         this.pronunciationVideoSentenceHash$ = this.createSetting$<string>('video', '', 'url');
 

@@ -26,7 +26,7 @@ export const QuizCardScheduleRowDisplay = (
     const isDefinitionHidden = useIsFieldHidden({quizCard, label: 'definition'});
     return <div>
         <div style={{marginTop: '24px'}}>
-            Due in: {scheduleRow.dueIn()}
+            Due: {scheduleRow.dueIn()}
             <br/>
             Due Date: {formatDueDate(scheduleRow.dueDate())}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.dueDate}/>}

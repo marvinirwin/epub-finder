@@ -449,10 +449,7 @@ export class Manager {
         this.progressTreeService = new FrequencyTreeService(this);
         this.quizHighlightService = new QuizHighlightService( this )
         this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(this);
-        this.wordCardModalService = new WordCardModalService({
-            cardService: this.cardsRepository,
-            languageConfigsService: this.languageConfigsService
-        })
+        this.wordCardModalService = new WordCardModalService(this)
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

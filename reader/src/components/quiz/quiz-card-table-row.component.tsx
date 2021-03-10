@@ -1,5 +1,5 @@
 import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row.interface";
-import {TableCell, TableRow, Typography} from "@material-ui/core";
+import {Button, TableCell, TableRow, Typography} from "@material-ui/core";
 import {
     quizCardTableRow,
     quizCardTableRowCounts,
@@ -18,14 +18,17 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
         <TableRow
             key={row.d.word}
             className={`${quizCardTableRow}`}
-            onClick={() => m.wordCardModalService.word$.next(row.d.word)}
         >
             <TableCell
                 component="th"
                 scope="row"
                 className={quizCardTableRowWord}
             >
-                <Typography variant={'h6'}>{row.d.word} </Typography>
+                <Button
+                    onClick={() => m.wordCardModalService.word$.next(row.d.word)}
+                >
+                    <Typography variant={'h6'}>{row.d.word}</Typography>
+                </Button>
             </TableCell>
             <TableCell>
                 Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}

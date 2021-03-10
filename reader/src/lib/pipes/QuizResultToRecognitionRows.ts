@@ -26,7 +26,7 @@ export const QuizResultToRecognitionRows =
                         timestamp: new Date(),
                         ...nextRecognitionRecord,
                         nextDueDate: moment().add(nextRecognitionRecord.interval, 'day').toDate(),
-                        grade: scorePair.grade
+                        grade: scorePair.grade,
                     };
                 })
             )

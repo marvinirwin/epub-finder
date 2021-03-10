@@ -2,12 +2,12 @@ import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount
 import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
 import {orderBy, sum} from "lodash";
-import moment from "moment";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
 import humanizeDuration from "humanize-duration";
 import {isSameDay} from 'date-fns';
-import {last} from "rxjs/operators";
+import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+
 
 export interface ScheduleRowData {
     wordCountRecords: DocumentWordCount[];
@@ -93,7 +93,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public dueIn() {
-        return humanizeDuration(this.dueDate().getTime() - Date.now(), {largest: 3})
+        return formatDistance(this.dueDate(), Date.now(), {addSuffix: true})
     }
 
     public isUnrecognized() {

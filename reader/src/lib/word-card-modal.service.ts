@@ -3,6 +3,7 @@ import {LanguageConfigsService} from "./language-configs.service";
 import {wordCardFactory} from "../components/quiz/card-card.factory";
 import CardsRepository from "./manager/cards.repository";
 import {WordCard} from "../components/quiz/word-card.interface";
+import {ModalService} from "./modal.service";
 
 export class WordCardModalService {
     word$ = new ReplaySubject<string | undefined>(1);
@@ -10,15 +11,20 @@ export class WordCardModalService {
 
     constructor({
                     languageConfigsService,
-                    cardService
+                    cardsRepository,
+                    modalService
                 }: {
         languageConfigsService: LanguageConfigsService,
-        cardService: CardsRepository,
+        cardsRepository: CardsRepository,
+        modalService: ModalService
     }) {
         this.wordCard$ = wordCardFactory(
             this.word$,
-            cardService,
+            cardsRepository,
             languageConfigsService
         );
+        this.word$.subscribe(word => {
+            modalService.wordPaperDisplay.open$.next(!!word);
+        })
     }
 }

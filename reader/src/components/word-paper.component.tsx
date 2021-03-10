@@ -41,6 +41,7 @@ const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedSchedul
                         <TableCell>Grade</TableCell>
                         <TableCell align="right">Next Due Date</TableCell>
                         <TableCell align="right">Timestamp</TableCell>
+                        <TableCell align="right">Interval</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -51,6 +52,7 @@ const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedSchedul
                             </TableCell>
                             <TableCell align="right">{formatDueDate(row.nextDueDate || new Date())}</TableCell>
                             <TableCell align="right">{formatDueDate(row.timestamp || new Date())}</TableCell>
+                            <TableCell align="right">{row.interval}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -90,7 +92,11 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
     const romanization = useObservableState(wordCard.romanization$);
     const translation = useObservableState(wordCard.translation$);
     const description = useObservableState(wordCard.description$.value$);
-    return <Paper>
+    return <Paper style={{
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        alignItems: 'center'
+    }}>
         <CardImage quizCard={wordCard}/>
         <CardLearningLanguageText word={word || ''}/>
         <Typography variant='h4' className={wordCardRomanization}>
@@ -100,6 +106,7 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
         <Typography variant='h4' className={wordCardTranslation}>
             {translation}
         </Typography>
+        <br/>
         <TextField
             label="Description"
             inputProps={{className: quizCardDescription}}
@@ -109,7 +116,9 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
             value={description || ''}
             onChange={e => wordCard.description$.set(e.target.value)}
         />
+        <br/>
         {scheduleRow && <RecognitionRowTable scheduleRow={scheduleRow}/>}
+        <br/>
         {scheduleRow && <CountRecordTable scheduleRow={scheduleRow}/>}
     </Paper>
 }
