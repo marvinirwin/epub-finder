@@ -15,6 +15,10 @@ export function createPopperElement(document1: XMLDocument) {
     return {popperEl, popperId};
 }
 
+type atomizeConfiguration = {
+    splitDelims?: string[]
+};
+
 export class AtomizedDocument {
     document: XMLDocument;
     _originalSrc: string;
@@ -23,11 +27,10 @@ export class AtomizedDocument {
         return `translate-popper_${popperId}`;
     }
 
-    static atomizeDocument(xmlsource: string): AtomizedDocument {
+    static atomizeDocument(xmlsource: string, atomizeConfiguration?: atomizeConfiguration): AtomizedDocument {
         const doc = new AtomizedDocument(AtomizedDocument.getDomParser()
             .parseFromString(xmlsource, 'text/html'));
         doc.ensurePopperContainer();
-        doc.replaceDocumentSources(doc.document);
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
         return doc;
     }
@@ -99,7 +102,7 @@ export class AtomizedDocument {
         }
     }
 
-    constructor(document: XMLDocument) {
+    constructor(document: XMLDocument, atomizeConfiguration?: atomizeConfiguration) {
         this._originalSrc = new XMLSerializer().serializeToString(document);
         this.document = document;
     }
