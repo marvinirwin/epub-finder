@@ -27,8 +27,6 @@ export const QuizCardScheduleRowDisplay = (
     return <div>
         <div style={{marginTop: '24px'}}>
             Due: {scheduleRow.dueIn()}
-            <br/>
-            Due Date: {formatDueDate(scheduleRow.dueDate())}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.dueDate}/>}
         </div>
         <div style={{marginTop: '24px'}}>
