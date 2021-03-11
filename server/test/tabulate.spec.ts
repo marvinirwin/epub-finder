@@ -1,4 +1,3 @@
-import {Segment} from "../src/shared";
 import {Test} from '@nestjs/testing';
 import {TabulateService} from "../src/documents/similarity/tabulate.service";
 import {DocumentsModule} from "../src/documents/documents.module";
@@ -33,14 +32,12 @@ describe('document tabulation', () => {
     );
     it(
         'Greedily tabulates documents', async () => {
-            const tabulation = await tabulateService.tabulate(
+            const tabulation = await tabulateService.tabulateNoCache(
                 {where: {name: "Test Html"}},
-                ['今天', '今', '天']
+                ['你好', '你', '好']
             );
-            const bigWordCount = tabulation.greedyWordCounts.get('今天');
-            const smallWordCount = tabulation.greedyWordCounts.get('今');
-            expect(bigWordCount).toBe(1);
-            expect(smallWordCount).toBeFalsy()
+            expect(tabulation.greedyWordCounts.get('你好')).toBe(1);
+            expect(tabulation.greedyWordCounts.get('你')).toBeFalsy()
         }
     )
 })

@@ -50,7 +50,7 @@ export class Segment {
                 }
                 greedyWordCounts.set(
                     chosenGreedyWord.word,
-                    greedyWordCounts.get(chosenGreedyWord.word)
+                    greedyWordCounts.get(chosenGreedyWord.word) + 1
                 );
             }
             return chosenGreedyWord;
@@ -98,7 +98,7 @@ export class Segment {
             if (!greedyWord) {
                 greedyWord = newGreedyWord();
             }
-            const greedyWordHasEnded = wordsInProgress.includes(greedyWord);
+            const greedyWordHasEnded = !wordsInProgress.includes(greedyWord);
             if (greedyWordHasEnded) {
                 greedyWord = newGreedyWord()
             }

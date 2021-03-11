@@ -25,27 +25,30 @@ export class TabulateService {
                 args: [findOptions, words],
                 service: "TABULATE",
                 cb: async () => {
-                    const documentToTabulate = await this.documentViewRepository.findOne(findOptions)
-                    if (!documentToTabulate) {
-                        throw new Error(`Cannot find document ${JSON.stringify(documentToTabulate)}`);
-                    }
-
-                    const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
-                    const atomizedDocument = AtomizedDocument.atomizeDocument(text);
-                    const tabulation = Segment.tabulate(
-                        new SetWithUniqueLengths(words),
-                        atomizedDocument.segments(),
-                    );
-                    return {
-                        wordCounts: tabulation.wordCounts,
-                        wordSegmentStringsMap: new Map(),
-                        greedyWordCounts: tabulation.greedyWordCounts
-                    };
+                    return await this.tabulateNoCache(findOptions, words);
                 }
             }
         )
     }
 
+    async tabulateNoCache(findOptions: FindOneOptions<DocumentView>, words: string[]) {
+        const documentToTabulate = await this.documentViewRepository.findOne(findOptions)
+        if (!documentToTabulate) {
+            throw new Error(`Cannot find document ${JSON.stringify(documentToTabulate)}`);
+        }
+
+        const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
+        const atomizedDocument = AtomizedDocument.atomizeDocument(text);
+        const tabulation = Segment.tabulate(
+            new SetWithUniqueLengths(words),
+            atomizedDocument.segments(),
+        );
+        return {
+            wordCounts: tabulation.wordCounts,
+            wordSegmentStringsMap: new Map(),
+            greedyWordCounts: tabulation.greedyWordCounts
+        };
+    }
 }
 
 function streamToString(stream): Promise<string> {
