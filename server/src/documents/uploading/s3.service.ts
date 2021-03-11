@@ -1,7 +1,10 @@
+import {config} from 'dotenv';
 import {BucketConfig} from "../bucket-config.interface";
 import AWS from "aws-sdk";
 import * as stream from "stream";
 import {v4 as uuidv4} from 'uuid';
+config({path: '.env'});
+
 
 const inputAccessKeyId = process.env.DOCUMENT_S3_ACCESS_KEY_ID;
 const inputSecretAccessKey = process.env.DOCUMENT_S3_ACCESS_KEY_SECRET;

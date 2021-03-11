@@ -17,7 +17,6 @@ export interface ScheduleRowData {
     word: string;
 }
 
-
 export interface NormalizedScheduleRowData extends ScheduleRowData {
     count: SortValue<number>;
     dueDate: SortValue<Date>;
@@ -34,7 +33,6 @@ export interface SortValue<T> {
     weightedInverseLogNormalValue: number;
     weight: number;
 }
-
 
 export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     private _dueDate: Date;

@@ -30,5 +30,17 @@ describe('document tabulation', () => {
             );
             expect(tabulation.wordCounts).toMatchObject({'今天': 1, '今': 1, '天': 1});
         }
+    );
+    it(
+        'Greedily tabulates documents', async () => {
+            const tabulation = await tabulateService.tabulate(
+                {where: {name: "Test Html"}},
+                ['今天', '今', '天']
+            );
+            const bigWordCount = tabulation.greedyWordCounts.get('今天');
+            const smallWordCount = tabulation.greedyWordCounts.get('今');
+            expect(bigWordCount).toBe(1);
+            expect(smallWordCount).toBeFalsy()
+        }
     )
 })

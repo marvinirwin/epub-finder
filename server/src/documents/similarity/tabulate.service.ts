@@ -6,11 +6,10 @@ import {AtomizedDocument, Segment, SerializedTabulation} from "../../shared";
 import trie from "trie-prefix-tree";
 import {CacheService} from "../../util/cache.service";
 import {Inject} from "@nestjs/common";
+import {SetWithUniqueLengths} from "../../shared/tabulate-documents/set-with-unique-lengths";
 
 
 export class TabulateService {
-    _service: "TABULATE"
-
     constructor(
         @InjectRepository(DocumentView)
         private documentViewRepository: Repository<DocumentView>,
@@ -24,7 +23,7 @@ export class TabulateService {
         return this.cacheService.memo<SerializedTabulation>(
             {
                 args: [findOptions, words],
-                service: this._service,
+                service: "TABULATE",
                 cb: async () => {
                     const documentToTabulate = await this.documentViewRepository.findOne(findOptions)
                     if (!documentToTabulate) {
@@ -34,7 +33,7 @@ export class TabulateService {
                     const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
                     const atomizedDocument = AtomizedDocument.atomizeDocument(text);
                     const tabulation = Segment.tabulate(
-                        trie(words),
+                        new SetWithUniqueLengths(words),
                         atomizedDocument.segments(),
                     );
                     return {
