@@ -1,4 +1,4 @@
-import {SortValue} from "./schedule-row.interface";
+import {SortValue} from "./schedule-row";
 import React from "react";
 
 export const DisplaySortValue = ({sortValue}: { sortValue: SortValue<any> }) => {

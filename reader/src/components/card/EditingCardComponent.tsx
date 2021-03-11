@@ -14,7 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../hotkey-wrapper";
-import {ScheduleRow, ScheduleRowData} from "../../lib/schedule/schedule-row.interface";
+import {ScheduleRow, ScheduleRowData} from "../../lib/schedule/schedule-row";
 
 const useStyles = makeStyles((theme) => ({
     root: {

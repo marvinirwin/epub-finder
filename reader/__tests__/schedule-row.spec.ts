@@ -1,4 +1,4 @@
-import {ScheduleRow, ScheduleRowData} from "../src/lib/schedule/schedule-row.interface";
+import {ScheduleRow, ScheduleRowData} from "../src/lib/schedule/schedule-row";
 import {WordRecognitionRow} from "../src/lib/schedule/word-recognition-row";
 import {SuperMemoGrade} from "supermemo";
 import {addDays, subDays} from 'date-fns';
@@ -7,7 +7,8 @@ const scheduleRowWithRecognitionRecords = (wordRecognitionRecords: any[]) => new
     wordRecognitionRecords,
     wordCountRecords: [],
     pronunciationRecords: [],
-    word: 'test'
+    word: 'test',
+    greedyWordCountRecords: []
 });
 
 

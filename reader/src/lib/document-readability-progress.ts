@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {
     SerializedTabulation,
     TabulatedDocuments
@@ -33,7 +33,7 @@ export class DocumentReadabilityProgress {
         // Now take any word which was recognized twice in a row and mark it as complete
         // Any word which was recognized once or is overdue and mark it as kind of complete
         // Then the rest are red
-        const totalWordCount = sum(Object.values(tabulatedDocument.wordCounts));
+        const totalWordCount = sum(Array.from(tabulatedDocument.greedyWordCounts.values()));
         const {fullRecognition, somewhatRecognized, unrecognized} = {
             fullRecognition: [],
             somewhatRecognized: [],

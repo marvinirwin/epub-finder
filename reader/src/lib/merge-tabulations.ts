@@ -9,7 +9,8 @@ export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos:
         segments: [],
         documentWordCounts: {},
         atomMetadatas: new Map(),
-        wordSegmentStringsMap: new Map()
+        wordSegmentStringsMap: new Map(),
+        greedyWordCounts: new Map()
     };
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
@@ -24,6 +25,15 @@ export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos:
 
     for (let i = 0; i < sentenceInfos.length; i++) {
         const newSentenceInfo = sentenceInfos[i];
+        newSentenceInfo.greedyWordCounts.forEach((count, word) => {
+            if (!aggregateSentenceInfo.greedyWordCounts.get(word)) {
+                aggregateSentenceInfo.greedyWordCounts.set(word, 0);
+            }
+            aggregateSentenceInfo.greedyWordCounts.set(
+                word,
+                aggregateSentenceInfo.greedyWordCounts.get(word) as number + 1
+            )
+        })
         newSentenceInfo.atomMetadatas.forEach(
             (value, key) =>
                 aggregateSentenceInfo.atomMetadatas.set(key, value)
@@ -37,6 +47,7 @@ export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos:
         merge(newSentenceInfo.wordElementsMap, aggregateSentenceInfo.wordElementsMap);
         merge(newSentenceInfo.wordSegmentMap, aggregateSentenceInfo.wordSegmentMap);
         aggregateSentenceInfo.segments.push(...newSentenceInfo.segments)
+
         if (!!(newSentenceInfo as unknown as TabulatedDocuments).documentWordCounts) {
             // @ts-ignore
             mergeDocumentWordCounts(merge, newSentenceInfo, aggregateSentenceInfo);

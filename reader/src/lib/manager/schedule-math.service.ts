@@ -1,5 +1,5 @@
 import {orderBy} from "lodash";
-import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 import {getSortValue} from "./sort-value.interface";
 import {NormalizedValue} from "./normalized-value.interface";
 

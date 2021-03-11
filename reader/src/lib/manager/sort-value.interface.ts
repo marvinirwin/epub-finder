@@ -1,4 +1,4 @@
-import {SortValue} from "../schedule/schedule-row.interface";
+import {SortValue} from "../schedule/schedule-row";
 
 export function getInverseLogNormalValue(normalCount: number) {
     if (normalCount === 0) {

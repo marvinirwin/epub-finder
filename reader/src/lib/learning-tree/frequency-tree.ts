@@ -18,7 +18,13 @@ export class FrequencyTree {
                     ...t1.wordCounts,
                     ...vocab.wordCounts,
                 },
-                wordSegmentStringsMap: new Map()
+                wordSegmentStringsMap: new Map(),
+                greedyWordCounts: new Map(
+                    [
+                        ...t1.greedyWordCounts.entries(),
+                        ...vocab.greedyWordCounts.entries()
+                    ]
+                )
             },
             t2
         );

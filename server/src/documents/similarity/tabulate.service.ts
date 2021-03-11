@@ -39,7 +39,8 @@ export class TabulateService {
                     );
                     return {
                         wordCounts: tabulation.wordCounts,
-                        wordSegmentStringsMap: new Map()
+                        wordSegmentStringsMap: new Map(),
+                        greedyWordCounts: tabulation.greedyWordCounts
                     };
                 }
             }

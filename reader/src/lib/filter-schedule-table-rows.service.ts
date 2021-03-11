@@ -1,6 +1,6 @@
 import {ScheduleService} from "./manager/schedule.service";
 import {combineLatest, Observable} from "rxjs";
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {SettingsService} from "../services/settings.service";
 import {debounceTime, map, shareReplay} from "rxjs/operators";
 

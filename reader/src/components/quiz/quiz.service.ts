@@ -8,7 +8,7 @@ import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {ICard} from "../../../../server/src/shared/ICard";
 import {TrieWrapper} from "../../lib/TrieWrapper";
-import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
 import {SettingsService} from "../../services/settings.service";

@@ -17,7 +17,7 @@ export type TabulatedSentences = SerializedTabulation & {
 
 export interface SerializedTabulation {
     wordCounts: Dictionary<number>;
-    largestWordCounts: Map<string, number>;
+    greedyWordCounts: Map<string, number>;
     wordSegmentStringsMap: Map<string, Set<string>>;
 }
 

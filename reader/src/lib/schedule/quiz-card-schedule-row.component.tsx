@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "./schedule-row";
 import React from "react";
 import {DEV} from "../../components/directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";

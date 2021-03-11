@@ -21,7 +21,7 @@ import {
 } from "@shared/";
 import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../App";
-import {NormalizedScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row";
 import {formatDueDate} from "../lib/schedule/format-due-date";
 
 

@@ -557,12 +557,16 @@ $hideColor:#f5f5f5;
 }
 #mouseFollowingDiv {
   position: fixed;
-  background-color: lightgrey;
   z-index: 10000;
   pointer-events: none;
   font-size: 160%;
+  background: #fff;
+  border-radius: 2px;
+  display: inline-block;
+
 }
 
-#mouseFollowingDiv.has-text > * {
+
+#mouseFollowingDiv > div.has-text {
   padding: 24px;
 }

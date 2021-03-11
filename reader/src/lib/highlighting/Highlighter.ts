@@ -5,7 +5,7 @@ import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
 import {QuizService} from "../../components/quiz/quiz.service";
-import {ScheduleRow} from "../schedule/schedule-row.interface";
+import {ScheduleRow} from "../schedule/schedule-row";
 
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
     const m = new Map<string, RGBA>();

@@ -24,7 +24,7 @@ export class VocabService {
             trieService: TrieService
         }
     ) {
-        let observable = combineLatest([
+        const observable = combineLatest([
             documentRepository.collection$,
             settingsService.selectedVocabulary$
         ]).pipe(
@@ -57,11 +57,15 @@ export class VocabService {
                      indexedScheduleRows
                  ]) => {
                 if (!selectedTabulation) {
+                    const knownWordEntries: [string, number][] = Object.values(indexedScheduleRows)
+                        .filter(row => row.isSomewhatRecognized() || row.isRecognized())
+                        .map(row => [row.d.word, 1]);
                     return {
                         wordCounts: Object.fromEntries(
-                            Object.values(indexedScheduleRows)
-                                .filter(row => row.isSomewhatRecognized() || row.isRecognized())
-                                .map(row => [row.d.word, 1])
+                            knownWordEntries
+                        ),
+                        greedyWordCounts: new Map<string, number>(
+                            knownWordEntries
                         ),
                         wordSegmentStringsMap: new Map()
                     }

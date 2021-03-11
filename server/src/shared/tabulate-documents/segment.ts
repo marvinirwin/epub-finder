@@ -44,13 +44,15 @@ export class Segment {
 
         const newGreedyWord = () => {
             const chosenGreedyWord = maxBy(wordsInProgress, wordInProgress => wordInProgress.word.length);
-            if (!greedyWordCounts.get(chosenGreedyWord.word)) {
-                greedyWordCounts.set(chosenGreedyWord.word, 0)
+            if (chosenGreedyWord){
+                if (!greedyWordCounts.get(chosenGreedyWord.word)) {
+                    greedyWordCounts.set(chosenGreedyWord.word, 0)
+                }
+                greedyWordCounts.set(
+                    chosenGreedyWord.word,
+                    greedyWordCounts.get(chosenGreedyWord.word)
+                );
             }
-            greedyWordCounts.set(
-                chosenGreedyWord.word,
-                greedyWordCounts.get(chosenGreedyWord.word)
-            );
             return chosenGreedyWord;
         };
 
@@ -157,7 +159,7 @@ export class Segment {
             wordSegmentMap: segmentDictionary,
             segments,
             atomMetadatas,
-            largestWordCounts: greedyWordCounts,
+            greedyWordCounts: greedyWordCounts,
             wordSegmentStringsMap: new Map(Object.entries(segmentDictionary).map(([word, segments]) => [word, new Set(segments.map(segment => segment.translatableText))])),
         };
     }

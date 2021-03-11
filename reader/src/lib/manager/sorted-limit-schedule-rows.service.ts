@@ -3,7 +3,7 @@ import {ScheduleService} from "./schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
-import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedScheduleRowData>[];

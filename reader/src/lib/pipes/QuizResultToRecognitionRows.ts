@@ -5,7 +5,7 @@ import {map, withLatestFrom} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import moment from "moment";
-import {ScheduleRow} from "../schedule/schedule-row.interface";
+import {ScheduleRow} from "../schedule/schedule-row";
 
 export const QuizResultToRecognitionRows =
     (

@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row.interface";
+import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 import {Button, TableCell, TableRow, Typography} from "@material-ui/core";
 import {
     quizCardTableRow,
