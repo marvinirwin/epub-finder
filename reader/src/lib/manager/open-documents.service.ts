@@ -1,7 +1,7 @@
 import {combineLatest, merge, Observable, of} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {Website} from "../Website/Website";
-import {Segment} from "@shared/";
+import {Segment, SerializedDocumentTabulation} from "@shared/";
 import {flattenTree, NamedDeltaScanner} from "../delta-scan/delta-scan.module";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
@@ -19,7 +19,6 @@ import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabul
 import {mergeTabulations} from "../merge-tabulations";
 import {LanguageConfigsService} from "../language-configs.service";
 import {BrowserSegment} from "../browser-segment";
-
 
 export type TrieObservable = Observable<TrieWrapper>;
 
@@ -134,7 +133,7 @@ export class OpenDocumentsService {
 
         this.virtualDocumentTabulation$ = getDocumentTabulation(document => document.virtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
             .pipe(
-                map((documentTabulations: SerializedTabulation[]) =>
+                map((documentTabulations: SerializedDocumentTabulation[]) =>
                     new SerializedTabulationAggregate(documentTabulations)
                 ),
                 shareReplay(1)

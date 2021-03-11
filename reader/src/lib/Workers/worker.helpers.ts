@@ -8,7 +8,7 @@ import TabulateRemoteDocumentWorker from 'Worker-loader?name=dist/[name].js!./ta
 import TabulateLocalDocumentWorker from 'Worker-loader?name=dist/[name].js!./tabulate-local-document.worker';
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker';
-import {InterpolateService, SerializedTabulation} from "@shared/";
+import {InterpolateService, SerializedDocumentTabulation, SerializedTabulation} from "@shared/";
 import {TabulateRemoteDocumentDto} from "./tabulate-remote-document.dto";
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 
@@ -29,8 +29,8 @@ export const TabulateRemoteDocument = async (dto: TabulateRemoteDocumentDto) => 
         return result;
     })
 
-export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) => GetWorkerResults<SerializedTabulation>(new TabulateLocalDocumentWorker(), dto)
-    .then((result: SerializedTabulation) => {
+export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) => GetWorkerResults<SerializedDocumentTabulation>(new TabulateLocalDocumentWorker(), dto)
+    .then((result: SerializedDocumentTabulation) => {
         return result;
     })
 

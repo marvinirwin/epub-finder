@@ -1,11 +1,11 @@
-import {SerializedTabulation} from "../tabulate-documents/tabulated-documents.interface";
-import {flatten} from "@nestjs/common";
+import {SerializedDocumentTabulation, SerializedTabulation} from "../tabulate-documents/tabulated-documents.interface";
 import {safePushMapSet} from "../safe-push";
 
 export class SerializedTabulationAggregate {
-    serializedTabulations: SerializedTabulation[];
+    serializedTabulations: SerializedDocumentTabulation[];
 
-    constructor(serializedTabulations: SerializedTabulation[]) {
+    constructor(serializedTabulations: SerializedDocumentTabulation[]) {
+        debugger;
         this.serializedTabulations = serializedTabulations;
     }
 

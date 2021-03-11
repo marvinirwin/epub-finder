@@ -1,5 +1,6 @@
 import {mergeDocumentWordCounts, TabulatedDocuments, TabulatedSentences} from "@shared/";
 import {Dictionary} from "lodash";
+import {safePushMap} from "../../../server/src/shared/safe-push";
 
 export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos: T[]): TabulatedDocuments => {
     const aggregateSentenceInfo: TabulatedDocuments = {
@@ -10,7 +11,8 @@ export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos:
         documentWordCounts: {},
         atomMetadatas: new Map(),
         wordSegmentStringsMap: new Map(),
-        greedyWordCounts: new Map()
+        greedyWordCounts: new Map(),
+        greedyDocumentWordCounts: new Map()
     };
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
@@ -51,6 +53,11 @@ export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos:
         if (!!(newSentenceInfo as unknown as TabulatedDocuments).documentWordCounts) {
             // @ts-ignore
             mergeDocumentWordCounts(merge, newSentenceInfo, aggregateSentenceInfo);
+            (newSentenceInfo as unknown as TabulatedDocuments).greedyDocumentWordCounts.forEach((documentWordCounts, word) => {
+                documentWordCounts.forEach(documentWordCount => {
+                    safePushMap(aggregateSentenceInfo.greedyDocumentWordCounts, word, documentWordCount)
+                })
+            })
         }
     }
     return aggregateSentenceInfo;

@@ -3,7 +3,7 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 import {
     annotatedAndTranslated,
     AtomizedDocument,
-    Segment,
+    Segment, SerializedDocumentTabulation,
     SerializedTabulation,
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
@@ -22,7 +22,7 @@ export class OpenDocument {
     public name: string;
     public renderedSegments$ = new ReplaySubject<BrowserSegment[]>(1)
     public renderedTabulation$: Observable<TabulatedDocuments>;
-    public virtualTabulation$: Observable<SerializedTabulation>;
+    public virtualTabulation$: Observable<SerializedDocumentTabulation>;
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
 
     constructor(

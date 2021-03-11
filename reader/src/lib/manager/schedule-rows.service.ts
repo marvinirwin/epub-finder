@@ -11,22 +11,23 @@ import {NormalizedScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedu
 import {ScheduleMathService} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
+import {OpenDocumentsService} from "./open-documents.service";
 
 export class ScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedScheduleRowData>>>;
 
     constructor({
                     wordRecognitionProgressService,
-                    readingWordCounts$,
+                    openDocumentsService,
                     pronunciationProgressService,
                     cardsRepository,
                     ignoredWordsRepository,
                     settingsService,
-                    allWordsRepository
+                    allWordsRepository,
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
-        readingWordCounts$: Observable<ds_Dict<DocumentWordCount[]>>,
+        openDocumentsService: OpenDocumentsService
         cardsRepository: CardsRepository,
         ignoredWordsRepository: IgnoredWordsRepository,
         settingsService: SettingsService,
@@ -38,7 +39,7 @@ export class ScheduleRowsService {
         ])
         this.indexedScheduleRows$ = combineLatest([
             progress$,
-            readingWordCounts$.pipe(startWith({})),
+            openDocumentsService.virtualDocumentTabulation$,
             cardsRepository.cardIndex$,
             ignoredWordsRepository.latestRecords$,
             combineLatest([
@@ -73,17 +74,19 @@ export class ScheduleRowsService {
                 allWords.forEach(word => {
                     ensureScheduleRow(word)
                 })
+                wordCounts.serializedTabulations.forEach(({greedyDocumentWordCounts}) => {
+                    /**
+                     * Prevent cards created only for visual purposes from showing up in the quiz rows
+                     */
+                    [...greedyDocumentWordCounts.entries()].filter(
+                        ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
+                    ).forEach(([word, wordCountRecords]) => {
+                        if (scheduleRows[word]) {
+                            scheduleRows[word].wordCountRecords.push(...wordCountRecords)
+                        }
+                    });
+                })
 
-                /**
-                 * Prevent cards created only for visual purposes from showing up in the quiz rows
-                 */
-                Object.entries(wordCounts).filter(
-                    ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
-                ).forEach(([word, wordCountRecords]) => {
-                    if (scheduleRows[word]) {
-                        scheduleRows[word].wordCountRecords.push(...wordCountRecords)
-                    }
-                });
                 Object.entries(pronunciationRowIndex).forEach(([word, pronunciationRecords]) => {
                     if (scheduleRows[word]) {
                         scheduleRows[word].pronunciationRecords.push(...pronunciationRecords);

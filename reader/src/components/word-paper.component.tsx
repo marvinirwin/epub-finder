@@ -26,7 +26,9 @@ import {formatDueDate} from "../lib/schedule/format-due-date";
 
 
 export const CardLearningLanguageText = ({word}: { word: string }) => {
+    const m = useContext(ManagerContext);
     return <Typography
+        onClick={() => m.wordCardModalService.word$.next(word)}
         variant={'h1'}
         className={quizCardLearningLanguage}
     >{word || ''}</Typography>

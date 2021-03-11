@@ -1,9 +1,16 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument, Segment, SerializedTabulation, tabulatedSentenceToTabulatedDocuments} from "@shared/";
+import {
+    AtomizedDocument,
+    Segment,
+    SerializedDocumentTabulation,
+    SerializedTabulation,
+    tabulatedSentenceToTabulatedDocuments
+} from "@shared/";
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
+import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
 
 // @ts-ignore
 self.window = self;
@@ -23,7 +30,9 @@ ctx.onmessage = async (ev) => {
         ctx.postMessage({
             wordCounts: tabulated.wordCounts,
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
-        } as SerializedTabulation);
+            documentWordCounts: tabulated.documentWordCounts,
+            greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts
+        } as SerializedDocumentTabulation);
     } catch(e) {
         console.error(e);
         ctx.postMessage(
@@ -34,7 +43,8 @@ ctx.onmessage = async (ev) => {
                 segments: [],
                 atomMetadatas: new Map(),
                 wordCounts: {},
-                wordSegmentStringsMap: new Map()
+                wordSegmentStringsMap: new Map(),
+                greedyDocumentWordCounts: new Map()
             }
         )
     }
