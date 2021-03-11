@@ -1,8 +1,3 @@
-KEYCLOAK_USER=admin
-KEYCLOAK_PASSWORD=future_DOOR_fence_22
-DB_USER=postgres
-DB_PASSWORD=Cirdan999
-DB_ADDR=language-trainer.cepasb0h4kbd.us-east-2.rds.amazonaws.com
 
 
 sudo docker run \
