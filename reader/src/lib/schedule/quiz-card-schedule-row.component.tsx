@@ -7,7 +7,6 @@ import {QuizCard} from "../../components/quiz/word-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
-import {formatDueDate} from "./format-due-date";
 
 export const QuizCardScheduleRowDisplay = (
     {

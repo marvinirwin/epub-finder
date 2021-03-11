@@ -1,4 +1,3 @@
-import {Card} from "@material-ui/core";
 import React, {useContext, useState} from "react";
 import {AudioRecorderResizedContext} from "../main";
 import {ManagerContext} from "../../App";

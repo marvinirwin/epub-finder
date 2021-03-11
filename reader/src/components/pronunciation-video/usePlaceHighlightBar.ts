@@ -14,7 +14,7 @@ export const usePlaceHighlightBar = (
             }
         }
 
-    }, [highlightStartPosition, highlightEndPosition, sectionContainer]);
+    }, [highlightStartPosition, highlightEndPosition, sectionContainer, highlightBar]);
 
     useEffect(() => {
         if (highlightBar && sectionContainer) {
@@ -24,5 +24,5 @@ export const usePlaceHighlightBar = (
                 highlightBar.style.width = `${(highlightEndPosition - highlightStartPosition) * sectionContainer.clientWidth}px`;
             }
         }
-    }, [highlightEndPosition, sectionContainer])
+    }, [highlightEndPosition, sectionContainer, highlightBar])
 }

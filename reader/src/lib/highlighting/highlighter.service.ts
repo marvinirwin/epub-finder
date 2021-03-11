@@ -10,7 +10,7 @@ import {LtElement} from "./Highlighter";
 import {Dictionary} from "lodash";
 import {mixRGBA, RGBA} from "./color.service";
 import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
-import {map, shareReplay, tap} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 import debug from 'debug';
 import {safePushMap} from "../../../../server/src/shared/safe-push";
 const d = debug('highlight:highlighter');

@@ -6,7 +6,6 @@ import {orderBy, uniq} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
-import {ICard} from "../../../../server/src/shared/ICard";
 import {TrieWrapper} from "../../lib/TrieWrapper";
 import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
@@ -97,7 +96,7 @@ export class QuizService {
         this.quizCard = {
             ...wordCard,
             hiddenFields$: combineLatest([currentWord$.pipe(distinctUntilChanged()), this.manualHiddenFieldConfig$]).pipe(
-                map(([word, manualFieldConfig]) => {
+                map(([, manualFieldConfig]) => {
                     const m = {hiddenDefinition, hiddenLearningLanguage};
                     // @ts-ignore
                     return m[manualFieldConfig] ||

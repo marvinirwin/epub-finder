@@ -9,7 +9,7 @@ import {
     somewhatRecognizedCount,
     unrecognizedCount,
 } from "@shared/";
-import {Card, Paper} from "@material-ui/core";
+import {Paper} from "@material-ui/core";
 
 export const QuizCardProgress = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);

@@ -2,19 +2,27 @@ import {useEffect, useState} from "react";
 import React from "react";
 
 export const mouseFollowingDiv = document.createElement('div');
-const textContentDiv = document.createElement('div');
-mouseFollowingDiv.appendChild(textContentDiv);
+const titleContentDiv = document.createElement('div');
+const subtitleContentDiv = document.createElement('div');
+mouseFollowingDiv.appendChild(titleContentDiv);
+mouseFollowingDiv.appendChild(subtitleContentDiv);
 mouseFollowingDiv.id = 'mouseFollowingDiv';
 mouseFollowingDiv.classList.add('MuiPaper-root', 'MuiPaper-elevation1','MuiPaper-rounded')
+titleContentDiv.id = 'titleContentDiv';
+subtitleContentDiv.id = 'subtitleContentDiv';
 document.body.appendChild(mouseFollowingDiv);
 
-export const setMouseOverText = (s: string) => {
-    textContentDiv.innerText = s;
+export const setDivText = (div: HTMLDivElement, s: string) => {
+    div.innerText = s;
     if (s) {
-        textContentDiv.classList.add('has-text')
+        div.classList.add('has-text')
     } else {
-        textContentDiv.classList.remove('has-text')
+        div.classList.remove('has-text')
     }
+}
+export const setMouseOverText = (title: string, subtitle: string) => {
+    setDivText(titleContentDiv, title);
+    setDivText(subtitleContentDiv, subtitle);
 }
 
 export const setMouseOverDivPosition = (e: {clientX: number, clientY: number}) => {

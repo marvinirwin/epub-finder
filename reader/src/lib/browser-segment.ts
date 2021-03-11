@@ -8,7 +8,7 @@ import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
 export class BrowserSegment extends Segment{
     translation$: Observable<string>;
     romanization$: Observable<string>;
-    mouseoverText$: Observable<string>;
+    mouseoverText$: Observable<{title: string, subtitle: string}>;
     constructor( {
         element,
         languageConfigsService,
@@ -38,11 +38,10 @@ export class BrowserSegment extends Segment{
             settingsService.showTranslation$
         ]).pipe(
             map(([translation, romanization, showRomanization, showTranslation]) => {
-                const els = [
-                    showRomanization && romanization,
-                    showTranslation && translation
-                ].filter(v => v)
-                return els.join('\n');
+                return {
+                    title: showRomanization ? (romanization || '') : '',
+                    subtitle: showTranslation ? (translation || '') : ''
+                }
             }),
             shareReplay(1)
         )

@@ -75,6 +75,7 @@ export class BrowserInputs {
     }) {
         this.hotkeys$ = hotkeys$;
         this.activeSentenceService = activeSentenceService;
+/*
         settingsService.showTranslation$.subscribe(showTranslations => {
             this.showTranslations = showTranslations;
             if (showTranslations) {
@@ -83,6 +84,7 @@ export class BrowserInputs {
                 setMouseOverText('')
             }
         });
+*/
         combineLatest([
                 hotkeys$,
                 this.keysPressed$
@@ -93,9 +95,9 @@ export class BrowserInputs {
 
         this.mouseoverSegment$.pipe(
             switchMap(
-                segment => segment ? segment.mouseoverText$ : of('')
+                segment => segment ? segment.mouseoverText$ : of({title: '', subtitle: ''})
             )
-        ).subscribe(setMouseOverText);
+        ).subscribe(({title, subtitle}) => setMouseOverText(title, subtitle));
     }
 
     async pressHotkey(keys: string[]) {

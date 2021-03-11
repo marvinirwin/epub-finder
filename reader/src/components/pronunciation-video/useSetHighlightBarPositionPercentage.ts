@@ -15,5 +15,5 @@ export const useHighlightBarPositionPercentage = (startPercentage: number, endPe
 
     useEffect(() => {
          setHighlightBarPositionPercentages();
-    }, [startPercentage, endPercentage]);
+    }, [startPercentage, endPercentage, setHighlightBarPositionPercentages]);
 }
