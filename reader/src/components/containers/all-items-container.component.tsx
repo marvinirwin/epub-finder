@@ -12,7 +12,10 @@ export const AllItemsContainer: React.FC<React.HTMLProps<HTMLDivElement>> = ({..
         {
             uniqueBy(
                 Object.values(allItems)
-                    .filter(menuNode => menuNode.Component),
+                    .filter(menuNode =>
+                        menuNode.Component &&
+                        menuNode.name === selectedComponent?.name
+                    ),
                 menuNode => menuNode.Component
             ).map((item, index) => <div
                     key={index}

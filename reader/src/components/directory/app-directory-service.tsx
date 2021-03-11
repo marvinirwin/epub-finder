@@ -19,8 +19,6 @@ import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
 import {LibraryNode} from "./nodes/library.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
-import {TreeMenuNodeItem} from "../tree-menu/tree-menu-node-item.component";
-import {FrequencyTreeMenuNode} from "./nodes/frequency-tree.node";
 import {ProgressNode} from "./nodes/progress.node";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
@@ -38,7 +36,6 @@ function AppDirectory(
             [
                 LanguageSelectNode(m)
             ],
-            FrequencyTreeMenuNode(),
             SignInWithNode(profile),
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),

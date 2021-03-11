@@ -39,7 +39,7 @@ export class DocumentReadabilityProgress {
             somewhatRecognized: [],
             unrecognized: []
         } as ReadabilityState;
-        Object.entries(tabulatedDocument.wordCounts)
+        Array.from(tabulatedDocument.greedyWordCounts.entries())
             .forEach(([word, count]) => {
                 const scheduleRow = scheduleRows.get(word);
                 const readabilityRecord = {word, scheduleRow, count, totalWordCount};
