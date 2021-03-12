@@ -8,7 +8,7 @@ import {AUTH} from "@shared/";
 export const SignInWithNode = (profile: Profile | undefined): TreeMenuNode => ({
     name: AUTH,
     label: 'Sign In With',
-    action: () => window.location.href = `${process.env.PUBLIC_URL}/auth/keycloak`,
+    action: () => window.location.href = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`,
     hidden: !!profile?.email,
     LeftIcon: () => <AccountCircle/>
 });
