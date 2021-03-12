@@ -12,7 +12,7 @@ import {mixRGBA, RGBA} from "./color.service";
 import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 import {map, shareReplay} from "rxjs/operators";
 import debug from 'debug';
-import {safePushMap} from "../../../../server/src/shared/safe-push";
+import {safePushMap} from "@shared/";
 const d = debug('highlight:highlighter');
 
 // Priority, highlighterName

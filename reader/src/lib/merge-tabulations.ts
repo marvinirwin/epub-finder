@@ -1,6 +1,6 @@
 import {mergeDocumentWordCounts, TabulatedDocuments, TabulatedSentences} from "@shared/";
 import {Dictionary} from "lodash";
-import {safePushMap} from "../../../server/src/shared/safe-push";
+import {safePushMap} from "@shared/";
 
 export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos: T[]): TabulatedDocuments => {
     const aggregateSentenceInfo: TabulatedDocuments = {

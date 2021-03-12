@@ -3,7 +3,7 @@ import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {filter, map, shareReplay, startWith, tap, withLatestFrom} from "rxjs/operators";
 import {orderBy, flatten} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
-import {safePush} from "../../../../server/src/shared/safe-push";
+import {safePush} from "@shared/";
 
 export class IndexedRowsRepository<T extends { word: string, id?: number }> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
