@@ -3,3 +3,13 @@ reader/.env
 server/.env
 env
 **/*/.idea
+        .DS_Store
+        .env
+        .idea/
+        package-lock.json
+        reader/config/
+        reader/scripts/
+        server/package-lock.json
+        server/public/video/
+        server/src/subtitles/
+
