@@ -49,7 +49,7 @@ export class ScheduleService {
         )
 
         this.learningCards$ = this.sortedScheduleRows$.pipe(
-            map(rows => rows.filter(row => row.isLearningOrReviewing())),
+            map(rows => rows.filter(row => row.isLearning())),
             shareReplay(1)
         )
         this.newCards$ = this.sortedScheduleRows$.pipe(

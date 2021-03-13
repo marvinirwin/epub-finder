@@ -39,6 +39,7 @@ export class OpenDocumentsService {
     openDocumentBodies$: Observable<HTMLBodyElement>;
     renderedSegments$: Observable<BrowserSegment[]>;
     virtualDocumentTabulation$: Observable<SerializedTabulationAggregate>;
+    aVirtualTabulationIsLoading$: Observable<boolean>;
 
     constructor(
         private config: {
@@ -112,18 +113,18 @@ export class OpenDocumentsService {
             shareReplay(1)
         );
 
-        const getDocumentTabulation = <T>(mapFn: (d: OpenDocument) => Observable<T>, nodeLabel: string) => {
+        const mapDocumentTree = <T>(mapFn: (d: OpenDocument) => Observable<T>, nodeLabel: string) => {
             return this.openDocumentTree.mapWith(mapFn)
                 .updates$.pipe(
                     switchMap(({sourced}) => {
                         const sourceDocuments = sourced?.children?.[nodeLabel];
-                        const documentTabulations: Observable<T>[] = flattenTree<Observable<T>>(sourceDocuments);
-                        return combineLatest(documentTabulations);
+                        const observables: Observable<T>[] = flattenTree<Observable<T>>(sourceDocuments);
+                        return combineLatest(observables);
                     }),
                 );
         }
 
-        this.displayDocumentTabulation$ = getDocumentTabulation(document => document.renderedTabulation$, READING_DOCUMENT_NODE_LABEL)
+        this.displayDocumentTabulation$ = mapDocumentTree(document => document.renderedTabulation$, READING_DOCUMENT_NODE_LABEL)
             .pipe(
                 map((documentTabulations: TabulatedDocuments[]) =>
                     mergeTabulations(...documentTabulations),
@@ -131,13 +132,21 @@ export class OpenDocumentsService {
                 shareReplay(1)
             );
 
-        this.virtualDocumentTabulation$ = getDocumentTabulation(document => document.virtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
+        this.virtualDocumentTabulation$ = mapDocumentTree(
+            document => document.virtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
             .pipe(
                 map((documentTabulations: SerializedDocumentTabulation[]) =>
                     new SerializedTabulationAggregate(documentTabulations)
                 ),
                 shareReplay(1)
             );
+
+        this.aVirtualTabulationIsLoading$ = mapDocumentTree(
+            document => document.isLoadingVirtualTabulation$, SOURCE_DOCUMENTS_NODE_LABEL)
+            .pipe(
+                map(loadingTabulationBooleans => loadingTabulationBooleans.every(v => v)),
+                shareReplay(1)
+            )
 
 
         this.openDocumentBodies$ = this.openDocumentTree

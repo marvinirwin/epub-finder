@@ -17,6 +17,7 @@ import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {BrowserSegment} from "../browser-segment";
 import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language-configs.service";
+import {isLoading} from "../util/is-loading";
 
 export class OpenDocument {
     public name: string;
@@ -24,6 +25,7 @@ export class OpenDocument {
     public renderedTabulation$: Observable<TabulatedDocuments>;
     public virtualTabulation$: Observable<SerializedDocumentTabulation>;
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1);
+    public isLoadingVirtualTabulation$: Observable<boolean>;
 
     constructor(
         public id: string,
@@ -49,18 +51,21 @@ export class OpenDocument {
             ),
             shareReplay(1),
         );
-        this.virtualTabulation$ = combineLatest([
-            this.trie$,
-            this.atomizedDocument$
-        ]).pipe(
-            switchMap(([trie, document]) => {
+        const {isLoading$, obs$} = isLoading(
+            combineLatest([
+                this.trie$,
+                this.atomizedDocument$
+            ]),
+            ([trie, document]) => {
                 return TabulateLocalDocument({
                     label,
                     trieWords: Array.from(trie.t.values()),
                     src: document._originalSrc
                 })
-            })
+            },
         );
+        this.virtualTabulation$ = obs$;
+        this.isLoadingVirtualTabulation$ = isLoading$;
     }
 
     async handleHTMLHasBeenRendered(

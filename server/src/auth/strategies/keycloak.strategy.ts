@@ -14,7 +14,7 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, "keycloak") {
             realm: process.env.KEYCLOAK_REALM,
             clientID: process.env.KEYCLOAK_CLIENT_ID,
             clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-            callbackURL: '/auth/keycloak/callback',
+            callbackURL: '/languagetrainer-auth/keycloak/callback',
             authorizationURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
             tokenURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
             userInfoURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,

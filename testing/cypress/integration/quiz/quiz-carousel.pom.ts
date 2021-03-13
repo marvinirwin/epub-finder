@@ -5,7 +5,7 @@ import {QuizCardPom} from "./quiz-card.pom";
 import {ImageSearchPom} from "./image-search.pom";
 import {HiddenQuizFields} from "../../../../reader/src/lib/hidden-quiz-fields";
 import {
-    frequencyDocumentProgressPrefix,
+    frequencyDocumentProgressPrefix, leftTodayNumber,
     manualQuizHiddenFieldConfigId,
     noMoreQuizCards,
     QUIZ_BUTTON_EASY,
@@ -16,7 +16,7 @@ import {
     quizCardDescription,
     quizCardImage,
     quizCardLearningLanguage,
-    quizCardTranslation,
+    quizCardTranslation, quizLearningNumber, quizToReviewNumber, quizUnlearnedNumber,
     recognizedCount,
     somewhatRecognizedCount,
     unrecognizedCount
@@ -135,6 +135,22 @@ export class QuizCarouselPom {
         assertCount(recognizedCount, counts.recognizedCount);
         assertCount(unrecognizedCount, counts.unrecognizedCount);
         assertCount(somewhatRecognizedCount, counts.somewhatRecognizedCount);
+    }
+
+    static learningNumber() {
+        return cy.get(`.${quizLearningNumber}`)
+    }
+
+    static toReviewNumber() {
+        return cy.get(`.${quizToReviewNumber}`)
+    }
+
+    static unLearned() {
+        return cy.get(`.${quizUnlearnedNumber}`)
+    }
+
+    static leftToday() {
+        return cy.get(`.${leftTodayNumber}`)
     }
 }
 

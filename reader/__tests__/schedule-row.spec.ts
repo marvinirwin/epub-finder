@@ -42,13 +42,13 @@ const dueTomorrowDidTodayScheduleRow = getRecognitionRow(
 describe('ScheduleRow', () => {
         it('Assigns records to learning, reviewing and learned', () => {
             const emptyScheduleRow = scheduleRowWithRecognitionRecords([]);
-            expect(!emptyScheduleRow.isToReview() && !emptyScheduleRow.isLearningOrReviewing()).toBe(true);
+            expect(!emptyScheduleRow.isToReview() && !emptyScheduleRow.isLearning()).toBe(true);
             const dueYesterdayDidYesterdayRow = scheduleRowWithRecognitionRecords([dueYesterdayDidYesterday]);
-            expect(!dueYesterdayDidYesterdayRow.isLearningOrReviewing() && !dueYesterdayDidYesterdayRow.isToReview());
+            expect(!dueYesterdayDidYesterdayRow.isLearning() && !dueYesterdayDidYesterdayRow.isToReview());
             const dueYesterdayDidTodayScheduleRow = scheduleRowWithRecognitionRecords([dueYesterdayDidToday]);
-            expect(dueYesterdayDidTodayScheduleRow.isLearningOrReviewing() && !dueYesterdayDidTodayScheduleRow.isToReview()).toBe(true);
+            expect(dueYesterdayDidTodayScheduleRow.isLearning() && !dueYesterdayDidTodayScheduleRow.isToReview()).toBe(true);
             const dueTomorrowDidTodayRow = scheduleRowWithRecognitionRecords([dueTomorrowDidTodayScheduleRow]);
-            expect(!dueTomorrowDidTodayRow.isLearningOrReviewing() && !dueTomorrowDidTodayRow.isToReview()).toBe(true);
+            expect(!dueTomorrowDidTodayRow.isLearning() && !dueTomorrowDidTodayRow.isToReview()).toBe(true);
         })
     }
 )

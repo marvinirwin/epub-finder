@@ -1,5 +1,14 @@
 import {Button, Paper, Typography} from "@material-ui/core";
-import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM, quizButtonReveal} from "@shared/";
+import {
+    leftTodayNumber,
+    QUIZ_BUTTON_EASY,
+    QUIZ_BUTTON_HARD,
+    QUIZ_BUTTON_IGNORE,
+    QUIZ_BUTTON_MEDIUM,
+    quizButtonReveal,
+    quizLearningNumber,
+    quizToReviewNumber, quizUnlearnedNumber
+} from "@shared/";
 import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {QuizCard} from "./word-card.interface";
@@ -59,16 +68,16 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
             <div>
                 <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', margin: '24px'}}>
                     <Typography>
-                        To Review: {rowInfo.wordsToReview.length}
+                        To Review: <span className={quizToReviewNumber}>{rowInfo.wordsToReview.length}</span>
                     </Typography>
                     <Typography>
-                        Learning: {rowInfo.wordsReviewingOrLearning.length}
+                        Learning: <span className={quizLearningNumber}>{rowInfo.wordsReviewingOrLearning.length}</span>
                     </Typography>
                     <Typography>
-                        Unstarted: {(rowInfo.wordsWhichHaventBeenStarted.length || 0)}
+                        Unstarted: <span className={quizUnlearnedNumber}>{(rowInfo.wordsWhichHaventBeenStarted.length || 0)}</span>
                     </Typography>
                     <Typography>
-                        Left Today: {dailyLimit - (rowInfo.wordsLearnedToday.length || 0)}
+                        Left Today: <span className={leftTodayNumber}>{dailyLimit - (rowInfo.wordsLearnedToday.length || 0)}</span>
                     </Typography>
                 </div>
                 <div>

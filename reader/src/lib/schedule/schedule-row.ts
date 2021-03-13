@@ -58,7 +58,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public isToReview() {
-        if (this.isLearningOrReviewing()) return false;
+        if (this.isLearning()) return false;
         return this.isOverDue();
     }
 
@@ -76,7 +76,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
         return r.slice(n * -1)
     }
 
-    public isLearningOrReviewing() {
+    public isLearning() {
         if (!this.d.wordRecognitionRecords.length) return false;
         if (!this.isOverDue()) {
             return false;

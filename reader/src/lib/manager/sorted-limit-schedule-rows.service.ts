@@ -37,7 +37,7 @@ export class SortedLimitScheduleRowsService {
                     r => r.isLearnedToday()
                 );
                 const wordsReviewingOrLearning = sortedScheduleRows.filter(
-                    r => r.isLearningOrReviewing()
+                    r => r.isLearning()
                 )
                 const wordsWhichHaventBeenStarted = sortedScheduleRows.filter(
                     scheduleRow => scheduleRow.d.wordCountRecords.length && !scheduleRow.isUnlearned()

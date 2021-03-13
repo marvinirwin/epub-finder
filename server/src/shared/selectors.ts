@@ -49,6 +49,11 @@ export const wordCardDescription =  'wordCardDescription '
 export const wordCardLearningLanguage =  'wordCardLearningLanguage '
 export const wordCardRomanization =  'wordCardRomanization '
 export const wordCardTranslation =  'wordCardTranslation '
+export const quizLearningNumber = 'quizLearningNumber' ;
+export const quizToReviewNumber = 'quizToReviewNumber' ;
+export const quizUnlearnedNumber = 'quizUnlearnedNumber' ;
+export const leftTodayNumber = 'leftTodayNumber';
+
 
 
 

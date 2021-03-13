@@ -5,7 +5,6 @@ export class SerializedTabulationAggregate {
     serializedTabulations: SerializedDocumentTabulation[];
 
     constructor(serializedTabulations: SerializedDocumentTabulation[]) {
-        debugger;
         this.serializedTabulations = serializedTabulations;
     }
 
