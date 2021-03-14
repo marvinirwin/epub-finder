@@ -7,7 +7,8 @@ import {noMoreQuizCards} from "@shared/";
 export const QuizCardLimitReached = () => {
     const m = useContext(ManagerContext);
     const limit = useObservableState(m.settingsService.newQuizWordLimit$) || 0;
+    const cardsDoneToday = useObservableState(m.scheduleService.cardsLearnedToday$)?.length || 0
     return <Typography className={noMoreQuizCards} variant='h3'>
-        Quiz Card Limit {limit} reached
+        Quiz Card Limit {cardsDoneToday} / {limit} reached
     </Typography>
 }

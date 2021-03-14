@@ -27,7 +27,7 @@ export class ScheduleService {
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
     private db: DatabaseService;
-    private wordsCompletedToday$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
+    cardsLearnedToday$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
 
     constructor({
                     db,
@@ -94,7 +94,7 @@ export class ScheduleService {
             shareReplay(1)
         );
 
-        this.wordsCompletedToday$ = this.sortedScheduleRows$.pipe(
+        this.cardsLearnedToday$ = this.sortedScheduleRows$.pipe(
             map(
                 rows => rows.filter(row => row.wasLearnedToday())
             )

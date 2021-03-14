@@ -36,12 +36,12 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                 m.hotkeyEvents.quizResultEasy$.next()
             }
         })
-    const cardsLearnedToday = useObservableState(m.scheduleService.learningCards$) || 0;
+    const cardsLearnedToday = useObservableState(m.scheduleService.cardsLearnedToday$)?.length || 0;
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0;
     const cardLimitReached = cardsLearnedToday >= cardLimit;
     return <Paper className='quiz-card' {...props}>
         {
-            cardLimitReached ?
+            !cardLimitReached ?
                 <Fragment>
                     <div className={'quiz-card-data-sheet'}>
                         <div>
