@@ -28,7 +28,6 @@ export const TreeMenu: React.FunctionComponent<{
         children
     }
 ) => {
-    const useMinified = false;
     const visibleTreeNodes = new Set(
         Object.values(walkTree(tree, ...directoryPath)?.children || {})
         .filter(treeNode => !treeNode?.value?.hidden)
