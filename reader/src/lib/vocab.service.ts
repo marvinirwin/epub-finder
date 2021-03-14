@@ -17,12 +17,12 @@ export class VocabService {
         {
             settingsService,
             documentRepository,
-            scheduleRowsService,
+            quizCardScheduleRowsService,
             tabulationConfigurationService
         }: {
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
-            scheduleRowsService: QuizCardScheduleRowsService,
+            quizCardScheduleRowsService: QuizCardScheduleRowsService,
             tabulationConfigurationService: TabulationConfigurationService
         }
     ) {
@@ -35,7 +35,7 @@ export class VocabService {
                 return selectedDocument ? [
                     new FrequencyDocument(
                         selectedDocument,
-                        scheduleRowsService.indexedScheduleRows$
+                        quizCardScheduleRowsService.indexedScheduleRows$
                             .pipe(
                                 map(indexedScheduleRows =>
                                     new Map(Object.entries(indexedScheduleRows))

@@ -1,8 +1,10 @@
 import {ScheduleService} from "./schedule/schedule.service";
 import {combineLatest, Observable} from "rxjs";
-import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {SettingsService} from "../services/settings.service";
 import {debounceTime, map, shareReplay} from "rxjs/operators";
+import {sumWordCountRecords} from "./schedule/schedule-math.service";
+import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 
 export class FilterScheduleTableRowsService {
     public filteredScheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
@@ -10,14 +12,14 @@ export class FilterScheduleTableRowsService {
         scheduleService,
         settingsService
                 }: {
-        scheduleService: ScheduleService,
+        scheduleService: QuizCardScheduleRowsService,
         settingsService: SettingsService
     }) {
         this.filteredScheduleRows$ = combineLatest([
             settingsService.scheduleTableWordFilterValue$,
             settingsService.scheduleTableShowUnderDue$,
             settingsService.scheduleTableShowUncounted$,
-            scheduleService.sortedScheduleRows$
+            scheduleService.indexedScheduleRows$.pipe(map(v => Object.values(v)))
         ]).pipe(
             debounceTime(500),
             map(([scheduleTableWordFilterValue, showUnderDue, showUncounted, sortedScheduleRows]) => {
@@ -29,7 +31,7 @@ export class FilterScheduleTableRowsService {
                     filterFuncs.push(r => r.dueDate() > now);
                 }
                 if (!showUncounted) {
-                    filterFuncs.push(r => r.count() > 0)
+                    filterFuncs.push(r => sumWordCountRecords(r) > 0)
                 }
                 return sortedScheduleRows.filter(row => filterFuncs.every(filterFunc => filterFunc(row)))
             }),

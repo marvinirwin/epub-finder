@@ -4,9 +4,7 @@ import {getSortValue} from "../manager/sort-value.interface";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
-function sumWordCountRecords(row: ScheduleRow<QuizScheduleRowData>) {
-    return sum(row.d.wordCountRecords.map(w => w.count));
-}
+export const sumWordCountRecords = (row: ScheduleRow<QuizScheduleRowData>) => sum(row.d.wordCountRecords.map(w => w.count));
 
 export class ScheduleMathService {
     public static normalizeAndSortQuizScheduleRows(

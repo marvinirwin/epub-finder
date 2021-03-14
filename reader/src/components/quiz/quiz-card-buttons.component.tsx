@@ -20,7 +20,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
     const m = useContext(ManagerContext);
     const word = useObservableState((quizCard.word$));
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
-    const rowInfo = useObservableState(m.sortedLimitScheduleRowsService.sortedLimitedScheduleRows$) || {
+    const rowInfo = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$) || {
         wordsToReview: [],
         limitedScheduleRows: [],
         wordsLearnedToday: [],
@@ -33,38 +33,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
         () => quizCard.answerIsRevealed$.next(true))
     return <div className={'quiz-button-row'}>
         {answerIsRevealed ?
-            <Fragment>
-                <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
-                    <Button
-                        className={QUIZ_BUTTON_HARD}
-                        onClick={() => m.hotkeyEvents.quizResultHard$.next()}>
-                        Hard
-                    </Button>
-                </HotkeyWrapper>
-                <HotkeyWrapper action={"QUIZ_RESULT_MEDIUM"}>
-                    <Button
-                        className={QUIZ_BUTTON_MEDIUM}
-                        onClick={() => m.hotkeyEvents.quizResultMedium$.next()}>
-                        Medium
-                    </Button>
-                </HotkeyWrapper>
-                <HotkeyWrapper action={"QUIZ_RESULT_EASY"}> <Button
-                    className={QUIZ_BUTTON_EASY}
-                    onClick={() => m.hotkeyEvents.quizResultEasy$.next()}
-                >
-                    Easy
-                </Button>
-                </HotkeyWrapper>
-                <Button
-                    className={QUIZ_BUTTON_IGNORE}
-                    onClick={() => {
-                        if (word) {
-                            m.ignoredWordsRepository.addRecords$.next([{word, timestamp: new Date()}])
-                        }
-                    }}>
-                    Ignore
-                </Button>
-            </Fragment> :
+             :
             <div>
                 <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', margin: '24px'}}>
                     <Typography>

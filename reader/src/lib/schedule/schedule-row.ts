@@ -5,7 +5,7 @@ import {sum} from "lodash";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
 import {isSameDay} from 'date-fns';
-import { formatDistance, subDays } from 'date-fns'
+import {formatDistance, subDays} from 'date-fns'
 import {SuperMemoGrade, SuperMemoItem} from "supermemo";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
@@ -23,7 +23,8 @@ export type ScheduleRowRecord = SuperMemoItem & {
     grade: SuperMemoGrade;
     timestamp: Date;
 };
-export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData{
+
+export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData {
     count: SortValue<number>;
     dueDate: SortValue<Date>;
     length: SortValue<number>;
@@ -40,7 +41,14 @@ export interface SortValue<T> {
     weight: number;
 }
 
-export type ScheduleRowItem = { nextDueDate: Date, grade: SuperMemoGrade, timestamp: Date, repitition: number };
+export type ScheduleRowItem = {
+    nextDueDate: Date,
+    grade: SuperMemoGrade,
+    timestamp: Date,
+    repetition: number,
+    interval: number,
+    efactor: number
+};
 
 export class ScheduleRow<T> {
     private _dueDate: Date;
@@ -119,8 +127,8 @@ export class ScheduleRow<T> {
         return lastTwoRecords.length === 2 && lastTwoRecords
             .every(
                 r => r.grade >= 3 &&
-                isSameDay(r.timestamp, new Date()) &&
-                (r.nextDueDate || 0) > new Date()
+                    isSameDay(r.timestamp, new Date()) &&
+                    (r.nextDueDate || 0) > new Date()
             );
     }
 

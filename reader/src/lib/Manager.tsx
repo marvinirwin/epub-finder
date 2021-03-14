@@ -96,6 +96,8 @@ import {WordsService} from "./words.service";
 import {TabulationConfigurationService} from "./tabulation-configuration.service";
 import {TranslationAttemptScheduleService} from "./schedule/translation-attempt-schedule.service";
 import {TranslationAttemptRepository} from "./schedule/translation-attempt.repository";
+import {QuizScheduleRowData} from "./schedule/schedule-row";
+import {TranslationAttemptService} from "../components/translation-attempt/translation-attempt.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -125,7 +127,7 @@ export class Manager {
     public audioRecordingService: AudioManager;
     public cardsRepository: CardsRepository;
     public openDocumentsService: OpenDocumentsService;
-    public scheduleService: ScheduleService;
+    public quizCardScheduleService: ScheduleService<QuizScheduleRowData>;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
     public browserInputs: BrowserInputs;
@@ -191,7 +193,7 @@ export class Manager {
     public quizHighlightService: QuizHighlightService;
     public vocabService: VocabService;
     public filterScheduleTableRowsService: FilterScheduleTableRowsService;
-    sortedLimitScheduleRowsService: SortedLimitScheduleRowsService;
+    sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService;
     wordCardModalService: WordCardModalService;
     public loadingMessagesService: LoadingMessagesService;
     notableSubsequencesService: NotableSubsequencesService;
@@ -199,6 +201,7 @@ export class Manager {
     tabulationConfigurationService: TabulationConfigurationService;
     translationAttemptScheduleService: TranslationAttemptScheduleService;
     translationAttemptRepository: TranslationAttemptRepository;
+    translationAttemptService: TranslationAttemptService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -272,14 +275,18 @@ export class Manager {
         this.readingWordCounts$ = documentwordCounts;
         this.readingwordSentenceMap = sentenceMap$;
         this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this);
-        this.scheduleService = new ScheduleService({
+        this.quizCardScheduleService = new ScheduleService({
             scheduleRowsService: this.quizCardScheduleRowsService,
         });
-        this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
+        this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService({
+            settingsService: this.settingsService,
+            scheduleService: this.quizCardScheduleRowsService
+        })
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
         this.translationAttemptRepository = new TranslationAttemptRepository(this)
         this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
+        this.translationAttemptService = new TranslationAttemptService(this)
 
 
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
@@ -299,7 +306,7 @@ export class Manager {
         });
         this.quizManager = new QuizManager();
         const s = new QuizResultService({
-            srmService: this.scheduleService.srmService,
+            srmService: this.quizCardScheduleService.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
             scheduleRowsService: this.quizCardScheduleRowsService,
@@ -310,11 +317,11 @@ export class Manager {
             .subscribe(metadata => {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
             })
-        CardScheduleQuiz(this.cardsRepository, this.scheduleService, this.quizManager);
+        CardScheduleQuiz(this.cardsRepository, this.quizCardScheduleService, this.quizManager);
         InputPage(this.browserInputs, this.openDocumentsService);
         CardPage(this.cardsRepository, this.openDocumentsService);
         InputQuiz(this.browserInputs, this.quizManager)
-        ScheduleQuiz(this.scheduleService, this.quizManager);
+        ScheduleQuiz(this.quizCardScheduleService, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioRecordingService)
 
         this.openDocumentsService.renderedSegments$.subscribe(segments => {
@@ -437,8 +444,12 @@ export class Manager {
         this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this);
         this.vocabService = new VocabService(this)
         this.progressTreeService = new FrequencyTreeService(this);
-        this.quizHighlightService = new QuizHighlightService( this )
-        this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(this);
+        this.quizHighlightService = new QuizHighlightService(this)
+        this.filterScheduleTableRowsService = new FilterScheduleTableRowsService({
+                scheduleService: this.quizCardScheduleRowsService,
+                settingsService: this.settingsService
+            }
+        );
         this.wordCardModalService = new WordCardModalService(this)
         this.loadingMessagesService = new LoadingMessagesService(this);
 

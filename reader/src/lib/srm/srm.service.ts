@@ -16,7 +16,7 @@ export const RecognitionMap: {[key: string]: SuperMemoGrade} = {
 }
 
 export class SrmService {
-    constructor() { }
+    constructor() {}
 
     private static getProgressScore(rows: ScheduleRowItem[]): number {
         return rows[rows.length - 1]?.repetition || 0;
@@ -26,8 +26,8 @@ export class SrmService {
         return 3
     }
 
-    getNextRecognitionRecord(
-        previousRows: WordRecognitionRow[],
+    public static getNextRecognitionRecord(
+        previousRows: ScheduleRowItem[],
         score: SuperMemoGrade,
     ): SuperMemoItem {
         const mostRecentRow: SuperMemoItem = previousRows[previousRows.length - 1] || {

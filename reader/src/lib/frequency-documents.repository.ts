@@ -38,12 +38,12 @@ export class FrequencyDocumentsRepository {
 
     constructor(
         {
-            scheduleRowsService,
+            quizCardScheduleRowsService,
             settingsService,
             documentRepository,
             tabulationConfigurationService
         }: {
-            scheduleRowsService: QuizCardScheduleRowsService,
+            quizCardScheduleRowsService: QuizCardScheduleRowsService,
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
             tabulationConfigurationService: TabulationConfigurationService
@@ -59,7 +59,7 @@ export class FrequencyDocumentsRepository {
                     if (documentSelectedForFrequency) {
                         const frequencyDocument = new FrequencyDocument(
                             documentSelectedForFrequency,
-                            scheduleRowsService.indexedScheduleRows$
+                            quizCardScheduleRowsService.indexedScheduleRows$
                                 .pipe(
                                     map(indexedScheduleRows => new Map(Object.entries(indexedScheduleRows))),
                                     shareReplay(1)

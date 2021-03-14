@@ -3,7 +3,8 @@ import {ScheduleService} from "../schedule/schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
-import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
+import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
@@ -22,11 +23,11 @@ export class SortedLimitScheduleRowsService {
         }: {
 
             settingsService: SettingsService,
-            scheduleService: ScheduleService,
+            scheduleService: QuizCardScheduleRowsService,
         }
     ) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            scheduleService.sortedScheduleRows$,
+            scheduleService.indexedScheduleRows$.pipe(map(index => Object.values(index))),
             settingsService.newQuizWordLimit$,
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit]) => {

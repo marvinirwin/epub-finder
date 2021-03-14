@@ -13,10 +13,11 @@ import {SettingsService} from "../../services/settings.service";
 import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
 import {wordCardFactory} from "./card-card.factory";
 import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
+import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
-    .filter(r => r.count() > 0);
+    .filter(r => sumWordCountRecords(r) > 0);
 
 export const computeRandomHiddenQuizFields = () => {
     return hiddenDefinition;
@@ -35,7 +36,7 @@ export class QuizService {
     constructor(
         {
             cardsRepository,
-            sortedLimitScheduleRowsService,
+            sortedLimitedQuizScheduleRowsService,
             exampleSentencesService,
             openDocumentsService,
             languageConfigsService,
@@ -43,7 +44,7 @@ export class QuizService {
             tabulationConfigurationService
         }: {
             cardsRepository: CardsRepository
-            sortedLimitScheduleRowsService: SortedLimitScheduleRowsService,
+            sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService,
             languageConfigsService: LanguageConfigsService,
@@ -52,7 +53,7 @@ export class QuizService {
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
-        this.currentScheduleRow$ = sortedLimitScheduleRowsService.sortedLimitedScheduleRows$.pipe(
+        this.currentScheduleRow$ = sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$.pipe(
             map(rows => filterQuizRows(rows.limitedScheduleRows)[0]),
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
