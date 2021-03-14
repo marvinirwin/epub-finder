@@ -39,5 +39,12 @@ describe('document tabulation', () => {
             expect(tabulation.greedyWordCounts.get('你好')).toBe(1);
             expect(tabulation.greedyWordCounts.get('你')).toBeFalsy()
         }
-    )
+    );
+    it('Tabulates sentences', async () => {
+        const tabulation = await tabulateService.tabulateNoCache(
+            {where: {name: "Test Html 3 Sentences"}},
+            ['你好', '你', '好', '今', '天', '今天']
+        );
+
+    })
 })

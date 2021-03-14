@@ -1,12 +1,11 @@
 import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
 import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
-import {orderBy, sum} from "lodash";
+import {sum} from "lodash";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
-import humanizeDuration from "humanize-duration";
 import {isSameDay} from 'date-fns';
-import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+import { formatDistance, subDays } from 'date-fns'
 
 
 export interface ScheduleRowData {
@@ -107,7 +106,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
         return !this.isUnrecognized() && !this.isSomewhatRecognized()
     }
 
-    isLearnedToday() {
+    wasLearnedToday() {
         const lastTwoRecords = ScheduleRow.lastNRecords(
             this.d.wordRecognitionRecords,
             2

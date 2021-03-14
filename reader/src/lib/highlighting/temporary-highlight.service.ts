@@ -3,7 +3,7 @@ import {RGBA} from "./color.service";
 import {HighlighterService} from "./highlighter.service";
 import {map} from "rxjs/operators";
 import CardsRepository from "../manager/cards.repository";
-import {sleep} from "../Util/Util";
+import {sleep} from "../util/Util";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
 
 export function removePunctuation(withPunctuation: string) {

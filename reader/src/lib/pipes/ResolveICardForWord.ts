@@ -2,7 +2,7 @@ import {combineLatest, Observable} from "rxjs";
 import {Dictionary} from "lodash";
 import {ICard} from "../../../../server/src/shared/ICard";
 import {catchError, map, shareReplay, withLatestFrom} from "rxjs/operators";
-import {cardForWord} from "../Util/Util";
+import {cardForWord} from "../util/Util";
 
 export const resolveICardForWord = <T, U>(icardMap$: Observable<Dictionary<ICard[]>>) => (obs$: Observable<T>): Observable<U> =>
     obs$.pipe(

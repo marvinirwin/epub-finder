@@ -1,19 +1,10 @@
-import {mergeDocumentWordCounts, TabulatedDocuments, TabulatedSentences} from "@shared/";
+import {mergeDocumentWordCounts, TabulatedDocuments, TabulatedSegments} from "@shared/";
 import {Dictionary} from "lodash";
 import {safePushMap} from "@shared/";
+import {tabulationFactory} from "../../../server/src/shared/tabulation/tabulate";
 
-export const mergeTabulations = <T extends TabulatedSentences>(...sentenceInfos: T[]): TabulatedDocuments => {
-    const aggregateSentenceInfo: TabulatedDocuments = {
-        wordElementsMap: {},
-        wordSegmentMap: {},
-        wordCounts: {},
-        segments: [],
-        documentWordCounts: {},
-        atomMetadatas: new Map(),
-        wordSegmentStringsMap: new Map(),
-        greedyWordCounts: new Map(),
-        greedyDocumentWordCounts: new Map()
-    };
+export const mergeTabulations = <T extends TabulatedSegments>(...sentenceInfos: T[]): TabulatedDocuments => {
+    const aggregateSentenceInfo: TabulatedDocuments = tabulationFactory();
 
     function merge<T>(dict: Dictionary<T[]>, aggregateDict: Dictionary<T[]>) {
         for (const key in dict) {

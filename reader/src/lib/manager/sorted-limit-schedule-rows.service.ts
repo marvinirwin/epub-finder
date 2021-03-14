@@ -34,7 +34,7 @@ export class SortedLimitScheduleRowsService {
                     r => r.d.wordCountRecords.length && r.isToReview()
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
-                    r => r.isLearnedToday()
+                    r => r.wasLearnedToday()
                 );
                 const wordsReviewingOrLearning = sortedScheduleRows.filter(
                     r => r.isLearning()

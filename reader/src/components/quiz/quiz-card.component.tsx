@@ -10,10 +10,9 @@ import {observableLastValue} from "../../services/settings.service";
 import {flatten, uniq} from "lodash";
 import {CardInfo} from "../../lib/schedule/quiz-card-current-card-info.component";
 import {QuizCardProgress} from "../../lib/schedule/quiz-card-progress.component";
-import {quizCardLearningLanguage} from "@shared/";
 import {QuizCardButtons} from "./quiz-card-buttons.component";
 import {useIsFieldHidden} from "./useIsFieldHidden";
-import {EmptyQuizCard} from "./empty-quiz-card.component";
+import {QuizCardLimitReached} from "./empty-quiz-card.component";
 import {CardLearningLanguageText} from "../word-paper.component";
 
 
@@ -37,9 +36,12 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                 m.hotkeyEvents.quizResultEasy$.next()
             }
         })
+    const cardsLearnedToday = useObservableState(m.scheduleService.learningCards$) || 0;
+    const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0;
+    const cardLimitReached = cardsLearnedToday >= cardLimit;
     return <Paper className='quiz-card' {...props}>
         {
-            word ?
+            cardLimitReached ?
                 <Fragment>
                     <div className={'quiz-card-data-sheet'}>
                         <div>
@@ -48,7 +50,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                         <div className={'quiz-card-data-sheet-middle'}>
                             <CardImage quizCard={quizCard}/>
                             {
-                                !isLearningLanguageHidden && <CardLearningLanguageText word={word}/>
+                                !isLearningLanguageHidden && <CardLearningLanguageText word={word || ''}/>
                             }
                         </div>
                         <div>
@@ -58,7 +60,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                     <OpenDocumentComponent openedDocument={quizCard.exampleSentenceOpenDocument}/>
                     <QuizCardButtons quizCard={quizCard}/>
                 </Fragment> :
-                <EmptyQuizCard/>
+                <QuizCardLimitReached/>
         }
 
 

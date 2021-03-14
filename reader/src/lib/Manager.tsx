@@ -11,7 +11,6 @@ import CardsRepository from "./manager/cards.repository";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 import {QuizManager} from "./manager/QuizManager";
 import {BrowserInputs} from "./hotkeys/browser-inputs";
-import {resolveICardForWord} from "./pipes/ResolveICardForWord";
 import {CardScheduleQuiz} from "./manager/manager-connections/Card-Schedule-Quiz";
 import {InputPage} from "./manager/manager-connections/Input-Page";
 import {CardPage} from "./manager/manager-connections/Card-Page";
@@ -19,13 +18,12 @@ import {InputQuiz} from "./manager/manager-connections/Input-Quiz";
 import {ScheduleQuiz} from "./manager/manager-connections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./manager/CreatedSentenceManager";
 import {Segment} from "@shared/";
-import {mergeDictArrays} from "./Util/mergeAnnotationDictionary";
+import {mergeDictArrays} from "./util/mergeAnnotationDictionary";
 import EditingCardManager from "./manager/EditingCardManager";
 import {CardPageEditingCardCardDBAudio} from "./manager/manager-connections/Card-Page-EditingCard-CardDB-Audio";
 import {ProgressManager} from "./manager/ProgressManager";
 import {AppContext} from "./app-context/AppContext";
-import {RecordRequest} from "./Util/RecordRequest";
-import {resolveICardForWords} from "./pipes/ResultICardForWords";
+import {RecordRequest} from "./util/RecordRequest";
 import {DocumentWordCount} from "../../../server/src/shared/DocumentWordCount";
 import {Highlighter} from "./highlighting/Highlighter";
 import {HotKeyEvents} from "./HotKeyEvents";
@@ -93,6 +91,7 @@ import {VocabService} from "./vocab.service";
 import {FilterScheduleTableRowsService} from "./filter-schedule-table-rows.service";
 import {SortedLimitScheduleRowsService} from "./manager/sorted-limit-schedule-rows.service";
 import {WordCardModalService} from "./word-card-modal.service";
+import {LoadingMessagesService} from "./loading/loading-messages.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -191,6 +190,7 @@ export class Manager {
     public filterScheduleTableRowsService: FilterScheduleTableRowsService;
     sortedLimitScheduleRowsService: SortedLimitScheduleRowsService;
     wordCardModalService: WordCardModalService;
+    public loadingMessagesService: LoadingMessagesService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -450,6 +450,7 @@ export class Manager {
         this.quizHighlightService = new QuizHighlightService( this )
         this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(this);
         this.wordCardModalService = new WordCardModalService(this)
+        this.loadingMessagesService = new LoadingMessagesService(this);
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

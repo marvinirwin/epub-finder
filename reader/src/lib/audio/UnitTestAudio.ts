@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject, Subject} from "rxjs";
 import {withLatestFrom, take, shareReplay} from "rxjs/operators";
-import {sleep} from "../Util/Util";
-import {MakeQuerablePromise} from "../Util/QueryablePromise";
+import {sleep} from "../util/Util";
+import {MakeQuerablePromise} from "../util/QueryablePromise";
 import {AudioSource} from "./AudioSource";
 
 export class UnitTestAudio implements AudioSource {

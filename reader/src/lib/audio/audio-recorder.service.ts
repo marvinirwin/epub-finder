@@ -1,7 +1,7 @@
 import {Observable, race, ReplaySubject, Subject} from "rxjs";
 import {filter, map, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
-import {RecordRequest} from "../Util/RecordRequest";
-import {sleep} from "../Util/Util";
+import {RecordRequest} from "../util/RecordRequest";
+import {sleep} from "../util/Util";
 import {AudioSource} from "./AudioSource";
 import {transliterate} from "../transliterate.service";
 import {LanguageConfigsService} from "../language-configs.service";

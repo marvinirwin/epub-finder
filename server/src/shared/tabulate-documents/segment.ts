@@ -4,9 +4,10 @@ import {IWordInProgress} from "../Annotation/IWordInProgress";
 import {IPositionedWord} from "../Annotation/IPositionedWord";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
-import {TabulatedSentences} from "./tabulated-documents.interface";
-import {safePushSet} from "../safe-push";
-import {SetWithUniqueLengths} from "./set-with-unique-lengths";
+import {TabulatedSegments} from "./tabulated-documents.interface";
+import {safePush, safePushMap, safePushSet} from "../safe-push";
+import {TabulationConfiguration, tabulationFactory, WordCountRecord} from "../tabulation/tabulate";
+
 
 export class Segment {
     _translation: string | undefined;
@@ -24,41 +25,61 @@ export class Segment {
     }
 
     static tabulate(
-        t: SetWithUniqueLengths,
-        segments: Segment[],
-    ): TabulatedSentences {
-        const greedyWordCounts = new Map<string, number>();
+        {
+            notableCharacterSequences,
+            segments,
+            greedyWordSet
+        }: TabulationConfiguration
+    ): TabulatedSegments {
+        const tabulationObject = tabulationFactory();
         const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
+        const {
+            greedyWordCounts,
+            wordSegmentMap,
+            wordSegmentStringsMap,
+            segmentWordCountRecordsMap,
+            wordCounts,
+            atomMetadatas,
+            wordElementsMap,
+            greedyDocumentWordCounts
+        } = tabulationObject
+
         const characterElements = flatten(segments.map(segment => {
             segment.children.forEach(node => elementSegmentMap.set(node, segment));
             return segment.children;
         })).filter(n => (n.textContent).trim());
-        const uniqueLengths = uniq(Array.from(t.uniqueLengths).concat(1));
-        const wordCounts: Dictionary<number> = {};
-        const wordElementsMap: Dictionary<AtomMetadata[]> = {};
-        const wordSegmentMap: Dictionary<Set<Segment>> = {};
-        const atomMetadatas = new Map<XMLDocumentNode, AtomMetadata>();
-        let wordsInProgress: IWordInProgress[] = [];
+        const uniqueLengths = uniq(Array.from(notableCharacterSequences.uniqueLengths).concat(1));
         const textContent = characterElements.map(node => node.textContent).join('');
+        let notableSubsequencesInProgress: IWordInProgress[] = [];
         let greedyWord: IWordInProgress | undefined;
-
-        const newGreedyWord = () => {
-            const chosenGreedyWord = maxBy(wordsInProgress, wordInProgress => wordInProgress.word.length);
-            if (chosenGreedyWord){
-                if (!greedyWordCounts.get(chosenGreedyWord.word)) {
-                    greedyWordCounts.set(chosenGreedyWord.word, 0)
-                }
-                greedyWordCounts.set(
-                    chosenGreedyWord.word,
-                    greedyWordCounts.get(chosenGreedyWord.word) + 1
-                );
-            }
-            return chosenGreedyWord;
-        };
-
+        let currentSegment;
+        let currentSegmentStart;
         for (let i = 0; i < characterElements.length; i++) {
             const currentMark = characterElements[i];
-            wordsInProgress = wordsInProgress.map(w => {
+            currentSegmentStart++;
+            if (elementSegmentMap.get(currentMark) !== currentSegment) {
+                currentSegment = elementSegmentMap.get(currentMark);
+                currentSegmentStart = i;
+            }
+            const newGreedyWord = () => {
+                const chosenGreedyWord = maxBy(
+                    notableSubsequencesInProgress.filter(wordInProgress => greedyWordSet.has(wordInProgress.word)),
+                    wordInProgress => wordInProgress.word.length
+                );
+                if (chosenGreedyWord) {
+                    if (!greedyWordCounts.get(chosenGreedyWord.word)) {
+                        greedyWordCounts.set(chosenGreedyWord.word, 0)
+                    }
+                    greedyWordCounts.set(
+                        chosenGreedyWord.word,
+                        greedyWordCounts.get(chosenGreedyWord.word) + 1
+                    );
+
+                }
+                return chosenGreedyWord;
+            };
+
+            notableSubsequencesInProgress = notableSubsequencesInProgress.map(w => {
                 w.lengthRemaining--;
                 return w;
             }).filter(w => w.lengthRemaining > 0);
@@ -89,16 +110,26 @@ export class Segment {
              */
             const potentialWords = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
             const wordsWhichStartHere: string[] = potentialWords.reduce((acc: string[], potentialWord) => {
-                if (t.has(potentialWord)) {
-                    safePushSet(wordSegmentMap, potentialWord, elementSegmentMap.get(currentMark))
+                if (notableCharacterSequences.has(potentialWord)) {
+                    safePush(wordSegmentMap, potentialWord, elementSegmentMap.get(currentMark))
                     acc.push(potentialWord);
                 }
                 return acc;
             }, []);
+            wordsWhichStartHere.forEach(wordStartingHere => {
+                safePushMap(
+                    segmentWordCountRecordsMap,
+                    currentSegment as Segment,
+                    {
+                        position: i - currentSegmentStart,
+                        word: wordStartingHere
+                    }
+                )
+            })
             if (!greedyWord) {
                 greedyWord = newGreedyWord();
             }
-            const greedyWordHasEnded = !wordsInProgress.includes(greedyWord);
+            const greedyWordHasEnded = !notableSubsequencesInProgress.includes(greedyWord);
             if (greedyWordHasEnded) {
                 greedyWord = newGreedyWord()
             }
@@ -109,11 +140,11 @@ export class Segment {
              * A single character is a word
              */
             const currentCharacter = textContent[i];
-            if ((wordsWhichStartHere.length === 0 && wordsInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
+            if ((wordsWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
                 wordsWhichStartHere.push(currentCharacter);
             }
 
-            wordsInProgress.push(...wordsWhichStartHere.map(word => {
+            notableSubsequencesInProgress.push(...wordsWhichStartHere.map(word => {
                 // Side effects bad
                 if (wordCounts[word]) {
                     wordCounts[word]++;
@@ -124,7 +155,7 @@ export class Segment {
             }))
 
             // Positioned words, what's this for?
-            const words: IPositionedWord[] = wordsInProgress.map(({word, lengthRemaining}) => {
+            const words: IPositionedWord[] = notableSubsequencesInProgress.map(({word, lengthRemaining}) => {
                 const position = word.length - lengthRemaining;
                 const newPositionedWord: IPositionedWord = {
                     word,
@@ -149,19 +180,12 @@ export class Segment {
                 }
             })
         }
-        const segmentDictionary: Dictionary<Segment[]> = Object.fromEntries(
+        tabulationObject.wordSegmentMap = Object.fromEntries(
             Object.entries(wordSegmentMap)
                 .map(([word, segmentSet]) => [word, Array.from(segmentSet)])
         );
-        return {
-            wordElementsMap,
-            wordCounts,
-            wordSegmentMap: segmentDictionary,
-            segments,
-            atomMetadatas,
-            greedyWordCounts: greedyWordCounts,
-            wordSegmentStringsMap: new Map(Object.entries(segmentDictionary).map(([word, segments]) => [word, new Set(segments.map(segment => segment.translatableText))])),
-        };
+        tabulationObject.wordSegmentStringsMap = new Map(Object.entries(tabulationObject.wordSegmentMap).map(([word, segments]) => [word, new Set(segments.map(segment => segment.translatableText))]))
+        return tabulationObject;
     }
 
     getSentenceHTMLElement(): HTMLElement {

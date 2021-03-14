@@ -4,7 +4,7 @@ import {Dictionary, orderBy, maxBy, flatten} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../../../../server/src/shared/Message";
 import {DatabaseService} from "../Storage/database.service";
-import {cardForWord} from "../Util/Util";
+import {cardForWord} from "../util/Util";
 import {observableLastValue} from "../../services/settings.service";
 import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";
 

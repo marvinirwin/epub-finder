@@ -1,5 +1,5 @@
 /* eslint import/no-webpack-loader-syntax:0 */
-import {GetWorkerResults} from "../Util/GetWorkerResults";
+import {GetWorkerResults} from "../util/GetWorkerResults";
 // @ts-ignore
 import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-src.worker';
 // @ts-ignore

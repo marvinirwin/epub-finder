@@ -4,7 +4,7 @@ import {WavAudio} from "../WavAudio";
 import {flatMap, take} from "rxjs/operators";
 import {AudioSource} from "../audio/AudioSource";
 import {fetchSynthesizedAudio} from "../audio/FetchSynthesizedAudio";
-import {sleep} from "../Util/Util";
+import {sleep} from "../util/Util";
 
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
