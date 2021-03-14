@@ -1,6 +1,7 @@
 import moment from "moment";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {supermemo, SuperMemoGrade, SuperMemoItem} from 'supermemo';
+import {ScheduleRowItem} from "../schedule/schedule-row";
 
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -17,7 +18,7 @@ export const RecognitionMap: {[key: string]: SuperMemoGrade} = {
 export class SrmService {
     constructor() { }
 
-    private static getProgressScore(rows: WordRecognitionRow[]): number {
+    private static getProgressScore(rows: ScheduleRowItem[]): number {
         return rows[rows.length - 1]?.repetition || 0;
     }
 

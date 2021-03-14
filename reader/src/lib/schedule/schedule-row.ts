@@ -40,7 +40,7 @@ export interface SortValue<T> {
     weight: number;
 }
 
-type ScheduleRowItem = { nextDueDate: Date, grade: SuperMemoGrade, timestamp: Date };
+export type ScheduleRowItem = { nextDueDate: Date, grade: SuperMemoGrade, timestamp: Date, repitition: number };
 
 export class ScheduleRow<T> {
     private _dueDate: Date;
