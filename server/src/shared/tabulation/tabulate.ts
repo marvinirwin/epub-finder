@@ -32,6 +32,6 @@ export const tabulationFactory = (): TabulatedDocuments => ({
     segments: [],
     documentWordCounts: {},
     greedyDocumentWordCounts: new Map(),
-    segmentWordCountRecordsMap: new Map<Segment, WordCountRecord[]>(),
+    segmentWordCountRecordsMap: new Map<SerializedSegment, WordCountRecord[]>(),
 })
 

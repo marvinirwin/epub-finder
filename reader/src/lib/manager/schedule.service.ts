@@ -14,10 +14,8 @@ import {filterQuizRows} from "../../components/quiz/quiz.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
-const LEARNING_CARDS_LIMIT = 20;
 
 export class ScheduleService {
-    wordQuizList$: Observable<ScheduleRow[]>;
     sortedScheduleRows$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
     learningCards$: Observable<ScheduleRow[]>;
 
@@ -26,17 +24,14 @@ export class ScheduleService {
     srmService: SrmService;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
-    private db: DatabaseService;
     cardsLearnedToday$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
 
     constructor({
-                    db,
                     scheduleRowsService,
                 }: {
         db: DatabaseService,
         scheduleRowsService: ScheduleRowsService,
     }) {
-        this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
         this.srmService = new SrmService();
@@ -69,28 +64,6 @@ export class ScheduleService {
         // First take from the learning
         // Second take from the overdue
         // Third take from the new
-
-        this.wordQuizList$ = combineLatest([
-            this.learningCards$,
-            this.toReviewCards$,
-            this.newCards$
-        ]).pipe(
-            map(([learningCards, toReviewCards, newCards]) => {
-                    const learningCardsRequired = LEARNING_CARDS_LIMIT - (learningCards.length + toReviewCards.length);
-                    if (learningCardsRequired > 0) {
-                        const collection1 = [
-                            ...learningCards,
-                            ...toReviewCards,
-                            ...(newCards.slice(0, learningCardsRequired) || [])
-                        ];
-                        return uniqueBy(collection1, w => w.d.word);
-                    }
-                    const collection = [...learningCards, ...toReviewCards, ...newCards];
-                    return uniqueBy(collection, w => w.d.word);
-                }
-            ),
-            shareReplay(1)
-        );
 
         this.cardsLearnedToday$ = this.sortedScheduleRows$.pipe(
             map(

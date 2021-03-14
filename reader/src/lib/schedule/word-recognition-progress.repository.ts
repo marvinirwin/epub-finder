@@ -7,7 +7,8 @@ export class WordRecognitionProgressRepository extends IndexedRowsRepository<Wor
         super({
             db,
             load: () => db.getWordRecordsGenerator(db.wordRecognitionRecords),
-            add: (r) => db.wordRecognitionRecords.add(r)
+            add: (r) => db.wordRecognitionRecords.add(r),
+            getIndexValue: r => ({indexValue: r.word})
         });
     }
 }

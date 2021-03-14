@@ -5,17 +5,18 @@ import {orderBy, flatten} from "lodash";
 import {DatabaseService} from "../Storage/database.service";
 import {safePush} from "@shared/";
 
-export class IndexedRowsRepository<T extends { word: string, id?: number }> {
+export class IndexedRowsRepository<T extends {id?: number}> {
     records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
     recordList$: Observable<T[]>;
     latestRecords$ = new BehaviorSubject<Map<string, T>>(new Map())
     addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1);
     clearRecords$ = new ReplaySubject<void>(1);
 
-    constructor({db, load, add}: {
+    constructor({db, load, add, getIndexValue}: {
         db: DatabaseService,
         load: () => AsyncGenerator<T[]>,
         add: (t: T) => Promise<number>,
+        getIndexValue: (v: T) => ({indexValue: string})
     }) {
         this.records$.next({});
         this.addRecords$.pipe(
@@ -24,9 +25,10 @@ export class IndexedRowsRepository<T extends { word: string, id?: number }> {
             tap(([rows, wordRecognitionRecords]: [T[], ds_Dict<T[]>]) => {
                 const newLatestRecords = new Map<string, T>(this.latestRecords$.getValue());
                 rows.forEach(row => {
-                    safePush(wordRecognitionRecords, row.word, row);
-                    wordRecognitionRecords[row.word] = orderBy(wordRecognitionRecords[row.word], 'timestamp');
-                    newLatestRecords.set(row.word, row);
+                    const {indexValue} = getIndexValue(row)
+                    safePush(wordRecognitionRecords, indexValue, row);
+                    wordRecognitionRecords[indexValue] = orderBy(wordRecognitionRecords[indexValue], 'timestamp');
+                    newLatestRecords.set(indexValue, row);
                 });
                 // This is a hack side effect
                 this.records$.next(wordRecognitionRecords);

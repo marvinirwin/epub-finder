@@ -40,11 +40,20 @@ describe('document tabulation', () => {
             expect(tabulation.greedyWordCounts.get('你')).toBeFalsy()
         }
     );
-    it('Tabulates sentences', async () => {
+    it('Calculates regular word counts, greedy work counts, cross segment counting', async () => {
         const tabulation = await tabulateService.tabulateNoCache(
             {where: {name: "Test Html 3 Sentences"}},
             ['你好', '你', '好', '今', '天', '今天']
         );
-        console.log(tabulation);
+        expect(tabulation.greedyWordCounts.get('你好')).toBe(2);
+        expect(tabulation.greedyWordCounts.get('今天')).toBe(2);
+        expect(tabulation.wordCounts).toEqual({
+            "你好": 2,
+            "你": 2,
+            "好": 2,
+            "今天": 2,
+            "今": 2,
+            "天": 2
+        });
     })
 })

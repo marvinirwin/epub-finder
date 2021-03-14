@@ -6,14 +6,16 @@ import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.i
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {BasicDocument} from "../../types";
 import {IgnoredWord} from "../schedule/ignored-word.interface";
+import {TranslationAttempt} from "../schedule/translation-attempt.repository";
 
 
 export class DatabaseService extends Dexie {
-    static CURRENT_VERSION = 8;
+    static CURRENT_VERSION = 9;
 
 
     public cards: Dexie.Table<ICard, number>;
     public wordRecognitionRecords: Dexie.Table<WordRecognitionRow, number>;
+    public translationAttempts: Dexie.Table<TranslationAttempt, number>;
     public pronunciationRecords: Dexie.Table<PronunciationProgressRow, number>
     public ignoredWords: Dexie.Table<IgnoredWord, number>
 
@@ -26,6 +28,7 @@ export class DatabaseService extends Dexie {
         this.version(DatabaseService.CURRENT_VERSION).stores({
             cards: 'id++, learningLanguage, knownLanguage, deck',
             wordRecognitionRecords: 'id++, word, timestamp',
+            translationAttempts: 'id++, knownLanguage, learningLanguage, timestamp',
             pronunciationRecords: 'id++, word, timestamp',
             ignoredWords: 'id++, word, timestamp',
             settings2: 'name, value',
@@ -40,6 +43,7 @@ export class DatabaseService extends Dexie {
         this.ignoredWords = this.table("ignoredWords");
         this.createdSentences = this.table("createdSentences");
         this.customDocuments = this.table("customDocuments");
+        this.translationAttempts = this.table("translationAttempts");
     }
 
     async getCardsInDatabaseCount(): Promise<number> {
@@ -71,12 +75,11 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async* getWordRecordsGenerator<T extends {word: string}>(table: Dexie.Table<T>, mapFn?: (v:T)=> T): AsyncGenerator<T[]> {
+    async* getWordRecordsGenerator<T>(table: Dexie.Table<T>, mapFn?: (v:T)=> T): AsyncGenerator<T[]> {
         let offset = 0;
         const chunkSize = 500;
         while (await table.offset(offset).first()) {
             const chunkedRecognitionRows = await table.offset(offset).limit(chunkSize).toArray();
-            chunkedRecognitionRows.forEach(r => r.word = r.word.normalize())
             if (mapFn) {
                 yield chunkedRecognitionRows.map(mapFn);
             } else {

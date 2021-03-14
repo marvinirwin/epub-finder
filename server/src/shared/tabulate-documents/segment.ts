@@ -56,7 +56,6 @@ export class Segment {
         let currentSerialzedSegment;
         for (let i = 0; i < characterElements.length; i++) {
             const currentMark = characterElements[i];
-            currentSegmentStart++;
             if (elementSegmentMap.get(currentMark) !== currentSegment) {
                 currentSegment = elementSegmentMap.get(currentMark);
                 segmentIndex++;
@@ -109,15 +108,15 @@ export class Segment {
              *
              * I should have written tests for this
              */
-            const potentialWords = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
-            const wordsWhichStartHere: string[] = potentialWords.reduce((acc: string[], potentialWord) => {
+            const potentialNotableSequences = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
+            const notableSequencesWhichStartHere: string[] = potentialNotableSequences.reduce((acc: string[], potentialWord) => {
                 if (notableCharacterSequences.has(potentialWord)) {
                     safePush(wordSegmentMap, potentialWord, elementSegmentMap.get(currentMark))
                     acc.push(potentialWord);
                 }
                 return acc;
             }, []);
-            wordsWhichStartHere.forEach(wordStartingHere => {
+            notableSequencesWhichStartHere.forEach(wordStartingHere => {
                 safePushMap(
                     segmentWordCountRecordsMap,
                     currentSerialzedSegment as SerializedSegment,
@@ -127,13 +126,6 @@ export class Segment {
                     }
                 )
             })
-            if (!greedyWord) {
-                greedyWord = newGreedyWord();
-            }
-            const greedyWordHasEnded = !notableSubsequencesInProgress.includes(greedyWord);
-            if (greedyWordHasEnded) {
-                greedyWord = newGreedyWord()
-            }
 
             /**
              * If there is a character here which isn't part of a word, add it to the counts
@@ -141,11 +133,11 @@ export class Segment {
              * A single character is a word
              */
             const currentCharacter = textContent[i];
-            if ((wordsWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
-                wordsWhichStartHere.push(currentCharacter);
+            if ((notableSequencesWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
+                notableSequencesWhichStartHere.push(currentCharacter);
             }
 
-            notableSubsequencesInProgress.push(...wordsWhichStartHere.map(word => {
+            notableSubsequencesInProgress.push(...notableSequencesWhichStartHere.map(word => {
                 // Side effects bad
                 if (wordCounts[word]) {
                     wordCounts[word]++;
@@ -154,6 +146,13 @@ export class Segment {
                 }
                 return ({word, lengthRemaining: word.length});
             }))
+            if (!greedyWord) {
+                greedyWord = newGreedyWord();
+            }
+            const greedyWordHasEnded = !notableSubsequencesInProgress.includes(greedyWord);
+            if (greedyWordHasEnded) {
+                greedyWord = newGreedyWord()
+            }
 
             // Positioned words, what's this for?
             const words: IPositionedWord[] = notableSubsequencesInProgress.map(({word, lengthRemaining}) => {
