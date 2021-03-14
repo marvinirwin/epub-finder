@@ -7,26 +7,27 @@ import {DocumentSourcesService} from "./document-sources.service";
 import {OpenDocument} from "./open-document.entity";
 import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language-configs.service";
+import {TabulationConfigurationService} from "../tabulation-configuration.service";
 
 
 export const OpenExampleSentencesFactory = (
     {
         name,
         sentences$,
-        trie$,
+        tabulationConfigurationService,
         settingsService,
         languageConfigsService
     }: {
         name: string,
         sentences$: Observable<string[]>,
-        trie$: Observable<TrieWrapper>,
+        tabulationConfigurationService: TabulationConfigurationService
         settingsService: SettingsService,
         languageConfigsService: LanguageConfigsService
     }
 ) => {
     return new OpenDocument(
         name,
-        trie$,
+        tabulationConfigurationService,
         DocumentSourcesService
             .document({
                 unAtomizedDocument$: sentences$

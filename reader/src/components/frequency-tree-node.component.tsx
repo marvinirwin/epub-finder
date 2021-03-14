@@ -39,6 +39,7 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
                 }
 */}
             </div>
+{/*
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '24px'}}>
                 {Object.values(frequencyNode.children || {}).map(child =>
                     <FrequencyTreeNode
@@ -51,5 +52,6 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> =
                         )}
                     />)}
             </div>
+*/}
         </Paper>
     }

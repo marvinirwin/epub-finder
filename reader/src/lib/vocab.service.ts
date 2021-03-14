@@ -7,6 +7,8 @@ import {ScheduleRowsService} from "./manager/schedule-rows.service";
 import {DocumentRepository} from "./documents/document.repository";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
+import {TabulateLocalDocumentDto} from "./Workers/tabulate-local-document.dto";
+import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export class VocabService {
     vocab$: Observable<SerializedTabulation>;
@@ -16,12 +18,12 @@ export class VocabService {
             settingsService,
             documentRepository,
             scheduleRowsService,
-            trieService
+            tabulationConfigurationService
         }: {
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
             scheduleRowsService: ScheduleRowsService,
-            trieService: TrieService
+            tabulationConfigurationService: TabulationConfigurationService
         }
     ) {
         const observable = combineLatest([
@@ -40,7 +42,7 @@ export class VocabService {
                                 ),
                                 shareReplay(1)
                             ),
-                        trieService.trie$
+                        tabulationConfigurationService
                     )
                 ] : [];
             }),
@@ -67,7 +69,8 @@ export class VocabService {
                         greedyWordCounts: new Map<string, number>(
                             knownWordEntries
                         ),
-                        wordSegmentStringsMap: new Map()
+                        wordSegmentStringsMap: new Map(),
+                        segmentWordCountRecordsMap: new Map()
                     }
                 }
                 return selectedTabulation.tabulation

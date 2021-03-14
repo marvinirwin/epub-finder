@@ -152,26 +152,4 @@ export default class CardsRepository {
             this.addCardsWhichDoNotHaveToBePersisted$.next(cards);
         }
     }
-
-    public putWords(words: string[]) {
-        this.addCardsWhichDoNotHaveToBePersisted$.next(
-            words.map(cardForWord)
-        )
-    }
-    public putMouseoverDisabledWords(words: string[]) {
-        this.addCardsWhichDoNotHaveToBePersisted$.next(
-            words.map(cardForWord).map(card => {
-                card.highlightOnly = true;
-                return card
-           })
-        )
-    }
-    public putSyntheticWords(words: string[]) {
-        this.addCardsWhichDoNotHaveToBePersisted$.next(
-            words.map(cardForWord).map(card => {
-                card.synthetic = true;
-                return card
-            })
-        )
-    }
 }

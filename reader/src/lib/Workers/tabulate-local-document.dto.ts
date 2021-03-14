@@ -1,1 +1,6 @@
-export type TabulateLocalDocumentDto = { trieWords: string[], src: string, label: string };
+export type TabulateLocalDocumentDto = {
+    notableSubsequences: string[],
+    words: string[],
+    src: string,
+    label: string
+};

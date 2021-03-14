@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {combineLatest, Observable} from "rxjs";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
 import {ScheduleRowsService} from "./manager/schedule-rows.service";
@@ -6,6 +6,7 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 import {SettingsService} from "../services/settings.service";
 import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
 import {DocumentRepository} from "./documents/document.repository";
+import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export const tabulateFrequencyDocuments =
     (frequencyDocuments$: Observable<FrequencyDocument[]>):
@@ -37,15 +38,15 @@ export class FrequencyDocumentsRepository {
 
     constructor(
         {
-            trieService,
             scheduleRowsService,
             settingsService,
-            documentRepository
+            documentRepository,
+            tabulationConfigurationService
         }: {
-            trieService: TrieService,
             scheduleRowsService: ScheduleRowsService,
             settingsService: SettingsService,
-            documentRepository: DocumentRepository
+            documentRepository: DocumentRepository,
+            tabulationConfigurationService: TabulationConfigurationService
         }) {
         this.selected$ = combineLatest([
             documentRepository.collection$,
@@ -63,7 +64,7 @@ export class FrequencyDocumentsRepository {
                                     map(indexedScheduleRows => new Map(Object.entries(indexedScheduleRows))),
                                     shareReplay(1)
                                 ),
-                            trieService.trie$
+                            tabulationConfigurationService
                         );
                         newMap.set(
                             frequencyDocument.frequencyDocument.id(),

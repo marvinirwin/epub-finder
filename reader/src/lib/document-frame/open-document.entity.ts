@@ -1,5 +1,5 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {map, shareReplay, switchMap} from "rxjs/operators";
+import {map, shareReplay} from "rxjs/operators";
 import {
     annotatedAndTranslated,
     AtomizedDocument,
@@ -8,9 +8,6 @@ import {
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
 } from "@shared/";
-import {TrieWrapper} from "../TrieWrapper";
-import {ds_Dict} from "../delta-scan/delta-scan.module";
-import {flatten} from "lodash";
 import {TabulateLocalDocument} from "../Workers/worker.helpers";
 import {mergeTabulations} from "../merge-tabulations";
 import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
@@ -18,6 +15,7 @@ import {BrowserSegment} from "../browser-segment";
 import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language-configs.service";
 import {isLoading} from "../util/is-loading";
+import {TabulationConfigurationService} from "../tabulation-configuration.service";
 
 export class OpenDocument {
     public name: string;
@@ -29,7 +27,7 @@ export class OpenDocument {
 
     constructor(
         public id: string,
-        public trie$: Observable<TrieWrapper>,
+        public tabulationConfigurationService: TabulationConfigurationService,
         public atomizedDocument$: Observable<AtomizedDocument>,
         public label: string,
         public settingsService: SettingsService,
@@ -39,12 +37,14 @@ export class OpenDocument {
         this.renderedSegments$.next([]);
         this.renderedTabulation$ = combineLatest([
             this.renderedSegments$,
-            trie$,
+            tabulationConfigurationService.tabulationConfiguration$,
         ]).pipe(
-            map(([segments, trie]) => {
+            map(([segments, tabulationConfiguration]) => {
                     const tabulatedSentences = mergeTabulations(Segment.tabulate(
-                        trie.t,
-                        segments,
+                        {
+                            ...tabulationConfiguration,
+                            segments,
+                        },
                     ));
                     return tabulatedSentenceToTabulatedDocuments(tabulatedSentences, this.label);
                 }
@@ -53,13 +53,14 @@ export class OpenDocument {
         );
         const {isLoading$, obs$} = isLoading(
             combineLatest([
-                this.trie$,
+                this.tabulationConfigurationService.tabulationConfiguration$,
                 this.atomizedDocument$
             ]),
-            ([trie, document]) => {
+            ([tabulationConfiguration, document]) => {
                 return TabulateLocalDocument({
                     label,
-                    trieWords: Array.from(trie.t.values()),
+                    notableSubsequences: [...tabulationConfiguration.notableCharacterSequences.values()],
+                    words: [...tabulationConfiguration.greedyWordSet.values()],
                     src: document._originalSrc
                 })
             },

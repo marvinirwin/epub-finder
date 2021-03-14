@@ -6,7 +6,7 @@ import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
 import {TabulatedSegments} from "./tabulated-documents.interface";
 import {safePush, safePushMap, safePushSet} from "../safe-push";
-import {TabulationConfiguration, tabulationFactory, WordCountRecord} from "../tabulation/tabulate";
+import {TabulationParameters, tabulationFactory, WordCountRecord} from "../tabulation/tabulate";
 
 
 export class Segment {
@@ -29,7 +29,7 @@ export class Segment {
             notableCharacterSequences,
             segments,
             greedyWordSet
-        }: TabulationConfiguration
+        }: TabulationParameters
     ): TabulatedSegments {
         const tabulationObject = tabulationFactory();
         const elementSegmentMap = new Map<XMLDocumentNode, Segment>();

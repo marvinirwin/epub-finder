@@ -6,9 +6,11 @@ import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import {DocumentWordCount} from "../DocumentWordCount";
 
+export type TabulationParameters =  {
+    segments: Segment[],
+} & TabulationConfiguration
 export interface TabulationConfiguration {
     notableCharacterSequences: SetWithUniqueLengths,
-    segments: Segment[],
     greedyWordSet: SetWithUniqueLengths
 }
 

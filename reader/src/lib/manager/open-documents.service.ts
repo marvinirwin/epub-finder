@@ -19,6 +19,7 @@ import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabul
 import {mergeTabulations} from "../merge-tabulations";
 import {LanguageConfigsService} from "../language-configs.service";
 import {BrowserSegment} from "../browser-segment";
+import {TabulationConfigurationService} from "../tabulation-configuration.service";
 
 export type TrieObservable = Observable<TrieWrapper>;
 
@@ -43,11 +44,11 @@ export class OpenDocumentsService {
 
     constructor(
         private config: {
-            trie$: TrieObservable,
             db: DatabaseService;
             settingsService: SettingsService;
             documentRepository: DocumentRepository;
-            languageConfigsService: LanguageConfigsService
+            languageConfigsService: LanguageConfigsService,
+            tabulationConfigurationService: TabulationConfigurationService
         }
     ) {
 
@@ -62,7 +63,7 @@ export class OpenDocumentsService {
                         }
                         const openDocument = new OpenDocument(
                             document.id(),
-                            config.trie$,
+                            config.tabulationConfigurationService,
                             DocumentSourcesService.document(documentSource),
                             document.name,
                             config.settingsService,

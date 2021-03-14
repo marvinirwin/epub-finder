@@ -6,9 +6,14 @@ import {Segment} from "./segment";
 import {ChineseVocabService} from "./chinese-vocab.service";
 
 export const TabulateChineseText = async (text: string) => {
+    const notableCharacterSequencesSegmentsGreedyWordSet = trie(await ChineseVocabService.vocab());
     return Segment.tabulate(
-        trie(await ChineseVocabService.vocab()),
-        AtomizedDocument.atomizeDocument(InterpolateService.text(text)).segments()
+        {
+            notableCharacterSequences: notableCharacterSequencesSegmentsGreedyWordSet,
+            segments: AtomizedDocument.atomizeDocument(InterpolateService.text(text)).segments(),
+            greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet
+        }
+
     )
 
 }

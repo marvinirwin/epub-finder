@@ -46,5 +46,6 @@ describe('document tabulation', () => {
             ['你好', '你', '好', '今', '天', '今天']
         );
 
+
     })
 })

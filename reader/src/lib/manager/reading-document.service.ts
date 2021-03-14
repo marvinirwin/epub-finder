@@ -6,6 +6,7 @@ import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from "./open-documents.service";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {LanguageConfigsService} from "../language-configs.service";
+import {TabulationConfigurationService} from "../tabulation-configuration.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;
@@ -13,13 +14,13 @@ export class ReadingDocumentService {
 
     constructor(
         {
-            trie$,
+            tabulationConfigurationService,
             openDocumentsService,
             settingsService,
             languageConfigsService
         }:
             {
-                trie$: TrieObservable,
+                tabulationConfigurationService: TabulationConfigurationService,
                 openDocumentsService: OpenDocumentsService,
                 settingsService: SettingsService,
                 languageConfigsService: LanguageConfigsService
@@ -27,7 +28,7 @@ export class ReadingDocumentService {
     ) {
         this.readingDocument = new OpenDocument(
             "Reading Document",
-            trie$,
+            tabulationConfigurationService,
             this.displayDocument$.pipe(
                 switchMap(atomizedDocument => {
                     return atomizedDocument;

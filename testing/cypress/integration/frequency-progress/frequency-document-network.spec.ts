@@ -3,7 +3,6 @@ import {DirectoryPom} from "../../support/pom/directory.pom";
 import {SimilarityResults} from "../../../../server/src/shared/compre-similarity-result";
 import {TabulateChineseText} from "../../../../server/src/shared/tabulate-documents/tabulate-chinese-string";
 import Chainable = Cypress.Chainable;
-import {DocumentSimilarityService} from "../../../../server/src/documents/similarity/document-similarity.service";
 import {computeSimilarityTabulation} from "../../../../server/src/shared/similarity-result.interface";
 
 const testFrequencyDocument1 = 'Test Freq1';

@@ -68,13 +68,13 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
             <div>
                 <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', margin: '24px'}}>
                     <Typography>
+                        Cards Unseen: <span className={quizUnlearnedNumber}>{(rowInfo.wordsWhichHaventBeenStarted.length || 0)}</span>
+                    </Typography>
+                    <Typography>
+                        Being Learned: <span className={quizLearningNumber}>{rowInfo.wordsReviewingOrLearning.length}</span>
+                    </Typography>
+                    <Typography>
                         To Review: <span className={quizToReviewNumber}>{rowInfo.wordsToReview.length}</span>
-                    </Typography>
-                    <Typography>
-                        Learning: <span className={quizLearningNumber}>{rowInfo.wordsReviewingOrLearning.length}</span>
-                    </Typography>
-                    <Typography>
-                        Unstarted: <span className={quizUnlearnedNumber}>{(rowInfo.wordsWhichHaventBeenStarted.length || 0)}</span>
                     </Typography>
                     <Typography>
                         Left Today: <span className={leftTodayNumber}>{dailyLimit - (rowInfo.wordsLearnedToday.length || 0)}</span>

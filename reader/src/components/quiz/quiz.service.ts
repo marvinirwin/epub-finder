@@ -13,6 +13,7 @@ import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fi
 import {SettingsService} from "../../services/settings.service";
 import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
 import {wordCardFactory} from "./card-card.factory";
+import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -34,21 +35,21 @@ export class QuizService {
 
     constructor(
         {
-            trie$,
-            cardService,
+            cardsRepository,
             sortedLimitScheduleRowsService,
             exampleSentencesService,
             openDocumentsService,
             languageConfigsService,
-            settingsService
+            settingsService,
+            tabulationConfigurationService
         }: {
-            trie$: Observable<TrieWrapper>,
-            cardService: CardsRepository
+            cardsRepository: CardsRepository
             sortedLimitScheduleRowsService: SortedLimitScheduleRowsService,
             exampleSentencesService: ExampleSegmentsService,
             openDocumentsService: OpenDocumentsService,
             languageConfigsService: LanguageConfigsService,
-            settingsService: SettingsService
+            settingsService: SettingsService,
+            tabulationConfigurationService: TabulationConfigurationService
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
@@ -58,7 +59,7 @@ export class QuizService {
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
             {
-                trie$,
+                tabulationConfigurationService,
                 settingsService,
                 languageConfigsService,
                 name: 'example-sentences',
@@ -89,7 +90,7 @@ export class QuizService {
 
         const wordCard = wordCardFactory(
             currentWord$,
-            cardService,
+            cardsRepository,
             languageConfigsService
         );
 

@@ -1,7 +1,7 @@
 import {ReplaySubject} from "rxjs";
 import {RGBA} from "./color.service";
 import {HighlighterService} from "./highlighter.service";
-import {map} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 import CardsRepository from "../manager/cards.repository";
 import {sleep} from "../util/Util";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
@@ -12,8 +12,10 @@ export function removePunctuation(withPunctuation: string) {
     }).join('');
 }
 
+export type TemporaryHighlightRequest = { word: string, color: RGBA, duration: number };
+
 export class TemporaryHighlightService {
-    private temporaryHighlightRequests$ = new ReplaySubject<{ word: string, color: RGBA, duration: number }>(1)
+    public temporaryHighlightRequests$ = new ReplaySubject< TemporaryHighlightRequest | undefined >(1)
     private cardService: CardsRepository;
 
     constructor(
@@ -28,7 +30,9 @@ export class TemporaryHighlightService {
         this.cardService = cardService;
         highlighterService.timedHighlight(
             this.temporaryHighlightRequests$.pipe(
-                map(({color, word, duration}) =>
+                // @ts-ignore
+                filter((v: TemporaryHighlightRequest | undefined) => v !== undefined),
+                map(({color, word, duration}: TemporaryHighlightRequest) =>
                     (
                         {
                             timeout: duration,
@@ -45,10 +49,10 @@ export class TemporaryHighlightService {
     }
 
     public async highlightTemporaryWord(word: string, color: RGBA, duration: number) {
-        this.cardService.putMouseoverDisabledWords([word]);
         this.temporaryHighlightRequests$.next({word, color, duration});
         await sleep(duration);
-        this.cardService.deleteWords.next([word])
+        // This is gonna fail if there's two temporary highlight requests
+        this.temporaryHighlightRequests$.next(undefined);
     }
 }
 

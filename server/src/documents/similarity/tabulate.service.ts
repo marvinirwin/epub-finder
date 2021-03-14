@@ -39,15 +39,23 @@ export class TabulateService {
 
         const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
         const atomizedDocument = AtomizedDocument.atomizeDocument(text);
+        const setWithUniqueLengths = new SetWithUniqueLengths(words);
         const tabulation = Segment.tabulate(
-            new SetWithUniqueLengths(words),
-            atomizedDocument.segments(),
+            {
+                notableCharacterSequences: setWithUniqueLengths,
+                segments: atomizedDocument.segments(),
+                greedyWordSet: setWithUniqueLengths
+            }
         );
+        return tabulation;
+/*
         return {
             wordCounts: tabulation.wordCounts,
             wordSegmentStringsMap: new Map(),
-            greedyWordCounts: tabulation.greedyWordCounts
+            greedyWordCounts: tabulation.greedyWordCounts,
+            segmentWordCountRecordsMap
         };
+*/
     }
 }
 

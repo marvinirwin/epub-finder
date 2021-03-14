@@ -18,12 +18,15 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {trieWords, src, label}: TabulateLocalDocumentDto = ev.data;
+    const {words, notableSubsequences, src, label}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
     const segments = doc.segments();
     const tabulatedSentences = Segment.tabulate(
-        new SetWithUniqueLengths(trieWords),
-        segments,
+        {
+            greedyWordSet: new SetWithUniqueLengths(words),
+            notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
+            segments,
+        }
     );
     try {
         const tabulated = tabulatedSentenceToTabulatedDocuments(tabulatedSentences, label);
@@ -33,7 +36,7 @@ ctx.onmessage = async (ev) => {
             documentWordCounts: tabulated.documentWordCounts,
             greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts
         } as SerializedDocumentTabulation);
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         ctx.postMessage(
             {

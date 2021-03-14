@@ -5,6 +5,8 @@ import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {TrieObservable} from "./manager/open-documents.service";
 import {TabulateRemoteDocument} from "./Workers/worker.helpers";
 import {map, shareReplay, switchMap} from "rxjs/operators";
+import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
+import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export class FrequencyDocument {
     progress$: Observable<DocumentReadabilityProgress>;
@@ -13,11 +15,15 @@ export class FrequencyDocument {
     constructor(
         public frequencyDocument: LtDocument,
         private scheduleRows$: Observable<Map<string, ScheduleRow<NormalizedScheduleRowData>>>,
-        private wordTrie$: TrieObservable
+        private tabulationConfigurationService: TabulationConfigurationService
     ) {
-        this.tabulation$ = wordTrie$.pipe(
-            switchMap(wordTrie => TabulateRemoteDocument(
-                {trieWords: Array.from(wordTrie.t.values()), d: frequencyDocument.d}
+        this.tabulation$ = tabulationConfigurationService.tabulationConfiguration$.pipe(
+            switchMap(config => TabulateRemoteDocument(
+                {
+                    words: [...config.greedyWordSet.values()],
+                    d: frequencyDocument.d,
+                    notableSubsequences: [...config.notableCharacterSequences.values()]
+                }
             )),
             shareReplay(1)
         );

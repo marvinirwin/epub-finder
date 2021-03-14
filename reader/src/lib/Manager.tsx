@@ -43,7 +43,6 @@ import {QuizResultService} from "./quiz/quiz-result.service";
 import {HighlightPronunciationProgressService} from "./highlighting/highlight-pronunciation-progress.service";
 import {HighlightRecollectionDifficultyService} from "./highlighting/highlight-recollection-difficulty.service";
 import {TestHotkeysService} from "./hotkeys/test-hotkeys.service";
-import {CardCreationService} from "./card/card-creation.service";
 import {IntroService} from "./intro/intro.service";
 import {IntroSeriesService} from "./intro/intro-series.service";
 import {IntroHighlightService} from "./intro/intro-highlight.service";
@@ -92,6 +91,9 @@ import {FilterScheduleTableRowsService} from "./filter-schedule-table-rows.servi
 import {SortedLimitScheduleRowsService} from "./manager/sorted-limit-schedule-rows.service";
 import {WordCardModalService} from "./word-card-modal.service";
 import {LoadingMessagesService} from "./loading/loading-messages.service";
+import {NotableSubsequencesService} from "./notable-subsequences.service";
+import {WordsService} from "./words.service";
+import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -171,7 +173,6 @@ export class Manager {
     public activeSentenceService: ActiveSentenceService;
     public elementAtomMetadataIndex: ElementAtomMetadataIndex;
     public wordMetadataMapService: WordMetadataMapService;
-    public trieService: TrieService;
     public toastMessageService: ToastMessageService;
     public isRecordingService: IsRecordingService;
     public historyService: HistoryService;
@@ -191,6 +192,9 @@ export class Manager {
     sortedLimitScheduleRowsService: SortedLimitScheduleRowsService;
     wordCardModalService: WordCardModalService;
     public loadingMessagesService: LoadingMessagesService;
+    notableSubsequencesService: NotableSubsequencesService;
+    wordsService: WordsService;
+    tabulationConfigurationService: TabulationConfigurationService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -217,19 +221,15 @@ export class Manager {
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardsRepository = new CardsRepository({databaseService: db});
+        this.notableSubsequencesService = new NotableSubsequencesService(this);
+        this.wordsService = new WordsService(this)
         this.libraryService = new LibraryService(this);
         this.documentCheckingOutService = new DocumentCheckingOutService(this)
         this.droppedFilesService = new DroppedFilesService();
         this.pronunciationProgressService = new PronunciationProgressRepository(this);
         this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this);
-        this.trieService = new TrieService(this)
-        this.openDocumentsService = new OpenDocumentsService({
-            trie$: this.trieService.trie$,
-            db,
-            settingsService: this.settingsService,
-            documentRepository: this.documentRepository,
-            languageConfigsService: this.languageConfigsService
-        });
+        this.tabulationConfigurationService = new TabulationConfigurationService(this);
+        this.openDocumentsService = new OpenDocumentsService(this);
 
         this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService(this);
@@ -268,7 +268,6 @@ export class Manager {
             scheduleRows$: this.scheduleRowsService.indexedScheduleRows$
         });
         this.quizManager = new QuizManager();
-
         const s = new QuizResultService({
             srmService: this.scheduleService.srmService,
             quizManager: this.quizManager,
@@ -281,8 +280,6 @@ export class Manager {
             .subscribe(metadata => {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
             })
-        // const normalizeSentenceRegexp = /[\u4E00-\uFA29]/;
-
         CardScheduleQuiz(this.cardsRepository, this.scheduleService, this.quizManager);
         InputPage(this.browserInputs, this.openDocumentsService);
         CardPage(this.cardsRepository, this.openDocumentsService);
@@ -294,22 +291,9 @@ export class Manager {
                 this.browserInputs.applySegmentListeners(segments)
             }
         );
-        this.readingDocumentService = new ReadingDocumentService({
-            trie$: this.trieService.trie$,
-            openDocumentsService: this.openDocumentsService,
-            settingsService: this.settingsService,
-            languageConfigsService: this.languageConfigsService
-        });
+        this.readingDocumentService = new ReadingDocumentService(this);
         this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
-        this.quizService = new QuizService({
-            sortedLimitScheduleRowsService: this.sortedLimitScheduleRowsService,
-            exampleSentencesService: this.exampleSentencesService,
-            trie$: this.trieService.trie$,
-            cardService: this.cardsRepository,
-            openDocumentsService: this.openDocumentsService,
-            languageConfigsService: this.languageConfigsService,
-            settingsService: this.settingsService
-        })
+        this.quizService = new QuizService(this)
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map(component => component?.name || '')
@@ -400,7 +384,6 @@ export class Manager {
         });
 
         const ths = new TestHotkeysService(this);
-        const ccs = new CardCreationService(this)
         this.introSeriesService = new IntroSeriesService(this);
         this.introHighlightSeries = new IntroHighlightService({
             temporaryHighlightService: this.temporaryHighlightService,
