@@ -2,7 +2,7 @@ import {PronunciationProgressRepository} from "./schedule/pronunciation-progress
 import {WordRecognitionProgressRepository} from "./schedule/word-recognition-progress.repository";
 import {SetWithUniqueLengths} from "../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 import {combineLatest, Observable} from "rxjs";
-import {map, shareReplay} from "rxjs/operators";
+import {map, shareReplay, startWith} from "rxjs/operators";
 import {TemporaryHighlightService} from "./highlighting/temporary-highlight.service";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
 
@@ -25,7 +25,8 @@ export class NotableSubsequencesService {
         this.notableSubsequenceSet$ = combineLatest([
             pronunciationProgressService.records$,
             wordRecognitionProgressService.records$,
-            temporaryHighlightService.temporaryHighlightRequests$,
+            temporaryHighlightService.temporaryHighlightRequests$
+                .pipe(startWith(undefined)),
             videoMetadataRepository.all$
         ]).pipe(
             map(([

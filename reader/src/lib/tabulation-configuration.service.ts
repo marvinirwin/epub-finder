@@ -26,9 +26,7 @@ export class TabulationConfigurationService {
                 notableSubsequencesService.notableSubsequenceSet$,
             ]
         ).pipe(
-            map(([
-                wordSet,
-                     notableSubsequenceSet]) => {
+            map(([ wordSet, notableSubsequenceSet]) => {
                 return {
                     notableCharacterSequences: notableSubsequenceSet,
                     greedyWordSet: wordSet
