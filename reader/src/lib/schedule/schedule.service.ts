@@ -1,35 +1,27 @@
-import {combineLatest, Observable} from "rxjs";
-import {DatabaseService} from "../Storage/database.service";
-import {orderBy} from "lodash";
-import {map, shareReplay, startWith} from "rxjs/operators";
-import moment from "moment";
-import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
+import {Observable} from "rxjs";
+import {map, shareReplay} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
-import {ScheduleRowsService} from "../schedule/schedule-rows.service";
-import {SettingsService} from "../../services/settings.service";
-import {ScheduleMathService} from "../schedule/schedule-math.service";
-import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
-import {NormalizedQuizCardScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row";
-import {filterQuizRows} from "../../components/quiz/quiz.service";
+import {ScheduleRow,} from "./schedule-row";
+import {ScheduleRowsService} from "./schedule-rows-service.interface";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 
-export class ScheduleService {
-    sortedScheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
-    learningCards$: Observable<ScheduleRow[]>;
+export class ScheduleService<T> {
+    sortedScheduleRows$: Observable<ScheduleRow<T>[]>;
+    learningCards$: Observable<ScheduleRow<T>[]>;
 
     private today: number;
     private yesterday: number;
     srmService: SrmService;
-    newCards$: Observable<ScheduleRow[]>;
-    toReviewCards$: Observable<ScheduleRow[]>;
-    cardsLearnedToday$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
+    newCards$: Observable<ScheduleRow<T>[]>;
+    toReviewCards$: Observable<ScheduleRow<T>[]>;
+    cardsLearnedToday$: Observable<ScheduleRow<T>[]>;
 
     constructor({
                     scheduleRowsService,
                 }: {
-        scheduleRowsService: ScheduleRowsService,
+        scheduleRowsService: ScheduleRowsService<T>,
     }) {
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;

@@ -12,7 +12,7 @@ import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
 
-export class ScheduleRowsService {
+export class QuizCardScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedQuizCardScheduleRowData>>>;
 
     constructor({

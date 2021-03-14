@@ -69,7 +69,7 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
             }
         }
     )
-    const scheduleRowIndex = useObservableState(m.scheduleRowsService.indexedScheduleRows$);
+    const scheduleRowIndex = useObservableState(m.quizCardScheduleRowsService.indexedScheduleRows$);
     const scheduleRow: ScheduleRow | undefined = (scheduleRowIndex && characters) ? scheduleRowIndex[characters] : undefined;
     const score = scheduleRow?.wordRecognitionScore()
 

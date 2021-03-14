@@ -57,11 +57,11 @@ import {AlertsService} from "../services/alerts.service";
 import {ReadingDocumentService} from "./manager/reading-document.service";
 import {RequestRecordingService} from "../components/pronunciation-video/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
-import {ScheduleService} from "./manager/schedule.service";
+import {ScheduleService} from "./schedule/schedule.service";
 import {QuizService} from "../components/quiz/quiz.service";
 import {ExampleSegmentsService} from "./example-segments.service";
 import {ImageSearchService} from "./image-search.service";
-import {ScheduleRowsService} from "./schedule/schedule-rows.service";
+import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
 import {VisibleService} from "./manager/visible.service";
@@ -138,7 +138,7 @@ export class Manager {
     public alertsService = new AlertsService();
     public requestRecordingService: RequestRecordingService;
     public treeMenuService: TreeMenuService<any, { value: any }>
-    public scheduleRowsService: ScheduleRowsService;
+    public quizCardScheduleRowsService: QuizCardScheduleRowsService;
 
     public observableService = new ObservableService();
 
@@ -267,8 +267,10 @@ export class Manager {
         this.readingwordElementMap = wordElementMap$;
         this.readingWordCounts$ = documentwordCounts;
         this.readingwordSentenceMap = sentenceMap$;
-        this.scheduleRowsService = new ScheduleRowsService(this);
-        this.scheduleService = new ScheduleService(this);
+        this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this);
+        this.scheduleService = new ScheduleService({
+            scheduleRowsService: this.quizCardScheduleRowsService,
+        });
         this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
@@ -287,14 +289,14 @@ export class Manager {
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
             wordRecognitionRows$: this.wordRecognitionProgressService.records$,
-            scheduleRows$: this.scheduleRowsService.indexedScheduleRows$
+            scheduleRows$: this.quizCardScheduleRowsService.indexedScheduleRows$
         });
         this.quizManager = new QuizManager();
         const s = new QuizResultService({
             srmService: this.scheduleService.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
-            scheduleRowsService: this.scheduleRowsService,
+            scheduleRowsService: this.quizCardScheduleRowsService,
             alertsService: this.alertsService
         })
 
@@ -345,7 +347,7 @@ export class Manager {
 
         combineLatest([
             this.highlightAllWithDifficultySignal$,
-            this.scheduleRowsService.indexedScheduleRows$,
+            this.quizCardScheduleRowsService.indexedScheduleRows$,
         ]).subscribe(([signal, indexedScheduleRows]) => {
             signal ?
                 this.highlighter.highlightWithDifficulty$.next(indexedScheduleRows) :

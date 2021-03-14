@@ -6,7 +6,7 @@ import {PronunciationProgressRow} from "../schedule/pronunciation-progress-row.i
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {BasicDocument} from "../../types";
 import {IgnoredWord} from "../schedule/ignored-word.interface";
-import {TranslationAttempt} from "../schedule/translation-attempt.repository";
+import {TranslationAttemptRecord} from "../schedule/translation-attempt.repository";
 
 
 export class DatabaseService extends Dexie {
@@ -15,7 +15,7 @@ export class DatabaseService extends Dexie {
 
     public cards: Dexie.Table<ICard, number>;
     public wordRecognitionRecords: Dexie.Table<WordRecognitionRow, number>;
-    public translationAttempts: Dexie.Table<TranslationAttempt, number>;
+    public translationAttempts: Dexie.Table<TranslationAttemptRecord, number>;
     public pronunciationRecords: Dexie.Table<PronunciationProgressRow, number>
     public ignoredWords: Dexie.Table<IgnoredWord, number>
 

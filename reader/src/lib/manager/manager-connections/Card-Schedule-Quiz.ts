@@ -1,4 +1,4 @@
-import {ScheduleService} from "../schedule.service";
+import {ScheduleService} from "../../schedule/schedule.service";
 import {QuizManager} from "../QuizManager";
 import CardsRepository from "../cards.repository";
 

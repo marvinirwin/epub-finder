@@ -1,4 +1,4 @@
-import {ScheduleService} from "./manager/schedule.service";
+import {ScheduleService} from "./schedule/schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {SettingsService} from "../services/settings.service";

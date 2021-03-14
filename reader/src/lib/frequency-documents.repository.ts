@@ -1,7 +1,7 @@
 import {combineLatest, Observable} from "rxjs";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
-import {ScheduleRowsService} from "./schedule/schedule-rows.service";
+import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {SettingsService} from "../services/settings.service";
 import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
@@ -43,7 +43,7 @@ export class FrequencyDocumentsRepository {
             documentRepository,
             tabulationConfigurationService
         }: {
-            scheduleRowsService: ScheduleRowsService,
+            scheduleRowsService: QuizCardScheduleRowsService,
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
             tabulationConfigurationService: TabulationConfigurationService

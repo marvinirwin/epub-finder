@@ -2,12 +2,12 @@ import {IndexedRowsRepository} from "./indexed-rows.repository";
 import {DatabaseService} from "../Storage/database.service";
 import {SuperMemoGrade} from "supermemo";
 
-export interface TranslationAttempt {
+export interface TranslationAttemptRecord {
     id?: number;
     knownLanguage: string;
     translationAttempt: string;
     timestamp: Date;
-    nextDueDate?: Date;
+    nextDueDate: Date;
 
     interval: number;
     repetition: number;
@@ -15,7 +15,7 @@ export interface TranslationAttempt {
     grade: SuperMemoGrade;
 }
 
-export class TranslationAttemptRepository extends IndexedRowsRepository<TranslationAttempt> {
+export class TranslationAttemptRepository extends IndexedRowsRepository<TranslationAttemptRecord> {
     constructor({db}: { db: DatabaseService }) {
         super({
             db,

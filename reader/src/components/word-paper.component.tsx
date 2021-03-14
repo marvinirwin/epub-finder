@@ -89,7 +89,7 @@ const CountRecordTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedQuizCardSc
 export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard}) => {
     const m = useContext(ManagerContext);
     const word = useObservableState(wordCard.word$);
-    const scheduleRows = useObservableState(m.scheduleRowsService.indexedScheduleRows$) || {};
+    const scheduleRows = useObservableState(m.quizCardScheduleRowsService.indexedScheduleRows$) || {};
     const scheduleRow = scheduleRows[word || ''];
     const romanization = useObservableState(wordCard.romanization$);
     const translation = useObservableState(wordCard.translation$);

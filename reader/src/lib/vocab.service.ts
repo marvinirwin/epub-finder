@@ -3,7 +3,7 @@ import {combineLatest, Observable} from "rxjs";
 import {SettingsService} from "../services/settings.service";
 import {FrequencyDocumentsRepository, tabulateFrequencyDocuments} from "./frequency-documents.repository";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {ScheduleRowsService} from "./schedule/schedule-rows.service";
+import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 import {DocumentRepository} from "./documents/document.repository";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
@@ -22,7 +22,7 @@ export class VocabService {
         }: {
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
-            scheduleRowsService: ScheduleRowsService,
+            scheduleRowsService: QuizCardScheduleRowsService,
             tabulationConfigurationService: TabulationConfigurationService
         }
     ) {

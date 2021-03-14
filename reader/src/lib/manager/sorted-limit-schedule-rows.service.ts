@@ -1,5 +1,5 @@
 import {SettingsService} from "../../services/settings.service";
-import {ScheduleService} from "./schedule.service";
+import {ScheduleService} from "../schedule/schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
