@@ -111,7 +111,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
             this.d.wordRecognitionRecords,
             2
         );
-        return lastTwoRecords
+        return lastTwoRecords.length === 2 && lastTwoRecords
             .every(
                 r => r.grade >= 3 &&
                 isSameDay(r.timestamp, new Date()) &&

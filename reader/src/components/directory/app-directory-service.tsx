@@ -30,9 +30,8 @@ function AppDirectory(
     availableDocuments: DocumentSelectionRowInterface[],
     profile: Profile | undefined) {
     return arrayToTreeRoot<TreeMenuNode>(
-        ReadingNode(m),
+        QuizCarouselNode(),
         [
-            ReadingNode(m, selectedComponent === 'reading'),
             SignInWithNode(profile),
             LanguageSelectNode(m),
             RecognizeSpeechNode(m),

@@ -32,11 +32,9 @@ export class ScheduleService {
     constructor({
                     db,
                     scheduleRowsService,
-                    settingsService
                 }: {
         db: DatabaseService,
         scheduleRowsService: ScheduleRowsService,
-        settingsService: SettingsService
     }) {
         this.db = db;
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);

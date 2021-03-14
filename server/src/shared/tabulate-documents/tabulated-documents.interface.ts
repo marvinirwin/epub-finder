@@ -3,7 +3,7 @@ import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {Segment} from "./segment";
 import {DocumentWordCount} from "../DocumentWordCount";
 import {XMLDocumentNode} from "../XMLDocumentNode";
-import {WordCountRecord} from "../tabulation/tabulate";
+import {SerializedSegment, WordCountRecord} from "../tabulation/tabulate";
 
 export type DocumentWordCounts = {
     documentWordCounts: Dictionary<DocumentWordCount[]>;
@@ -23,7 +23,7 @@ export interface SerializedTabulation {
     wordCounts: Dictionary<number>;
     greedyWordCounts: Map<string, number>;
     wordSegmentStringsMap: Map<string, Set<string>>;
-    segmentWordCountRecordsMap: Map<Segment, WordCountRecord[]>
+    segmentWordCountRecordsMap: Map<SerializedSegment, WordCountRecord[]>
 }
 
 export type SerializedDocumentTabulation = SerializedTabulation & DocumentWordCounts;

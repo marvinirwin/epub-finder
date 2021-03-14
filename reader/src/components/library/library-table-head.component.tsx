@@ -6,7 +6,9 @@ export const LibraryTableHead: React.FC<{}> = () => {
         <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Use for Frequency</TableCell>
+{/*
             <TableCell>Read</TableCell>
+*/}
             <TableCell>Delete</TableCell>
         </TableRow>
     </TableHead>

@@ -10,7 +10,7 @@ type LimitedScheduleRows = {
     limitedScheduleRows: ScheduleRow<NormalizedScheduleRowData>[];
     wordsLearnedToday: ScheduleRow<NormalizedScheduleRowData>[];
     wordsReviewingOrLearning: ScheduleRow<NormalizedScheduleRowData>[];
-    wordsWhichHaventBeenStarted: ScheduleRow<NormalizedScheduleRowData>[]
+    wordsLeftForToday: ScheduleRow<NormalizedScheduleRowData>[]
 };
 
 export class SortedLimitScheduleRowsService {
@@ -47,7 +47,7 @@ export class SortedLimitScheduleRowsService {
                     wordsToReview,
                     wordsLearnedToday,
                     wordsReviewingOrLearning,
-                    wordsWhichHaventBeenStarted,
+                    wordsLeftForToday: wordsWhichHaventBeenStarted,
                     limitedScheduleRows: orderBy(
                         [
                             ...wordsToReview,

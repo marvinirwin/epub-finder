@@ -6,7 +6,7 @@ import {XMLDocumentNode} from "../XMLDocumentNode";
 import {isChineseCharacter} from "../OldAnkiClasses/Card";
 import {TabulatedSegments} from "./tabulated-documents.interface";
 import {safePush, safePushMap, safePushSet} from "../safe-push";
-import {TabulationParameters, tabulationFactory, WordCountRecord} from "../tabulation/tabulate";
+import {TabulationParameters, tabulationFactory, WordCountRecord, SerializedSegment} from "../tabulation/tabulate";
 
 
 export class Segment {
@@ -36,12 +36,10 @@ export class Segment {
         const {
             greedyWordCounts,
             wordSegmentMap,
-            wordSegmentStringsMap,
             segmentWordCountRecordsMap,
             wordCounts,
             atomMetadatas,
             wordElementsMap,
-            greedyDocumentWordCounts
         } = tabulationObject
 
         const characterElements = flatten(segments.map(segment => {
@@ -52,14 +50,18 @@ export class Segment {
         const textContent = characterElements.map(node => node.textContent).join('');
         let notableSubsequencesInProgress: IWordInProgress[] = [];
         let greedyWord: IWordInProgress | undefined;
-        let currentSegment;
+        let currentSegment: Segment;
+        let segmentIndex = -1;
         let currentSegmentStart;
+        let currentSerialzedSegment;
         for (let i = 0; i < characterElements.length; i++) {
             const currentMark = characterElements[i];
             currentSegmentStart++;
             if (elementSegmentMap.get(currentMark) !== currentSegment) {
                 currentSegment = elementSegmentMap.get(currentMark);
+                segmentIndex++;
                 currentSegmentStart = i;
+                currentSerialzedSegment = {text: currentSegment.translatableText, index: segmentIndex}
             }
             const newGreedyWord = () => {
                 const chosenGreedyWord = maxBy(
@@ -74,7 +76,6 @@ export class Segment {
                         chosenGreedyWord.word,
                         greedyWordCounts.get(chosenGreedyWord.word) + 1
                     );
-
                 }
                 return chosenGreedyWord;
             };
@@ -119,7 +120,7 @@ export class Segment {
             wordsWhichStartHere.forEach(wordStartingHere => {
                 safePushMap(
                     segmentWordCountRecordsMap,
-                    currentSegment as Segment,
+                    currentSerialzedSegment as SerializedSegment,
                     {
                         position: i - currentSegmentStart,
                         word: wordStartingHere

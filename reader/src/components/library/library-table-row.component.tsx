@@ -22,6 +22,7 @@ export const LibraryDocumentRowComponent: React.FC<{ document: LibraryDocumentRo
                 onChange={() => document.toggleUseForFrequency()}
             />
         </TableCell>
+{/*
         <TableCell>
             <Checkbox
                 className={libraryRowToggleReading}
@@ -29,6 +30,7 @@ export const LibraryDocumentRowComponent: React.FC<{ document: LibraryDocumentRo
                 onChange={() => document.toggleReading()}
             />
         </TableCell>
+*/}
         <TableCell>
             <Button
                 className={libraryRowDelete}
