@@ -7,12 +7,7 @@ import CardsRepository from "../lib/manager/cards.repository";
 export class VideoMetadataRepository {
     all$ = new BehaviorSubject<Map<string, VideoMetadata>>(new Map())
 
-    constructor({
-                    cardsRepository
-                }: {
-                    cardsRepository: CardsRepository
-                }
-    ) {
+    constructor() {
         axios.get(`${process.env.PUBLIC_URL}/video_metadata`)
             .then(response => {
                 if (response.status === 200) {

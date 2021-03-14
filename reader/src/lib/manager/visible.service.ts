@@ -33,10 +33,9 @@ export class VisibleService {
     elementsInView$: Observable<Set<HTMLElement>>
     openDocumentsInView$: Observable<OpenDocument[]>
 
-    constructor({componentInView$, openDocumentsService, quizService}: {
+    constructor({componentInView$, openDocumentsService}: {
         componentInView$: Observable<string>,
         openDocumentsService: OpenDocumentsService,
-        quizService: QuizService
     }) {
         this.openDocumentsInView$ = combineLatest([
             componentInView$,

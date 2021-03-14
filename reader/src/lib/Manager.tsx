@@ -221,15 +221,36 @@ export class Manager {
         });
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardsRepository = new CardsRepository({databaseService: db});
+        this.pronunciationProgressService = new PronunciationProgressRepository(this);
+        this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this);
+        this.openDocumentsService = new OpenDocumentsService(this);
+        this.visibleElementsService = new VisibleService({
+            componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
+                map(component => component?.name || '')
+            ),
+            openDocumentsService: this.openDocumentsService,
+        });
+        this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)
+        this.wordMetadataMapService = new WordMetadataMapService({
+            visibleElementsService: this.visibleElementsService,
+            aggregateElementIndexService: this.elementAtomMetadataIndex
+        });
+        this.highlighterService = new HighlighterService(
+            {
+                wordElementMap$: this.wordMetadataMapService.visibleWordMetadataMap$
+            }
+        )
+        this.temporaryHighlightService = new TemporaryHighlightService({
+            highlighterService: this.highlighterService,
+            cardService: this.cardsRepository
+        });
+        this.videoMetadataRepository = new VideoMetadataRepository();
         this.notableSubsequencesService = new NotableSubsequencesService(this);
         this.wordsService = new WordsService(this)
         this.libraryService = new LibraryService(this);
         this.documentCheckingOutService = new DocumentCheckingOutService(this)
         this.droppedFilesService = new DroppedFilesService();
-        this.pronunciationProgressService = new PronunciationProgressRepository(this);
-        this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this);
         this.tabulationConfigurationService = new TabulationConfigurationService(this);
-        this.openDocumentsService = new OpenDocumentsService(this);
 
         this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService(this);
@@ -248,10 +269,11 @@ export class Manager {
         this.readingwordSentenceMap = sentenceMap$;
         this.scheduleRowsService = new ScheduleRowsService(this);
         this.scheduleService = new ScheduleService(this);
-
-        this.videoMetadataRepository = new VideoMetadataRepository(this);
-
+        this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
         this.exampleSentencesService = new ExampleSegmentsService(this)
+        this.quizService = new QuizService(this)
+
+
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioRecordingService = new AudioManager(audioSource);
         this.micFeedbackService = new MicFeedbackService({
@@ -292,25 +314,6 @@ export class Manager {
             }
         );
         this.readingDocumentService = new ReadingDocumentService(this);
-        this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
-        this.quizService = new QuizService(this)
-        this.visibleElementsService = new VisibleService({
-            componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
-                map(component => component?.name || '')
-            ),
-            openDocumentsService: this.openDocumentsService,
-            quizService: this.quizService
-        });
-        this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)
-        this.wordMetadataMapService = new WordMetadataMapService({
-            visibleElementsService: this.visibleElementsService,
-            aggregateElementIndexService: this.elementAtomMetadataIndex
-        });
-        this.highlighterService = new HighlighterService(
-            {
-                wordElementMap$: this.wordMetadataMapService.visibleWordMetadataMap$
-            }
-        )
 
         this.highlighter = new Highlighter(this)
 
@@ -362,10 +365,6 @@ export class Manager {
             wordMetadataMapService: this.wordMetadataMapService
         })
 
-        this.temporaryHighlightService = new TemporaryHighlightService({
-            highlighterService: this.highlighterService,
-            cardService: this.cardsRepository
-        });
         const LEARNING_GREEN: RGBA = [88, 204, 2, 0.5];
         this.audioRecordingService.audioRecorder.currentRecognizedText$
             .subscribe(text => text && this.temporaryHighlightService.highlightTemporaryWord(removePunctuation(text), LEARNING_GREEN, 5000))
