@@ -45,8 +45,8 @@ type ScheduleRowItem = { nextDueDate: Date, grade: SuperMemoGrade, timestamp: Da
 export class ScheduleRow<T> {
     private _dueDate: Date;
 
-    constructor(public d: T, private recordsWithDueDate: ScheduleRowItem[]) {
-        this._dueDate = this.recordsWithDueDate[this.recordsWithDueDate.length - 1]?.nextDueDate || new Date();
+    constructor(public d: T, private superMemoRecords: ScheduleRowItem[]) {
+        this._dueDate = this.superMemoRecords[this.superMemoRecords.length - 1]?.nextDueDate || new Date();
     }
 
     public dueDate() {
@@ -54,11 +54,11 @@ export class ScheduleRow<T> {
     }
 
     public isNew() {
-        return this.recordsWithDueDate.length === 0;
+        return this.superMemoRecords.length === 0;
     }
 
     public recognitionScore() {
-        return this.recordsWithDueDate[this.recordsWithDueDate.length - 1]?.grade || 0;
+        return this.superMemoRecords[this.superMemoRecords.length - 1]?.grade || 0;
     }
 
     public isToReview() {
@@ -72,7 +72,7 @@ export class ScheduleRow<T> {
     }
 
     public hasNRecognizedInARow(n = 2) {
-        const last2 = this.recordsWithDueDate.slice(n * -1);
+        const last2 = this.superMemoRecords.slice(n * -1);
         return last2.every(rec => rec.grade === SrmService.correctScore());
     }
 
@@ -81,12 +81,12 @@ export class ScheduleRow<T> {
     }
 
     public isLearning() {
-        if (!this.recordsWithDueDate.length) return false;
+        if (!this.superMemoRecords.length) return false;
         if (!this.isOverDue()) {
             return false;
         }
-        const lastRecord = this.recordsWithDueDate[this.recordsWithDueDate.length - 1];
-        const last2Records = ScheduleRow.lastNRecords(this.recordsWithDueDate, 2);
+        const lastRecord = this.superMemoRecords[this.superMemoRecords.length - 1];
+        const last2Records = ScheduleRow.lastNRecords(this.superMemoRecords, 2);
         return last2Records.length === 2 &&
             last2Records
                 .every(record =>
@@ -113,7 +113,7 @@ export class ScheduleRow<T> {
 
     wasLearnedToday() {
         const lastTwoRecords = ScheduleRow.lastNRecords(
-            this.recordsWithDueDate,
+            this.superMemoRecords,
             2
         );
         return lastTwoRecords.length === 2 && lastTwoRecords
@@ -123,7 +123,8 @@ export class ScheduleRow<T> {
                 (r.nextDueDate || 0) > new Date()
             );
     }
+
     isUnlearned() {
-        return this.recordsWithDueDate.length === 0;
+        return this.superMemoRecords.length === 0;
     }
 }

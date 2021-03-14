@@ -94,6 +94,7 @@ import {LoadingMessagesService} from "./loading/loading-messages.service";
 import {NotableSubsequencesService} from "./notable-subsequences.service";
 import {WordsService} from "./words.service";
 import {TabulationConfigurationService} from "./tabulation-configuration.service";
+import {TranslationAttemptScheduleService} from "./schedule/translation-attempt-schedule.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -195,6 +196,7 @@ export class Manager {
     notableSubsequencesService: NotableSubsequencesService;
     wordsService: WordsService;
     tabulationConfigurationService: TabulationConfigurationService;
+    translationAttemptScheduleService: TranslationAttemptScheduleService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -274,6 +276,7 @@ export class Manager {
         this.sortedLimitScheduleRowsService = new SortedLimitScheduleRowsService(this)
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
+        this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
 
 
         this.createdSentenceManager = new CreatedSentenceManager(this.db);

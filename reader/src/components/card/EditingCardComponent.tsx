@@ -14,7 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import Done from '@material-ui/icons/Done';
 import {HotkeyWrapper} from "../hotkey-wrapper";
-import {ScheduleRow, ScheduleRowData} from "../../lib/schedule/schedule-row";
+import {QuizScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,17 +40,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Manager, className?: string }> = ({
-                                                                                                                  card,
-                                                                                                                  m,
-                                                                                                                  className
-                                                                                                              }) => {
+const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Manager, className?: string }> = (
+    {
+        card,
+        m,
+        className
+    }) => {
     const classes = useStyles();
     const characters = useObservableState(card.learningLanguage$);
     const sounds = useObservableState(card.sounds$);
     const translation = useObservableState(card.translation$);
     useEffect(() => {
         const els = document.getElementsByClassName('new-audio');
+        // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < els.length; i++) {
             // @ts-ignore
             els[i].play();
@@ -70,9 +72,9 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
         }
     )
     const scheduleRowIndex = useObservableState(m.quizCardScheduleRowsService.indexedScheduleRows$);
-    const scheduleRow: ScheduleRow | undefined = (scheduleRowIndex && characters) ? scheduleRowIndex[characters] : undefined;
+    const scheduleRow: ScheduleRow<QuizScheduleRowData> | undefined = (scheduleRowIndex && characters) ? scheduleRowIndex[characters] : undefined;
     const score = scheduleRow?.wordRecognitionScore()
-
+¡
     return <Card className={`${className || ''} ${classes.root}`}>
         <CardContent ref={setReferenceElement}>
             <div className={classes.root}>
