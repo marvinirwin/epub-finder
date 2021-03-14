@@ -21,7 +21,7 @@ import {
 } from "@shared/";
 import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../App";
-import {NormalizedScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row";
 import {formatDueDate} from "../lib/schedule/format-due-date";
 
 
@@ -34,7 +34,7 @@ export const CardLearningLanguageText = ({word}: { word: string }) => {
     >{word || ''}</Typography>
 }
 
-const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedScheduleRowData> }> =
+const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData> }> =
     ({scheduleRow}) => {
         return <TableContainer component={Paper}>
             <Table size="small" aria-label="a dense table">
@@ -47,7 +47,7 @@ const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedSchedul
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {scheduleRow.d.wordRecognitionRecords.map((row) => (
+                    {scheduleRow.d.recordsWithDueDate.map((row) => (
                         <TableRow key={row.id}>
                             <TableCell component="th" scope="row">
                                 {row.grade}
@@ -62,7 +62,7 @@ const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedSchedul
         </TableContainer>
     };
 
-const CountRecordTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedScheduleRowData> }> =
+const CountRecordTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData> }> =
     ({scheduleRow}) => {
         return <TableContainer component={Paper}>
             <Table size="small">

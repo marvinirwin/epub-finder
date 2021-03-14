@@ -1,7 +1,7 @@
 import {combineLatest, Observable} from "rxjs";
 import {FrequencyDocument} from "./frequency-documents";
 import {TrieService} from "./manager/trie.service";
-import {ScheduleRowsService} from "./manager/schedule-rows.service";
+import {ScheduleRowsService} from "./schedule/schedule-rows.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {SettingsService} from "../services/settings.service";
 import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";

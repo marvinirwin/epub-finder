@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {
     SerializedTabulation,
     TabulatedDocuments
@@ -7,7 +7,7 @@ import { sum } from "lodash";
 
 export interface WordReadabilityRecord {
     word: string;
-    scheduleRow: ScheduleRow<NormalizedScheduleRowData> | undefined;
+    scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData> | undefined;
     count: number;
     totalWordCount: number;
 }
@@ -26,7 +26,7 @@ export class DocumentReadabilityProgress {
             scheduleRows,
             tabulatedDocument,
         }: {
-            scheduleRows: Map<string, ScheduleRow<NormalizedScheduleRowData>>,
+            scheduleRows: Map<string, ScheduleRow<NormalizedQuizCardScheduleRowData>>,
             tabulatedDocument: SerializedTabulation
         }
     ) {

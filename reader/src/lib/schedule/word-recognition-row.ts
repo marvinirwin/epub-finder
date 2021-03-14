@@ -4,7 +4,7 @@ export interface WordRecognitionRow {
     id?: number;
     word: string;
     timestamp: Date;
-    nextDueDate?: Date;
+    nextDueDate: Date;
 
     interval: number;
     repetition: number;

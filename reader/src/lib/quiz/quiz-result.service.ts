@@ -2,7 +2,7 @@ import {QuizManager} from "../manager/QuizManager";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {QuizResultToRecognitionRows} from "../pipes/QuizResultToRecognitionRows";
 import {SrmService} from "../srm/srm.service";
-import {ScheduleRowsService} from "../manager/schedule-rows.service";
+import {ScheduleRowsService} from "../schedule/schedule-rows.service";
 import {AlertsService} from "../../services/alerts.service";
 import humanizeDuration from 'humanize-duration';
 

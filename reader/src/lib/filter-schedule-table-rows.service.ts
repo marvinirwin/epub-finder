@@ -1,11 +1,11 @@
 import {ScheduleService} from "./manager/schedule.service";
 import {combineLatest, Observable} from "rxjs";
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {SettingsService} from "../services/settings.service";
 import {debounceTime, map, shareReplay} from "rxjs/operators";
 
 export class FilterScheduleTableRowsService {
-    public filteredScheduleRows$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
+    public filteredScheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
     constructor({
         scheduleService,
         settingsService
@@ -22,7 +22,7 @@ export class FilterScheduleTableRowsService {
             debounceTime(500),
             map(([scheduleTableWordFilterValue, showUnderDue, showUncounted, sortedScheduleRows]) => {
                 const now = new Date();
-                const filterFuncs: ((r: ScheduleRow<NormalizedScheduleRowData>) => boolean)[] = [
+                const filterFuncs: ((r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => boolean)[] = [
                     row => row.d.word.includes(scheduleTableWordFilterValue)
                 ];
                 if (!showUnderDue) {

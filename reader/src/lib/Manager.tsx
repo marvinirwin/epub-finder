@@ -61,7 +61,7 @@ import {ScheduleService} from "./manager/schedule.service";
 import {QuizService} from "../components/quiz/quiz.service";
 import {ExampleSegmentsService} from "./example-segments.service";
 import {ImageSearchService} from "./image-search.service";
-import {ScheduleRowsService} from "./manager/schedule-rows.service";
+import {ScheduleRowsService} from "./schedule/schedule-rows.service";
 import {GoalsService} from "./goals.service";
 import {ActiveSentenceService} from "./active-sentence.service";
 import {VisibleService} from "./manager/visible.service";

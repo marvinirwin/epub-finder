@@ -1,7 +1,7 @@
 import {combineLatest, from, Observable} from "rxjs";
 import {DocumentReadabilityProgress} from "./document-readability-progress";
 import {LtDocument, SerializedTabulation} from "@shared/";
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
 import {TrieObservable} from "./manager/open-documents.service";
 import {TabulateRemoteDocument} from "./Workers/worker.helpers";
 import {map, shareReplay, switchMap} from "rxjs/operators";
@@ -14,7 +14,7 @@ export class FrequencyDocument {
 
     constructor(
         public frequencyDocument: LtDocument,
-        private scheduleRows$: Observable<Map<string, ScheduleRow<NormalizedScheduleRowData>>>,
+        private scheduleRows$: Observable<Map<string, ScheduleRow<NormalizedQuizCardScheduleRowData>>>,
         private tabulationConfigurationService: TabulationConfigurationService
     ) {
         this.tabulation$ = tabulationConfigurationService.tabulationConfiguration$.pipe(

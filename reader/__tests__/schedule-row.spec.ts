@@ -4,7 +4,7 @@ import {SuperMemoGrade} from "supermemo";
 import {addDays, subDays} from 'date-fns';
 
 const scheduleRowWithRecognitionRecords = (wordRecognitionRecords: any[]) => new ScheduleRow<ScheduleRowData>({
-    wordRecognitionRecords,
+    recordsWithDueDate: wordRecognitionRecords,
     wordCountRecords: [],
     pronunciationRecords: [],
     word: 'test',

@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "./schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule-row";
 import React from "react";
 import {DEV} from "../../components/directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
@@ -13,7 +13,7 @@ export const QuizCardScheduleRowDisplay = (
         scheduleRow,
         quizCard
     }: {
-        scheduleRow: ScheduleRow<NormalizedScheduleRowData>,
+        scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData>,
         quizCard: QuizCard
     }) => {
     const description = useObservableState(quizCard.description$.value$);

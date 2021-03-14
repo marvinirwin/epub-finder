@@ -3,14 +3,14 @@ import {ScheduleService} from "./schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
-import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 
 type LimitedScheduleRows = {
-    wordsToReview: ScheduleRow<NormalizedScheduleRowData>[];
-    limitedScheduleRows: ScheduleRow<NormalizedScheduleRowData>[];
-    wordsLearnedToday: ScheduleRow<NormalizedScheduleRowData>[];
-    wordsReviewingOrLearning: ScheduleRow<NormalizedScheduleRowData>[];
-    wordsLeftForToday: ScheduleRow<NormalizedScheduleRowData>[]
+    wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
+    limitedScheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
+    wordsLearnedToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
+    wordsReviewingOrLearning: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
+    wordsLeftForToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
 };
 
 export class SortedLimitScheduleRowsService {

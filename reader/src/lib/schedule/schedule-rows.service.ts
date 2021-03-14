@@ -1,20 +1,19 @@
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay, startWith} from "rxjs/operators";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
-import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
-import {WordRecognitionRow} from "../schedule/word-recognition-row";
-import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
-import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
-import CardsRepository from "./cards.repository";
-import {IgnoredWordsRepository} from "../schedule/ignored-words.repository";
-import {NormalizedScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row";
+import {IndexedRowsRepository} from "./indexed-rows.repository";
+import {WordRecognitionRow} from "./word-recognition-row";
+import {PronunciationProgressRepository} from "./pronunciation-progress.repository";
+import CardsRepository from "../manager/cards.repository";
+import {IgnoredWordsRepository} from "./ignored-words.repository";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow, QuizScheduleRowData} from "./schedule-row";
 import {ScheduleMathService} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
-import {OpenDocumentsService} from "./open-documents.service";
+import {OpenDocumentsService} from "../manager/open-documents.service";
 
 export class ScheduleRowsService {
-    public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedScheduleRowData>>>;
+    public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedQuizCardScheduleRowData>>>;
 
     constructor({
                     wordRecognitionProgressService,
@@ -57,16 +56,16 @@ export class ScheduleRowsService {
                      [frequencyWeight, dateWeight, wordLengthWeight],
                      allWords
                  ]) => {
-                const scheduleRows: ds_Dict<ScheduleRowData> = {};
+                const scheduleRows: ds_Dict<QuizScheduleRowData> = {};
                 const ensureScheduleRow = (word: string) => {
                     if (!scheduleRows[word]) {
                         scheduleRows[word] = {
-                            wordRecognitionRecords: [],
                             wordCountRecords: [],
                             word,
+                            wordRecognitionRecords: [],
                             pronunciationRecords: [],
                             greedyWordCountRecords: []
-                        } as ScheduleRowData;
+                        } as QuizScheduleRowData;
                     }
                     return scheduleRows[word];
                 };
@@ -96,8 +95,9 @@ export class ScheduleRowsService {
                     scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
-                return Object.fromEntries(ScheduleMathService.sortScheduleRows(
-                    Object.values(scheduleRows).map(r => new ScheduleRow(r)),
+                return Object.fromEntries(ScheduleMathService.normalizeAndSortQuizScheduleRows(
+                    Object.values(scheduleRows)
+                        .map(r => new ScheduleRow<QuizScheduleRowData>(r, r.wordRecognitionRecords)),
                     {
                         dateWeight,
                         countWeight: frequencyWeight,

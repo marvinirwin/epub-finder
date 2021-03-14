@@ -1,4 +1,4 @@
-import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 import {Button, TableCell, TableRow, Typography} from "@material-ui/core";
 import {
     quizCardTableRow,
@@ -12,7 +12,7 @@ import {lastN} from "./last-n";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../App";
 
-export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRowData> }> = ({row}) => {
+export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedQuizCardScheduleRowData> }> = ({row}) => {
     const m = useContext(ManagerContext);
     return (
         <TableRow
@@ -47,7 +47,7 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedScheduleRow
             <TableCell
                 className={quizCardTableRowRecognitions}
             >{
-                lastN(1)(row.d.wordRecognitionRecords)
+                lastN(1)(row.d.recordsWithDueDate)
                     .map(r => `${r.grade}`)
                     .join(',')
             }

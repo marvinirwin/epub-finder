@@ -1,12 +1,16 @@
-import {orderBy} from "lodash";
-import {NormalizedScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
-import {getSortValue} from "./sort-value.interface";
-import {NormalizedValue} from "./normalized-value.interface";
+import {orderBy, sum} from "lodash";
+import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "./schedule-row";
+import {getSortValue} from "../manager/sort-value.interface";
+import {NormalizedValue} from "../manager/normalized-value.interface";
+import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
+
+function sumWordCountRecords(row: ScheduleRow<QuizScheduleRowData>) {
+    return sum(row.d.wordCountRecords.map(w => w.count));
+}
 
 export class ScheduleMathService {
-
-    public static sortScheduleRows(
-        scheduleRows: ScheduleRow [],
+    public static normalizeAndSortQuizScheduleRows(
+        scheduleRows: ScheduleRow< QuizScheduleRowData > [],
         {
             dateWeight,
             countWeight,
@@ -16,8 +20,8 @@ export class ScheduleMathService {
             countWeight: number,
             wordLengthWeight: number,
         }
-    ): ScheduleRow<NormalizedScheduleRowData>[] {
-        const scheduleRowNormalizedDateMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
+    ): ScheduleRow<NormalizedQuizCardScheduleRowData>[] {
+        const scheduleRowNormalizedDateMap = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
             row => row.dueDate().getTime() * -1
         ).map(([n, row]) => {
@@ -27,15 +31,15 @@ export class ScheduleMathService {
             ];
         }));
 
-        const scheduleRowNormalizedCountMap = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
+        const scheduleRowNormalizedCountMap = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
-            row => row.count()
+            row => sumWordCountRecords(row)
         ).map(([n, row]) => [
             row,
             n,
         ]));
 
-        const scheduleRowNormalizedLength = new Map<ScheduleRow, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
+        const scheduleRowNormalizedLength = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
             scheduleRows,
             row => row.d.word.length
         ).map(([n, row]) => {
@@ -45,11 +49,11 @@ export class ScheduleMathService {
             ];
         }));
 
-        const sortableScheduleRows: NormalizedScheduleRowData[] = scheduleRows.map(scheduleRow => {
+        const sortableScheduleRows: NormalizedQuizCardScheduleRowData[] = scheduleRows.map(scheduleRow => {
             const normalCount = scheduleRowNormalizedCountMap.get(scheduleRow) as NormalizedValue;
             const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as NormalizedValue;
             const normalLength = scheduleRowNormalizedLength.get(scheduleRow) as NormalizedValue;
-            const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, scheduleRow.count());
+            const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, sumWordCountRecords(scheduleRow));
             const dueDateSortValue = getSortValue<Date>(
                 normalDate.normalizedValue,
                 dateWeight,
@@ -72,11 +76,11 @@ export class ScheduleMathService {
                 ),
                 normalizedCount: normalCount,
                 normalizedDate: normalDate
-            } as NormalizedScheduleRowData;
+            } as NormalizedQuizCardScheduleRowData;
         })
 
         return orderBy(
-            sortableScheduleRows.map(r => new ScheduleRow<NormalizedScheduleRowData>(r)),
+            sortableScheduleRows.map(r => new ScheduleRow<NormalizedQuizCardScheduleRowData>(r, r.wordRecognitionRecords)),
             r => r.d.finalSortValue,
             'desc')
     }

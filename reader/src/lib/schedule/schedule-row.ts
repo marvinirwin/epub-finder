@@ -6,9 +6,11 @@ import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
 import {isSameDay} from 'date-fns';
 import { formatDistance, subDays } from 'date-fns'
+import {SuperMemoGrade, SuperMemoItem} from "supermemo";
+import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
 
-export interface ScheduleRowData {
+export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[];
     greedyWordCountRecords: DocumentWordCount[];
     wordRecognitionRecords: WordRecognitionRow[];
@@ -16,7 +18,12 @@ export interface ScheduleRowData {
     word: string;
 }
 
-export interface NormalizedScheduleRowData extends ScheduleRowData {
+export type ScheduleRowRecord = SuperMemoItem & {
+    nextDueDate: Date;
+    grade: SuperMemoGrade;
+    timestamp: Date;
+};
+export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData{
     count: SortValue<number>;
     dueDate: SortValue<Date>;
     length: SortValue<number>;
@@ -33,15 +40,13 @@ export interface SortValue<T> {
     weight: number;
 }
 
-export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
+type ScheduleRowItem = { nextDueDate: Date, grade: SuperMemoGrade, timestamp: Date };
+
+export class ScheduleRow<T> {
     private _dueDate: Date;
 
-    constructor(public d: T) {
-        this._dueDate = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.nextDueDate || new Date();
-    }
-
-    public count() {
-        return sum(this.d.wordCountRecords.map(r => r.count));
+    constructor(public d: T, private recordsWithDueDate: ScheduleRowItem[]) {
+        this._dueDate = this.recordsWithDueDate[this.recordsWithDueDate.length - 1]?.nextDueDate || new Date();
     }
 
     public dueDate() {
@@ -49,11 +54,11 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public isNew() {
-        return this.d.wordRecognitionRecords.length === 0;
+        return this.recordsWithDueDate.length === 0;
     }
 
-    public wordRecognitionScore() {
-        return this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1]?.grade || 0;
+    public recognitionScore() {
+        return this.recordsWithDueDate[this.recordsWithDueDate.length - 1]?.grade || 0;
     }
 
     public isToReview() {
@@ -67,7 +72,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public hasNRecognizedInARow(n = 2) {
-        const last2 = this.d.wordRecognitionRecords.slice(n * -1);
+        const last2 = this.recordsWithDueDate.slice(n * -1);
         return last2.every(rec => rec.grade === SrmService.correctScore());
     }
 
@@ -76,12 +81,12 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
     }
 
     public isLearning() {
-        if (!this.d.wordRecognitionRecords.length) return false;
+        if (!this.recordsWithDueDate.length) return false;
         if (!this.isOverDue()) {
             return false;
         }
-        const lastRecord = this.d.wordRecognitionRecords[this.d.wordRecognitionRecords.length - 1];
-        const last2Records = ScheduleRow.lastNRecords(this.d.wordRecognitionRecords, 2);
+        const lastRecord = this.recordsWithDueDate[this.recordsWithDueDate.length - 1];
+        const last2Records = ScheduleRow.lastNRecords(this.recordsWithDueDate, 2);
         return last2Records.length === 2 &&
             last2Records
                 .every(record =>
@@ -108,7 +113,7 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
 
     wasLearnedToday() {
         const lastTwoRecords = ScheduleRow.lastNRecords(
-            this.d.wordRecognitionRecords,
+            this.recordsWithDueDate,
             2
         );
         return lastTwoRecords.length === 2 && lastTwoRecords
@@ -119,6 +124,6 @@ export class ScheduleRow<T extends ScheduleRowData = ScheduleRowData> {
             );
     }
     isUnlearned() {
-        return this.d.wordRecognitionRecords.length === 0;
+        return this.recordsWithDueDate.length === 0;
     }
 }

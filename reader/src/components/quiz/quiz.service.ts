@@ -6,7 +6,7 @@ import {orderBy, uniq} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
 import {ExampleSegmentsService} from "../../lib/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
-import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
 import {SettingsService} from "../../services/settings.service";
@@ -14,7 +14,7 @@ import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-sch
 import {wordCardFactory} from "./card-card.factory";
 import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
 
-export const filterQuizRows = (rows: ScheduleRow<NormalizedScheduleRowData>[]) => rows
+export const filterQuizRows = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
     .filter(r => r.count() > 0);
 
@@ -29,7 +29,7 @@ export const computeRandomHiddenQuizFields = () => {
 
 export class QuizService {
     quizCard: QuizCard;
-    currentScheduleRow$: Observable<ScheduleRow<NormalizedScheduleRowData>>
+    currentScheduleRow$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>>
     manualHiddenFieldConfig$ = new ReplaySubject<string>();
 
     constructor(

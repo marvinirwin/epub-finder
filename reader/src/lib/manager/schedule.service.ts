@@ -5,18 +5,18 @@ import {map, shareReplay, startWith} from "rxjs/operators";
 import moment from "moment";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
 import {SrmService} from "../srm/srm.service";
-import {ScheduleRowsService} from "./schedule-rows.service";
+import {ScheduleRowsService} from "../schedule/schedule-rows.service";
 import {SettingsService} from "../../services/settings.service";
-import {ScheduleMathService} from "./schedule-math.service";
+import {ScheduleMathService} from "../schedule/schedule-math.service";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
-import {NormalizedScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow, ScheduleRowData} from "../schedule/schedule-row";
 import {filterQuizRows} from "../../components/quiz/quiz.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
 
 export class ScheduleService {
-    sortedScheduleRows$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
+    sortedScheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
     learningCards$: Observable<ScheduleRow[]>;
 
     private today: number;
@@ -24,12 +24,11 @@ export class ScheduleService {
     srmService: SrmService;
     newCards$: Observable<ScheduleRow[]>;
     toReviewCards$: Observable<ScheduleRow[]>;
-    cardsLearnedToday$: Observable<ScheduleRow<NormalizedScheduleRowData>[]>;
+    cardsLearnedToday$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>;
 
     constructor({
                     scheduleRowsService,
                 }: {
-        db: DatabaseService,
         scheduleRowsService: ScheduleRowsService,
     }) {
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);

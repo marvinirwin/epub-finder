@@ -14,7 +14,7 @@ import {ManagerContext} from "../../App";
 import {QuizCard} from "./word-card.interface";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../hotkey-wrapper";
-import {NormalizedScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
 
 export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) => {
     const m = useContext(ManagerContext);
