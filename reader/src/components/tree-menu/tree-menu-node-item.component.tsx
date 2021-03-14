@@ -11,56 +11,33 @@ export function TreeMenuNodeItem(
         componentChanged,
         actionSelected,
         directoryChanged,
-        useMinified
+        hidden
     }: {
-        treeNode: ds_Tree<TreeMenuNode>,
+        treeNode: TreeMenuNode,
         directoryPath: string[], componentChanged: (s: string[]) => void,
         actionSelected: (s: string[]) => void,
         directoryChanged: (s: string[]) => void,
-        useMinified: boolean
+        hidden: boolean
     }) {
-    const TreeMenuNode = treeNode.value as TreeMenuNode;
-
     return <ListItem
         button
         selected={false}
-        id={TreeMenuNode?.name}
+        id={treeNode.name}
+        style={{display: hidden ? 'none' : ''}}
         onClick={() => {
-            if (TreeMenuNode) {
-                const newPath = directoryPath.concat(TreeMenuNode?.name);
-                if (TreeMenuNode.Component) {
-                    componentChanged(newPath);
-                }
-                if (TreeMenuNode.action) {
-                    actionSelected(newPath);
-                }
-                if (TreeMenuNode.moveDirectory) {
-                    directoryChanged(newPath);
-                }
+            const newPath = directoryPath.concat(treeNode?.name);
+            if (treeNode.Component) {
+                componentChanged(newPath);
+            }
+            if (treeNode.action) {
+                actionSelected(newPath);
+            }
+            if (treeNode.moveDirectory) {
+                directoryChanged(newPath);
             }
         }}
     >
-        <ListItemIcon>{TreeMenuNode.LeftIcon ? <TreeMenuNode.LeftIcon/> : <Settings/>}</ListItemIcon>
-        <ListItemText primary={TreeMenuNode.label} />
-{/*
-        {TreeMenuNode?.LeftIcon && <ListItemIcon><TreeMenuNode.LeftIcon/></ListItemIcon>}
-*/}
-{/*
-        {!TreeMenuNode?.InlineComponent && <ListItemText primary={TreeMenuNode?.label}/>}
-        {TreeMenuNode?.InlineComponent && <TreeMenuNode.InlineComponent/>}
-*/}
-{/*
-        {TreeMenuNode?.moveDirectory && <ListItemSecondaryAction>
-            <IconButton
-                style={{marginRight: useMinified ? 150 : undefined}}
-                onClick={() => {
-                    TreeMenuNode && directoryChanged(directoryPath.concat(TreeMenuNode.name))
-                }}
-            >
-                <KeyboardArrowRight color={'action'}/>
-            </IconButton>
-        </ListItemSecondaryAction>
-        }
-*/}
+        <ListItemIcon>{treeNode.LeftIcon ? <treeNode.LeftIcon/> : <Settings/>}</ListItemIcon>
+        <ListItemText primary={treeNode.label}/>
     </ListItem>;
 }

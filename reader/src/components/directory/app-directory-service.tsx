@@ -33,9 +33,7 @@ function AppDirectory(
         ReadingNode(m),
         [
             ReadingNode(m, selectedComponent === 'reading'),
-            [
-                LanguageSelectNode(m)
-            ],
+            LanguageSelectNode(m),
             SignInWithNode(profile),
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),

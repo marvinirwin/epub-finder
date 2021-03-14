@@ -6,6 +6,8 @@ import {TreeMenuNode} from "../directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {TreeMenuNodeItem} from "./tree-menu-node-item.component";
 import IconButton from "@material-ui/core/IconButton";
+import {flattenTree} from "../../lib/delta-scan/delta-scan.module";
+import { uniq } from "lodash";
 
 
 export const TreeMenu: React.FunctionComponent<{
@@ -27,9 +29,12 @@ export const TreeMenu: React.FunctionComponent<{
     }
 ) => {
     const useMinified = false;
-    const treeNodes = Object.values(walkTree(tree, ...directoryPath)?.children || {})
-        .filter(treeNode => !treeNode?.value?.hidden);
-
+    const visibleTreeNodes = new Set(
+        Object.values(walkTree(tree, ...directoryPath)?.children || {})
+        .filter(treeNode => !treeNode?.value?.hidden)
+            .map(v => v.value)
+    );
+    const allTreeNodes = uniq(flattenTree(tree));
     return <Fragment>
         {
             directoryPath.length ? <ListItem>
@@ -42,17 +47,16 @@ export const TreeMenu: React.FunctionComponent<{
                 null
         }
         {
-            treeNodes
-                .map((treeNode, index) =>
-                    <TreeMenuNodeItem
-                        key={Math.random()}
-                        treeNode={treeNode}
-                        directoryPath={directoryPath}
-                        componentChanged={componentChanged}
-                        actionSelected={actionSelected}
-                        directoryChanged={directoryChanged}
-                        useMinified={useMinified}/>
-                )
+            allTreeNodes.map(treeNode => <TreeMenuNodeItem
+                key={Math.random()}
+                treeNode={treeNode}
+                directoryPath={directoryPath}
+                componentChanged={componentChanged}
+                actionSelected={actionSelected}
+                directoryChanged={directoryChanged}
+                hidden={!visibleTreeNodes.has(treeNode)}
+                />
+            )
         }
     </Fragment>
     {/*
