@@ -24,7 +24,10 @@ export class DocumentRepository {
                 this.collection$.next(mergeMaps(mappedDocuments, this.collection$.getValue()));
             }
         );
+        // !! Bad
+        obs$.subscribe();
         this.isFetching$ = isLoading$;
+        this.fetchSignal$.next()
     }
 
 

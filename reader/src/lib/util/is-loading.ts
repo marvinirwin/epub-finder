@@ -1,5 +1,5 @@
 import {BehaviorSubject, Observable} from "rxjs";
-import {switchMap, tap} from "rxjs/operators";
+import {shareReplay, switchMap, tap} from "rxjs/operators";
 
 export const isLoading = <T, U>(
     o$: Observable<T>,
@@ -15,6 +15,7 @@ export const isLoading = <T, U>(
             tap(() => isLoading$.next(true)),
             switchMap(switchMapFn),
             tap(() => isLoading$.next(false)),
+            shareReplay(1)
         ),
     }
 }
