@@ -40,7 +40,7 @@ export class SortedLimitScheduleRowsService {
                 const wordsReviewingOrLearning = sortedScheduleRows.filter(
                     r => r.isLearning()
                 )
-                const wordsWhichHaventBeenStarted = sortedScheduleRows.filter(
+                const unstartedWords = sortedScheduleRows.filter(
                     scheduleRow => scheduleRow.d.wordCountRecords.length && !scheduleRow.isUnlearned()
                 ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
@@ -48,12 +48,12 @@ export class SortedLimitScheduleRowsService {
                     wordsToReview,
                     wordsLearnedToday,
                     wordsReviewingOrLearning,
-                    wordsLeftForToday: wordsWhichHaventBeenStarted,
+                    wordsLeftForToday: unstartedWords,
                     limitedScheduleRows: orderBy(
                         [
                             ...wordsToReview,
                             ...wordsReviewingOrLearning,
-                            ...wordsWhichHaventBeenStarted
+                            ...unstartedWords
                         ],
                         r => r.d.finalSortValue,
                         'desc'

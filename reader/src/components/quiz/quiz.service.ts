@@ -54,7 +54,9 @@ export class QuizService {
     ) {
         this.manualHiddenFieldConfig$.next('');
         this.currentScheduleRow$ = sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$.pipe(
-            map(rows => filterQuizRows(rows.limitedScheduleRows)[0]),
+            map(rows => {
+                return rows.limitedScheduleRows[0];
+            }),
         );
         const currentWord$ = this.currentScheduleRow$.pipe(map(row => row?.d.word));
         const openExampleSentencesDocument = OpenExampleSentencesFactory(
