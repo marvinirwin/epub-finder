@@ -44,17 +44,20 @@ export class SortedLimitScheduleRowsService {
                     scheduleRow => !scheduleRow.isUnlearned()
                 ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
+                let collection = [
+                    ...wordsToReview,
+                    ...learning,
+                    ...unstartedWords
+                ];
+                const ren = collection.find(word => word.d.word === '人');
+                debugger;console.log();
                 return {
                     wordsToReview,
                     wordsLearnedToday,
                     wordsReviewingOrLearning: learning,
                     wordsLeftForToday: unstartedWords,
                     limitedScheduleRows: orderBy(
-                        [
-                            ...wordsToReview,
-                            ...learning,
-                            ...unstartedWords
-                        ],
+                        collection,
                         r => r.d.finalSortValue,
                         'desc'
                     )
