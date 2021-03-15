@@ -116,6 +116,10 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
             value={description || ''}
             onChange={e => wordCard.description$.set(e.target.value)}
         />
+        <Typography variant={'h6'}>Learning: {scheduleRow?.isLearning() ? 'Yes' : 'No'}</Typography>
+        <Typography variant={'h6'}>To review: {scheduleRow?.isToReview() ? 'Yes' : 'No'}</Typography>
+        <Typography variant={'h6'}>Learned Today: {scheduleRow?.wasLearnedToday() ? 'Yes' : 'No'}</Typography>
+        <Typography variant={'h6'}>Unstarted: {scheduleRow?.isUnlearned() ? 'Yes' : 'No'}</Typography>
         <br/>
         {scheduleRow && <RecognitionRowTable scheduleRow={scheduleRow}/>}
         <br/>
