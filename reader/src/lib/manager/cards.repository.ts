@@ -1,6 +1,6 @@
 import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from "rxjs";
 import {getIsMeFunction, ICard} from "../../../../server/src/shared/ICard";
-import {Dictionary, orderBy, maxBy, flatten} from "lodash";
+import {Dictionary, flatten, maxBy} from "lodash";
 import {map, scan, shareReplay, startWith} from "rxjs/operators";
 import {Settings} from "../../../../server/src/shared/Message";
 import {DatabaseService} from "../Storage/database.service";
@@ -29,9 +29,7 @@ export const priorityMouseoverHighlightWord = (
         flatten(
             atomMetadata.words
                 .map(word => {
-                    const cardMapElement = cardMap[word.word] || [];
-                    return cardMapElement
-                        .filter(v => !v.highlightOnly);
+                    return cardMap[word.word] || []
                 })
         ), c => c.learningLanguage.length);
 }

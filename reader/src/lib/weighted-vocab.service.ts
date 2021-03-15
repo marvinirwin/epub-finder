@@ -18,10 +18,12 @@ export class WeightedVocabService {
                 map((indexedScheduleRows) => {
                     return new Map(
                         Object.values(indexedScheduleRows)
-                            .map(scheduleRow => [
-                                scheduleRow.d.word,
-                                scheduleRow.isRecognized() ? 1 : 0
-                            ])
+                            .map(scheduleRow => {
+                                return [
+                                    scheduleRow.d.word,
+                                    scheduleRow.isRecognized() ? 1 : 0
+                                ];
+                            })
                     )
                 }),
                 shareReplay(1)

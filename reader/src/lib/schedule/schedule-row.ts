@@ -116,7 +116,10 @@ export class ScheduleRow<T> {
     }
 
     public isRecognized() {
+        return this.recognitionScore() >= 3;
+/*
         return !this.isUnrecognized() && !this.isSomewhatRecognized()
+*/
     }
 
     wasLearnedToday() {

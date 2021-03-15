@@ -73,13 +73,11 @@ export class QuizCardScheduleRowsService {
                 allWords.forEach(word => {
                     ensureScheduleRow(word)
                 })
-                wordCounts.serializedTabulations.forEach(({greedyDocumentWordCounts}) => {
+                wordCounts.serializedTabulations.forEach(({documentWordCounts}) => {
                     /**
                      * Prevent cards created only for visual purposes from showing up in the quiz rows
                      */
-                    [...greedyDocumentWordCounts.entries()].filter(
-                        ([word]) => cardIndex[word]?.find(card => !card.highlightOnly)
-                    ).forEach(([word, wordCountRecords]) => {
+                    Object.entries(documentWordCounts).forEach(([word, wordCountRecords]) => {
                         if (scheduleRows[word]) {
                             scheduleRows[word].wordCountRecords.push(...wordCountRecords)
                         }
