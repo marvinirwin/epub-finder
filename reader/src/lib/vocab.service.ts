@@ -6,8 +6,6 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 import {DocumentRepository} from "./documents/document.repository";
 import {FrequencyDocument} from "./frequency-documents";
-import {TrieService} from "./manager/trie.service";
-import {TabulateLocalDocumentDto} from "./Workers/tabulate-local-document.dto";
 import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export class VocabService {

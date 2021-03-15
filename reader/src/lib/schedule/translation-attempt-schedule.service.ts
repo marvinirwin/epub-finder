@@ -5,10 +5,19 @@ import {OpenDocumentsService} from "../manager/open-documents.service";
 import {combineLatest, Observable} from "rxjs";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {map} from "rxjs/operators";
+import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
+import {WeightedVocabService} from "../weighted-vocab.service";
+import {orderBy} from "lodash";
+import {
+    wordListAverageDifficulty,
+    wordsFromCountRecordList
+} from "../../../../server/src/shared/tabulation/word-count-records.module";
+import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: TranslationAttemptRecord[];
     segmentText: string;
+    wordCountRecords: WordCountRecord[]
 }
 
 export class TranslationAttemptScheduleService implements ScheduleRowsService<TranslationAttemptScheduleData> {
@@ -17,23 +26,30 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
     constructor(
         {
             translationAttemptRepository,
-            openDocumentsService
+            openDocumentsService,
+            weightedVocabService
         }: {
             translationAttemptRepository: TranslationAttemptRepository,
-            openDocumentsService: OpenDocumentsService
+            openDocumentsService: OpenDocumentsService,
+            weightedVocabService: WeightedVocabService
         }
     ) {
         this.indexedScheduleRows$ = combineLatest([
             openDocumentsService.virtualDocumentTabulation$,
-            translationAttemptRepository.records$
+            translationAttemptRepository.records$,
+            weightedVocabService.weightedVocab$
         ]).pipe(
-            map(([virtualDocumentTabulation, translationAttempts]) => {
+            map(([
+                     virtualDocumentTabulation,
+                     translationAttempts,
+                     weightedVocab]) => {
                 const scheduleRows: ds_Dict<TranslationAttemptScheduleData> = {};
                 const ensureScheduleRow = (segmentText: string) => {
                     if (!scheduleRows[segmentText]) {
                         scheduleRows[segmentText] = {
                             translationAttemptRecords: [],
                             segmentText,
+                            wordCountRecords: []
                         } as TranslationAttemptScheduleData;
                     }
                     return scheduleRows[segmentText];
@@ -41,21 +57,34 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                 virtualDocumentTabulation.serializedTabulations
                     .forEach(serialzedTabulation => serialzedTabulation
                         .segmentWordCountRecordsMap
-                        .forEach((value, key) =>
-                            ensureScheduleRow(key.text)
+                        .forEach((value, key) => {
+                                ensureScheduleRow(key.text).wordCountRecords.push(...value);
+                            }
                         )
                     );
                 Object.entries(translationAttempts)
-                    .forEach(([key, value]) => ensureScheduleRow(key)
-                        .translationAttemptRecords.push(...value))
+                    .forEach(([key, value]) => {
+                        if (scheduleRows[key]) {
+                            scheduleRows[key].translationAttemptRecords.push(...value);
+                        }
+                    })
                 return Object.fromEntries(
-                    Object.values(scheduleRows).map(scheduleRowData => [
-                            scheduleRowData.segmentText,
-                            new ScheduleRow(
-                                scheduleRowData,
-                                scheduleRowData.translationAttemptRecords
-                            )
-                        ]
+                    orderBy(
+                        Object.values(scheduleRows)
+                            .map(scheduleRowData => [
+                                    scheduleRowData.segmentText,
+                                    new ScheduleRow(
+                                        scheduleRowData,
+                                        scheduleRowData.translationAttemptRecords
+                                    )
+                                ]
+                            ),
+                        ([segmentText, scheduleRow]: [string, ScheduleRow<TranslationAttemptScheduleData>]) =>
+                            wordListAverageDifficulty(
+                                wordsFromCountRecordList(scheduleRow.d.wordCountRecords),
+                                weightedVocab
+                            ),
+                        'desc'
                     )
                 );
             })

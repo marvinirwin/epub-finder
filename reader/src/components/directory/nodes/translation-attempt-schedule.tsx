@@ -1,13 +1,15 @@
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {CalendarTodayOutlined} from "@material-ui/icons";
+import {CalendarTodayOutlined, Call} from "@material-ui/icons";
 import React from "react";
 import {TableCell, TableHead, TableRow, Toolbar, Typography} from "@material-ui/core";
 import {TranslationAttemptScheduleData} from "../../../lib/schedule/translation-attempt-schedule.service";
 import {ScheduleRow} from "../../../lib/schedule/schedule-row";
 import {TranslationAttemptScheduleTable} from "./translation-attempt-schedule-table.component";
+import {TranslationAttempt} from "../../translation-attempt/translation-attempt.component";
 
 
-const TranslationAttemptScheduleNode = '';
+const TranslationAttemptScheduleNode = 'TranslationAttemptScheduleNode ';
+const TranslationAttemptNodeLabel = 'TranslationAttemptNodeLabel';
 
 export const TranslationAttemptTableHead: React.FC<{}> = () => {
     return <TableHead>
@@ -50,4 +52,10 @@ export const TranslationAttemptSchedule: TreeMenuNode = {
     label: 'Translation Attempt Schedule',
     Component: TranslationAttemptScheduleTable,
     LeftIcon: () => <CalendarTodayOutlined/>
+}
+export const TranslationAttemptNode: TreeMenuNode = {
+    name: TranslationAttemptScheduleNode,
+    label: 'Translation Attempt Schedule',
+    Component: () => <TranslationAttempt/>,
+    LeftIcon: () => <Call/>
 }

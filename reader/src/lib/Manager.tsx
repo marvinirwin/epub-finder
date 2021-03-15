@@ -95,6 +95,7 @@ import {TranslationAttemptScheduleService} from "./schedule/translation-attempt-
 import {TranslationAttemptRepository} from "./schedule/translation-attempt.repository";
 import {QuizScheduleRowData} from "./schedule/schedule-row";
 import {TranslationAttemptService} from "../components/translation-attempt/translation-attempt.service";
+import {WeightedVocabService} from "./weighted-vocab.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -199,6 +200,7 @@ export class Manager {
     translationAttemptScheduleService: TranslationAttemptScheduleService;
     translationAttemptRepository: TranslationAttemptRepository;
     translationAttemptService: TranslationAttemptService;
+    weightedVocabService: WeightedVocabService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -282,6 +284,7 @@ export class Manager {
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
         this.translationAttemptRepository = new TranslationAttemptRepository(this)
+        this.weightedVocabService = new WeightedVocabService(this);
         this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
         this.translationAttemptService = new TranslationAttemptService(this)
 

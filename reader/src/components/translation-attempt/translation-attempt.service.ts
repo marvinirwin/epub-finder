@@ -7,6 +7,8 @@ import {distinctUntilChanged, map, shareReplay, switchMap} from "rxjs/operators"
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {ScheduleRow} from "../../lib/schedule/schedule-row";
 
+
+
 export class TranslationAttemptService {
     currentTranslation$: Observable<string | undefined>;
     currentKnownLanguage$: Observable<string | undefined>;
