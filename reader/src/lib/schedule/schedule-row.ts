@@ -147,11 +147,11 @@ export class ScheduleRow<T> {
             .every(
                 r => r.grade >= 3 &&
                     isToday(r.timestamp) &&
-                    !isAfter(r.nextDueDate, Date.now())
+                    isAfter(r.nextDueDate, Date.now())
             );
     }
 
-    isUnlearned() {
+    isNotStarted() {
         return this.superMemoRecords.length === 0;
     }
 }

@@ -1,9 +1,8 @@
 import {SettingsService} from "../../services/settings.service";
-import {ScheduleService} from "../schedule/schedule.service";
 import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
-import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
+import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 
 type LimitedScheduleRows = {
@@ -41,23 +40,20 @@ export class SortedLimitScheduleRowsService {
                     r => r.isLearning()
                 )
                 const unstartedWords = sortedScheduleRows.filter(
-                    scheduleRow => !scheduleRow.isUnlearned()
+                    scheduleRow => scheduleRow.isNotStarted()
                 ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
-                let collection = [
-                    ...wordsToReview,
-                    ...learning,
-                    ...unstartedWords
-                ];
-                const ren = collection.find(word => word.d.word === '人');
-                debugger;console.log();
                 return {
                     wordsToReview,
                     wordsLearnedToday,
                     wordsReviewingOrLearning: learning,
                     wordsLeftForToday: unstartedWords,
                     limitedScheduleRows: orderBy(
-                        collection,
+                        [
+                            ...wordsToReview,
+                            ...learning,
+                            ...unstartedWords
+                        ],
                         r => r.d.finalSortValue,
                         'desc'
                     )
