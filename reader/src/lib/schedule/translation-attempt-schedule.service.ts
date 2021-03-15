@@ -13,6 +13,7 @@ import {
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
+import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
 
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: TranslationAttemptRecord[];
@@ -58,7 +59,9 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                     .forEach(serialzedTabulation => serialzedTabulation
                         .segmentWordCountRecordsMap
                         .forEach((value, key) => {
+                            if (key.text.split('').find(isChineseCharacter)) {
                                 ensureScheduleRow(key.text).wordCountRecords.push(...value);
+                            }
                             }
                         )
                     );
@@ -67,8 +70,8 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                         if (scheduleRows[key]) {
                             scheduleRows[key].translationAttemptRecords.push(...value);
                         }
-                    })
-                return Object.fromEntries(
+                    });
+                const fromEntries = Object.fromEntries(
                     orderBy(
                         Object.values(scheduleRows)
                             .map(scheduleRowData => [
@@ -87,6 +90,7 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                         'desc'
                     )
                 );
+                return fromEntries;
             })
         )
     }

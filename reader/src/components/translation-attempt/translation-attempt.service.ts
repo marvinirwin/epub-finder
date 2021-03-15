@@ -25,7 +25,10 @@ export class TranslationAttemptService {
         }
     ) {
         this.currentScheduleRow$ = translationAttemptScheduleService.indexedScheduleRows$
-            .pipe(map(rows => rows[0]));
+            .pipe(
+                map(indexedRows => Object.values(indexedRows)[0]),
+                shareReplay(1)
+            );
         this.currentKnownLanguage$ = this.currentScheduleRow$.pipe(
             map(row => row?.d.segmentText),
             distinctUntilChanged(),

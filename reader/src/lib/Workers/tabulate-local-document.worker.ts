@@ -11,6 +11,7 @@ import {
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
+import {SerializedSegment, WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
 // @ts-ignore
 self.window = self;
@@ -34,7 +35,8 @@ ctx.onmessage = async (ev) => {
             wordCounts: tabulated.wordCounts,
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
             documentWordCounts: tabulated.documentWordCounts,
-            greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts
+            greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts,
+            segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap
         } as SerializedDocumentTabulation);
     } catch (e) {
         console.error(e);
@@ -47,7 +49,8 @@ ctx.onmessage = async (ev) => {
                 atomMetadatas: new Map(),
                 wordCounts: {},
                 wordSegmentStringsMap: new Map(),
-                greedyDocumentWordCounts: new Map()
+                greedyDocumentWordCounts: new Map(),
+                segmentWordCountRecordsMap: new Map()
             }
         )
     }

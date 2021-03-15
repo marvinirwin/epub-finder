@@ -8,6 +8,7 @@ import moment from "moment";
 import {Observable} from "rxjs";
 import {AdvanceButton} from "../quiz/quiz-card-buttons.component";
 import {DifficultyButtons} from "./difficulty-buttons.component";
+import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 
 export const translateRequest = '';
 
@@ -42,16 +43,17 @@ export const TranslationAttempt: React.FC = () => {
     useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
     useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
     useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
-    useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true))
-    return <Paper>
+    useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true));
+    const knownText = `You know ${sumWordCountRecords(currentRow?.d.wordCountRecords)} / ${}`;
+    return <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
         {
             knownLanguage &&
             <Fragment>
-                <Typography>
+                <Typography variant={'h3'} style={{margin: '24px'}}>
                     {knownLanguage}
                 </Typography>
                 <TextField
-                    label="Translate"
+                    label=
                     inputProps={{id: translateRequest}}
                     multiline
                     rows={3}
