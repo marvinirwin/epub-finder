@@ -8,8 +8,10 @@ export class SetWithUniqueLengths {
     }
 
     add(v: string) {
-        this.set.add(v);
-        this.uniqueLengths.add(v.length)
+        if (v.length) {
+            this.set.add(v);
+            this.uniqueLengths.add(v.length)
+        }
     }
     delete(v: string) {
         // TODO this doesn't delete from uniqueLengths, might be a problem in future

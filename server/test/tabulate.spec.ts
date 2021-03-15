@@ -6,6 +6,40 @@ import {Document} from "../src/entities/document.entity";
 import {DocumentView} from "../src/entities/document-view.entity";
 import {User} from "../src/entities/user.entity";
 import {DatabaseModule} from "../src/config/database.module";
+import {wordsFromCountRecordList} from "../src/shared/tabulation/word-count-records.module";
+
+async function tabulateHtml3(tabulateService: TabulateService) {
+    return await tabulateService.tabulateNoCache(
+        {where: {name: "Test Html 3 Sentences"}},
+        [
+            '你好',
+            '你',
+            '好',
+            '今',
+            '天',
+            '今天',
+            '之',
+            '所以',
+            '所',
+            '以',
+            '搞出',
+            '出',
+            '搞',
+            '这么多',
+            '大',
+            '内乱',
+            '内',
+            '乱',
+            '原因',
+            '主要',
+            '主',
+            '要',
+            '这几点',
+            '这',
+            '几点',
+        ]
+    );
+}
 
 describe('document tabulation', () => {
     let tabulateService: TabulateService;
@@ -41,10 +75,7 @@ describe('document tabulation', () => {
         }
     );
     it('Calculates regular word counts, greedy work counts, cross segment counting', async () => {
-        const tabulation = await tabulateService.tabulateNoCache(
-            {where: {name: "Test Html 3 Sentences"}},
-            ['你好', '你', '好', '今', '天', '今天']
-        );
+        const tabulation = await tabulateHtml3(tabulateService);
         expect(tabulation.greedyWordCounts.get('你好')).toBe(2);
         expect(tabulation.greedyWordCounts.get('今天')).toBe(2);
         expect(tabulation.wordCounts).toEqual({
@@ -55,6 +86,13 @@ describe('document tabulation', () => {
             "今": 2,
             "天": 2
         });
-
+    });
+    it('Counts word records', async () => {
+        const tabulation = await tabulateHtml3(tabulateService);
+        const segmentWord = [...tabulation.segmentWordCountRecordsMap.values()];
+        const countRecords = wordsFromCountRecordList(
+            segmentWord[segmentWord.length - 1]
+        );
+        expect(countRecords).toHaveLength(9)
     })
 })

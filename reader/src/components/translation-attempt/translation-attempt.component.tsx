@@ -50,12 +50,15 @@ export const TranslationAttempt: React.FC = () => {
     useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
     useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
     useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true));
+    if (currentRow !== undefined) {
+        debugger;console.log()
+    }
     const totalWords = wordsFromCountRecordList(currentRow?.d?.wordCountRecords || []);
     const average = wordListAverageDifficulty(
         totalWords,
         weightedVocab
     );
-    const knownText = `There is an average difficulty ${average} of ${totalWords.length}`;
+    const knownText = `${totalWords.map(word => `${word}: ${weightedVocab.get(word) || 0}`).join(', ')}`;
     return <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
         {
             learningLanguage &&
