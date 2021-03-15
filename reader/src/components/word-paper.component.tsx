@@ -15,8 +15,6 @@ import {CardImage} from "./quiz/quiz-card-image.component";
 import {
     quizCardDescription,
     quizCardLearningLanguage,
-    quizCardRomanization,
-    quizCardTranslation,
     wordCardRomanization, wordCardTranslation
 } from "@shared/";
 import {useObservableState} from "observable-hooks";
@@ -47,7 +45,7 @@ const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedQuizCar
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {scheduleRow.d.recordsWithDueDate.map((row) => (
+                    {scheduleRow.d.wordRecognitionRecords.map((row) => (
                         <TableRow key={row.id}>
                             <TableCell component="th" scope="row">
                                 {row.grade}

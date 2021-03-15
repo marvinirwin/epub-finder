@@ -5,7 +5,7 @@ import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
 import {HighlighterService} from "./highlighter.service";
 import {RGBA} from "./color.service";
 import {QuizService} from "../../components/quiz/quiz.service";
-import {ScheduleRow} from "../schedule/schedule-row";
+import {QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 
 export const timeWordsMap = (timeout: number, numbers: RGBA) => (words: string[]) => {
     const m = new Map<string, RGBA>();
@@ -26,7 +26,7 @@ export class Highlighter {
     mouseoverHighlightedSentences$ = new ReplaySubject<string | undefined>(1);
     deletedCards$ = new ReplaySubject<string[]>(1);
     createdCards$ = new ReplaySubject<string[]>(1);
-    highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow>>(1);
+    highlightWithDifficulty$ = new ReplaySubject<ds_Dict<ScheduleRow<QuizScheduleRowData>>>(1);
 
     constructor({
                     highlighterService,

@@ -13,7 +13,8 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
                     }
                     return v
                 }),
-                add: (r) => db.ignoredWords.add(r)
+                add: (r) => db.ignoredWords.add(r),
+            getIndexValue: r => ({indexValue: r.word})
             }
         );
     }

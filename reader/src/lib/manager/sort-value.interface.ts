@@ -5,13 +5,6 @@ export function getInverseLogNormalValue(normalCount: number) {
         return 0;
     }
     return normalCount;
-    /*
-        const number = Math.log(normalCount);
-        if (number < 0) {
-            debugger;console.log();
-        }
-        return number;
-    */
 }
 
 export function getSortValue<T>(normalizedValue: number, weight: number, value: T): SortValue<T> {

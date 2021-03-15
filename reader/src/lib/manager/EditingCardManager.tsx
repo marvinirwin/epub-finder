@@ -57,8 +57,6 @@ export default class EditingCardManager {
             });
 
         this.showEditingCardPopup$.subscribe(v => {
-            console.log()
-            // Why does this fix it??
         })
     }
 }

@@ -5,7 +5,7 @@ import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {CORRECT_RECOGNITION_SCORE} from "../highlighting/Highlighter";
 import HSK1 from '../hsk/hsk-level-1.json';
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
-import {ScheduleRow} from "../schedule/schedule-row";
+import {QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 
 export interface HSKWord {
     id: number;
@@ -56,7 +56,7 @@ export class ProgressManager {
                     scheduleRows$,
                 }: {
         wordRecognitionRows$: Observable<ds_Dict<WordRecognitionRow[]>>,
-        scheduleRows$: Observable<ds_Dict<ScheduleRow>>
+        scheduleRows$: Observable<ds_Dict<ScheduleRow<QuizScheduleRowData>>>
     }) {
         // Let's maintain some fractions
         // Ultimate Progress

@@ -47,7 +47,7 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedQuizCardSch
             <TableCell
                 className={quizCardTableRowRecognitions}
             >{
-                lastN(1)(row.d.recordsWithDueDate)
+                lastN(1)(row.d.wordRecognitionRecords)
                     .map(r => `${r.grade}`)
                     .join(',')
             }

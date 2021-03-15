@@ -55,5 +55,6 @@ describe('document tabulation', () => {
             "今": 2,
             "天": 2
         });
+
     })
 })

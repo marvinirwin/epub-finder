@@ -11,11 +11,9 @@ import CardsRepository from "./manager/cards.repository";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 import {QuizManager} from "./manager/QuizManager";
 import {BrowserInputs} from "./hotkeys/browser-inputs";
-import {CardScheduleQuiz} from "./manager/manager-connections/Card-Schedule-Quiz";
 import {InputPage} from "./manager/manager-connections/Input-Page";
 import {CardPage} from "./manager/manager-connections/Card-Page";
 import {InputQuiz} from "./manager/manager-connections/Input-Quiz";
-import {ScheduleQuiz} from "./manager/manager-connections/Schedule-Quiz";
 import {CreatedSentenceManager} from "./manager/CreatedSentenceManager";
 import {Segment} from "@shared/";
 import {mergeDictArrays} from "./util/mergeAnnotationDictionary";
@@ -69,7 +67,6 @@ import {TabulatedDocuments} from "@shared/";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
-import {TrieService} from "./manager/trie.service";
 import {ToastMessageService} from "./toast-message.service";
 import {ProgressItemService} from "../components/progress-item.service";
 import {IsRecordingService} from "./is-recording.service";
@@ -317,11 +314,9 @@ export class Manager {
             .subscribe(metadata => {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
             })
-        CardScheduleQuiz(this.cardsRepository, this.quizCardScheduleService, this.quizManager);
         InputPage(this.browserInputs, this.openDocumentsService);
         CardPage(this.cardsRepository, this.openDocumentsService);
         InputQuiz(this.browserInputs, this.quizManager)
-        ScheduleQuiz(this.quizCardScheduleService, this.quizManager);
         CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioRecordingService)
 
         this.openDocumentsService.renderedSegments$.subscribe(segments => {

@@ -5,11 +5,11 @@ import {map, withLatestFrom} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import moment from "moment";
-import {ScheduleRow} from "../schedule/schedule-row";
+import {QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 
 export const QuizResultToRecognitionRows =
     (
-        scheduleRows$: Observable<Dictionary<ScheduleRow>>,
+        scheduleRows$: Observable<Dictionary<ScheduleRow<QuizScheduleRowData>>>,
         ms: SrmService
     ) =>
         (obs$: Observable<QuizResult>) =>
@@ -17,7 +17,7 @@ export const QuizResultToRecognitionRows =
                 withLatestFrom(scheduleRows$),
                 map(([scorePair, wordScheduleRowDict]): WordRecognitionRow => {
                     const previousRecords = wordScheduleRowDict[scorePair.word]?.d.wordRecognitionRecords || []
-                    const nextRecognitionRecord = ms.getNextRecognitionRecord(
+                    const nextRecognitionRecord = SrmService.getNextRecognitionRecord(
                         previousRecords,
                         scorePair.grade,
                     );

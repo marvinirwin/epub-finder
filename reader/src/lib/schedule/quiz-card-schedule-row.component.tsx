@@ -7,6 +7,7 @@ import {QuizCard} from "../../components/quiz/word-card.interface";
 import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
+import {sumWordCountRecords} from "./schedule-math.service";
 
 export const QuizCardScheduleRowDisplay = (
     {
@@ -29,7 +30,7 @@ export const QuizCardScheduleRowDisplay = (
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.dueDate}/>}
         </div>
         <div style={{marginTop: '24px'}}>
-            Frequency: {scheduleRow.count()}
+            Frequency: {sumWordCountRecords(scheduleRow)}
             {DEV && <div>Hidden Fields: {JSON.stringify([...hiddenFields.values()])}</div>}
             {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
         </div>
