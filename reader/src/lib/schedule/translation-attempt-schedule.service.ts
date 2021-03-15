@@ -87,7 +87,7 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                                 wordsFromCountRecordList(scheduleRow.d.wordCountRecords),
                                 weightedVocab
                             ),
-                        'desc'
+                        'asc'
                     )
                 );
                 return fromEntries;

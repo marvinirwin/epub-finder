@@ -4,7 +4,7 @@ import {SuperMemoGrade} from "supermemo";
 
 export interface TranslationAttemptRecord {
     id?: number;
-    knownLanguage: string;
+    learningLanguage: string;
     translationAttempt: string;
     timestamp: Date;
     nextDueDate: Date;
@@ -21,7 +21,7 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
             db,
             load: () => db.getWordRecordsGenerator(db.translationAttempts),
             add: (r) => db.translationAttempts.add(r),
-            getIndexValue: r => ({indexValue: r.knownLanguage})
+            getIndexValue: r => ({indexValue: r.learningLanguage})
         });
     }
 }
