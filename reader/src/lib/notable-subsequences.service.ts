@@ -5,6 +5,7 @@ import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay, startWith} from "rxjs/operators";
 import {TemporaryHighlightService} from "./highlighting/temporary-highlight.service";
 import {VideoMetadataRepository} from "../services/video-metadata.repository";
+import {WordsService} from "./words.service";
 
 export class NotableSubsequencesService {
     notableSubsequenceSet$: Observable<SetWithUniqueLengths>
@@ -14,12 +15,14 @@ export class NotableSubsequencesService {
             pronunciationProgressService,
             wordRecognitionProgressService,
             temporaryHighlightService,
-            videoMetadataRepository
+            videoMetadataRepository,
+            wordsService
         }: {
             pronunciationProgressService: PronunciationProgressRepository;
             wordRecognitionProgressService: WordRecognitionProgressRepository;
             temporaryHighlightService: TemporaryHighlightService;
             videoMetadataRepository: VideoMetadataRepository;
+            wordsService: WordsService
         }
     ) {
         this.notableSubsequenceSet$ = combineLatest([
@@ -27,18 +30,21 @@ export class NotableSubsequencesService {
             wordRecognitionProgressService.records$,
             temporaryHighlightService.temporaryHighlightRequests$
                 .pipe(startWith(undefined)),
-            videoMetadataRepository.all$
+            videoMetadataRepository.all$,
+            wordsService.words$,
         ]).pipe(
             map(([
                      pronunciationRecords,
                      wordRecognitionRecords,
                      temporaryHighlightRequest,
-                     videoMetadata
+                     videoMetadata,
+                     words
                  ]) => {
                 const strings = [
                     ...Object.keys(pronunciationRecords),
                     ...Object.keys(wordRecognitionRecords),
-                    ...videoMetadata.keys()
+                    ...videoMetadata.keys(),
+                    ...words.values()
                 ];
                 if (temporaryHighlightRequest) {
                     strings.push(temporaryHighlightRequest.word)

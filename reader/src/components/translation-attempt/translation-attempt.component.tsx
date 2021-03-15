@@ -10,7 +10,7 @@ import {AdvanceButton} from "../quiz/quiz-card-buttons.component";
 import {DifficultyButtons} from "./difficulty-buttons.component";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 import {
-    wordListAverageDifficulty,
+    averageWordRecognitionScore,
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
 
@@ -54,7 +54,7 @@ export const TranslationAttempt: React.FC = () => {
         debugger;console.log()
     }
     const totalWords = wordsFromCountRecordList(currentRow?.d?.wordCountRecords || []);
-    const average = wordListAverageDifficulty(
+    const average = averageWordRecognitionScore(
         totalWords,
         weightedVocab
     );

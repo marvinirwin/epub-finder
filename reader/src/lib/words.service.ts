@@ -21,13 +21,14 @@ export class WordsService {
             cardsRepository.all$,
             allWordsRepository.all$
         ]).pipe(
-            map(([cards, words]) =>
-                new SetWithUniqueLengths(
-                    [
-                        ...Object.keys(cards),
-                        ...words.keys()
-                    ]
-                )
+            map(([cards, words]) => {
+                return new SetWithUniqueLengths(
+                        [
+                            ...Object.keys(cards),
+                            ...words.values()
+                        ]
+                    );
+                }
             ),
             shareReplay(1)
         )

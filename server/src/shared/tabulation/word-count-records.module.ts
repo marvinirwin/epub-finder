@@ -43,8 +43,8 @@ export const wordsFromCountRecordList = (records: WordCountRecord[]) => {
 }
 
 
-export const wordListAverageDifficulty = (words: string[], vocab: Map<string, number>) => {
+export const averageWordRecognitionScore = (words: string[], vocab: Map<string, number>) => {
     return sum(
-        words.map(word => vocab.has(word) !== undefined ? vocab.has(word) : 0)
+        words.map(word => vocab.has(word) ? vocab.get(word) : 0)
     ) / words.length;
 }

@@ -7,6 +7,9 @@ import {DocumentView} from "../src/entities/document-view.entity";
 import {User} from "../src/entities/user.entity";
 import {DatabaseModule} from "../src/config/database.module";
 import {wordsFromCountRecordList} from "../src/shared/tabulation/word-count-records.module";
+import {AtomizedDocument, InterpolateService, Segment} from "../src/shared";
+import {ChineseVocabService} from "../src/shared/tabulate-documents/chinese-vocab.service";
+import {SetWithUniqueLengths} from "../src/shared/tabulate-documents/set-with-unique-lengths";
 
 async function tabulateHtml3(tabulateService: TabulateService) {
     return await tabulateService.tabulateNoCache(
@@ -89,10 +92,29 @@ describe('document tabulation', () => {
     });
     it('Counts word records', async () => {
         const tabulation = await tabulateHtml3(tabulateService);
+        // @ts-ignore
         const segmentWord = [...tabulation.segmentWordCountRecordsMap.values()];
         const countRecords = wordsFromCountRecordList(
             segmentWord[segmentWord.length - 1]
         );
         expect(countRecords).toHaveLength(9)
+    });
+    it('tabulates sentences with vocab' ,async () => {
+        const chineseVocabSet = new SetWithUniqueLengths(await ChineseVocabService.vocab());
+        const tabulation = Segment.tabulate(
+            {
+                notableCharacterSequences: chineseVocabSet,
+                segments: AtomizedDocument.atomizeDocument(
+                    InterpolateService.sentences([
+                        "让安禄山兼任平卢、范阳、河东三镇节度使，就属于 唐玄宗制度上的错误。"
+                    ])
+                ).segments(),
+                greedyWordSet: chineseVocabSet
+            }
+        );
+        // @ts-ignore
+        expect([...tabulation.segmentWordCountRecordsMap.values()][0])
+            .toHaveLength(26);
+
     })
 })

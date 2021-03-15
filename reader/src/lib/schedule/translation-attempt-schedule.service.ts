@@ -9,7 +9,7 @@ import {TranslationAttemptService} from "../../components/translation-attempt/tr
 import {WeightedVocabService} from "../weighted-vocab.service";
 import {orderBy} from "lodash";
 import {
-    wordListAverageDifficulty,
+    averageWordRecognitionScore,
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
@@ -83,7 +83,7 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                                 ]
                             ),
                         ([segmentText, scheduleRow]: [string, ScheduleRow<TranslationAttemptScheduleData>]) =>
-                            wordListAverageDifficulty(
+                            averageWordRecognitionScore(
                                 wordsFromCountRecordList(scheduleRow.d.wordCountRecords),
                                 weightedVocab
                             ),

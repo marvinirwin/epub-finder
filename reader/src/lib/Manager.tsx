@@ -251,8 +251,8 @@ export class Manager {
             cardService: this.cardsRepository
         });
         this.videoMetadataRepository = new VideoMetadataRepository();
-        this.notableSubsequencesService = new NotableSubsequencesService(this);
         this.wordsService = new WordsService(this)
+        this.notableSubsequencesService = new NotableSubsequencesService(this);
         this.libraryService = new LibraryService(this);
         this.documentCheckingOutService = new DocumentCheckingOutService(this)
         this.droppedFilesService = new DroppedFilesService();
