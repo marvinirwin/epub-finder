@@ -14,7 +14,19 @@ import {ManagerContext} from "../../App";
 import {QuizCard} from "./word-card.interface";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {HotkeyWrapper} from "../hotkey-wrapper";
-import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
+import {DifficultyButtons} from "../translation-attempt/translation-attempt";
+
+
+export const AdvanceButton = () => {
+    const m = useContext(ManagerContext);
+    return <HotkeyWrapper action={"ADVANCE_QUIZ"}>
+        <Button
+            id={quizButtonReveal}
+            onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
+            Reveal
+        </Button>
+    </HotkeyWrapper>
+}
 
 export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) => {
     const m = useContext(ManagerContext);
@@ -33,30 +45,22 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
         () => quizCard.answerIsRevealed$.next(true))
     return <div className={'quiz-button-row'}>
         {answerIsRevealed ?
-             :
+            <DifficultyButtons/> :
             <div>
                 <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', margin: '24px'}}>
                     <Typography>
-                        New Words Left for Today: <span className={quizUnlearnedNumber}>{(rowInfo.wordsLeftForToday.length || 0)}</span>
+                        New Words Left for Today: <span
+                        className={quizUnlearnedNumber}>{(rowInfo.wordsLeftForToday.length || 0)}</span>
                     </Typography>
                     <Typography>
-                        Being Learned: <span className={quizLearningNumber}>{rowInfo.wordsReviewingOrLearning.length}</span>
+                        Being Learned: <span
+                        className={quizLearningNumber}>{rowInfo.wordsReviewingOrLearning.length}</span>
                     </Typography>
                     <Typography>
                         To Review: <span className={quizToReviewNumber}>{rowInfo.wordsToReview.length}</span>
                     </Typography>
                 </div>
-                <div>
-                    <HotkeyWrapper action={"ADVANCE_QUIZ"}>
-                        <Button
-                            id={quizButtonReveal}
-                            onClick={() => m.hotkeyEvents.advanceQuiz$.next()}>
-                            Reveal
-                        </Button>
-                    </HotkeyWrapper>
-                </div>
             </div>
-
         }
     </div>
 }

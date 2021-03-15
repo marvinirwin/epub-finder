@@ -1,4 +1,5 @@
 export interface Hotkeys<T> {
+    QUIZ_RESULT_IGNORE: T;
     OPEN_IMAGE_SEARCH: T,
     HIDE: T,
     MARK_AS_KNOWN: T,

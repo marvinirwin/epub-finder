@@ -73,8 +73,6 @@ const EditingCardComponent: React.FunctionComponent<{ card: EditingCard, m: Mana
     )
     const scheduleRowIndex = useObservableState(m.quizCardScheduleRowsService.indexedScheduleRows$);
     const scheduleRow: ScheduleRow<QuizScheduleRowData> | undefined = (scheduleRowIndex && characters) ? scheduleRowIndex[characters] : undefined;
-    const score = scheduleRow?.wordRecognitionScore()
-¡
     return <Card className={`${className || ''} ${classes.root}`}>
         <CardContent ref={setReferenceElement}>
             <div className={classes.root}>

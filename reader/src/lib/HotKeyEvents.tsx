@@ -20,6 +20,9 @@ export class HotKeyEvents {
     public get quizResultEasy$() {
         return this.subjects.QUIZ_RESULT_EASY;
     }
+    public get quizResultIgnore$() {
+        return this.subjects.QUIZ_RESULT_IGNORE;
+    }
     public get quizResultMedium$() {
         return this.subjects.QUIZ_RESULT_MEDIUM;
     }
@@ -83,20 +86,6 @@ export class HotKeyEvents {
         });
 
 
-        function setQuizResult(quizResultEasy$2: Subject<void>, recognitionScore1: SuperMemoGrade) {
-            quizResultEasy$2.pipe(
-                withLatestFrom(m.quizService.quizCard.word$)
-            ).subscribe(([_, word]) => {
-                if (word) {
-                    m.quizManager.completeQuiz(word, recognitionScore1)
-                }
-            });
-        }
-
-        setQuizResult(this.quizResultEasy$, RecognitionMap.easy);
-        setQuizResult(this.quizResultMedium$, RecognitionMap.medium);
-        setQuizResult(this.quizResultHard$, RecognitionMap.hard);
-
         this.hide$.pipe(withLatestFrom(
             m.imageSearchService.queryImageRequest$,
             m.editingCardManager.showEditingCardPopup$
@@ -136,12 +125,12 @@ export class HotKeyEvents {
             QUIZ_RESULT_EASY: ['3'],
             QUIZ_RESULT_MEDIUM: ['2'],
             QUIZ_RESULT_HARD: ['1'],
+            QUIZ_RESULT_IGNORE: ['z'],
             ADVANCE_QUIZ: [' '],
             RECORD_QUIZ_WORD: ['r'],
             REQUEST_EDIT_WORD: ['e'],
             HIDE_VIDEO: ['v'],
             PRONUNCIATION_RECORD_SUCCESS: ['p'],
-
         }
     }
 }

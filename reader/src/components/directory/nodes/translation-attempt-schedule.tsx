@@ -15,7 +15,7 @@ export const TranslationAttemptTableHead: React.FC<{}> = () => {
             <TableCell>Text</TableCell>
             <TableCell>Score</TableCell>
             <TableCell>Next Due Date</TableCell>
-{/*
+            {/*
             <TableCell>Timestamp</TableCell>
             <TableCell>EFactor</TableCell>
 */}
@@ -46,10 +46,8 @@ export const TranslationAttemptScheduleTableRow: React.FC<{ scheduleRow: Schedul
 };
 
 export const TranslationAttemptSchedule: TreeMenuNode = {
-    return {
-        name: TranslationAttemptScheduleNode,
-        label: 'Translation Attempt Schedule',
-        Component: TranslationAttemptScheduleTable,
-        LeftIcon: () => <CalendarTodayOutlined/>
-    };
+    name: TranslationAttemptScheduleNode,
+    label: 'Translation Attempt Schedule',
+    Component: TranslationAttemptScheduleTable,
+    LeftIcon: () => <CalendarTodayOutlined/>
 }

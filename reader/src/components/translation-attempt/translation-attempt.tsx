@@ -1,17 +1,18 @@
 import React, {useContext, useState, Fragment, useEffect} from "react";
 import {ManagerContext} from "../../App";
 import {Button, Paper, TextField, Typography} from "@material-ui/core";
-import {useObservableState} from "observable-hooks";
+import {useObservableState, useSubscription} from "observable-hooks";
 import {SuperMemoGrade} from "supermemo";
-import {fetchTranslation} from "../../services/translate.service";
 import {SrmService} from "../../lib/srm/srm.service";
 import moment from "moment";
 import {HotkeyWrapper} from "../hotkey-wrapper";
-import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM} from "@shared/*";
+import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM} from "@shared/";
+import {Observable} from "rxjs";
+import {AdvanceButton} from "../quiz/quiz-card-buttons.component";
 
 const translateRequest = '';
 
-const DifficultyButtons = (props: { submit: (grade: SuperMemoGrade) => void }) => {
+export const DifficultyButtons = () => {
     const m = useContext(ManagerContext)
     return <Fragment>
         <HotkeyWrapper action={"QUIZ_RESULT_HARD"}>
@@ -35,15 +36,15 @@ const DifficultyButtons = (props: { submit: (grade: SuperMemoGrade) => void }) =
             Easy
         </Button>
         </HotkeyWrapper>
-        <Button
-            className={QUIZ_BUTTON_IGNORE}
-            onClick={() => {
-                if (word) {
-                    m.ignoredWordsRepository.addRecords$.next([{word, timestamp: new Date()}])
-                }
-            }}>
-            Ignore
-        </Button>
+        <HotkeyWrapper action={"QUIZ_RESULT_IGNORE"}>
+            <Button
+                className={QUIZ_BUTTON_IGNORE}
+                onClick={() => {
+                    m.hotkeyEvents.quizResultIgnore$.next()
+                }}>
+                Ignore
+            </Button>
+        </HotkeyWrapper>
     </Fragment>
 };
 
@@ -55,6 +56,29 @@ export const TranslationAttempt: React.FC = () => {
     const answerIsShown = useObservableState(m.translationAttemptService.answerIsShown$)
     // TODO maybe filter by due date
     const [translateAttempt, setTranslateAttempt] = useState<string>('');
+    const useQuizResult = (obs$: Observable<unknown>, grade: SuperMemoGrade) => {
+        useSubscription(obs$, () => {
+            const previousRows = currentRow?.d.translationAttemptRecords || [];
+            const translationAttemptRow = SrmService.getNextRecognitionRecord(
+                previousRows,
+                grade
+            );
+            m.translationAttemptRepository.addRecords$.next([
+                {
+                    knownLanguage,
+                    grade,
+                    translationAttempt: translateAttempt,
+                    timestamp: new Date(),
+                    nextDueDate: moment().add(translationAttemptRow.interval, 'day').toDate(),
+                    ...translationAttemptRow,
+                }
+            ])
+        })
+    }
+    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
+    useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
+    useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
+    useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true))
     return <Paper>
         {
             knownLanguage &&
@@ -73,32 +97,8 @@ export const TranslationAttempt: React.FC = () => {
                 />
                 {
                     answerIsShown ?
-                        <DifficultyButtons
-                            submit={grade => {
-                                const previousRows = currentRow?.d.translationAttemptRecords || [];
-                                const recognitionRow = SrmService.getNextRecognitionRecord(
-                                    previousRows,
-                                    grade
-                                );
-                                m.translationAttemptRepository.addRecords$.next([
-                                    {
-                                        knownLanguage,
-                                        grade,
-                                        translationAttempt: translateAttempt,
-                                        timestamp: new Date(),
-                                        nextDueDate: moment().add(recognitionRow.interval, 'day').toDate(),
-                                        ...recognitionRow,
-                                    }
-                                ])
-                            }
-                            }
-                        /> :
-                        <Button
-                            onClick={() => {
-                                m.translationAttemptService.answerIsShown$.next(true);
-                            }
-                            }
-                        >Show</Button>
+                        <DifficultyButtons/> :
+                        <AdvanceButton/>
                 }
 
             </Fragment>

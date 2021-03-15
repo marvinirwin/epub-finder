@@ -14,6 +14,8 @@ import {QuizCardButtons} from "./quiz-card-buttons.component";
 import {useIsFieldHidden} from "./useIsFieldHidden";
 import {QuizCardLimitReached} from "./empty-quiz-card.component";
 import {CardLearningLanguageText} from "../word-paper.component";
+import {Observable, Subject} from "rxjs";
+import {SuperMemoGrade} from "supermemo";
 
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
@@ -22,20 +24,24 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const isLearningLanguageHidden = useIsFieldHidden({quizCard, label: 'learningLanguage'})
     useSubscription(
         m.audioRecordingService.audioRecorder.currentRecognizedText$,
-        async recognizedText => {
-            if (!word) {
-                return;
-            }
-            const exampleSegments = await observableLastValue(m.exampleSentencesService.exampleSegmentMap$);
-            const pronouncedQuizWord = recognizedText.includes(word);
-            const pronouncedTextIsInExampleSegments = uniq(
-                flatten(Array.from(exampleSegments.values()).map(set => Array.from(set.values())))
-            ).map(segment => segment)
-                .find(segmentText => segmentText.includes(recognizedText))
-            if (pronouncedQuizWord && pronouncedTextIsInExampleSegments) {
-                m.hotkeyEvents.quizResultEasy$.next()
+        async recognizedText => { });
+
+    const useQuizResult = (obs$: Observable<unknown>, score: SuperMemoGrade) => {
+        useSubscription(obs$, () => {
+            if (word) {
+                m.quizManager.completeQuiz(word, score)
             }
         })
+    }
+    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
+    useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
+    useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
+    useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
+        if (word) {
+            m.ignoredWordsRepository
+                .addRecords$.next([{word, timestamp: new Date()}])
+        }
+    })
     const cardsLearnedToday = useObservableState(m.quizCardScheduleService.cardsLearnedToday$)?.length || 0;
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0;
     const cardLimitReached = cardsLearnedToday >= cardLimit;

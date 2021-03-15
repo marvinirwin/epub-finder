@@ -41,7 +41,4 @@ export class TranslationAttemptService {
             shareReplay(1)
         )
     }
-    showAnswer() {
-        this.
-    }
 }
