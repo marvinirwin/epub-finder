@@ -4,7 +4,7 @@ import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
 import {sum} from "lodash";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
-import {isSameDay} from 'date-fns';
+import {isSameDay, isToday, isBefore, isAfter} from 'date-fns';
 import {formatDistance, subDays} from 'date-fns'
 import {SuperMemoGrade, SuperMemoItem} from "supermemo";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
@@ -70,7 +70,20 @@ export class ScheduleRow<T> {
     }
 
     public isToReview() {
-        if (this.isLearning()) return false;
+        const hasNeverBeenAttempted = this.superMemoRecords.length <= 0;
+        if (hasNeverBeenAttempted) {
+            return false;
+        }
+        const isComplete = this.superMemoRecords
+            .filter(r => isToday(r.timestamp) && r.grade >= 3);
+        if (isComplete) {
+            return false;
+        }
+        const isCurrentlyReviewing = this.superMemoRecords
+            .find(r => isToday(r.timestamp));
+        if (isCurrentlyReviewing) {
+            return false
+        }
         return this.isOverDue();
     }
 
@@ -89,18 +102,15 @@ export class ScheduleRow<T> {
     }
 
     public isLearning() {
-        if (!this.superMemoRecords.length) return false;
-        if (!this.isOverDue()) {
-            return false;
+        const hasNoRecords = !this.superMemoRecords.length;
+        if (hasNoRecords) return false;
+        const lastTwoRecords = ScheduleRow.lastNRecords(
+            this.superMemoRecords,
+            2
+        );
+        if (lastTwoRecords.every(record => record.grade >= 3 && isToday(record.timestamp))) {
+            return true;
         }
-        const lastRecord = this.superMemoRecords[this.superMemoRecords.length - 1];
-        const last2Records = ScheduleRow.lastNRecords(this.superMemoRecords, 2);
-        return last2Records.length === 2 &&
-            last2Records
-                .every(record =>
-                    isSameDay(lastRecord.nextDueDate || new Date(),
-                        record.nextDueDate || new Date()
-                    ) && record.grade >= 3)
     }
 
     public dueIn() {
@@ -130,8 +140,8 @@ export class ScheduleRow<T> {
         return lastTwoRecords.length === 2 && lastTwoRecords
             .every(
                 r => r.grade >= 3 &&
-                    isSameDay(r.timestamp, new Date()) &&
-                    (r.nextDueDate || 0) > new Date()
+                    isToday(r.timestamp) &&
+                    !isAfter(r.nextDueDate, Date.now())
             );
     }
 

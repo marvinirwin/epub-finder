@@ -59,9 +59,9 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                     .forEach(serialzedTabulation => serialzedTabulation
                         .segmentWordCountRecordsMap
                         .forEach((value, key) => {
-                            if (key.text.split('').find(isChineseCharacter)) {
-                                ensureScheduleRow(key.text).wordCountRecords.push(...value);
-                            }
+                                if (key.text.split('').find(isChineseCharacter) && key.text.length > 5) {
+                                    ensureScheduleRow(key.text).wordCountRecords.push(...value);
+                                }
                             }
                         )
                     );

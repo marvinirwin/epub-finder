@@ -32,7 +32,7 @@ export class SortedLimitScheduleRowsService {
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit]) => {
                 const wordsToReview = sortedScheduleRows.filter(
-                    r => r.d.wordCountRecords.length && r.isToReview()
+                    r => r.isToReview()
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
                     r => r.wasLearnedToday()

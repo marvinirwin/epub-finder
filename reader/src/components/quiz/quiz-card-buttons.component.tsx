@@ -59,6 +59,9 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
                     <Typography>
                         To Review: <span className={quizToReviewNumber}>{rowInfo.wordsToReview.length}</span>
                     </Typography>
+                    <Typography>
+                        Learned Today: <span>{rowInfo.wordsLearnedToday.length}</span>
+                    </Typography>
                 </div>
             </div>
         }
