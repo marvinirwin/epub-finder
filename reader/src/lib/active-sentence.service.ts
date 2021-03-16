@@ -1,7 +1,6 @@
-import {Segment} from "../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "@shared/";
 import {combineLatest, ReplaySubject} from "rxjs";
 import {SettingsService} from "../services/settings.service";
-import {transliterate} from "./transliterate.service";
 import {LanguageConfigsService} from "./language-configs.service";
 
 export class ActiveSentenceService {

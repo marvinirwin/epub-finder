@@ -44,6 +44,22 @@ async function tabulateHtml3(tabulateService: TabulateService) {
     );
 }
 
+async function tabulateChineseSentence(让安禄山兼任平卢范阳河东三镇节度使就属于唐玄宗制度上的错误: string) {
+    const chineseVocabSet = new SetWithUniqueLengths(await ChineseVocabService.vocab());
+    const tabulation = Segment.tabulate(
+        {
+            notableCharacterSequences: chineseVocabSet,
+            segments: AtomizedDocument.atomizeDocument(
+                InterpolateService.sentences([
+                    让安禄山兼任平卢范阳河东三镇节度使就属于唐玄宗制度上的错误
+                ])
+            ).segments(),
+            greedyWordSet: chineseVocabSet
+        }
+    );
+    return tabulation;
+}
+
 describe('document tabulation', () => {
     let tabulateService: TabulateService;
     beforeEach(async () => {
@@ -100,21 +116,12 @@ describe('document tabulation', () => {
         expect(countRecords).toHaveLength(9)
     });
     it('tabulates sentences with vocab' ,async () => {
-        const chineseVocabSet = new SetWithUniqueLengths(await ChineseVocabService.vocab());
-        const tabulation = Segment.tabulate(
-            {
-                notableCharacterSequences: chineseVocabSet,
-                segments: AtomizedDocument.atomizeDocument(
-                    InterpolateService.sentences([
-                        "让安禄山兼任平卢、范阳、河东三镇节度使，就属于 唐玄宗制度上的错误。"
-                    ])
-                ).segments(),
-                greedyWordSet: chineseVocabSet
-            }
-        );
+        const tabulation3 = await tabulateChineseSentence("楚文王在鬻拳的苦谏下，决定放蔡哀侯归国。");
+        expect([...tabulation3.segmentWordCountRecordsMap.values()][0]) .toHaveLength(26);
+        const tabulation = await tabulateChineseSentence("让安禄山兼任平卢、范阳、河东三镇节度使，就属于 唐玄宗制度上的错误。");
         // @ts-ignore
-        expect([...tabulation.segmentWordCountRecordsMap.values()][0])
-            .toHaveLength(26);
-
+        expect([...tabulation.segmentWordCountRecordsMap.values()][0]) .toHaveLength(26);
+        const tabulation2 = await tabulateChineseSentence("陛下为何要爱惜此人，而亏损王法呢");
+        expect([...tabulation2.segmentWordCountRecordsMap.values()][0]) .toHaveLength(13);
     })
 })

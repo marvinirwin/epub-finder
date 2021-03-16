@@ -116,16 +116,6 @@ export class Segment {
                 }
                 return acc;
             }, []);
-            notableSequencesWhichStartHere.forEach(wordStartingHere => {
-                safePushMap(
-                    segmentWordCountRecordsMap,
-                    currentSerialzedSegment as SerializedSegment,
-                    {
-                        position: i - currentSegmentStart,
-                        word: wordStartingHere
-                    }
-                )
-            })
 
             /**
              * If there is a character here which isn't part of a word, add it to the counts
@@ -136,6 +126,17 @@ export class Segment {
             if ((notableSequencesWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
                 notableSequencesWhichStartHere.push(currentCharacter);
             }
+
+            notableSequencesWhichStartHere.forEach(wordStartingHere => {
+                safePushMap(
+                    segmentWordCountRecordsMap,
+                    currentSerialzedSegment as SerializedSegment,
+                    {
+                        position: i - currentSegmentStart,
+                        word: wordStartingHere
+                    }
+                )
+            })
 
             notableSubsequencesInProgress.push(...notableSequencesWhichStartHere.map(word => {
                 // Side effects bad

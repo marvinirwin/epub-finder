@@ -13,6 +13,7 @@ import {
     averageWordRecognitionScore,
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
+import { sum } from "lodash";
 
 export const translateRequest = '';
 
@@ -50,15 +51,9 @@ export const TranslationAttempt: React.FC = () => {
     useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
     useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
     useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true));
-    if (currentRow !== undefined) {
-        debugger;console.log()
-    }
     const totalWords = wordsFromCountRecordList(currentRow?.d?.wordCountRecords || []);
-    const average = averageWordRecognitionScore(
-        totalWords,
-        weightedVocab
-    );
-    const knownText = `${totalWords.map(word => `${word}: ${weightedVocab.get(word) || 0}`).join(', ')}`;
+    const sumVocab = sum( totalWords.map(word => weightedVocab.has(word) ? weightedVocab.get(word) : 0) )
+    const knownText = `${sumVocab} / ${totalWords.length} words known`;
     return <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
         {
             learningLanguage &&
