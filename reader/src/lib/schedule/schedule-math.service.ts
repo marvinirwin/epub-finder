@@ -17,15 +17,6 @@ export class ScheduleMathService {
         >(
         sortConfigs: U,
         scheduleRows: T[],
-        {
-            dateWeight,
-            countWeight,
-            wordLengthWeight,
-        }: {
-            dateWeight: number,
-            countWeight: number,
-            wordLengthWeight: number,
-        },
         assembleSortObject: (sortValues: SortValue<any>[], sortConfigs: U) => R
     ): { row: T, finalSortValue: number, sortValues: R }[] {
         const rowNormalMaps = Object.values(sortConfigs).map(

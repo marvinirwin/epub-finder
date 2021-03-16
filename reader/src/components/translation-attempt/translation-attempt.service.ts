@@ -28,7 +28,7 @@ export class TranslationAttemptService {
         this.currentScheduleRow$ = translationAttemptScheduleService.indexedScheduleRows$
             .pipe(
                 map(indexedRows => Object.values(indexedRows)
-                    .filter(r => r.dueDate() < new Date())[0]),
+                    .filter(r => +r.dueDate() < Date.now())[0]),
                 shareReplay(1)
             );
         this.currentScheduleRow$.pipe(

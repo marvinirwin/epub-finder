@@ -1,11 +1,10 @@
-import {QuizScheduleRowData, ScheduleRow, ScheduleRowRecord} from "./schedule-row";
+import {ScheduleRow} from "./schedule-row";
 import {ScheduleRowsService} from "./schedule-rows-service.interface";
 import {TranslationAttemptRecord, TranslationAttemptRepository} from "./translation-attempt.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
 import {combineLatest, Observable} from "rxjs";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {map} from "rxjs/operators";
-import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
 import {WeightedVocabService} from "../weighted-vocab.service";
 import {orderBy} from "lodash";
 import {
@@ -71,7 +70,7 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                             scheduleRows[key].translationAttemptRecords.push(...value);
                         }
                     });
-                const fromEntries = Object.fromEntries(
+                return Object.fromEntries(
                     orderBy(
                         Object.values(scheduleRows)
                             .map(scheduleRowData => [
@@ -90,7 +89,6 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                         'desc'
                     )
                 );
-                return fromEntries;
             })
         )
     }

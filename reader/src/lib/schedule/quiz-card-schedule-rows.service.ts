@@ -46,7 +46,7 @@ export class QuizCardScheduleRowsService {
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$
             ]),
-            allWordsRepository.all$
+            allWordsRepository.all$,
         ]).pipe(
             map(([
                      [wordRecognitionRowIndex, pronunciationRowIndex],
@@ -97,24 +97,19 @@ export class QuizCardScheduleRowsService {
                     {
                         dueDate: {
                             fn: (row: ScheduleRow<QuizScheduleRowData>) => row.dueDate().getTime() * -1,
-                            weight: 1
+                            weight: dateWeight
                         },
                         count: {
                             fn: (row: ScheduleRow<QuizScheduleRowData>) => sumWordCountRecords(row),
-                            weight: 1,
+                            weight: frequencyWeight,
                         },
                         length: {
                             fn: (row: ScheduleRow<QuizScheduleRowData>) => row.d.word.length,
-                            weight: 1
-                        }
+                            weight: wordLengthWeight
+                        },
                     },
                     Object.values(scheduleRows)
                         .map(r => new ScheduleRow<QuizScheduleRowData>(r, r.wordRecognitionRecords)),
-                    {
-                        dateWeight,
-                        countWeight: frequencyWeight,
-                        wordLengthWeight
-                    },
                     (sortValues, sortConfigs) => {
                         return {
                             dueDate: sortValues[0],
