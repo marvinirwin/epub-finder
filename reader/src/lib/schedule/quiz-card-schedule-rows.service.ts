@@ -7,7 +7,7 @@ import {PronunciationProgressRepository} from "./pronunciation-progress.reposito
 import CardsRepository from "../manager/cards.repository";
 import {IgnoredWordsRepository} from "./ignored-words.repository";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow, QuizScheduleRowData} from "./schedule-row";
-import {ScheduleMathService} from "./schedule-math.service";
+import {ScheduleMathService, sumWordCountRecords} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
@@ -94,14 +94,47 @@ export class QuizCardScheduleRowsService {
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
                 return Object.fromEntries(ScheduleMathService.normalizeAndSortQuizScheduleRows(
+                    {
+                        dueDate: {
+                            fn: (row: ScheduleRow<QuizScheduleRowData>) => row.dueDate().getTime() * -1,
+                            weight: 1
+                        },
+                        count: {
+                            fn: (row: ScheduleRow<QuizScheduleRowData>) => sumWordCountRecords(row),
+                            weight: 1,
+                        },
+                        length: {
+                            fn: (row: ScheduleRow<QuizScheduleRowData>) => row.d.word.length,
+                            weight: 1
+                        }
+                    },
                     Object.values(scheduleRows)
                         .map(r => new ScheduleRow<QuizScheduleRowData>(r, r.wordRecognitionRecords)),
                     {
                         dateWeight,
                         countWeight: frequencyWeight,
                         wordLengthWeight
+                    },
+                    (sortValues, sortConfigs) => {
+                        return {
+                            dueDate: sortValues[0],
+                            count: sortValues[1],
+                            length: sortValues[2]
+                        }
                     }
-                ).map(row => [row.d.word, row]))
+                ).map(row => [
+                    row.row.d.word,
+                    new ScheduleRow<NormalizedQuizCardScheduleRowData>(
+                        {
+                            ...row.row.d,
+                            ...row.sortValues,
+                            finalSortValue: row.finalSortValue,
+                            normalizedCount: row.sortValues.count.normalizedValueObject,
+                            normalizedDate: row.sortValues.dueDate.normalizedValueObject
+                        },
+                        row.row.d.wordRecognitionRecords
+                    )
+                ]))
             }),
             shareReplay(1)
         );

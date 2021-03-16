@@ -39,6 +39,7 @@ export interface SortValue<T> {
     inverseLogNormalValue: number;
     weightedInverseLogNormalValue: number;
     weight: number;
+    normalizedValueObject: NormalizedValue;
 }
 
 export type ScheduleRowItem = {

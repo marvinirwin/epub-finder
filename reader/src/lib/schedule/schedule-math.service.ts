@@ -1,14 +1,22 @@
-import {orderBy, sum} from "lodash";
-import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "./schedule-row";
+import {orderBy, sum, sumBy} from "lodash";
+import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow, SortValue} from "./schedule-row";
 import {getSortValue} from "../manager/sort-value.interface";
 import {NormalizedValue} from "../manager/normalized-value.interface";
-import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
 export const sumWordCountRecords = (row: ScheduleRow<QuizScheduleRowData>) => sum(row.d.wordCountRecords.map(w => w.count));
 
+export type SortConfig<T, U extends number> = {
+    fn: (v: T) => U,
+    weight: number;
+}
+
 export class ScheduleMathService {
-    public static normalizeAndSortQuizScheduleRows(
-        scheduleRows: ScheduleRow< QuizScheduleRowData > [],
+    public static normalizeAndSortQuizScheduleRows<U extends {
+        [label: string]: SortConfig<any, any>
+    }, R, T = ScheduleRow<QuizScheduleRowData>,
+        >(
+        sortConfigs: U,
+        scheduleRows: T[],
         {
             dateWeight,
             countWeight,
@@ -17,70 +25,38 @@ export class ScheduleMathService {
             dateWeight: number,
             countWeight: number,
             wordLengthWeight: number,
-        }
-    ): ScheduleRow<NormalizedQuizCardScheduleRowData>[] {
-        const scheduleRowNormalizedDateMap = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
-            scheduleRows,
-            row => row.dueDate().getTime() * -1
-        ).map(([n, row]) => {
-            return [
-                row,
-                n
-            ];
-        }));
-
-        const scheduleRowNormalizedCountMap = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
-            scheduleRows,
-            row => sumWordCountRecords(row)
-        ).map(([n, row]) => [
-            row,
-            n,
-        ]));
-
-        const scheduleRowNormalizedLength = new Map<ScheduleRow<QuizScheduleRowData>, NormalizedValue>(ScheduleMathService.normalizeScheduleRows(
-            scheduleRows,
-            row => row.d.word.length
-        ).map(([n, row]) => {
-            return [
-                row,
-                n
-            ];
-        }));
-
-        const sortableScheduleRows: NormalizedQuizCardScheduleRowData[] = scheduleRows.map(scheduleRow => {
-            const normalCount = scheduleRowNormalizedCountMap.get(scheduleRow) as NormalizedValue;
-            const normalDate = scheduleRowNormalizedDateMap.get(scheduleRow) as NormalizedValue;
-            const normalLength = scheduleRowNormalizedLength.get(scheduleRow) as NormalizedValue;
-            const countSortValue = getSortValue<number>(normalCount.normalizedValue, countWeight, sumWordCountRecords(scheduleRow));
-            const dueDateSortValue = getSortValue<Date>(
-                normalDate.normalizedValue,
-                dateWeight,
-                scheduleRow.dueDate()
-            );
-            const lengthSortValue = getSortValue<number>(
-                normalLength.normalizedValue,
-                wordLengthWeight,
-                scheduleRow.d.word.length
-            );
+        },
+        assembleSortObject: (sortValues: SortValue<any>[], sortConfigs: U) => R
+    ): { row: T, finalSortValue: number, sortValues: R }[] {
+        const rowNormalMaps = Object.values(sortConfigs).map(
+            sortConfig => new Map<T, NormalizedValue>(
+                ScheduleMathService.normalizeScheduleRows(
+                    scheduleRows,
+                    sortConfig.fn
+                ).map(([n, row]) => [row, n])
+            )
+        );
+        const sortableScheduleRows = scheduleRows.map(scheduleRow => {
+            const sortValues = Object.values(sortConfigs).map((sortConfig, index) => {
+                const normalValue = rowNormalMaps[index].get(scheduleRow) as NormalizedValue;
+                return getSortValue(
+                    normalValue,
+                    sortConfig.weight,
+                    sortConfig.fn(scheduleRow)
+                );
+            });
             return {
-                ...scheduleRow.d,
-                count: countSortValue,
-                dueDate: dueDateSortValue,
-                length: lengthSortValue,
-                finalSortValue: (
-                    countSortValue.weightedInverseLogNormalValue +
-                    (dueDateSortValue.weightedInverseLogNormalValue) +
-                    lengthSortValue.weightedInverseLogNormalValue
-                ),
-                normalizedCount: normalCount,
-                normalizedDate: normalDate
-            } as NormalizedQuizCardScheduleRowData;
+                row: scheduleRow,
+                finalSortValue: sumBy(sortValues, v => v.weightedInverseLogNormalValue),
+                sortValues: assembleSortObject(sortValues, sortConfigs),
+            }
         })
 
         return orderBy(
-            sortableScheduleRows.map(r => new ScheduleRow<NormalizedQuizCardScheduleRowData>(r, r.wordRecognitionRecords)),
-            r => r.d.finalSortValue,
-            'desc')
+            sortableScheduleRows,
+            r => r.finalSortValue,
+            'desc'
+        )
     }
 
     private static normalizeScheduleRows<T>(
