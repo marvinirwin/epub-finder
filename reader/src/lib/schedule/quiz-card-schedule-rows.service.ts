@@ -33,8 +33,8 @@ export class QuizCardScheduleRowsService {
         allWordsRepository: AllWordsRepository
     }) {
         const progress$ = combineLatest([
-            wordRecognitionProgressService.records$.pipe(startWith({})),
-            pronunciationProgressService.records$,
+            wordRecognitionProgressService.indexOfOrderedRecords$.pipe(startWith({})),
+            pronunciationProgressService.indexOfOrderedRecords$,
         ])
         this.indexedScheduleRows$ = combineLatest([
             progress$,

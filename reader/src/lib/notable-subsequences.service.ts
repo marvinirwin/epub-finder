@@ -26,8 +26,8 @@ export class NotableSubsequencesService {
         }
     ) {
         this.notableSubsequenceSet$ = combineLatest([
-            pronunciationProgressService.records$,
-            wordRecognitionProgressService.records$,
+            pronunciationProgressService.indexOfOrderedRecords$,
+            wordRecognitionProgressService.indexOfOrderedRecords$,
             temporaryHighlightService.temporaryHighlightRequests$
                 .pipe(startWith(undefined)),
             videoMetadataRepository.all$,

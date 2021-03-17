@@ -18,7 +18,7 @@ export class HighlightRecollectionDifficultyService extends HighlightDifficultyS
     }) {
         super({
             highlighterService,
-            rows$: wordRecognitionRowService.records$,
+            rows$: wordRecognitionRowService.indexOfOrderedRecords$,
             getHighlightDelta: wordRecognitionRows => {
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in wordRecognitionRows) {

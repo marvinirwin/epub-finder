@@ -301,7 +301,7 @@ export class Manager {
         });
         this.editingCardManager = new EditingCardManager();
         this.progressManager = new ProgressManager({
-            wordRecognitionRows$: this.wordRecognitionProgressService.records$,
+            wordRecognitionRows$: this.wordRecognitionProgressService.indexOfOrderedRecords$,
             scheduleRows$: this.quizCardScheduleRowsService.indexedScheduleRows$
         });
         this.quizManager = new QuizManager();

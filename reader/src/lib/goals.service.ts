@@ -25,8 +25,8 @@ export class GoalsService {
         pronunciationProgressService: PronunciationProgressRepository
     }) {
         this.dailyProgress$ = combineLatest([
-            wordRecognitionProgressService.records$,
-            pronunciationProgressService.records$
+            wordRecognitionProgressService.indexOfOrderedRecords$,
+            pronunciationProgressService.indexOfOrderedRecords$
         ]).pipe(
             map(([recognition, pronunciation]) => {
                 /**

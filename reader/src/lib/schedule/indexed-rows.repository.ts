@@ -6,7 +6,7 @@ import {DatabaseService} from "../Storage/database.service";
 import {safePush} from "@shared/";
 
 export class IndexedRowsRepository<T extends {id?: number}> {
-    records$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
+    indexOfOrderedRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<ds_Dict<T[]>>(1);
     recordList$: Observable<T[]>;
     latestRecords$ = new BehaviorSubject<Map<string, T>>(new Map())
     addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1);
@@ -18,10 +18,10 @@ export class IndexedRowsRepository<T extends {id?: number}> {
         add: (t: T) => Promise<number>,
         getIndexValue: (v: T) => ({indexValue: string})
     }) {
-        this.records$.next({});
+        this.indexOfOrderedRecords$.next({});
         this.addRecords$.pipe(
             filter(rows => !!rows.length),
-            withLatestFrom(this.records$.pipe(startWith({}))),
+            withLatestFrom(this.indexOfOrderedRecords$.pipe(startWith({}))),
             tap(([rows, wordRecognitionRecords]: [T[], ds_Dict<T[]>]) => {
                 const newLatestRecords = new Map<string, T>(this.latestRecords$.getValue());
                 rows.forEach(row => {
@@ -31,7 +31,7 @@ export class IndexedRowsRepository<T extends {id?: number}> {
                     newLatestRecords.set(indexValue, row);
                 });
                 // This is a hack side effect
-                this.records$.next(wordRecognitionRecords);
+                this.indexOfOrderedRecords$.next(wordRecognitionRecords);
                 this.latestRecords$.next(newLatestRecords);
             }),
         ).subscribe(([rows]) => {
@@ -42,8 +42,8 @@ export class IndexedRowsRepository<T extends {id?: number}> {
                 }
             }
         });
-        this.clearRecords$.subscribe(v => this.records$.next({}));
-        this.recordList$ = this.records$
+        this.clearRecords$.subscribe(v => this.indexOfOrderedRecords$.next({}));
+        this.recordList$ = this.indexOfOrderedRecords$
             .pipe(
                 map(recordObject => flatten(Object.values(recordObject))),
                 shareReplay(1)

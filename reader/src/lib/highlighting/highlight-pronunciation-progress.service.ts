@@ -19,7 +19,7 @@ export class HighlightPronunciationProgressService extends HighlightDifficultySe
     }) {
         super({
             highlighterService,
-            rows$: pronunciationProgressService.records$,
+            rows$: pronunciationProgressService.indexOfOrderedRecords$,
             getHighlightDelta: pronunciationRows => {
                 const highlights: HighlightDelta = new Map<string, RGBA>();
                 for (const word in pronunciationRows) {

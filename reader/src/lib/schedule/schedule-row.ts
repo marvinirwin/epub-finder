@@ -1,13 +1,10 @@
 import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
 import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
-import {sum} from "lodash";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
-import {isSameDay, isToday, isBefore, isAfter} from 'date-fns';
-import {formatDistance, subDays} from 'date-fns'
+import {formatDistance, isAfter, isToday} from 'date-fns';
 import {SuperMemoGrade, SuperMemoItem} from "supermemo";
-import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 
 
 export interface QuizScheduleRowData {
@@ -49,6 +46,19 @@ export type ScheduleRowItem = {
     repetition: number,
     interval: number,
     efactor: number
+};
+
+export const recordsLearnedToday = (r1: ScheduleRowItem[]) => {
+    const lastTwoRecords = ScheduleRow.lastNRecords(
+        r1,
+        2
+    );
+    return lastTwoRecords.length === 2 && lastTwoRecords
+        .every(
+            r => r.grade >= 3 &&
+                isToday(r.timestamp) &&
+                isAfter(r.nextDueDate, Date.now())
+        );
 };
 
 export class ScheduleRow<T> {
@@ -140,16 +150,7 @@ export class ScheduleRow<T> {
     }
 
     wasLearnedToday() {
-        const lastTwoRecords = ScheduleRow.lastNRecords(
-            this.superMemoRecords,
-            2
-        );
-        return lastTwoRecords.length === 2 && lastTwoRecords
-            .every(
-                r => r.grade >= 3 &&
-                    isToday(r.timestamp) &&
-                    isAfter(r.nextDueDate, Date.now())
-            );
+        return recordsLearnedToday(this.superMemoRecords);
     }
 
     isNotStarted() {

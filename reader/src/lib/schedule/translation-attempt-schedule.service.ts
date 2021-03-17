@@ -36,7 +36,7 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
     ) {
         this.indexedScheduleRows$ = combineLatest([
             openDocumentsService.virtualDocumentTabulation$,
-            translationAttemptRepository.records$,
+            translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$
         ]).pipe(
             map(([

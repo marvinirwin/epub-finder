@@ -1,27 +1,30 @@
 import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.service";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
+import {WordRecognitionProgressRepository} from "./schedule/word-recognition-progress.repository";
+import {recordsLearnedToday} from "./schedule/schedule-row";
 
 export class WeightedVocabService {
     weightedVocab$: Observable<Map<string, number>>
 
     constructor(
         {
-            quizCardScheduleRowsService
+            wordRecognitionProgressRepository
         }: {
-            quizCardScheduleRowsService: QuizCardScheduleRowsService
+            wordRecognitionProgressRepository: WordRecognitionProgressRepository
         }
     ) {
-        this.weightedVocab$ = quizCardScheduleRowsService
-            .indexedScheduleRows$
+        this.weightedVocab$ = wordRecognitionProgressRepository
+            .indexOfOrderedRecords$
             .pipe(
-                map((indexedScheduleRows) => {
+                map((indexedWordRecognitionRecords) => {
                     return new Map(
-                        Object.values(indexedScheduleRows)
-                            .map(scheduleRow => {
+                        Object.values(indexedWordRecognitionRecords)
+                            .map(recognitionRecords => {
+                                const lastRecord = recognitionRecords[recognitionRecords.length - 1];
                                 return [
-                                    scheduleRow.d.word,
-                                    scheduleRow.isRecognized() ? 1 : 0
+                                    lastRecord.word,
+                                    recordsLearnedToday(recognitionRecords) ? 1 : 0
                                 ];
                             })
                     )
