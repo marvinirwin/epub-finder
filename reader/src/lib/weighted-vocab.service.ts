@@ -9,12 +9,12 @@ export class WeightedVocabService {
 
     constructor(
         {
-            wordRecognitionProgressRepository
+            wordRecognitionProgressService
         }: {
-            wordRecognitionProgressRepository: WordRecognitionProgressRepository
+            wordRecognitionProgressService: WordRecognitionProgressRepository
         }
     ) {
-        this.weightedVocab$ = wordRecognitionProgressRepository
+        this.weightedVocab$ = wordRecognitionProgressService
             .indexOfOrderedRecords$
             .pipe(
                 map((indexedWordRecognitionRecords) => {

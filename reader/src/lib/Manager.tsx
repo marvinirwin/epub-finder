@@ -273,6 +273,10 @@ export class Manager {
         this.readingwordElementMap = wordElementMap$;
         this.readingWordCounts$ = documentwordCounts;
         this.readingwordSentenceMap = sentenceMap$;
+        this.translationAttemptRepository = new TranslationAttemptRepository(this)
+        this.weightedVocabService = new WeightedVocabService(this);
+        this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
+        this.translationAttemptService = new TranslationAttemptService(this)
         this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this);
         this.quizCardScheduleService = new ScheduleService({
             scheduleRowsService: this.quizCardScheduleRowsService,
@@ -283,10 +287,6 @@ export class Manager {
         })
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
-        this.translationAttemptRepository = new TranslationAttemptRepository(this)
-        this.weightedVocabService = new WeightedVocabService(this);
-        this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
-        this.translationAttemptService = new TranslationAttemptService(this)
 
 
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
