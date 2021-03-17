@@ -60,6 +60,18 @@ export const recordsLearnedToday = (r1: ScheduleRowItem[]) => {
                 isAfter(r.nextDueDate, Date.now())
         );
 };
+export const recordsLearnedAnyDay = (r1: ScheduleRowItem[]) => {
+    const lastTwoRecords = ScheduleRow.lastNRecords(
+        r1,
+        2
+    );
+    return lastTwoRecords.length === 2 && lastTwoRecords
+        .every(
+            r => r.grade >= 3 &&
+                isAfter(r.nextDueDate, Date.now())
+        );
+};
+
 
 export class ScheduleRow<T> {
     private _dueDate: Date;

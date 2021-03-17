@@ -2,7 +2,7 @@ import {QuizCardScheduleRowsService} from "./schedule/quiz-card-schedule-rows.se
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {WordRecognitionProgressRepository} from "./schedule/word-recognition-progress.repository";
-import {recordsLearnedToday} from "./schedule/schedule-row";
+import {recordsLearnedAnyDay, recordsLearnedToday} from "./schedule/schedule-row";
 
 export class WeightedVocabService {
     weightedVocab$: Observable<Map<string, number>>
@@ -24,7 +24,7 @@ export class WeightedVocabService {
                                 const lastRecord = recognitionRecords[recognitionRecords.length - 1];
                                 return [
                                     lastRecord.word,
-                                    recordsLearnedToday(recognitionRecords) ? 1 : 0
+                                    recordsLearnedAnyDay(recognitionRecords) ? 1 : 0
                                 ];
                             })
                     )
