@@ -103,7 +103,7 @@ export class QuizCardScheduleRowsService {
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
                 const firstRecordSentence = Object.keys(indexedTranslationAttemptScheduleRows)[0] || '';
-                return Object.fromEntries(ScheduleMathService.normalizeAndSortQuizScheduleRows(
+                let entries = ScheduleMathService.normalizeAndSortQuizScheduleRows(
                     {
                         dueDate: {
                             fn: (row: ScheduleRow<QuizScheduleRowData>) => row.dueDate().getTime() * -1,
@@ -132,7 +132,7 @@ export class QuizCardScheduleRowsService {
                             length: sortValues[2]
                         }
                     }
-                ).map(row => [
+                ).filter(row => !!row.row.d.word).map(row => [
                     row.row.d.word,
                     new ScheduleRow<NormalizedQuizCardScheduleRowData>(
                         {
@@ -144,7 +144,8 @@ export class QuizCardScheduleRowsService {
                         },
                         row.row.d.wordRecognitionRecords
                     )
-                ]))
+                ]);
+                return Object.fromEntries(entries)
             }),
             shareReplay(1)
         );
