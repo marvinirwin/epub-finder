@@ -8,7 +8,7 @@ var Fragment = (function () {
   function Fragment(data, beginTime, endTime) {
     _classCallCheck(this, Fragment);
 
-    this.data = data;
+    this.content = data;
     this.beginTime = beginTime;
     this.endTime = endTime;
     this.gain = 1;

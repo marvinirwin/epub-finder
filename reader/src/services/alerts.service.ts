@@ -14,7 +14,6 @@ export class AlertsService {
 
     public alertMessages$ = new BehaviorSubject<AlertMessage[]>([]);
     public newAlerts$ = new ReplaySubject<AlertMessage>(1);
-    public alertMessagesVisible$ = new ReplaySubject<boolean>(1);
 
     private readonly _testing = 'is_test';
 
@@ -54,7 +53,6 @@ export class AlertsService {
         const messages = this.alertMessages$.getValue();
         const MAX_MESSAGES = 10;
         const sliceStart = messages.length - MAX_MESSAGES > 0 ? messages.length - MAX_MESSAGES : 0;
-        this.alertMessagesVisible$.next(true);
         this.alertMessages$.next(messages.concat({msg, severity: color}).slice(sliceStart, sliceStart + MAX_MESSAGES));
     }
 

@@ -51,7 +51,7 @@ import {LibraryService} from "./manager/library.service";
 import {DroppedFilesService} from "./uploading-documents/dropped-files.service";
 import {UploadingDocumentsService} from "./uploading-documents/uploading-documents.service";
 import {DocumentSelectionService} from "./document-selection/document-selection.service";
-import {AlertsService} from "../services/alerts.service";
+import {AlertMessage, AlertsService} from "../services/alerts.service";
 import {ReadingDocumentService} from "./manager/reading-document.service";
 import {RequestRecordingService} from "../components/pronunciation-video/request-recording.service";
 import {TreeMenuService} from "../services/tree-menu.service";
@@ -67,7 +67,7 @@ import {TabulatedDocuments} from "@shared/";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
 import {WordMetadataMapService} from "../services/word-metadata-map.service";
 import {AtomElementEventsService} from "./atom-element-events.service";
-import {ToastMessageService} from "./toast-message.service";
+import {ToastMessage, ToastMessageService} from "./toast-message.service";
 import {ProgressItemService} from "../components/progress-item.service";
 import {IsRecordingService} from "./is-recording.service";
 import {HistoryService} from "./history.service";
@@ -96,6 +96,8 @@ import {TranslationAttemptRepository} from "./schedule/translation-attempt.repos
 import {QuizScheduleRowData} from "./schedule/schedule-row";
 import {TranslationAttemptService} from "../components/translation-attempt/translation-attempt.service";
 import {WeightedVocabService} from "./weighted-vocab.service";
+import {Alert} from "@material-ui/lab";
+import {GeneralToastMessageService} from "./general-toast-message.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -175,7 +177,7 @@ export class Manager {
     public activeSentenceService: ActiveSentenceService;
     public elementAtomMetadataIndex: ElementAtomMetadataIndex;
     public wordMetadataMapService: WordMetadataMapService;
-    public toastMessageService: ToastMessageService;
+    public alertToastMessageService: ToastMessageService<AlertMessage>;
     public isRecordingService: IsRecordingService;
     public historyService: HistoryService;
     public languageConfigsService: LanguageConfigsService;
@@ -201,11 +203,18 @@ export class Manager {
     translationAttemptRepository: TranslationAttemptRepository;
     translationAttemptService: TranslationAttemptService;
     weightedVocabService: WeightedVocabService;
+    generalToastMessagesService: GeneralToastMessageService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
         this.allWordsRepository = new AllWordsRepository();
-        this.toastMessageService = new ToastMessageService(this)
+        this.alertToastMessageService = new ToastMessageService({
+            addToastMessage$: this.alertsService.newAlerts$.pipe(
+                    map(alert => new ToastMessage(10000, alert)),
+                    shareReplay(1)
+                )
+        })
+        this.generalToastMessagesService = new GeneralToastMessageService();
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this);
         this.languageConfigsService = new LanguageConfigsService(this);

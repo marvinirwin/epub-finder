@@ -125,10 +125,10 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
         {
             sortInfo &&
                 <Fragment>
-                    <Typography variant={'h6'}>Count Weight: {round(sortInfo.count.weightedInverseLogNormalValue)}</Typography>
-                    <Typography variant={'h6'}>Date Weight: {round(sortInfo.dueDate.weightedInverseLogNormalValue)}</Typography>
-                    <Typography variant={'h6'}>Length: {round(sortInfo.length.weightedInverseLogNormalValue)}</Typography>
-                    <Typography variant={'h6'}>Sentence Priority: {round(sortInfo.sentencePriority.weightedInverseLogNormalValue)}</Typography>
+                    <Typography variant={'h6'}>Count Weight: {round(sortInfo.count.weightedInverseLogNormalValue, 2)}</Typography>
+                    <Typography variant={'h6'}>Date Weight: {round(sortInfo.dueDate.weightedInverseLogNormalValue, 2)}</Typography>
+                    <Typography variant={'h6'}>Length: {round(sortInfo.length.weightedInverseLogNormalValue, 2)}</Typography>
+                    <Typography variant={'h6'}>Sentence Priority: {round(sortInfo.sentencePriority.weightedInverseLogNormalValue, 2)}</Typography>
                 </Fragment>
         }
         <br/>

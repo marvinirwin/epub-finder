@@ -8,7 +8,7 @@ import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/main";
 import {ThemeProvider} from '@material-ui/core/styles';
 import {GlobalDragOver} from "./components/global-drag-over.component";
-import {AlertSnackbar} from "./components/alert-snackbar.component";
+import {AlertSnackbar, GeneralMessageSnackbar} from "./components/alert-snackbar.component";
 import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
@@ -43,6 +43,7 @@ function App() {
                     }
                     <LoadingBackdrop/>
                     <AlertSnackbar/>
+                    <GeneralMessageSnackbar/>
                     <SpeechRecognitionSnackbar/>
                     <GlobalDragOver/>
                     <Main m={manager}/>
