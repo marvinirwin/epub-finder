@@ -28,6 +28,12 @@ export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData {
     finalSortValue: number;
     normalizedCount: NormalizedValue,
     normalizedDate: NormalizedValue,
+    sortValues: {
+        dueDate: SortValue<Date>,
+        count: SortValue<number>,
+        length: SortValue<number>,
+        sentencePriority: SortValue<number>
+    }
 }
 
 export interface SortValue<T> {

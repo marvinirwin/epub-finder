@@ -3,8 +3,6 @@ import {map, shareReplay} from "rxjs/operators";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 
 
-
-
 export class ExampleSegmentsService {
     exampleSegmentMap$: Observable<Map<string, Set<string>>>
 
@@ -13,12 +11,12 @@ export class ExampleSegmentsService {
         {
             openDocumentsService,
         }: {
-            openDocumentsService: OpenDocumentsService
+            openDocumentsService: OpenDocumentsService,
         }
     ) {
         this.exampleSegmentMap$ = openDocumentsService.virtualDocumentTabulation$.pipe(
             map((tabulation) => {
-                return tabulation.wordSegmentStringsMap()
+                    return tabulation.wordSegmentStringsMap()
                 }
             ),
             shareReplay(1)

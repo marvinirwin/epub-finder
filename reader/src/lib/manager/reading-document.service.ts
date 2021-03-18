@@ -1,5 +1,5 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
+import {AtomizedDocument} from "@shared/";
 import {shareReplay, switchMap, tap} from "rxjs/operators";
 import {filterMap, findMap, firstMap} from "../map.module";
 import {SettingsService} from "../../services/settings.service";

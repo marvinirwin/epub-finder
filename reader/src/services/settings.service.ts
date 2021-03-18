@@ -72,7 +72,7 @@ export class SettingsService {
 
         this.pronunciationVideoSentenceHash$ = this.createSetting$<string>('video', '', 'url');
 
-        this.readingDocument$ = this.createSetting$<string>('readingDocument', '', 'url')
+        this.readingDocument$ = this.createSetting$<string>('readingDocument', '', 'indexedDB')
 
         this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
 

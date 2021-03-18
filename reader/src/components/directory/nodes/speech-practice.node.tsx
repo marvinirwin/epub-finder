@@ -9,5 +9,4 @@ export const SpeechPracticeNode: TreeMenuNode = {
     label: 'Speech Practice',
     Component: () => <SpeechPractice/>,
     LeftIcon: () => <Translate/>,
-    moveDirectory: true
 }

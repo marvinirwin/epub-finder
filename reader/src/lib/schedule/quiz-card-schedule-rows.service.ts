@@ -125,11 +125,12 @@ export class QuizCardScheduleRowsService {
                     },
                     Object.values(scheduleRows)
                         .map(r => new ScheduleRow<QuizScheduleRowData>(r, r.wordRecognitionRecords)),
-                    (sortValues, sortConfigs) => {
+                    ([dueDate, count, length, sentencePriority], sortConfigs) => {
                         return {
-                            dueDate: sortValues[0],
-                            count: sortValues[1],
-                            length: sortValues[2]
+                            dueDate,
+                            count,
+                            length,
+                            sentencePriority
                         }
                     }
                 ).filter(row => !!row.row.d.word).map(row => [
@@ -140,7 +141,8 @@ export class QuizCardScheduleRowsService {
                             ...row.sortValues,
                             finalSortValue: row.finalSortValue,
                             normalizedCount: row.sortValues.count.normalizedValueObject,
-                            normalizedDate: row.sortValues.dueDate.normalizedValueObject
+                            normalizedDate: row.sortValues.dueDate.normalizedValueObject,
+                            sortValues: row.sortValues
                         },
                         row.row.d.wordRecognitionRecords
                     )

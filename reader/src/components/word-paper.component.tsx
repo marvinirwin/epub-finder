@@ -1,5 +1,5 @@
 import {WordCard} from "./quiz/word-card.interface";
-import React, {useContext} from "react";
+import React, {useContext, Fragment} from "react";
 import {
     Paper,
     Table,
@@ -21,6 +21,7 @@ import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../App";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row";
 import {formatDueDate} from "../lib/schedule/format-due-date";
+import { round } from "lodash";
 
 
 export const CardLearningLanguageText = ({word}: { word: string }) => {
@@ -92,6 +93,7 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
     const romanization = useObservableState(wordCard.romanization$);
     const translation = useObservableState(wordCard.translation$);
     const description = useObservableState(wordCard.description$.value$);
+    const sortInfo = scheduleRow?.d?.sortValues;
     return <Paper style={{
         display: 'flex',
         flexFlow: 'column nowrap',
@@ -120,6 +122,15 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
         <Typography variant={'h6'}>To review: {scheduleRow?.isToReview() ? 'Yes' : 'No'}</Typography>
         <Typography variant={'h6'}>Learned Today: {scheduleRow?.wasLearnedToday() ? 'Yes' : 'No'}</Typography>
         <Typography variant={'h6'}>Unstarted: {scheduleRow?.isNotStarted() ? 'Yes' : 'No'}</Typography>
+        {
+            sortInfo &&
+                <Fragment>
+                    <Typography variant={'h6'}>Count Weight: {round(sortInfo.count.weightedInverseLogNormalValue)}</Typography>
+                    <Typography variant={'h6'}>Date Weight: {round(sortInfo.dueDate.weightedInverseLogNormalValue)}</Typography>
+                    <Typography variant={'h6'}>Length: {round(sortInfo.length.weightedInverseLogNormalValue)}</Typography>
+                    <Typography variant={'h6'}>Sentence Priority: {round(sortInfo.sentencePriority.weightedInverseLogNormalValue)}</Typography>
+                </Fragment>
+        }
         <br/>
         {scheduleRow && <RecognitionRowTable scheduleRow={scheduleRow}/>}
         <br/>

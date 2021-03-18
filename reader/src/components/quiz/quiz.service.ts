@@ -14,6 +14,7 @@ import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-sch
 import {wordCardFactory} from "./card-card.factory";
 import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
+import {TranslationAttemptScheduleService} from "../../lib/schedule/translation-attempt-schedule.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -41,7 +42,8 @@ export class QuizService {
             openDocumentsService,
             languageConfigsService,
             settingsService,
-            tabulationConfigurationService
+            tabulationConfigurationService,
+            translationAttemptScheduleService
         }: {
             cardsRepository: CardsRepository
             sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService,
@@ -50,6 +52,7 @@ export class QuizService {
             languageConfigsService: LanguageConfigsService,
             settingsService: SettingsService,
             tabulationConfigurationService: TabulationConfigurationService
+            translationAttemptScheduleService: TranslationAttemptScheduleService
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
@@ -67,12 +70,25 @@ export class QuizService {
                 name: 'example-sentences',
                 sentences$: combineLatest([
                     exampleSentencesService.exampleSegmentMap$,
-                    currentWord$
+                    currentWord$,
+                    translationAttemptScheduleService.indexedScheduleRows$
                 ]).pipe(
-                    map(([sentenceMap, currentWord]) => {
+                    map(([sentenceMap, currentWord, translationAttemptScheduleIndex]) => {
+                        const firstTranslationAttempt = Object.values(translationAttemptScheduleIndex)[0]?.d?.segmentText || '';
                         if (!currentWord) return [];
                         const exampleSegmentTexts = Array.from(sentenceMap.get(currentWord) || new Set<string>());
-                        return uniq(orderBy(exampleSegmentTexts, v => v.length).map(a => a)).slice(0, 10)
+                        return uniq(
+                            orderBy(
+                                exampleSegmentTexts,
+                                [
+                                    segmentText => firstTranslationAttempt.includes(segmentText) ? 1 : 0,
+                                    v => v.length,
+                                ],
+                                [
+                                    'desc',
+                                    'asc',
+                                ]
+                            )).slice(0, 10)
                     }),
                     shareReplay(1)
                 ),
