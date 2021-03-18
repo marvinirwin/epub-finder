@@ -57,6 +57,7 @@ export class SettingsService {
     public scheduleTableShowUncounted$: ReplaySubject<boolean>;
     public scheduleTableShowUnderDue$: ReplaySubject<boolean>;
     public newQuizWordLimit$: ReplaySubject<number>;
+    public translationAttemptSentenceWeight$: ReplaySubject<number>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -95,6 +96,7 @@ export class SettingsService {
         this.manualIsRecording$ = this.createSetting$<boolean>('manualIsRecording', false, 'indexedDB')
 
         this.frequencyWeight$ = this.createSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+        this.translationAttemptSentenceWeight$ = this.createSetting$<number>('translationAttemptSentenceWeight', 0.5, 'indexedDB');
 
         this.dateWeight$ = this.createSetting$<number>('dateWeight', 0.5, 'indexedDB');
 

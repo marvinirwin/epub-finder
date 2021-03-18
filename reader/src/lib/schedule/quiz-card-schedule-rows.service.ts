@@ -6,12 +6,12 @@ import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRepository} from "./pronunciation-progress.repository";
 import CardsRepository from "../manager/cards.repository";
 import {IgnoredWordsRepository} from "./ignored-words.repository";
-import {NormalizedQuizCardScheduleRowData, ScheduleRow, QuizScheduleRowData} from "./schedule-row";
+import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "./schedule-row";
 import {ScheduleMathService, sumWordCountRecords} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
-import {TranslationAttemptScheduleService} from "./translation-attempt-schedule.service";
+import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
 
 export class QuizCardScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedQuizCardScheduleRowData>>>;
@@ -24,7 +24,7 @@ export class QuizCardScheduleRowsService {
                     ignoredWordsRepository,
                     settingsService,
                     allWordsRepository,
-                    translationAttemptScheduleService
+                    translationAttemptService
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
@@ -33,7 +33,7 @@ export class QuizCardScheduleRowsService {
         ignoredWordsRepository: IgnoredWordsRepository,
         settingsService: SettingsService,
         allWordsRepository: AllWordsRepository,
-        translationAttemptScheduleService: TranslationAttemptScheduleService
+        translationAttemptService: TranslationAttemptService
     }) {
         const progress$ = combineLatest([
             wordRecognitionProgressService.indexOfOrderedRecords$.pipe(startWith({})),
@@ -49,10 +49,11 @@ export class QuizCardScheduleRowsService {
             combineLatest([
                 settingsService.frequencyWeight$,
                 settingsService.dateWeight$,
-                settingsService.wordLengthWeight$
+                settingsService.wordLengthWeight$,
+                settingsService.translationAttemptSentenceWeight$
             ]),
             allWordsRepository.all$,
-            translationAttemptScheduleService.indexedScheduleRows$
+            translationAttemptService.currentScheduleRow$
         ]).pipe(
             map(([
                      [wordRecognitionRowIndex, pronunciationRowIndex],
@@ -61,9 +62,9 @@ export class QuizCardScheduleRowsService {
                          cardIndex,
                          ignoredWords,
                      ],
-                     [frequencyWeight, dateWeight, wordLengthWeight],
+                     [frequencyWeight, dateWeight, wordLengthWeight, translationAttemptSentenceWeight],
                      allWords,
-                     indexedTranslationAttemptScheduleRows
+                     currentTranslationAttemptScheduleRow
                  ]) => {
                 const scheduleRows: ds_Dict<QuizScheduleRowData> = {};
                 const ensureScheduleRow = (word: string) => {
@@ -102,8 +103,8 @@ export class QuizCardScheduleRowsService {
                     scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
-                const firstRecordSentence = Object.keys(indexedTranslationAttemptScheduleRows)[0] || '';
-                let entries = ScheduleMathService.normalizeAndSortQuizScheduleRows(
+                const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText;
+                return Object.fromEntries(ScheduleMathService.normalizeAndSortQuizScheduleRows(
                     {
                         dueDate: {
                             fn: (row: ScheduleRow<QuizScheduleRowData>) => row.dueDate().getTime() * -1,
@@ -119,8 +120,10 @@ export class QuizCardScheduleRowsService {
                         },
                         // How do we tell if we're included in the first row?
                         sentencePriority: {
-                            fn: (row: ScheduleRow<QuizScheduleRowData>) => firstRecordSentence.includes(row.d.word),
-                            weight: 0.5
+                            fn: (row: ScheduleRow<QuizScheduleRowData>) => {
+                                return firstRecordSentence.includes(row.d.word);
+                            },
+                            weight: translationAttemptSentenceWeight
                         }
                     },
                     Object.values(scheduleRows)
@@ -146,8 +149,7 @@ export class QuizCardScheduleRowsService {
                         },
                         row.row.d.wordRecognitionRecords
                     )
-                ]);
-                return Object.fromEntries(entries)
+                ]))
             }),
             shareReplay(1)
         );

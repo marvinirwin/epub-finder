@@ -22,3 +22,22 @@ export const AdjustDateWeight = () => {
         />
     </ListItem>
 }
+export const AdjustTranslationAttemptSentenceWeight = () => {
+    const m = useContext(ManagerContext);
+    const dateWeight = useObservableState(m.settingsService.translationAttemptSentenceWeight$) || 0;
+    return <ListItem>
+        <Typography gutterBottom>
+            How much being included in the first translation attempt sentence influence the flash card order
+        </Typography>
+        <Slider
+            value={dateWeight}
+            onChange={(_, value) => {
+                m.settingsService.translationAttemptSentenceWeight$.next(value as number);
+            }}
+            step={.1}
+            marks
+            min={0.1}
+            max={1}
+        />
+    </ListItem>
+}
