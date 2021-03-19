@@ -8,7 +8,7 @@ import {TranslationAttemptScheduleTable} from "./translation-attempt-schedule-ta
 import {TranslationAttempt} from "../../translation-attempt/translation-attempt.component";
 
 
-const TranslationAttemptScheduleNode = 'TranslationAttemptScheduleNode ';
+const TranslationAttemptScheduleNode = 'TranslationAttemptScheduleNode';
 const TranslationAttemptNodeLabel = 'TranslationAttemptNodeLabel';
 
 export const TranslationAttemptTableHead: React.FC<{}> = () => {

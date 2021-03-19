@@ -2,6 +2,10 @@ import {Observable, ReplaySubject} from "rxjs";
 import {setInterval} from "timers";
 import {HotkeyModes} from "./hotkeys/hotkey-modes";
 import {isDocument} from "./hotkeys/browser-inputs-service";
+import {GeneralToastMessageService} from "./general-toast-message.service";
+import {DEV} from "../components/directory/app-directory-service";
+import {Typography} from "@material-ui/core";
+import React from "react";
 
 
 const inputSelected = "inputSelected";
@@ -29,7 +33,11 @@ export class HotkeyModeService {
     hotkeyMode$ = new ReplaySubject<HotkeyMode>(1);
 
     constructor(
-        {}: {}
+        {
+            generalToastMessageService
+        }: {
+            generalToastMessageService: GeneralToastMessageService;
+        }
     ) {
         window.addEventListener('blur', el => {
             this.hotkeyMode$.next(nothingSelected)
@@ -45,5 +53,14 @@ export class HotkeyModeService {
             }
 
         });
+        if (DEV) {
+            this.hotkeyMode$.subscribe(mode => generalToastMessageService.addToastMessage$.next(
+                () => {
+                    return <Typography>
+                        Hotkey Mode: {mode}
+                    </Typography>
+                }
+            ))
+        }
     }
 }

@@ -41,14 +41,14 @@ export class OnSelectService {
                 })
             }
         })
+        this.handleSelection(document);
     }
 
     handleSelection(document: HTMLDocument) {
         const checkForSelectedText = () => {
             const activeEl = document.activeElement;
             if (activeEl) {
-                // @ts-ignore
-                const selObj = root.getSelection();
+                const selObj = document.getSelection();
                 if (selObj) {
                     const text = selObj.toString();
                     if (text) {
