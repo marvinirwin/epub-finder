@@ -13,6 +13,8 @@ import {
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
 import {isChineseCharacter} from "../../../../server/src/shared/OldAnkiClasses/Card";
+import {SelectedVirtualTabulationsService} from "../manager/selected-virtual-tabulations.service";
+import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
 
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: TranslationAttemptRecord[];
@@ -26,23 +28,24 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
     constructor(
         {
             translationAttemptRepository,
-            openDocumentsService,
+            selectedVirtualTabulationsService,
             weightedVocabService
         }: {
             translationAttemptRepository: TranslationAttemptRepository,
-            openDocumentsService: OpenDocumentsService,
+            selectedVirtualTabulationsService: SelectedVirtualTabulationsService,
             weightedVocabService: WeightedVocabService
         }
     ) {
         this.indexedScheduleRows$ = combineLatest([
-            openDocumentsService.virtualDocumentTabulation$,
+            selectedVirtualTabulationsService.selectedVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$
         ]).pipe(
             map(([
-                     virtualDocumentTabulation,
+                     selectedVirtualTabulations,
                      translationAttempts,
                      weightedVocab]) => {
+                const virtualDocumentTabulation = new SerializedTabulationAggregate(selectedVirtualTabulations)
                 const scheduleRows: ds_Dict<TranslationAttemptScheduleData> = {};
                 const ensureScheduleRow = (segmentText: string) => {
                     if (!scheduleRows[segmentText]) {

@@ -15,21 +15,6 @@ export function isDocument(t: HTMLElement | Document): t is Document {
     return !t.hasOwnProperty('tagName');
 }
 
-export function hotkeyMode(t: HTMLElement | Document | null): HotkeyModes {
-    if (!t) return HotkeyModes.Reading;
-
-    if (isDocument(t)) {
-        return HotkeyModes.Reading;
-    }
-
-    switch (t.tagName) {
-        case "INPUT":
-        case "TEXTAREA":
-            return HotkeyModes.TextInput;
-        default:
-            return HotkeyModes.Reading;
-    }
-}
 
 export function isListening(keyMode: HotkeyModes, actionListeningFor: keyof Hotkeys<any>) {
     switch (keyMode) {
