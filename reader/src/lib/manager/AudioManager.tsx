@@ -10,6 +10,7 @@ import {Typography} from "@material-ui/core";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
+import {transliterate} from "../transliterate.service";
 
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
@@ -64,29 +65,12 @@ export function makeCancelable<T>(promise: Promise<T>) {
 export const RecognizedTextComponent = (recognizedText: string): React.FC => () => {
     const m = useContext(ManagerContext);
     const [romanization, setRomanization] = useState<string>('');
-    /*
-        const {cancellablePromise} = useCancellablePromise();
-    */
+    const {cancellablePromise} = useCancellablePromise();
     const currentRomanizationFn = useObservableState(m.languageConfigsService.learningToLatinTransliterateFn$);
     useEffect(() => {
         if (currentRomanizationFn) {
-            // @ts-ignore
-            currentRomanizationFn.then((...v) => {
-                // @ts-ignore
-                debugger; console.log()
-                // @ts-ignore
-            }).catch((...err) => {
-                // @ts-ignore
-                    debugger; console.log()
-                }
-            )
-            /*
-                        const p = currentRomanizationFn(recognizedText);
-                        p.then(setRomanization)
-            */
-            /*
-                        cancellablePromise(p).then(setRomanization)
-            */
+            cancellablePromise(transliterate({...currentRomanizationFn, text: recognizedText}))
+                .then(setRomanization);
         }
     }, [currentRomanizationFn]);
     return <>

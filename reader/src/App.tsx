@@ -44,7 +44,9 @@ function App() {
                     <LoadingBackdrop/>
                     <AlertSnackbar/>
                     <GeneralMessageSnackbar/>
+{/*
                     <SpeechRecognitionSnackbar/>
+*/}
                     <GlobalDragOver/>
                     <Main m={manager}/>
                 </CssBaseline>
