@@ -19,7 +19,7 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {words, notableSubsequences, src, label}: TabulateLocalDocumentDto = ev.data;
+    const {words, notableSubsequences, src, label, id}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
     const segments = doc.segments();
     const tabulatedSentences = Segment.tabulate(
@@ -30,7 +30,11 @@ ctx.onmessage = async (ev) => {
         }
     );
     try {
-        const tabulated = tabulatedSentenceToTabulatedDocuments(tabulatedSentences, label);
+        const tabulated = tabulatedSentenceToTabulatedDocuments({
+            tabulatedSentences,
+            label,
+            id
+        });
         ctx.postMessage({
             wordCounts: tabulated.wordCounts,
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,

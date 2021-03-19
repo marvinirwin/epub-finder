@@ -8,6 +8,8 @@ import {SerializedSegment, WordCountRecord} from "../tabulation/tabulate";
 export type DocumentWordCounts = {
     documentWordCounts: Dictionary<DocumentWordCount[]>;
     greedyDocumentWordCounts: Map<string, DocumentWordCount[]>;
+    id: string;
+    label: string;
 }
 
 export type TabulatedDocuments = TabulatedSegments & DocumentWordCounts;
@@ -29,16 +31,25 @@ export interface SerializedTabulation {
 export type SerializedDocumentTabulation = SerializedTabulation & DocumentWordCounts;
 
 export const tabulatedSentenceToTabulatedDocuments = (
-    tabulatedSentences: TabulatedSegments,
-    documentLabel: string
+    {
+        tabulatedSentences,
+        label,
+        id
+    }:
+        {
+            tabulatedSentences: TabulatedSegments,
+            label: string, id?: string
+        }
 ): TabulatedDocuments => {
     const entries: [string, DocumentWordCount[]][] = Object.entries(tabulatedSentences.wordCounts)
         .map(([word, count]) =>
-            [word, [{word, count, document: documentLabel}]]);
+            [word, [{word, count, document: label}]]);
 
     return {
+        id,
+        label,
         ...tabulatedSentences,
         documentWordCounts: Object.fromEntries(entries),
-        greedyDocumentWordCounts: new Map(entries)
+        greedyDocumentWordCounts: new Map(entries),
     };
 };

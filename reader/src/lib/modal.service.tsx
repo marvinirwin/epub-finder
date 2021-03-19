@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {FileChooser} from "../components/directory/upload.component";
 import {LanguageSelect} from "../components/directory/nodes/language-select.component";
 import {ToggleTranslateComponent} from "../components/settings/toggle-translate.component";
@@ -7,11 +7,16 @@ import {ManualTestModal} from "../components/modals/test-modal/manual-test-modal
 import {AdjustFrequencyWeight} from "../components/directory/adjust-frequency-weight.component";
 import {NavModal} from "./nav-modal";
 import {SetVocab} from "../components/settings/set-vocab.component";
-import {AdjustDateWeight} from "../components/directory/adjust-date-weight.component";
+import {
+    AdjustDateWeight,
+    AdjustTranslationAttemptSentenceWeight
+} from "../components/directory/adjust-date-weight.component";
 import {AdjustLengthWeight} from "../components/directory/adjust-length-weight.component";
 import {LibraryTable} from "../components/library/library-table.component";
 import {SetQuizWordLimit} from "../components/settings/set-new-quiz-word-limit";
 import {WordCardDisplay} from "./word-card.modal.component";
+import {ManagerContext} from "../App";
+import {HotkeyConfig} from "../components/hotkeys/HotkeyConfig";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -37,15 +42,19 @@ export class ModalService {
 
         this.settings = new NavModal(
             'settings',
-            () => <div>
-                <ToggleTranslateComponent/>
-                <TogglePinyinComponent/>
-                <AdjustFrequencyWeight/>
-                <AdjustDateWeight/>
-                <AdjustLengthWeight/>
-                <SetVocab/>
-                <SetQuizWordLimit/>
-            </div>
+            () => {
+                const m = useContext(ManagerContext);
+                return <div>
+                    <ToggleTranslateComponent/>
+                    <TogglePinyinComponent/>
+                    <AdjustFrequencyWeight/>
+                    <AdjustDateWeight/>
+                    <AdjustLengthWeight/>
+                    <AdjustTranslationAttemptSentenceWeight/>
+                    <SetQuizWordLimit/>
+                    <HotkeyConfig/>
+                </div>;
+            }
         );
 
 

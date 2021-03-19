@@ -98,6 +98,7 @@ import {TranslationAttemptService} from "../components/translation-attempt/trans
 import {WeightedVocabService} from "./weighted-vocab.service";
 import {Alert} from "@material-ui/lab";
 import {GeneralToastMessageService} from "./general-toast-message.service";
+import { SelectedVirtualTabulationsService } from "./manager/selected-virtual-tabulations.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -204,6 +205,7 @@ export class Manager {
     translationAttemptService: TranslationAttemptService;
     weightedVocabService: WeightedVocabService;
     generalToastMessagesService: GeneralToastMessageService;
+    selectedVirtualTabulationsService: SelectedVirtualTabulationsService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -239,6 +241,7 @@ export class Manager {
         this.pronunciationProgressService = new PronunciationProgressRepository(this);
         this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this);
         this.openDocumentsService = new OpenDocumentsService(this);
+        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map(component => component?.name || '')

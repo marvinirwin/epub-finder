@@ -1,11 +1,15 @@
 import {Manager} from "../../lib/Manager";
 import {orderBy} from "lodash";
 import {EditableHotkeyComponent} from "./editable-hotkey.component";
-import React from "react";
+import React, {useContext} from "react";
 import {Hotkeys} from "../../lib/hotkeys/hotkeys.interface";
+import {ManagerContext} from "../../App";
+import {useObservableState} from "observable-hooks";
 
-export function HotkeyConfig({hotkeyConfig, m}: { hotkeyConfig: Partial<Hotkeys<string[]>>, m: Manager }) {
-    return <div>
+export function HotkeyConfig() {
+    const m = useContext(ManagerContext);
+    const hotkeyConfig = useObservableState(m.hotkeysService.hotkeyConfiguration$) || {} as Hotkeys<string[]>;
+    return <div style={{display: 'flex', flexFlow: 'row wrap'}}>
         {orderBy(Object.entries(hotkeyConfig), ([action]) => action).map(([action, arr]) => {
             return <EditableHotkeyComponent action={action} keyCombo={arr} m={m}/>
         })}

@@ -9,6 +9,7 @@ export const SetQuizWordLimit = () => {
     const selectedQuizWordLimit = useObservableState(m.settingsService.newQuizWordLimit$);
     return <TextField
         type="number"
+        label={"new words per day"}
         value={selectedQuizWordLimit || 0}
         onChange={e => m.settingsService.newQuizWordLimit$.next(
             parseInt(e.target.value || '0', 10) || 10

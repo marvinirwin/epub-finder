@@ -46,7 +46,12 @@ export class OpenDocument {
                             segments,
                         },
                     ));
-                    return tabulatedSentenceToTabulatedDocuments(tabulatedSentences, this.label);
+                    return tabulatedSentenceToTabulatedDocuments({
+                            tabulatedSentences,
+                            label: this.label,
+                            id: this.id
+                        }
+                    );
                 }
             ),
             shareReplay(1),
@@ -61,7 +66,8 @@ export class OpenDocument {
                     label,
                     notableSubsequences: [...tabulationConfiguration.notableCharacterSequences.values()],
                     words: [...tabulationConfiguration.greedyWordSet.values()],
-                    src: document._originalSrc
+                    src: document._originalSrc,
+                    id: this.id
                 })
             },
         );

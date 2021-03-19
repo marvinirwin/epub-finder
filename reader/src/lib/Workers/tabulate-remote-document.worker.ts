@@ -2,7 +2,7 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {TabulateRemoteDocumentDto} from "./tabulate-remote-document.dto";
-import {AtomizedDocument, Segment, tabulatedSentenceToTabulatedDocuments} from "@shared/";
+import {AtomizedDocument, LtDocument, Segment, tabulatedSentenceToTabulatedDocuments} from "@shared/";
 import trie from "trie-prefix-tree";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
@@ -12,17 +12,21 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {words, notableSubsequences, d: {filename, name}}: TabulateRemoteDocumentDto = ev.data;
-    const response = await fetch(`${process.env.PUBLIC_URL}/documents/${filename}`);
+    const {words, notableSubsequences, d}: TabulateRemoteDocumentDto = ev.data;
+    const ltDoc = new LtDocument(d)
+    const response = await fetch(`${process.env.PUBLIC_URL}/documents/${ltDoc.filename}`);
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
-    const tabulated = tabulatedSentenceToTabulatedDocuments(Segment.tabulate(
-        {
-            greedyWordSet: new SetWithUniqueLengths(words),
-            notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
-            segments: doc.segments(),
-        }),
-        name
+    const tabulated = tabulatedSentenceToTabulatedDocuments({
+            tabulatedSentences: Segment.tabulate(
+                {
+                    greedyWordSet: new SetWithUniqueLengths(words),
+                    notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
+                    segments: doc.segments(),
+                }),
+            label: ltDoc.name,
+            id: ltDoc.id(),
+        }
         )
     ;
     ctx.postMessage(tabulated);
