@@ -5,6 +5,9 @@ import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {EditableValue} from "./editing-value";
 import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
+import {transliterate} from "../../lib/transliterate.service";
+import translate from "google-translate-api";
+import {fetchTranslation} from "../../services/translate.service";
 
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
@@ -17,6 +20,7 @@ export const wordCardFactory = (
             propsToUpdate
         )
     }
+
     return ({
         word$: currentWord$,
         image$: new EditableValue<string | undefined>(
@@ -53,8 +57,11 @@ export const wordCardFactory = (
             currentWord$
         ]).pipe(
             switchMap((
-                [transliterateFn, currentWord]
-            ) => transliterateFn ? transliterateFn(currentWord || '') : of(undefined)),
+                [transliterateConfig, currentWord]
+            ) => transliterateConfig ? transliterate({
+                ...transliterateConfig,
+                text: currentWord || ''
+            }) : of(undefined)),
             shareReplay(1)
         ),
         translation$: combineLatest([
@@ -62,8 +69,11 @@ export const wordCardFactory = (
             currentWord$
         ]).pipe(
             switchMap(
-                ([translateFn, currentWord]) =>
-                    translateFn ? translateFn(currentWord || '') : of(undefined)
+                ([translateConfig, currentWord]) => {
+                    return translateConfig ? fetchTranslation(
+                        {text: currentWord || '', ...translateConfig}
+                    ) : of(undefined);
+                }
             ),
             shareReplay(1)
         ),

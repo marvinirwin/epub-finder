@@ -210,9 +210,9 @@ export class Manager {
         this.allWordsRepository = new AllWordsRepository();
         this.alertToastMessageService = new ToastMessageService({
             addToastMessage$: this.alertsService.newAlerts$.pipe(
-                    map(alert => new ToastMessage(10000, alert)),
-                    shareReplay(1)
-                )
+                map(alert => new ToastMessage(10000, alert)),
+                shareReplay(1)
+            )
         })
         this.generalToastMessagesService = new GeneralToastMessageService();
         this.historyService = new HistoryService()
@@ -299,7 +299,10 @@ export class Manager {
 
 
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
-        this.audioRecordingService = new AudioManager(audioSource);
+        this.audioRecordingService = new AudioManager({
+            audioSource,
+            generalToastMessageService: this.generalToastMessagesService
+        });
         this.micFeedbackService = new MicFeedbackService({
             audioSource
         });

@@ -7,13 +7,14 @@ import {SpeechToTextConfig, SupportedSpeechToTextService} from "./supported-spee
 import {SupportedTransliterationService} from "./supported-transliteration.service";
 import {transliterate} from "./transliterate.service";
 
-type PossibleStringFetcher = ((text: string) => Promise<string>) | undefined;
+export type PossibleTranslationConfig = { from: string, to: string } | undefined;
+export type PossibleTransliterationConfig = { language: string, fromScript: string, toScript: string } | undefined;
 
 export class LanguageConfigsService {
-    public knownToLearningTranslate$: Observable<PossibleStringFetcher>;
-    public learningToKnownTranslateFn$: Observable<PossibleStringFetcher>;
-    public learningToLatinTransliterateFn$: Observable<PossibleStringFetcher>;
-    public latinToLearningTransliterate$: Observable<PossibleStringFetcher>;
+    public knownToLearningTranslate$: Observable<PossibleTranslationConfig>;
+    public learningToKnownTranslateFn$: Observable<PossibleTranslationConfig>;
+    public learningToLatinTransliterateFn$: Observable<PossibleTransliterationConfig>;
+    public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>;
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>;
 
     constructor(
@@ -25,7 +26,7 @@ export class LanguageConfigsService {
     ) {
         const knownLanguage$ = new ReplaySubject<string>(1);
         knownLanguage$.next('en');
-        const h = <T>(f: (knownLanguageCode: string, learningLanguageCode: string) => T) =>
+        const getLanguageCodeObservable = <T>(f: (knownLanguageCode: string, learningLanguageCode: string) => T) =>
             combineLatest([
                 knownLanguage$,
                 settingsService.readingLanguage$
@@ -33,30 +34,28 @@ export class LanguageConfigsService {
                 map(([knownLanguage, learningLanguage]) => f(knownLanguage, learningLanguage)),
                 shareReplay(1)
             );
-        this.knownToLearningTranslate$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.knownToLearningTranslate$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {
-                return (text: string = '') => fetchTranslation({
-                    text,
+                return {
                     from: supportedLanguage.code,
                     to: learningLanguageCode
-                })
+                }
             }
         });
-        this.learningToKnownTranslateFn$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.learningToKnownTranslateFn$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {
-                return (text: string = '') => fetchTranslation({
+                return {
                     from: learningLanguageCode,
                     to: knownLanguageCode,
-                    text
-                })
+                }
             }
         });
 
-        this.potentialLearningSpoken$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.potentialLearningSpoken$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             const textSpeechMap = {
                 'zh-hant': [
                     'zh-cn',
@@ -262,26 +261,23 @@ export class LanguageConfigsService {
                 settingsService.spokenLanguage$.next('')
             }
         })
-        let supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
-        this.learningToLatinTransliterateFn$ = h((knownLanguageCode, learningLanguageCode) => {
+        const supportedTransliterations = SupportedTransliterationService.SupportedTransliteration;
+        this.learningToLatinTransliterateFn$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             const goesToLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
                 return code.toLowerCase() === learningLanguageCode.toLowerCase() &&
                     script2 === 'Latn'
             });
-            /**
-             */
             if (goesToLatin) {
-                return (text: string = '') =>
-                    transliterate({
-                        text,
-                        language: goesToLatin.code,
-                        fromScript: goesToLatin.script1,
-                        toScript: goesToLatin.script2
-                    })
+                return {
+
+                    language: goesToLatin.code,
+                    fromScript: goesToLatin.script1,
+                    toScript: goesToLatin.script2
+                }
             }
             return
         });
-        this.latinToLearningTransliterate$ = h((knownLanguageCode, learningLanguageCode) => {
+        this.latinToLearningTransliterate$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             // Need script2 and bidirectional
             // Is there a script1 that's latin?  Only for serbian, but that's a serial case
             const goesFromLatin = supportedTransliterations.find(({script1, script2, bidirectional, code}) => {
@@ -291,12 +287,11 @@ export class LanguageConfigsService {
 
             });
             if (goesFromLatin) {
-                return (text: string = '') => transliterate({
-                    text,
+                return {
                     language: learningLanguageCode,
                     fromScript: goesFromLatin.script2,
                     toScript: goesFromLatin.script1,
-                })
+                }
             }
         });
     }

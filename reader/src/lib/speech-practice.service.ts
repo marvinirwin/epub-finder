@@ -2,6 +2,8 @@ import {AudioRecorder} from "./audio/audio-recorder.service";
 import {combineLatest, Observable} from "rxjs";
 import {LanguageConfigsService} from "./language-configs.service";
 import {map, shareReplay, switchMap} from "rxjs/operators";
+import {transliterate} from "./transliterate.service";
+import {fetchTranslation} from "../services/translate.service";
 
 export class SpeechPracticeService {
     public learningLanguage$: Observable<string | undefined>;
@@ -24,9 +26,9 @@ export class SpeechPracticeService {
             this.learningLanguage$,
             languageConfigsService.learningToLatinTransliterateFn$
         ]).pipe(
-            switchMap(async ([learningLanguageText, transliterateFn]) => {
-                if (transliterateFn && learningLanguageText) {
-                       return transliterateFn(learningLanguageText)
+            switchMap(async ([learningLanguageText, transliterateConfig]) => {
+                if (transliterateConfig && learningLanguageText) {
+                       return transliterate({...transliterateConfig, text: learningLanguageText})
                 }
             }),
             shareReplay(1)
@@ -35,9 +37,9 @@ export class SpeechPracticeService {
             this.learningLanguage$,
             languageConfigsService.learningToKnownTranslateFn$
         ]).pipe(
-            switchMap(async ([learningLanguageText, translateFn]) => {
-                if (translateFn && learningLanguageText) {
-                    return translateFn(learningLanguageText)
+            switchMap(async ([learningLanguageText, translateConfig]) => {
+                if (translateConfig && learningLanguageText) {
+                    return fetchTranslation({...translateConfig, text: learningLanguageText})
                 }
             }),
             shareReplay(1)

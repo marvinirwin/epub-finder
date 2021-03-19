@@ -4,6 +4,8 @@ import {combineLatest, Observable} from "rxjs";
 import {LanguageConfigsService} from "./language-configs.service";
 import {SettingsService} from "../services/settings.service";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {fetchTranslation} from "../services/translate.service";
+import {transliterate} from "./transliterate.service";
 
 export class BrowserSegment extends Segment{
     translation$: Observable<string>;
@@ -22,13 +24,13 @@ export class BrowserSegment extends Segment{
         this.translation$ = languageConfigsService
             .learningToKnownTranslateFn$
             .pipe(
-                switchMap(translateFunc => translateFunc ? translateFunc(this.translatableText) : ''),
+                switchMap(translateConfig => translateConfig ? fetchTranslation({...translateConfig, text: this.translatableText}) : ''),
                 shareReplay(1)
             );
         this.romanization$ = languageConfigsService
             .learningToLatinTransliterateFn$
             .pipe(
-                switchMap(romanizationFunc => romanizationFunc ? romanizationFunc(this.translatableText) : ''),
+                switchMap(romanizationConfig => romanizationConfig ? transliterate({...romanizationConfig, text: this.translatableText}) : ''),
                 shareReplay(1)
             );
         this.mouseoverText$ = combineLatest([

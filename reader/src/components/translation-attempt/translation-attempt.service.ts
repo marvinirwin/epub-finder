@@ -6,6 +6,8 @@ import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxj
 import {distinctUntilChanged, map, shareReplay, switchMap} from "rxjs/operators";
 import {LanguageConfigsService} from "../../lib/language-configs.service";
 import {ScheduleRow} from "../../lib/schedule/schedule-row";
+import {fetchTranslation} from "../../services/translate.service";
+import {transliterate} from "../../lib/transliterate.service";
 
 
 
@@ -43,9 +45,12 @@ export class TranslationAttemptService {
             this.currentLearningLanguage$,
             languageConfigsService.learningToKnownTranslateFn$
         ]).pipe(
-            switchMap(([currentTranslatableWord, learningToKnownTranslationFn]) => {
-                return (learningToKnownTranslationFn && currentTranslatableWord) ?
-                    learningToKnownTranslationFn(currentTranslatableWord)
+            switchMap(([currentTranslatableWord, learningToKnownTranslationConfig]) => {
+                return (learningToKnownTranslationConfig && currentTranslatableWord) ?
+                    fetchTranslation({
+                        ...learningToKnownTranslationConfig,
+                        text: currentTranslatableWord
+                    })
                     : of(undefined)
             }),
             shareReplay(1)
@@ -54,9 +59,9 @@ export class TranslationAttemptService {
             this.currentLearningLanguage$,
             languageConfigsService.learningToLatinTransliterateFn$
         ]).pipe(
-            switchMap(([currentTranslatableWord, learningToLatinFn]) => {
-                return (learningToLatinFn && currentTranslatableWord) ?
-                    learningToLatinFn(currentTranslatableWord)
+            switchMap(([currentTranslatableWord, learningToLatinConfig]) => {
+                return (learningToLatinConfig && currentTranslatableWord) ?
+                    transliterate({...learningToLatinConfig, text: currentTranslatableWord})
                     : of(undefined)
             }),
             shareReplay(1)
