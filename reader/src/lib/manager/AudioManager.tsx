@@ -92,7 +92,10 @@ export class AudioManager {
     constructor({
                     audioSource,
                     generalToastMessageService
-                }: { audioSource: AudioSource, generalToastMessageService: GeneralToastMessageService }) {
+                }: {
+        audioSource: AudioSource,
+        generalToastMessageService: GeneralToastMessageService
+    }) {
         this.audioRecorder = new AudioRecorder({audioSource});
         this.audioRecorder.currentRecognizedText$.subscribe(recognizedText => generalToastMessageService.addToastMessage$.next(RecognizedTextComponent(recognizedText)))
         this.queSynthesizedSpeechRequest$.pipe(

@@ -75,16 +75,6 @@ export class BrowserInputs {
     }) {
         this.hotkeys$ = hotkeys$;
         this.activeSentenceService = activeSentenceService;
-/*
-        settingsService.showTranslation$.subscribe(showTranslations => {
-            this.showTranslations = showTranslations;
-            if (showTranslations) {
-                setMouseOverText(this.latestTranslationTarget?._translation || '')
-            } else {
-                setMouseOverText('')
-            }
-        });
-*/
         combineLatest([
                 hotkeys$,
                 this.keysPressed$

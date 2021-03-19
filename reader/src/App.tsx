@@ -12,7 +12,6 @@ import {AlertSnackbar, GeneralMessageSnackbar} from "./components/alert-snackbar
 import {LoadingBackdrop} from "./components/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
-import {SpeechRecognitionSnackbar} from "./components/speech-recognition-snackbar.component";
 
 
 const urlParams = new URLSearchParams(window.location.search);

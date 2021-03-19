@@ -10,9 +10,6 @@ export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>();
     public currentRecognizedText$ = new ReplaySubject<string>(1);
     public recentlyRecorded$ = new ReplaySubject<boolean>(1);
-/*
-    public currentRecognizedPinyin$: Observable<string>;
-*/
     private countdown$ = new Subject<number>();
     public audioSource: AudioSource;
 
@@ -22,16 +19,10 @@ export class AudioRecorder {
 
     constructor({audioSource}:{audioSource: AudioSource}) {
         this.audioSource = audioSource
-/*
-        this.currentRecognizedPinyin$ = this.currentRecognizedText$.pipe(
-            switchMap(async text => {
-
-            }),
-            shareReplay(1)
-        );
-*/
         this.isRecording$.subscribe(recordingNow => {
-            recordingNow && this.recentlyRecorded$.next(recordingNow);
+            if (recordingNow) {
+                this.recentlyRecorded$.next(recordingNow);
+            }
         });
         this.isRecording$.pipe(
             filter(v => !v),
