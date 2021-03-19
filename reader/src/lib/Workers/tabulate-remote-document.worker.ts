@@ -2,7 +2,13 @@
 // @ts-ignore
 // noinspection JSConstantReassignment
 import {TabulateRemoteDocumentDto} from "./tabulate-remote-document.dto";
-import {AtomizedDocument, LtDocument, Segment, tabulatedSentenceToTabulatedDocuments} from "@shared/";
+import {
+    AtomizedDocument,
+    LtDocument,
+    Segment,
+    SerializedDocumentTabulation,
+    tabulatedSentenceToTabulatedDocuments
+} from "@shared/";
 import trie from "trie-prefix-tree";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
@@ -18,17 +24,25 @@ ctx.onmessage = async (ev) => {
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments({
-            tabulatedSentences: Segment.tabulate(
-                {
-                    greedyWordSet: new SetWithUniqueLengths(words),
-                    notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
-                    segments: doc.segments(),
-                }),
-            label: ltDoc.name,
-            id: ltDoc.id(),
-        }
-        )
-    ;
-    ctx.postMessage(tabulated);
-};
+        tabulatedSentences: Segment.tabulate(
+            {
+                greedyWordSet: new SetWithUniqueLengths(words),
+                notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
+                segments: doc.segments(),
+            }),
+        label: ltDoc.name,
+        id: ltDoc.id(),
+    });
+    ctx.postMessage({
+        wordCounts: tabulated.wordCounts,
+        wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
+        documentWordCounts: tabulated.documentWordCounts,
+        greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts,
+        segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
+        greedyWordCounts: tabulated.greedyWordCounts,
+        id: ltDoc.id(),
+        label: ltDoc.name
+    } as SerializedDocumentTabulation);
+}
+
 

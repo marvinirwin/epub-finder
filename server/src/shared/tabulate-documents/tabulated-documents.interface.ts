@@ -38,7 +38,8 @@ export const tabulatedSentenceToTabulatedDocuments = (
     }:
         {
             tabulatedSentences: TabulatedSegments,
-            label: string, id?: string
+            label: string,
+            id?: string
         }
 ): TabulatedDocuments => {
     const entries: [string, DocumentWordCount[]][] = Object.entries(tabulatedSentences.wordCounts)

@@ -1,6 +1,7 @@
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {OpenDocumentsService} from "./manager/open-documents.service";
+import {SelectedVirtualTabulationsService} from "./manager/selected-virtual-tabulations.service";
+import {SerializedTabulationAggregate} from "../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
 
 
 export class ExampleSegmentsService {
@@ -9,14 +10,14 @@ export class ExampleSegmentsService {
     // We take the words we know and then find the segments which contain the words we know
     constructor(
         {
-            openDocumentsService,
+            selectedVirtualTabulationsService,
         }: {
-            openDocumentsService: OpenDocumentsService,
+            selectedVirtualTabulationsService: SelectedVirtualTabulationsService,
         }
     ) {
-        this.exampleSegmentMap$ = openDocumentsService.virtualDocumentTabulation$.pipe(
+        this.exampleSegmentMap$ = selectedVirtualTabulationsService.selectedVirtualTabulations$.pipe(
             map((tabulation) => {
-                    return tabulation.wordSegmentStringsMap()
+                    return new SerializedTabulationAggregate(tabulation).wordSegmentStringsMap()
                 }
             ),
             shareReplay(1)

@@ -5,7 +5,7 @@ import {combineLatest, Observable} from "rxjs";
 import {SerializedDocumentTabulation} from "@shared/*";
 
 export class SelectedVirtualTabulationsService {
-    private selectedVirtualTabulations$: Observable<SerializedDocumentTabulation[]>;
+    selectedVirtualTabulations$: Observable<SerializedDocumentTabulation[]>;
 
     constructor(
         {

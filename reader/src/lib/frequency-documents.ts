@@ -2,10 +2,8 @@ import {combineLatest, from, Observable} from "rxjs";
 import {DocumentReadabilityProgress} from "./document-readability-progress";
 import {LtDocument, SerializedTabulation} from "@shared/";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule/schedule-row";
-import {TrieObservable} from "./manager/open-documents.service";
 import {TabulateRemoteDocument} from "./Workers/worker.helpers";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {TabulatedFrequencyDocument} from "./learning-tree/tabulated-frequency-document";
 import {TabulationConfigurationService} from "./tabulation-configuration.service";
 
 export class FrequencyDocument {
