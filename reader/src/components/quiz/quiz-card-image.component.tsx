@@ -5,7 +5,7 @@ import {useObservableState} from "observable-hooks";
 import {QuizCard, WordCard} from "./word-card.interface";
 import {ManagerContext} from "../../App";
 import {observableLastValue} from "../../services/settings.service";
-import {IconButton} from "@material-ui/core";
+import {Button, IconButton, Typography} from "@material-ui/core";
 import {quizCardImage, selectQuizCardImageButton} from "@shared/";
 import {useIsFieldHidden} from "./useIsFieldHidden";
 
@@ -30,9 +30,9 @@ export function CardImage({quizCard}: { quizCard: WordCard }) {
                     className={quizCardImage}
                     src={quizCardImageSource}
                 /> :
-                <IconButton color='primary' id={selectQuizCardImageButton}>
-                    <InsertPhoto id={'quiz-card-image-placeholder'}/>
-                </IconButton>
+                <Button id={selectQuizCardImageButton} style={{margin: '24px'}}>
+                    <Typography>Select Photo</Typography>
+                </Button>
         }
 
     </EditableOnClick>;

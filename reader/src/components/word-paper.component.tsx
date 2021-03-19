@@ -1,6 +1,7 @@
 import {WordCard} from "./quiz/word-card.interface";
 import React, {useContext, Fragment} from "react";
 import {
+    Button,
     Paper,
     Table,
     TableBody,
@@ -21,16 +22,17 @@ import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../App";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../lib/schedule/schedule-row";
 import {formatDueDate} from "../lib/schedule/format-due-date";
-import { round } from "lodash";
+import {round} from "lodash";
 
 
 export const CardLearningLanguageText = ({word}: { word: string }) => {
     const m = useContext(ManagerContext);
-    return <Typography
+    return <Button
         onClick={() => m.wordCardModalService.word$.next(word)}
-        variant={'h1'}
         className={quizCardLearningLanguage}
-    >{word || ''}</Typography>
+    ><Typography
+        variant={'h1'}
+    >{word || ''}</Typography></Button>
 }
 
 const RecognitionRowTable: React.FC<{ scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData> }> =
@@ -124,12 +126,16 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
         <Typography variant={'h6'}>Unstarted: {scheduleRow?.isNotStarted() ? 'Yes' : 'No'}</Typography>
         {
             sortInfo &&
-                <Fragment>
-                    <Typography variant={'h6'}>Count Weight: {round(sortInfo.count.weightedInverseLogNormalValue, 2)}</Typography>
-                    <Typography variant={'h6'}>Date Weight: {round(sortInfo.dueDate.weightedInverseLogNormalValue, 2)}</Typography>
-                    <Typography variant={'h6'}>Length: {round(sortInfo.length.weightedInverseLogNormalValue, 2)}</Typography>
-                    <Typography variant={'h6'}>Sentence Priority: {round(sortInfo.sentencePriority.weightedInverseLogNormalValue, 2)}</Typography>
-                </Fragment>
+            <Fragment>
+                <Typography variant={'h6'}>Count
+                    Weight: {round(sortInfo.count.weightedInverseLogNormalValue, 2)}</Typography>
+                <Typography variant={'h6'}>Date
+                    Weight: {round(sortInfo.dueDate.weightedInverseLogNormalValue, 2)}</Typography>
+                <Typography
+                    variant={'h6'}>Length: {round(sortInfo.length.weightedInverseLogNormalValue, 2)}</Typography>
+                <Typography variant={'h6'}>Sentence
+                    Priority: {round(sortInfo.sentencePriority.weightedInverseLogNormalValue, 2)}</Typography>
+            </Fragment>
         }
         <br/>
         {scheduleRow && <RecognitionRowTable scheduleRow={scheduleRow}/>}
