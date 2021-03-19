@@ -10,7 +10,7 @@ import {AudioManager} from "./manager/AudioManager";
 import CardsRepository from "./manager/cards.repository";
 import {OpenDocumentsService} from "./manager/open-documents.service";
 import {QuizManager} from "./manager/QuizManager";
-import {BrowserInputs} from "./hotkeys/browser-inputs";
+import {BrowserInputsService} from "./hotkeys/browser-inputs-service";
 import {InputPage} from "./manager/manager-connections/Input-Page";
 import {CardPage} from "./manager/manager-connections/Card-Page";
 import {InputQuiz} from "./manager/manager-connections/Input-Quiz";
@@ -99,6 +99,8 @@ import {WeightedVocabService} from "./weighted-vocab.service";
 import {Alert} from "@material-ui/lab";
 import {GeneralToastMessageService} from "./general-toast-message.service";
 import { SelectedVirtualTabulationsService } from "./manager/selected-virtual-tabulations.service";
+import {HotkeyModeService} from "./hotkey-mode.service";
+import {OnSelectService} from "./on-select.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -131,7 +133,7 @@ export class Manager {
     public quizCardScheduleService: ScheduleService<QuizScheduleRowData>;
     public quizManager: QuizManager;
     public createdSentenceManager: CreatedSentenceManager;
-    public browserInputs: BrowserInputs;
+    public browserInputsService: BrowserInputsService;
     public editingCardManager: EditingCardManager;
     public progressManager: ProgressManager;
     public visibleElementsService: VisibleService;
@@ -189,6 +191,7 @@ export class Manager {
     public mousedOverWordHighlightService: MousedOverWordHighlightService;
     public ignoredWordsRepository: IgnoredWordsRepository;
     public frequencyDocumentsRepository: FrequencyDocumentsRepository;
+    public hotkeyModeService: HotkeyModeService;
     public allWordsRepository: AllWordsRepository;
     public progressTreeService: FrequencyTreeService;
     public quizHighlightService: QuizHighlightService;
@@ -204,8 +207,9 @@ export class Manager {
     translationAttemptRepository: TranslationAttemptRepository;
     translationAttemptService: TranslationAttemptService;
     weightedVocabService: WeightedVocabService;
-    generalToastMessagesService: GeneralToastMessageService;
+    generalToastMessageService: GeneralToastMessageService;
     selectedVirtualTabulationsService: SelectedVirtualTabulationsService;
+    onSelectService: OnSelectService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
@@ -216,7 +220,8 @@ export class Manager {
                 shareReplay(1)
             )
         })
-        this.generalToastMessagesService = new GeneralToastMessageService();
+        this.hotkeyModeService = new HotkeyModeService(this);
+        this.generalToastMessageService = new GeneralToastMessageService();
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this);
         this.languageConfigsService = new LanguageConfigsService(this);
@@ -227,7 +232,7 @@ export class Manager {
         this.hotkeysService = new HotkeysService(this)
         this.hotkeyEvents = new HotKeyEvents(this)
         this.activeSentenceService = new ActiveSentenceService(this)
-        this.browserInputs = new BrowserInputs({
+        this.browserInputsService = new BrowserInputsService({
             hotkeys$: this.hotkeysService.mapHotkeysWithDefault(
                 HotKeyEvents.defaultHotkeys(),
                 this.hotkeyEvents.hotkeyActions(),
@@ -236,6 +241,7 @@ export class Manager {
             settingsService: this.settingsService,
             languageConfigsService: this.languageConfigsService
         });
+        this.onSelectService = new OnSelectService(this);
         this.documentRepository = new DocumentRepository({databaseService: this.db});
         this.cardsRepository = new CardsRepository({databaseService: db});
         this.pronunciationProgressService = new PronunciationProgressRepository(this);
@@ -270,7 +276,7 @@ export class Manager {
         this.droppedFilesService = new DroppedFilesService();
         this.tabulationConfigurationService = new TabulationConfigurationService(this);
 
-        this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputs.applyDocumentListeners(body.ownerDocument as HTMLDocument))
+        this.openDocumentsService.openDocumentBodies$.subscribe(body => this.browserInputsService.applyDocumentListeners(body.ownerDocument as HTMLDocument))
         this.uploadingDocumentsService = new UploadingDocumentsService(this);
         this.uploadingDocumentsService.uploadingMessages$.subscribe(msg => this.alertsService.info(msg));
         /*
@@ -304,7 +310,7 @@ export class Manager {
         this.createdSentenceManager = new CreatedSentenceManager(this.db);
         this.audioRecordingService = new AudioManager({
             audioSource,
-            generalToastMessageService: this.generalToastMessagesService
+            generalToastMessageService: this.generalToastMessageService
         });
         this.micFeedbackService = new MicFeedbackService({
             audioSource
@@ -332,13 +338,13 @@ export class Manager {
             .subscribe(metadata => {
                 this.pronunciationVideoService.videoMetadata$.next(metadata);
             })
-        InputPage(this.browserInputs, this.openDocumentsService);
+        InputPage(this.browserInputsService, this.openDocumentsService);
         CardPage(this.cardsRepository, this.openDocumentsService);
-        InputQuiz(this.browserInputs, this.quizManager)
+        InputQuiz(this.browserInputsService, this.quizManager)
         CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioRecordingService)
 
         this.openDocumentsService.renderedSegments$.subscribe(segments => {
-                this.browserInputs.applySegmentListeners(segments)
+                this.browserInputsService.applySegmentListeners(segments)
             }
         );
         this.readingDocumentService = new ReadingDocumentService(this);
@@ -365,7 +371,7 @@ export class Manager {
                 ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
         */
 
-        this.browserInputs.selectedText$.subscribe(word => {
+        this.browserInputsService.selectedText$.subscribe(word => {
             this.audioRecordingService.audioRecorder.recordRequest$.next(new RecordRequest(word));
             this.audioRecordingService.queSynthesizedSpeechRequest$.next(word);
             this.editingCardManager.requestEditWord$.next(word);
@@ -440,7 +446,7 @@ export class Manager {
             modesService: this.modesService,
             highlighter: this.highlighter,
             pronunciationVideoService: this.pronunciationVideoService,
-            browserInputs: this.browserInputs,
+            browserInputs: this.browserInputsService,
             elementAtomMetadataIndex: this.elementAtomMetadataIndex,
             cardsRepository: this.cardsRepository,
             videoMetadataRepository: this.videoMetadataRepository,

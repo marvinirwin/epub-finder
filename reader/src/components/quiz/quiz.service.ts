@@ -15,6 +15,7 @@ import {wordCardFactory} from "./card-card.factory";
 import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 import {TranslationAttemptScheduleService} from "../../lib/schedule/translation-attempt-schedule.service";
+import {OnSelectService} from "../../lib/on-select.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())
@@ -43,7 +44,8 @@ export class QuizService {
             languageConfigsService,
             settingsService,
             tabulationConfigurationService,
-            translationAttemptScheduleService
+            translationAttemptScheduleService,
+            onSelectService
         }: {
             cardsRepository: CardsRepository
             sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService,
@@ -52,7 +54,8 @@ export class QuizService {
             languageConfigsService: LanguageConfigsService,
             settingsService: SettingsService,
             tabulationConfigurationService: TabulationConfigurationService
-            translationAttemptScheduleService: TranslationAttemptScheduleService
+            translationAttemptScheduleService: TranslationAttemptScheduleService,
+            onSelectService: OnSelectService
         }
     ) {
         this.manualHiddenFieldConfig$.next('');
@@ -67,6 +70,7 @@ export class QuizService {
                 tabulationConfigurationService,
                 settingsService,
                 languageConfigsService,
+                onSelectService,
                 name: 'example-sentences',
                 sentences$: combineLatest([
                     exampleSentencesService.exampleSegmentMap$,

@@ -35,7 +35,7 @@ export class SpeechPracticeService {
         )
         this.translation$ = combineLatest([
             this.learningLanguage$,
-            languageConfigsService.learningToKnownTranslateFn$
+            languageConfigsService.learningToKnownTranslateConfig
         ]).pipe(
             switchMap(async ([learningLanguageText, translateConfig]) => {
                 if (translateConfig && learningLanguageText) {

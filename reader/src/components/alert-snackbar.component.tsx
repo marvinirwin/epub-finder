@@ -25,12 +25,12 @@ export const AlertSnackbar = () => {
 
 export const GeneralMessageSnackbar = () => {
     const m = useContext(ManagerContext);
-    const alertMessages = useObservableState(m.generalToastMessagesService.toastMessageService.toastMessageList$);
+    const alertMessages = useObservableState(m.generalToastMessageService.toastMessageService.toastMessageList$);
     return <Snackbar
         open={!!alertMessages?.length}
         autoHideDuration={6000}
         anchorOrigin={{horizontal: 'center', vertical: 'top'}}
-        onClose={e => m.generalToastMessagesService.toastMessageService.alertMessagesVisible$.next(false)}>
+        onClose={e => m.generalToastMessageService.toastMessageService.alertMessagesVisible$.next(false)}>
         <div>
             {
                 (alertMessages || []).map(({content: {Component}}, index) =>

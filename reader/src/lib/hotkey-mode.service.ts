@@ -1,7 +1,7 @@
 import {Observable, ReplaySubject} from "rxjs";
 import {setInterval} from "timers";
 import {HotkeyModes} from "./hotkeys/hotkey-modes";
-import {isDocument} from "./hotkeys/browser-inputs";
+import {isDocument} from "./hotkeys/browser-inputs-service";
 
 
 const inputSelected = "inputSelected";

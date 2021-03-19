@@ -5,7 +5,7 @@ import {OpenDocumentsService} from "./manager/open-documents.service";
 import {ds_Dict, flattenTree} from "./delta-scan/delta-scan.module";
 import {XMLDocumentNode} from "../../../server/src/shared/XMLDocumentNode";
 import {PronunciationVideoService} from "../components/pronunciation-video/pronunciation-video.service";
-import {BrowserInputs} from "./hotkeys/browser-inputs";
+import {BrowserInputsService} from "./hotkeys/browser-inputs-service";
 import {debounce, flatten, maxBy} from "lodash";
 import {Highlighter} from "./highlighting/Highlighter";
 import {ElementAtomMetadataIndex} from "../services/element-atom-metadata.index";
@@ -35,7 +35,7 @@ export class AtomElementEventsService {
                 modesService: ModesService,
                 highlighter: Highlighter,
                 pronunciationVideoService: PronunciationVideoService,
-                browserInputs: BrowserInputs,
+                browserInputs: BrowserInputsService,
                 elementAtomMetadataIndex: ElementAtomMetadataIndex,
                 cardsRepository: CardsRepository,
                 videoMetadataRepository: VideoMetadataRepository,

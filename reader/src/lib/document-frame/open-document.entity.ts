@@ -4,7 +4,6 @@ import {
     annotatedAndTranslated,
     AtomizedDocument,
     Segment, SerializedDocumentTabulation,
-    SerializedTabulation,
     TabulatedDocuments,
     tabulatedSentenceToTabulatedDocuments
 } from "@shared/";
@@ -16,6 +15,7 @@ import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language-configs.service";
 import {isLoading} from "../util/is-loading";
 import {TabulationConfigurationService} from "../tabulation-configuration.service";
+import {OnSelectService} from "../on-select.service";
 
 export class OpenDocument {
     public name: string;
@@ -30,8 +30,12 @@ export class OpenDocument {
         public tabulationConfigurationService: TabulationConfigurationService,
         public atomizedDocument$: Observable<AtomizedDocument>,
         public label: string,
-        public settingsService: SettingsService,
-        public languageConfigsService: LanguageConfigsService
+        public services: {
+            settingsService: SettingsService,
+            languageConfigsService: LanguageConfigsService,
+            onSelectService: OnSelectService
+        },
+
     ) {
         this.name = id;
         this.renderedSegments$.next([]);
@@ -83,10 +87,11 @@ export class OpenDocument {
             .map(element => {
                 return new BrowserSegment({
                     element: element as unknown as XMLDocumentNode,
-                    languageConfigsService: this.languageConfigsService,
-                    settingsService: this.settingsService
+                    languageConfigsService: this.services.languageConfigsService,
+                    settingsService: this.services.settingsService
                 });
             });
+        this.services.onSelectService.handleSelection(body.ownerDocument);
         this.renderRoot$.next((body.ownerDocument as HTMLDocument).body as HTMLBodyElement);
         this.renderedSegments$.next(segments);
     }

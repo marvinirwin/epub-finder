@@ -22,7 +22,7 @@ export class BrowserSegment extends Segment{
     }, ) {
         super(element);
         this.translation$ = languageConfigsService
-            .learningToKnownTranslateFn$
+            .learningToKnownTranslateConfig
             .pipe(
                 switchMap(translateConfig => translateConfig ? fetchTranslation({...translateConfig, text: this.translatableText}) : ''),
                 shareReplay(1)

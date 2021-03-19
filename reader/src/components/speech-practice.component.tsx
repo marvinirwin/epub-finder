@@ -39,7 +39,7 @@ export const SpeechPractice = () => {
         record();
     }, []);
 
-    useSubscription(m.browserInputs.getKeyDownSubject('q'), () => {
+    useSubscription(m.browserInputsService.getKeyDownSubject('q'), () => {
         record()
     })
     return <div id={'speech-practice-container'}>

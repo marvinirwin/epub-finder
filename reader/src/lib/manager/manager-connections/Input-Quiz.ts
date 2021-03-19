@@ -1,10 +1,10 @@
-import {BrowserInputs} from "../../hotkeys/browser-inputs";
+import {BrowserInputsService} from "../../hotkeys/browser-inputs-service";
 import {QuizComponent, QuizManager} from "../QuizManager";
 import {filter, withLatestFrom} from "rxjs/operators";
 import {Observable} from "rxjs";
 import {RecognitionMap} from "../../srm/srm.service";
 
-export function InputQuiz(i: BrowserInputs, q: QuizManager) {
+export function InputQuiz(i: BrowserInputsService, q: QuizManager) {
     const advanceSet = new Set<QuizComponent>([QuizComponent.Characters, QuizComponent.Conclusion]);
     const conclusionSet = new Set<QuizComponent>([QuizComponent.Conclusion]);
 

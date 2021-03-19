@@ -20,6 +20,7 @@ import {mergeTabulations} from "../merge-tabulations";
 import {LanguageConfigsService} from "../language-configs.service";
 import {BrowserSegment} from "../browser-segment";
 import {TabulationConfigurationService} from "../tabulation-configuration.service";
+import {OnSelectService} from "../on-select.service";
 
 export type TrieObservable = Observable<TrieWrapper>;
 
@@ -48,6 +49,7 @@ export class OpenDocumentsService {
             settingsService: SettingsService;
             documentRepository: DocumentRepository;
             languageConfigsService: LanguageConfigsService,
+            onSelectService: OnSelectService,
             tabulationConfigurationService: TabulationConfigurationService
         }
     ) {
@@ -66,8 +68,11 @@ export class OpenDocumentsService {
                             config.tabulationConfigurationService,
                             DocumentSourcesService.document(documentSource),
                             document.name,
-                            config.settingsService,
-                            config.languageConfigsService
+                            {
+                                settingsService: config.settingsService,
+                                languageConfigsService: config.languageConfigsService,
+                                onSelectService: config.onSelectService
+                            }
                         );
                         return [
                             id,

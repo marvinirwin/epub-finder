@@ -12,7 +12,7 @@ export type PossibleTransliterationConfig = { language: string, fromScript: stri
 
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleTranslationConfig>;
-    public learningToKnownTranslateFn$: Observable<PossibleTranslationConfig>;
+    public learningToKnownTranslateConfig: Observable<PossibleTranslationConfig>;
     public learningToLatinTransliterateFn$: Observable<PossibleTransliterationConfig>;
     public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>;
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>;
@@ -44,7 +44,7 @@ export class LanguageConfigsService {
                 }
             }
         });
-        this.learningToKnownTranslateFn$ = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
+        this.learningToKnownTranslateConfig = getLanguageCodeObservable((knownLanguageCode, learningLanguageCode) => {
             const supportedLanguage = SupportedTranslationService
                 .SupportedTranslations.find(({code}) => code === knownLanguageCode);
             if (supportedLanguage) {

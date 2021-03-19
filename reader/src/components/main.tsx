@@ -20,11 +20,11 @@ export const PronunciationVideoResizedContext = React.createContext<Subject<void
 
 export function Main({m}: { m: Manager }) {
     useEffect(() => {
-        m.browserInputs.applyDocumentListeners(document);
+        m.browserInputsService.applyDocumentListeners(document);
         AppDirectoryService(m).subscribe(v => m.treeMenuService.tree.appendDelta$.next(v));
     }, [m]);
 
-    const hotkeyHandler = useObservableState(m.browserInputs.focusedElement$) || null;
+    const hotkeyHandler = useObservableState(m.browserInputsService.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {});
     const withDefaults = {...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig};
 

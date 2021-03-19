@@ -8,6 +8,7 @@ import {OpenDocument} from "./open-document.entity";
 import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language-configs.service";
 import {TabulationConfigurationService} from "../tabulation-configuration.service";
+import {OnSelectService} from "../on-select.service";
 
 
 export const OpenExampleSentencesFactory = (
@@ -16,13 +17,15 @@ export const OpenExampleSentencesFactory = (
         sentences$,
         tabulationConfigurationService,
         settingsService,
-        languageConfigsService
+        languageConfigsService,
+        onSelectService
     }: {
         name: string,
         sentences$: Observable<string[]>,
         tabulationConfigurationService: TabulationConfigurationService
         settingsService: SettingsService,
-        languageConfigsService: LanguageConfigsService
+        languageConfigsService: LanguageConfigsService,
+        onSelectService: OnSelectService
     }
 ) => {
     return new OpenDocument(
@@ -38,7 +41,10 @@ export const OpenExampleSentencesFactory = (
                     )
             }),
         'Example Sentences',
-        settingsService,
-        languageConfigsService
+        {
+            settingsService,
+            languageConfigsService,
+            onSelectService
+        }
     );
 }

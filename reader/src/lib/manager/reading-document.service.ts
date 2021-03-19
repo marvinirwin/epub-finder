@@ -7,6 +7,7 @@ import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from 
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {LanguageConfigsService} from "../language-configs.service";
 import {TabulationConfigurationService} from "../tabulation-configuration.service";
+import {OnSelectService} from "../on-select.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;
@@ -17,13 +18,15 @@ export class ReadingDocumentService {
             tabulationConfigurationService,
             openDocumentsService,
             settingsService,
-            languageConfigsService
+            languageConfigsService,
+            onSelectService
         }:
             {
                 tabulationConfigurationService: TabulationConfigurationService,
                 openDocumentsService: OpenDocumentsService,
                 settingsService: SettingsService,
-                languageConfigsService: LanguageConfigsService
+                languageConfigsService: LanguageConfigsService,
+                onSelectService: OnSelectService
             }
     ) {
         this.readingDocument = new OpenDocument(
@@ -36,8 +39,11 @@ export class ReadingDocumentService {
                 shareReplay(1)
             ),
             "Reading Document",
-            settingsService,
-            languageConfigsService
+            {
+                settingsService,
+                languageConfigsService,
+                onSelectService
+            }
         );
 
         openDocumentsService.openDocumentTree.appendDelta$.next(

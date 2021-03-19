@@ -26,7 +26,7 @@ export const SpeechPracticeCard = () => {
     const speechCode = useObservableState(m.settingsService.spokenLanguage$);
     const recognitionSupported = !!speechCode;
     const romanizationSupported = !!useObservableState(languageConfig.learningToLatinTransliterateFn$);
-    const translationSupported = !!useObservableState(languageConfig.learningToKnownTranslateFn$);
+    const translationSupported = !!useObservableState(languageConfig.learningToKnownTranslateConfig);
     const classes = useStyles();
 
     const recordedText = useObservableState(m.speechPracticeService.learningLanguage$) ||

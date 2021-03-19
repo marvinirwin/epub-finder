@@ -38,7 +38,7 @@ const compareKeySequenceToHotkeyMap = (hotkeyMap: Map<string[], Subject<void>>, 
  * If the key you're listening for is
  */
 
-export class BrowserInputs {
+export class BrowserInputsService {
     keydownMap: Dictionary<Subject<KeyboardEvent>> = {};
     keyupMap: Dictionary<Subject<KeyboardEvent>> = {};
     keysPressed$ = new BehaviorSubject<ds_Dict<boolean>>({});
@@ -90,24 +90,7 @@ export class BrowserInputs {
             this.keyupMap[ev.key]?.next(ev);
         };
 
-        const checkForSelectedText = () => {
-            const activeEl = root.activeElement;
-            if (activeEl) {
-                // @ts-ignore
-                const selObj = root.getSelection();
-                if (selObj) {
-                    const text = selObj.toString();
-                    if (text) {
-                        /*
-                                                this.selectedText$.next(text);
-                        */
-                    }
-                    return;
-                }
-            }
-        };
-        root.onmouseup = checkForSelectedText;
-        this.getKeyUpSubject("Shift").subscribe(checkForSelectedText);
+
     }
 
     getKeyDownSubject(key: string): Subject<KeyboardEvent> {

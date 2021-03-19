@@ -31,7 +31,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         m.pronunciationVideoService.chunkedAudioBuffers$,
         {chunkedAudioBuffers: [], max: 0}
     );
-    const currentSentenceCharacterIndex = useObservableState(m.browserInputs.videoCharacterIndex$);
+    const currentSentenceCharacterIndex = useObservableState(m.browserInputsService.videoCharacterIndex$);
 
     useHighlightBarPositionPercentage(
         highlightBarPosition1Ms || 0,
@@ -63,7 +63,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
         )
     }, [sectionLengthMs]);
 
-    useSubscription(m.browserInputs.getKeyDownSubject('q'), () => {
+    useSubscription(m.browserInputsService.getKeyDownSubject('q'), () => {
         setHighlightBarMsP1(0);
         setHighlightBarMsP2(0);
     });
@@ -74,7 +74,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{ m: Manager }
 
 
     useSubscription(
-        m.browserInputs.getKeyDownSubject('Escape'),
+        m.browserInputsService.getKeyDownSubject('Escape'),
         () => m.pronunciationVideoService.videoMetadata$.next(undefined)
     )
 

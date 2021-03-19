@@ -13,7 +13,7 @@ export const ManualHotkey = () => {
             id={manualHotkeyInput}/>
         <button
             id={submitManualHotkeyButton}
-            onClick={() => m.browserInputs.pressHotkey([manualHotkeyText])}
+            onClick={() => m.browserInputsService.pressHotkey([manualHotkeyText])}
         >press manual hotkey
         </button>
     </div>
