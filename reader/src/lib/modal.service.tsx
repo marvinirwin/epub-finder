@@ -17,6 +17,7 @@ import {SetQuizWordLimit} from "../components/settings/set-new-quiz-word-limit";
 import {WordCardDisplay} from "./word-card.modal.component";
 import {ManagerContext} from "../App";
 import {HotkeyConfig} from "../components/hotkeys/HotkeyConfig";
+import {QuizScheduleOverView} from "./quiz-schedule-over-view.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -81,7 +82,8 @@ export class ModalService {
             this.library,
             this.settings,
             this.testingUtils,
-            this.wordPaperDisplay
+            this.wordPaperDisplay,
+            this.quizScheduleOverView
         ]
     }
 }

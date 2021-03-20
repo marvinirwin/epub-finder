@@ -14,7 +14,6 @@ import {
 import {useObservableState} from "observable-hooks";
 import {QuizCardTableHead} from "./quiz-card-table-head.component";
 import {QuizCardTableRow} from "./quiz-card-table-row.component";
-import { filterScheduleRows } from "@shared/";
 import {QuizCardTableToolbar} from "./quiz-card-table-toolbar.component";
 
 

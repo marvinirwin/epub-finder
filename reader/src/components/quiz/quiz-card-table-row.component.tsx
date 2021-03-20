@@ -11,6 +11,7 @@ import {round, sum} from "lodash";
 import {lastN} from "./last-n";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../App";
+import {formatDistance} from "date-fns";
 
 export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedQuizCardScheduleRowData> }> = ({row}) => {
     const m = useContext(ManagerContext);
@@ -30,40 +31,11 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedQuizCardSch
                     <Typography variant={'h6'}>{row.d.word}</Typography>
                 </Button>
             </TableCell>
-            <TableCell>
-                Due Date: {round(row.d.dueDate.weightedInverseLogNormalValue || 0, 2)}
-                <br/>
-                Due Date Normal: {round(row.d.dueDate.normalValue || 0, 2)}
-                <br/>
-                Count: {round(row.d.count.weightedInverseLogNormalValue || 0, 2)}
-                <br/>
-                Length: {round(row.d.length.weightedInverseLogNormalValue || 0, 2)}
-                <br/>
-                Length Weight: {round(row.d.length.weight || 0, 2)}
-            </TableCell>
-            <TableCell>
-                {`${row.dueIn()} ${+row.dueDate() < 0 ? ' ago' : ''}`}
-            </TableCell>
-            <TableCell
-                className={quizCardTableRowRecognitions}
-            >{
-                lastN(1)(row.d.wordRecognitionRecords)
-                    .map(r => `${r.grade}`)
-                    .join(',')
-            }
-            </TableCell>
-            <TableCell
-                className={quizCardTableRowCounts}
-            >{
-                sum(row.d.wordCountRecords.map(r => r.count)) || 0
-            }</TableCell>
-            <TableCell
-                className={quizCardTableRowLastAnswer}
-            >{
-                lastN(1)(row.d.pronunciationRecords)
-                    .map(r => `${r.success ? 'Correct' : ''}`)
-                    .join(',')
-            }</TableCell>
+            <TableCell>{formatDistance(row.d.dueDate.value, Date.now())} </TableCell>
+            <TableCell>{round(row.d.sortValues.dueDate.weightedInverseLogNormalValue || 0, 2)}</TableCell>
+            <TableCell>{round(row.d.sortValues.count.weightedInverseLogNormalValue || 0, 2)}</TableCell>
+            <TableCell>{round(row.d.sortValues.length.weightedInverseLogNormalValue || 0, 2)} </TableCell>
+            <TableCell>{round(row.d.sortValues.sentencePriority.weightedInverseLogNormalValue || 0, 2)} </TableCell>
         </TableRow>
 
     );

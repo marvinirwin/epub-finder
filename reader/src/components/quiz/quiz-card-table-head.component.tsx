@@ -5,11 +5,11 @@ export const QuizCardTableHead: React.FC<{}> = () => {
     return <TableHead>
         <TableRow>
             <TableCell style={{minWidth: '10em'}}>Word</TableCell>
-            <TableCell>Sort Weight</TableCell>
-            <TableCell>Due In</TableCell>
-            <TableCell>Recognition</TableCell>
-            <TableCell>Frequency</TableCell>
-            <TableCell>Pronunciation</TableCell>
+            <TableCell>Due Date</TableCell>
+            <TableCell>Due Date</TableCell>
+            <TableCell>Count</TableCell>
+            <TableCell>Length</TableCell>
+            <TableCell>Sentences</TableCell>
         </TableRow>
     </TableHead>
 }

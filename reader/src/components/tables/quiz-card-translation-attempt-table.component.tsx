@@ -20,7 +20,7 @@ export const QuizCardTranslationAttemptSchedule = () => {
                 {rows.slice(0, 3).map((row) => (
                     <TableRow key={row.d.segmentText}>
                         <TableCell component="th" scope="row">
-                            {row.d.segmentText}
+                            {row.d.segmentText.substr(0, 10)}
                         </TableCell>
                         <TableCell align="right">
                             {format(row.dueDate(), 'yyyy MMM-do HH:mm')}

@@ -5,10 +5,9 @@ import {AccountCircle} from "@material-ui/icons";
 import {AUTH} from "@shared/";
 
 
-export const SignInWithNode = (profile: Profile | undefined): TreeMenuNode => ({
+export const SignInWithNode = (): TreeMenuNode => ({
     name: AUTH,
     label: 'Sign In With',
     action: () => window.location.href = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`,
-    hidden: !!profile?.email,
     LeftIcon: () => <AccountCircle/>
 });

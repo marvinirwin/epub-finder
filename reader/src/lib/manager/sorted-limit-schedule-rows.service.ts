@@ -10,7 +10,8 @@ type LimitedScheduleRows = {
     limitedScheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
     wordsLearnedToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
     wordsReviewingOrLearning: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
-    wordsLeftForToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
+    wordsLeftForToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
+    unStartedWords: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
 };
 
 export class SortedLimitScheduleRowsService {
@@ -39,24 +40,26 @@ export class SortedLimitScheduleRowsService {
                 const learning = sortedScheduleRows.filter(
                     r => r.isLearning()
                 )
-                const unstartedWords = sortedScheduleRows.filter(
+                const unStartedWords = sortedScheduleRows.filter(
                     scheduleRow => scheduleRow.isNotStarted()
-                ).slice(0, newQuizWordLimit - wordsLearnedToday.length);
+                );
+                const wordsLeftForToday = unStartedWords.slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
                 return {
                     wordsToReview,
                     wordsLearnedToday,
+                    wordsLeftForToday,
                     wordsReviewingOrLearning: learning,
-                    wordsLeftForToday: unstartedWords,
+                    unStartedWords,
                     limitedScheduleRows: orderBy(
                         [
                             ...wordsToReview,
                             ...learning,
-                            ...unstartedWords
+                            ...wordsLeftForToday
                         ],
                         r => r.dueDate(),
                         'asc'
-                    )
+                    ),
                 }
             }),
             shareReplay(1)

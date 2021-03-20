@@ -25,14 +25,12 @@ export const TESTING = new URLSearchParams(window.location.search).has('test')
 export const DEV = new URLSearchParams(window.location.search).has('dev')
 
 
-function AppDirectory(
-    m: Manager, selectedComponent: string | undefined,
-    availableDocuments: DocumentSelectionRowInterface[],
-    profile: Profile | undefined) {
+export function AppDirectory(
+    m: Manager) {
     return arrayToTreeRoot<TreeMenuNode>(
         QuizCarouselNode(),
         [
-            SignInWithNode(profile),
+            SignInWithNode(),
             LanguageSelectNode(m),
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
@@ -43,65 +41,10 @@ function AppDirectory(
             TranslationAttemptSchedule,
             TranslationAttemptNode,
             QuizCarouselNode(),
-            QuizScheduleNode(),
+            QuizScheduleNode(m),
             ProgressNode,
             SpeechPracticeNode,
         ] as ArrayToTreeParams<TreeMenuNode>
     );
 }
 
-export const AppDirectoryService = (m: Manager): Observable<ds_Tree<TreeMenuNode>> => {
-    // This is going to break the way I do "Selected components".
-    // I should do selected components by path, that way their refs can change?
-    // Also I gotta make sure all my values are unique in that loop
-    return combineLatest([
-        m.authManager.profile$.pipe(
-            startWith(undefined)
-        ),
-        m.documentSelectionService.documentSelectionRows$.pipe(
-            startWith([] as DocumentSelectionRowInterface[]),
-        ),
-        m.treeMenuService.selectedComponentNode$.pipe(
-            startWith(undefined),
-            map(c => c?.name),
-            distinctUntilChanged(),
-        )
-    ]).pipe(
-        map(([
-                 profile,
-                 availableDocuments,
-                 selectedComponent
-             ]) => {
-            return AppDirectory(
-                m,
-                selectedComponent,
-                availableDocuments,
-                profile
-            );
-            /*
-                        const reading = menuNodeFactory(ReadingComponent, 'Reading', 'reading', true);
-            */
-            /*
-                        if (DEVELOPER_MODE) {
-                            rootTree.children.AllSentences = constructTree(
-                                'AllSentences',
-                                menuNodeFactory(() => <AllSentences m={m}/>, 'AllSentences', 'AllSentences', false)
-                            );
-                            rootTree.children.resetIntro = {
-                                nodeLabel: 'resetIntro',
-                                value: {
-                                    name: 'resetIntro',
-                                    label: 'resetIntro',
-                                    InlineComponent: () => <ListItem
-                                        button
-                                        onClick={() => m.settingsService.completedSteps$.next([])}
-                                    >Reset tutorial
-                                    </ListItem>,
-                                },
-                            };
-                        }
-            */
-            // return rootTree;
-        })
-    )
-}

@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-
         },
         card: {
             padding: theme.spacing(5),
@@ -47,6 +46,7 @@ export const ActionModal: React.FC<{
             BackdropProps={{
                 timeout: 500,
             }}
+            fullScreen={true}
         >
             <Card className={classes.card} style={{overflow: 'auto'}}>
                 {children}

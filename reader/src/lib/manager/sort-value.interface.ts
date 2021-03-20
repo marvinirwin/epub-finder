@@ -8,7 +8,8 @@ export function getInverseLogNormalValue(normalCount: number) {
     return normalCount;
 }
 
-export function getSortValue<T>(normalizedValueObject: NormalizedValue, weight: number, value: T): SortValue<T> {
+export function getSortValue<T>(
+    normalizedValueObject: NormalizedValue, weight: number, value: T): SortValue<T> {
     const normalizedValue = normalizedValueObject.normalizedValue
     return {
         value,

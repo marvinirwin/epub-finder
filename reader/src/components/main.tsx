@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import {Manager} from "../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import {HotKeyEvents} from "../lib/HotKeyEvents";
-import {AppDirectoryService} from "./app-directory/app-directory-service";
+import {AppDirectory} from "./app-directory/app-directory-service";
 import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./app-container/drawer";
@@ -21,7 +21,7 @@ export const PronunciationVideoResizedContext = React.createContext<Subject<void
 export function Main({m}: { m: Manager }) {
     useEffect(() => {
         m.browserInputsService.applyDocumentListeners(document);
-        AppDirectoryService(m).subscribe(v => m.treeMenuService.tree.appendDelta$.next(v));
+        m.treeMenuService.tree.appendDelta$.next(AppDirectory(m))
     }, [m]);
 
     const hotkeyHandler = useObservableState(m.browserInputsService.focusedElement$) || null;
