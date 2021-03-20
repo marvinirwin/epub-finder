@@ -26,15 +26,6 @@ export const QuizCardScheduleRowDisplay = (
     const isDefinitionHidden = useIsFieldHidden({quizCard, label: 'definition'});
     return <div>
         <div style={{marginTop: '24px'}}>
-            Due: {scheduleRow.dueIn()}
-            {DEV && <DisplaySortValue sortValue={scheduleRow.d.dueDate}/>}
-        </div>
-        <div style={{marginTop: '24px'}}>
-            Frequency: {sumWordCountRecords(scheduleRow)}
-            {DEV && <div>Hidden Fields: {JSON.stringify([...hiddenFields.values()])}</div>}
-            {DEV && <DisplaySortValue sortValue={scheduleRow.d.count}/>}
-        </div>
-        <div style={{marginTop: '24px'}}>
             <Typography variant='h4' className={quizCardRomanization}>
                 {isRomanizationHidden ? '' : romanization}
             </Typography>

@@ -103,7 +103,7 @@ export class QuizCardScheduleRowsService {
                     scheduleRows[word]?.wordRecognitionRecords.push(...wordRecognitionRecords);
                 });
                 ignoredWords.forEach(({word}) => delete scheduleRows[word]);
-                const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText;
+                const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || '';
                 return Object.fromEntries(ScheduleMathService.normalizeAndSortQuizScheduleRows(
                     {
                         dueDate: {

@@ -54,8 +54,8 @@ export class SortedLimitScheduleRowsService {
                             ...learning,
                             ...unstartedWords
                         ],
-                        r => r.d.finalSortValue,
-                        'desc'
+                        r => r.d.dueDate,
+                        'asc'
                     )
                 }
             }),
