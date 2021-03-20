@@ -26,11 +26,10 @@ export class QuizResultService {
             QuizResultToRecognitionRows(scheduleRowsService.indexedScheduleRows$)
         ).subscribe(record => {
 /*
-            alertsService.info(`You'll review this card in ${humanizeDuration(record.nextDueDate.getTime() - new Date().getTime())}`)
-*/
             generalToastMessageService.addToastMessage$.next(() => <Typography variant={'h6'}>
                 {record.word} next due date {format(record.nextDueDate, "yyyy MMM-do HH:mm")}
             </Typography>)
+*/
             wordRecognitionProgressService.addRecords$.next([ record ])
         });
     }

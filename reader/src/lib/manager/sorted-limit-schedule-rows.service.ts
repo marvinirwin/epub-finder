@@ -54,7 +54,7 @@ export class SortedLimitScheduleRowsService {
                             ...learning,
                             ...unstartedWords
                         ],
-                        r => r.d.dueDate,
+                        r => r.dueDate(),
                         'asc'
                     )
                 }
