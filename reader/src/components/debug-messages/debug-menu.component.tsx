@@ -7,7 +7,7 @@ interface Props {
     text$: Observable<string>;
 }
 
-const DebugDisplay: React.FunctionComponent<Props> = ({visible$, text$, children}) => {
+const DebugMenuComponent: React.FunctionComponent<Props> = ({visible$, text$, children}) => {
     const visible = useObservableState(visible$);
     const t = useObservableState(text$);
     if (children) {
@@ -20,4 +20,4 @@ const DebugDisplay: React.FunctionComponent<Props> = ({visible$, text$, children
 
 }
 
-export default DebugDisplay;
+export default DebugMenuComponent;

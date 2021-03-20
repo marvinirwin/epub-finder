@@ -1,4 +1,3 @@
-import {SpeakMode} from "../modes/speak-mode.component";
 import {TreeMenuNode} from "../tree-menu-node.interface";
 import {Manager} from "../../../lib/Manager";
 import {RecordRequest} from "../../../lib/util/RecordRequest";

@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {TreeMenu} from "../tree-menu/tree-menu.component";

@@ -7,7 +7,7 @@ import {useChunkedCharacterTimings} from "./useChunkedCharacterTimings";
 import {PronunciationVideo} from "./pronunciation-video.component";
 import {useDebouncedFn, useResizeObserver} from "beautiful-react-hooks";
 import {PronunciationSection} from "./pronunciation-section";
-import {PlaybackSpeedComponent} from "../directory/playback-speed.component";
+import {PlaybackSpeedComponent} from "../app-directory/playback-speed.component";
 import {useHighlightBarPositionPercentage} from "./useSetHighlightBarPositionPercentage";
 
 const DRAG_TIMEOUT = 500;

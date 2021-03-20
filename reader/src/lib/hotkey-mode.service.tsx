@@ -3,7 +3,7 @@ import {setInterval} from "timers";
 import {HotkeyModes} from "./hotkeys/hotkey-modes";
 import {isDocument} from "./hotkeys/browser-inputs-service";
 import {GeneralToastMessageService} from "./general-toast-message.service";
-import {DEV} from "../components/directory/app-directory-service";
+import {DEV} from "../components/app-directory/app-directory-service";
 import {Typography} from "@material-ui/core";
 import React from "react";
 

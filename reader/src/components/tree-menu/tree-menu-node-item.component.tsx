@@ -1,5 +1,5 @@
 import {ds_Tree} from "../../services/tree.service";
-import {TreeMenuNode} from "../directory/tree-menu-node.interface";
+import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText} from "@material-ui/core";
 import {Inbox, KeyboardArrowRight, Settings} from "@material-ui/icons";
 import React from "react";

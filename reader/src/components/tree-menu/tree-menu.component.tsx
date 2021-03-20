@@ -2,7 +2,7 @@ import {Divider, List, ListItem, ListItemIcon, ListItemText,} from "@material-ui
 import React, {Fragment, useContext} from "react";
 import {ArrowBack} from "@material-ui/icons";
 import {ds_Tree, treeValue, walkTree} from "../../services/tree.service";
-import {TreeMenuNode} from "../directory/tree-menu-node.interface";
+import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {TreeMenuNodeItem} from "./tree-menu-node-item.component";
 import IconButton from "@material-ui/core/IconButton";

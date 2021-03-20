@@ -2,10 +2,10 @@ import React, {useEffect} from "react";
 import {Manager} from "../lib/Manager";
 import {useObservableState} from "observable-hooks";
 import {HotKeyEvents} from "../lib/HotKeyEvents";
-import {AppDirectoryService} from "./directory/app-directory-service";
+import {AppDirectoryService} from "./app-directory/app-directory-service";
 import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
-import {MiniDrawer} from "./containers/drawer";
+import {MiniDrawer} from "./app-container/drawer";
 import {ImageSearchComponent} from "./image-search/image-search.component";
 import './mouseover-div';
 

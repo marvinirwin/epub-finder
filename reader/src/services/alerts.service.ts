@@ -2,7 +2,7 @@ import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
 import {Color} from "@material-ui/lab";
 import {map} from "rxjs/operators";
 import axios, {AxiosError, AxiosResponse} from "axios";
-import {TESTING} from "../components/directory/app-directory-service";
+import {TESTING} from "../components/app-directory/app-directory-service";
 
 export type AlertMessage = { severity: Color, msg: string };
 

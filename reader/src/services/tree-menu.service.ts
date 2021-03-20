@@ -2,7 +2,7 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {ds_Tree, flattenTreeIntoDict, walkTree} from "./tree.service";
-import {TreeMenuNode} from "../components/directory/tree-menu-node.interface";
+import {TreeMenuNode} from "../components/app-directory/tree-menu-node.interface";
 import {SettingsService} from "./settings.service";
 import {DeltaScanner, ds_Dict} from "../lib/delta-scan/delta-scan.module";
 

@@ -1,6 +1,6 @@
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule-row";
 import React from "react";
-import {DEV} from "../../components/directory/app-directory-service";
+import {DEV} from "../../components/app-directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";
 import {QuizCard} from "../../components/quiz/word-card.interface";
