@@ -40,7 +40,7 @@ export const TranslationAttempt: React.FC = () => {
                     grade,
                     translationAttempt: translateAttempt,
                     timestamp: new Date(),
-                    nextDueDate: moment().add(translationAttemptRow.interval, 'day').toDate(),
+                    nextDueDate: moment().add(translationAttemptRow.interval, 'minute').toDate(),
                     ...translationAttemptRow,
                 }
             ])

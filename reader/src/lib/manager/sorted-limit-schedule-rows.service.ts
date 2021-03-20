@@ -58,7 +58,7 @@ export class SortedLimitScheduleRowsService {
                             ...wordsLeftForToday
                         ],
                         r => r.dueDate(),
-                        'asc'
+                        'desc'
                     ),
                 }
             }),

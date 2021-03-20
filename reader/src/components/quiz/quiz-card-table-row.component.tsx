@@ -31,7 +31,7 @@ export const QuizCardTableRow: React.FC<{ row: ScheduleRow<NormalizedQuizCardSch
                     <Typography variant={'h6'}>{row.d.word}</Typography>
                 </Button>
             </TableCell>
-            <TableCell>{formatDistance(row.d.dueDate.value, Date.now())} </TableCell>
+            <TableCell>{formatDistance(row.dueDate(), Date.now())} </TableCell>
             <TableCell>{round(row.d.sortValues.dueDate.weightedInverseLogNormalValue || 0, 2)}</TableCell>
             <TableCell>{round(row.d.sortValues.count.weightedInverseLogNormalValue || 0, 2)}</TableCell>
             <TableCell>{round(row.d.sortValues.length.weightedInverseLogNormalValue || 0, 2)} </TableCell>

@@ -16,8 +16,6 @@ export const RecognitionMap: {[key: string]: SuperMemoGrade} = {
 }
 
 export class SrmService {
-    constructor() {}
-
     private static getProgressScore(rows: ScheduleRowItem[]): number {
         return rows[rows.length - 1]?.repetition || 0;
     }

@@ -2,7 +2,7 @@ import React, {useContext} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
-import {format} from "date-fns";
+import {format, formatDistance} from "date-fns";
 import {round} from "lodash";
 
 export const QuizCardScheduleTable = () => {
@@ -29,8 +29,7 @@ export const QuizCardScheduleTable = () => {
                             {row.d.word}
                         </TableCell>
                         <TableCell align="right">
-                            {format(row.dueDate(), "yyyy MMM-do HH:mm")} &nbsp;
-                            {round(row.d.sortValues.dueDate.weightedInverseLogNormalValue, 2)}
+                            <TableCell>{formatDistance(row.dueDate(), Date.now())} </TableCell>
                         </TableCell>
                         {/*
                         <TableCell align="right">
