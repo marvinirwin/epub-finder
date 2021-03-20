@@ -43,7 +43,7 @@ export const QuizCardScheduleTable = () => {
                             {row.d.word}
                         </TableCell>
                         <TableCell align="right">
-                            {format(row.d.sortValues.dueDate.value, "yyyy MMM-do HH:mm")} &nbsp;
+                            {format(row.dueDate(), "yyyy MMM-do HH:mm")} &nbsp;
                             {round(row.d.sortValues.dueDate.weightedInverseLogNormalValue, 2)}
                         </TableCell>
 {/*
