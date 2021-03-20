@@ -3,7 +3,6 @@ import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {format, formatDistance} from "date-fns";
-import {round} from "lodash";
 
 export const QuizCardScheduleTable = () => {
     const m = useContext(ManagerContext);
@@ -14,7 +13,7 @@ export const QuizCardScheduleTable = () => {
             <TableHead>
                 <TableRow>
                     <TableCell>Word</TableCell>
-                    <TableCell align="right">DueDate</TableCell>
+                    <TableCell>Due In</TableCell>
                     {/*
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Sentence Priority</TableCell>
@@ -28,7 +27,7 @@ export const QuizCardScheduleTable = () => {
                         <TableCell component="th" scope="row">
                             {row.d.word}
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell>
                             <TableCell>{formatDistance(row.dueDate(), Date.now())} </TableCell>
                         </TableCell>
                         {/*

@@ -35,7 +35,12 @@ export class SortedLimitScheduleRowsService {
                     r => r.isToReview()
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
-                    r => r.wasLearnedToday()
+                    r => {
+                        if (r.d.word === '俄罗斯') {
+                            debugger;console.log();
+                        }
+                        return r.wasLearnedToday();
+                    }
                 );
                 const learning = sortedScheduleRows.filter(
                     r => r.isLearning()
@@ -58,7 +63,7 @@ export class SortedLimitScheduleRowsService {
                             ...wordsLeftForToday
                         ],
                         r => r.dueDate(),
-                        'desc'
+                        'asc'
                     ),
                 }
             }),

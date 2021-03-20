@@ -1,8 +1,34 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {format} from "date-fns";
+import {useCancellablePromise} from "../../lib/manager/AudioManager";
+import {fetchTranslation} from "../../services/translate.service";
+import {TranslationAttemptScheduleData} from "../../lib/schedule/translation-attempt-schedule.service";
+import {ScheduleRow} from "../../lib/schedule/schedule-row";
+
+const useTranslation = (segmentText: string | undefined) => {
+    const m = useContext(ManagerContext);
+    const languageConfig = useObservableState(m.languageConfigsService.learningToKnownTranslateConfig);
+    const { cancellablePromise } = useCancellablePromise();
+    const [translation, setTranslation] = useState('');
+    useEffect(() => {
+        if (languageConfig && segmentText) {
+            cancellablePromise(fetchTranslation({...languageConfig, text: segmentText})).then(setTranslation)
+        }
+    }, [segmentText, languageConfig]);
+    return translation;
+};
+
+export const TranslationAttemptScheduleRow: React.FC<{row: ScheduleRow<TranslationAttemptScheduleData>}> = ({row}) => {
+    const translation = useTranslation(row?.d?.segmentText);
+    return <TableRow key={row.d.segmentText}>
+        <TableCell component="th" scope="row">
+            {translation}
+        </TableCell>
+    </TableRow>
+}
 
 export const QuizCardTranslationAttemptSchedule = () => {
     const m = useContext(ManagerContext);
@@ -13,20 +39,12 @@ export const QuizCardTranslationAttemptSchedule = () => {
             <TableHead>
                 <TableRow>
                     <TableCell>Sentence</TableCell>
-                    <TableCell align="right">Due Date</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
-                {rows.slice(0, 3).map((row) => (
-                    <TableRow key={row.d.segmentText}>
-                        <TableCell component="th" scope="row">
-                            {row.d.segmentText.substr(0, 10)}
-                        </TableCell>
-                        <TableCell align="right">
-                            {format(row.dueDate(), 'yyyy MMM-do HH:mm')}
-                        </TableCell>
-                    </TableRow>
-                ))}
+                {rows.slice(0, 3).map((row) => {
+                    return <TranslationAttemptScheduleRow row={row}/>;
+                })}
             </TableBody>
         </Table>
     </TableContainer>

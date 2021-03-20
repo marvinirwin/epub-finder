@@ -15,7 +15,7 @@ import {transliterate} from "../transliterate.service";
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };
 
-function useCancellablePromise<T>() {
+export const useCancellablePromise = <T extends any>() => {
     const promises = useRef<{ cancel: () => void }[]>();
     // useEffect initializes the promises array
     // and cleans up by calling cancel on every stored
@@ -43,7 +43,7 @@ function useCancellablePromise<T>() {
     }
 
     return {cancellablePromise};
-}
+};
 
 export function makeCancelable<T>(promise: Promise<T>) {
     let isCanceled = false;
