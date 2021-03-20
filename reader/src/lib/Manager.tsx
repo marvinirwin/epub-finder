@@ -327,11 +327,10 @@ export class Manager {
         });
         this.quizManager = new QuizManager();
         const s = new QuizResultService({
-            srmService: this.quizCardScheduleService.srmService,
             quizManager: this.quizManager,
             wordRecognitionProgressService: this.wordRecognitionProgressService,
             scheduleRowsService: this.quizCardScheduleRowsService,
-            alertsService: this.alertsService
+            generalToastMessageService: this.generalToastMessageService
         })
 
         this.observableService.videoMetadata$

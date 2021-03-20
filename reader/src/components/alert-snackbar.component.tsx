@@ -1,4 +1,4 @@
-import {Snackbar} from "@material-ui/core";
+import {Paper, Snackbar} from "@material-ui/core";
 import {Alert} from "@material-ui/lab";
 import React, {useContext} from "react";
 import {ManagerContext} from "../App";
@@ -34,9 +34,7 @@ export const GeneralMessageSnackbar = () => {
         <div>
             {
                 (alertMessages || []).map(({content: {Component}}, index) =>
-                    <Alert key={index} severity={'info'}>
-                        <Component/>
-                    </Alert>
+                    <Paper><Component key={index}/></Paper>
                 )
             }
         </div>

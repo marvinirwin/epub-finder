@@ -5,27 +5,32 @@ import {SrmService} from "../srm/srm.service";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 import {AlertsService} from "../../services/alerts.service";
 import humanizeDuration from 'humanize-duration';
+import {GeneralToastMessageService} from "../general-toast-message.service";
+import { Typography } from "@material-ui/core";
+import React from "react";
+import { format } from "date-fns";
 
 export class QuizResultService {
     constructor({
                     quizManager,
                     wordRecognitionProgressService,
                     scheduleRowsService,
-                    srmService,
-        alertsService
+                    generalToastMessageService
                 }: {
-        srmService: SrmService,
         scheduleRowsService: QuizCardScheduleRowsService,
         quizManager: QuizManager,
         wordRecognitionProgressService: WordRecognitionProgressRepository,
-        alertsService: AlertsService,
+        generalToastMessageService: GeneralToastMessageService,
     }) {
         quizManager.quizResult$.pipe(
-            QuizResultToRecognitionRows(scheduleRowsService.indexedScheduleRows$, srmService)
+            QuizResultToRecognitionRows(scheduleRowsService.indexedScheduleRows$)
         ).subscribe(record => {
 /*
             alertsService.info(`You'll review this card in ${humanizeDuration(record.nextDueDate.getTime() - new Date().getTime())}`)
 */
+            generalToastMessageService.addToastMessage$.next(() => <Typography variant={'h6'}>
+                {record.word} next due date {format(record.nextDueDate, "yyyy MMM-do HH:mm")}
+            </Typography>)
             wordRecognitionProgressService.addRecords$.next([ record ])
         });
     }

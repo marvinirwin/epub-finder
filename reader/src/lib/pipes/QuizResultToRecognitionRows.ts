@@ -10,7 +10,6 @@ import {QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 export const QuizResultToRecognitionRows =
     (
         scheduleRows$: Observable<Dictionary<ScheduleRow<QuizScheduleRowData>>>,
-        ms: SrmService
     ) =>
         (obs$: Observable<QuizResult>) =>
             obs$.pipe(

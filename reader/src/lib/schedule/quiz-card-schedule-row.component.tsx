@@ -8,6 +8,7 @@ import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
 import {sumWordCountRecords} from "./schedule-math.service";
+import {QuizCardScheduleTable} from "../../components/quiz/quiz-card.component";
 
 export const QuizCardScheduleRowDisplay = (
     {
@@ -25,6 +26,7 @@ export const QuizCardScheduleRowDisplay = (
     const isRomanizationHidden = useIsFieldHidden({quizCard, label: 'romanization'});
     const isDefinitionHidden = useIsFieldHidden({quizCard, label: 'definition'});
     return <div>
+        {!isDescriptionHidden && <QuizCardScheduleTable/>}
         <div style={{marginTop: '24px'}}>
             <Typography variant='h4' className={quizCardRomanization}>
                 {isRomanizationHidden ? '' : romanization}

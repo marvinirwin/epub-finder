@@ -29,9 +29,11 @@ export const QuizCardScheduleTable = () => {
                 <TableRow>
                     <TableCell>Word</TableCell>
                     <TableCell align="right">DueDate</TableCell>
+{/*
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Sentence Priority</TableCell>
                     <TableCell align="right">Length</TableCell>
+*/}
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -41,9 +43,10 @@ export const QuizCardScheduleTable = () => {
                             {row.d.word}
                         </TableCell>
                         <TableCell align="right">
-                            {format(row.d.sortValues.dueDate.value, 'yy MMM d H m')} &nbsp;
+                            {format(row.d.sortValues.dueDate.value, "yyyy MMM-do HH:mm")} &nbsp;
                             {round(row.d.sortValues.dueDate.weightedInverseLogNormalValue, 2)}
                         </TableCell>
+{/*
                         <TableCell align="right">
                             {row.d.sortValues.count.value}&nbsp;
                             {round(row.d.sortValues.count.weightedInverseLogNormalValue, 2)}
@@ -56,6 +59,7 @@ export const QuizCardScheduleTable = () => {
                             {row.d.sortValues.length.value}&nbsp;
                             {round(row.d.sortValues.length.weightedInverseLogNormalValue, 2)}
                         </TableCell>
+*/}
                     </TableRow>
                 ))}
             </TableBody>
@@ -72,7 +76,7 @@ export const QuizCardTranslationAttemptSchedule = () => {
             <TableHead>
                 <TableRow>
                     <TableCell>Sentence</TableCell>
-                    <TableCell align="right">Difficulty</TableCell>
+                    <TableCell align="right">Due Date</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -82,7 +86,7 @@ export const QuizCardTranslationAttemptSchedule = () => {
                             {row.d.segmentText}
                         </TableCell>
                         <TableCell align="right">
-                            {format(row.dueDate(), 'yy MM d H m')}
+                            {format(row.dueDate(), 'yyyy MMM-do HH:mm')}
                         </TableCell>
                     </TableRow>
                 ))}
