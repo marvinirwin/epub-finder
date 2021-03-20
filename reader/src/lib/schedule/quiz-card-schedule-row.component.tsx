@@ -8,7 +8,7 @@ import {TextField, Typography} from "@material-ui/core";
 import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@shared/";
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
 import {sumWordCountRecords} from "./schedule-math.service";
-import {QuizCardScheduleTable} from "../../components/quiz/quiz-card.component";
+import {QuizCardScheduleTable} from "../../components/tables/quiz-card-due-date-schedule-table.component";
 
 export const QuizCardScheduleRowDisplay = (
     {
