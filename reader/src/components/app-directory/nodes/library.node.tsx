@@ -7,5 +7,5 @@ export const LibraryNode = (m: Manager) => ({
     name: LIBRARY,
     label: 'Library',
     LeftIcon: () => <LibraryBooks/>,
-    action: () => m.modalService.documentSelect.open$.next(true)
+    action: () => m.modalService.library.open$.next(true)
 });

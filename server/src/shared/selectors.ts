@@ -53,6 +53,9 @@ export const quizLearningNumber = 'quizLearningNumber' ;
 export const quizToReviewNumber = 'quizToReviewNumber' ;
 export const quizUnlearnedNumber = 'quizUnlearnedNumber' ;
 export const leftTodayNumber = 'leftTodayNumber';
+export const quizRowsFinishedTodayTable = 'quizRowsFinishedTodayTable';
+export const quizRowsInProgressTable = 'quizRowsInProgressTable';
+export const quizRowsNotInProgressTable = 'quizRowsNotInProgressTable';
 
 
 

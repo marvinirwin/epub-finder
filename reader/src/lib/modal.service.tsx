@@ -21,10 +21,11 @@ import {HotkeyConfig} from "../components/hotkeys/HotkeyConfig";
 export class ModalService {
     public languageSelect: NavModal;
     public fileUpload: NavModal;
-    public documentSelect: NavModal;
+    public library: NavModal;
     public settings: NavModal;
     public testingUtils: NavModal;
     public wordPaperDisplay: NavModal;
+    public quizScheduleOverView: NavModal;
 
     constructor() {
         this.fileUpload = new NavModal(
@@ -35,10 +36,14 @@ export class ModalService {
             'spokenLanguage',
             () => <LanguageSelect/>
         );
-        this.documentSelect = new NavModal(
+        this.library = new NavModal(
             'documentSelect',
             () => <LibraryTable/>
         );
+        this.quizScheduleOverView = new NavModal(
+            'quizScheduleOverView',
+            () => <QuizScheduleOverView/>
+        )
 
         this.settings = new NavModal(
             'settings',
@@ -73,7 +78,7 @@ export class ModalService {
         return [
             this.fileUpload,
             this.languageSelect,
-            this.documentSelect,
+            this.library,
             this.settings,
             this.testingUtils,
             this.wordPaperDisplay

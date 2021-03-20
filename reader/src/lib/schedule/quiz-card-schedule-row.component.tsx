@@ -21,7 +21,6 @@ export const QuizCardScheduleRowDisplay = (
     const description = useObservableState(quizCard.description$.value$);
     const romanization = useObservableState(quizCard.romanization$);
     const translation = useObservableState(quizCard.translation$);
-    const hiddenFields = useObservableState(quizCard.hiddenFields$) || new Set();
     const isDescriptionHidden = useIsFieldHidden({quizCard, label: 'description'});
     const isRomanizationHidden = useIsFieldHidden({quizCard, label: 'romanization'});
     const isDefinitionHidden = useIsFieldHidden({quizCard, label: 'definition'});

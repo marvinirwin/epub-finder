@@ -2,7 +2,7 @@ import {DirectoryPom} from "../../support/pom/directory.pom";
 import {QuizCarouselPom} from "./quiz-carousel.pom";
 import {newWordLimitInput, QUIZ_BUTTON_EASY} from "@shared/*";
 
-class SettingsPom {
+export class SettingsPom {
     static SetNewQuizWordLimit(newLimit: number) {
         DirectoryPom.OpenSettings();
         const limitInputSelector = `#${newWordLimitInput}`;
