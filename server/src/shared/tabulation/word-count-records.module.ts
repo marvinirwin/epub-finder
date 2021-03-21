@@ -43,8 +43,28 @@ export const wordsFromCountRecordList = (records: WordCountRecord[]) => {
 }
 
 
-export const averageWordRecognitionScore = (words: string[], vocab: Map<string, number>) => {
-    return sum(
-        words.map(word => vocab.has(word) ? vocab.get(word) : 0)
+export type AverageResult = {
+    known: Set<string>
+    unknown: Set<string>
+    average: number;
+}
+
+export const averageKnownWords = (words: string[], vocab: Map<string, number>) => {
+    const known = new Set<string>();
+    const unknown = new Set<string>(words);
+    const average = sum(
+        words.map(word => {
+            if (vocab.has(word)) {
+                unknown.delete(word);
+                known.add(word)
+                return 1;
+            }
+            return 0;
+        })
     ) / words.length;
+    return {
+        known,
+        unknown,
+        average
+    }
 }

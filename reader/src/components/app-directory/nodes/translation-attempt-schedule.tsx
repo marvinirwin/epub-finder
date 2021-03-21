@@ -5,7 +5,7 @@ import {TableCell, TableHead, TableRow, Toolbar, Typography} from "@material-ui/
 import {TranslationAttemptScheduleData} from "../../../lib/schedule/translation-attempt-schedule.service";
 import {ScheduleRow} from "../../../lib/schedule/schedule-row";
 import {TranslationAttemptScheduleTable} from "./translation-attempt-schedule-table.component";
-import {TranslationAttempt} from "../../translation-attempt/translation-attempt.component";
+import {TranslationAttempt, TranslationAttemptDataTable} from "../../translation-attempt/translation-attempt.component";
 
 
 const TranslationAttemptScheduleNode = 'TranslationAttemptScheduleNode';
@@ -56,6 +56,6 @@ export const TranslationAttemptSchedule: TreeMenuNode = {
 export const TranslationAttemptNode: TreeMenuNode = {
     name: TranslationAttemptScheduleNode,
     label: 'Translation Attempt Schedule',
-    Component: () => <TranslationAttempt/>,
+    Component: () => <TranslationAttemptDataTable/>,
     LeftIcon: () => <Call/>
 }

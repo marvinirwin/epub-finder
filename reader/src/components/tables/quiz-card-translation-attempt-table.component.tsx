@@ -8,7 +8,7 @@ import {fetchTranslation} from "../../services/translate.service";
 import {TranslationAttemptScheduleData} from "../../lib/schedule/translation-attempt-schedule.service";
 import {ScheduleRow} from "../../lib/schedule/schedule-row";
 
-const useTranslation = (segmentText: string | undefined) => {
+export const useTranslation = (segmentText: string | undefined) => {
     const m = useContext(ManagerContext);
     const languageConfig = useObservableState(m.languageConfigsService.learningToKnownTranslateConfig);
     const { cancellablePromise } = useCancellablePromise();

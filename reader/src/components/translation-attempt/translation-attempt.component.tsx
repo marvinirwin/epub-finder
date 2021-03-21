@@ -1,6 +1,16 @@
-import React, {Fragment, useContext, useState} from "react";
+import React, {Fragment, useContext, useEffect, useState} from "react";
 import {ManagerContext} from "../../App";
-import {Paper, TextField, Typography} from "@material-ui/core";
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
+} from "@material-ui/core";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {SuperMemoGrade} from "supermemo";
 import {SrmService} from "../../lib/srm/srm.service";
@@ -10,12 +20,76 @@ import {AdvanceButton} from "../quiz/quiz-card-buttons.component";
 import {DifficultyButtons} from "./difficulty-buttons.component";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 import {
-    averageWordRecognitionScore,
+    averageKnownWords, AverageResult,
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
-import { sum } from "lodash";
+import {sum, round} from "lodash";
+import {TranslationAttemptScheduleData} from "../../lib/schedule/translation-attempt-schedule.service";
+import {ScheduleRow} from "../../lib/schedule/schedule-row";
+import {useTranslation} from "../tables/quiz-card-translation-attempt-table.component";
 
 export const translateRequest = '';
+
+export const useTranslationAttemptDifficulty = (r: ScheduleRow<TranslationAttemptScheduleData>) => {
+    const m = useContext(ManagerContext);
+    const weightedVocab = useObservableState(m.weightedVocabService.weightedVocab$);
+    const [data, setData] = useState<AverageResult | undefined>();
+    useEffect(() => {
+        if (weightedVocab) {
+            setData(averageKnownWords(
+                wordsFromCountRecordList(r.d.wordCountRecords),
+                weightedVocab
+            ))
+        }
+    }, [weightedVocab, r])
+
+    return data;
+}
+
+const TranslationAttemptDataTableRow: React.FC<{ row: ScheduleRow<TranslationAttemptScheduleData> }> = (
+    {row}
+) => {
+    const translation = useTranslation(row.d.segmentText);
+    const difficultyData = useTranslationAttemptDifficulty(row);
+    return <TableRow>
+        <TableCell>
+            {translation}
+        </TableCell>
+        <TableCell>
+            {Array.from(difficultyData?.known || []).join(', ')}
+        </TableCell>
+        <TableCell>
+            {Array.from(difficultyData?.unknown || []).join(', ')}
+        </TableCell>
+        <TableCell>
+            {round(difficultyData?.average || 0, 2)}
+        </TableCell>
+    </TableRow>
+}
+
+export const TranslationAttemptDataTable = () => {
+    const m = useContext(ManagerContext);
+    const rows = Object.values(useObservableState(m.translationAttemptScheduleService.indexedScheduleRows$) || {});
+    return <TableContainer component={Paper}>
+        <Table size='small'>
+            <TableHead>
+                <TableRow>
+                    <TableCell>English</TableCell>
+                    <TableCell>KnownWords</TableCell>
+                    <TableCell>UnknownWords</TableCell>
+                    <TableCell>Difficulty</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {
+                    rows.map((row) => {
+                        return <TranslationAttemptDataTableRow row={row}/>
+                    })
+                }
+            </TableBody>
+        </Table>
+    </TableContainer>
+}
 
 
 export const TranslationAttempt: React.FC = () => {
@@ -52,7 +126,7 @@ export const TranslationAttempt: React.FC = () => {
     useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
     useSubscription(m.hotkeyEvents.advanceQuiz$, () => m.translationAttemptService.answerIsShown$.next(true));
     const totalWords = wordsFromCountRecordList(currentRow?.d?.wordCountRecords || []);
-    const sumVocab = sum( totalWords.map(word => weightedVocab.has(word) ? weightedVocab.get(word) : 0) )
+    const sumVocab = sum(totalWords.map(word => weightedVocab.has(word) ? weightedVocab.get(word) : 0))
     const knownText = `${sumVocab} / ${totalWords.length} words known`;
     return <Paper style={{display: 'flex', flexFlow: 'column nowrap'}}>
         {

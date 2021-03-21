@@ -8,7 +8,7 @@ import {map} from "rxjs/operators";
 import {WeightedVocabService} from "../weighted-vocab.service";
 import {orderBy} from "lodash";
 import {
-    averageWordRecognitionScore,
+    averageKnownWords,
     wordsFromCountRecordList
 } from "../../../../server/src/shared/tabulation/word-count-records.module";
 import {WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
@@ -85,10 +85,10 @@ export class TranslationAttemptScheduleService implements ScheduleRowsService<Tr
                                 ]
                             ),
                         ([segmentText, scheduleRow]: [string, ScheduleRow<TranslationAttemptScheduleData>]) =>
-                            averageWordRecognitionScore(
+                            averageKnownWords(
                                 wordsFromCountRecordList(scheduleRow.d.wordCountRecords),
                                 weightedVocab
-                            ),
+                            ).average || 0,
                         'desc'
                     )
                 );
