@@ -62,8 +62,7 @@ export const recordsLearnedToday = (r1: ScheduleRowItem[]) => {
     return lastTwoRecords.length === 2 && lastTwoRecords
         .every(
             r => r.grade >= 3 &&
-                isToday(r.timestamp) &&
-                isAfter(r.nextDueDate, Date.now())
+                isToday(r.timestamp)
         );
 };
 export const recordsLearnedAnyDay = (r1: ScheduleRowItem[]) => {
@@ -73,8 +72,7 @@ export const recordsLearnedAnyDay = (r1: ScheduleRowItem[]) => {
     );
     return lastTwoRecords.length === 2 && lastTwoRecords
         .every(
-            r => r.grade >= 3 &&
-                isAfter(r.nextDueDate, Date.now())
+            r => r.grade >= 3
         );
 };
 
@@ -83,11 +81,11 @@ export class ScheduleRow<T> {
     private _dueDate: Date;
 
     constructor(public d: T, private superMemoRecords: ScheduleRowItem[]) {
-        this._dueDate = this.superMemoRecords[this.superMemoRecords.length - 1]?.nextDueDate || new Date();
+        this._dueDate = this.superMemoRecords[this.superMemoRecords.length - 1]?.nextDueDate;
     }
 
     public dueDate() {
-        return this._dueDate;
+        return this._dueDate || new Date();
     }
 
     public isNew() {
