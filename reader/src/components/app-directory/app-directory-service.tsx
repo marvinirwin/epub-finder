@@ -20,16 +20,25 @@ import {LibraryNode} from "./nodes/library.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {ProgressNode} from "./nodes/progress.node";
 import {TranslationAttemptNode, TranslationAttemptSchedule} from "./nodes/translation-attempt-schedule";
+import {ReadingComponent} from "../reading/reading.component";
 
 export const TESTING = new URLSearchParams(window.location.search).has('test')
 export const DEV = new URLSearchParams(window.location.search).has('dev')
 
+
+export const ReadingNode = (m: Manager): TreeMenuNode => ({
+    Component: () => <ReadingComponent m={m}/>,
+    label: 'Read',
+    name: 'reading',
+    hidden: !DEV,
+})
 
 export function AppDirectory(
     m: Manager) {
     return arrayToTreeRoot<TreeMenuNode>(
         QuizCarouselNode(),
         [
+            ReadingNode(m),
             SignInWithNode(),
             LanguageSelectNode(m),
             RecognizeSpeechNode(m),

@@ -12,6 +12,8 @@ import {SettingsService} from "../../services/settings.service";
 import {AllWordsRepository} from "../all-words.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
 import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
+import {SelectedVirtualTabulationsService} from "../manager/selected-virtual-tabulations.service";
+import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
 
 export class QuizCardScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedQuizCardScheduleRowData>>>;
@@ -24,7 +26,8 @@ export class QuizCardScheduleRowsService {
                     ignoredWordsRepository,
                     settingsService,
                     allWordsRepository,
-                    translationAttemptService
+                    translationAttemptService,
+                    selectedVirtualTabulationsService
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
@@ -33,7 +36,8 @@ export class QuizCardScheduleRowsService {
         ignoredWordsRepository: IgnoredWordsRepository,
         settingsService: SettingsService,
         allWordsRepository: AllWordsRepository,
-        translationAttemptService: TranslationAttemptService
+        translationAttemptService: TranslationAttemptService,
+        selectedVirtualTabulationsService: SelectedVirtualTabulationsService
     }) {
         const progress$ = combineLatest([
             wordRecognitionProgressService.indexOfOrderedRecords$.pipe(startWith({})),
@@ -42,7 +46,7 @@ export class QuizCardScheduleRowsService {
         this.indexedScheduleRows$ = combineLatest([
             progress$,
             combineLatest([
-                openDocumentsService.virtualDocumentTabulation$,
+                selectedVirtualTabulationsService.selectedVirtualTabulations$,
                 cardsRepository.cardIndex$,
                 ignoredWordsRepository.latestRecords$,
             ]),
@@ -58,7 +62,7 @@ export class QuizCardScheduleRowsService {
             map(([
                      [wordRecognitionRowIndex, pronunciationRowIndex],
                      [
-                         wordCounts,
+                         selectedVirtualTabulations,
                          cardIndex,
                          ignoredWords,
                      ],
@@ -83,7 +87,7 @@ export class QuizCardScheduleRowsService {
                 allWords.forEach(word => {
                     ensureScheduleRow(word)
                 })
-                wordCounts.serializedTabulations.forEach(({documentWordCounts}) => {
+                new SerializedTabulationAggregate(selectedVirtualTabulations).serializedTabulations.forEach(({documentWordCounts}) => {
                     /**
                      * Prevent cards created only for visual purposes from showing up in the quiz rows
                      */
