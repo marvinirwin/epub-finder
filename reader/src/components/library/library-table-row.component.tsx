@@ -10,8 +10,15 @@ import {libraryRow, libraryRowDelete, libraryRowToggleFrequency, libraryRowToggl
 export const LibraryDocumentRowComponent: React.FC<{ document: LibraryDocumentRow }> = ({document}) => {
     const m = useContext(ManagerContext);
     const frequencyDocuments = useObservableState(m.settingsService.selectedFrequencyDocuments$);
-    const readingDocument = useObservableState(m.settingsService.readingDocument$);
-    return <TableRow id={document.ltDocument.name} className={libraryRow}>
+    return <TableRow
+        id={document.ltDocument.name}
+        className={libraryRow}
+        onClick={(e) => {
+            if (e.metaKey) {
+                m.settingsService.readingDocument$.next(document.ltDocument.id())
+            }
+        }}
+    >
         <TableCell>
             {document.ltDocument.d.name}
         </TableCell>

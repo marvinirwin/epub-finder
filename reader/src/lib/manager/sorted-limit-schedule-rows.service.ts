@@ -31,14 +31,12 @@ export class SortedLimitScheduleRowsService {
             settingsService.newQuizWordLimit$,
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit]) => {
+                sortedScheduleRows = sortedScheduleRows.filter(row => row.d.count.value > 0);
                 const wordsToReview = sortedScheduleRows.filter(
                     r => r.isToReview()
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
                     r => {
-                        if (r.d.word === '俄罗斯') {
-                            debugger;console.log();
-                        }
                         return r.wasLearnedToday();
                     }
                 );
@@ -50,21 +48,25 @@ export class SortedLimitScheduleRowsService {
                 );
                 const wordsLeftForToday = unStartedWords.slice(0, newQuizWordLimit - wordsLearnedToday.length);
 
+                /**
+                 * The first rows are those which are overdue
+                 */
+                const overDue = orderBy([...learning, ...wordsToReview].filter(r => r.isOverDue()), r => r.isOverDue(), 'asc');
+                const notOverDue = orderBy([...learning, ...wordsToReview].filter(r => !r.isOverDue()), r => r.dueDate(), 'asc');
+                /**
+                 * The second are those which are overDue and reviewing
+                 */
                 return {
                     wordsToReview,
                     wordsLearnedToday,
                     wordsLeftForToday,
                     wordsReviewingOrLearning: learning,
                     unStartedWords,
-                    limitedScheduleRows: orderBy(
-                        [
-                            ...wordsToReview,
-                            ...learning,
-                            ...wordsLeftForToday
-                        ],
-                        r => r.dueDate(),
-                        'asc'
-                    ),
+                    limitedScheduleRows: [
+                        ...overDue,
+                        ...wordsLeftForToday,
+                        ...notOverDue
+                    ],
                 }
             }),
             shareReplay(1)

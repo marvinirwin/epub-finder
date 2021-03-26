@@ -37,7 +37,7 @@ export const QuizResultToRecognitionRows =
 
                     const nextDueDate = () => {
                         if (scorePair.grade < 3) {
-                            return add(Date.now(), {seconds: 1})
+                            return add(Date.now(), {minutes: 1})
                         }
                         const correctRecordsInARow = inARow(previousRecords.reverse(), r => r.grade >= 3);
                         switch (correctRecordsInARow.length) {
