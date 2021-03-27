@@ -8,6 +8,7 @@ import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./app-container/drawer";
 import {ImageSearchComponent} from "./image-search/image-search.component";
 import './mouseover-div/mouseover-div';
+import {useShowIntroModal} from "../lib/intro/use-show-intro-modal";
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)
@@ -23,6 +24,7 @@ export function Main({m}: { m: Manager }) {
         m.browserInputsService.applyDocumentListeners(document);
         m.treeMenuService.tree.appendDelta$.next(AppDirectory(m))
     }, [m]);
+    useShowIntroModal()
 
     const hotkeyHandler = useObservableState(m.browserInputsService.focusedElement$) || null;
     const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {});

@@ -1,6 +1,5 @@
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "./schedule-row";
 import React from "react";
-import {DEV} from "../../components/app-directory/app-directory-service";
 import {DisplaySortValue} from "./schedule-row-math.component";
 import {useObservableState} from "observable-hooks";
 import {QuizCard} from "../../components/quiz/word-card.interface";
@@ -9,6 +8,7 @@ import {quizCardDescription, quizCardRomanization, quizCardTranslation} from "@s
 import {useIsFieldHidden} from "../../components/quiz/useIsFieldHidden";
 import {sumWordCountRecords} from "./schedule-math.service";
 import {QuizCardScheduleTable} from "../../components/tables/quiz-card-due-date-schedule-table.component";
+import {DEV} from "../util/url-params";
 
 export const QuizCardScheduleRowDisplay = (
     {

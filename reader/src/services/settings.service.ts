@@ -59,6 +59,7 @@ export class SettingsService {
     public newQuizWordLimit$: ReplaySubject<number>;
     public translationAttemptSentenceWeight$: ReplaySubject<number>;
     public hiddenFieldsRequiredToProgress$: ReplaySubject<string[][]>;
+    public currentIntroTab$: ReplaySubject<number>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -97,6 +98,7 @@ export class SettingsService {
         this.manualIsRecording$ = this.createSetting$<boolean>('manualIsRecording', false, 'indexedDB')
 
         this.frequencyWeight$ = this.createSetting$<number>('frequencyWeight', 0.5, 'indexedDB');
+
         this.translationAttemptSentenceWeight$ = this.createSetting$<number>('translationAttemptSentenceWeight', 0.5, 'indexedDB');
 
         this.dateWeight$ = this.createSetting$<number>('dateWeight', 0.5, 'indexedDB');
@@ -119,7 +121,9 @@ export class SettingsService {
             'hiddenFieldsRequiredToProgress',
             [],
             'indexedDB'
-        )
+        );
+
+        this.currentIntroTab$ = this.createSetting$<number>('currentIntroTab', 0, 'indexedDB');
     }
 
     public createSetting$<T>(

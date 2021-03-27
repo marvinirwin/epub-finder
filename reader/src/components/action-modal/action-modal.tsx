@@ -1,7 +1,7 @@
 import React from 'react';
 import {makeStyles, Theme, createStyles} from '@material-ui/core/styles';
 import Backdrop from '@material-ui/core/Backdrop';
-import {Card, Dialog} from "@material-ui/core";
+import {Card, Dialog, Paper} from "@material-ui/core";
 import {useObservableState} from "observable-hooks";
 import {NavModal} from "../../lib/user-interface/nav-modal";
 
@@ -48,9 +48,7 @@ export const ActionModal: React.FC<{
             }}
             fullScreen={true}
         >
-            <Card className={classes.card} style={{overflow: 'auto'}}>
-                {children}
-            </Card>
+            {children}
         </Dialog>
     );
 }

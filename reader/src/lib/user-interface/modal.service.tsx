@@ -6,7 +6,6 @@ import {TogglePinyinComponent} from "../../components/settings/toggle-pinyin.com
 import {ManualTestModal} from "../../components/modals/test-modal/manual-test-modal.component";
 import {AdjustFrequencyWeight} from "../../components/app-directory/adjust-frequency-weight.component";
 import {NavModal} from "./nav-modal";
-import {SetVocab} from "../../components/settings/set-vocab.component";
 import {
     AdjustDateWeight,
     AdjustTranslationAttemptSentenceWeight
@@ -18,6 +17,7 @@ import {WordCardDisplay} from "../word-card/word-card.modal.component";
 import {ManagerContext} from "../../App";
 import {HotkeyConfig} from "../../components/hotkeys/HotkeyConfig";
 import {QuizScheduleOverView} from "../quiz/quiz-schedule-over-view.component";
+import { Intro } from "../../components/intro/intro.component";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -27,8 +27,13 @@ export class ModalService {
     public testingUtils: NavModal;
     public wordPaperDisplay: NavModal;
     public quizScheduleOverView: NavModal;
+    public intro: NavModal;
 
     constructor() {
+        this.intro = new NavModal(
+            'intro',
+            () => <Intro/>
+        )
         this.fileUpload = new NavModal(
             'fileUpload',
             () => <FileChooser/>
@@ -83,7 +88,8 @@ export class ModalService {
             this.settings,
             this.testingUtils,
             this.wordPaperDisplay,
-            this.quizScheduleOverView
+            this.quizScheduleOverView,
+            this.intro
         ]
     }
 }

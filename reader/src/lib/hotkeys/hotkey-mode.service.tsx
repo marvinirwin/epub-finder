@@ -3,9 +3,9 @@ import {setInterval} from "timers";
 import {HotkeyModes} from "./hotkey-modes";
 import {isDocument} from "./browser-inputs-service";
 import {GeneralToastMessageService} from "../user-interface/general-toast-message.service";
-import {DEV} from "../../components/app-directory/app-directory-service";
 import {Typography} from "@material-ui/core";
 import React from "react";
+import {DEV} from "../util/url-params";
 
 
 const inputSelected = "inputSelected";

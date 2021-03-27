@@ -56,7 +56,11 @@ export const leftTodayNumber = 'leftTodayNumber';
 export const quizRowsFinishedTodayTable = 'quizRowsFinishedTodayTable';
 export const quizRowsInProgressTable = 'quizRowsInProgressTable';
 export const quizRowsNotInProgressTable = 'quizRowsNotInProgressTable';
-
+export const introLanguageSelect = 'introLanguageSelect';
+export const introAddLearningMaterial = 'introAddLearningMaterial';
+export const introSetCardLimit = 'introSetCardLimit';
+export const readingLanguageSelect = 'readingLanguageSelect';
+export const spokenLanguageSelect = 'spokenLanguageSelect';
 
 
 

@@ -1,12 +1,7 @@
-import {ds_Tree} from "../../services/tree.service";
 import React from "react";
 import {Manager} from "../../lib/manager/Manager";
-import {combineLatest, Observable} from "rxjs";
-import {distinctUntilChanged, map, startWith} from "rxjs/operators";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";
 import {TreeMenuNode} from "./tree-menu-node.interface";
-import {DocumentSelectionRowInterface} from "../../lib/document-selection/document-selection-row.interface";
-import {Profile} from "../../lib/auth/loggedInUserService";
 import {UploadNode} from "./nodes/upload.node";
 import {QuizScheduleNode} from "./nodes/quiz-schedule.node";
 import {QuizCarouselNode} from "./nodes/quiz-carousel.node";
@@ -21,9 +16,7 @@ import {SignInWithNode} from "./nodes/sign-in-with.node";
 import {ProgressNode} from "./nodes/progress.node";
 import {TranslationAttemptNode, TranslationAttemptSchedule} from "./nodes/translation-attempt-schedule";
 import {ReadingComponent} from "../reading/reading.component";
-
-export const TESTING = new URLSearchParams(window.location.search).has('test')
-export const DEV = new URLSearchParams(window.location.search).has('dev')
+import {DEV} from "../../lib/util/url-params";
 
 
 export const ReadingNode = (m: Manager): TreeMenuNode => ({
