@@ -58,6 +58,7 @@ export const QuizResultToRecognitionRows =
                         ...nextRecognitionRecord,
                         nextDueDate: nextDueDate(),
                         grade: scorePair.grade,
+                        hiddenFields: []
                     };
                 })
             )

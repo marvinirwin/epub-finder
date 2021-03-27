@@ -1,7 +1,6 @@
 import {combineLatest, merge, Observable, of} from "rxjs";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {Website} from "../Website/Website";
-import {Segment, SerializedDocumentTabulation} from "@shared/";
+import {SerializedDocumentTabulation} from "@shared/";
 import {flattenTree, NamedDeltaScanner} from "../delta-scan/delta-scan.module";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
@@ -27,10 +26,6 @@ export type TrieObservable = Observable<TrieWrapper>;
 export const SOURCE_DOCUMENTS_NODE_LABEL = 'libraryDocuments';
 export const EXAMPLE_SENTENCE_DOCUMENT = 'exampleSentences';
 export const READING_DOCUMENT_NODE_LABEL = 'readingDocument';
-export const isWebsite = (variableToCheck: any): variableToCheck is Website =>
-    (variableToCheck as Website).url !== undefined;
-export const isCustomDocument = (variableToCheck: any): variableToCheck is BasicDocument =>
-    (variableToCheck as BasicDocument).html !== undefined;
 
 export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>();

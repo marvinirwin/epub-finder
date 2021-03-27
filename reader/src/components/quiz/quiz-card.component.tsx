@@ -1,7 +1,6 @@
 import React, {Fragment, useContext} from "react";
 import {Paper} from "@material-ui/core";
 import {useObservableState, useSubscription} from "observable-hooks";
-import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
 import {QuizCard} from "./word-card.interface";
 import {ManagerContext} from "../../App";
 import {PaperProps} from "@material-ui/core/Paper/Paper";
@@ -15,6 +14,7 @@ import {Observable} from "rxjs";
 import {SuperMemoGrade} from "supermemo";
 import {QuizCardScheduleTable} from "../tables/quiz-card-due-date-schedule-table.component";
 import {QuizCardTranslationAttemptSchedule} from "../tables/quiz-card-translation-attempt-table.component";
+import {OpenDocumentComponent} from "../reading/open-document.component";
 
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({quizCard, ...props}) => {
