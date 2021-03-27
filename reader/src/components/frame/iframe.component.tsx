@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import { createPortal } from 'react-dom'
-import {setMouseOverDivPosition, setMouseOverText} from "../mouseover-div";
+import {setMouseOverDivPosition, setMouseOverText} from "../mouseover-div/mouseover-div";
 
 export const IframeComponent = React.forwardRef<HTMLIFrameElement, {title: string} & React.HTMLProps<HTMLIFrameElement>>(({ children,title, ...props }, ref) => {
     const [contentRef, setContentRef] = useState<HTMLIFrameElement | null>()

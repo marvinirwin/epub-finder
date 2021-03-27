@@ -1,16 +1,16 @@
 import {AudioRecorder} from "../audio/audio-recorder.service";
 import {ReplaySubject} from "rxjs";
-import {WavAudio} from "../WavAudio";
+import {WavAudio} from "../audio/WavAudio";
 import {flatMap, take} from "rxjs/operators";
 import {AudioSource} from "../audio/AudioSource";
 import {fetchSynthesizedAudio} from "../audio/FetchSynthesizedAudio";
 import {sleep} from "../util/Util";
-import {GeneralToastMessageService} from "../general-toast-message.service";
+import {GeneralToastMessageService} from "../user-interface/general-toast-message.service";
 import {Typography} from "@material-ui/core";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
-import {transliterate} from "../transliterate.service";
+import {transliterate} from "../language/transliterate.service";
 
 
 export type AudioPair = { user: WavAudio, synth: WavAudio };

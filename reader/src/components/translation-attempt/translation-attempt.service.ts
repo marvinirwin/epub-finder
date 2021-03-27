@@ -4,10 +4,10 @@ import {
 } from "../../lib/schedule/translation-attempt-schedule.service";
 import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from "rxjs";
 import {distinctUntilChanged, map, shareReplay, switchMap} from "rxjs/operators";
-import {LanguageConfigsService} from "../../lib/language-configs.service";
+import {LanguageConfigsService} from "../../lib/language/language-configs.service";
 import {ScheduleRow} from "../../lib/schedule/schedule-row";
 import {fetchTranslation} from "../../services/translate.service";
-import {transliterate} from "../../lib/transliterate.service";
+import {transliterate} from "../../lib/language/transliterate.service";
 
 
 

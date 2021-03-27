@@ -1,5 +1,5 @@
 import React from "react";
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {useObservableState} from "observable-hooks";
 import {Observable} from "rxjs";
 import {VideoMetadata} from "../pronunciation-video/video-meta-data.interface";

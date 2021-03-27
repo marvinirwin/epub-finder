@@ -1,13 +1,13 @@
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
 import {AtomizedDocument} from "@shared/";
 import {shareReplay, switchMap, tap} from "rxjs/operators";
-import {filterMap, findMap, firstMap} from "../map.module";
+import {filterMap, findMap, firstMap} from "../util/map.module";
 import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from "./open-documents.service";
 import {OpenDocument} from "../document-frame/open-document.entity";
-import {LanguageConfigsService} from "../language-configs.service";
-import {TabulationConfigurationService} from "../tabulation-configuration.service";
-import {OnSelectService} from "../on-select.service";
+import {LanguageConfigsService} from "../language/language-configs.service";
+import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {OnSelectService} from "../user-interface/on-select.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument;

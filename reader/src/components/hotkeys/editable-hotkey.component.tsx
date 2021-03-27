@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {TextField} from "@material-ui/core";
 import React from "react";
 import {debounce} from 'lodash';

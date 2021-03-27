@@ -1,4 +1,4 @@
-import {WavAudio} from "../WavAudio";
+import {WavAudio} from "./WavAudio";
 import axios from "axios";
 
 export async function fetchSynthesizedAudio(text: string): Promise<WavAudio | undefined> {

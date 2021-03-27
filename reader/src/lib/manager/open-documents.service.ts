@@ -6,7 +6,7 @@ import {flattenTree, NamedDeltaScanner} from "../delta-scan/delta-scan.module";
 import {DatabaseService} from "../Storage/database.service";
 import {SettingsService} from "../../services/settings.service";
 import {BasicDocument} from "../../types";
-import {mapMap, mapToArray} from "../map.module";
+import {mapMap, mapToArray} from "../util/map.module";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {AtomizedDocumentSources, DocumentSourcesService} from "../document-frame/document-sources.service";
 import {
@@ -14,13 +14,13 @@ import {
     TabulatedDocuments
 } from "@shared/";
 import {DocumentRepository} from "../documents/document.repository";
-import {TrieWrapper} from "../TrieWrapper";
+import {TrieWrapper} from "../util/TrieWrapper";
 import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
-import {mergeTabulations} from "../merge-tabulations";
-import {LanguageConfigsService} from "../language-configs.service";
-import {BrowserSegment} from "../browser-segment";
-import {TabulationConfigurationService} from "../tabulation-configuration.service";
-import {OnSelectService} from "../on-select.service";
+import {mergeTabulations} from "../util/merge-tabulations";
+import {LanguageConfigsService} from "../language/language-configs.service";
+import {BrowserSegment} from "../sentences/browser-segment";
+import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {OnSelectService} from "../user-interface/on-select.service";
 
 export type TrieObservable = Observable<TrieWrapper>;
 

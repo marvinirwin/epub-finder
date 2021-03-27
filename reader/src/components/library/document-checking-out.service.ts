@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {observableLastValue, SettingsService} from "../../services/settings.service";
 
 export class DocumentCheckingOutService {

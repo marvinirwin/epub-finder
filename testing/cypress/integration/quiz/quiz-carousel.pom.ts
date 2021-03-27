@@ -1,9 +1,5 @@
 /// <reference types="cypress" />
-import {CardList} from "./quiz.document";
-import {DirectoryPom} from "../../support/pom/directory.pom";
-import {QuizCardPom} from "./quiz-card.pom";
 import {ImageSearchPom} from "./image-search.pom";
-import {HiddenQuizFields} from "../../../../reader/src/lib/hidden-quiz-fields";
 import {
     frequencyDocumentProgressPrefix, leftTodayNumber,
     manualQuizHiddenFieldConfigId,

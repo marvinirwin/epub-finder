@@ -1,5 +1,5 @@
 import {map, shareReplay} from "rxjs/operators";
-import {HotKeyEvents} from "../lib/HotKeyEvents";
+import {HotKeyEvents} from "../lib/hotkeys/HotKeyEvents";
 import {Observable, Subject} from "rxjs";
 import {SettingsService} from "./settings.service";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";

@@ -4,7 +4,7 @@ import {DocumentCheckingOutService} from "../../components/library/document-chec
 import {LoggedInUserService} from "../auth/loggedInUserService";
 import {last, map, startWith} from "rxjs/operators";
 import {LibraryService} from "../manager/library.service";
-import {ProgressItemService} from "../../components/progress-item.service";
+import {ProgressItemService} from "../../components/item-in-progress/progress-item.service";
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html']);
 

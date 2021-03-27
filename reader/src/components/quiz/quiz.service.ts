@@ -4,18 +4,18 @@ import {distinctUntilChanged, map, mapTo, shareReplay} from "rxjs/operators";
 import {QuizCard} from "./word-card.interface";
 import {orderBy, uniq} from "lodash";
 import CardsRepository from "src/lib/manager/cards.repository";
-import {ExampleSegmentsService} from "../../lib/example-segments.service";
+import {ExampleSegmentsService} from "../../lib/quiz/example-segments.service";
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from "../../lib/manager/open-documents.service";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../../lib/schedule/schedule-row";
-import {LanguageConfigsService} from "../../lib/language-configs.service";
-import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/hidden-quiz-fields";
+import {LanguageConfigsService} from "../../lib/language/language-configs.service";
+import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/quiz/hidden-quiz-fields";
 import {SettingsService} from "../../services/settings.service";
 import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
 import {wordCardFactory} from "./card-card.factory";
-import {TabulationConfigurationService} from "../../lib/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../../lib/language/tabulation-configuration.service";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 import {TranslationAttemptScheduleService} from "../../lib/schedule/translation-attempt-schedule.service";
-import {OnSelectService} from "../../lib/on-select.service";
+import {OnSelectService} from "../../lib/user-interface/on-select.service";
 
 export const filterQuizRows = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => rows
     .filter(r => r.dueDate() < new Date())

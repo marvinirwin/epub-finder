@@ -1,6 +1,6 @@
 import {ds_Tree} from "../../services/tree.service";
 import React from "react";
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {combineLatest, Observable} from "rxjs";
 import {distinctUntilChanged, map, startWith} from "rxjs/operators";
 import {ArrayToTreeParams, arrayToTreeRoot} from "./directory.factory";

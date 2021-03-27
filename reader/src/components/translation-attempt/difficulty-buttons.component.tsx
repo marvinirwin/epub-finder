@@ -1,6 +1,6 @@
 import React, {Fragment, useContext} from "react";
 import {ManagerContext} from "../../App";
-import {HotkeyWrapper} from "../hotkey-wrapper";
+import {HotkeyWrapper} from "../hotkeys/hotkey-wrapper";
 import {Button} from "@material-ui/core";
 import {QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM} from "@shared/";
 

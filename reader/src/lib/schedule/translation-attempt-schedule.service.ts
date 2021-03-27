@@ -5,7 +5,7 @@ import {OpenDocumentsService} from "../manager/open-documents.service";
 import {combineLatest, Observable} from "rxjs";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {map} from "rxjs/operators";
-import {WeightedVocabService} from "../weighted-vocab.service";
+import {WeightedVocabService} from "../language/weighted-vocab.service";
 import {orderBy} from "lodash";
 import {
     averageKnownWords,

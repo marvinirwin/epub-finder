@@ -1,11 +1,11 @@
 import {combineLatest, Observable, of} from "rxjs";
 import CardsRepository from "../../lib/manager/cards.repository";
 import {ICard} from "../../../../server/src/shared/ICard";
-import {LanguageConfigsService} from "../../lib/language-configs.service";
+import {LanguageConfigsService} from "../../lib/language/language-configs.service";
 import {EditableValue} from "./editing-value";
 import {resolveICardForWordLatest} from "../../lib/pipes/ResolveICardForWord";
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom} from "rxjs/operators";
-import {transliterate} from "../../lib/transliterate.service";
+import {transliterate} from "../../lib/language/transliterate.service";
 import translate from "google-translate-api";
 import {fetchTranslation} from "../../services/translate.service";
 

@@ -3,7 +3,7 @@ import {Observable, ReplaySubject, Subject} from "rxjs";
 import {ds_Dict} from "../lib/delta-scan/delta-scan.module";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {distinct, distinctUntilChanged, skip, take} from "rxjs/operators";
-import {HistoryService} from "../lib/history.service";
+import {HistoryService} from "../lib/app-context/history.service";
 import {SettingGetSet, SettingType} from "./setting-get-set";
 import {MapSubject} from "./map-subject";
 
@@ -58,6 +58,7 @@ export class SettingsService {
     public scheduleTableShowUnderDue$: ReplaySubject<boolean>;
     public newQuizWordLimit$: ReplaySubject<number>;
     public translationAttemptSentenceWeight$: ReplaySubject<number>;
+    public hiddenFieldsRequiredToProgress$: ReplaySubject<string[][]>;
 
     constructor({db, historyService}: { db: DatabaseService, historyService: HistoryService }) {
         this.db = db;
@@ -113,6 +114,12 @@ export class SettingsService {
         this.scheduleTableShowUncounted$ = this.createSetting$<boolean>('scheduleTableShowUncounted', false, 'indexedDB')
         this.scheduleTableShowUnderDue$ = this.createSetting$<boolean>('scheduleTableShowUnderDue', false, 'indexedDB')
         this.newQuizWordLimit$ = this.createSetting$<number>('newQuizWordLimit', 10, 'indexedDB')
+
+        this.hiddenFieldsRequiredToProgress$ = this.createSetting$<string[][]>(
+            'hiddenFieldsRequiredToProgress',
+            [],
+            'indexedDB'
+        )
     }
 
     public createSetting$<T>(

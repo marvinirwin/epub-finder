@@ -1,6 +1,6 @@
 import React from "react";
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {Manager} from "../../../lib/Manager";
+import {Manager} from "../../../lib/manager/Manager";
 import {AttachFile} from "@material-ui/icons";
 import { UPLOAD_LEARNING_MATERIAL } from "@shared/";
 

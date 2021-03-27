@@ -1,11 +1,11 @@
-import {TrieWrapper} from "../TrieWrapper";
+import {TrieWrapper} from "../util/TrieWrapper";
 import trie from "trie-prefix-tree";
 import CardsRepository from "./cards.repository";
 import {Observable} from "rxjs";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {IndexedRowsRepository} from "../schedule/indexed-rows.repository";
-import {AllWordsRepository} from "../all-words.repository";
+import {AllWordsRepository} from "../language/all-words.repository";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 
 export class TrieService {

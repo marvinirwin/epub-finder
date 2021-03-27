@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import React, {useEffect, useRef, useState} from "react";
 import {useObservableState, useSubscription} from "observable-hooks";
 import {Card} from "@material-ui/core";

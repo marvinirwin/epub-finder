@@ -1,5 +1,5 @@
-import {HotKeyEvents} from "../../lib/HotKeyEvents";
-import {Manager} from "../../lib/Manager";
+import {HotKeyEvents} from "../../lib/hotkeys/HotKeyEvents";
+import {Manager} from "../../lib/manager/Manager";
 import React, {useContext} from "react";
 import {orderBy} from "lodash";
 import {ds_Tree} from "../../services/tree.service";

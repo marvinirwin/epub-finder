@@ -1,5 +1,5 @@
 import React, {useContext, useMemo, useState} from "react";
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {OpenDocumentComponent} from "../../lib/atomized/open-document.component";
 import {useObservableState} from "observable-hooks";
 import {AudioRecorderResizedContext, PronunciationVideoResizedContext} from "../main";

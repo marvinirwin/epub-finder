@@ -7,9 +7,9 @@ import {getManager} from "./AppSingleton";
 import {CssBaseline} from "@material-ui/core";
 import {Main} from "./components/main";
 import {ThemeProvider} from '@material-ui/core/styles';
-import {GlobalDragOver} from "./components/global-drag-over.component";
-import {AlertSnackbar, GeneralMessageSnackbar} from "./components/alert-snackbar.component";
-import {LoadingBackdrop} from "./components/loading-backdrop.component";
+import {GlobalDragOver} from "./components/library/global-drag-over.component";
+import {AlertSnackbar, GeneralMessageSnackbar} from "./components/snackbars/alert-snackbar.component";
+import {LoadingBackdrop} from "./components/library/loading-backdrop.component";
 import {theme} from "./theme";
 import {ActionModal} from "./components/action-modal/action-modal";
 

@@ -7,7 +7,7 @@ import {
 import {filter, flatMap, map, shareReplay, withLatestFrom} from "rxjs/operators";
 import {AudioSource} from "./AudioSource";
 import {SpeechRecognitionConfigService} from "./speech-recognition-config.service";
-import {LanguageConfigsService} from "../language-configs.service";
+import {LanguageConfigsService} from "../language/language-configs.service";
 
 
 export class BrowserAudio implements AudioSource {

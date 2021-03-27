@@ -2,7 +2,7 @@ import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {QuizCard} from "../../components/quiz/word-card.interface";
 import {useObservableState} from "observable-hooks";
-import {FrequencyDocument} from "../frequency-documents";
+import {FrequencyDocument} from "../documents/frequency-documents";
 import {
     frequencyDocumentProgress,
     frequencyDocumentProgressPrefix, recognizedCount,

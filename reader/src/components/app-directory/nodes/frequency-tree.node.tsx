@@ -4,7 +4,7 @@ import {AccountCircle, DeviceHub, Settings} from "@material-ui/icons";
 import {AUTH, PROGRESS_TREE} from "@shared/";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
-import {FrequencyTreeNode} from "../../frequency-tree-node.component";
+import {FrequencyTreeNode} from "../../frequency-tree/frequency-tree-node.component";
 import {Typography} from "@material-ui/core";
 
 

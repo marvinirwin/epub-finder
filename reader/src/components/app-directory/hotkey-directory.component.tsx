@@ -1,5 +1,5 @@
 import {useObservableState} from "observable-hooks";
-import {HotKeyEvents} from "../../lib/HotKeyEvents";
+import {HotKeyEvents} from "../../lib/hotkeys/HotKeyEvents";
 import {EditableHotkeyComponent} from "../hotkeys/editable-hotkey.component";
 import React, {useContext} from "react";
 import {ManagerContext} from "../../App";

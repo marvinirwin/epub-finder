@@ -1,13 +1,13 @@
 import React, {useEffect} from "react";
-import {Manager} from "../lib/Manager";
+import {Manager} from "../lib/manager/Manager";
 import {useObservableState} from "observable-hooks";
-import {HotKeyEvents} from "../lib/HotKeyEvents";
+import {HotKeyEvents} from "../lib/hotkeys/HotKeyEvents";
 import {AppDirectory} from "./app-directory/app-directory-service";
 import {Subject} from "rxjs";
 import {Hotkeys} from "../lib/hotkeys/hotkeys.interface";
 import {MiniDrawer} from "./app-container/drawer";
 import {ImageSearchComponent} from "./image-search/image-search.component";
-import './mouseover-div';
+import './mouseover-div/mouseover-div';
 
 
 export const FocusedElement = React.createContext<HTMLElement | Document | null>(null)

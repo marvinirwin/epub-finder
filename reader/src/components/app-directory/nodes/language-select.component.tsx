@@ -2,7 +2,7 @@ import React, {Fragment, useContext} from "react";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
 import {InputLabel, MenuItem, Select} from "@material-ui/core";
-import {SupportedTranslationService} from "../../../lib/supported-translation.service";
+import {SupportedTranslationService} from "../../../lib/language/supported-translation.service";
 
 export const LanguageSelect = () => {
     const m = useContext(ManagerContext);

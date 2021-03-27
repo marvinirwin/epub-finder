@@ -8,14 +8,14 @@ import {
     tabulatedSentenceToTabulatedDocuments
 } from "@shared/";
 import {TabulateLocalDocument} from "../Workers/worker.helpers";
-import {mergeTabulations} from "../merge-tabulations";
+import {mergeTabulations} from "../util/merge-tabulations";
 import {XMLDocumentNode} from "../../../../server/src/shared/XMLDocumentNode";
-import {BrowserSegment} from "../browser-segment";
+import {BrowserSegment} from "../sentences/browser-segment";
 import {SettingsService} from "../../services/settings.service";
-import {LanguageConfigsService} from "../language-configs.service";
+import {LanguageConfigsService} from "../language/language-configs.service";
 import {isLoading} from "../util/is-loading";
-import {TabulationConfigurationService} from "../tabulation-configuration.service";
-import {OnSelectService} from "../on-select.service";
+import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {OnSelectService} from "../user-interface/on-select.service";
 
 export class OpenDocument {
     public name: string;

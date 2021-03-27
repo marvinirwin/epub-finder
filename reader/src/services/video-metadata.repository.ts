@@ -1,7 +1,7 @@
 import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
 import {VideoMetadata} from "../components/pronunciation-video/video-meta-data.interface";
 import axios from "axios";
-import {mapFromId} from "../lib/map.module";
+import {mapFromId} from "../lib/util/map.module";
 import CardsRepository from "../lib/manager/cards.repository";
 
 export class VideoMetadataRepository {

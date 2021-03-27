@@ -1,4 +1,4 @@
-import {Manager} from "../../lib/Manager";
+import {Manager} from "../../lib/manager/Manager";
 import {orderBy} from "lodash";
 import {EditableHotkeyComponent} from "./editable-hotkey.component";
 import React, {useContext} from "react";

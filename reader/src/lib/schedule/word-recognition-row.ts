@@ -10,5 +10,7 @@ export interface WordRecognitionRow {
     repetition: number;
     efactor: number;
     grade: SuperMemoGrade;
+
+    hiddenFields: string[];
 }
 

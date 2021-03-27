@@ -2,7 +2,7 @@ import {QuizManager} from "../manager/QuizManager";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {QuizResultToRecognitionRows} from "../pipes/QuizResultToRecognitionRows";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
-import {GeneralToastMessageService} from "../general-toast-message.service";
+import {GeneralToastMessageService} from "../user-interface/general-toast-message.service";
 import React from "react";
 
 export class QuizResultService {

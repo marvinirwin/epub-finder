@@ -3,7 +3,7 @@ import {LtDocument} from "@shared/";
 import {Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {DocumentRepository} from "../documents/document.repository";
-import {FrequencyDocumentsRepository} from "../frequency-documents.repository";
+import {FrequencyDocumentsRepository} from "../documents/frequency-documents.repository";
 
 export class LibraryDocumentRow {
     selectedForFrequency$: Observable<boolean>;

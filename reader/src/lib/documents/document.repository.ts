@@ -2,7 +2,7 @@ import axios from 'axios';
 import {DocumentViewDto} from '@server/'
 import {DatabaseService} from "../Storage/database.service";
 import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
-import {deleteMap, mapFromId, mergeMaps} from "../map.module";
+import {deleteMap, mapFromId, mergeMaps} from "../util/map.module";
 import {LtDocument} from "@shared/";
 import {TESTING} from "../../components/app-directory/app-directory-service";
 import {isLoading} from "../util/is-loading";

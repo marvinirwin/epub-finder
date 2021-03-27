@@ -3,8 +3,8 @@ import {filter, map, shareReplay, startWith, switchMap, take, withLatestFrom} fr
 import {RecordRequest} from "../util/RecordRequest";
 import {sleep} from "../util/Util";
 import {AudioSource} from "./AudioSource";
-import {transliterate} from "../transliterate.service";
-import {LanguageConfigsService} from "../language-configs.service";
+import {transliterate} from "../language/transliterate.service";
+import {LanguageConfigsService} from "../language/language-configs.service";
 
 export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>();

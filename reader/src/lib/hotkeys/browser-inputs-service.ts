@@ -6,10 +6,10 @@ import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {HotkeyModes} from "./hotkey-modes";
 import {Hotkeys} from "./hotkeys.interface";
 import {observableLastValue, SettingsService} from "../../services/settings.service";
-import {ActiveSentenceService} from "../active-sentence.service";
-import {setMouseOverText} from "../../components/mouseover-div";
-import {LanguageConfigsService} from "../language-configs.service";
-import {BrowserSegment} from "../browser-segment";
+import {ActiveSentenceService} from "../sentences/active-sentence.service";
+import {setMouseOverText} from "../../components/mouseover-div/mouseover-div";
+import {LanguageConfigsService} from "../language/language-configs.service";
+import {BrowserSegment} from "../sentences/browser-segment";
 
 export function isDocument(t: HTMLElement | Document): t is Document {
     return !t.hasOwnProperty('tagName');

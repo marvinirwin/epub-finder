@@ -1,7 +1,7 @@
 import {Language} from '@material-ui/icons'
 import React from "react";
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {Manager} from "../../../lib/Manager";
+import {Manager} from "../../../lib/manager/Manager";
 import {LANGUAGE_SELECT} from "@shared/";
 
 

@@ -1,7 +1,7 @@
 import {filter, map, pairwise, shareReplay, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {Observable, of, ReplaySubject} from "rxjs";
 import {EditingCard} from "../reactive-classes/EditingCard";
-import {WavAudio} from "../WavAudio";
+import {WavAudio} from "../audio/WavAudio";
 
 export default class EditingCardManager {
     showEditingCardPopup$: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);

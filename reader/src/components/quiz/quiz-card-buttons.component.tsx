@@ -13,7 +13,7 @@ import React, {useContext, Fragment} from "react";
 import {ManagerContext} from "../../App";
 import {QuizCard} from "./word-card.interface";
 import {useObservableState, useSubscription} from "observable-hooks";
-import {HotkeyWrapper} from "../hotkey-wrapper";
+import {HotkeyWrapper} from "../hotkeys/hotkey-wrapper";
 import {DifficultyButtons} from "../translation-attempt/difficulty-buttons.component";
 
 

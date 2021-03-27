@@ -1,4 +1,4 @@
-import {Manager} from "../../../lib/Manager";
+import {Manager} from "../../../lib/manager/Manager";
 import {Profile} from "../../../lib/auth/loggedInUserService";
 import {Settings} from "@material-ui/icons";
 import React from "react";

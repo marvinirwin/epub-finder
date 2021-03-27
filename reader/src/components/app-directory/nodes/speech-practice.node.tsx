@@ -1,5 +1,5 @@
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {SpeechPractice} from "../../speech-practice.component";
+import {SpeechPractice} from "../../speech-practice/speech-practice.component";
 import React from "react";
 import {Translate} from "@material-ui/icons";
 import {SPEECH_PRACTICE} from '@shared/';

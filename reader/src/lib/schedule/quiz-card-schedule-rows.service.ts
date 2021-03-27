@@ -9,7 +9,7 @@ import {IgnoredWordsRepository} from "./ignored-words.repository";
 import {NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow} from "./schedule-row";
 import {ScheduleMathService, sumWordCountRecords} from "./schedule-math.service";
 import {SettingsService} from "../../services/settings.service";
-import {AllWordsRepository} from "../all-words.repository";
+import {AllWordsRepository} from "../language/all-words.repository";
 import {OpenDocumentsService} from "../manager/open-documents.service";
 import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
 import {SelectedVirtualTabulationsService} from "../manager/selected-virtual-tabulations.service";

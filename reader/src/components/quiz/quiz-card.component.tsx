@@ -10,7 +10,7 @@ import {CardInfo} from "../../lib/schedule/quiz-card-current-card-info.component
 import {QuizCardButtons} from "./quiz-card-buttons.component";
 import {useIsFieldHidden} from "./useIsFieldHidden";
 import {QuizCardLimitReached} from "./empty-quiz-card.component";
-import {CardLearningLanguageText} from "../word-paper.component";
+import {CardLearningLanguageText} from "../word-information/word-paper.component";
 import {Observable} from "rxjs";
 import {SuperMemoGrade} from "supermemo";
 import {QuizCardScheduleTable} from "../tables/quiz-card-due-date-schedule-table.component";

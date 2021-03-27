@@ -4,7 +4,7 @@ import EditingCardManager from "../EditingCardManager";
 import {resolveICardForWord} from "../../pipes/ResolveICardForWord";
 import {ICard} from "../../../../../server/src/shared/ICard";
 import {EditingCard} from "../../reactive-classes/EditingCard";
-import {CardDB} from "../../Manager";
+import {CardDB} from "../Manager";
 import {AudioManager} from "../AudioManager";
 
 

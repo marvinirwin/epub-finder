@@ -1,5 +1,5 @@
 import {DatabaseService} from "../lib/Storage/database.service";
-import {HistoryService} from "../lib/history.service";
+import {HistoryService} from "../lib/app-context/history.service";
 import {Observable, of} from "rxjs";
 import {distinctUntilChanged, skip} from "rxjs/operators";
 

@@ -1,5 +1,5 @@
 import {HotkeysService} from "../../services/hotkeys.service";
-import {HotKeyEvents} from "../HotKeyEvents";
+import {HotKeyEvents} from "./HotKeyEvents";
 import {PronunciationProgressRepository} from "../schedule/pronunciation-progress.repository";
 
 export class TestHotkeysService {

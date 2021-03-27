@@ -1,5 +1,5 @@
 import {TreeMenuNode} from "../tree-menu-node.interface";
-import {Manager} from "../../../lib/Manager";
+import {Manager} from "../../../lib/manager/Manager";
 import {RecordRequest} from "../../../lib/util/RecordRequest";
 import {removePunctuation} from "../../../lib/highlighting/temporary-highlight.service";
 import React, {useContext} from "react";

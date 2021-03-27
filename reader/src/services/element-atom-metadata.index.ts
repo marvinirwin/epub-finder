@@ -1,6 +1,6 @@
 import {BehaviorSubject, combineLatest, merge, Observable} from "rxjs";
 import {map, shareReplay, startWith, switchMap} from "rxjs/operators";
-import {mergeMaps} from "../lib/map.module";
+import {mergeMaps} from "../lib/util/map.module";
 import {OpenDocumentsService} from "../lib/manager/open-documents.service";
 import {VisibleService} from "../lib/manager/visible.service";
 import {AtomMetadata} from "../../../server/src/shared/atom-metadata.interface.ts/atom-metadata";

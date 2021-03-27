@@ -1,4 +1,4 @@
-import {Manager} from "./lib/Manager";
+import {Manager} from "./lib/manager/Manager";
 import {DatabaseService} from "./lib/Storage/database.service";
 import {BrowserAudio} from "./lib/audio/browser.audio";
 import {Website} from "./lib/Website/Website";
