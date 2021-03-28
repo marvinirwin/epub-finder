@@ -10,6 +10,7 @@ export const SetQuizWordLimit = () => {
     return <TextField
         type="number"
         label={"new words per day"}
+        variant={'filled'}
         value={selectedQuizWordLimit || 0}
         onChange={e => m.settingsService.newQuizWordLimit$.next(
             parseInt(e.target.value || '0', 10) || 10

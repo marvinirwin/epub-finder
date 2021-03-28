@@ -37,14 +37,18 @@ export function AppDirectory(
             RecognizeSpeechNode(m),
             WatchPronunciationNode(m),
             LibraryNode(m),
+/*
             UploadNode(m),
+*/
             SettingsNode(m),
             TestingUtilsNode(m),
             TranslationAttemptSchedule,
             TranslationAttemptNode,
             QuizCarouselNode(),
             QuizScheduleNode(m),
+/*
             ProgressNode,
+*/
             SpeechPracticeNode,
         ] as ArrayToTreeParams<TreeMenuNode>
     );

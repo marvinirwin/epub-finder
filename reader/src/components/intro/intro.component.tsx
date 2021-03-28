@@ -47,7 +47,7 @@ export const Intro = () => {
                 return <Container id={introAddLearningMaterial} style={{flex: 1}}>
                     <Paper>
                         <Box m={2} p={1}>
-                            <Typography variant={'h4'}>Copy and paste your learning material here</Typography>
+                            <Typography variant={'h4'}>Add some text you'd like to learn here</Typography>
                             <UploadText/>
                             <NextButton/>
                         </Box>
@@ -59,8 +59,8 @@ export const Intro = () => {
             Component: () => {
                 return <Container id={introSetCardLimit} style={{flex: 1}}>
                     <Paper>
-                        <Box m={2}> <Typography>What's your learning goal each day?</Typography>
-                            <SetQuizWordLimit/>
+                        <Box m={2} p={1}> <Typography variant={'h4'}>How many words do you want to learn each day?</Typography>
+                            <Box m={2} p={1}><SetQuizWordLimit/></Box>
                             <NextButton/>
                         </Box>
                     </Paper>
