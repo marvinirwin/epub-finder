@@ -9,7 +9,6 @@ import {RecognizeSpeechNode} from "./nodes/recognize-speech.node";
 import {WatchPronunciationNode} from "./nodes/watch-pronunciation.node";
 import {TestingUtilsNode} from "./nodes/testing-utils.node";
 import {SettingsNode} from "./nodes/settings.node";
-import {SpeechPracticeNode} from "./nodes/speech-practice.node";
 import {LanguageSelectNode} from "./nodes/language-select.node";
 import {LibraryNode} from "./nodes/library.node";
 import {SignInWithNode} from "./nodes/sign-in-with.node";
