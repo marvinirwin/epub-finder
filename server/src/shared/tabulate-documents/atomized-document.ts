@@ -1,7 +1,7 @@
 import {getIndexOfEl} from "../getIndexOfEl";
 import {Dictionary, uniqueId, flatten} from 'lodash';
 import {DOMParser, XMLSerializer} from "xmldom";
-import {Segment} from "./segment";
+import {Segment} from "./segment/segment";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import { annotatedAndTranslated } from "../selectors";
 import { InterpolateService } from "../interpolate.service";

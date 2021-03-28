@@ -7,7 +7,7 @@ import {DocumentView} from "../src/entities/document-view.entity";
 import {User} from "../src/entities/user.entity";
 import {DatabaseModule} from "../src/config/database.module";
 import {wordsFromCountRecordList} from "../src/shared/tabulation/word-count-records.module";
-import {AtomizedDocument, InterpolateService, Segment} from "../src/shared";
+import {AtomizedDocument, InterpolateService, Segment, tabulate} from "../src/shared";
 import {ChineseVocabService} from "../src/shared/tabulate-documents/chinese-vocab.service";
 import {SetWithUniqueLengths} from "../src/shared/tabulate-documents/set-with-unique-lengths";
 
@@ -46,7 +46,7 @@ async function tabulateHtml3(tabulateService: TabulateService) {
 
 async function tabulateChineseSentence(让安禄山兼任平卢范阳河东三镇节度使就属于唐玄宗制度上的错误: string) {
     const chineseVocabSet = new SetWithUniqueLengths(await ChineseVocabService.vocab());
-    const tabulation = Segment.tabulate(
+    const tabulation = tabulate(
         {
             notableCharacterSequences: chineseVocabSet,
             segments: AtomizedDocument.atomizeDocument(

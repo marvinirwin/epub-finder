@@ -2,7 +2,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {DocumentView} from "../../entities/document-view.entity";
 import {FindOneOptions, Repository} from "typeorm";
 import {s3ReadStream} from "../uploading/s3.service";
-import {AtomizedDocument, Segment, SerializedTabulation} from "../../shared";
+import {AtomizedDocument, Segment, SerializedTabulation, tabulate} from "../../shared";
 import trie from "trie-prefix-tree";
 import {CacheService} from "../../util/cache.service";
 import {Inject} from "@nestjs/common";
@@ -40,7 +40,7 @@ export class TabulateService {
         const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
         const atomizedDocument = AtomizedDocument.atomizeDocument(text);
         const setWithUniqueLengths = new SetWithUniqueLengths(words);
-        const tabulation = Segment.tabulate(
+        const tabulation = tabulate(
             {
                 notableCharacterSequences: setWithUniqueLengths,
                 segments: atomizedDocument.segments(),

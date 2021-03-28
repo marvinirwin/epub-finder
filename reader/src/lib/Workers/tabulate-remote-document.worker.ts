@@ -6,7 +6,7 @@ import {
     AtomizedDocument,
     LtDocument,
     Segment,
-    SerializedDocumentTabulation,
+    SerializedDocumentTabulation, tabulate,
     tabulatedSentenceToTabulatedDocuments
 } from "@shared/";
 import trie from "trie-prefix-tree";
@@ -24,7 +24,7 @@ ctx.onmessage = async (ev) => {
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
     const doc = AtomizedDocument.atomizeDocument(documentSrc);
     const tabulated = tabulatedSentenceToTabulatedDocuments({
-        tabulatedSentences: Segment.tabulate(
+        tabulatedSentences: tabulate(
             {
                 greedyWordSet: new SetWithUniqueLengths(words),
                 notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),

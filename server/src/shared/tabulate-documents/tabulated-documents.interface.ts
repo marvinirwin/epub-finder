@@ -1,6 +1,6 @@
 import {Dictionary} from "lodash";
 import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
-import {Segment} from "./segment";
+import {Segment} from "./segment/segment";
 import {DocumentWordCount} from "../DocumentWordCount";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import {SerializedSegment, WordCountRecord} from "../tabulation/tabulate";

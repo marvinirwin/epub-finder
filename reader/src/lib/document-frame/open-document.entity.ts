@@ -5,7 +5,8 @@ import {
     AtomizedDocument,
     Segment, SerializedDocumentTabulation,
     TabulatedDocuments,
-    tabulatedSentenceToTabulatedDocuments
+    tabulatedSentenceToTabulatedDocuments,
+    tabulate
 } from "@shared/";
 import {TabulateLocalDocument} from "../Workers/worker.helpers";
 import {mergeTabulations} from "../util/merge-tabulations";
@@ -44,7 +45,7 @@ export class OpenDocument {
             tabulationConfigurationService.tabulationConfiguration$,
         ]).pipe(
             map(([segments, tabulationConfiguration]) => {
-                    const tabulatedSentences = mergeTabulations(Segment.tabulate(
+                    const tabulatedSentences = mergeTabulations(tabulate(
                         {
                             ...tabulationConfiguration,
                             segments,

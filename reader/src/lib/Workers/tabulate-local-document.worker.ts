@@ -6,7 +6,8 @@ import {
     Segment,
     SerializedDocumentTabulation,
     SerializedTabulation,
-    tabulatedSentenceToTabulatedDocuments
+    tabulatedSentenceToTabulatedDocuments,
+    tabulate
 } from "@shared/";
 import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
@@ -22,7 +23,7 @@ ctx.onmessage = async (ev) => {
     const {words, notableSubsequences, src, label, id}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
     const segments = doc.segments();
-    const tabulatedSentences = Segment.tabulate(
+    const tabulatedSentences = tabulate(
         {
             greedyWordSet: new SetWithUniqueLengths(words),
             notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),

@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment/segment";
 import {ds_Dict} from "../delta-scan/delta-scan.module";
 import {filter, map, take} from "rxjs/operators";
 import {flatten, chunk} from "lodash";

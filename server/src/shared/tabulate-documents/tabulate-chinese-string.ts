@@ -2,12 +2,13 @@ import {InterpolateService} from "../interpolate.service";
 import {AtomizedDocument} from "./atomized-document";
 import {TabulateService} from "../../documents/similarity/tabulate.service";
 import trie from "trie-prefix-tree";
-import {Segment} from "./segment";
+import {Segment} from "./segment/segment";
 import {ChineseVocabService} from "./chinese-vocab.service";
+import {tabulate} from "./segment/tabulate";
 
 export const TabulateChineseText = async (text: string) => {
     const notableCharacterSequencesSegmentsGreedyWordSet = trie(await ChineseVocabService.vocab());
-    return Segment.tabulate(
+    return tabulate(
         {
             notableCharacterSequences: notableCharacterSequencesSegmentsGreedyWordSet,
             segments: AtomizedDocument.atomizeDocument(InterpolateService.text(text)).segments(),

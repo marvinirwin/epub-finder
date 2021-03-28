@@ -6,7 +6,7 @@ import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService, READING_DOCUMENT_NODE_L
 import {QuizService} from "../../components/quiz/quiz.service";
 import {map, shareReplay, switchMap, tap} from "rxjs/operators";
 import {AtomizedDocument} from "../../../../server/src/shared/tabulate-documents/atomized-document";
-import {Segment} from "../../../../server/src/shared/tabulate-documents/segment";
+import {Segment} from "../../../../server/src/shared/tabulate-documents/segment/segment";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {QUIZ_NODE, READING_NODE} from "@shared/";
 
