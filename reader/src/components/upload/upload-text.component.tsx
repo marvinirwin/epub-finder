@@ -24,16 +24,21 @@ export const UploadText = () => {
             rows={10}
             onChange={v => setText(v.target.value || '')}
             value={text}
+            placeholder={'Put what you want to read here'}
             id={uploadTextArea}
         /></Box>
         <Box m={2} p={1}> <Button
             color={'primary'}
             variant={'contained'}
             onClick={
-                () => m
-                    .droppedFilesService
-                    .uploadFileRequests$
-                    .next([new File([text], `${title}.txt`)])
+                () => {
+                    m
+                        .droppedFilesService
+                        .uploadFileRequests$
+                        .next([new File([text], `${title}.txt`)]);
+                    setTitle('');
+                    setText('');
+                }
             }
             id={uploadTextButton}>
             Use as Learning Material
