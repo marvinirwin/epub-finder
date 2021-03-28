@@ -10,9 +10,10 @@ export const UploadText = () => {
     return <Box m={2} style={{display: 'flex', flexFlow: 'column nowrap'}}>
         <Box m={2} p={1}>
             <TextField
+                label={'Label'}
                 value={title}
                 onChange={v => setTitle(v.target.value || '')}
-                placeholder={'name'}
+                placeholder={'Label'}
                 variant={'filled'}
                 inputProps={{id: uploadTextName}}
             />
@@ -24,7 +25,8 @@ export const UploadText = () => {
             rows={10}
             onChange={v => setText(v.target.value || '')}
             value={text}
-            placeholder={'Put what you want to read here'}
+            label={'Learning Material'}
+            placeholder={'Learning Material'}
             id={uploadTextArea}
         /></Box>
         <Box m={2} p={1}> <Button
