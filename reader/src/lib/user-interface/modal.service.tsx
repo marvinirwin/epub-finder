@@ -1,5 +1,4 @@
 import React, {useContext} from "react";
-import {FileChooser} from "../../components/app-directory/upload.component";
 import {LanguageSelect} from "../../components/app-directory/nodes/language-select.component";
 import {ToggleTranslateComponent} from "../../components/settings/toggle-translate.component";
 import {TogglePinyinComponent} from "../../components/settings/toggle-pinyin.component";
@@ -18,6 +17,7 @@ import {ManagerContext} from "../../App";
 import {HotkeyConfig} from "../../components/hotkeys/HotkeyConfig";
 import {QuizScheduleOverView} from "../quiz/quiz-schedule-over-view.component";
 import { Intro } from "../../components/intro/intro.component";
+import {UploadDialog} from "../../components/upload/upload-dialog";
 
 export class ModalService {
     public languageSelect: NavModal;
@@ -36,7 +36,7 @@ export class ModalService {
         )
         this.fileUpload = new NavModal(
             'fileUpload',
-            () => <FileChooser/>
+            () => <UploadDialog/>
         );
         this.languageSelect = new NavModal(
             'spokenLanguage',

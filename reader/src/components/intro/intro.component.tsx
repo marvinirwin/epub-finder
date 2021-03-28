@@ -5,10 +5,8 @@ import React, {useContext} from "react";
 import {LanguageSelect} from "../app-directory/nodes/language-select.component";
 import {SetQuizWordLimit} from "../settings/set-new-quiz-word-limit";
 import {introAddLearningMaterial, introLanguageSelect, introSetCardLimit} from "@shared/";
+import {UploadText} from "../upload/upload-text.component";
 
-function AddLearningMaterial() {
-    return null;
-}
 
 export const Intro = () => {
     const m = useContext(ManagerContext);
@@ -23,11 +21,11 @@ export const Intro = () => {
             }
         ;
         return <Box m={2} p={1}>
-            <Button onClick={onClick}>
-            {
-                isLastTab ? `Finish` : 'Next'
-            }
-        </Button>
+            <Button onClick={onClick} variant={'contained'}>
+                {
+                    isLastTab ? `Finish` : 'Next'
+                }
+            </Button>
         </Box>
     }
     const steps = [
@@ -35,7 +33,7 @@ export const Intro = () => {
             Component: () => {
                 return <Container id={introLanguageSelect} style={{flex: 1}}>
                     <Paper>
-                        <Box m={4}>
+                        <Box m={4} p={1}>
                             <Typography variant={'h4'}>What language would you like to learn?</Typography>
                             <LanguageSelect/>
                             <NextButton/>
@@ -47,10 +45,10 @@ export const Intro = () => {
         {
             Component: () => {
                 return <Container id={introAddLearningMaterial} style={{flex: 1}}>
-                    <Paper elevation={24}>
-                        <Box m={2}>
-                            <Typography>Copy and paste your learning material here</Typography>
-                            <AddLearningMaterial/>
+                    <Paper>
+                        <Box m={2} p={1}>
+                            <Typography variant={'h4'}>Copy and paste your learning material here</Typography>
+                            <UploadText/>
                             <NextButton/>
                         </Box>
                     </Paper>
