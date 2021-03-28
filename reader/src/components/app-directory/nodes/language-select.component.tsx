@@ -14,10 +14,10 @@ export const LanguageSelect = () => {
         <Box m={2}>
             <InputLabel id="reading-language-select-label">Script</InputLabel>
             <Select
+                variant={'filled'}
                 labelId="reading-language-select-label"
                 value={readingLanguageCode}
                 onChange={e => m.settingsService.readingLanguage$.next(e.target.value as string)}
-                style={{margin: '24px'}}
                 inputProps={{
                     className: readingLanguageSelect
                 }}
@@ -32,9 +32,9 @@ export const LanguageSelect = () => {
         <Box m={2}>
             <InputLabel id="spoken-language-select-label">Spoken Language</InputLabel>
             <Select
+                variant={'filled'}
                 labelId="spoken-language-select-label"
                 value={spokenLanguageCode}
-                style={{margin: '24px'}}
                 onChange={e => m.settingsService.spokenLanguage$.next(e.target.value as string)}
                 inputProps={{
                     className: spokenLanguageSelect

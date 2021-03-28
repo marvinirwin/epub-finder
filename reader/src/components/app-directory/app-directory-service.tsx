@@ -49,7 +49,9 @@ export function AppDirectory(
 /*
             ProgressNode,
 */
+/*
             SpeechPracticeNode,
+*/
         ] as ArrayToTreeParams<TreeMenuNode>
     );
 }

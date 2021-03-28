@@ -11,7 +11,7 @@ export const QuizCardTableToolbar = () => {
     const showUnderDue = useObservableState(m.settingsService.scheduleTableShowUnderDue$) || false;
     return <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
         <Typography variant="h6" component="div">
-            Quiz Schedule
+            Progress
         </Typography>
         <FormControlLabel
             control={
