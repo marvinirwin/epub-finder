@@ -11,7 +11,7 @@ export const QuizScheduleOverView = () => {
     const quizSchedule = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$);
     const rowsUnStarted = quizSchedule?.unStartedWords || []
     const rowsInProgress = quizSchedule?.wordsReviewingOrLearning || [];
-    const rowsFinished = quizSchedule?.wordsLearnedToday || [];
+    const wordsLearnedToday = quizSchedule?.wordsLearnedToday || [];
     return <Paper style={{height: '90vh', width: '90vw', display: 'flex', flexFlow: 'row wrap'}}>
             <TableContainer component={Paper} style={{width: '50%'}}>
                 <Typography style={{margin: '24px'}} variant={'h6'}>New words to learn</Typography>
@@ -37,7 +37,7 @@ export const QuizScheduleOverView = () => {
                 <Table size="small" id={quizRowsFinishedTodayTable}>
                     <QuizCardTableHead/>
                     <TableBody>
-                        {rowsFinished.slice(0, 100).map(row => <QuizCardTableRow row={row} key={row.d.word}/>)}
+                        {wordsLearnedToday.slice(0, 100).map(row => <QuizCardTableRow row={row} key={row.d.word}/>)}
                     </TableBody>
                 </Table>
             </TableContainer>

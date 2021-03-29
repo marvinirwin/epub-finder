@@ -13,7 +13,7 @@ export const tabulate = (
     {
         notableCharacterSequences,
         segments,
-        greedyWordSet
+        greedyWordSet,
     }: TabulationParameters
 ): TabulatedSegments => {
     const tabulationObject = tabulationFactory();
