@@ -6,10 +6,15 @@ import {XMLDocumentNode} from "../XMLDocumentNode";
 
 export type TabulationParameters =  {
     segments: Segment[],
-} & TabulationConfiguration
+} & TabulationConfiguration;
+
+export type WordIdentifyingStrategy = "noSeparator" | "punctuationSeparator"
 export interface TabulationConfiguration {
     notableCharacterSequences: SetWithUniqueLengths,
-    greedyWordSet: SetWithUniqueLengths
+    greedyWordSet: SetWithUniqueLengths,
+    isNotableCharacterRegex: RegExp;
+    isWordBoundaryRegex: RegExp;
+    wordIdentifyingStrategy: WordIdentifyingStrategy
 }
 
 export interface WordCountRecord {

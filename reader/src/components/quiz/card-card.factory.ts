@@ -65,7 +65,7 @@ export const wordCardFactory = (
             shareReplay(1)
         ),
         translation$: combineLatest([
-            languageConfigsService.learningToKnownTranslateConfig,
+            languageConfigsService.learningToKnownTranslateConfig$,
             currentWord$
         ]).pipe(
             switchMap(

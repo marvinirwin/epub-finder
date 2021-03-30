@@ -6,7 +6,7 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 import {DocumentRepository} from "../documents/document.repository";
 import {FrequencyDocument} from "../documents/frequency-documents";
-import {TabulationConfigurationService} from "./tabulation-configuration.service";
+import {TabulationConfigurationService} from "./language-maps/tabulation-configuration.service";
 
 export class VocabService {
     vocab$: Observable<SerializedTabulation>;

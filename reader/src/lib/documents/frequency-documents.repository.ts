@@ -6,7 +6,7 @@ import {map, shareReplay, switchMap} from "rxjs/operators";
 import {SettingsService} from "../../services/settings.service";
 import {TabulatedFrequencyDocument} from "../learning-tree/tabulated-frequency-document";
 import {DocumentRepository} from "./document.repository";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 
 export const tabulateFrequencyDocuments =
     (frequencyDocuments$: Observable<FrequencyDocument[]>):

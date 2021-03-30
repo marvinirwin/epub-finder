@@ -18,7 +18,7 @@ import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabul
 import {mergeTabulations} from "../util/merge-tabulations";
 import {LanguageConfigsService} from "../language/language-configs.service";
 import {BrowserSegment} from "../sentences/browser-segment";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 import {OnSelectService} from "../user-interface/on-select.service";
 
 export type TrieObservable = Observable<TrieWrapper>;

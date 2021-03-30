@@ -12,7 +12,7 @@ import {hiddenDefinition, hiddenLearningLanguage} from "../../lib/quiz/hidden-qu
 import {SettingsService} from "../../services/settings.service";
 import {SortedLimitScheduleRowsService} from "../../lib/manager/sorted-limit-schedule-rows.service";
 import {wordCardFactory} from "./card-card.factory";
-import {TabulationConfigurationService} from "../../lib/language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../../lib/language/language-maps/tabulation-configuration.service";
 import {sumWordCountRecords} from "../../lib/schedule/schedule-math.service";
 import {TranslationAttemptScheduleService} from "../../lib/schedule/translation-attempt-schedule.service";
 import {OnSelectService} from "../../lib/user-interface/on-select.service";

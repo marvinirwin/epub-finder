@@ -25,7 +25,7 @@ export class OnSelectService {
         this.generalToastMessageService = generalToastMessageService
         this.selectedText$.pipe(
             distinctUntilChanged(),
-            withLatestFrom(languageConfigsService.learningToKnownTranslateConfig)
+            withLatestFrom(languageConfigsService.learningToKnownTranslateConfig$)
         ).subscribe(async ([str, translateConfig]) => {
             if (str && translateConfig) {
                 const translation = await fetchTranslation({...translateConfig, text: str});

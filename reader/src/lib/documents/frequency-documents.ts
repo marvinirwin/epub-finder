@@ -4,7 +4,7 @@ import {LtDocument, SerializedTabulation} from "@shared/";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 import {TabulateRemoteDocument} from "../Workers/worker.helpers";
 import {map, shareReplay, switchMap} from "rxjs/operators";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 
 export class FrequencyDocument {
     progress$: Observable<DocumentReadabilityProgress>;

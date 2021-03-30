@@ -1,4 +1,5 @@
 import {ICard} from "../ICard";
+import {chineseCharacterRegexp} from "../../../../reader/src/lib/language/language-maps/word-separator";
 
 
 export class Card {
@@ -66,7 +67,6 @@ export interface SerializedCard {
 }
 
 
-const chineseCharacterRegexp = /[\u4E00-\uFA29]/;
 // Dont know if this matches simplified or traditional
 export function isChineseCharacter(s: string) {
     return s.match(chineseCharacterRegexp);

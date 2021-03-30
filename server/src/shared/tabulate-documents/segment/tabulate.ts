@@ -4,20 +4,28 @@ import {XMLDocumentNode} from "../../XMLDocumentNode";
 import {flatten, maxBy, uniq} from "lodash";
 import {IWordInProgress} from "../../Annotation/IWordInProgress";
 import {safePush, safePushMap} from "../../safe-push";
-import {isChineseCharacter} from "../../OldAnkiClasses/Card";
 import {IPositionedWord} from "../../Annotation/IPositionedWord";
 import {AtomMetadata} from "../../atom-metadata.interface.ts/atom-metadata";
 import {Segment} from "./segment";
+
+const rehydrateRegex = (str: string) => {
+    const [_, pattern, flags] = str.match(/\/(.*?)\/([a-z]*)?$/i);
+    return new RegExp(pattern.replace("\\", "\\\\"), flags || '');
+}
 
 export const tabulate = (
     {
         notableCharacterSequences,
         segments,
         greedyWordSet,
+        isNotableCharacterRegex,
+        wordIdentifyingStrategy,
+        isWordBoundaryRegex
     }: TabulationParameters
 ): TabulatedSegments => {
     const tabulationObject = tabulationFactory();
     const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
+    const isNotableCharacter = (character: string) => isNotableCharacterRegex.test(character);
     const {
         greedyWordCounts,
         wordSegmentMap,
@@ -41,6 +49,7 @@ export const tabulate = (
     let currentSerialzedSegment;
     for (let i = 0; i < characterElements.length; i++) {
         const currentMark = characterElements[i];
+        const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
             currentSegment = elementSegmentMap.get(currentMark);
             segmentIndex++;
@@ -68,31 +77,6 @@ export const tabulate = (
             w.lengthRemaining--;
             return w;
         }).filter(w => w.lengthRemaining > 0);
-        /**
-         * One thing I could do which would be easy is to take the largest word in progress at any point
-         * However, then I would have a hard time knowing when to end the word
-         * How did I do this before?
-         * I don't think I did it before, I think just I ignored all 1 character words if they were in progress
-         * Can't I still do that?
-         *
-         * The easiest thing to visualize is getting to a character and then finding the largest word which starts where
-         * Then add 1 to the count, and wait until that word expires before picking a new one
-         * I'll have to store the start position so I know when it ends
-         *
-         * What's the algorithmic alternative to the greedy version above?
-         * I could do what I did before and ignore one-character words, but that would generate an un-intuitive count
-         *
-         * I could also ignore words which are subsumed by other words, but obtain words which span two "greedy" words
-         * For the "ignore-subsumed" approach I'll still have to calculate the max word in progress, so I should just do max word
-         *
-         * Would I be able to calculate these "maxWords", just by looking at each character?
-         * I would take each character's maxWord, and then adjust the count when the maxWord changes
-         * However, if there were two of the same maxWord in a row this would fail
-         *
-         * Alright, I'll do greedy for now
-         *
-         * I should have written tests for this
-         */
         const potentialNotableSequences = uniq(uniqueLengths.map(size => textContent.substr(i, size)));
         const notableSequencesWhichStartHere: string[] = potentialNotableSequences.reduce((acc: string[], potentialWord) => {
             if (notableCharacterSequences.has(potentialWord)) {
@@ -103,13 +87,21 @@ export const tabulate = (
         }, []);
 
         /**
-         * If there is a character here which isn't part of a word, add it to the counts
-         * If this was a letter based language we would add unidentified words, but for character based languages
-         * A single character is a word
+         * If there's nothing in progress, add this word as a notable subsequence if it fits the bill
          */
-        const currentCharacter = textContent[i];
-        if ((notableSequencesWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0) && isChineseCharacter(currentCharacter)) {
-            notableSequencesWhichStartHere.push(currentCharacter);
+        let b = isNotableCharacter(currentCharacter);
+        if ((notableSequencesWhichStartHere.length === 0 && notableSubsequencesInProgress.length === 0)
+            && b) {
+            switch (wordIdentifyingStrategy) {
+                case "noSeparator":
+                    notableSequencesWhichStartHere.push(currentCharacter);
+                    break;
+                case "punctuationSeparator":
+                    // Go until the next space or punctuation
+                    const wordEnd = textContent.substr(i).split(isWordBoundaryRegex)[0];
+                    notableSequencesWhichStartHere.push(wordEnd);
+                    break;
+            }
         }
 
         notableSequencesWhichStartHere.forEach(wordStartingHere => {

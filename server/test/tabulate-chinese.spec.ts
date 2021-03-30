@@ -7,57 +7,58 @@ import {DocumentView} from "../src/entities/document-view.entity";
 import {User} from "../src/entities/user.entity";
 import {DatabaseModule} from "../src/config/database.module";
 import {wordsFromCountRecordList} from "../src/shared/tabulation/word-count-records.module";
-import {AtomizedDocument, InterpolateService, Segment, tabulate} from "../src/shared";
+import {AtomizedDocument, InterpolateService, tabulate} from "../src/shared";
 import {ChineseVocabService} from "../src/shared/tabulate-documents/chinese-vocab.service";
 import {SetWithUniqueLengths} from "../src/shared/tabulate-documents/set-with-unique-lengths";
+import {chineseCharacterRegexp} from "../src/shared/OldAnkiClasses/Card";
 
-async function tabulateHtml3(tabulateService: TabulateService) {
-    return await tabulateService.tabulateNoCache(
-        {where: {name: "Test Html 3 Sentences"}},
-        [
-            '你好',
-            '你',
-            '好',
-            '今',
-            '天',
-            '今天',
-            '之',
-            '所以',
-            '所',
-            '以',
-            '搞出',
-            '出',
-            '搞',
-            '这么多',
-            '大',
-            '内乱',
-            '内',
-            '乱',
-            '原因',
-            '主要',
-            '主',
-            '要',
-            '这几点',
-            '这',
-            '几点',
-        ]
-    );
-}
+const tabulateHtml3 = async (tabulateService: TabulateService) => await tabulateService.tabulateNoCache(
+    {where: {name: "Test Html 3 Sentences"}},
+    [
+        '你好',
+        '你',
+        '好',
+        '今',
+        '天',
+        '今天',
+        '之',
+        '所以',
+        '所',
+        '以',
+        '搞出',
+        '出',
+        '搞',
+        '这么多',
+        '大',
+        '内乱',
+        '内',
+        '乱',
+        '原因',
+        '主要',
+        '主',
+        '要',
+        '这几点',
+        '这',
+        '几点',
+    ]
+);
 
-async function tabulateChineseSentence(让安禄山兼任平卢范阳河东三镇节度使就属于唐玄宗制度上的错误: string) {
+async function tabulateChineseSentence(chineseSegment: string) {
     const chineseVocabSet = new SetWithUniqueLengths(await ChineseVocabService.vocab());
-    const tabulation = tabulate(
+    return tabulate(
         {
             notableCharacterSequences: chineseVocabSet,
             segments: AtomizedDocument.atomizeDocument(
                 InterpolateService.sentences([
-                    让安禄山兼任平卢范阳河东三镇节度使就属于唐玄宗制度上的错误
+                    chineseSegment
                 ])
             ).segments(),
-            greedyWordSet: chineseVocabSet
+            greedyWordSet: chineseVocabSet,
+            isNotableCharacterRegexString: chineseCharacterRegexp.toString(),
+            isWordBoundaryRegexString: "//",
+            wordIdentifyingStrategy: undefined
         }
     );
-    return tabulation;
 }
 
 describe('document tabulation', () => {
@@ -117,11 +118,13 @@ describe('document tabulation', () => {
     });
     it('tabulates sentences with vocab' ,async () => {
         const tabulation3 = await tabulateChineseSentence("楚文王在鬻拳的苦谏下，决定放蔡哀侯归国。");
+        // @ts-ignore
         expect([...tabulation3.segmentWordCountRecordsMap.values()][0]) .toHaveLength(26);
         const tabulation = await tabulateChineseSentence("让安禄山兼任平卢、范阳、河东三镇节度使，就属于 唐玄宗制度上的错误。");
         // @ts-ignore
         expect([...tabulation.segmentWordCountRecordsMap.values()][0]) .toHaveLength(26);
         const tabulation2 = await tabulateChineseSentence("陛下为何要爱惜此人，而亏损王法呢");
+        // @ts-ignore
         expect([...tabulation2.segmentWordCountRecordsMap.values()][0]) .toHaveLength(13);
     })
 })

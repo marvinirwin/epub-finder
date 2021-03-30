@@ -6,7 +6,7 @@ import {SettingsService} from "../../services/settings.service";
 import {OpenDocumentsService, READING_DOCUMENT_NODE_LABEL, TrieObservable} from "./open-documents.service";
 import {OpenDocument} from "../document-frame/open-document.entity";
 import {LanguageConfigsService} from "../language/language-configs.service";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 import {OnSelectService} from "../user-interface/on-select.service";
 
 export class ReadingDocumentService {

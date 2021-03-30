@@ -90,7 +90,7 @@ import {WordCardModalService} from "../word-card/word-card-modal.service";
 import {LoadingMessagesService} from "../loading/loading-messages.service";
 import {NotableSubsequencesService} from "../sentences/notable-subsequences.service";
 import {WordsService} from "../language/words.service";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 import {TranslationAttemptScheduleService} from "../schedule/translation-attempt-schedule.service";
 import {TranslationAttemptRepository} from "../schedule/translation-attempt.repository";
 import {QuizScheduleRowData} from "../schedule/schedule-row";

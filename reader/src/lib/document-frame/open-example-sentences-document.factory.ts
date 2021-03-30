@@ -7,7 +7,7 @@ import {DocumentSourcesService} from "./document-sources.service";
 import {OpenDocument} from "./open-document.entity";
 import {SettingsService} from "../../services/settings.service";
 import {LanguageConfigsService} from "../language/language-configs.service";
-import {TabulationConfigurationService} from "../language/tabulation-configuration.service";
+import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 import {OnSelectService} from "../user-interface/on-select.service";
 
 

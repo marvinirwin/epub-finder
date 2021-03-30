@@ -43,7 +43,7 @@ export class TranslationAttemptService {
         );
         this.currentTranslation$ = combineLatest([
             this.currentLearningLanguage$,
-            languageConfigsService.learningToKnownTranslateConfig
+            languageConfigsService.learningToKnownTranslateConfig$
         ]).pipe(
             switchMap(([currentTranslatableWord, learningToKnownTranslationConfig]) => {
                 return (learningToKnownTranslationConfig && currentTranslatableWord) ?

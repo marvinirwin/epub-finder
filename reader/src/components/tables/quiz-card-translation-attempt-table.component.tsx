@@ -10,7 +10,7 @@ import {ScheduleRow} from "../../lib/schedule/schedule-row";
 
 export const useTranslation = (segmentText: string | undefined) => {
     const m = useContext(ManagerContext);
-    const languageConfig = useObservableState(m.languageConfigsService.learningToKnownTranslateConfig);
+    const languageConfig = useObservableState(m.languageConfigsService.learningToKnownTranslateConfig$);
     const { cancellablePromise } = useCancellablePromise();
     const [translation, setTranslation] = useState('');
     useEffect(() => {
