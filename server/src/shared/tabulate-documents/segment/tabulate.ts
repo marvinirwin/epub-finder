@@ -38,7 +38,12 @@ export const tabulate = (
     const characterElements = flatten(segments.map(segment => {
         segment.children.forEach(node => elementSegmentMap.set(node, segment));
         return segment.children;
-    })).filter(n => (n.textContent).trim());
+    })).filter(n => {
+        if (wordIdentifyingStrategy === 'noSeparator') {
+            return (n.textContent).trim();
+        }
+        return n.textContent;
+    });
     const uniqueLengths = uniq(Array.from(notableCharacterSequences.uniqueLengths).concat(1));
     const textContent = characterElements.map(node => node.textContent).join('');
     let notableSubsequencesInProgress: IWordInProgress[] = [];
@@ -98,7 +103,8 @@ export const tabulate = (
                     break;
                 case "punctuationSeparator":
                     // Go until the next space or punctuation
-                    const wordEnd = textContent.substr(i).split(isWordBoundaryRegex)[0];
+                    let strings = textContent.substr(i).split(isWordBoundaryRegex);
+                    const wordEnd = strings[0];
                     notableSequencesWhichStartHere.push(wordEnd);
                     break;
             }
