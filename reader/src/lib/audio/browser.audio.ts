@@ -37,16 +37,17 @@ export class BrowserAudio implements AudioSource {
             )
         }
 
+        navigator.mediaDevices.getUserMedia({
+            audio: true,
+        }).then(mediaStream => this.microphone$.next(mediaStream))
+
+
         this.beginRecordingSignal$
-            .pipe(withLatestFrom(this.learningToKnownSpeech$))
-            .subscribe(async ([_, lang]) => {
+            .pipe(withLatestFrom(this.learningToKnownSpeech$, this.microphone$))
+            .subscribe(async ([_, lang, mediaStream]) => {
                 if (!lang) {
                     return
                 }
-                const mediaStream = await navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                })
-                this.microphone$.next(mediaStream)
                 const audioConfig = AudioConfig.fromMicrophoneInput(
                     mediaStream.id,
                 )
