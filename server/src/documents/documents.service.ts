@@ -26,15 +26,15 @@ export class DocumentsService {
 
     async allDocuments({
         user,
-        for_testing,
+        condition
     }: {
         user?: User | undefined
-        for_testing?: boolean
+        condition: Partial<DocumentView>
     }): Promise<DocumentView[]> {
         return await this.documentViewRepository.find({
             where: [
-                { creator_id: user?.id, deleted: false, for_testing },
-                { global: true, deleted: false, for_testing },
+                { creator_id: user?.id, deleted: false, ...condition},
+                { global: true, deleted: false, ...condition },
             ],
         })
     }

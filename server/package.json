@@ -9,11 +9,12 @@
     "author": "Bowden Kelly",
     "license": "MIT",
     "scripts": {
-        "start": "nest start -p tsconfig.json",
-        "build": "nest build -p tsconfig.json",
+        "start": "nest start -p tsconfig.json dist/server/src/main.js",
+        "build": "nest build -p tsconfig.json dist/server/src/main.js",
         "watch": "nest start --watch -p tsconfig.json",
         "test": "jest ",
-        "lint-fix": "prettier --write ."
+        "lint-fix": "prettier --write .",
+        "nest-help": "nest --help"
     },
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",

@@ -6,7 +6,7 @@ import { AtomizedDocument, SerializedTabulation, tabulate } from '../../shared'
 import { CacheService } from '../../util/cache.service'
 import { Inject } from '@nestjs/common'
 import { SetWithUniqueLengths } from '../../shared/tabulate-documents/set-with-unique-lengths'
-import { resolvePartialTabulationConfig } from '../../../../reader/src/lib/language/language-maps/word-separator'
+import { resolvePartialTabulationConfig } from '../../shared/tabulation/word-separator'
 
 export class TabulateService {
     constructor(

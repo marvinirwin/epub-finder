@@ -3,7 +3,6 @@ import { Document, documentRootId } from '../entities/document.entity'
 import {
     Body,
     Controller,
-    Delete,
     Get,
     Header,
     Headers,
@@ -13,6 +12,7 @@ import {
     Param,
     Post,
     Put,
+    Query,
     Res,
     UploadedFile,
     UseGuards,
@@ -21,19 +21,16 @@ import {
 import { DocumentsService } from './documents.service'
 import { UserFromReq } from '../decorators/userFromReq'
 import { User } from '../entities/user.entity'
-import { LoggedInGuard } from '../guards/logged-in.guard'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { HashService } from './uploading/hash.service'
 import multerS3 from 'multer-s3'
 import { v4 as uuidv4 } from 'uuid'
-import { s3ReadStream, s3 } from './uploading/s3.service'
+import { s3, s3ReadStream } from './uploading/s3.service'
 import { AnonymousGuard } from '../guards/anonymous.guard'
 import { DocumentViewDto } from './document-view.dto'
 import { S3UploadedFile, UploadOutput } from './uploading/s3-uploaded-file'
 import { RevisionUpdater } from '../revision-updater'
-import { DocumentView } from '../entities/document-view.entity'
 import { DocumentUpdateDto } from './document-update.dto'
-import { LtDocument } from '../shared'
 import { ltDocId } from '../shared/lt-document'
 
 @Controller('documents')
@@ -41,16 +38,21 @@ export class DocumentsController {
     constructor(
         private documentsService: DocumentsService,
         private uploadedFileService: HashService,
-    ) {}
+    ) {
+    }
 
     @Get('')
     async all(
         @UserFromReq() user: User | undefined,
         @Headers('is_test') is_test: string,
+        @Query('language_code') language_code: string,
     ) {
         return this.documentsService.allDocuments({
             user,
-            for_testing: !!is_test,
+            condition: {
+                for_testing: !!is_test,
+                language_code,
+            },
         })
     }
 
@@ -78,7 +80,7 @@ export class DocumentsController {
     )
     async upload(
         @UploadedFile()
-        file: {
+            file: {
             originalname: string
             bucket: string
             key: string
@@ -86,6 +88,7 @@ export class DocumentsController {
         },
         @UserFromReq() user: User,
         @Headers('document_id') document_id: string | undefined,
+        @Headers('language_code') language_code: string,
         @Headers('sandbox_file') sandbox_file: string | undefined,
     ): Promise<DocumentViewDto> {
         console.log(`Uploaded ${file.originalname} to S3 ${file.key}`)
@@ -100,18 +103,6 @@ export class DocumentsController {
                 name,
                 output.index().s3Key,
                 document_id,
-            )
-        }
-        const existingDocumentWithSameName = await this.documentsService.byName(
-            name,
-            user,
-        )
-        if (existingDocumentWithSameName) {
-            return this.documentsService.saveRevision(
-                user,
-                name,
-                output.index().s3Key,
-                documentRootId(existingDocumentWithSameName),
             )
         }
         const savedDocument = await this.documentsService.saveNew(

@@ -18,7 +18,7 @@ import { LanguageConfigsService } from '../language/language-configs.service'
 import { isLoading } from '../util/is-loading'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
-import { resolvePartialTabulationConfig } from '../language/language-maps/word-separator'
+import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
 export class OpenDocument {
     public name: string

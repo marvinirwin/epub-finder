@@ -6,4 +6,5 @@ export interface DocumentUpdateDto extends Partial<Document> {
     global: boolean
     id: string
     deleted: boolean
+    language_code: string
 }

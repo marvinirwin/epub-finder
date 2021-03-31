@@ -7,12 +7,14 @@ import {
     PrimaryColumn,
     PrimaryGeneratedColumn,
 } from 'typeorm'
-import { DocumentClassifierEndpointArn } from 'aws-sdk/clients/comprehend'
 
 @Entity()
 export class Document {
     @PrimaryGeneratedColumn('uuid')
     id: string
+
+    @Column({default: "zh-Hans"})
+    language_code: string
 
     // Used for Groupwise Max
     @Column({ default: null })

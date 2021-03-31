@@ -16,7 +16,7 @@ import {
     SerializedSegment,
     WordCountRecord,
 } from '../../../../server/src/shared/tabulation/tabulate'
-import { resolvePartialTabulationConfig } from '../language/language-maps/word-separator'
+import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
 // @ts-ignore
 self.window = self

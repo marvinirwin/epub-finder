@@ -5,7 +5,7 @@ import { Segment } from './segment/segment'
 import { XMLDocumentNode } from '../XMLDocumentNode'
 import { annotatedAndTranslated } from '../selectors'
 import { InterpolateService } from '../interpolate.service'
-import { sectionBoundaryRegexp } from '../../../../reader/src/lib/language/language-maps/word-separator'
+import { segmentBoundaryRegexp } from '../tabulation/word-separator'
 
 export function createPopperElement(document1: XMLDocument) {
     const popperEl = document1.createElement('div')
@@ -160,7 +160,7 @@ export class AtomizedDocument {
     convertTextNodeToAtomizedSegments(textNode: Element): XMLDocumentNode {
         const text = textNode.nodeValue
         const subSegmentTextList = text
-            .split(sectionBoundaryRegexp)
+            .split(segmentBoundaryRegexp)
             .filter((t) => !!t.trim())
         const newParent = this.document.createElement('span')
         for (let i = 0; i < subSegmentTextList.length; i++) {

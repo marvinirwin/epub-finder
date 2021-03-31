@@ -10,7 +10,7 @@ import {
     languageRegexMap,
     latinCharacterRegexp,
     wordBoundaryRegexp,
-} from '../../reader/src/lib/language/language-maps/word-separator'
+} from '../src/shared/tabulation/word-separator'
 
 const segmentText = (text: string, languageCode: string) => {
     return tabulate({

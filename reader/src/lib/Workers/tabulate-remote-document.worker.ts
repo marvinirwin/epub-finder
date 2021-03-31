@@ -12,7 +12,7 @@ import {
 } from '@shared/'
 import trie from 'trie-prefix-tree'
 import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
-import { resolvePartialTabulationConfig } from '../language/language-maps/word-separator'
+import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
 // @ts-ignore
 self.window = self

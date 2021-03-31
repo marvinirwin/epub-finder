@@ -14,7 +14,7 @@ import { WordCountRecord } from '../../../../server/src/shared/tabulation/tabula
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { resolvePartialTabulationConfig } from '../language/language-maps/word-separator'
+import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: TranslationAttemptRecord[]

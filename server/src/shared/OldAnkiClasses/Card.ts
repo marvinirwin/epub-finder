@@ -1,5 +1,5 @@
 import { ICard } from '../ICard'
-import { chineseCharacterRegexp } from '../../../../reader/src/lib/language/language-maps/word-separator'
+import { chineseCharacterRegexp } from '../tabulation/word-separator'
 
 export class Card {
     frontPhotos: string[]

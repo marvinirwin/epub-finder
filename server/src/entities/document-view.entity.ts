@@ -21,7 +21,8 @@ import { User } from './user.entity'
         b.hash,
         b.for_testing,
         b.for_frequency,
-        b.for_reading
+        b.for_reading,
+        b.language_code
     FROM document b
     LEFT JOIN document document_max 
         ON document_max.created_at > b.created_at
@@ -59,12 +60,15 @@ export class DocumentView {
     @ViewColumn()
     deleted: boolean
 
-    @Column()
+    @ViewColumn()
     for_testing: boolean
 
-    @Column()
+    @ViewColumn()
     for_frequency: boolean
 
-    @Column()
+    @ViewColumn()
     for_reading: boolean
+
+    @ViewColumn()
+    language_code: string;
 }

@@ -45,6 +45,7 @@ export class BuiltInDocument {
             global: !!this.config.global,
             for_testing: !!this.config.for_testing,
             for_frequency: !!this.config.for_frequency,
+            language_code: 'zh-Hans'
         })
         if (exactlyTheSameVersion) {
             return

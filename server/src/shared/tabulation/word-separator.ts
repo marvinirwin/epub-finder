@@ -1,5 +1,5 @@
 import { flatten } from 'lodash'
-import { WordIdentifyingStrategy } from '../../../../../server/src/shared/tabulation/tabulate'
+import { WordIdentifyingStrategy } from './tabulate'
 
 export type LanguageCode = string
 
@@ -32,8 +32,8 @@ export const koreanRegexp = /\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7F
  * https://en.wikipedia.org/wiki/English_punctuation#Usage_of_different_punctuation_marks_or_symbols
  * https://en.wikipedia.org/wiki/Chinese_punctuation
  */
-export const wordBoundaryRegexp = /[\W.,"'–?:!;，！？；：（ ）［］【】。「」﹁﹂""、‧《》〈〉]/
-export const sectionBoundaryRegexp = /[.,"'–?:!;，！？；：（ ）［］【】。「」﹁﹂、‧《》〈〉]/
+export const wordBoundaryRegexp = /[\W.,"'–?:!;，！？；：（）［］【】。「」﹁﹂、‧《》〈〉]/
+export const segmentBoundaryRegexp = /[.,“”"‘’'–?:!;，！？；：（）［］【】。「」﹁﹂、‧《》〈〉]/
 export const LanguageSeparatorStrategy: {
     languages: LanguageCode[]
     strategy?: WordIdentifyingStrategy
