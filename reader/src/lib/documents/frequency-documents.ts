@@ -20,7 +20,8 @@ export class FrequencyDocument {
                 {
                     words: [...config.greedyWordSet.values()],
                     d: frequencyDocument.d,
-                    notableSubsequences: [...config.notableCharacterSequences.values()]
+                    notableSubsequences: [...config.notableCharacterSequences.values()],
+                    languageCode: config.languageCode
                 }
             )),
             shareReplay(1)

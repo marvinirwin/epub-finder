@@ -1,12 +1,13 @@
 import {SerializedTabulation} from "@shared/";
 import {combineLatest, Observable} from "rxjs";
 import {SettingsService} from "../../services/settings.service";
-import {FrequencyDocumentsRepository, tabulateFrequencyDocuments} from "../documents/frequency-documents.repository";
+import {tabulateFrequencyDocuments} from "../documents/frequency-documents.repository";
 import {map, shareReplay, switchMap} from "rxjs/operators";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 import {DocumentRepository} from "../documents/document.repository";
 import {FrequencyDocument} from "../documents/frequency-documents";
 import {TabulationConfigurationService} from "./language-maps/tabulation-configuration.service";
+import {TimeService} from "../time/time.service";
 
 export class VocabService {
     vocab$: Observable<SerializedTabulation>;
@@ -16,12 +17,14 @@ export class VocabService {
             settingsService,
             documentRepository,
             quizCardScheduleRowsService,
-            tabulationConfigurationService
+            tabulationConfigurationService,
+            timeService
         }: {
             settingsService: SettingsService,
             documentRepository: DocumentRepository,
             quizCardScheduleRowsService: QuizCardScheduleRowsService,
-            tabulationConfigurationService: TabulationConfigurationService
+            tabulationConfigurationService: TabulationConfigurationService,
+            timeService: TimeService
         }
     ) {
         const observable = combineLatest([
@@ -49,16 +52,18 @@ export class VocabService {
         this.vocab$ = combineLatest(
             [
                 tabulateFrequencyDocuments(observable),
-                quizCardScheduleRowsService.indexedScheduleRows$
+                quizCardScheduleRowsService.indexedScheduleRows$,
+                timeService.quizNow$
             ]
         ).pipe(
             map(([
                      [selectedTabulation],
-                     indexedScheduleRows
+                     indexedScheduleRows,
+                now
                  ]) => {
                 if (!selectedTabulation) {
                     const knownWordEntries: [string, number][] = Object.values(indexedScheduleRows)
-                        .filter(row => row.isSomewhatRecognized() || row.isRecognized())
+                        .filter(row => row.isSomewhatRecognized({now}) || row.isRecognized())
                         .map(row => [row.d.word, 1]);
                     return {
                         wordCounts: Object.fromEntries(

@@ -14,6 +14,7 @@ import {OpenDocumentsService} from "../manager/open-documents.service";
 import {TranslationAttemptService} from "../../components/translation-attempt/translation-attempt.service";
 import {SelectedVirtualTabulationsService} from "../manager/selected-virtual-tabulations.service";
 import {SerializedTabulationAggregate} from "../../../../server/src/shared/tabulation/serialized-tabulation.aggregate";
+import {TimeService} from "../time/time.service";
 
 export class QuizCardScheduleRowsService {
     public indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<NormalizedQuizCardScheduleRowData>>>;
@@ -27,7 +28,8 @@ export class QuizCardScheduleRowsService {
                     settingsService,
                     allWordsRepository,
                     translationAttemptService,
-                    selectedVirtualTabulationsService
+                    selectedVirtualTabulationsService,
+                    timeService
                 }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>,
         pronunciationProgressService: PronunciationProgressRepository
@@ -37,7 +39,8 @@ export class QuizCardScheduleRowsService {
         settingsService: SettingsService,
         allWordsRepository: AllWordsRepository,
         translationAttemptService: TranslationAttemptService,
-        selectedVirtualTabulationsService: SelectedVirtualTabulationsService
+        selectedVirtualTabulationsService: SelectedVirtualTabulationsService,
+        timeService: TimeService
     }) {
         const progress$ = combineLatest([
             wordRecognitionProgressService.indexOfOrderedRecords$.pipe(startWith({})),
@@ -57,7 +60,8 @@ export class QuizCardScheduleRowsService {
                 settingsService.translationAttemptSentenceWeight$
             ]),
             allWordsRepository.all$,
-            translationAttemptService.currentScheduleRow$
+            translationAttemptService.currentScheduleRow$,
+            timeService.quizNow$
         ]).pipe(
             map(([
                      [wordRecognitionRowIndex, pronunciationRowIndex],

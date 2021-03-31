@@ -95,6 +95,7 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
     const romanization = useObservableState(wordCard.romanization$);
     const translation = useObservableState(wordCard.translation$);
     const description = useObservableState(wordCard.description$.value$);
+    const now = useObservableState(m.timeService.quizNow$) || new Date();
     const sortInfo = scheduleRow?.d?.sortValues;
     return <Paper style={{
         display: 'flex',
@@ -121,7 +122,7 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({wordCard})
             onChange={e => wordCard.description$.set(e.target.value)}
         />
         <Typography variant={'h6'}>Learning: {scheduleRow?.isLearning() ? 'Yes' : 'No'}</Typography>
-        <Typography variant={'h6'}>To review: {scheduleRow?.isToReview() ? 'Yes' : 'No'}</Typography>
+        <Typography variant={'h6'}>To review: {scheduleRow?.isToReview({now}) ? 'Yes' : 'No'}</Typography>
         <Typography variant={'h6'}>Learned Today: {scheduleRow?.wasLearnedToday() ? 'Yes' : 'No'}</Typography>
         <Typography variant={'h6'}>Unstarted: {scheduleRow?.isNotStarted() ? 'Yes' : 'No'}</Typography>
         {

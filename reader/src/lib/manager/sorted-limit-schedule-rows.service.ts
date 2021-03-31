@@ -4,6 +4,7 @@ import {map, shareReplay} from "rxjs/operators";
 import {orderBy} from "lodash";
 import {NormalizedQuizCardScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
+import {TimeService} from "../time/time.service";
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[];
@@ -19,21 +20,24 @@ export class SortedLimitScheduleRowsService {
     constructor(
         {
             settingsService,
-            scheduleService,
+            quizCardScheduleRowsService,
+            timeService
         }: {
 
             settingsService: SettingsService,
-            scheduleService: QuizCardScheduleRowsService,
+            quizCardScheduleRowsService: QuizCardScheduleRowsService,
+            timeService: TimeService
         }
     ) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            scheduleService.indexedScheduleRows$.pipe(map(index => Object.values(index))),
+            quizCardScheduleRowsService.indexedScheduleRows$.pipe(map(index => Object.values(index))),
             settingsService.newQuizWordLimit$,
+            timeService.quizNow$
         ]).pipe(
-            map(([sortedScheduleRows, newQuizWordLimit]) => {
+            map(([sortedScheduleRows, newQuizWordLimit, now]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(row => row.d.count.value > 0);
                 const wordsToReview = sortedScheduleRows.filter(
-                    r => r.isToReview()
+                    r => r.isToReview({ now })
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
                     r => {
@@ -51,8 +55,8 @@ export class SortedLimitScheduleRowsService {
                 /**
                  * The first rows are those which are overdue
                  */
-                const overDue = orderBy([...learning, ...wordsToReview].filter(r => r.isOverDue()), r => r.isOverDue(), 'asc');
-                const notOverDue = orderBy([...learning, ...wordsToReview].filter(r => !r.isOverDue()), r => r.dueDate(), 'asc');
+                const overDue = orderBy([...learning, ...wordsToReview].filter(r => r.isOverDue({now})), r => r.isOverDue({now}), 'asc');
+                const notOverDue = orderBy([...learning, ...wordsToReview].filter(r => !r.isOverDue({now})), r => r.dueDate(), 'asc');
                 /**
                  * The second are those which are overDue and reviewing
                  */

@@ -3,5 +3,6 @@ import {DocumentViewDto} from "../../../../server/src/documents/document-view.dt
 export type TabulateRemoteDocumentDto = {
     notableSubsequences: string[],
     words: string[],
-    d: DocumentViewDto
+    d: DocumentViewDto,
+    languageCode: string
 };

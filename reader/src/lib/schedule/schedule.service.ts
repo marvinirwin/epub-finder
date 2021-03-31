@@ -1,8 +1,9 @@
-import {Observable} from "rxjs";
+import {combineLatest, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
 import {ScheduleRow,} from "./schedule-row";
 import {ScheduleRowsService} from "./schedule-rows-service.interface";
+import {TimeService} from "../time/time.service";
 
 const DAY_IN_MINISECONDS = 24 * 60 * 60 * 1000;
 
@@ -19,15 +20,17 @@ export class ScheduleService<T> {
     cardsLearnedToday$: Observable<ScheduleRow<T>[]>;
 
     constructor({
-                    scheduleRowsService,
+                    quizCardScheduleRowsService,
+        timeService
                 }: {
-        scheduleRowsService: ScheduleRowsService<T>,
+        quizCardScheduleRowsService: ScheduleRowsService<T>,
+        timeService: TimeService
     }) {
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS);
         this.yesterday = this.today - 1;
         this.srmService = new SrmService();
 
-        this.sortedScheduleRows$ = scheduleRowsService.indexedScheduleRows$.pipe(
+        this.sortedScheduleRows$ = quizCardScheduleRowsService.indexedScheduleRows$.pipe(
             // Relying on javascript object value ordering behaviour here, bad idea
             map((rowDict) => Object.values(rowDict) ),
             shareReplay(1)
@@ -45,9 +48,9 @@ export class ScheduleService<T> {
             }),
             shareReplay(1)
         )
-        this.toReviewCards$ = this.sortedScheduleRows$.pipe(
-            map(rows => {
-                return rows.filter(row => row.isToReview());
+        this.toReviewCards$ = combineLatest([this.sortedScheduleRows$, timeService.quizNow$]).pipe(
+            map(([rows, now]) => {
+                return rows.filter(row => row.isToReview({now}));
             }),
             shareReplay(1)
         )

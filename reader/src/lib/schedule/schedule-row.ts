@@ -96,7 +96,7 @@ export class ScheduleRow<T> {
         return this.superMemoRecords[this.superMemoRecords.length - 1]?.grade || 0;
     }
 
-    public isToReview() {
+    public isToReview({now}: { now: Date }) {
         const hasNeverBeenAttempted = this.superMemoRecords.length <= 0;
         if (hasNeverBeenAttempted) {
             return false;
@@ -111,12 +111,12 @@ export class ScheduleRow<T> {
         if (isCurrentlyReviewing) {
             return false
         }
-        return this.isOverDue();
+        return this.isOverDue({now});
     }
 
-    public isOverDue() {
+    public isOverDue({now}: { now: Date }) {
         const myDueDate = this.dueDate();
-        return myDueDate < new Date();
+        return myDueDate < now;
     }
 
     public hasNRecognizedInARow(n = 2) {
@@ -154,15 +154,15 @@ export class ScheduleRow<T> {
         return this.hasNRecognizedInARow(1);
     }
 
-    public isSomewhatRecognized() {
-        return this.hasNRecognizedInARow(2) && this.isOverDue();
+    public isSomewhatRecognized({now}: { now: Date }) {
+        return this.hasNRecognizedInARow(2) && this.isOverDue({now});
     }
 
     public isRecognized() {
         return this.recognitionScore() >= 3;
-/*
-        return !this.isUnrecognized() && !this.isSomewhatRecognized()
-*/
+        /*
+                return !this.isUnrecognized() && !this.isSomewhatRecognized()
+        */
     }
 
     wasLearnedToday() {

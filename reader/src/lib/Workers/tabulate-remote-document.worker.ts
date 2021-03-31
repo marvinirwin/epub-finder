@@ -11,6 +11,7 @@ import {
 } from "@shared/";
 import trie from "trie-prefix-tree";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
+import {resolvePartialTabulationConfig} from "../language/language-maps/word-separator";
 
 // @ts-ignore
 self.window = self;
@@ -18,7 +19,7 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {words, notableSubsequences, d}: TabulateRemoteDocumentDto = ev.data;
+    const {words, notableSubsequences, d, languageCode}: TabulateRemoteDocumentDto = ev.data;
     const ltDoc = new LtDocument(d)
     const response = await fetch(`${process.env.PUBLIC_URL}/documents/${ltDoc.filename}`);
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer());
@@ -29,6 +30,8 @@ ctx.onmessage = async (ev) => {
                 greedyWordSet: new SetWithUniqueLengths(words),
                 notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
                 segments: doc.segments(),
+                ...resolvePartialTabulationConfig(languageCode),
+                languageCode,
             }),
         label: ltDoc.name,
         id: ltDoc.id(),

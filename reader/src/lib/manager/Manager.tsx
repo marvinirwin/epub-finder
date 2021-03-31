@@ -101,6 +101,7 @@ import {GeneralToastMessageService} from "../user-interface/general-toast-messag
 import { SelectedVirtualTabulationsService } from "./selected-virtual-tabulations.service";
 import {HotkeyModeService} from "../hotkeys/hotkey-mode.service";
 import {OnSelectService} from "../user-interface/on-select.service";
+import {TimeService} from "../time/time.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -210,8 +211,10 @@ export class Manager {
     generalToastMessageService: GeneralToastMessageService;
     selectedVirtualTabulationsService: SelectedVirtualTabulationsService;
     onSelectService: OnSelectService;
+    timeService: TimeService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
+        this.timeService = new TimeService();
         this.ignoredWordsRepository = new IgnoredWordsRepository(this);
         this.allWordsRepository = new AllWordsRepository();
         this.alertToastMessageService = new ToastMessageService({
@@ -296,13 +299,8 @@ export class Manager {
         this.translationAttemptScheduleService = new TranslationAttemptScheduleService(this)
         this.translationAttemptService = new TranslationAttemptService(this)
         this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this);
-        this.quizCardScheduleService = new ScheduleService({
-            scheduleRowsService: this.quizCardScheduleRowsService,
-        });
-        this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService({
-            settingsService: this.settingsService,
-            scheduleService: this.quizCardScheduleRowsService
-        })
+        this.quizCardScheduleService = new ScheduleService(this);
+        this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService(this)
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
 

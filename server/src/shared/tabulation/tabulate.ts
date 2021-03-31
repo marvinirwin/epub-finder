@@ -4,14 +4,18 @@ import {TabulatedDocuments, TabulatedSegments} from "../tabulate-documents/tabul
 import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 
-export type TabulationParameters =  {
+export type TabulationParameters = {
     segments: Segment[],
 } & TabulationConfiguration;
 
 export type WordIdentifyingStrategy = "noSeparator" | "punctuationSeparator"
-export interface TabulationConfiguration {
+
+export type SerializableTabulationConfiguration = {
     notableCharacterSequences: SetWithUniqueLengths,
     greedyWordSet: SetWithUniqueLengths,
+    languageCode: string;
+}
+export type TabulationConfiguration = SerializableTabulationConfiguration & {
     isNotableCharacterRegex: RegExp;
     isWordBoundaryRegex: RegExp;
     wordIdentifyingStrategy: WordIdentifyingStrategy
@@ -28,10 +32,10 @@ export interface SerializedSegment {
 }
 
 export const tabulationFactory = (): TabulatedDocuments => ({
-    wordCounts : {},
+    wordCounts: {},
     wordElementsMap: {},
     wordSegmentMap: {},
-    atomMetadatas : new Map<XMLDocumentNode, AtomMetadata>(),
+    atomMetadatas: new Map<XMLDocumentNode, AtomMetadata>(),
     greedyWordCounts: new Map<string, number>(),
     wordSegmentStringsMap: new Map<string, Set<string>>(),
     segments: [],

@@ -13,6 +13,7 @@ import {TabulateLocalDocumentDto} from "./tabulate-local-document.dto";
 import {SetWithUniqueLengths} from "../../../../server/src/shared/tabulate-documents/set-with-unique-lengths";
 import {DocumentWordCount} from "../../../../server/src/shared/DocumentWordCount";
 import {SerializedSegment, WordCountRecord} from "../../../../server/src/shared/tabulation/tabulate";
+import {resolvePartialTabulationConfig} from "../language/language-maps/word-separator";
 
 // @ts-ignore
 self.window = self;
@@ -20,7 +21,7 @@ self.window = self;
 const ctx: Worker = self as any;
 
 ctx.onmessage = async (ev) => {
-    const {words, notableSubsequences, src, label, id}: TabulateLocalDocumentDto = ev.data;
+    const {words, notableSubsequences, src, label, id, languageCode}: TabulateLocalDocumentDto = ev.data;
     const doc = AtomizedDocument.atomizeDocument(src);
     const segments = doc.segments();
     const tabulatedSentences = tabulate(
@@ -28,6 +29,8 @@ ctx.onmessage = async (ev) => {
             greedyWordSet: new SetWithUniqueLengths(words),
             notableCharacterSequences: new SetWithUniqueLengths(notableSubsequences),
             segments,
+            ...resolvePartialTabulationConfig(languageCode),
+            languageCode
         }
     );
     try {

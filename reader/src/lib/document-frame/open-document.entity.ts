@@ -17,6 +17,7 @@ import {LanguageConfigsService} from "../language/language-configs.service";
 import {isLoading} from "../util/is-loading";
 import {TabulationConfigurationService} from "../language/language-maps/tabulation-configuration.service";
 import {OnSelectService} from "../user-interface/on-select.service";
+import {resolvePartialTabulationConfig} from "../language/language-maps/word-separator";
 
 export class OpenDocument {
     public name: string;
@@ -36,19 +37,20 @@ export class OpenDocument {
             languageConfigsService: LanguageConfigsService,
             onSelectService: OnSelectService
         },
-
     ) {
         this.name = id;
         this.renderedSegments$.next([]);
         this.renderedTabulation$ = combineLatest([
             this.renderedSegments$,
             tabulationConfigurationService.tabulationConfiguration$,
+            tabulationConfigurationService.languageCode$
         ]).pipe(
-            map(([segments, tabulationConfiguration]) => {
+            map(([segments, tabulationConfiguration, languageCode]) => {
                     const tabulatedSentences = mergeTabulations(tabulate(
                         {
-                            ...tabulationConfiguration,
                             segments,
+                            ...tabulationConfiguration,
+                            ...resolvePartialTabulationConfig(languageCode)
                         },
                     ));
                     return tabulatedSentenceToTabulatedDocuments({
@@ -72,7 +74,8 @@ export class OpenDocument {
                     notableSubsequences: [...tabulationConfiguration.notableCharacterSequences.values()],
                     words: [...tabulationConfiguration.greedyWordSet.values()],
                     src: document._originalSrc,
-                    id: this.id
+                    id: this.id,
+                    languageCode: tabulationConfiguration.languageCode
                 })
             },
         );
