@@ -4,17 +4,17 @@ import { DatabaseService } from '../Storage/database.service'
 import { IgnoredWord } from './ignored-word.interface'
 
 export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
-    constructor({ db }: { db: DatabaseService }) {
+    constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
-            db,
+            databaseService,
             load: () =>
-                db.getWordRecordsGenerator(db.ignoredWords, (v) => {
+                databaseService.getWordRecordsGenerator(databaseService.ignoredWords, (v) => {
                     if (!v.timestamp) {
                         v.timestamp = new Date()
                     }
                     return v
                 }),
-            add: (r) => db.ignoredWords.add(r),
+            add: (r) => databaseService.ignoredWords.add(r),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

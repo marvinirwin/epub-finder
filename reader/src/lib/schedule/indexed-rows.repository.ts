@@ -22,12 +22,12 @@ export class IndexedRowsRepository<T extends { id?: number }> {
     clearRecords$ = new ReplaySubject<void>(1)
 
     constructor({
-        db,
+        databaseService,
         load,
         add,
         getIndexValue,
     }: {
-        db: DatabaseService
+        databaseService: DatabaseService
         load: () => AsyncGenerator<T[]>
         add: (t: T) => Promise<number>
         getIndexValue: (v: T) => { indexValue: string }

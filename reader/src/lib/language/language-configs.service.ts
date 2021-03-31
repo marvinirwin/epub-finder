@@ -20,7 +20,7 @@ export class LanguageConfigsService {
     public learningToLatinTransliterateFn$: Observable<PossibleTransliterationConfig>
     public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>
-    languageCode$: Observable<string>
+    readingLanguageCode$: Observable<string>
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
         const knownLanguage$ = new ReplaySubject<string>(1)
@@ -63,7 +63,7 @@ export class LanguageConfigsService {
                 }
             },
         )
-        this.languageCode$ = this.learningToKnownTranslateConfig$.pipe(
+        this.readingLanguageCode$ = this.learningToKnownTranslateConfig$.pipe(
             map((translationConfig) => translationConfig?.from || 'en'),
             shareReplay(1),
         )

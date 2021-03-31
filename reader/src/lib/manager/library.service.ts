@@ -9,22 +9,23 @@ export class LibraryService {
     private settingsService: SettingsService
 
     constructor({
-        db,
+        databaseService,
         documentRepository,
         settingsService,
     }: {
-        db: DatabaseService
+        databaseService: DatabaseService
         documentRepository: DocumentRepository
         settingsService: SettingsService
     }) {
         this.settingsService = settingsService
         this.documentRepository = documentRepository
-        this.db = db
+        this.db = databaseService
     }
 
-    public async upsertDocument(file: File): Promise<void> {
+    public async upsertDocument(file: File, languageCode: string): Promise<void> {
         const saved = await this.documentRepository.upsert({
             file,
+            languageCode
         })
         this.settingsService.readingDocument$.next(saved.id())
     }

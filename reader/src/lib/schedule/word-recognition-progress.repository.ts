@@ -3,11 +3,11 @@ import { WordRecognitionRow } from './word-recognition-row'
 import { DatabaseService } from '../Storage/database.service'
 
 export class WordRecognitionProgressRepository extends IndexedRowsRepository<WordRecognitionRow> {
-    constructor({ db }: { db: DatabaseService }) {
+    constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
-            db,
-            load: () => db.getWordRecordsGenerator(db.wordRecognitionRecords),
-            add: (r) => db.wordRecognitionRecords.add(r),
+            databaseService,
+            load: () => databaseService.getWordRecordsGenerator(databaseService.wordRecognitionRecords),
+            add: (r) => databaseService.wordRecognitionRecords.add(r),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

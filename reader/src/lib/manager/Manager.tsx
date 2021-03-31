@@ -149,8 +149,8 @@ function splitTextDataStreams$(textData$: Observable<TabulatedDocuments>) {
 
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
-        this.db,
-        this.db.cards,
+        this.databaseService,
+        this.databaseService.cards,
         (c: ICard) => c.id,
         (i: number, c: ICard) => ({ ...c, id: i }),
     )
@@ -241,7 +241,7 @@ export class Manager {
     timeService: TimeService
     advanceTimeService: AdvanceTimeService
 
-    constructor(public db: DatabaseService, { audioSource }: AppContext) {
+    constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)
         this.allWordsRepository = new AllWordsRepository()
@@ -273,10 +273,8 @@ export class Manager {
             languageConfigsService: this.languageConfigsService,
         })
         this.onSelectService = new OnSelectService(this)
-        this.documentRepository = new DocumentRepository({
-            databaseService: this.db,
-        })
-        this.cardsRepository = new CardsRepository({ databaseService: db })
+        this.documentRepository = new DocumentRepository(this)
+        this.cardsRepository = new CardsRepository(this)
         this.pronunciationProgressService = new PronunciationProgressRepository(
             this,
         )
@@ -357,7 +355,7 @@ export class Manager {
         this.exampleSentencesService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
 
-        this.createdSentenceManager = new CreatedSentenceManager(this.db)
+        this.createdSentenceManager = new CreatedSentenceManager(this.databaseService)
         this.audioRecordingService = new AudioManager({
             audioSource,
             generalToastMessageService: this.generalToastMessageService,

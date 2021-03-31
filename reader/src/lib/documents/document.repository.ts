@@ -1,71 +1,74 @@
 import axios from 'axios'
 import { DocumentViewDto } from '@server/'
 import { DatabaseService } from '../Storage/database.service'
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs'
-import { deleteMap, mapFromId, mergeMaps } from '../util/map.module'
+import { merge, Observable, ReplaySubject } from 'rxjs'
+import { mapFromId, mergeMaps } from '../util/map.module'
 import { LtDocument } from '@shared/'
 import { isLoading } from '../util/is-loading'
 import { TESTING } from '../util/url-params'
+import { LanguageConfigsService } from '../language/language-configs.service'
+import { map, scan } from 'rxjs/operators'
 
 export class DocumentRepository {
-    private databaseService: DatabaseService
-    collection$ = new BehaviorSubject<Map<string, LtDocument>>(new Map())
-    fetchSignal$ = new ReplaySubject<void>(1)
+    collection$: Observable<Map<string, LtDocument>>
     isFetching$: Observable<boolean>
+    newDocument$ = new ReplaySubject<LtDocument>(1)
+    deleteDocument$ = new ReplaySubject<LtDocument>(1)
+    private databaseService: DatabaseService
 
-    constructor({ databaseService }: { databaseService: DatabaseService }) {
+    constructor({
+                    databaseService,
+                    languageConfigsService,
+                }: {
+        databaseService: DatabaseService,
+        languageConfigsService: LanguageConfigsService
+    }) {
         this.databaseService = databaseService
-        const { obs$, isLoading$ } = isLoading(this.fetchSignal$, async () => {
+        const { obs$, isLoading$ } = isLoading(languageConfigsService.readingLanguageCode$, async (code) => {
             const response = await axios.get(
                 `${process.env.PUBLIC_URL}/documents`,
             )
             const responseDocuments = ((response?.data ||
                 []) as DocumentViewDto[]).map((d) => new LtDocument(d))
-            const mappedDocuments = mapFromId<string, LtDocument>(
+            return mapFromId<string, LtDocument>(
                 responseDocuments,
                 (d) => d.id(),
             )
-            this.collection$.next(
-                mergeMaps(mappedDocuments, this.collection$.getValue()),
-            )
         })
-        // !! Bad
-        obs$.subscribe()
-        this.isFetching$ = isLoading$
-        this.fetchSignal$.next()
-    }
 
-    public delete(ltDocument: LtDocument) {
-        return axios
-            .post(`${process.env.PUBLIC_URL}/documents/update`, {
-                ...ltDocument.d,
-                deleted: true,
-            })
-            .then((response) => {
-                this.collection$.next(
-                    deleteMap(this.collection$.getValue(), ltDocument.id()),
-                )
-                return response?.data
-            })
-    }
-
-    public async upsert({
-        file,
-        document_id,
-    }: {
-        document_id?: string
-        file: File
-    }): Promise<LtDocument> {
-        const result = await DocumentRepository.uploadFile(file, document_id)
-        this.collection$.next(
-            new Map(this.collection$.getValue()).set(result.id(), result),
+        this.collection$ = merge(
+            obs$.pipe(map(fetchedDocumentMap => ({ fetchedDocumentMap }))),
+            this.newDocument$.pipe(map(newDocument => ({ newDocument }))),
+            this.deleteDocument$.pipe(map(deletedDocument => ({ deletedDocument }))),
+        ).pipe(
+            scan((acc, o: { newDocument: LtDocument } | { fetchedDocumentMap: Map<string, LtDocument> } | { deletedDocument: LtDocument }) => {
+                // @ts-ignore
+                const fetchedDocumentMap: Map<string, LtDocument> | undefined = o.fetchedDocumentMap
+                // @ts-ignore
+                const newDocument: LtDocument | undefined = o.newDocument
+                // @ts-ignore
+                const deletedDocument: LtDocument | undefined = o.deletedDocument
+                if (fetchedDocumentMap) {
+                    return fetchedDocumentMap
+                }
+                if (newDocument) {
+                    return mergeMaps(acc, new Map([[(newDocument as LtDocument).id(), newDocument]]))
+                }
+                if (deletedDocument) {
+                    acc.delete(deletedDocument.id())
+                    return new Map(acc)
+                }
+                return acc
+            }, new Map()),
         )
-        return result
+        // !! Bad
+        this.isFetching$ = isLoading$
     }
 
     private static async uploadFile(
         file: File,
-        document_id?: string,
+        languageCode: string,
+        documentId?: string,
     ): Promise<LtDocument> {
         const formData = new FormData()
         formData.append('file', file)
@@ -73,9 +76,12 @@ export class DocumentRepository {
         const headers: {
             document_id?: string
             sandbox_file?: string
-        } = {}
-        if (document_id) {
-            headers.document_id = document_id
+            language_code: string
+        } = {
+            language_code: languageCode,
+        }
+        if (documentId) {
+            headers.document_id = documentId
         }
         if (TESTING) {
             headers.sandbox_file = '1'
@@ -89,5 +95,29 @@ export class DocumentRepository {
         )
         const d = (await result).data
         return new LtDocument(d)
+    }
+
+    public delete(ltDocument: LtDocument) {
+        return axios
+            .post(`${process.env.PUBLIC_URL}/documents/update`, {
+                ...ltDocument.d,
+                deleted: true,
+            })
+            .then((response) => {
+                this.deleteDocument$.next(ltDocument)
+            })
+    }
+
+    public async upsert({
+                            file,
+                            documentId,
+                            languageCode,
+                        }: {
+        documentId?: string,
+        languageCode: string
+        file: File
+    }): Promise<LtDocument> {
+        this.newDocument$.next(await DocumentRepository.uploadFile(file, languageCode, documentId))
+        return await DocumentRepository.uploadFile(file, languageCode, documentId)
     }
 }

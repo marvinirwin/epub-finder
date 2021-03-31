@@ -2,9 +2,10 @@ import { combineLatest, ReplaySubject } from 'rxjs'
 import { DroppedFilesService } from './dropped-files.service'
 import { DocumentCheckingOutService } from '../../components/library/document-checking-out.service'
 import { LoggedInUserService } from '../auth/loggedInUserService'
-import { last, map, startWith } from 'rxjs/operators'
+import { last, map, startWith, withLatestFrom } from 'rxjs/operators'
 import { LibraryService } from '../manager/library.service'
 import { ProgressItemService } from '../../components/item-in-progress/progress-item.service'
+import { LanguageConfigsService } from '../language/language-configs.service'
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html'])
 
@@ -22,11 +23,13 @@ export class UploadingDocumentsService {
         droppedFilesService,
         libraryService,
         progressItemService,
+        languageConfigsService
     }: {
         progressItemService: ProgressItemService
         documentCheckingOutService: DocumentCheckingOutService
         droppedFilesService: DroppedFilesService
-        libraryService: LibraryService
+        libraryService: LibraryService,
+        languageConfigsService: LanguageConfigsService
     }) {
         this.currentUploadingFile$.next()
         // There will also have to be a document synchronization service
@@ -41,8 +44,9 @@ export class UploadingDocumentsService {
                         ),
                     ),
                 ),
+                withLatestFrom(languageConfigsService.readingLanguageCode$)
             )
-            .subscribe(async (customDocuments) => {
+            .subscribe(async ([customDocuments, languageCode]) => {
                 progressItemService.newProgressItem().exec(async () => {
                     let lastDocument: string | undefined
                     for (let i = 0; i < customDocuments.length; i++) {
@@ -52,7 +56,7 @@ export class UploadingDocumentsService {
                             `Uploading ${basicDocument.name}.  This can take up to 30 seconds`,
                         )
                         this.currentUploadingFile$.next(basicDocument)
-                        await libraryService.upsertDocument(basicDocument)
+                        await libraryService.upsertDocument(basicDocument, languageCode)
                         this.currentUploadingFile$.next(undefined)
                         this.uploadingMessages$.next(
                             `Uploading ${basicDocument.name} success!`,

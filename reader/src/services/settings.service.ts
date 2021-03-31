@@ -63,13 +63,13 @@ export class SettingsService {
     public currentIntroTab$: ReplaySubject<number>
 
     constructor({
-        db,
+        databaseService,
         historyService,
     }: {
-        db: DatabaseService
+        databaseService: DatabaseService
         historyService: HistoryService
     }) {
-        this.db = db
+        this.db = databaseService
         this.historyService = historyService
         this.drawerClosed$ = this.createSetting$<boolean>(
             'drawerClosed',

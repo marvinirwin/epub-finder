@@ -3,17 +3,17 @@ import { PronunciationProgressRow } from './pronunciation-progress-row.interface
 import { DatabaseService } from '../Storage/database.service'
 
 export class PronunciationProgressRepository extends IndexedRowsRepository<PronunciationProgressRow> {
-    constructor({ db }: { db: DatabaseService }) {
+    constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
-            db,
+            databaseService,
             load: () =>
-                db.getWordRecordsGenerator(db.pronunciationRecords, (v) => {
+                databaseService.getWordRecordsGenerator(databaseService.pronunciationRecords, (v) => {
                     if (!v.timestamp) {
                         v.timestamp = new Date()
                     }
                     return v
                 }),
-            add: (r) => db.pronunciationRecords.add(r),
+            add: (r) => databaseService.pronunciationRecords.add(r),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

@@ -26,7 +26,7 @@ export class TabulationConfigurationService {
         this.tabulationConfiguration$ = combineLatest([
             wordsService.words$,
             notableSubsequencesService.notableSubsequenceSet$,
-            languageConfigsService.languageCode$,
+            languageConfigsService.readingLanguageCode$,
         ]).pipe(
             map(([wordSet, notableSubsequenceSet, languageCode]) => {
                 return {

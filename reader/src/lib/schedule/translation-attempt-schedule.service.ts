@@ -41,7 +41,7 @@ export class TranslationAttemptScheduleService
             selectedVirtualTabulationsService.selectedVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$,
-            languageConfigsService.languageCode$
+            languageConfigsService.readingLanguageCode$
         ]).pipe(
             map(
                 ([

@@ -16,11 +16,11 @@ export interface TranslationAttemptRecord {
 }
 
 export class TranslationAttemptRepository extends IndexedRowsRepository<TranslationAttemptRecord> {
-    constructor({ db }: { db: DatabaseService }) {
+    constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
-            db,
-            load: () => db.getWordRecordsGenerator(db.translationAttempts),
-            add: (r) => db.translationAttempts.add(r),
+            databaseService,
+            load: () => databaseService.getWordRecordsGenerator(databaseService.translationAttempts),
+            add: (r) => databaseService.translationAttempts.add(r),
             getIndexValue: (r) => ({ indexValue: r.learningLanguage }),
         })
     }

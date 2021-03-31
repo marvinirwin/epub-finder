@@ -40,7 +40,7 @@ export class OpenDocumentsService {
 
     constructor(
         private config: {
-            db: DatabaseService
+            databaseService: DatabaseService
             settingsService: SettingsService
             documentRepository: DocumentRepository
             languageConfigsService: LanguageConfigsService

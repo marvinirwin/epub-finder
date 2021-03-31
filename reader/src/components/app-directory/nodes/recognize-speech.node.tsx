@@ -24,7 +24,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
         label: 'Speak',
         action: async () => {
             const currentLanguageCode = await observableLastValue(
-                m.languageConfigsService.languageCode$,
+                m.languageConfigsService.readingLanguageCode$,
             )
             const recordRequest = new RecordRequest(
                 `Try reading one of the sentences below`,

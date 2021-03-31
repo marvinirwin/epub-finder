@@ -14,7 +14,7 @@ export class TestHotkeysService {
         languageConfigsService: LanguageConfigsService
     }) {
         hotkeyEvents.subjects.PRONUNCIATION_RECORD_SUCCESS.pipe(
-            withLatestFrom(languageConfigsService.languageCode$),
+            withLatestFrom(languageConfigsService.readingLanguageCode$),
         ).subscribe(([_, languageCode]) => {
             pronunciationProgressService.addRecords$.next([
                 {

@@ -25,7 +25,7 @@ export const QuizCardComponent: React.FC<
         quizCard,
         label: 'learningLanguage',
     })
-    const latestLanguageCode = useObservableState(m.languageConfigsService.languageCode$)
+    const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,

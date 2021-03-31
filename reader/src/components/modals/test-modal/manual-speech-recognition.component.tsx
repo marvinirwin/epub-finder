@@ -23,7 +23,7 @@ export const ManualSpeechRecognition = () => {
                             success: true,
                             timestamp: new Date(),
                             languageCode: await observableLastValue(
-                                m.languageConfigsService.languageCode$,
+                                m.languageConfigsService.readingLanguageCode$,
                             ),
                         },
                     ])
