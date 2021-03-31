@@ -1,10 +1,6 @@
 import { ScheduleRow } from './schedule-row'
 import { ScheduleRowsService } from './schedule-rows-service.interface'
-import {
-    TranslationAttemptRecord,
-    TranslationAttemptRepository,
-} from './translation-attempt.repository'
-import { OpenDocumentsService } from '../manager/open-documents.service'
+import { TranslationAttemptRecord, TranslationAttemptRepository } from './translation-attempt.repository'
 import { combineLatest, Observable } from 'rxjs'
 import { ds_Dict } from '../delta-scan/delta-scan.module'
 import { map } from 'rxjs/operators'
@@ -15,9 +11,10 @@ import {
     wordsFromCountRecordList,
 } from '../../../../server/src/shared/tabulation/word-count-records.module'
 import { WordCountRecord } from '../../../../server/src/shared/tabulation/tabulate'
-import { isChineseCharacter } from '../../../../server/src/shared/OldAnkiClasses/Card'
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import { LanguageConfigsService } from '../language/language-configs.service'
+import { resolvePartialTabulationConfig } from '../language/language-maps/word-separator'
 
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: TranslationAttemptRecord[]
@@ -27,30 +24,32 @@ export interface TranslationAttemptScheduleData {
 
 export class TranslationAttemptScheduleService
     implements ScheduleRowsService<TranslationAttemptScheduleData> {
-    indexedScheduleRows$: Observable<
-        ds_Dict<ScheduleRow<TranslationAttemptScheduleData>>
-    >
+    indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<TranslationAttemptScheduleData>>>
 
     constructor({
-        translationAttemptRepository,
-        selectedVirtualTabulationsService,
-        weightedVocabService,
-    }: {
+                    translationAttemptRepository,
+                    selectedVirtualTabulationsService,
+                    weightedVocabService,
+                    languageConfigsService,
+                }: {
         translationAttemptRepository: TranslationAttemptRepository
         selectedVirtualTabulationsService: SelectedVirtualTabulationsService
-        weightedVocabService: WeightedVocabService
+        weightedVocabService: WeightedVocabService,
+        languageConfigsService: LanguageConfigsService
     }) {
         this.indexedScheduleRows$ = combineLatest([
             selectedVirtualTabulationsService.selectedVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$,
+            languageConfigsService.languageCode$
         ]).pipe(
             map(
                 ([
-                    selectedVirtualTabulations,
-                    translationAttempts,
-                    weightedVocab,
-                ]) => {
+                     selectedVirtualTabulations,
+                     translationAttempts,
+                     weightedVocab,
+                    languageCode
+                 ]) => {
                     const virtualDocumentTabulation = new SerializedTabulationAggregate(
                         selectedVirtualTabulations,
                     )
@@ -69,10 +68,11 @@ export class TranslationAttemptScheduleService
                         (serialzedTabulation) =>
                             serialzedTabulation.segmentWordCountRecordsMap.forEach(
                                 (value, key) => {
+                                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex;
                                     if (
                                         key.text
                                             .split('')
-                                            .find(isChineseCharacter) &&
+                                            .find(v => isNotableCharacterRegex.test(v)) &&
                                         key.text.length > 5
                                     ) {
                                         ensureScheduleRow(
@@ -87,7 +87,7 @@ export class TranslationAttemptScheduleService
                             if (scheduleRows[key]) {
                                 scheduleRows[
                                     key
-                                ].translationAttemptRecords.push(...value)
+                                    ].translationAttemptRecords.push(...value)
                             }
                         },
                     )

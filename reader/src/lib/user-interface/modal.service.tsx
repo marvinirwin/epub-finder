@@ -18,6 +18,7 @@ import { HotkeyConfig } from '../../components/hotkeys/HotkeyConfig'
 import { QuizScheduleOverView } from '../quiz/quiz-schedule-over-view.component'
 import { Intro } from '../../components/intro/intro.component'
 import { UploadDialog } from '../../components/upload/upload-dialog'
+import { Box } from '@material-ui/core'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -35,7 +36,7 @@ export class ModalService {
         this.languageSelect = new NavModal('spokenLanguage', () => (
             <LanguageSelect />
         ))
-        this.library = new NavModal('documentSelect', () => <LibraryTable />)
+        this.library = new NavModal('documentSelect', () => <Box m={2} p={1}><LibraryTable /></Box>)
         this.quizScheduleOverView = new NavModal('quizScheduleOverView', () => (
             <QuizScheduleOverView />
         ))

@@ -40,7 +40,7 @@ export const LanguageSeparatorStrategy: {
     regexp: RegExp
 }[] = [
     {
-        languages: ['zh-hans', 'zh-hant', 'yue'],
+        languages: ['zh-Hans', 'zh-Hant', 'yue'],
         strategy: 'noSeparator',
         regexp: chineseCharacterRegexp,
     },
@@ -83,6 +83,7 @@ export const resolvePartialTabulationConfig = (
     isNotableCharacterRegex: RegExp
 } => {
     const result = languageRegexMap.get(languageCode)
+    debugger;
     return {
         wordIdentifyingStrategy: result?.strategy || 'noSeparator',
         isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,

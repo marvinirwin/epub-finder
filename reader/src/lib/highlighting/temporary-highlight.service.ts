@@ -4,13 +4,12 @@ import { HighlighterService } from './highlighter.service'
 import { filter, map } from 'rxjs/operators'
 import CardsRepository from '../manager/cards.repository'
 import { sleep } from '../util/Util'
-import { isChineseCharacter } from '../../../../server/src/shared/OldAnkiClasses/Card'
 
 export function removePunctuation(withPunctuation: string) {
     return withPunctuation
         .split('')
         .filter((c) => {
-            return isChineseCharacter(c) && !punctuation.has(c)
+            return !punctuation.has(c)
         })
         .join('')
 }

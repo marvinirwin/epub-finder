@@ -24,7 +24,7 @@ export class Card {
     }
 
     get matchCriteria(): string {
-        return this.fields.join('').split('').filter(isChineseCharacter).join('')
+        return this.fields.join('').split('').join('')
     }
 
 
@@ -66,8 +66,3 @@ export interface SerializedCard {
     iCard: ICard;
 }
 
-
-// Dont know if this matches simplified or traditional
-export function isChineseCharacter(s: string) {
-    return s.match(chineseCharacterRegexp);
-}
