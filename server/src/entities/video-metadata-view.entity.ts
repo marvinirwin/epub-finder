@@ -1,5 +1,12 @@
-import {Column, CreateDateColumn, Entity, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
-import {VideoMetadata} from "./video.metadata";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryColumn,
+    ViewColumn,
+    ViewEntity,
+} from 'typeorm'
+import { VideoMetadata } from './video.metadata'
 
 @ViewEntity({
     expression: `
@@ -16,25 +23,25 @@ import {VideoMetadata} from "./video.metadata";
             COALESCE(video_metadata_max.video_metadata_id::text, video_metadata_max.id::text) = 
             COALESCE(v.video_metadata_id::text, v.id::text)
         WHERE video_metadata_max.id IS NULL
-    `
+    `,
 })
 export class VideoMetadataView {
     @ViewColumn()
-    id: string;
+    id: string
 
     // Used in groupwise max
     @ViewColumn()
-    video_metadata_id: string | null;
+    video_metadata_id: string | null
 
     @ViewColumn()
-    sentence: string;
+    sentence: string
 
     @ViewColumn()
-    sentence_hash: string;
+    sentence_hash: string
 
     @ViewColumn()
-    metadata: string;
+    metadata: string
 
     @ViewColumn()
-    created_at: Date;
+    created_at: Date
 }

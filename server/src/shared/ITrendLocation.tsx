@@ -1,12 +1,12 @@
 export interface ITrendLocation {
-    country: string,
-    countryCode: string,
-    name: string,
-    parentid: number,
+    country: string
+    countryCode: string
+    name: string
+    parentid: number
     placeType: {
-        code: number,
+        code: number
         name: string
-    },
-    url: string,
+    }
+    url: string
     woeid: number
 }

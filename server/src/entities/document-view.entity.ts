@@ -1,5 +1,11 @@
-import {Column, OneToOne, PrimaryColumn, ViewColumn, ViewEntity} from "typeorm";
-import {User} from "./user.entity";
+import {
+    Column,
+    OneToOne,
+    PrimaryColumn,
+    ViewColumn,
+    ViewEntity,
+} from 'typeorm'
+import { User } from './user.entity'
 
 @ViewEntity({
     expression: `
@@ -22,43 +28,43 @@ import {User} from "./user.entity";
         AND COALESCE(document_max.document_id::text, document_max.id::text)
         = COALESCE(b.document_id::text, b.id::text)
     WHERE document_max.id IS NULL
-`
+`,
 })
-export class DocumentView  {
+export class DocumentView {
     @ViewColumn()
-    id: string;
+    id: string
 
     @ViewColumn()
-    document_id: string;
+    document_id: string
 
     @ViewColumn()
-    name: string;
+    name: string
 
     @ViewColumn()
-    hash: string;
+    hash: string
 
     @ViewColumn()
-    filename: string | null;
+    filename: string | null
 
     @ViewColumn()
-    created_at: Date;
+    created_at: Date
 
     @ViewColumn()
-    @OneToOne(() => User, user => user.id)
-    creator_id: number | undefined;
+    @OneToOne(() => User, (user) => user.id)
+    creator_id: number | undefined
 
     @ViewColumn()
-    global: boolean;
+    global: boolean
 
     @ViewColumn()
-    deleted: boolean;
+    deleted: boolean
 
     @Column()
-    for_testing: boolean;
+    for_testing: boolean
 
     @Column()
-    for_frequency: boolean;
+    for_frequency: boolean
 
     @Column()
-    for_reading: boolean;
+    for_reading: boolean
 }

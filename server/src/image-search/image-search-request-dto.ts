@@ -1,3 +1,3 @@
 export class ImageSearchRequestDto {
-    term: string;
+    term: string
 }

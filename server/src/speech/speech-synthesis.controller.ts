@@ -1,13 +1,13 @@
-import {Body, Controller, Header, Post, Res} from '@nestjs/common';
-import {SpeechService} from "./speech.service";
-import {SpeechSynthesisRequestDto} from "./speech-synthesis-request-dto";
-import fs from "fs-extra";
+import { Body, Controller, Header, Post, Res } from '@nestjs/common'
+import { SpeechService } from './speech.service'
+import { SpeechSynthesisRequestDto } from './speech-synthesis-request-dto'
+import fs from 'fs-extra'
 
 @Controller('speech-synthesis')
 export class SpeechSynthesisController {
     constructor(private speechService: SpeechService) {}
 
-/*
+    /*
     @Post()
     @Header('Content-Type', 'audio/wav')
     async synthesize(

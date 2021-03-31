@@ -1,13 +1,19 @@
-import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, CreateDateColumn} from "typeorm";
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+} from 'typeorm'
 
 @Entity()
 export class SubscriptionEvent {
     @PrimaryColumn()
-    id: number;
+    id: number
 
-    @CreateDateColumn({type: "timestamp"})
-    current_period_end: Date;
+    @CreateDateColumn({ type: 'timestamp' })
+    current_period_end: Date
 
-    @CreateDateColumn({type: "timestamp"})
-    current_period_start: Date;
+    @CreateDateColumn({ type: 'timestamp' })
+    current_period_start: Date
 }

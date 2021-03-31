@@ -1,5 +1,3 @@
 describe('Scheduling', () => {
-    it('Schedules rows based on a bunch of factors', () => {
-
-    })
+    it('Schedules rows based on a bunch of factors', () => {})
 })

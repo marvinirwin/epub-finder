@@ -1,4 +1,4 @@
-import {Column, ViewColumn, ViewEntity} from "typeorm";
+import { Column, ViewColumn, ViewEntity } from 'typeorm'
 
 @ViewEntity({
     expression: `
@@ -10,13 +10,13 @@ import {Column, ViewColumn, ViewEntity} from "typeorm";
         LEFT JOIN usage_event usage_decrement ON usage_decrement.cost > 0
         LEFT JOIN usage_event usage_increment ON usage_increment.cost < 0
         GROUP BY "user".id
-    `
+    `,
 })
 export class Usage {
     @ViewColumn()
-    usage: number;
+    usage: number
     @ViewColumn()
-    available: number;
+    available: number
     @ViewColumn()
-    user_id: number;
+    user_id: number
 }

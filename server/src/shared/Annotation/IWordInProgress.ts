@@ -1,4 +1,4 @@
 export interface IWordInProgress {
-    word: string;
-    lengthRemaining: number;
+    word: string
+    lengthRemaining: number
 }

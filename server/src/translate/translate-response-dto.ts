@@ -1,3 +1,3 @@
 export class TranslateResponseDto {
-    translation: string;
+    translation: string
 }

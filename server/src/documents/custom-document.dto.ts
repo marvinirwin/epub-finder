@@ -1,4 +1,4 @@
 export interface CustomdocumentDto {
-    name: string;
-    document_id: number;
+    name: string
+    document_id: number
 }

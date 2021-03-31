@@ -1,15 +1,15 @@
-import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class JsonCache {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number
     @Column()
-    service: string;
+    service: string
     @Column()
-    key_hash: string;
-    @Column("text")
-    value: string;
-    @Column("text", {default: ''})
-    key: string;
+    key_hash: string
+    @Column('text')
+    value: string
+    @Column('text', { default: '' })
+    key: string
 }

@@ -1,3 +1,3 @@
 export type Named = {
-    name: string;
+    name: string
 }

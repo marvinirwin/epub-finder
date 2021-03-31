@@ -1,20 +1,25 @@
-import {SerializedDocumentTabulation, SerializedTabulation} from "../tabulate-documents/tabulated-documents.interface";
-import {safePushMapSet} from "../safe-push";
+import {
+    SerializedDocumentTabulation,
+    SerializedTabulation,
+} from '../tabulate-documents/tabulated-documents.interface'
+import { safePushMapSet } from '../safe-push'
 
 export class SerializedTabulationAggregate {
-    serializedTabulations: SerializedDocumentTabulation[];
+    serializedTabulations: SerializedDocumentTabulation[]
 
     constructor(serializedTabulations: SerializedDocumentTabulation[]) {
-        this.serializedTabulations = serializedTabulations;
+        this.serializedTabulations = serializedTabulations
     }
 
     wordSegmentStringsMap(): Map<string, Set<string>> {
-        const m = new Map<string, Set<string>>();
-        this.serializedTabulations
-            .forEach(t => t.wordSegmentStringsMap.forEach((set, word) => set.forEach(segmentString =>
-                safePushMapSet(m, word, segmentString)))
-            )
+        const m = new Map<string, Set<string>>()
+        this.serializedTabulations.forEach((t) =>
+            t.wordSegmentStringsMap.forEach((set, word) =>
+                set.forEach((segmentString) =>
+                    safePushMapSet(m, word, segmentString),
+                ),
+            ),
+        )
         return m
     }
-
 }

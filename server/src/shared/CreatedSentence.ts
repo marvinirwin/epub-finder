@@ -1,4 +1,4 @@
 export interface CreatedSentence {
-    learningLanguage: string;
-    id?: number;
+    learningLanguage: string
+    id?: number
 }

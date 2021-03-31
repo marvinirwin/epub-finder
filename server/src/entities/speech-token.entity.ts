@@ -1,11 +1,11 @@
-import {Entity, Column, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class SpeechToken {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number
     @Column()
-    exp: number;
+    exp: number
     @Column()
-    token: string;
+    token: string
 }

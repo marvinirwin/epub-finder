@@ -1,3 +1,3 @@
 export interface IRendition {
-    display: (e: string) => Promise<any>;
+    display: (e: string) => Promise<any>
 }

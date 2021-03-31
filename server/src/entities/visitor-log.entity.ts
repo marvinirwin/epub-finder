@@ -1,18 +1,13 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 @Entity()
 export class VisitorLog {
     @PrimaryGeneratedColumn()
-    id: number | undefined;
+    id: number | undefined
 
     @Column()
-    ip: string = '';
+    ip: string = ''
 
-    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
-    timestamp: Date = new Date();
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    timestamp: Date = new Date()
 }
-

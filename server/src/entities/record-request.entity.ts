@@ -1,16 +1,21 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 
 @Entity()
 export class RecordRequest {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number
 
     @Column()
-    user_id: number;
+    user_id: number
 
     @CreateDateColumn()
-    created_at: Date;
+    created_at: Date
 
     @Column()
-    sentence: string;
+    sentence: string
 }

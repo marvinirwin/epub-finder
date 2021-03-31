@@ -1,5 +1,5 @@
 /// <reference types="express" />
-import {Profile} from "passport";
+import { Profile } from 'passport'
 
 /*
 export declare namespace Express {
@@ -22,9 +22,9 @@ export declare namespace Express {
 
 declare namespace Profiles {
     interface GithubProfile extends Profile {
-        avatar_url: string | undefined;
-        location: string | undefined;
-        blog: string | undefined;
+        avatar_url: string | undefined
+        location: string | undefined
+        blog: string | undefined
         /*
                 u.profile_picture = u.profile_picture || profile.avatar_url;
                 u.profile_location = u.profile_location || profile.location;
@@ -33,13 +33,13 @@ declare namespace Profiles {
     }
 
     interface TwitterProfile extends Profile {
-        displayName: string;
-        location: string;
-        profile_image_url_https: string;
+        displayName: string
+        location: string
+        profile_image_url_https: string
     }
 
     interface GoogleProfile extends Profile {
-        gender: string;
-        picture: string;
+        gender: string
+        picture: string
     }
 }

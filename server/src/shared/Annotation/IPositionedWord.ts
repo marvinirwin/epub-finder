@@ -1,4 +1,4 @@
 export interface IPositionedWord {
-    word: string;
-    position: number;
+    word: string
+    position: number
 }

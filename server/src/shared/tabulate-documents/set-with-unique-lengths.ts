@@ -1,15 +1,15 @@
 export class SetWithUniqueLengths {
-    uniqueLengths = new Set<number>();
-    set = new Set<string>();
+    uniqueLengths = new Set<number>()
+    set = new Set<string>()
     constructor(strings?: string[]) {
         if (strings) {
-            strings.forEach(string => this.add(string))
+            strings.forEach((string) => this.add(string))
         }
     }
 
     add(v: string) {
         if (v.length) {
-            this.set.add(v);
+            this.set.add(v)
             this.uniqueLengths.add(v.length)
         }
     }
@@ -18,8 +18,8 @@ export class SetWithUniqueLengths {
         // Could be solved with a map with counts
         this.set.delete(v)
     }
-    has(v: string)  {
-        return this.set.has(v);
+    has(v: string) {
+        return this.set.has(v)
     }
     values() {
         return this.set.values()

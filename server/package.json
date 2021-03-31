@@ -12,7 +12,8 @@
         "start": "nest start -p tsconfig.json",
         "build": "nest build -p tsconfig.json",
         "watch": "nest start --watch -p tsconfig.json",
-        "test": "jest "
+        "test": "jest ",
+        "lint-fix": "prettier --write ."
     },
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",

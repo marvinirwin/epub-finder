@@ -1,38 +1,43 @@
-import {ICard} from "../ICard";
-import {chineseCharacterRegexp} from "../../../../reader/src/lib/language/language-maps/word-separator";
-
+import { ICard } from '../ICard'
+import { chineseCharacterRegexp } from '../../../../reader/src/lib/language/language-maps/word-separator'
 
 export class Card {
-    frontPhotos: string[];
+    frontPhotos: string[]
     constructor(
         public fields: string[],
         public interpolatedFields: string[],
         public deck: string,
         public collection: string,
         public ankiPackage: string,
-        public iCard: ICard
+        public iCard: ICard,
     ) {
-        this.frontPhotos = [];
+        this.frontPhotos = []
     }
 
     get front(): string {
-        return this.interpolatedFields[0].normalize();
+        return this.interpolatedFields[0].normalize()
     }
 
     get back(): string {
-        return this.interpolatedFields.slice(5).join('</br>').normalize();
+        return this.interpolatedFields.slice(5).join('</br>').normalize()
     }
 
     get matchCriteria(): string {
         return this.fields.join('').split('').join('')
     }
 
-
     static fromSerialized(c: SerializedCard) {
-        return new Card(c.fields, c.interpolatedFields, c.deck, c.collection, c.ankiPackage, c.iCard);
+        return new Card(
+            c.fields,
+            c.interpolatedFields,
+            c.deck,
+            c.collection,
+            c.ankiPackage,
+            c.iCard,
+        )
     }
 
-/*
+    /*
     static createICardFromCard(packageName: string, collectionName: string, c: Card): ICard {
         return {
             characters: c.front,
@@ -48,21 +53,19 @@ export class Card {
 */
 
     private getSounds() {
-        return [];
+        return []
     }
 
     private getPhotos() {
-        return [];
+        return []
     }
 }
 
-
 export interface SerializedCard {
-    interpolatedFields: string[];
-    fields: string[];
-    deck: string;
-    collection: string;
-    ankiPackage: string;
-    iCard: ICard;
+    interpolatedFields: string[]
+    fields: string[]
+    deck: string
+    collection: string
+    ankiPackage: string
+    iCard: ICard
 }
-

@@ -1,13 +1,12 @@
-import {Column, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import { Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
 
 export class SimilarityEdgeVersion {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Column()
-    count_edge_id: string;
+    count_edge_id: string
 
-
-    @Column("text")
-    similarity_result: string;
+    @Column('text')
+    similarity_result: string
 }

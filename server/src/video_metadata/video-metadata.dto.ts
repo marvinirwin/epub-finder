@@ -1,5 +1,5 @@
-import {VideoMetadata} from '@reader/'
+import { VideoMetadata } from '@reader/'
 
 export interface VideoMetadataDto {
-    metadata: VideoMetadata;
+    metadata: VideoMetadata
 }

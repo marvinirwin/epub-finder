@@ -1,14 +1,12 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["es5", "dom", "esnext"],
-    "types": ["cypress", "node"],
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["../server/src/shared"]
-    }
-  },
-  "include": [
-    "**/*.ts"
-  ]
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["es5", "dom", "esnext"],
+        "types": ["cypress", "node"],
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["../server/src/shared"]
+        }
+    },
+    "include": ["**/*.ts"]
 }

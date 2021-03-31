@@ -1,7 +1,8 @@
 /// <reference types="cypress" />
-import {ImageSearchPom} from "./image-search.pom";
+import { ImageSearchPom } from './image-search.pom'
 import {
-    frequencyDocumentProgressPrefix, leftTodayNumber,
+    frequencyDocumentProgressPrefix,
+    leftTodayNumber,
     manualQuizHiddenFieldConfigId,
     noMoreQuizCards,
     QUIZ_BUTTON_EASY,
@@ -12,12 +13,14 @@ import {
     quizCardDescription,
     quizCardImage,
     quizCardLearningLanguage,
-    quizCardTranslation, quizLearningNumber, quizToReviewNumber, quizUnlearnedNumber,
+    quizCardTranslation,
+    quizLearningNumber,
+    quizToReviewNumber,
+    quizUnlearnedNumber,
     recognizedCount,
     somewhatRecognizedCount,
-    unrecognizedCount
-} from "@shared/*";
-
+    unrecognizedCount,
+} from '@shared/*'
 
 export const defaultHotkeys = {
     quizScore5: '5',
@@ -27,8 +30,11 @@ export const defaultHotkeys = {
     quizScore1: '1',
 }
 
-type RecognizedCounts = { recognizedCount: number, somewhatRecognizedCount: number, unrecognizedCount: number };
-
+type RecognizedCounts = {
+    recognizedCount: number
+    somewhatRecognizedCount: number
+    unrecognizedCount: number
+}
 
 export class QuizCarouselPom {
     static goToQuizCard(word: string) {
@@ -60,31 +66,25 @@ export class QuizCarouselPom {
     }
 
     exampleSentences() {
-        return cy
-            .find('iframe')
-            .iframeBody()
-            .find('.example-sentence')
+        return cy.find('iframe').iframeBody().find('.example-sentence')
     }
 
     static editDescription(newDescription: string) {
-        cy
-            .find(`.${quizCardDescription}`)
-            .type(newDescription);
+        cy.find(`.${quizCardDescription}`).type(newDescription)
     }
 
     static selectNewImage() {
         // HACK, I just don't want to verify what src there is not, I'm just happy if it's not empty
-        const oldSrc = '';
-        ImageSearchPom.SelectFirstSearchResult();
+        const oldSrc = ''
+        ImageSearchPom.SelectFirstSearchResult()
         // Now assert we have an image we clicked (Or since I'm lazy, just not the previous one
-        cy
-            .find(`.${quizCardImage}`)
-            .should('have.attr', 'src').should('not.include', oldSrc);
+        cy.find(`.${quizCardImage}`)
+            .should('have.attr', 'src')
+            .should('not.include', oldSrc)
     }
 
-
     static translatedTextShouldBe(s: string) {
-        cy.get(`.${quizCardTranslation}`).should('have.text', s);
+        cy.get(`.${quizCardTranslation}`).should('have.text', s)
     }
 
     static descriptionTextShouldBe(s: string) {
@@ -103,34 +103,33 @@ export class QuizCarouselPom {
         cy.get(`.${noMoreQuizCards}`).should('be.visible')
     }
 
-
     static submitQuizResult(
-        difficulty: typeof QUIZ_BUTTON_HARD |
-            typeof QUIZ_BUTTON_MEDIUM |
-            typeof QUIZ_BUTTON_EASY |
-            typeof QUIZ_BUTTON_IGNORE
+        difficulty:
+            | typeof QUIZ_BUTTON_HARD
+            | typeof QUIZ_BUTTON_MEDIUM
+            | typeof QUIZ_BUTTON_EASY
+            | typeof QUIZ_BUTTON_IGNORE,
     ) {
-        cy.get(`.${difficulty}`).click();
+        cy.get(`.${difficulty}`).click()
     }
 
     static frequencyDocumentProgressContainer(documentName: string) {
-        return cy.get(`${frequencyDocumentProgressPrefix}${documentName}`);
+        return cy.get(`${frequencyDocumentProgressPrefix}${documentName}`)
     }
 
     static assertFrequencyDocumentProgress(
         documentName: string,
-        counts: RecognizedCounts
+        counts: RecognizedCounts,
     ) {
-        const assertCount = (selector: string,
-                             count: number) => {
+        const assertCount = (selector: string, count: number) => {
             QuizCarouselPom.frequencyDocumentProgressContainer(documentName)
                 .find(`.${selector}`)
                 .should('contain', count)
-        };
+        }
 
-        assertCount(recognizedCount, counts.recognizedCount);
-        assertCount(unrecognizedCount, counts.unrecognizedCount);
-        assertCount(somewhatRecognizedCount, counts.somewhatRecognizedCount);
+        assertCount(recognizedCount, counts.recognizedCount)
+        assertCount(unrecognizedCount, counts.unrecognizedCount)
+        assertCount(somewhatRecognizedCount, counts.somewhatRecognizedCount)
     }
 
     static learningNumber() {
@@ -149,7 +148,3 @@ export class QuizCarouselPom {
         return cy.get(`.${leftTodayNumber}`)
     }
 }
-
-
-
-

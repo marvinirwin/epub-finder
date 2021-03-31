@@ -36,60 +36,67 @@ declare namespace Cypress {
 
         visitHome(): Chainable<void>
 
-        signup(): Chainable<{email: string, password: string}>
+        signup(): Chainable<{ email: string; password: string }>
 
-        login(credentials: {email: string, password: string}): Chainable<void>
+        login(credentials: { email: string; password: string }): Chainable<void>
     }
 }
 
 Cypress.Commands.add('visitHome', () => {
-    cy.visit('http://localhost:3000/?test=1&skip_intro=1');
+    cy.visit('http://localhost:3000/?test=1&skip_intro=1')
 })
 
 Cypress.Commands.add('signupLogin', () => {
-    cy.visitHome();
-    cy.signup();
-});
+    cy.visitHome()
+    cy.signup()
+})
 
 Cypress.Commands.add('signup', () => {
-    cy.task('randomEmailPassword')
-        .then(({email, password}) => {
-                cy.wait(1000)
-                    .get('#signup-email').type(email)
-                    .get('#signup-password').type(password)
-                    .get('#signup-button').click()
-                return {email, password};
-            }
-        )
-});
+    cy.task('randomEmailPassword').then(({ email, password }) => {
+        cy.wait(1000)
+            .get('#signup-email')
+            .type(email)
+            .get('#signup-password')
+            .type(password)
+            .get('#signup-button')
+            .click()
+        return { email, password }
+    })
+})
 
-Cypress.Commands.add('login', ({email, password}) => {
+Cypress.Commands.add('login', ({ email, password }) => {
     cy.get('#login-email').type(email)
     cy.get('#login-password').type(password)
     cy.get('#login-button').click()
 })
 
-Cypress.Commands.add('iframeBody', {
-    prevSubject: true
-}, (subject) => {
-    return cy.wrap(subject)
-        .its('0.contentDocument').should('exist')
-        .its('body').should('not.be.undefined')
-        .then(cy.wrap)
-});
-
+Cypress.Commands.add(
+    'iframeBody',
+    {
+        prevSubject: true,
+    },
+    (subject) => {
+        return cy
+            .wrap(subject)
+            .its('0.contentDocument')
+            .should('exist')
+            .its('body')
+            .should('not.be.undefined')
+            .then(cy.wrap)
+    },
+)
 
 Cypress.Commands.add('clearIndexedDB', async () => {
     // @ts-ignore
-    const databases = await window.indexedDB.databases();
+    const databases = await window.indexedDB.databases()
 
     await Promise.all(
         databases.map(
-            ({name}) =>
+            ({ name }) =>
                 new Promise((resolve, reject) => {
-                    const request = window.indexedDB.open(name);
-                    request.onsuccess = event => {
-                        const db = request.result;
+                    const request = window.indexedDB.open(name)
+                    request.onsuccess = (event) => {
+                        const db = request.result
                         let storeNames = [
                             'cards',
                             // cards: 'id++, learningLanguage, knownLanguage, deck',
@@ -103,21 +110,25 @@ Cypress.Commands.add('clearIndexedDB', async () => {
                             // createdSentences: 'id++, learningLanguage',
                             'customDocuments',
                             // customDocuments: 'name, html'
-                        ];
-                        const transaction = db.transaction(storeNames, 'readwrite')
-                        storeNames.forEach(storeName => transaction.objectStore(storeName).clear())
-                        transaction.oncomplete = resolve;
-                    };
+                        ]
+                        const transaction = db.transaction(
+                            storeNames,
+                            'readwrite',
+                        )
+                        storeNames.forEach((storeName) =>
+                            transaction.objectStore(storeName).clear(),
+                        )
+                        transaction.oncomplete = resolve
+                    }
 
                     // Note: we need to also listen to the "blocked" event
                     // (and resolve the promise) due to https://stackoverflow.com/a/35141818
-                    request.addEventListener('blocked', resolve);
-                    request.addEventListener('error', reject);
+                    request.addEventListener('blocked', resolve)
+                    request.addEventListener('error', reject)
                 }),
         ),
-    );
-});
-
+    )
+})
 
 Cypress.Commands.add('skipIntro', () => {
     /*

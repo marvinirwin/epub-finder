@@ -1,4 +1,4 @@
 export interface ImageSearchRequest {
-    term: string;
+    term: string
     cb: (s: string) => void
 }

@@ -1,4 +1,4 @@
 export interface card {
-    nid: number;
-    did: string;
+    nid: number
+    did: string
 }

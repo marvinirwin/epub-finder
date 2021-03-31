@@ -5,50 +5,52 @@ import {
     Entity,
     Generated,
     PrimaryColumn,
-    PrimaryGeneratedColumn
-} from "typeorm";
-import {DocumentClassifierEndpointArn} from "aws-sdk/clients/comprehend";
+    PrimaryGeneratedColumn,
+} from 'typeorm'
+import { DocumentClassifierEndpointArn } from 'aws-sdk/clients/comprehend'
 
 @Entity()
 export class Document {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     // Used for Groupwise Max
-    @Column({default: null})
-    document_id: string | null;
-
-    @Column("text")
-    name: string;
-
-    @Column({default: null})
-    filename: string | null;
+    @Column({ default: null })
+    document_id: string | null
 
     @Column('text')
-    hash: string;
+    name: string
 
-    @Column({default: null})
-    creator_id: number | null;
+    @Column({ default: null })
+    filename: string | null
+
+    @Column('text')
+    hash: string
+
+    @Column({ default: null })
+    creator_id: number | null
 
     @Column()
-    global: boolean;
+    global: boolean
 
-    @Column({default: false})
-    for_testing: boolean = false;
+    @Column({ default: false })
+    for_testing: boolean = false
 
-    @Column({default: false})
-    for_frequency: boolean = false;
+    @Column({ default: false })
+    for_frequency: boolean = false
 
-    @Column({default: true})
-    for_reading: boolean = true;
+    @Column({ default: true })
+    for_reading: boolean = true
 
-    @Column({default: false})
-    deleted: boolean = false;
+    @Column({ default: false })
+    deleted: boolean = false
 
     @CreateDateColumn()
-    created_at: Date;
+    created_at: Date
 }
-export const documentRootId = (d: {document_id: string | null, id: string}) => {
+export const documentRootId = (d: {
+    document_id: string | null
+    id: string
+}) => {
     return d.document_id || d.id
 }
-

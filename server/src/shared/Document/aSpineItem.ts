@@ -1,3 +1,3 @@
 export interface aSpineItem {
-    href: string;
+    href: string
 }
