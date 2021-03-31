@@ -2,7 +2,7 @@ import { Observable, ReplaySubject, Subject } from 'rxjs'
 import { withLatestFrom, take, shareReplay } from 'rxjs/operators'
 import { sleep } from '../util/Util'
 import { MakeQuerablePromise } from '../util/QueryablePromise'
-import { AudioSource } from './AudioSource'
+import { AudioSource } from './audio-source'
 
 export class UnitTestAudio implements AudioSource {
     public isRecording$ = new ReplaySubject<boolean>(1)

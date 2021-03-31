@@ -6,8 +6,8 @@ import {
     AUDIO_GRAPH_SAMPLE_SIZE,
     filterData,
     normalizeData,
-} from './AudioGraphing'
-import { audioContext } from './AudioContext'
+} from './audio-graphing'
+import { audioContext } from './audio-context'
 
 export class WavAudio {
     blob: Blob

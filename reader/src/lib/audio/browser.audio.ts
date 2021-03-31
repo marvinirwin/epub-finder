@@ -11,7 +11,7 @@ import {
     shareReplay,
     withLatestFrom,
 } from 'rxjs/operators'
-import { AudioSource } from './AudioSource'
+import { AudioSource } from './audio-source'
 import { SpeechRecognitionConfigService } from './speech-recognition-config.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 

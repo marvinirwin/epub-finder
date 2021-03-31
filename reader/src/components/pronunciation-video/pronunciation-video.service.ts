@@ -17,7 +17,7 @@ import {
 import { VideoMetadata } from '../../types'
 import Ciseaux from '../../lib/ciseaux/browser'
 import { Tape } from 'ciseaux/browser'
-import { filterData } from '../../lib/audio/AudioGraphing'
+import { filterData } from '../../lib/audio/audio-graphing'
 
 // @ts-ignore
 Ciseaux.context = new AudioContext()

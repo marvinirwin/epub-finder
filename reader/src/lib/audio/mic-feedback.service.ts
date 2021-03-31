@@ -1,7 +1,7 @@
 import { Observable, ReplaySubject } from 'rxjs'
-import { AudioSource } from './AudioSource'
+import { AudioSource } from './audio-source'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
-import { audioContext } from './AudioContext'
+import { audioContext } from './audio-context'
 import { observableLastValue } from '../../services/settings.service'
 
 export class MicFeedbackService {
@@ -14,6 +14,7 @@ export class MicFeedbackService {
                 const source = (await audioContext).createMediaStreamSource(
                     mediaStream,
                 )
+                source.connect((await audioContext).destination)
                 const analyser = (await audioContext).createAnalyser()
                 source.connect(analyser)
                 return analyser

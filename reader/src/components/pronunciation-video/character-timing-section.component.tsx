@@ -9,7 +9,7 @@ import { PronunciationTimingCharacterComponent } from './pronunciation-character
 import { useDebouncedFn, useResizeObserver } from 'beautiful-react-hooks'
 import { VideoMetadata } from '../../types/'
 import { draw } from './draw-sine-wav'
-import { filterData, normalizeData } from '../../lib/audio/AudioGraphing'
+import { filterData, normalizeData } from '../../lib/audio/audio-graphing'
 
 export type Percentage = number
 const urlParams = new URLSearchParams(window.location.search)

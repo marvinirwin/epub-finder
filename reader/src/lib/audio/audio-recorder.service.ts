@@ -10,7 +10,7 @@ import {
 } from 'rxjs/operators'
 import { RecordRequest } from '../util/RecordRequest'
 import { sleep } from '../util/Util'
-import { AudioSource } from './AudioSource'
+import { AudioSource } from './audio-source'
 import { transliterate } from '../language/transliterate.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 

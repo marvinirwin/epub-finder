@@ -1,4 +1,4 @@
-import { AudioSource } from '../audio/AudioSource'
+import { AudioSource } from '../audio/audio-source'
 
 export interface AppContext {
     audioSource: AudioSource

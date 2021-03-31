@@ -1,4 +1,4 @@
-import { WavAudio } from './WavAudio'
+import { WavAudio } from './wav-audio'
 import axios from 'axios'
 
 export async function fetchSynthesizedAudio(
