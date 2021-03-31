@@ -1,3 +1,3 @@
-require("./lib/browser-interface")();
+require('./lib/browser-interface')()
 
-module.exports = require("./lib");
+module.exports = require('./lib')

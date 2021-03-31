@@ -1,5 +1,5 @@
 export const audioContext = new Promise<AudioContext>((resolve) => {
-  setTimeout(() => {
-    resolve(new AudioContext());
-  }, 1000);
-});
+    setTimeout(() => {
+        resolve(new AudioContext())
+    }, 1000)
+})

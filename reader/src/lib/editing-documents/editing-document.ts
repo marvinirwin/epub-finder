@@ -1,7 +1,7 @@
-import { Observable, ReplaySubject, Subject } from "rxjs";
-import { map, withLatestFrom } from "rxjs/operators";
+import { Observable, ReplaySubject, Subject } from 'rxjs'
+import { map, withLatestFrom } from 'rxjs/operators'
 
-type EditingDocumentDto = { name: string; text: string };
+type EditingDocumentDto = { name: string; text: string }
 
 /**
  * You can either edit plain local customDocuments
@@ -9,14 +9,14 @@ type EditingDocumentDto = { name: string; text: string };
  * What'
  */
 export class EditingDocument {
-  text$ = new ReplaySubject<string>(1);
-  name$ = new ReplaySubject<string>(1);
-  saveSignal$ = new Subject<void>();
-  saveEvent$: Observable<EditingDocumentDto>;
-  constructor() {
-    this.saveEvent$ = this.saveSignal$.pipe(
-      withLatestFrom(this.name$, this.text$),
-      map(([, name, text]) => ({ name, text }))
-    );
-  }
+    text$ = new ReplaySubject<string>(1)
+    name$ = new ReplaySubject<string>(1)
+    saveSignal$ = new Subject<void>()
+    saveEvent$: Observable<EditingDocumentDto>
+    constructor() {
+        this.saveEvent$ = this.saveSignal$.pipe(
+            withLatestFrom(this.name$, this.text$),
+            map(([, name, text]) => ({ name, text })),
+        )
+    }
 }

@@ -1,9 +1,9 @@
-import { InterpolateService } from "@shared/";
+import { InterpolateService } from '@shared/'
 
 export class InterpolateExampleSentencesService {
-  public static interpolate(sentences: string[]) {
-    return InterpolateService.html(
-      `
+    public static interpolate(sentences: string[]) {
+        return InterpolateService.html(
+            `
 <style>
 .example-sentence-container {
     display: flex; 
@@ -16,13 +16,13 @@ export class InterpolateExampleSentencesService {
 }
 </style>
             `,
-      `
+            `
             
 ${sentences
-  .map((sentence) => `<div class="example-sentence">${sentence}</div>`)
-  .join("</br>")}
+    .map((sentence) => `<div class="example-sentence">${sentence}</div>`)
+    .join('</br>')}
 </div>
-            `
-    );
-  }
+            `,
+        )
+    }
 }

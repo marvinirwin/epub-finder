@@ -1,7 +1,7 @@
 export interface PronunciationProgressRow {
-  word: string;
-  id?: number;
-  success: boolean;
-  timestamp: Date;
-  languageCode: string;
+    word: string
+    id?: number
+    success: boolean
+    timestamp: Date
+    languageCode: string
 }

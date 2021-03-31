@@ -1,17 +1,17 @@
-import { SuperMemoGrade } from "supermemo";
+import { SuperMemoGrade } from 'supermemo'
 
 export interface WordRecognitionRow {
-  id?: number;
-  word: string;
-  timestamp: Date;
-  nextDueDate: Date;
+    id?: number
+    word: string
+    timestamp: Date
+    nextDueDate: Date
 
-  interval: number;
-  repetition: number;
-  efactor: number;
-  grade: SuperMemoGrade;
+    interval: number
+    repetition: number
+    efactor: number
+    grade: SuperMemoGrade
 
-  hiddenFields: string[];
+    hiddenFields: string[]
 
-  languageCode: string;
+    languageCode: string
 }

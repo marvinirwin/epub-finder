@@ -1,3 +1,3 @@
-import { format } from "date-fns";
+import { format } from 'date-fns'
 
-export const formatDueDate = (d: Date) => format(d, "LLL do hbbb");
+export const formatDueDate = (d: Date) => format(d, 'LLL do hbbb')

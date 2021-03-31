@@ -66,4 +66,4 @@ export const BodyStyle = `
     .no-metadata {
         background-color: pink;
     }
-`;
+`
