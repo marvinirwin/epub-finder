@@ -12,12 +12,11 @@ export class ExampleSegmentsService {
     }: {
         selectedVirtualTabulationsService: SelectedVirtualTabulationsService
     }) {
-        this.exampleSegmentMap$ = selectedVirtualTabulationsService.selectedVirtualTabulations$.pipe(
+        this.exampleSegmentMap$ = selectedVirtualTabulationsService.selectedExampleVirtualTabulations$.pipe(
             map((tabulation) => {
-                const map1 = new SerializedTabulationAggregate(
+                return new SerializedTabulationAggregate(
                     tabulation,
                 ).wordSegmentStringsMap()
-                return map1
             }),
             shareReplay(1),
         )

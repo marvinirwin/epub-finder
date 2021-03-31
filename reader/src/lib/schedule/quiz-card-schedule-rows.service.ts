@@ -60,7 +60,7 @@ export class QuizCardScheduleRowsService {
         this.indexedScheduleRows$ = combineLatest([
             progress$,
             combineLatest([
-                selectedVirtualTabulationsService.selectedVirtualTabulations$,
+                selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
                 cardsRepository.cardIndex$,
                 ignoredWordsRepository.latestRecords$,
             ]),

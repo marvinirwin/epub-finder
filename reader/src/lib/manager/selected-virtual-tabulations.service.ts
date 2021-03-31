@@ -5,7 +5,8 @@ import { combineLatest, Observable } from 'rxjs'
 import { SerializedDocumentTabulation } from '@shared/*'
 
 export class SelectedVirtualTabulationsService {
-    selectedVirtualTabulations$: Observable<SerializedDocumentTabulation[]>
+    selectedFrequencyVirtualTabulations$: Observable<SerializedDocumentTabulation[]>
+    selectedExampleVirtualTabulations$: Observable<SerializedDocumentTabulation[]>
 
     constructor({
         openDocumentsService,
@@ -14,16 +15,26 @@ export class SelectedVirtualTabulationsService {
         openDocumentsService: OpenDocumentsService
         settingsService: SettingsService
     }) {
-        this.selectedVirtualTabulations$ = combineLatest([
-            openDocumentsService.virtualDocumentTabulation$,
-            settingsService.selectedFrequencyDocuments$,
-        ]).pipe(
+        const selectedPipe = <T, U>(idFunc: (v: T) => U) => (o$: Observable<[ T[], U[] ]>): Observable<T[]> => o$.pipe(
             map(([virtualDocumentTabulation, selectedFrequencyDocuments]) => {
                 const set = new Set(selectedFrequencyDocuments)
-                return virtualDocumentTabulation.serializedTabulations.filter(
-                    (tabulation) => set.has(tabulation.id || ''),
+                return virtualDocumentTabulation.filter(
+                    (tabulation) => set.has(idFunc(tabulation)),
                 )
             }),
+        )
+        this.selectedFrequencyVirtualTabulations$ = combineLatest([
+            openDocumentsService.virtualDocumentTabulation$.pipe(map(tabulationAggregate => tabulationAggregate.serializedTabulations)),
+            settingsService.selectedFrequencyDocuments$,
+        ]).pipe(
+            selectedPipe<SerializedDocumentTabulation, string>(t => t.id),
+            shareReplay(1),
+        );
+        this.selectedExampleVirtualTabulations$ = combineLatest([
+            openDocumentsService.virtualDocumentTabulation$.pipe(map(tabulationAggregate => tabulationAggregate.serializedTabulations)),
+            settingsService.selectedExampleSegmentDocuments$,
+        ]).pipe(
+            selectedPipe<SerializedDocumentTabulation, string>(t => t.id),
             shareReplay(1),
         )
     }

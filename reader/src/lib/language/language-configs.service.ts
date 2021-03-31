@@ -2,10 +2,7 @@ import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay } from 'rxjs/operators'
 import { SupportedTranslationService } from './supported-translation.service'
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
-import {
-    SpeechToTextConfig,
-    SupportedSpeechToTextService,
-} from './supported-speech-to-text.service'
+import { SpeechToTextConfig, SupportedSpeechToTextService } from './supported-speech-to-text.service'
 import { SupportedTransliterationService } from './supported-transliteration.service'
 import { TextSpeechMap } from './text-speech-map'
 
@@ -71,7 +68,8 @@ export class LanguageConfigsService {
         this.potentialLearningSpoken$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
                 const lowerCode = learningLanguageCode.toLowerCase()
-                return (TextSpeechMap[lowerCode] || []).map((code) =>
+                const textSpeechMapElement = TextSpeechMap[lowerCode]
+                return (textSpeechMapElement || []).map((code) =>
                     SupportedSpeechToTextService.ConfigMap.get(code),
                 ) as SpeechToTextConfig[]
                 /*
@@ -90,15 +88,14 @@ export class LanguageConfigsService {
             settingsService.spokenLanguage$,
         ]).subscribe(
             ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
-                const firstPotentialSpokenLanguageConfig =
-                    potentialSpokenLanguageConfigs[0]
-                const shouldSetDefaultSpokenLanguage =
-                    !currentSpokenLanguageCode &&
-                    firstPotentialSpokenLanguageConfig
+                const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0]
+                const shouldSetDefaultSpokenLanguage = (!currentSpokenLanguageCode || !potentialSpokenLanguageConfigs.find(config => config.code === currentSpokenLanguageCode)) &&
+                    firstPotentialSpokenLanguageConfig;
                 if (shouldSetDefaultSpokenLanguage) {
                     settingsService.spokenLanguage$.next(
                         firstPotentialSpokenLanguageConfig.code,
                     )
+                    return;
                 }
                 const shouldClearSpokenLanguage =
                     currentSpokenLanguageCode &&
@@ -118,7 +115,7 @@ export class LanguageConfigsService {
                     ({ script1, script2, bidirectional, code }) => {
                         return (
                             code.toLowerCase() ===
-                                learningLanguageCode.toLowerCase() &&
+                            learningLanguageCode.toLowerCase() &&
                             script2 === 'Latn'
                         )
                     },
@@ -141,7 +138,7 @@ export class LanguageConfigsService {
                     ({ script1, script2, bidirectional, code }) => {
                         return (
                             code.toLowerCase() ===
-                                learningLanguageCode.toLocaleLowerCase() &&
+                            learningLanguageCode.toLocaleLowerCase() &&
                             script2 === 'Latn' &&
                             bidirectional
                         )

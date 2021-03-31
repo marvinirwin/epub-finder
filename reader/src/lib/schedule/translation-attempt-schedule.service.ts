@@ -38,7 +38,7 @@ export class TranslationAttemptScheduleService
         languageConfigsService: LanguageConfigsService
     }) {
         this.indexedScheduleRows$ = combineLatest([
-            selectedVirtualTabulationsService.selectedVirtualTabulations$,
+            selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$,
             languageConfigsService.readingLanguageCode$

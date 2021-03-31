@@ -1,16 +1,8 @@
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-} from '@material-ui/core'
-import { format, formatDistance } from 'date-fns'
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
+import { formatDistance } from 'date-fns'
 
 export const QuizCardScheduleTable = () => {
     const m = useContext(ManagerContext)
@@ -20,7 +12,7 @@ export const QuizCardScheduleTable = () => {
         )?.limitedScheduleRows || []
     return (
         <TableContainer component={Paper}>
-            <Table size="small">
+            <Table size='small'>
                 <TableHead>
                     <TableRow>
                         <TableCell>Word</TableCell>
@@ -35,13 +27,11 @@ export const QuizCardScheduleTable = () => {
                 <TableBody>
                     {rows.slice(0, 3).map((row) => (
                         <TableRow key={row.d.word}>
-                            <TableCell component="th" scope="row">
+                            <TableCell component='th' scope='row'>
                                 {row.d.word}
                             </TableCell>
                             <TableCell>
-                                <TableCell>
-                                    {formatDistance(row.dueDate(), Date.now())}{' '}
-                                </TableCell>
+                                {formatDistance(row.dueDate(), Date.now())}{' '}
                             </TableCell>
                             {/*
                         <TableCell align="right">

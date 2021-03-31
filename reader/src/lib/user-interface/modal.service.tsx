@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, Fragment } from 'react'
 import { LanguageSelect } from '../../components/app-directory/nodes/language-select.component'
 import { ToggleTranslateComponent } from '../../components/settings/toggle-translate.component'
 import { TogglePinyinComponent } from '../../components/settings/toggle-pinyin.component'
@@ -34,7 +34,7 @@ export class ModalService {
         this.intro = new NavModal('intro', () => <Intro />)
         this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
         this.languageSelect = new NavModal('spokenLanguage', () => (
-            <LanguageSelect />
+            <Box m={2} p={1} style={{height: '90vh', width: '90vw'}}><LanguageSelect /></Box>
         ))
         this.library = new NavModal('documentSelect', () => <Box m={2} p={1}><LibraryTable /></Box>)
         this.quizScheduleOverView = new NavModal('quizScheduleOverView', () => (
@@ -42,9 +42,8 @@ export class ModalService {
         ))
 
         this.settings = new NavModal('settings', () => {
-            const m = useContext(ManagerContext)
             return (
-                <div>
+                <Box m={2} p={1} style={{width: '90vw'}}>
                     <ToggleTranslateComponent />
                     <TogglePinyinComponent />
                     <AdjustFrequencyWeight />
@@ -53,7 +52,7 @@ export class ModalService {
                     <AdjustTranslationAttemptSentenceWeight />
                     <SetQuizWordLimit />
                     <HotkeyConfig />
-                </div>
+                </Box>
             )
         })
 

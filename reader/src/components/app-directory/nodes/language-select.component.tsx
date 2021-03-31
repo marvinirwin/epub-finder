@@ -16,9 +16,9 @@ export const LanguageSelect = () => {
         []
     return (
         <Fragment>
-            <Box m={2}>
+            <Box m={2} p={1}>
                 <InputLabel id="reading-language-select-label">
-                    Script
+                    Reading Language
                 </InputLabel>
                 <Select
                     variant={'filled'}
@@ -40,7 +40,7 @@ export const LanguageSelect = () => {
                     )}
                 </Select>
             </Box>
-            <Box m={2}>
+            <Box m={2} p={1}>
                 <InputLabel id="spoken-language-select-label">
                     Spoken Language
                 </InputLabel>
@@ -58,7 +58,7 @@ export const LanguageSelect = () => {
                     }}
                 >
                     {potentialSpokenLanguageCode.map((c) => (
-                        <MenuItem value={c.code}>{c.label}</MenuItem>
+                        <MenuItem key={c.code} value={c.code}>{c.label}</MenuItem>
                     ))}
                 </Select>
             </Box>

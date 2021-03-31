@@ -12,7 +12,7 @@ export const UploadDialog = () => {
         m.uploadingDocumentsService.currentUploadingFile$,
     )
     return (
-        <Box m={2}>
+        <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
                 Use text as learning material
             </Typography>
@@ -60,7 +60,7 @@ export const UploadDialog = () => {
                             variant="outlined"
                             component="span"
                         >
-                            Upload
+                            Upload a txt, pdf or html file
                         </Button>
                     </label>
                 </div>

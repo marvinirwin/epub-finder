@@ -49,7 +49,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                     checked={
                         !!exampleSentences?.includes(document.ltDocument.id())
                     }
-                    onChange={() => document.toggleUseForFrequency()}
+                    onChange={() => document.toggleUseForExamples()}
                 />
             </TableCell>
             {/*
