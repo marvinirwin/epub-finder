@@ -11,7 +11,7 @@ import {LibraryDocumentRowComponent} from "./library-table-row.component";
 export const LibraryTable = () => {
     const m = useContext(ManagerContext);
     const readingDocuments = useObservableState(m.documentRepository.collection$) || new Map();
-    return <TableContainer component={Paper}>
+    return <TableContainer component={Paper} style={{width: '90vw', height: '90vh'}}>
         <Box m={2} p={1}><Button
             variant={'contained'}
             onClick={() => {

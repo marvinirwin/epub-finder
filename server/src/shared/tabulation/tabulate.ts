@@ -1,6 +1,6 @@
 import {SetWithUniqueLengths} from "../tabulate-documents/set-with-unique-lengths";
 import {Segment} from "../tabulate-documents/segment/segment";
-import {TabulatedDocuments, TabulatedSegments} from "../tabulate-documents/tabulated-documents.interface";
+import {TabulatedDocuments} from "../tabulate-documents/tabulated-documents.interface";
 import {AtomMetadata} from "../atom-metadata.interface.ts/atom-metadata";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 

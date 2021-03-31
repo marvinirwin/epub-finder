@@ -5,6 +5,7 @@ import trie from "trie-prefix-tree";
 import {Segment} from "./segment/segment";
 import {ChineseVocabService} from "./chinese-vocab.service";
 import {tabulate} from "./segment/tabulate";
+import {resolvePartialTabulationConfig} from "../../../../reader/src/lib/language/language-maps/word-separator";
 
 export const TabulateChineseText = async (text: string) => {
     const notableCharacterSequencesSegmentsGreedyWordSet = trie(await ChineseVocabService.vocab());
@@ -12,7 +13,9 @@ export const TabulateChineseText = async (text: string) => {
         {
             notableCharacterSequences: notableCharacterSequencesSegmentsGreedyWordSet,
             segments: AtomizedDocument.atomizeDocument(InterpolateService.text(text)).segments(),
-            greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet
+            greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet,
+            ...resolvePartialTabulationConfig('zh-hans'),
+            languageCode: 'zh-hans'
         }
 
     )

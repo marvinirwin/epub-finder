@@ -7,6 +7,7 @@ import {TabulateService} from "./tabulate.service";
 import {CacheService} from "../../util/cache.service";
 import {SimilarityResults} from "../../shared/compre-similarity-result";
 import {computeSimilarityTabulation} from "../../shared/similarity-result.interface";
+import {language} from "googleapis/build/src/apis/language";
 
 export class DocumentSimilarityService {
     constructor(
@@ -21,7 +22,7 @@ export class DocumentSimilarityService {
     ) {
     }
 
-    async compareDocumentsByName(knownDocumentName: string, unknownDocumentName: string, words: string[]): Promise<SimilarityResults> {
+    async compareDocumentsByName(knownDocumentName: string, unknownDocumentName: string, words: string[], languageCode: string): Promise<SimilarityResults> {
         return this.cacheService.memo<SimilarityResults>(
             {
                 args: [knownDocumentName, unknownDocumentName, words],
@@ -29,11 +30,13 @@ export class DocumentSimilarityService {
                 cb: async () => {
                     const knownSerializedTabulation = await this.tabulateService.tabulate(
                         {where: {name: knownDocumentName}},
-                        words
+                        words,
+                        languageCode
                     );
                     const unknownSerializedTabulation = await this.tabulateService.tabulate(
                         {where: {name: knownDocumentName}},
-                        words
+                        words,
+                        languageCode
                     );
                     return computeSimilarityTabulation(
                         knownSerializedTabulation,

@@ -2,11 +2,11 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {DocumentView} from "../../entities/document-view.entity";
 import {FindOneOptions, Repository} from "typeorm";
 import {s3ReadStream} from "../uploading/s3.service";
-import {AtomizedDocument, Segment, SerializedTabulation, tabulate} from "../../shared";
-import trie from "trie-prefix-tree";
+import {AtomizedDocument, SerializedTabulation, tabulate} from "../../shared";
 import {CacheService} from "../../util/cache.service";
 import {Inject} from "@nestjs/common";
 import {SetWithUniqueLengths} from "../../shared/tabulate-documents/set-with-unique-lengths";
+import {resolvePartialTabulationConfig} from "../../../../reader/src/lib/language/language-maps/word-separator";
 
 
 export class TabulateService {
@@ -19,19 +19,19 @@ export class TabulateService {
 
     }
 
-    async tabulate(findOptions: FindOneOptions<DocumentView>, words: string[]): Promise<SerializedTabulation> {
+    async tabulate(findOptions: FindOneOptions<DocumentView>, words: string[], languageCode: string): Promise<SerializedTabulation> {
         return this.cacheService.memo<SerializedTabulation>(
             {
                 args: [findOptions, words],
                 service: "TABULATE",
                 cb: async () => {
-                    return await this.tabulateNoCache(findOptions, words);
+                    return await this.tabulateNoCache(findOptions, words, languageCode);
                 }
             }
         )
     }
 
-    async tabulateNoCache(findOptions: FindOneOptions<DocumentView>, words: string[]) {
+    async tabulateNoCache(findOptions: FindOneOptions<DocumentView>, words: string[], languageCode: string) {
         const documentToTabulate = await this.documentViewRepository.findOne(findOptions)
         if (!documentToTabulate) {
             throw new Error(`Cannot find document ${JSON.stringify(documentToTabulate)}`);
@@ -40,14 +40,15 @@ export class TabulateService {
         const text = await streamToString(await s3ReadStream(documentToTabulate.filename));
         const atomizedDocument = AtomizedDocument.atomizeDocument(text);
         const setWithUniqueLengths = new SetWithUniqueLengths(words);
-        const tabulation = tabulate(
+        return tabulate(
             {
                 notableCharacterSequences: setWithUniqueLengths,
                 segments: atomizedDocument.segments(),
-                greedyWordSet: setWithUniqueLengths
+                greedyWordSet: setWithUniqueLengths,
+                ...resolvePartialTabulationConfig(languageCode),
+                languageCode
             }
         );
-        return tabulation;
 /*
         return {
             wordCounts: tabulation.wordCounts,

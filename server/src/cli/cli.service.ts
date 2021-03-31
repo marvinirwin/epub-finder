@@ -7,6 +7,7 @@ import {SimilarityEdgeVersion} from "../entities/count-edge.version.entity";
 import {DocumentSimilarityService} from "../documents/similarity/document-similarity.service";
 import {Inject} from "@nestjs/common";
 import {ChineseVocabService} from "../shared/tabulate-documents/chinese-vocab.service";
+import {language} from "googleapis/build/src/apis/language";
 
 export class CliService {
     constructor(
@@ -20,9 +21,12 @@ export class CliService {
     async exec(customArgv?: string[]) {
         const args = commandLineArgs(
             {
+                languageCode: {
+                    type: String
+                },
                 documents: {
                     type: String, multiple: true, defaultOption: true
-                }
+                },
             },
             {
                 argv: customArgv || process.argv
@@ -33,7 +37,8 @@ export class CliService {
             await this.documentSimilarityService.compareDocumentsByName(
                 doc1Name,
                 doc2Name,
-                await ChineseVocabService.vocab()
+                await ChineseVocabService.vocab(),
+                args.languageCode
             )
         )
     }
