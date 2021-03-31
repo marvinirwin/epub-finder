@@ -14,7 +14,6 @@ export class MicFeedbackService {
                 const source = (await audioContext).createMediaStreamSource(
                     mediaStream,
                 )
-                source.connect((await audioContext).destination)
                 const analyser = (await audioContext).createAnalyser()
                 source.connect(analyser)
                 return analyser

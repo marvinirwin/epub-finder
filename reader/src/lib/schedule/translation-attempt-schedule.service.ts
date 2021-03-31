@@ -64,23 +64,24 @@ export class TranslationAttemptScheduleService
                         }
                         return scheduleRows[segmentText]
                     }
+                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex;
                     virtualDocumentTabulation.serializedTabulations.forEach(
-                        (serialzedTabulation) =>
+                        (serialzedTabulation) => {
                             serialzedTabulation.segmentWordCountRecordsMap.forEach(
-                                (value, key) => {
-                                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex;
+                                (wordCountRecords, serializedSegment) => {
                                     if (
-                                        key.text
+                                        serializedSegment.text
                                             .split('')
                                             .find(v => isNotableCharacterRegex.test(v)) &&
-                                        key.text.length > 5
+                                        serializedSegment.text.length > 5
                                     ) {
                                         ensureScheduleRow(
-                                            key.text,
-                                        ).wordCountRecords.push(...value)
+                                            serializedSegment.text,
+                                        ).wordCountRecords.push(...wordCountRecords)
                                     }
                                 },
-                            ),
+                            )
+                        },
                     )
                     Object.entries(translationAttempts).forEach(
                         ([key, value]) => {

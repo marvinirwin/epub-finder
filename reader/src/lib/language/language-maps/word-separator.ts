@@ -83,7 +83,6 @@ export const resolvePartialTabulationConfig = (
     isNotableCharacterRegex: RegExp
 } => {
     const result = languageRegexMap.get(languageCode)
-    debugger;
     return {
         wordIdentifyingStrategy: result?.strategy || 'noSeparator',
         isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,
