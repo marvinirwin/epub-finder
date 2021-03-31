@@ -6,5 +6,5 @@ module.exports = {
   load: null,
   decode: null,
   from: null,
-  render: null
+  render: null,
 };

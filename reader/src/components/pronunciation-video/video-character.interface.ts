@@ -1,4 +1,4 @@
 export interface VideoCharacter {
-    character: string;
-    timestamp: number;
+  character: string;
+  timestamp: number;
 }

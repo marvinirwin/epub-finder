@@ -1,6 +1,6 @@
 "use strict";
 /* eslint import/no-webpack-loader-syntax:0 */
-const RenderWorker = require('Worker-loader?name=dist/[name].js!./render-worker');
+const RenderWorker = require("Worker-loader?name=dist/[name].js!./render-worker");
 
 const worker = new RenderWorker();
 var __callbacks = [];
@@ -22,7 +22,10 @@ module.exports = {
       return array.buffer;
     });
 
-    worker.postMessage({ type: "transfer", data: data, buffers: buffers }, buffers);
+    worker.postMessage(
+      { type: "transfer", data: data, buffers: buffers },
+      buffers
+    );
 
     return data;
   },

@@ -1,5 +1,5 @@
-import {ReplaySubject} from "rxjs";
-import {ds_Dict, IndexedByNumber} from "../delta-scan/delta-scan.module";
+import { ReplaySubject } from "rxjs";
+import { ds_Dict, IndexedByNumber } from "../delta-scan/delta-scan.module";
 import { DocumentViewDto } from "@server/*";
 
 /**
@@ -7,5 +7,5 @@ import { DocumentViewDto } from "@server/*";
  * Right now this functions is just in settings
  */
 export class CheckedOutDocumentsService {
-    checkedOutDocuments$ = new ReplaySubject<IndexedByNumber<DocumentViewDto>>(1);
+  checkedOutDocuments$ = new ReplaySubject<IndexedByNumber<DocumentViewDto>>(1);
 }

@@ -1,5 +1,4 @@
-import {OpenDocumentsService} from "../open-documents.service";
-import {BrowserInputsService} from "../../hotkeys/browser-inputs-service";
+import { OpenDocumentsService } from "../open-documents.service";
+import { BrowserInputsService } from "../../hotkeys/browser-inputs-service";
 
-export function InputPage(u: BrowserInputsService, p: OpenDocumentsService) {
-}
+export function InputPage(u: BrowserInputsService, p: OpenDocumentsService) {}

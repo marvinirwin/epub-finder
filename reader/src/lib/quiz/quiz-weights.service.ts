@@ -1,12 +1,5 @@
-import {SettingsService} from "../../services/settings.service";
+import { SettingsService } from "../../services/settings.service";
 
 export class QuizWeightsService {
-    constructor(
-        {
-            settingsService
-        }: {
-            settingsService: SettingsService
-        }
-    ) {
-    }
+  constructor({ settingsService }: { settingsService: SettingsService }) {}
 }

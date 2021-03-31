@@ -1,5 +1,5 @@
 export function interpolateSimpleCustomDoc(text: string) {
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>

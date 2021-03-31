@@ -35,6 +35,7 @@
     "node-sass": "^4.14.1",
     "observable-hooks": "^3.0.0",
     "plotly.js": "^1.54.5",
+    "prettier": "^2.2.1",
     "react": "^16.13.1",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.13.1",
@@ -63,7 +64,7 @@
     "eject": "react-scripts eject",
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build",
-    "lint-fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
+    "lint-fix": "prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"

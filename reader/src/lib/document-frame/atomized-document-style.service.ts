@@ -67,4 +67,3 @@ export const BodyStyle = `
         background-color: pink;
     }
 `;
-

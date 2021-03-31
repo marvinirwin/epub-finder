@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useEffect, useState} from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 /*
 export const Carousel: FunctionComponent<{currentIndex: number}> = ({ currentIndex, children}) => {
@@ -43,5 +43,3 @@ export const Carousel: FunctionComponent<{currentIndex: number}> = ({ currentInd
     );
 }
 */
-
-

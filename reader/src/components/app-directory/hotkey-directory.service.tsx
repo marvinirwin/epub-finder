@@ -1,32 +1,30 @@
-import {HotKeyEvents} from "../../lib/hotkeys/HotKeyEvents";
-import {Manager} from "../../lib/manager/Manager";
-import React, {useContext} from "react";
-import {orderBy} from "lodash";
-import {ds_Tree} from "../../services/tree.service";
-import {HotkeyDirectoryComponent} from "./hotkey-directory.component";
-import {Hotkeys} from "../../lib/hotkeys/hotkeys.interface";
-import {TreeMenuNode} from "./tree-menu-node.interface";
+import { HotKeyEvents } from "../../lib/hotkeys/HotKeyEvents";
+import { Manager } from "../../lib/manager/Manager";
+import React, { useContext } from "react";
+import { orderBy } from "lodash";
+import { ds_Tree } from "../../services/tree.service";
+import { HotkeyDirectoryComponent } from "./hotkey-directory.component";
+import { Hotkeys } from "../../lib/hotkeys/hotkeys.interface";
+import { TreeMenuNode } from "./tree-menu-node.interface";
 
+const hotkeyMenuNodeFactory = (m: Manager, action: keyof Hotkeys<any>) => ({
+  name: action,
+  label: action,
+  InlineComponent: () => (
+    <HotkeyDirectoryComponent action={action} key={action} />
+  ),
+});
 
-const hotkeyMenuNodeFactory = (
-    m: Manager,
-    action: keyof Hotkeys<any>,
-) => ({
-    name: action,
-    label: action,
-    InlineComponent: () => <HotkeyDirectoryComponent action={action} key={action}/>
-})
-
-export const EditableHotkeys = (hotkeys: Hotkeys<string[]>, m: Manager): TreeMenuNode[] => {
-    return orderBy(Object.entries(hotkeys), ([action]) => action).map(([action, arr]) => {
-        return hotkeyMenuNodeFactory(m, action as keyof Hotkeys<any>);
-    })
-}
-
-
-
-
-
+export const EditableHotkeys = (
+  hotkeys: Hotkeys<string[]>,
+  m: Manager
+): TreeMenuNode[] => {
+  return orderBy(Object.entries(hotkeys), ([action]) => action).map(
+    ([action, arr]) => {
+      return hotkeyMenuNodeFactory(m, action as keyof Hotkeys<any>);
+    }
+  );
+};
 
 /*
 export const HotkeyDirectoryService = (m: Manager): ds_Tree<TreeMenuNode> => {

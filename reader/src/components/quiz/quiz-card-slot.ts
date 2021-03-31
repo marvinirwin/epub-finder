@@ -1,10 +1,7 @@
-import {ReplaySubject} from "rxjs";
+import { ReplaySubject } from "rxjs";
 
 export class QuizCardSlot {
-    term$ = new ReplaySubject<string>(1)
+  term$ = new ReplaySubject<string>(1);
 
-    constructor(
-
-    ) {
-    }
+  constructor() {}
 }

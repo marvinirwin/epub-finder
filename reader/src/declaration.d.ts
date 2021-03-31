@@ -1,2 +1,1 @@
-declare module 'shutterstock-api'
-
+declare module "shutterstock-api";

@@ -1,4 +1,4 @@
-import {blendColors} from "./blend-colors.service";
+import { blendColors } from "./blend-colors.service";
 
 export type RGBA = [number, number, number, number];
 /**
@@ -7,8 +7,8 @@ export type RGBA = [number, number, number, number];
  * @param h
  */
 export const mixRGBA = (h: RGBA[] | undefined): string => {
-    if (!h) return `transparent`;
-    const colors = [...h.values()];
-    if (!colors.length) return `transparent`;
-    return `RGBA(${blendColors(colors)})`
-}
+  if (!h) return `transparent`;
+  const colors = [...h.values()];
+  if (!colors.length) return `transparent`;
+  return `RGBA(${blendColors(colors)})`;
+};

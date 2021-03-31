@@ -32,9 +32,13 @@ function decode(buffer) {
     config.context = new AudioContext();
   }
   return new Promise(function (resolve, reject) {
-    config.context.decodeAudioData(buffer, function (audioBuffer) {
-      resolve(toAudioData(audioBuffer));
-    }, reject);
+    config.context.decodeAudioData(
+      buffer,
+      function (audioBuffer) {
+        resolve(toAudioData(audioBuffer));
+      },
+      reject
+    );
   });
 }
 
@@ -65,7 +69,8 @@ function from(src) {
 }
 
 function render(tape) {
-  var numberOfChannels = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+  var numberOfChannels =
+    arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 
   numberOfChannels = Math.max(numberOfChannels, tape.numberOfChannels);
 
@@ -76,10 +81,13 @@ function render(tape) {
   }
 
   return renderer.render(tape).then(function (channelData) {
-    return AudioData.toAudioBuffer({
-      sampleRate: tape.sampleRate,
-      channelData: channelData
-    }, config.context);
+    return AudioData.toAudioBuffer(
+      {
+        sampleRate: tape.sampleRate,
+        channelData: channelData,
+      },
+      config.context
+    );
   });
 }
 

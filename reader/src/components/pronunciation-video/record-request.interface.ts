@@ -1,1 +1,1 @@
-export type RecordRequestSentence = { sentence: string, selected: boolean };
+export type RecordRequestSentence = { sentence: string; selected: boolean };

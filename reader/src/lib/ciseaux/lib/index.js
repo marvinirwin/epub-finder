@@ -26,16 +26,22 @@ module.exports = {
   Tape: Tape,
 
   from: function from() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    for (
+      var _len = arguments.length, args = Array(_len), _key = 0;
+      _key < _len;
+      _key++
+    ) {
       args[_key] = arguments[_key];
     }
 
     if (config.from) {
       return config.from.apply(config, args);
     }
-    return Promise.resolve(new (Function.prototype.bind.apply(Tape, [null].concat(args)))());
+    return Promise.resolve(
+      new (Function.prototype.bind.apply(Tape, [null].concat(args)))()
+    );
   },
   silence: Tape.silence,
   concat: Tape.concat,
-  mix: Tape.mix
+  mix: Tape.mix,
 };

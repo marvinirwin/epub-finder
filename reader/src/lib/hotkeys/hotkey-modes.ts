@@ -1,4 +1,4 @@
 export enum HotkeyModes {
-    TextInput = "TextInput",
-    Reading = "Reading"
+  TextInput = "TextInput",
+  Reading = "Reading",
 }

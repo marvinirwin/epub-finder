@@ -40,7 +40,8 @@ function from(src) {
 }
 
 function render(tape) {
-  var numberOfChannels = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+  var numberOfChannels =
+    arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 
   numberOfChannels = Math.max(numberOfChannels, tape.numberOfChannels);
 
@@ -49,7 +50,7 @@ function render(tape) {
   return renderer.render(tape).then(function (channelData) {
     return WavEncoder.encode({
       sampleRate: tape.sampleRate,
-      channelData: channelData
+      channelData: channelData,
     });
   });
 }

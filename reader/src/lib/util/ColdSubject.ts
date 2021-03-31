@@ -1,5 +1,12 @@
-import {BehaviorSubject, merge, Observable, Subject} from "rxjs";
-import {map, mergeAll, scan, shareReplay, switchMap, tap} from "rxjs/operators";
+import { BehaviorSubject, merge, Observable, Subject } from "rxjs";
+import {
+  map,
+  mergeAll,
+  scan,
+  shareReplay,
+  switchMap,
+  tap,
+} from "rxjs/operators";
 
 /**
  * This doesn't work with withLatestFrom, it's complicated
@@ -7,13 +14,10 @@ import {map, mergeAll, scan, shareReplay, switchMap, tap} from "rxjs/operators";
  * @deprecated
  */
 export class ColdSubject<T> {
-    public addObservable$ = new Subject<Observable<T>>();
-    public obs$: Observable<T>;
-    constructor() {
-        this.obs$ = this.addObservable$.pipe(
-            mergeAll(),
-            shareReplay(1)
-        );
-        this.obs$.subscribe()
-    }
+  public addObservable$ = new Subject<Observable<T>>();
+  public obs$: Observable<T>;
+  constructor() {
+    this.obs$ = this.addObservable$.pipe(mergeAll(), shareReplay(1));
+    this.obs$.subscribe();
+  }
 }
