@@ -44,7 +44,7 @@ export class OpenDocument {
         this.renderedTabulation$ = combineLatest([
             this.renderedSegments$,
             tabulationConfigurationService.tabulationConfiguration$,
-            tabulationConfigurationService.languageCode$,
+            services.languageConfigsService.languageCode$,
         ]).pipe(
             map(([segments, tabulationConfiguration, languageCode]) => {
                 const tabulatedSentences = mergeTabulations(

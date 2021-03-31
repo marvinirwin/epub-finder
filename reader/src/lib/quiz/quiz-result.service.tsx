@@ -8,7 +8,8 @@ import { SuperMemoGrade } from 'supermemo'
 
 export interface QuizResult {
     word: string
-    grade: SuperMemoGrade
+    grade: SuperMemoGrade;
+    languageCode: string;
 }
 
 export enum QuizComponent {
@@ -43,10 +44,11 @@ export class QuizResultService {
                 wordRecognitionProgressService.addRecords$.next([record])
             })
     }
-    completeQuiz(word: string, recognitionScore: SuperMemoGrade) {
+    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade) {
         this.quizResult$.next({
             grade: recognitionScore,
             word,
+            languageCode,
         })
 
         this.requestNextCard$.next()

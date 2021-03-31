@@ -1,1 +1,1 @@
-declare module "memoizee/weak" {}
+declare module 'memoizee/weak' {}

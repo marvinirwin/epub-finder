@@ -1,21 +1,21 @@
-import { uniq, flatten } from "lodash";
-import { ICard } from "../../../../server/src/shared/ICard";
+import { uniq, flatten } from 'lodash'
+import { ICard } from '../../../../server/src/shared/ICard'
 
 export function cardForWord(word: string): ICard {
-  return {
-    learningLanguage: word,
-    photos: [],
-    sounds: [],
-    knownLanguage: [],
-    deck: "",
-    fields: [],
-    illustrationPhotos: [],
-    timestamp: new Date(),
-  };
+    return {
+        learningLanguage: word,
+        photos: [],
+        sounds: [],
+        knownLanguage: [],
+        deck: '',
+        fields: [],
+        illustrationPhotos: [],
+        timestamp: new Date(),
+    }
 }
 
 export const sleep = (n: number) =>
-  new Promise((resolve) => setTimeout(resolve, n));
+    new Promise((resolve) => setTimeout(resolve, n))
 
 /**
  * Changed this to split on linebreak because I'm lazy for now
@@ -24,12 +24,12 @@ export const sleep = (n: number) =>
  * @param filterFunc
  */
 export function splitPunctuation(
-  threshhold: number,
-  str: string,
-  filterFunc: (char: string) => boolean
+    threshhold: number,
+    str: string,
+    filterFunc: (char: string) => boolean,
 ): string[] {
-  return flatten(str.split("。").map((str) => str + "。"));
-  /*
+    return flatten(str.split('。').map((str) => str + '。'))
+    /*
     const splits = [];
     // Once the threshhold is reached, split on the next punctuation/line break
     let currentStart = 0;
@@ -47,24 +47,24 @@ export function splitPunctuation(
 */
 }
 export const splitKeepDelim = (delim: string) => (
-  ...strings: string[]
+    ...strings: string[]
 ): string[] => {
-  return flatten(
-    strings.map((string) =>
-      string
-        .split(delim)
-        .filter((v) => v)
-        .map((splitString) => splitString + delim)
+    return flatten(
+        strings.map((string) =>
+            string
+                .split(delim)
+                .filter((v) => v)
+                .map((splitString) => splitString + delim),
+        ),
     )
-  );
-};
+}
 
-export const jestDetected = () => process.env.JEST_WORKER_ID !== undefined;
+export const jestDetected = () => process.env.JEST_WORKER_ID !== undefined
 
 export enum NavigationPages {
-  READING_PAGE = "READING_PAGE",
-  QUIZ_PAGE = "QUIZ_PAGE",
-  TRENDS_PAGE = "TRENDS_PAGE",
-  SETTINGS_PAGE = "SETTINGS_PAGE",
-  LIBRARY_PAGE = "LIBRARY_PAGE",
+    READING_PAGE = 'READING_PAGE',
+    QUIZ_PAGE = 'QUIZ_PAGE',
+    TRENDS_PAGE = 'TRENDS_PAGE',
+    SETTINGS_PAGE = 'SETTINGS_PAGE',
+    LIBRARY_PAGE = 'LIBRARY_PAGE',
 }

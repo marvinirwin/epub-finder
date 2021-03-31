@@ -147,8 +147,8 @@ export class QuizService {
             ]).pipe(
                 map(([, manualFieldConfig]) => {
                     const m = { hiddenDefinition, hiddenLearningLanguage }
-                    // @ts-ignore
                     return (
+                        // @ts-ignore
                         m[manualFieldConfig] || computeRandomHiddenQuizFields()
                     )
                 }),

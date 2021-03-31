@@ -1,36 +1,36 @@
 .quiz-card {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
 }
 #quiz-card-image-placeholder {
 }
 .quiz-button-hard {
-  background-color: lightcoral;
+    background-color: lightcoral;
 }
 .quiz-button-medium {
-  background-color: lightyellow;
+    background-color: lightyellow;
 }
 .quiz-button-easy {
-  background-color: lightgreen;
+    background-color: lightgreen;
 }
 .quiz-button-hide {
-  background-color: lightgrey;
+    background-color: lightgrey;
 }
 
 .quiz-card-data-sheet {
-  display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
-  & > div {
-    flex: 1;
-  }
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    & > div {
+        flex: 1;
+    }
 }
 
 .quiz-card-data-sheet-middle {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }

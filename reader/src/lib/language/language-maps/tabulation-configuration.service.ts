@@ -13,7 +13,6 @@ import { map, shareReplay } from 'rxjs/operators'
 
 export class TabulationConfigurationService {
     tabulationConfiguration$: Observable<SerializableTabulationConfiguration>
-    languageCode$: Observable<string>
 
     constructor({
         wordsService,

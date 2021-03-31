@@ -110,10 +110,10 @@ export class SupportedTransliterationService {
             'Thai Thai',
             false,
             'Latn',
-            // @ts-ignore
         ],
         5,
     ).map(
+        // @ts-ignore
         ([language, code, script1, bidirectional, script2]: [
             string,
             string,

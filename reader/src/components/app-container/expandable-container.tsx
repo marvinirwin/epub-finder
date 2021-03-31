@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs'
 import { useSubscription } from 'observable-hooks'
 
 const dimensions = (
-    container: HTMLElement | undefined,
+    container: HTMLElement | undefined | null,
 ): React.CSSProperties => {
     // TODO maybe handle lots of children and pick the largest?
     const child = container?.children?.[0]
@@ -30,7 +30,7 @@ export const ExpandableContainer: React.FC<{
     resizeObservable$?: Observable<void>
     name?: string
 }> = ({ children, shouldShow, hideDelay, name, resizeObservable$ }) => {
-    const ref = useRef<HTMLElement>()
+    const ref = useRef<HTMLElement | null | undefined>()
     const [styles, setStyles] = useState({})
     // @ts-ignore
     const DOMRect = useResizeObserver(ref, 500)
@@ -66,7 +66,7 @@ export const ExpandableContainer: React.FC<{
     }, [shouldShow, DOMRect])
     // @ts-ignore
     return (
-        <div className={`expandable`} ref={ref} style={styles}>
+        <div className={`expandable`} ref={v => ref.current = v} style={styles}>
             {children}
         </div>
     )

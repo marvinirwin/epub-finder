@@ -1,5 +1,5 @@
-export { VideoMetadata } from "src/components/pronunciation-video/video-meta-data.interface";
+export { VideoMetadata } from 'src/components/pronunciation-video/video-meta-data.interface'
 
 export class BasicDocument {
-  constructor(public name: string, public html: string) {}
+    constructor(public name: string, public html: string) {}
 }

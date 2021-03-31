@@ -13,8 +13,10 @@ export const resolveICardForWord = <T, U>(
             if (word) {
                 // @ts-ignore
                 return cardIndex[word]?.length
+                    // @ts-ignore
                     ? cardIndex[word][0]
-                    : cardForWord(word, '')
+                    // @ts-ignore
+                    : cardForWord(word)
             }
             return undefined
         }),

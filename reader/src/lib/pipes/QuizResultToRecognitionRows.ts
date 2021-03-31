@@ -10,8 +10,8 @@ import { QuizResult } from '../quiz/quiz-result.service'
 
 export const QuizResultToRecognitionRows = (
     scheduleRows$: Observable<Dictionary<ScheduleRow<QuizScheduleRowData>>>,
-) => (obs$: Observable<QuizResult>) =>
-    obs$.pipe(
+) => (quizResults$: Observable<QuizResult>) =>
+    quizResults$.pipe(
         withLatestFrom(scheduleRows$),
         map(
             ([scorePair, wordScheduleRowDict]): WordRecognitionRow => {
@@ -68,6 +68,7 @@ export const QuizResultToRecognitionRows = (
                     nextDueDate: nextDueDate(),
                     grade: scorePair.grade,
                     hiddenFields: [],
+                    languageCode: scorePair.languageCode
                 }
             },
         ),

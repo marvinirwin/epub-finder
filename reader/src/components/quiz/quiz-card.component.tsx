@@ -27,12 +27,13 @@ export const QuizCardComponent: React.FC<
     })
 
     const useQuizResult = (
-        obs$: Observable<unknown>,
+        hotkeyObservable$: Observable<unknown>,
         score: SuperMemoGrade,
     ) => {
-        useSubscription(obs$, () => {
-            if (word) {
-                m.quizResultService.completeQuiz(word, score)
+        useSubscription(hotkeyObservable$.pipe(), async () => {
+            const latestLanguageCode = await useObservableState(m.languageConfigsService.languageCode$)
+            if (word && latestLanguageCode) {
+                m.quizResultService.completeQuiz(word, latestLanguageCode, score)
             }
         })
     }

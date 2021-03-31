@@ -1,4 +1,4 @@
-declare module "mammoth";
+declare module 'mammoth'
 {
-  export const convertToHtml = ({ arrayBuffer: ArrayBuffer }) => string;
+    export const convertToHtml = ({ arrayBuffer: ArrayBuffer }) => string
 }

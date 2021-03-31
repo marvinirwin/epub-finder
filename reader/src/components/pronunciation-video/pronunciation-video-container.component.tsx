@@ -24,7 +24,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
     const [replayDragInProgress, setReplayDragInProgress] = useState<boolean>(
         false,
     )
-    const pronunciationSectionsContainer = useRef<HTMLDivElement>()
+    const pronunciationSectionsContainer = useRef<HTMLDivElement | null | undefined>()
 
     const editingIndex = useObservableState(
         m.editingVideoMetadataService.editingCharacterIndex$,
@@ -113,7 +113,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
             {/* @ts-ignore */}
             <div
                 className={`pronunciation-sections-container`}
-                ref={pronunciationSectionsContainer}
+                ref={v => pronunciationSectionsContainer.current = v}
             >
                 {chunkedCharacterTimings &&
                     videoMetadata &&

@@ -1,9 +1,9 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@server/*": ["../server/src/types"],
-      "@shared/*": ["../server/src/shared"]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@server/*": ["../server/src/types"],
+            "@shared/*": ["../server/src/shared"]
+        }
     }
-  }
 }
