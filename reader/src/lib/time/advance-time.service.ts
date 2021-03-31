@@ -25,6 +25,7 @@ export class AdvanceTimeService {
              * If we're not in the quizComponent, set time to now
              */
         }, 1000);
+        quizResultService.quizResult$.subscribe(v => timeService.quizNow$.next(new Date()))
 
     }
 }
