@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import React from 'react'
 
 export const mouseFollowingDiv = document.createElement('div')
@@ -7,11 +6,6 @@ const subtitleContentDiv = document.createElement('div')
 mouseFollowingDiv.appendChild(titleContentDiv)
 mouseFollowingDiv.appendChild(subtitleContentDiv)
 mouseFollowingDiv.id = 'mouseFollowingDiv'
-mouseFollowingDiv.classList.add(
-    'MuiPaper-root',
-    'MuiPaper-elevation1',
-    'MuiPaper-rounded',
-)
 titleContentDiv.id = 'titleContentDiv'
 subtitleContentDiv.id = 'subtitleContentDiv'
 document.body.appendChild(mouseFollowingDiv)

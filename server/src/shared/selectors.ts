@@ -39,6 +39,7 @@ export const uploadTextButton = 'uploadTextButton'
 export const libraryRowToggleFrequency = 'libraryRowToggleFrequency'
 export const libraryRowToggleReading = 'libraryRowToggleReading'
 export const libraryRowDelete = 'libraryRowDelete'
+export const libraryRowToggleExample = 'libraryRowToggleExample';
 export const libraryRow = 'libraryRow'
 export const newWordLimitInput = 'newWordLimitInput'
 export const noMoreQuizCards = 'noMoreQuizCards'

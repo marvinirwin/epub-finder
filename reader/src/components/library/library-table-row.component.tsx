@@ -6,7 +6,7 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import {
     libraryRow,
-    libraryRowDelete,
+    libraryRowDelete, libraryRowToggleExample,
     libraryRowToggleFrequency,
     libraryRowToggleReading,
 } from '@shared/'
@@ -17,6 +17,9 @@ export const LibraryDocumentRowComponent: React.FC<{
     const m = useContext(ManagerContext)
     const frequencyDocuments = useObservableState(
         m.settingsService.selectedFrequencyDocuments$,
+    )
+    const exampleSentences = useObservableState(
+        m.settingsService.selectedExampleSegmentDocuments$,
     )
     return (
         <TableRow
@@ -36,6 +39,15 @@ export const LibraryDocumentRowComponent: React.FC<{
                     className={libraryRowToggleFrequency}
                     checked={
                         !!frequencyDocuments?.includes(document.ltDocument.id())
+                    }
+                    onChange={() => document.toggleUseForFrequency()}
+                />
+            </TableCell>
+            <TableCell>
+                <Checkbox
+                    className={libraryRowToggleExample}
+                    checked={
+                        !!exampleSentences?.includes(document.ltDocument.id())
                     }
                     onChange={() => document.toggleUseForFrequency()}
                 />

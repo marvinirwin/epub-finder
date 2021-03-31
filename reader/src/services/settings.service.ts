@@ -61,6 +61,7 @@ export class SettingsService {
     public translationAttemptSentenceWeight$: ReplaySubject<number>
     public hiddenFieldsRequiredToProgress$: ReplaySubject<string[][]>
     public currentIntroTab$: ReplaySubject<number>
+    selectedExampleSegmentDocuments$: ReplaySubject<string[]>
 
     constructor({
         databaseService,
@@ -231,6 +232,12 @@ export class SettingsService {
         this.currentIntroTab$ = this.createSetting$<number>(
             'currentIntroTab',
             0,
+            'indexedDB',
+        );
+
+        this.selectedExampleSegmentDocuments$ = this.createSetting$<string[]>(
+            'selectedExampleSegmentDocuments',
+            [],
             'indexedDB',
         )
     }

@@ -72,4 +72,19 @@ export class LibraryDocumentRow {
             )
         }
     }
+    async toggleUseForExamples() {
+        const mostRecent = await observableLastValue(
+            this.settingsService.selectedExampleSegmentDocuments$,
+        )
+        const documentIsAlreadySelected = mostRecent.includes(this.ltDocument.id())
+        if (documentIsAlreadySelected) {
+            this.settingsService.selectedExampleSegmentDocuments$.next(
+                mostRecent.filter((id) => id !== this.ltDocument.id()),
+            )
+        } else {
+            this.settingsService.selectedExampleSegmentDocuments$.next(
+                mostRecent.concat(this.ltDocument.id()),
+            )
+        }
+    }
 }
