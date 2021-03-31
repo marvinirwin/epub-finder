@@ -3,8 +3,9 @@ import {WordRecognitionRow} from "./word-recognition-row";
 import {PronunciationProgressRow} from "./pronunciation-progress-row.interface";
 import {NormalizedValue} from "../manager/normalized-value.interface";
 import {SrmService} from "../srm/srm.service";
-import {formatDistance, isAfter, isToday} from 'date-fns';
+import {formatDistance, isToday} from 'date-fns';
 import {SuperMemoGrade, SuperMemoItem} from "supermemo";
+import {lastN} from "../../components/quiz/last-n";
 
 
 export interface QuizScheduleRowData {
@@ -101,8 +102,8 @@ export class ScheduleRow<T> {
         if (hasNeverBeenAttempted) {
             return false;
         }
-        const isComplete = this.superMemoRecords
-            .filter(r => isToday(r.timestamp) && r.grade >= 3);
+        const isComplete = lastN(3)(this.superMemoRecords)
+            .every(r => isToday(r.timestamp) && r.grade >= 3);
         if (isComplete) {
             return false;
         }
@@ -115,8 +116,7 @@ export class ScheduleRow<T> {
     }
 
     public isOverDue({now}: { now: Date }) {
-        const myDueDate = this.dueDate();
-        return myDueDate < now;
+        return this.dueDate() < now;
     }
 
     public hasNRecognizedInARow(n = 2) {

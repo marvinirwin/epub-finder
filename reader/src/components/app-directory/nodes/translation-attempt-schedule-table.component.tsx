@@ -20,7 +20,7 @@ export const TranslationAttemptScheduleTable: React.FC = () => {
                 <TableBody>
                     {
                         Object.values(translationAttemptScheduleRows)
-                            .map(scheduleRow => <TranslationAttemptScheduleTableRow scheduleRow={scheduleRow}/>)
+                            .map(scheduleRow => <TranslationAttemptScheduleTableRow key={scheduleRow.d.segmentText} scheduleRow={scheduleRow}/>)
                     }
                 </TableBody>
             </Table>

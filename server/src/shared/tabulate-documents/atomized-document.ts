@@ -5,6 +5,7 @@ import {Segment} from "./segment/segment";
 import {XMLDocumentNode} from "../XMLDocumentNode";
 import { annotatedAndTranslated } from "../selectors";
 import { InterpolateService } from "../interpolate.service";
+import {sectionBoundaryRegexp} from "../../../../reader/src/lib/language/language-maps/word-separator";
 
 export function createPopperElement(document1: XMLDocument) {
     const popperEl = document1.createElement('div');
@@ -142,21 +143,23 @@ export class AtomizedDocument {
         return leaves;
     }
 
-    makeTextNodeRehydratable(textNode: Element): XMLDocumentNode {
-        const document1 = this.document;
-        const nodeValue = textNode.nodeValue;
-        const newParent = this.replaceTextNodeWithSubTextNode(
-            textNode,
-            nodeValue
-                .normalize()
-                .trim()
-                .split(''),
-            "mark"
-        );
-        const {popperEl, popperId} = createPopperElement(document1);
-        newParent.setAttribute('popper-id', popperId);
-        newParent.setAttribute("class", annotatedAndTranslated);
-        (this.findPopperContainer()).insertBefore(popperEl, popperEl.firstChild);
+    convertTextNodeToAtomizedSegments(textNode: Element): XMLDocumentNode {
+        const text = textNode.nodeValue;
+        const subSegmentTextList = text.split(sectionBoundaryRegexp).filter(t => !!t.trim())
+        const newParent = this.document.createElement('span');
+        for (let i = 0; i < subSegmentTextList.length; i++) {
+            const subSegmentTextListElement = subSegmentTextList[i];
+            const elementWithMarksUnderIt = this.replaceTextNodeWithSubTextNode(
+                textNode,
+                subSegmentTextListElement
+                    .normalize()
+                    .trim()
+                    .split(''),
+                "mark"
+            );
+            elementWithMarksUnderIt.setAttribute("class", annotatedAndTranslated);
+        }
+
         // @ts-ignore
         return newParent;
     }
@@ -211,7 +214,7 @@ export class AtomizedDocument {
 
     createMarksUnderLeaves(textNodes: Element[]) {
         for (let i = 0; i < textNodes.length; i++) {
-            this.makeTextNodeRehydratable(textNodes[i]);
+            this.convertTextNodeToAtomizedSegments(textNodes[i]);
         }
     }
 

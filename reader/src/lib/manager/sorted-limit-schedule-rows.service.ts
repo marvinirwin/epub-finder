@@ -37,7 +37,9 @@ export class SortedLimitScheduleRowsService {
             map(([sortedScheduleRows, newQuizWordLimit, now]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(row => row.d.count.value > 0);
                 const wordsToReview = sortedScheduleRows.filter(
-                    r => r.isToReview({ now })
+                    r => {
+                        return r.isToReview({now});
+                    }
                 );
                 const wordsLearnedToday = sortedScheduleRows.filter(
                     r => {
