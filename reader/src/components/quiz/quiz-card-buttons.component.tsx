@@ -39,7 +39,6 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({quizCard}) =>
         wordsReviewingOrLearning: [],
         wordsLeftForToday: [],
     };
-    const dailyLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
     useSubscription(
         m.hotkeyEvents.advanceQuiz$,
         () => quizCard.answerIsRevealed$.next(true))

@@ -25,7 +25,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const useQuizResult = (obs$: Observable<unknown>, score: SuperMemoGrade) => {
         useSubscription(obs$, () => {
             if (word) {
-                m.quizManager.completeQuiz(word, score)
+                m.quizResultService.completeQuiz(word, score)
             }
         })
     }

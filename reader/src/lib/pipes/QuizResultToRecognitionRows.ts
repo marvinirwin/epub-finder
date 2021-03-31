@@ -1,12 +1,12 @@
 import {Observable} from "rxjs";
 import {Dictionary} from "lodash";
-import {QuizResult} from "../manager/QuizManager";
 import {map, withLatestFrom} from "rxjs/operators";
 import {SrmService} from "../srm/srm.service";
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import moment from "moment";
 import {QuizScheduleRowData, ScheduleRow} from "../schedule/schedule-row";
 import {add} from "date-fns";
+import {QuizResult} from "../quiz/quiz-result.service";
 
 export const QuizResultToRecognitionRows =
     (

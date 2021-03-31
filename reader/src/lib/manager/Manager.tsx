@@ -9,11 +9,9 @@ import {AtomMetadata} from "../../../../server/src/shared/atom-metadata.interfac
 import {AudioManager} from "./AudioManager";
 import CardsRepository from "./cards.repository";
 import {OpenDocumentsService} from "./open-documents.service";
-import {QuizManager} from "./QuizManager";
 import {BrowserInputsService} from "../hotkeys/browser-inputs-service";
 import {InputPage} from "./manager-connections/Input-Page";
 import {CardPage} from "./manager-connections/Card-Page";
-import {InputQuiz} from "./manager-connections/Input-Quiz";
 import {CreatedSentenceManager} from "./CreatedSentenceManager";
 import {Segment} from "@shared/";
 import {mergeDictArrays} from "../util/mergeAnnotationDictionary";
@@ -102,6 +100,7 @@ import { SelectedVirtualTabulationsService } from "./selected-virtual-tabulation
 import {HotkeyModeService} from "../hotkeys/hotkey-mode.service";
 import {OnSelectService} from "../user-interface/on-select.service";
 import {TimeService} from "../time/time.service";
+import {AdvanceTimeService} from "../time/advance-time.service";
 
 export type CardDB = IndexDBManager<ICard>;
 
@@ -132,7 +131,7 @@ export class Manager {
     public cardsRepository: CardsRepository;
     public openDocumentsService: OpenDocumentsService;
     public quizCardScheduleService: ScheduleService<QuizScheduleRowData>;
-    public quizManager: QuizManager;
+    public quizResultService: QuizResultService;
     public createdSentenceManager: CreatedSentenceManager;
     public browserInputsService: BrowserInputsService;
     public editingCardManager: EditingCardManager;
@@ -212,6 +211,7 @@ export class Manager {
     selectedVirtualTabulationsService: SelectedVirtualTabulationsService;
     onSelectService: OnSelectService;
     timeService: TimeService;
+    advanceTimeService: AdvanceTimeService;
 
     constructor(public db: DatabaseService, {audioSource}: AppContext) {
         this.timeService = new TimeService();
@@ -323,9 +323,7 @@ export class Manager {
             wordRecognitionRows$: this.wordRecognitionProgressService.indexOfOrderedRecords$,
             scheduleRows$: this.quizCardScheduleRowsService.indexedScheduleRows$
         });
-        this.quizManager = new QuizManager();
-        const s = new QuizResultService({
-            quizManager: this.quizManager,
+        this.quizResultService = new QuizResultService({
             wordRecognitionProgressService: this.wordRecognitionProgressService,
             scheduleRowsService: this.quizCardScheduleRowsService,
             generalToastMessageService: this.generalToastMessageService
@@ -337,7 +335,6 @@ export class Manager {
             })
         InputPage(this.browserInputsService, this.openDocumentsService);
         CardPage(this.cardsRepository, this.openDocumentsService);
-        InputQuiz(this.browserInputsService, this.quizManager)
         CardPageEditingCardCardDBAudio(this.cardsRepository, this.openDocumentsService, this.editingCardManager, this.cardDBManager, this.audioRecordingService)
 
         this.openDocumentsService.renderedSegments$.subscribe(segments => {
@@ -468,6 +465,7 @@ export class Manager {
         );
         this.wordCardModalService = new WordCardModalService(this)
         this.loadingMessagesService = new LoadingMessagesService(this);
+        this.advanceTimeService = new AdvanceTimeService(this)
 
         this.hotkeyEvents.startListeners();
         this.cardsRepository.load();

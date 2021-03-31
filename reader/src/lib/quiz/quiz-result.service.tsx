@@ -1,23 +1,35 @@
-import {QuizManager} from "../manager/QuizManager";
 import {WordRecognitionProgressRepository} from "../schedule/word-recognition-progress.repository";
 import {QuizResultToRecognitionRows} from "../pipes/QuizResultToRecognitionRows";
 import {QuizCardScheduleRowsService} from "../schedule/quiz-card-schedule-rows.service";
 import {GeneralToastMessageService} from "../user-interface/general-toast-message.service";
 import React from "react";
+import {Subject} from "rxjs";
+import {SuperMemoGrade} from "supermemo";
+
+export interface QuizResult {
+    word: string;
+    grade: SuperMemoGrade;
+}
+
+export enum QuizComponent {
+    Conclusion = "Conclusion",
+    Characters = "Characters"
+}
 
 export class QuizResultService {
+    quizResult$ = new Subject<QuizResult>();
+    requestNextCard$ = new Subject<void>();
     constructor({
-                    quizManager,
                     wordRecognitionProgressService,
                     scheduleRowsService,
                     generalToastMessageService
                 }: {
         scheduleRowsService: QuizCardScheduleRowsService,
-        quizManager: QuizManager,
         wordRecognitionProgressService: WordRecognitionProgressRepository,
         generalToastMessageService: GeneralToastMessageService,
     }) {
-        quizManager.quizResult$.pipe(
+
+        this.quizResult$.pipe(
             QuizResultToRecognitionRows(scheduleRowsService.indexedScheduleRows$)
         ).subscribe(record => {
 /*
@@ -27,5 +39,13 @@ export class QuizResultService {
 */
             wordRecognitionProgressService.addRecords$.next([ record ])
         });
+    }
+    completeQuiz(word : string, recognitionScore : SuperMemoGrade ) {
+        this.quizResult$.next({
+            grade: recognitionScore,
+            word
+        });
+
+        this.requestNextCard$.next()
     }
 }
