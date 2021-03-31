@@ -19,7 +19,7 @@ export const TextSpeechMap = {
         `ar-ae`,
     ],
     bg: ['bg-bg'],
-    ca: ['ca-est'],
+    ca: ['ca-es'],
     hr: [`hr-hr`],
     cs: ['cs-cz'],
     da: ['da-dk'],

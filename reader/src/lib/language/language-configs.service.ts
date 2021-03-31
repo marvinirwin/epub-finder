@@ -69,18 +69,13 @@ export class LanguageConfigsService {
             (knownLanguageCode, learningLanguageCode) => {
                 const lowerCode = learningLanguageCode.toLowerCase()
                 const textSpeechMapElement = TextSpeechMap[lowerCode]
-                return (textSpeechMapElement || []).map((code) =>
+                const potentialLearningSpoken = (textSpeechMapElement || []).map((code) =>
                     SupportedSpeechToTextService.ConfigMap.get(code),
-                ) as SpeechToTextConfig[]
-                /*
-                        const speechToTextConfigs = SupportedSpeechToTextService.Configs;
-                        const supportedLanguage = speechToTextConfigs.find(({code}) =>
-                            ?.includes(code.toLowerCase())
-                        );
-                        if (supportedLanguage) {
-                            return supportedLanguage.code;
-                        }
-            */
+                ).filter(v => !!v) as SpeechToTextConfig[]
+                if (!potentialLearningSpoken.length) {
+                    debugger;console.log()
+                }
+                return potentialLearningSpoken
             },
         )
         combineLatest([
