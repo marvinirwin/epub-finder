@@ -1,6 +1,6 @@
 import { Segment } from '@shared/'
 import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
-import { combineLatest, Observable } from 'rxjs'
+import { combineLatest, Observable, of } from 'rxjs'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
@@ -28,7 +28,7 @@ export class BrowserSegment extends Segment {
                           ...translateConfig,
                           text: this.translatableText,
                       })
-                    : '',
+                    : of(''),
             ),
             shareReplay(1),
         )
@@ -39,7 +39,7 @@ export class BrowserSegment extends Segment {
                           ...romanizationConfig,
                           text: this.translatableText,
                       })
-                    : '',
+                    : of(''),
             ),
             shareReplay(1),
         )
