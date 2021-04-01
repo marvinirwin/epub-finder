@@ -22,17 +22,24 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
     }
 
     public async validate(
+        request,
         accessToken,
-        refreshToken,
-        profile,
-        done: Function,
-        ...args
+        unknown,
+        profile: {
+            email: string,
+            fullName: string,
+            firstName: string,
+            lastName: string,
+            keycloakId: string,
+        },
+        done,
+        currentUser
     ): Promise<User> {
         return await this.userService.upsertUserByEmailAndProvider(
             profile.email,
             'keycloak',
             profile.keycloakId,
-            args[0].user,
+            currentUser,
         )
     }
 }

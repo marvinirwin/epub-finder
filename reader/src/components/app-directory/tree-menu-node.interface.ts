@@ -9,4 +9,5 @@ export interface TreeMenuNode {
     moveDirectory?: boolean
     hidden?: boolean
     props?: React.HTMLProps<HTMLDivElement>
+    ReplaceComponent?: React.FunctionComponent
 }

@@ -11,7 +11,7 @@ export function SignoutNode(
     return {
         name: 'signOut',
         label: 'Sign Out',
-        action: () => m.authManager.signOut(),
+        action: () => m.loggedInUserService.signOut(),
         LeftIcon: () => <Settings />,
         hidden: !profile?.email,
     }

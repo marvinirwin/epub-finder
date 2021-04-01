@@ -101,6 +101,7 @@ export class QuizCardScheduleRowsService {
                         return scheduleRows[word]
                     }
 
+                    debugger;
                     allWords.forEach((word) => {
                         ensureScheduleRow(word)
                     })

@@ -38,7 +38,7 @@ export const TranslationAttemptScheduleRow: React.FC<{
 }> = ({ row }) => {
     const translation = useTranslation(row?.d?.segmentText)
     return (
-        <TableRow key={row.d.segmentText}>
+        <TableRow>
             <TableCell component="th" scope="row">
                 {translation}
             </TableCell>
@@ -64,7 +64,7 @@ export const QuizCardTranslationAttemptSchedule = () => {
                 </TableHead>
                 <TableBody>
                     {rows.slice(0, 3).map((row) => {
-                        return <TranslationAttemptScheduleRow row={row} />
+                        return <TranslationAttemptScheduleRow key={row.d.segmentText} row={row} />
                     })}
                 </TableBody>
             </Table>

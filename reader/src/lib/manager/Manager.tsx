@@ -165,7 +165,7 @@ export class Manager {
     public editingCardManager: EditingCardManager
     public progressManager: ProgressManager
     public visibleElementsService: VisibleService
-    public authManager = new LoggedInUserService()
+    public loggedInUserService = new LoggedInUserService()
     public highlighter: Highlighter
     public pronunciationProgressService: PronunciationProgressRepository
     public wordRecognitionProgressService: WordRecognitionProgressRepository
@@ -498,7 +498,7 @@ export class Manager {
         })
         this.requestRecordingService = new RequestRecordingService({
             readingDocumentService: this.readingDocumentService,
-            loggedInUserService: this.authManager,
+            loggedInUserService: this.loggedInUserService,
         })
 
         this.mousedOverWordHighlightService = new MousedOverWordHighlightService(

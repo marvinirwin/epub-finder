@@ -16,7 +16,7 @@ export const SignupLogin = () => {
     function login(email: string, password: string) {
         axios
             .post('/languagetrainer-auth/login', { email, password })
-            .then(() => m.authManager.fetchProfile())
+            .then(() => m.loggedInUserService.fetchProfile())
     }
 
     return (
