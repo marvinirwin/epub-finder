@@ -1,8 +1,4 @@
-import {
-    SerializedSegment,
-    tabulationFactory,
-    TabulationParameters,
-} from '../../tabulation/tabulate'
+import { SerializedSegment, tabulationFactory, TabulationParameters } from '../../tabulation/tabulate'
 import { TabulatedSegments } from '../tabulated-documents.interface'
 import { XMLDocumentNode } from '../../XMLDocumentNode'
 import { flatten, maxBy, uniq } from 'lodash'
@@ -73,8 +69,16 @@ export const tabulate = ({
         }
         const newGreedyWord = () => {
             const chosenGreedyWord = maxBy(
-                notableSubsequencesInProgress.filter((wordInProgress) =>
-                    greedyWordSet.has(wordInProgress.word),
+                notableSubsequencesInProgress.filter((wordInProgress) => {
+                        switch(wordIdentifyingStrategy) {
+                            case "noSeparator":
+                                return greedyWordSet.has(wordInProgress.word)
+                            case "punctuationSeparator":
+                                // How do I figure which subsequence to use?
+                                // This is why I should have used
+                                return
+                        }
+                    },
                 ),
                 (wordInProgress) => wordInProgress.word.length,
             )
@@ -114,14 +118,10 @@ export const tabulate = ({
             [],
         )
 
-        /**
-         * If there's nothing in progress, add this word as a notable subsequence if it fits the bill
-         */
-        let b = isNotableCharacter(currentCharacter)
         if (
             notableSequencesWhichStartHere.length === 0 &&
             notableSubsequencesInProgress.length === 0 &&
-            b
+            isNotableCharacter(currentCharacter)
         ) {
             switch (wordIdentifyingStrategy) {
                 case 'noSeparator':
@@ -132,7 +132,7 @@ export const tabulate = ({
                     let strings = textContent
                         .substr(i)
                         .split(isWordBoundaryRegex)
-                    const wordEnd = strings[0]
+                    const wordEnd = strings[0];
                     if (wordEnd.trim()) {
                         notableSequencesWhichStartHere.push(wordEnd)
                     }
