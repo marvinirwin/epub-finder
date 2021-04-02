@@ -8,7 +8,6 @@ import {
     Segment,
     SerializedDocumentTabulation,
     tabulate,
-    tabulatedSentenceToTabulatedDocuments,
 } from '@shared/'
 import trie from 'trie-prefix-tree'
 import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
@@ -32,22 +31,18 @@ ctx.onmessage = async (ev) => {
     )
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
     const doc = AtomizedDocument.atomizeDocument(documentSrc)
-    const tabulated = tabulatedSentenceToTabulatedDocuments({
-        tabulatedSentences: tabulate({
-            greedyWordSet: new SetWithUniqueLengths(words),
-            notableCharacterSequences: new SetWithUniqueLengths(
-                notableSubsequences,
-            ),
-            segments: doc.segments(),
-            ...resolvePartialTabulationConfig(languageCode),
-            languageCode,
-        }),
-        label: ltDoc.name,
-        id: ltDoc.id(),
+    const tabulated = tabulate({
+        greedyWordSet: new SetWithUniqueLengths(words),
+        notableCharacterSequences: new SetWithUniqueLengths(
+            notableSubsequences,
+        ),
+        segments: doc.segments(),
+        ...resolvePartialTabulationConfig(languageCode),
+        languageCode,
     })
     ctx.postMessage({
         wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
-        notableSubSequences: [],
+        notableSubSequences: tabulated.notableSubSequences,
         segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
         id: ltDoc.id(),
         label: ltDoc.name,

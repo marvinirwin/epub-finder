@@ -29,23 +29,3 @@ export interface SerializedTabulation {
 export type SerializedDocumentTabulation = SerializedTabulation &
     DocumentWordCounts
 
-export const tabulatedSentenceToTabulatedDocuments = ({
-    tabulatedSentences,
-    label,
-    id,
-}: {
-    tabulatedSentences: TabulatedSegments
-    label: string
-    id?: string
-}): TabulatedDocuments => {
-    const entries: [string, DocumentWordCount[]][] = Object.entries(
-        tabulatedSentences.wordCounts,
-    ).map(([word, count]) => [word, [{ word, count, document: label }]])
-
-    return {
-        id,
-        label,
-        ...tabulatedSentences,
-        greedyDocumentWordCounts: new Map(entries),
-    }
-}

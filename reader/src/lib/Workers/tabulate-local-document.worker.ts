@@ -3,10 +3,7 @@
 // noinspection JSConstantReassignment
 import {
     AtomizedDocument,
-    Segment,
     SerializedDocumentTabulation,
-    SerializedTabulation,
-    tabulatedSentenceToTabulatedDocuments,
     tabulate,
 } from '@shared/'
 import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
@@ -34,7 +31,7 @@ ctx.onmessage = async (ev) => {
     }: TabulateLocalDocumentDto = ev.data
     const doc = AtomizedDocument.atomizeDocument(src)
     const segments = doc.segments()
-    const tabulatedSentences = tabulate({
+    const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),
         notableCharacterSequences: new SetWithUniqueLengths(
             notableSubsequences,
@@ -44,11 +41,6 @@ ctx.onmessage = async (ev) => {
         languageCode,
     })
     try {
-        const tabulated = tabulatedSentenceToTabulatedDocuments({
-            tabulatedSentences,
-            label,
-            id,
-        })
         ctx.postMessage({
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
             notableSubSequences: tabulated.notableSubSequences,
