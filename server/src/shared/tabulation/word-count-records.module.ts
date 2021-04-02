@@ -3,6 +3,7 @@ import { maxBy, sum } from 'lodash'
 
 export const wordsFromCountRecordList = (records: WordCountRecord[]) => {
     const words: string[] = []
+    records = records.filter(r => r.word.length > 0);
     let index = 0
     const pickRecord = (index: number) => {
         const rec = maxBy(

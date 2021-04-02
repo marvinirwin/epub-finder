@@ -12,10 +12,6 @@ import { IPositionedWord } from '../../Annotation/IPositionedWord'
 import { AtomMetadata } from '../../atom-metadata.interface.ts/atom-metadata'
 import { Segment } from './segment'
 
-const rehydrateRegex = (str: string) => {
-    const [_, pattern, flags] = str.match(/\/(.*?)\/([a-z]*)?$/i)
-    return new RegExp(pattern.replace('\\', '\\\\'), flags || '')
-}
 
 export const tabulate = ({
     notableCharacterSequences,

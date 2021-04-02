@@ -2,18 +2,13 @@ import {
     BehaviorSubject,
     combineLatest,
     Observable,
-    of,
-    ReplaySubject,
     Subject,
 } from 'rxjs'
 import { Dictionary } from 'lodash'
 import {
-    debounceTime,
     map,
     shareReplay,
     startWith,
-    switchMap,
-    tap,
 } from 'rxjs/operators'
 import { DatabaseService } from '../Storage/database.service'
 import React from 'react'
@@ -114,7 +109,6 @@ import { TranslationAttemptRepository } from '../schedule/translation-attempt.re
 import { QuizScheduleRowData } from '../schedule/schedule-row'
 import { TranslationAttemptService } from '../../components/translation-attempt/translation-attempt.service'
 import { WeightedVocabService } from '../language/weighted-vocab.service'
-import { Alert } from '@material-ui/lab'
 import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
 import { SelectedVirtualTabulationsService } from './selected-virtual-tabulations.service'
 import { HotkeyModeService } from '../hotkeys/hotkey-mode.service'

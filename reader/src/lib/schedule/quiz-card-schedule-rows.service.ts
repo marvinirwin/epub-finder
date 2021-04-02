@@ -22,6 +22,8 @@ import { TranslationAttemptService } from '../../components/translation-attempt/
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import { TimeService } from '../time/time.service'
+import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
+import { VideoMetadataRepository } from '../../services/video-metadata.repository'
 
 export class QuizCardScheduleRowsService {
     public indexedScheduleRows$: Observable<
@@ -30,9 +32,9 @@ export class QuizCardScheduleRowsService {
 
     constructor({
         wordRecognitionProgressService,
-        openDocumentsService,
+        temporaryHighlightService,
         pronunciationProgressService,
-        cardsRepository,
+        videoMetadataRepository,
         ignoredWordsRepository,
         settingsService,
         allWordsRepository,
@@ -42,7 +44,8 @@ export class QuizCardScheduleRowsService {
     }: {
         wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
         pronunciationProgressService: PronunciationProgressRepository
-        openDocumentsService: OpenDocumentsService
+        temporaryHighlightService: TemporaryHighlightService,
+        videoMetadataRepository: VideoMetadataRepository,
         cardsRepository: CardsRepository
         ignoredWordsRepository: IgnoredWordsRepository
         settingsService: SettingsService
@@ -61,8 +64,9 @@ export class QuizCardScheduleRowsService {
             progress$,
             combineLatest([
                 selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
-                cardsRepository.cardIndex$,
                 ignoredWordsRepository.latestRecords$,
+                videoMetadataRepository.all$,
+                temporaryHighlightService.temporaryHighlightRequests$
             ]),
             combineLatest([
                 settingsService.frequencyWeight$,
@@ -77,7 +81,7 @@ export class QuizCardScheduleRowsService {
             map(
                 ([
                     [wordRecognitionRowIndex, pronunciationRowIndex],
-                    [selectedVirtualTabulations, cardIndex, ignoredWords],
+                    [selectedVirtualTabulations, ignoredWords, videoMetadataIndex, temporaryHighlightRequest],
                     [
                         frequencyWeight,
                         dateWeight,
@@ -88,6 +92,10 @@ export class QuizCardScheduleRowsService {
                     currentTranslationAttemptScheduleRow,
                 ]) => {
                     const scheduleRows: ds_Dict<QuizScheduleRowData> = {}
+                    const syntheticWords = new Set<string>(Object.keys(videoMetadataIndex));
+                    if (temporaryHighlightRequest?.word) {
+                        syntheticWords.add(temporaryHighlightRequest?.word);
+                    }
                     const ensureScheduleRow = (word: string) => {
                         if (!scheduleRows[word]) {
                             scheduleRows[word] = {
@@ -101,7 +109,6 @@ export class QuizCardScheduleRowsService {
                         return scheduleRows[word]
                     }
 
-                    debugger;
                     allWords.forEach((word) => {
                         ensureScheduleRow(word)
                     })
@@ -114,12 +121,8 @@ export class QuizCardScheduleRowsService {
                              */
                             Object.entries(documentWordCounts).forEach(
                                 ([word, wordCountRecords]) => {
-                                    if (scheduleRows[word]) {
-                                        scheduleRows[
-                                            word
-                                        ].wordCountRecords.push(
-                                            ...wordCountRecords,
-                                        )
+                                    if (!syntheticWords.has(word)) {
+                                        ensureScheduleRow(word).wordCountRecords.push(...wordCountRecords)
                                     }
                                 },
                             )
