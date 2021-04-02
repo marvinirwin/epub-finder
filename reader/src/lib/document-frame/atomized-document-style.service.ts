@@ -36,7 +36,6 @@ export const BodyStyle = `
         transition: background-color .25s ease-in-out;
     }
     mark:hover {
-        cursor: pointer;
     }
     .annotated_and_translated {
         position: relative;

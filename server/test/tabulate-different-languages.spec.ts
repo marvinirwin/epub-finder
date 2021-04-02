@@ -25,16 +25,17 @@ const segmentText = (text: string, languageCode: string) => {
         wordIdentifyingStrategy:
             languageRegexMap.get(languageCode)?.strategy ||
             'punctuationSeparator',
+        languageCode
     })
 }
 
 describe('Tabulating different languages', () => {
     it('Tabulates a toki pona sentence', () => {
-        expect(segmentText('jan.sona toki pona', 'toki').wordCounts).toEqual({
-            jan: 1,
-            sona: 1,
-            toki: 1,
-            pona: 1,
-        })
+        expect(!segmentText('Él vive en un gallinero pequeño y normal en un barrio pequeño y normal', 'es').notableSubSequences).toEqual([
+
+        ])
+        expect(segmentText('jan.sona toki pona', 'toki').notableSubSequences).toEqual([
+
+        ]);
     })
 })
