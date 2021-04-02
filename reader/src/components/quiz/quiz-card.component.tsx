@@ -26,7 +26,7 @@ export const QuizCardComponent: React.FC<
         label: 'learningLanguage',
     })
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const flashCardTypes = useObservableState(quizCard.flashCardTypes$) || [];
+    const flashCardTypes = useObservableState(quizCard.hiddenFields$) || [];
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,

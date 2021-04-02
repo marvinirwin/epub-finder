@@ -9,7 +9,7 @@ export const useIsFieldHidden = ({
     quizCard: QuizCard
     label: keyof QuizCardFields
 }) => {
-    const flashCardTypes = useObservableState(quizCard.flashCardTypes$) || new Set()
+    const flashCardTypes = useObservableState(quizCard.hiddenFields$) || new Set()
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     return flashCardTypes.has(label) && !answerIsRevealed
 }

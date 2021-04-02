@@ -8,7 +8,7 @@ import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
 import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
 import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import { hiddenDefinition } from '../../lib/quiz/hidden-quiz-fields'
+import { FlashCardType, hiddenDefinition, resolveHiddenFieldsForFlashcardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
 import { SortedLimitScheduleRowsService } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { wordCardFactory } from './card-card.factory'
@@ -130,11 +130,11 @@ export class QuizService {
 
         this.quizCard = {
             ...wordCard,
-            flashCardTypes$:
+            hiddenFields$:
                 this.currentScheduleRow$.pipe(
-                    map((word) => {
-                        word.d.flashCardTypes
-                    }),
+                    map((word) =>
+                        resolveHiddenFieldsForFlashcardType(word?.d?.flashCardType || FlashCardType.WordExamplesAndPicture)
+                    ),
                     shareReplay(1),
                 ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
