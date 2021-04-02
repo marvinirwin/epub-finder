@@ -6,6 +6,7 @@ import { map, shareReplay, startWith } from 'rxjs/operators'
 import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
 import { VideoMetadataRepository } from '../../services/video-metadata.repository'
 import { WordsService } from '../language/words.service'
+import { LanguageConfigsService } from '../language/language-configs.service'
 
 export class NotableSubsequencesService {
     notableSubsequenceSet$: Observable<SetWithUniqueLengths>
@@ -16,12 +17,14 @@ export class NotableSubsequencesService {
         temporaryHighlightService,
         videoMetadataRepository,
         wordsService,
+        languageConfigsService
     }: {
         pronunciationProgressService: PronunciationProgressRepository
         wordRecognitionProgressService: WordRecognitionProgressRepository
         temporaryHighlightService: TemporaryHighlightService
         videoMetadataRepository: VideoMetadataRepository
         wordsService: WordsService
+        languageConfigsService: LanguageConfigsService
     }) {
         this.notableSubsequenceSet$ = combineLatest([
             pronunciationProgressService.indexOfOrderedRecords$,
@@ -31,6 +34,7 @@ export class NotableSubsequencesService {
             ),
             videoMetadataRepository.all$,
             wordsService.words$,
+            languageConfigsService.readingLanguageCode$
         ]).pipe(
             map(
                 ([
@@ -39,10 +43,14 @@ export class NotableSubsequencesService {
                     temporaryHighlightRequest,
                     videoMetadata,
                     words,
+                    languageCode
                 ]) => {
+                    const recognitionRecordsForCurrentLanguage = Object.values(wordRecognitionRecords)
+                        .filter(recognitionRows => recognitionRows.find(r => r.languageCode === languageCode))
+                        .map(recognitionRows => recognitionRows[0].word)
                     const strings = [
                         ...Object.keys(pronunciationRecords),
-                        ...Object.keys(wordRecognitionRecords),
+                        ...recognitionRecordsForCurrentLanguage,
                         ...videoMetadata.keys(),
                         ...words.values(),
                     ]
