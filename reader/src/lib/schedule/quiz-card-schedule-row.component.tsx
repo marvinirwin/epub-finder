@@ -10,9 +10,8 @@ import {
     quizCardTranslation,
 } from '@shared/'
 import { useIsFieldHidden } from '../../components/quiz/useIsFieldHidden'
-import { sumWordCountRecords } from './schedule-math.service'
 import { QuizCardScheduleTable } from '../../components/tables/quiz-card-due-date-schedule-table.component'
-import { DEV } from '../util/url-params'
+import { QuizCardField } from '../quiz/hidden-quiz-fields'
 
 export const QuizCardScheduleRowDisplay = ({
     scheduleRow,
@@ -26,15 +25,15 @@ export const QuizCardScheduleRowDisplay = ({
     const translation = useObservableState(quizCard.translation$)
     const isDescriptionHidden = useIsFieldHidden({
         quizCard,
-        label: 'description',
+        label: QuizCardField.Description,
     })
     const isRomanizationHidden = useIsFieldHidden({
         quizCard,
-        label: 'romanization',
+        label: QuizCardField.Romanization,
     })
     const isDefinitionHidden = useIsFieldHidden({
         quizCard,
-        label: 'definition',
+        label: QuizCardField.KnownLanguageDefinition
     })
     return (
         <div>

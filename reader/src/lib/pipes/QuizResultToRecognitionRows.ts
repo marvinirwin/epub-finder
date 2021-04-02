@@ -15,7 +15,7 @@ export const QuizResultToRecognitionRows = (
         withLatestFrom(scheduleRows$),
         map(
             ([scorePair, scheduleRows]): WordRecognitionRow => {
-                const previousRecords = scheduleRows.find(scheduleRow => scheduleRow.d.word === scorePair.word && scheduleRow.d.flashCardTypes.join('') === scorePair.flashCardTypes.join(''))?.d.wordRecognitionRecords || []
+                const previousRecords = scheduleRows.find(scheduleRow => scheduleRow.d.word === scorePair.word && scheduleRow.d.flashCardType === scorePair.flashCardType)?.d.wordRecognitionRecords || []
                 const nextRecognitionRecord = SrmService.getNextRecognitionRecord(
                     previousRecords,
                     scorePair.grade,

@@ -1,15 +1,15 @@
 import { QuizCard } from './word-card.interface'
 import { useObservableState } from 'observable-hooks'
-import { QuizCardFields } from './quiz-card-fields.interface'
+import { FlashCardType, QuizCardField, resolveHiddenFieldsForFlashcardType } from '../../lib/quiz/hidden-quiz-fields'
 
 export const useIsFieldHidden = ({
     quizCard,
     label,
 }: {
     quizCard: QuizCard
-    label: keyof QuizCardFields
+    label: QuizCardField
 }) => {
-    const flashCardTypes = useObservableState(quizCard.hiddenFields$) || new Set()
+    const hiddenField = resolveHiddenFieldsForFlashcardType(useObservableState(quizCard.flashCardType$)  || FlashCardType.WordExamplesAndPicture)
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
-    return flashCardTypes.has(label) && !answerIsRevealed
+    return hiddenField.has(label) && !answerIsRevealed
 }

@@ -1,13 +1,13 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { OpenDocument } from '../../lib/document-frame/open-document.entity'
 import { EditableValue } from './editing-value'
-import { HiddenQuizFields, QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
+import { FlashCardType, HiddenQuizFields, QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 
 export type QuizCard = {
     exampleSentenceOpenDocument: OpenDocument
-    hiddenFields$: Observable<Set<QuizCardField>>
+    flashCardType$: Observable<FlashCardType>
     answerIsRevealed$: BehaviorSubject<boolean>
 } & WordCard
 

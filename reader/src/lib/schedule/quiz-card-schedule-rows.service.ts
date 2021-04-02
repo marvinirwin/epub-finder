@@ -75,7 +75,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$,
                 settingsService.translationAttemptSentenceWeight$,
-                settingsService.quizCardConfigurations$,
+                settingsService.flashCardTypesRequiredToProgress$,
             ]),
             translationAttemptService.currentScheduleRow$,
             timeService.quizNow$,
@@ -88,7 +88,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                          dateWeight,
                          wordLengthWeight,
                          translationAttemptSentenceWeight,
-                         quizCardConfiguration,
+                         flashCardTypesRequiredToProgress,
                      ],
                      currentTranslationAttemptScheduleRow,
                      now,
@@ -106,8 +106,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                         }),
                         flatten(learningTargetsList.map(
                             (learningTarget) =>
-                                quizCardConfiguration.map(configuration => new ScheduleRow<QuizScheduleRowData>(
-                                    { ...learningTarget, flashCardTypes: configuration.flashCardTypes },
+                                flashCardTypesRequiredToProgress.map(configuration => new ScheduleRow<QuizScheduleRowData>(
+                                    { ...learningTarget, flashCardType: configuration },
                                     learningTarget.wordRecognitionRecords,
                                     ),
                                 ),

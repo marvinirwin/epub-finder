@@ -5,6 +5,7 @@ import { GeneralToastMessageService } from '../user-interface/general-toast-mess
 import React from 'react'
 import { Subject } from 'rxjs'
 import { SuperMemoGrade } from 'supermemo'
+import { FlashCardType } from './hidden-quiz-fields'
 
 export interface QuizResult {
     word: string
@@ -46,7 +47,7 @@ export class QuizResultService {
             grade: recognitionScore,
             word,
             languageCode,
-            flashCardTypes
+            flashCardType
         })
 
         this.requestNextCard$.next()

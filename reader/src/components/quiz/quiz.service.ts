@@ -8,7 +8,7 @@ import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
 import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
 import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import { FlashCardType, hiddenDefinition, resolveHiddenFieldsForFlashcardType } from '../../lib/quiz/hidden-quiz-fields'
+import { FlashCardType, resolveHiddenFieldsForFlashcardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
 import { SortedLimitScheduleRowsService } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { wordCardFactory } from './card-card.factory'
@@ -24,14 +24,6 @@ export const filterQuizRows = (
         .filter((r) => r.dueDate() < new Date())
         .filter((r) => sumWordCountRecords(r) > 0)
 
-export const computeRandomHiddenQuizFields = () => {
-    return hiddenDefinition
-    /*
-        return Math.random() > 0.5 ?
-            hiddenDefinition :
-            hiddenLearningLanguage;
-    */
-}
 
 export class QuizService {
     quizCard: QuizCard
@@ -130,13 +122,10 @@ export class QuizService {
 
         this.quizCard = {
             ...wordCard,
-            hiddenFields$:
-                this.currentScheduleRow$.pipe(
-                    map((word) =>
-                        resolveHiddenFieldsForFlashcardType(word?.d?.flashCardType || FlashCardType.WordExamplesAndPicture)
-                    ),
-                    shareReplay(1),
-                ),
+            flashCardType$: this.currentScheduleRow$.pipe(
+                map(scheduleRow => scheduleRow?.d?.flashCardType || FlashCardType.WordExamplesAndPicture),
+                shareReplay(1)
+            ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
             exampleSentenceOpenDocument: openExampleSentencesDocument,
         }

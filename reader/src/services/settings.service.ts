@@ -1,5 +1,5 @@
 import { DatabaseService } from '../lib/Storage/database.service'
-import { Observable, ReplaySubject, Subject } from 'rxjs'
+import { Observable, ReplaySubject } from 'rxjs'
 import { ds_Dict } from '../lib/delta-scan/delta-scan.module'
 import { Hotkeys } from '../lib/hotkeys/hotkeys.interface'
 import { distinct, distinctUntilChanged, skip, take } from 'rxjs/operators'
@@ -24,7 +24,7 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
 
 
 export interface QuizCardConfiguration {
-    flashCardTypes: QuizCardField[]
+    flashCardType: FlashCardType
 }
 
 export class SettingsService {
@@ -68,7 +68,6 @@ export class SettingsService {
     public flashCardTypesRequiredToProgress$: ReplaySubject<FlashCardType[]>
     public currentIntroTab$: ReplaySubject<number>
     selectedExampleSegmentDocuments$: ReplaySubject<string[]>
-    quizCardConfigurations$: ReplaySubject<QuizCardConfiguration[]>
 
     constructor({
         databaseService,

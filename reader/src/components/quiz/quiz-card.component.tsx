@@ -15,6 +15,7 @@ import { SuperMemoGrade } from 'supermemo'
 import { QuizCardScheduleTable } from '../tables/quiz-card-due-date-schedule-table.component'
 import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translation-attempt-table.component'
 import { OpenDocumentComponent } from '../reading/open-document.component'
+import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 
 export const QuizCardComponent: React.FC<
     { quizCard: QuizCard } & PaperProps
@@ -23,18 +24,18 @@ export const QuizCardComponent: React.FC<
     const m = useContext(ManagerContext)
     const isLearningLanguageHidden = useIsFieldHidden({
         quizCard,
-        label: 'learningLanguage',
+        label: QuizCardField.LearningLanguage,
     })
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const flashCardTypes = useObservableState(quizCard.hiddenFields$) || [];
+    const flashCardType = useObservableState(quizCard.flashCardType$);
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,
         score: SuperMemoGrade,
     ) => {
         useSubscription(hotkeyObservable$.pipe(), async () => {
-            if (word && latestLanguageCode) {
-                m.quizResultService.completeQuiz(word, latestLanguageCode, score, [...flashCardTypes])
+            if (word && latestLanguageCode && flashCardType) {
+                m.quizResultService.completeQuiz(word, latestLanguageCode, score, flashCardType)
             }
         })
     }

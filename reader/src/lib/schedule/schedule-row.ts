@@ -6,7 +6,6 @@ import { SrmService } from '../srm/srm.service'
 import { formatDistance, isToday } from 'date-fns'
 import { SuperMemoGrade, SuperMemoItem } from 'supermemo'
 import { lastN } from '../../components/quiz/last-n'
-import { QuizCardField } from '../../services/settings.service'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 export interface QuizScheduleRowData {
