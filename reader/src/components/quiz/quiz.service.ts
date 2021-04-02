@@ -93,16 +93,15 @@ export class QuizService {
             ]).pipe(
                 map(
                     ([
-                        sentenceMap,
+                        exampleSegmentMap,
                         currentWord,
                         translationAttemptScheduleIndex,
                     ]) => {
-                        const firstTranslationAttempt =
-                            Object.values(translationAttemptScheduleIndex)[0]?.d
-                                ?.segmentText || ''
                         if (!currentWord) return [];
+                        const firstTranslationAttempt =
+                            translationAttemptScheduleIndex[0]?.d ?.segmentText || ''
                         const exampleSegmentTexts = Array.from(
-                            sentenceMap.get(currentWord) || new Set<string>(),
+                            exampleSegmentMap.get(currentWord) || new Set<string>(),
                         )
                         return uniq(
                             orderBy(
