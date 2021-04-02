@@ -39,3 +39,14 @@ export const deleteMap = <T, U>(m: Map<T, U>, key: T) => {
     m.delete(key)
     return new Map(m)
 }
+
+export const mapIfThenDefault = <T, U>(m: Map<T, U>, key: T, defaultValue: U, func?: (v: U) => U) => {
+    if (!m.get(key)) {
+        m.set(key, defaultValue);
+    } else {
+        if (func) {
+            m.set(key, func(m.get(key) as U))
+        }
+    }
+    return m.get(key) as U;
+}

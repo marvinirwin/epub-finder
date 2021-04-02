@@ -59,7 +59,7 @@ export class FrequencyDocumentsRepository {
                         if (documentSelectedForFrequency) {
                             const frequencyDocument = new FrequencyDocument(
                                 documentSelectedForFrequency,
-                                quizCardScheduleRowsService.indexedScheduleRows$.pipe(
+                                quizCardScheduleRowsService.scheduleRows$.pipe(
                                     map(
                                         (indexedScheduleRows) =>
                                             new Map(

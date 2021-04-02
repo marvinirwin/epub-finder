@@ -50,7 +50,7 @@ export const QuizCardTranslationAttemptSchedule = () => {
     const m = useContext(ManagerContext)
     const rows = Object.values(
         useObservableState(
-            m.translationAttemptScheduleService.indexedScheduleRows$,
+            m.translationAttemptScheduleService.scheduleRows$,
         ) || {},
     )
 

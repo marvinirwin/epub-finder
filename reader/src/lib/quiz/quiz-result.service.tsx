@@ -32,7 +32,7 @@ export class QuizResultService {
         this.quizResult$
             .pipe(
                 QuizResultToRecognitionRows(
-                    scheduleRowsService.indexedScheduleRows$,
+                    scheduleRowsService.scheduleRows$,
                 ),
             )
             .subscribe((record) => {

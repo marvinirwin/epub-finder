@@ -89,7 +89,7 @@ export class QuizService {
             sentences$: combineLatest([
                 exampleSentencesService.exampleSegmentMap$,
                 currentWord$,
-                translationAttemptScheduleService.indexedScheduleRows$,
+                translationAttemptScheduleService.scheduleRows$,
             ]).pipe(
                 map(
                     ([

@@ -25,7 +25,7 @@ export class FilterScheduleTableRowsService {
             settingsService.scheduleTableWordFilterValue$,
             settingsService.scheduleTableShowUnderDue$,
             settingsService.scheduleTableShowUncounted$,
-            scheduleService.indexedScheduleRows$.pipe(
+            scheduleService.scheduleRows$.pipe(
                 map((v) => Object.values(v)),
             ),
         ]).pipe(

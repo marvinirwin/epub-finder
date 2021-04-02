@@ -115,6 +115,7 @@ import { HotkeyModeService } from '../hotkeys/hotkey-mode.service'
 import { OnSelectService } from '../user-interface/on-select.service'
 import { TimeService } from '../time/time.service'
 import { AdvanceTimeService } from '../time/advance-time.service'
+import { FlashCardLearningTargetsService } from '../schedule/learning-target/flash-card-learning-targets.service'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -234,6 +235,7 @@ export class Manager {
     onSelectService: OnSelectService
     timeService: TimeService
     advanceTimeService: AdvanceTimeService
+    flashCardLearningTargetsService: FlashCardLearningTargetsService
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.timeService = new TimeService()
@@ -269,16 +271,10 @@ export class Manager {
         this.onSelectService = new OnSelectService(this)
         this.documentRepository = new DocumentRepository(this)
         this.cardsRepository = new CardsRepository(this)
-        this.pronunciationProgressService = new PronunciationProgressRepository(
-            this,
-        )
-        this.wordRecognitionProgressService = new WordRecognitionProgressRepository(
-            this,
-        )
+        this.pronunciationProgressService = new PronunciationProgressRepository(this)
+        this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
-        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(
-            this,
-        )
+        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map((component) => component?.name || ''),
@@ -341,8 +337,9 @@ export class Manager {
             this,
         )
         this.translationAttemptService = new TranslationAttemptService(this)
+        this.flashCardLearningTargetsService = new FlashCardLearningTargetsService(this)
         this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this)
-        this.quizCardScheduleService = new ScheduleService(this)
+        this.quizCardScheduleService = new ScheduleService({scheduleRowsService: this.quizCardScheduleRowsService, timeService: this.timeService})
         this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService(
             this,
         )
@@ -367,7 +364,7 @@ export class Manager {
             wordRecognitionRows$: this.wordRecognitionProgressService
                 .indexOfOrderedRecords$,
             scheduleRows$: this.quizCardScheduleRowsService
-                .indexedScheduleRows$,
+                .scheduleRows$,
         })
         this.quizResultService = new QuizResultService({
             wordRecognitionProgressService: this.wordRecognitionProgressService,
@@ -424,7 +421,7 @@ export class Manager {
 
         combineLatest([
             this.highlightAllWithDifficultySignal$,
-            this.quizCardScheduleRowsService.indexedScheduleRows$,
+            this.quizCardScheduleRowsService.scheduleRows$,
         ]).subscribe(([signal, indexedScheduleRows]) => {
             signal
                 ? this.highlighter.highlightWithDifficulty$.next(

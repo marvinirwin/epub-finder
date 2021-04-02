@@ -35,7 +35,7 @@ export class VocabService {
                     ? [
                           new FrequencyDocument(
                               selectedDocument,
-                              quizCardScheduleRowsService.indexedScheduleRows$.pipe(
+                              quizCardScheduleRowsService.scheduleRows$.pipe(
                                   map(
                                       (indexedScheduleRows) =>
                                           new Map(
@@ -55,7 +55,7 @@ export class VocabService {
         )
         this.vocab$ = combineLatest([
             tabulateFrequencyDocuments(observable),
-            quizCardScheduleRowsService.indexedScheduleRows$,
+            quizCardScheduleRowsService.scheduleRows$,
             timeService.quizNow$,
         ]).pipe(
             map(([[selectedTabulation], indexedScheduleRows, now]) => {

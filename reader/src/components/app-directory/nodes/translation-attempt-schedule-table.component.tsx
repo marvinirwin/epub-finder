@@ -12,7 +12,7 @@ export const TranslationAttemptScheduleTable: React.FC = () => {
     const m = useContext(ManagerContext)
     const translationAttemptScheduleRows =
         useObservableState(
-            m.translationAttemptScheduleService.indexedScheduleRows$,
+            m.translationAttemptScheduleService.scheduleRows$,
         ) || {}
     return (
         <div>

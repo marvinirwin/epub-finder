@@ -24,7 +24,7 @@ export interface TranslationAttemptScheduleData {
 
 export class TranslationAttemptScheduleService
     implements ScheduleRowsService<TranslationAttemptScheduleData> {
-    indexedScheduleRows$: Observable<ds_Dict<ScheduleRow<TranslationAttemptScheduleData>>>
+    scheduleRows$: Observable<ds_Dict<ScheduleRow<TranslationAttemptScheduleData>>>
 
     constructor({
                     translationAttemptRepository,
@@ -37,7 +37,7 @@ export class TranslationAttemptScheduleService
         weightedVocabService: WeightedVocabService,
         languageConfigsService: LanguageConfigsService
     }) {
-        this.indexedScheduleRows$ = combineLatest([
+        this.scheduleRows$ = combineLatest([
             selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$,

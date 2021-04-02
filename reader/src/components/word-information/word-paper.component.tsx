@@ -111,9 +111,9 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({
     const word = useObservableState(wordCard.word$)
     const scheduleRows =
         useObservableState(
-            m.quizCardScheduleRowsService.indexedScheduleRows$,
-        ) || {}
-    const scheduleRow = scheduleRows[word || '']
+            m.quizCardScheduleRowsService.scheduleRows$,
+        )
+    const scheduleRow = scheduleRows?.find(row => row?.d.word === word);
     const romanization = useObservableState(wordCard.romanization$)
     const translation = useObservableState(wordCard.translation$)
     const description = useObservableState(wordCard.description$.value$)

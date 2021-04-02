@@ -19,17 +19,17 @@ export class ScheduleService<T> {
     cardsLearnedToday$: Observable<ScheduleRow<T>[]>
 
     constructor({
-        quizCardScheduleRowsService,
+        scheduleRowsService,
         timeService,
     }: {
-        quizCardScheduleRowsService: ScheduleRowsService<T>
+        scheduleRowsService: ScheduleRowsService<T>
         timeService: TimeService
     }) {
         this.today = Math.round(new Date().getTime() / DAY_IN_MINISECONDS)
         this.yesterday = this.today - 1
         this.srmService = new SrmService()
 
-        this.sortedScheduleRows$ = quizCardScheduleRowsService.indexedScheduleRows$.pipe(
+        this.sortedScheduleRows$ = scheduleRowsService.scheduleRows$.pipe(
             // Relying on javascript object value ordering behaviour here, bad idea
             map((rowDict) => Object.values(rowDict)),
             shareReplay(1),

@@ -21,6 +21,14 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
     return settingReplaySubject
 }
 
+export enum QuizCardField {
+
+}
+
+interface QuizCardConfiguration {
+    visibleFields: QuizCardField[]
+}
+
 export class SettingsService {
     private settingsReplaySubjects: {
         [setting: string]: ReplaySubject<any>
@@ -62,6 +70,7 @@ export class SettingsService {
     public hiddenFieldsRequiredToProgress$: ReplaySubject<string[][]>
     public currentIntroTab$: ReplaySubject<number>
     selectedExampleSegmentDocuments$: ReplaySubject<string[]>
+    quizCardConfigurations$: ReplaySubject<QuizCardConfiguration[]>
 
     constructor({
         databaseService,
@@ -238,6 +247,16 @@ export class SettingsService {
         this.selectedExampleSegmentDocuments$ = this.createSetting$<string[]>(
             'selectedExampleSegmentDocuments',
             [],
+            'indexedDB',
+        );
+
+        this.quizCardConfigurations$ = this.createSetting$<QuizCardConfiguration[]>(
+            'quizCardConfigurations',
+            [
+                {
+                    visibleFields: []
+                }
+            ],
             'indexedDB',
         )
     }

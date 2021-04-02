@@ -34,7 +34,7 @@ export class TranslationAttemptService {
         translationAttemptScheduleService: TranslationAttemptScheduleService
         languageConfigsService: LanguageConfigsService
     }) {
-        this.currentScheduleRow$ = translationAttemptScheduleService.indexedScheduleRows$.pipe(
+        this.currentScheduleRow$ = translationAttemptScheduleService.scheduleRows$.pipe(
             map(
                 (indexedRows) =>
                     Object.values(indexedRows).filter(
