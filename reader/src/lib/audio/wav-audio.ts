@@ -18,6 +18,7 @@ export class WavAudio {
     graphData$: Observable<number[]>
 
     private graphObservable$: Observable<Observable<number[]>>
+    private src: string
 
     constructor(public buffer: ArrayBuffer) {
         // decodeAudioData detached the arraybuffer into the audio thread
@@ -34,7 +35,8 @@ export class WavAudio {
         )
         this.blob = new Blob([newBuffer], { type: 'audio/wav' })
         this.url = URL.createObjectURL(this.blob)
-        this.el = new Audio('data:audio/wav;base64,' + encode(newBuffer))
+        this.src = 'data:audio/wav;base64,' + encode(newBuffer)
+        this.el = new Audio(this.src)
         this.duration$ = this.audioBuffer$.pipe(map((b) => b.duration))
         this.graphData$ = this.audioBuffer$.pipe(
             map((b) => {

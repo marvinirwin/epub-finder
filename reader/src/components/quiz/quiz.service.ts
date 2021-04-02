@@ -128,6 +128,9 @@ export class QuizService {
             ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
             exampleSentenceOpenDocument: openExampleSentencesDocument,
+            audio: currentWord$.pipe(
+
+            )
         }
 
         currentWord$
