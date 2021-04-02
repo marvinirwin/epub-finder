@@ -5,6 +5,8 @@ import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { SpeechToTextConfig, SupportedSpeechToTextService } from './supported-speech-to-text.service'
 import { SupportedTransliterationService } from './supported-transliteration.service'
 import { TextSpeechMap } from './text-speech-map'
+import { WordIdentifyingStrategy } from '../../../../server/src/shared/tabulation/tabulate'
+import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
 export type PossibleTranslationConfig = { from: string; to: string } | undefined
 export type PossibleTransliterationConfig =
@@ -18,6 +20,7 @@ export class LanguageConfigsService {
     public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>
     readingLanguageCode$: Observable<string>
+    strategy$: Observable<WordIdentifyingStrategy>
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
         const knownLanguage$ = new ReplaySubject<string>(1)
@@ -63,16 +66,20 @@ export class LanguageConfigsService {
         this.readingLanguageCode$ = this.learningToKnownTranslateConfig$.pipe(
             map((translationConfig) => translationConfig?.from || 'en'),
             shareReplay(1),
+        );
+
+        this.strategy$ = this.readingLanguageCode$.pipe(
+            map(readingLanguageCode => resolvePartialTabulationConfig(readingLanguageCode).wordIdentifyingStrategy),
+            shareReplay(1)
         )
 
         this.potentialLearningSpoken$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
                 const lowerCode = learningLanguageCode.toLowerCase()
                 const textSpeechMapElement = TextSpeechMap[lowerCode]
-                const potentialLearningSpoken = (textSpeechMapElement || []).map((code) =>
+                return (textSpeechMapElement || []).map((code) =>
                     SupportedSpeechToTextService.ConfigMap.get(code),
                 ).filter(v => !!v) as SpeechToTextConfig[]
-                return potentialLearningSpoken
             },
         )
         combineLatest([

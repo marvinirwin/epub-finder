@@ -27,7 +27,7 @@ export const tabulate = ({
         wordElementsMap,
     } = tabulationObject
 
-    const characterElements = flatten(
+    const allMarks = flatten(
         segments.map((segment) => {
             segment.children.forEach((node) =>
                 elementSegmentMap.set(node, segment),
@@ -43,7 +43,7 @@ export const tabulate = ({
     const uniqueLengths = uniq(
         Array.from(notableCharacterSequences.uniqueLengths).concat(1),
     )
-    const textContent = characterElements
+    const textContent = allMarks
         .map((node) => node.textContent)
         .join('')
     let notableSubsequencesInProgress: IWordInProgress[] = []
@@ -51,8 +51,8 @@ export const tabulate = ({
     let segmentIndex = -1
     let currentSegmentStart
     let currentSerialzedSegment
-    for (let i = 0; i < characterElements.length; i++) {
-        const currentMark = characterElements[i];
+    for (let i = 0; i < allMarks.length; i++) {
+        const currentMark = allMarks[i];
         const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
             currentSegment = elementSegmentMap.get(currentMark)
@@ -88,6 +88,8 @@ export const tabulate = ({
             [],
         )
 
+        let wordStartingHereSplitBySeparator: string | undefined;
+
         if (
             notableSequencesWhichStartHere.length === 0 &&
             notableSubsequencesInProgress.length === 0 &&
@@ -102,17 +104,18 @@ export const tabulate = ({
                     let strings = textContent
                         .substr(i)
                         .split(isWordBoundaryRegex)
-                    const wordEnd = strings[0];
-                    if (wordEnd.trim()) {
-                        safePush(wordSegmentMap, wordEnd, elementSegmentMap.get(currentMark))
-                        notableSequencesWhichStartHere.push(wordEnd)
+                    const wordStartingHere = strings[0];
+                    if (wordStartingHere.trim()) {
+                        safePush(wordSegmentMap, wordStartingHere, elementSegmentMap.get(currentMark))
+                        wordStartingHereSplitBySeparator = wordStartingHere;
+                        notableSequencesWhichStartHere.push(wordStartingHere)
                     }
                     break
             }
         }
 
         notableSequencesWhichStartHere.forEach((wordStartingHere) => {
-            tabulationObject.notableSubSequences.push({position: i - currentSegmentStart, word: wordStartingHere})
+            tabulationObject.notableSubSequences.push({position: i, word: wordStartingHere})
             safePushMap(
                 segmentWordCountRecordsMap,
                 currentSerialzedSegment as SerializedSegment,
