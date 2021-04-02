@@ -7,7 +7,6 @@ import fs from 'fs-extra'
 export class SpeechSynthesisController {
     constructor(private speechService: SpeechService) {}
 
-    /*
     @Post()
     @Header('Content-Type', 'audio/wav')
     async synthesize(
@@ -20,8 +19,6 @@ export class SpeechSynthesisController {
         }
 
         console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
-        const cost = JSON.stringify(speechSynthesisRequest).length * 4;
         return fs.createReadStream(await this.speechService.TextToSpeech(speechSynthesisRequest))
     }
-*/
 }

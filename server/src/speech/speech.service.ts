@@ -23,8 +23,6 @@ export const speechConfig = SpeechConfig.fromSubscription(
 )
 const MAX_SPEECH_TOKENS = 1000
 
-speechConfig.speechRecognitionLanguage = 'zh-CN'
-speechConfig.speechSynthesisLanguage = 'zh-CN'
 
 @Injectable()
 export class SpeechService {
@@ -92,11 +90,11 @@ export class SpeechService {
         })
     }
 
-    async TextToSpeech({ text, voice, rate }: SpeechSynthesisRequestDto) {
+    async TextToSpeech({ text, voice, rate, locale }: SpeechSynthesisRequestDto) {
         const ssml = `
-<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="string">
-<voice name="zh-CN-Yaoyao-Apollo">
-<prosody rate="0.75">
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${locale}">
+<voice name="${voice}">
+<prosody rate="${rate}">
     ${text} 
 </prosody>
 </voice>
@@ -105,6 +103,8 @@ export class SpeechService {
         const filename = join(wavRoot, `${hash}.wav`)
         const audioFileExists = await fs.pathExists(filename)
         if (!audioFileExists) {
+            speechConfig.speechRecognitionLanguage = 'zh-CN'
+            speechConfig.speechSynthesisLanguage = 'zh-CN'
             await this.downloadSynthesizedSpeech(filename, ssml)
         }
         return filename
