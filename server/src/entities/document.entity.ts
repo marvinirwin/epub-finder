@@ -13,7 +13,7 @@ export class Document {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @Column({default: "zh-Hans"})
+    @Column()
     language_code: string
 
     // Used for Groupwise Max

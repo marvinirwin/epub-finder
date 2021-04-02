@@ -75,7 +75,6 @@ export class FlashCardLearningTargetsService {
             ]),
         ]).pipe(
             map(([allWords, selectedFrequencyVirtualTabulations, ignoredWords, videoMetadataIndex, temporaryHighlightedWord, [wordRecognitionRows, pronunciationRows]]) => {
-                debugger;
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()
                 /**
                  * This will break once there are real words with the same strings as the video metadata
@@ -109,10 +108,11 @@ export class FlashCardLearningTargetsService {
                          * Prevent cards created only for visual purposes from showing up in the quiz rows
                          */
                         const documentWordCounts = sumNotableSubSequences(notableSubSequences);
-                        Object.entries(documentWordCounts).forEach(
-                            ([word, wordCountRecords]) => {
+                        documentWordCounts.forEach(
+                            (count, word) => {
                                 if (!syntheticWords.has(word)) {
-                                    ensureLearningTargetForWord(word).wordCountRecords.push(...wordCountRecords)
+                                    // TODO, provide the document name
+                                    ensureLearningTargetForWord(word).wordCountRecords.push({count, word, document: ''})
                                 }
                             },
                         )

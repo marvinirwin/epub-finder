@@ -30,9 +30,7 @@ export class SortedLimitScheduleRowsService {
         timeService: TimeService
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            quizCardScheduleRowsService.scheduleRows$.pipe(
-                map((index) => Object.values(index)),
-            ),
+            quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
             timeService.quizNow$,
         ]).pipe(

@@ -96,7 +96,6 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                  ]) => {
                     const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
-                    debugger;
                     return ScheduleMathService.normalizeAndSortQuizScheduleRows(
                         getSortConfigs({
                             dateWeight,

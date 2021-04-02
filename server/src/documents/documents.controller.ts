@@ -90,30 +90,35 @@ export class DocumentsController {
         @Headers('document_id') document_id: string | undefined,
         @Headers('language_code') language_code: string,
         @Headers('sandbox_file') sandbox_file: string | undefined,
+        @Headers('for_frequency') for_frequency: string | undefined,
+        @Headers('for_reading') for_reading: string | undefined,
     ): Promise<DocumentViewDto> {
-        console.log(`Uploaded ${file.originalname} to S3 ${file.key}`)
         const output: UploadOutput = await new S3UploadedFile(
             file,
             !!sandbox_file,
         ).output()
         const name = file.originalname.split('.').slice(0, -1).join('')
-        if (document_id) {
-            return this.documentsService.saveRevision(
-                user,
-                name,
-                output.index().s3Key,
-                document_id,
-            )
-        }
-        const savedDocument = await this.documentsService.saveNew(
-            user,
+        const documentUpdateDto = {
+            for_frequency: !!for_frequency,
             name,
-            output.index().s3Key,
-        )
-        return await this.documentsService.byFilename({
-            filename: savedDocument.filename,
-            user,
-        })
+            for_reading: !!for_reading,
+            global: false,
+            deleted: false,
+            language_code: language_code,
+            id: undefined,
+            hash: await HashService.hashS3(output.index().s3Key),
+            filename: output.index().s3Key,
+            document_id,
+        }
+        const submitter = this.getRevisionUpdater(user, document_id)
+        // Check if we're allowed to modify this file
+        return await submitter.SubmitRevision(documentUpdateDto)
+        /*
+                return await this.documentsService.byFilename({
+                    filename: savedDocument.filename,
+                    user,
+                })
+        */
     }
 
     @Get(':filename')
@@ -137,8 +142,7 @@ export class DocumentsController {
                     ),
                 )
             }
-
-            ;(await s3ReadStream(filename)).pipe(response)
+            (await s3ReadStream(filename)).pipe(response)
             resolve()
         })
     }
@@ -152,27 +156,7 @@ export class DocumentsController {
         if (!user) {
             throw new HttpException('Not authorized to update document', 401)
         }
-        const submitter = new RevisionUpdater<Document, DocumentUpdateDto>(
-            (r) => this.documentsService.documentRepository.findOne(r.id),
-            (documentView) => documentView.creator_id === user?.id,
-            (currentVersion, newVersion) => ({
-                ...currentVersion,
-                document_id: ltDocId(documentUpdateDto),
-                for_frequency: newVersion.for_frequency,
-                for_reading: newVersion.for_reading,
-                global: newVersion.global,
-                name: newVersion.name,
-                deleted: newVersion.deleted,
-                id: undefined,
-                created_at: undefined,
-            }),
-            (newVersion) =>
-                this.documentsService.documentRepository.save(newVersion),
-            (newVersion) => ({
-                ...newVersion,
-                creator_id: user.id,
-            }),
-        )
+        const submitter = this.getRevisionUpdater(user, ltDocId(documentUpdateDto))
         // Check if we're allowed to modify this file
         return await submitter.SubmitRevision(documentUpdateDto)
         /*
@@ -188,5 +172,33 @@ export class DocumentsController {
             }
         )
 */
+    }
+
+    private getRevisionUpdater(user: User, existingDocumentId: string) {
+        return new RevisionUpdater<Document, DocumentUpdateDto>(
+            (r) => {
+                if (r.id) {
+                    return this.documentsService.documentRepository.findOne({ id: r.id })
+                }
+            },
+            (documentView) => documentView.creator_id === user?.id,
+            (currentVersion, newVersion) => ({
+                ...currentVersion,
+                document_id: existingDocumentId,
+                for_frequency: newVersion.for_frequency,
+                for_reading: newVersion.for_reading,
+                global: newVersion.global,
+                name: newVersion.name,
+                deleted: newVersion.deleted,
+                id: undefined,
+                created_at: undefined,
+            }),
+            (newVersion) =>
+                this.documentsService.documentRepository.save(newVersion),
+            (newVersion) => ({
+                ...newVersion,
+                creator_id: user?.id,
+            }),
+        )
     }
 }
