@@ -35,7 +35,7 @@ export const LanguageSelect = () => {
                 >
                     {SupportedTranslationService.SupportedTranslations.map(
                         (c) => (
-                            <MenuItem value={c.code}>{c.label}</MenuItem>
+                            <MenuItem key={c.code} value={c.code}>{c.label}</MenuItem>
                         ),
                     )}
                 </Select>

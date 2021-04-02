@@ -33,7 +33,6 @@ export interface SerializedSegment {
 }
 
 export const tabulationFactory = (): TabulatedDocuments => ({
-    wordCounts: {},
     wordElementsMap: {},
     wordSegmentMap: {},
     notableSubSequences: [],

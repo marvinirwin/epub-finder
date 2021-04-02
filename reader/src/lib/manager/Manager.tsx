@@ -349,15 +349,6 @@ export class Manager {
 
         this.highlighter = new Highlighter(this)
 
-        this.readingwordElementMap = combineLatest([
-            this.readingwordElementMap.pipe(startWith({})),
-            this.characterPagewordElementMap$.pipe(startWith({})),
-        ]).pipe(
-            map((wordElementMaps: Dictionary<AtomMetadata[]>[]) => {
-                return mergeDictArrays<AtomMetadata>(...wordElementMaps)
-            }),
-        )
-
         this.hotkeyEvents.hide$.subscribe(() => {
             this.editingCardManager.showEditingCardPopup$.next(false)
         })
