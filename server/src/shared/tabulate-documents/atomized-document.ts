@@ -38,7 +38,6 @@ export class AtomizedDocument {
                 'text/html',
             ),
         )
-        doc.ensurePopperContainer()
         doc.createMarksUnderLeaves(doc.getTextElements(doc.document))
         return doc
     }

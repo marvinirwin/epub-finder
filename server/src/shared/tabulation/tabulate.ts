@@ -9,7 +9,8 @@ export type TabulationParameters = {
     segments: Segment[]
 } & TabulationConfiguration
 
-export type WordIdentifyingStrategy = 'noSeparator' | 'punctuationSeparator'
+
+export type WordIdentifyingStrategy = 'noSeparator' | 'spaceSeparator'
 
 export type SerializableTabulationConfiguration = {
     notableCharacterSequences: SetWithUniqueLengths

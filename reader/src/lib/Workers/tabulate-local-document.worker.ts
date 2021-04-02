@@ -29,7 +29,7 @@ ctx.onmessage = async (ev) => {
         id,
         languageCode,
     }: TabulateLocalDocumentDto = ev.data
-    const doc = AtomizedDocument.atomizeDocument(src)
+    const doc = AtomizedDocument.fromAtomizedString(src)
     const segments = doc.segments()
     const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),

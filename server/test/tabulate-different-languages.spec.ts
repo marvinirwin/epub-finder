@@ -24,7 +24,7 @@ const segmentText = (text: string, languageCode: string) => {
         isWordBoundaryRegex: wordBoundaryRegexp,
         wordIdentifyingStrategy:
             languageRegexMap.get(languageCode)?.strategy ||
-            'punctuationSeparator',
+            'spaceSeparator',
         languageCode
     })
 }

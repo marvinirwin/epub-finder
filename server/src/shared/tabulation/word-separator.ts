@@ -46,7 +46,7 @@ export const LanguageSeparatorStrategy: {
     },
     {
         languages: ['ar', 'prs'],
-        strategy: 'punctuationSeparator',
+        strategy: 'spaceSeparator',
         regexp: arabicCharacterRegexp,
     },
     { languages: ['as', 'bn'], regexp: assameseBengaliCharacterRegexp },
@@ -84,7 +84,7 @@ export const resolvePartialTabulationConfig = (
 } => {
     const result = languageRegexMap.get(languageCode)
     return {
-        wordIdentifyingStrategy: result?.strategy || 'punctuationSeparator',
+        wordIdentifyingStrategy: result?.strategy || 'spaceSeparator',
         isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,
         isWordBoundaryRegex: wordBoundaryRegexp,
     }

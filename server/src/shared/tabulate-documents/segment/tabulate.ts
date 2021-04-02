@@ -52,8 +52,8 @@ export const tabulate = ({
     let currentSegmentStart
     let currentSerialzedSegment
     for (let i = 0; i < characterElements.length; i++) {
-        const currentMark = characterElements[i]
-        const currentCharacter = textContent[i]
+        const currentMark = characterElements[i];
+        const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
             currentSegment = elementSegmentMap.get(currentMark)
             segmentIndex++
@@ -97,13 +97,14 @@ export const tabulate = ({
                 case 'noSeparator':
                     notableSequencesWhichStartHere.push(currentCharacter)
                     break
-                case 'punctuationSeparator':
+                case 'spaceSeparator':
                     // Go until the next space or punctuation
                     let strings = textContent
                         .substr(i)
                         .split(isWordBoundaryRegex)
                     const wordEnd = strings[0];
                     if (wordEnd.trim()) {
+                        safePush(wordSegmentMap, wordEnd, elementSegmentMap.get(currentMark))
                         notableSequencesWhichStartHere.push(wordEnd)
                     }
                     break
