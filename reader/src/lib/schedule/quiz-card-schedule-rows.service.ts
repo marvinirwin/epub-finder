@@ -65,8 +65,8 @@ export class QuizCardScheduleRowsService {
             combineLatest([
                 selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
                 ignoredWordsRepository.latestRecords$,
-                videoMetadataRepository.all$,
-                temporaryHighlightService.temporaryHighlightRequests$
+                videoMetadataRepository.all$.pipe(startWith(new Map())),
+                temporaryHighlightService.temporaryHighlightRequests$.pipe(startWith(undefined))
             ]),
             combineLatest([
                 settingsService.frequencyWeight$,
@@ -92,10 +92,16 @@ export class QuizCardScheduleRowsService {
                     currentTranslationAttemptScheduleRow,
                 ]) => {
                     const scheduleRows: ds_Dict<QuizScheduleRowData> = {}
+                    /**
+                     * This will break once there are real words with the same strings as the video metadata
+                     * Same with temporary highlights :/
+                     */
                     const syntheticWords = new Set<string>(Object.keys(videoMetadataIndex));
+/*
                     if (temporaryHighlightRequest?.word) {
                         syntheticWords.add(temporaryHighlightRequest?.word);
                     }
+*/
                     const ensureScheduleRow = (word: string) => {
                         if (!scheduleRows[word]) {
                             scheduleRows[word] = {

@@ -32,7 +32,6 @@ ctx.onmessage = async (ev) => {
         id,
         languageCode,
     }: TabulateLocalDocumentDto = ev.data
-    debugger;
     const doc = AtomizedDocument.atomizeDocument(src)
     const segments = doc.segments()
     const tabulatedSentences = tabulate({
