@@ -120,7 +120,8 @@ export class DocumentRepository {
         languageCode: string
         file: File
     }): Promise<LtDocument> {
-        this.newDocument$.next(await DocumentRepository.uploadFile(file, languageCode, documentId))
-        return await DocumentRepository.uploadFile(file, languageCode, documentId)
+        const uploadedDocument = await DocumentRepository.uploadFile(file, languageCode, documentId)
+        this.newDocument$.next(uploadedDocument)
+        return uploadedDocument
     }
 }

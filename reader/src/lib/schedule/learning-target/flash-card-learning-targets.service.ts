@@ -44,7 +44,6 @@ export class FlashCardLearningTargetsService {
                     pronunciationProgressService,
                     videoMetadataRepository,
                     ignoredWordsRepository,
-                    settingsService,
                     allWordsRepository,
                     translationAttemptService,
                     selectedVirtualTabulationsService,
@@ -56,7 +55,6 @@ export class FlashCardLearningTargetsService {
                     videoMetadataRepository: VideoMetadataRepository,
                     cardsRepository: CardsRepository
                     ignoredWordsRepository: IgnoredWordsRepository
-                    settingsService: SettingsService
                     allWordsRepository: AllWordsRepository
                     translationAttemptService: TranslationAttemptService
                     selectedVirtualTabulationsService: SelectedVirtualTabulationsService
@@ -77,6 +75,7 @@ export class FlashCardLearningTargetsService {
             ]),
         ]).pipe(
             map(([allWords, selectedFrequencyVirtualTabulations, ignoredWords, videoMetadataIndex, temporaryHighlightedWord, [wordRecognitionRows, pronunciationRows]]) => {
+                debugger;
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()
                 /**
                  * This will break once there are real words with the same strings as the video metadata

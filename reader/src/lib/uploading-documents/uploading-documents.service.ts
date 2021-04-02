@@ -47,6 +47,7 @@ export class UploadingDocumentsService {
                 withLatestFrom(languageConfigsService.readingLanguageCode$)
             )
             .subscribe(async ([customDocuments, languageCode]) => {
+                debugger;
                 progressItemService.newProgressItem().exec(async () => {
                     let lastDocument: string | undefined
                     for (let i = 0; i < customDocuments.length; i++) {
