@@ -7,13 +7,14 @@ import { formatDistance, isToday } from 'date-fns'
 import { SuperMemoGrade, SuperMemoItem } from 'supermemo'
 import { lastN } from '../../components/quiz/last-n'
 import { QuizCardField } from '../../services/settings.service'
+import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[]
     greedyWordCountRecords: DocumentWordCount[]
     wordRecognitionRecords: WordRecognitionRow[]
     pronunciationRecords: PronunciationProgressRow[]
-    hiddenFields: QuizCardField[];
+    flashCardType: FlashCardType[];
     word: string
 }
 

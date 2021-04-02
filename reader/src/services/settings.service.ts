@@ -6,6 +6,7 @@ import { distinct, distinctUntilChanged, skip, take } from 'rxjs/operators'
 import { HistoryService } from '../lib/app-context/history.service'
 import { SettingGetSet, SettingType } from './setting-get-set'
 import { MapSubject } from './map-subject'
+import { FlashCardType } from '../lib/quiz/hidden-quiz-fields'
 
 const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
     const settingReplaySubject = new ReplaySubject<T>(1)
@@ -21,12 +22,9 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
     return settingReplaySubject
 }
 
-export enum QuizCardField {
-
-}
 
 export interface QuizCardConfiguration {
-    hiddenFields: QuizCardField[]
+    flashCardTypes: QuizCardField[]
 }
 
 export class SettingsService {
@@ -67,7 +65,7 @@ export class SettingsService {
     public scheduleTableShowUnderDue$: ReplaySubject<boolean>
     public newQuizWordLimit$: ReplaySubject<number>
     public translationAttemptSentenceWeight$: ReplaySubject<number>
-    public hiddenFieldsRequiredToProgress$: ReplaySubject<string[][]>
+    public flashCardTypesRequiredToProgress$: ReplaySubject<FlashCardType[]>
     public currentIntroTab$: ReplaySubject<number>
     selectedExampleSegmentDocuments$: ReplaySubject<string[]>
     quizCardConfigurations$: ReplaySubject<QuizCardConfiguration[]>
@@ -232,8 +230,8 @@ export class SettingsService {
             'indexedDB',
         )
 
-        this.hiddenFieldsRequiredToProgress$ = this.createSetting$<string[][]>(
-            'hiddenFieldsRequiredToProgress',
+        this.flashCardTypesRequiredToProgress$ = this.createSetting$<FlashCardType[]>(
+            'flashCardTypesRequiredToProgress',
             [],
             'indexedDB',
         )
@@ -249,16 +247,6 @@ export class SettingsService {
             [],
             'indexedDB',
         );
-
-        this.quizCardConfigurations$ = this.createSetting$<QuizCardConfiguration[]>(
-            'quizCardConfigurations',
-            [
-                {
-                    hiddenFields: []
-                }
-            ],
-            'indexedDB',
-        )
     }
 
     public createSetting$<T>(

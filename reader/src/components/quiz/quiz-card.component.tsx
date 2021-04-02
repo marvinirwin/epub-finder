@@ -26,7 +26,7 @@ export const QuizCardComponent: React.FC<
         label: 'learningLanguage',
     })
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const hiddenFields = useObservableState(quizCard.hiddenFields$) || [];
+    const flashCardTypes = useObservableState(quizCard.flashCardTypes$) || [];
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,
@@ -34,7 +34,7 @@ export const QuizCardComponent: React.FC<
     ) => {
         useSubscription(hotkeyObservable$.pipe(), async () => {
             if (word && latestLanguageCode) {
-                m.quizResultService.completeQuiz(word, latestLanguageCode, score, [...hiddenFields])
+                m.quizResultService.completeQuiz(word, latestLanguageCode, score, [...flashCardTypes])
             }
         })
     }

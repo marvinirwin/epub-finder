@@ -5,19 +5,10 @@ import { QuizCard } from './word-card.interface'
 import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
 import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
-import {
-    EXAMPLE_SENTENCE_DOCUMENT,
-    OpenDocumentsService,
-} from '../../lib/manager/open-documents.service'
-import {
-    NormalizedQuizCardScheduleRowData,
-    ScheduleRow,
-} from '../../lib/schedule/schedule-row'
+import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
+import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import {
-    hiddenDefinition,
-    hiddenLearningLanguage,
-} from '../../lib/quiz/hidden-quiz-fields'
+import { hiddenDefinition } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
 import { SortedLimitScheduleRowsService } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { wordCardFactory } from './card-card.factory'
@@ -44,22 +35,20 @@ export const computeRandomHiddenQuizFields = () => {
 
 export class QuizService {
     quizCard: QuizCard
-    currentScheduleRow$: Observable<
-        ScheduleRow<NormalizedQuizCardScheduleRowData>
-    >
+    currentScheduleRow$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>>
     manualHiddenFieldConfig$ = new ReplaySubject<string>()
 
     constructor({
-        cardsRepository,
-        sortedLimitedQuizScheduleRowsService,
-        exampleSentencesService,
-        openDocumentsService,
-        languageConfigsService,
-        settingsService,
-        tabulationConfigurationService,
-        translationAttemptScheduleService,
-        onSelectService,
-    }: {
+                    cardsRepository,
+                    sortedLimitedQuizScheduleRowsService,
+                    exampleSentencesService,
+                    openDocumentsService,
+                    languageConfigsService,
+                    settingsService,
+                    tabulationConfigurationService,
+                    translationAttemptScheduleService,
+                    onSelectService,
+                }: {
         cardsRepository: CardsRepository
         sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
         exampleSentencesService: ExampleSegmentsService
@@ -93,13 +82,13 @@ export class QuizService {
             ]).pipe(
                 map(
                     ([
-                        exampleSegmentMap,
-                        currentWord,
-                        translationAttemptScheduleIndex,
-                    ]) => {
-                        if (!currentWord) return [];
+                         exampleSegmentMap,
+                         currentWord,
+                         translationAttemptScheduleIndex,
+                     ]) => {
+                        if (!currentWord) return []
                         const firstTranslationAttempt =
-                            translationAttemptScheduleIndex[0]?.d ?.segmentText || ''
+                            translationAttemptScheduleIndex[0]?.d?.segmentText || ''
                         const exampleSegmentTexts = Array.from(
                             exampleSegmentMap.get(currentWord) || new Set<string>(),
                         )
@@ -141,19 +130,13 @@ export class QuizService {
 
         this.quizCard = {
             ...wordCard,
-            hiddenFields$: combineLatest([
-                currentWord$.pipe(distinctUntilChanged()),
-                this.manualHiddenFieldConfig$,
-            ]).pipe(
-                map(([, manualFieldConfig]) => {
-                    const m = { hiddenDefinition, hiddenLearningLanguage }
-                    return (
-                        // @ts-ignore
-                        m[manualFieldConfig] || computeRandomHiddenQuizFields()
-                    )
-                }),
-                shareReplay(1),
-            ),
+            flashCardTypes$:
+                this.currentScheduleRow$.pipe(
+                    map((word) => {
+                        word.d.flashCardTypes
+                    }),
+                    shareReplay(1),
+                ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
             exampleSentenceOpenDocument: openExampleSentencesDocument,
         }

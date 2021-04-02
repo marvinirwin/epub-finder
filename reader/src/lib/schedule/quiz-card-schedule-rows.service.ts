@@ -107,7 +107,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                         flatten(learningTargetsList.map(
                             (learningTarget) =>
                                 quizCardConfiguration.map(configuration => new ScheduleRow<QuizScheduleRowData>(
-                                    { ...learningTarget, hiddenFields: configuration.hiddenFields },
+                                    { ...learningTarget, flashCardTypes: configuration.flashCardTypes },
                                     learningTarget.wordRecognitionRecords,
                                     ),
                                 ),

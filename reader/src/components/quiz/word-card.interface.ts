@@ -7,7 +7,7 @@ import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 
 export type QuizCard = {
     exampleSentenceOpenDocument: OpenDocument
-    hiddenFields$: Observable<HiddenQuizFields>
+    flashCardTypes$: Observable<HiddenQuizFields>
     answerIsRevealed$: BehaviorSubject<boolean>
 } & WordCard
 

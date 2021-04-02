@@ -10,13 +10,9 @@ export interface QuizResult {
     word: string
     grade: SuperMemoGrade;
     languageCode: string;
-    hiddenFields: string[];
+    flashCardType: string;
 }
 
-export enum QuizComponent {
-    Conclusion = 'Conclusion',
-    Characters = 'Characters',
-}
 
 export class QuizResultService {
     quizResult$ = new Subject<QuizResult>()
@@ -45,12 +41,12 @@ export class QuizResultService {
                 wordRecognitionProgressService.addRecords$.next([record])
             })
     }
-    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade, hiddenFields: string[]) {
+    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade, flashCardType: FlashCardType) {
         this.quizResult$.next({
             grade: recognitionScore,
             word,
             languageCode,
-            hiddenFields
+            flashCardTypes
         })
 
         this.requestNextCard$.next()

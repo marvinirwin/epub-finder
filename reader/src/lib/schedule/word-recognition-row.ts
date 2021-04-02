@@ -11,7 +11,7 @@ export interface WordRecognitionRow {
     efactor: number
     grade: SuperMemoGrade
 
-    hiddenFields: string[]
+    flashCardTypes: string[]
 
     languageCode: string
 }
