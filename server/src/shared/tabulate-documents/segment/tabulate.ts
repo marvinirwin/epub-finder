@@ -1,7 +1,7 @@
 import { SerializedSegment, tabulationFactory, TabulationParameters } from '../../tabulation/tabulate'
 import { TabulatedSegments } from '../tabulated-documents.interface'
 import { XMLDocumentNode } from '../../XMLDocumentNode'
-import { flatten, maxBy, uniq } from 'lodash'
+import { flatten,  uniq } from 'lodash'
 import { IWordInProgress } from '../../Annotation/IWordInProgress'
 import { safePush, safePushMap } from '../../safe-push'
 import { IPositionedWord } from '../../Annotation/IPositionedWord'
@@ -12,7 +12,6 @@ import { Segment } from './segment'
 export const tabulate = ({
     notableCharacterSequences,
     segments,
-    greedyWordSet,
     isNotableCharacterRegex,
     wordIdentifyingStrategy,
     isWordBoundaryRegex,
@@ -22,7 +21,6 @@ export const tabulate = ({
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character)
     const {
-        greedyWordCounts,
         wordSegmentMap,
         segmentWordCountRecordsMap,
         wordCounts,
@@ -66,32 +64,6 @@ export const tabulate = ({
                 text: currentSegment.translatableText,
                 index: segmentIndex,
             }
-        }
-        const newGreedyWord = () => {
-            const chosenGreedyWord = maxBy(
-                notableSubsequencesInProgress.filter((wordInProgress) => {
-                        switch(wordIdentifyingStrategy) {
-                            case "noSeparator":
-                                return greedyWordSet.has(wordInProgress.word)
-                            case "punctuationSeparator":
-                                // How do I figure which subsequence to use?
-                                // This is why I should have used
-                                return
-                        }
-                    },
-                ),
-                (wordInProgress) => wordInProgress.word.length,
-            )
-            if (chosenGreedyWord) {
-                if (!greedyWordCounts.get(chosenGreedyWord.word)) {
-                    greedyWordCounts.set(chosenGreedyWord.word, 0)
-                }
-                greedyWordCounts.set(
-                    chosenGreedyWord.word,
-                    greedyWordCounts.get(chosenGreedyWord.word) + 1,
-                )
-            }
-            return chosenGreedyWord
         }
 
         notableSubsequencesInProgress = notableSubsequencesInProgress
@@ -141,6 +113,7 @@ export const tabulate = ({
         }
 
         notableSequencesWhichStartHere.forEach((wordStartingHere) => {
+            tabulationObject.notableSubSequences.push({position: i - currentSegmentStart, word: wordStartingHere})
             safePushMap(
                 segmentWordCountRecordsMap,
                 currentSerialzedSegment as SerializedSegment,
@@ -162,16 +135,6 @@ export const tabulate = ({
                 return { word, lengthRemaining: word.length }
             }),
         )
-        if (!greedyWord) {
-            greedyWord = newGreedyWord()
-        }
-        const greedyWordHasEnded = !notableSubsequencesInProgress.includes(
-            greedyWord,
-        )
-        if (greedyWordHasEnded) {
-            greedyWord = newGreedyWord()
-        }
-
         // Positioned words, what's this for?
         const words: IPositionedWord[] = notableSubsequencesInProgress.map(
             ({ word, lengthRemaining }) => {

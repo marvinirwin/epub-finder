@@ -3,6 +3,7 @@ import { Segment } from '../tabulate-documents/segment/segment'
 import { TabulatedDocuments } from '../tabulate-documents/tabulated-documents.interface'
 import { AtomMetadata } from '../atom-metadata.interface.ts/atom-metadata'
 import { XMLDocumentNode } from '../XMLDocumentNode'
+import { IPositionedWord } from '../Annotation/IPositionedWord'
 
 export type TabulationParameters = {
     segments: Segment[]
@@ -35,12 +36,10 @@ export const tabulationFactory = (): TabulatedDocuments => ({
     wordCounts: {},
     wordElementsMap: {},
     wordSegmentMap: {},
+    notableSubSequences: [],
     atomMetadatas: new Map<XMLDocumentNode, AtomMetadata>(),
-    greedyWordCounts: new Map<string, number>(),
     wordSegmentStringsMap: new Map<string, Set<string>>(),
     segments: [],
-    documentWordCounts: {},
-    greedyDocumentWordCounts: new Map(),
     segmentWordCountRecordsMap: new Map<SerializedSegment, WordCountRecord[]>(),
     label: '',
     id: '',

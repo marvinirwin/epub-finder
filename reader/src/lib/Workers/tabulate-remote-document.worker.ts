@@ -48,10 +48,8 @@ ctx.onmessage = async (ev) => {
     ctx.postMessage({
         wordCounts: tabulated.wordCounts,
         wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
-        documentWordCounts: tabulated.documentWordCounts,
-        greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts,
+        notableSubSequences: [],
         segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
-        greedyWordCounts: tabulated.greedyWordCounts,
         id: ltDoc.id(),
         label: ltDoc.name,
     } as SerializedDocumentTabulation)

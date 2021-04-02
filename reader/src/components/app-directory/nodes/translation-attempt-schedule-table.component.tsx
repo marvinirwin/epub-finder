@@ -13,7 +13,7 @@ export const TranslationAttemptScheduleTable: React.FC = () => {
     const translationAttemptScheduleRows =
         useObservableState(
             m.translationAttemptScheduleService.scheduleRows$,
-        ) || {}
+        ) || []
     return (
         <div>
             <TranslationAttemptTableToolbar />
@@ -21,7 +21,7 @@ export const TranslationAttemptScheduleTable: React.FC = () => {
                 <Table size="small">
                     <TranslationAttemptTableHead />
                     <TableBody>
-                        {Object.values(translationAttemptScheduleRows).map(
+                        {translationAttemptScheduleRows.map(
                             (scheduleRow) => (
                                 <TranslationAttemptScheduleTableRow
                                     key={scheduleRow.d.segmentText}

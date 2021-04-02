@@ -1,6 +1,5 @@
 import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
-import { ds_Dict } from '../delta-scan/delta-scan.module'
 import { NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow } from './schedule-row'
 import { ScheduleMathService, sumWordCountRecords } from './schedule-math.service'
 import { SettingsService } from '../../services/settings.service'
@@ -8,6 +7,51 @@ import { TranslationAttemptService } from '../../components/translation-attempt/
 import { TimeService } from '../time/time.service'
 import { FlashCardLearningTargetsService } from './learning-target/flash-card-learning-targets.service'
 import { ScheduleRowsService } from './schedule-rows-service.interface'
+import { flatten } from 'lodash'
+
+function getSortConfigs({
+                            dateWeight,
+                            frequencyWeight,
+                            wordLengthWeight,
+                            firstRecordSentence,
+                            translationAttemptSentenceWeight,
+                        }: {
+    dateWeight: number,
+    frequencyWeight: number,
+    wordLengthWeight: number, firstRecordSentence: string, translationAttemptSentenceWeight: number
+}) {
+    return {
+        dueDate: {
+            fn: (
+                row: ScheduleRow<QuizScheduleRowData>,
+            ) => row.dueDate().getTime() * -1,
+            weight: dateWeight,
+        },
+        count: {
+            fn: (
+                row: ScheduleRow<QuizScheduleRowData>,
+            ) => sumWordCountRecords(row),
+            weight: frequencyWeight,
+        },
+        length: {
+            fn: (
+                row: ScheduleRow<QuizScheduleRowData>,
+            ) => row.d.word.length,
+            weight: wordLengthWeight,
+        },
+        // How do we tell if we're included in the first row?
+        sentencePriority: {
+            fn: (
+                row: ScheduleRow<QuizScheduleRowData>,
+            ) => {
+                return firstRecordSentence.includes(
+                    row.d.word,
+                )
+            },
+            weight: translationAttemptSentenceWeight,
+        },
+    }
+}
 
 export class QuizCardScheduleRowsService implements ScheduleRowsService<NormalizedQuizCardScheduleRowData> {
     public scheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>
@@ -31,7 +75,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$,
                 settingsService.translationAttemptSentenceWeight$,
-                settingsService.quizCardConfigurations$
+                settingsService.quizCardConfigurations$,
             ]),
             translationAttemptService.currentScheduleRow$,
             timeService.quizNow$,
@@ -44,53 +88,30 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                          dateWeight,
                          wordLengthWeight,
                          translationAttemptSentenceWeight,
+                         quizCardConfiguration,
                      ],
                      currentTranslationAttemptScheduleRow,
                      now,
-                     scheduleRows,
+                     learningTargets,
                  ]) => {
-                    const firstRecordSentence =
-                        currentTranslationAttemptScheduleRow?.d?.segmentText ||
-                        ''
+                    const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
+                    const learningTargetsList = [...learningTargets.values()]
                     return ScheduleMathService.normalizeAndSortQuizScheduleRows(
-                        {
-                            dueDate: {
-                                fn: (
-                                    row: ScheduleRow<QuizScheduleRowData>,
-                                ) => row.dueDate().getTime() * -1,
-                                weight: dateWeight,
-                            },
-                            count: {
-                                fn: (
-                                    row: ScheduleRow<QuizScheduleRowData>,
-                                ) => sumWordCountRecords(row),
-                                weight: frequencyWeight,
-                            },
-                            length: {
-                                fn: (
-                                    row: ScheduleRow<QuizScheduleRowData>,
-                                ) => row.d.word.length,
-                                weight: wordLengthWeight,
-                            },
-                            // How do we tell if we're included in the first row?
-                            sentencePriority: {
-                                fn: (
-                                    row: ScheduleRow<QuizScheduleRowData>,
-                                ) => {
-                                    return firstRecordSentence.includes(
-                                        row.d.word,
-                                    )
-                                },
-                                weight: translationAttemptSentenceWeight,
-                            },
-                        },
-                        [...scheduleRows.values()].map(
-                            (r) =>
-                                new ScheduleRow<QuizScheduleRowData>(
-                                    r,
-                                    r.wordRecognitionRecords,
+                        getSortConfigs({
+                            dateWeight,
+                            frequencyWeight,
+                            wordLengthWeight,
+                            firstRecordSentence,
+                            translationAttemptSentenceWeight,
+                        }),
+                        flatten(learningTargetsList.map(
+                            (learningTarget) =>
+                                quizCardConfiguration.map(configuration => new ScheduleRow<QuizScheduleRowData>(
+                                    { ...learningTarget, hiddenFields: configuration.hiddenFields },
+                                    learningTarget.wordRecognitionRecords,
+                                    ),
                                 ),
-                        ),
+                        )),
                         (
                             [dueDate, count, length, sentencePriority],
                             sortConfigs,

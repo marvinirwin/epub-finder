@@ -1,11 +1,8 @@
 import React, { useContext } from 'react'
-import { FrequencyTree } from '../../lib/learning-tree/frequency-tree'
 import { Card, Paper, Typography, Button } from '@material-ui/core'
 import { FrequencyDocumentNodeArgs } from '../../lib/learning-tree/frequency-tree.service'
 import { TabulatedFrequencyDocument } from '../../lib/learning-tree/tabulated-frequency-document'
 import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
-import { SerializedTabulation } from '@shared/'
 
 export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> = ({
     frequencyNode,
@@ -13,11 +10,13 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> = ({
 }) => {
     const value = frequencyNode.value as TabulatedFrequencyDocument
     const m = useContext(ManagerContext)
+/*
     const vocab = useObservableState(m.vocabService.vocab$) || {
         wordCounts: {},
         wordSegmentStringsMap: new Map(),
         greedyWordCounts: new Map(),
     }
+*/
     return (
         <Paper id={value.frequencyDocument.name} style={{ margin: '24px' }}>
             <Button

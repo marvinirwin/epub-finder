@@ -4,10 +4,9 @@ import { Segment } from './segment/segment'
 import { DocumentWordCount } from '../DocumentWordCount'
 import { XMLDocumentNode } from '../XMLDocumentNode'
 import { SerializedSegment, WordCountRecord } from '../tabulation/tabulate'
+import { IPositionedWord } from '../Annotation/IPositionedWord'
 
 export type DocumentWordCounts = {
-    documentWordCounts: Dictionary<DocumentWordCount[]>
-    greedyDocumentWordCounts: Map<string, DocumentWordCount[]>
     id: string
     label: string
 }
@@ -22,8 +21,8 @@ export type TabulatedSegments = SerializedTabulation & {
 }
 
 export interface SerializedTabulation {
+    notableSubSequences: IPositionedWord[],
     wordCounts: Dictionary<number>
-    greedyWordCounts: Map<string, number>
     wordSegmentStringsMap: Map<string, Set<string>>
     segmentWordCountRecordsMap: Map<SerializedSegment, WordCountRecord[]>
 }
@@ -48,7 +47,6 @@ export const tabulatedSentenceToTabulatedDocuments = ({
         id,
         label,
         ...tabulatedSentences,
-        documentWordCounts: Object.fromEntries(entries),
         greedyDocumentWordCounts: new Map(entries),
     }
 }

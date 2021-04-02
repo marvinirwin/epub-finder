@@ -36,14 +36,15 @@ export class DocumentReadabilityProgress {
         // Now take any word which was recognized twice in a row and mark it as complete
         // Any word which was recognized once or is overdue and mark it as kind of complete
         // Then the rest are red
-        const totalWordCount = sum(
+        const totalWordCount = /*sum(
             Array.from(tabulatedDocument.greedyWordCounts.values()),
-        )
+        )*/0;
         const { fullRecognition, somewhatRecognized, unrecognized } = {
             fullRecognition: [],
             somewhatRecognized: [],
             unrecognized: [],
         } as ReadabilityState
+/*
         Array.from(tabulatedDocument.greedyWordCounts.entries()).forEach(
             ([word, count]) => {
                 const scheduleRow = scheduleRows.get(word)
@@ -64,6 +65,7 @@ export class DocumentReadabilityProgress {
                 fullRecognition.push(readabilityRecord)
             },
         )
+*/
         this.readabilityState = {
             fullRecognition,
             somewhatRecognized,

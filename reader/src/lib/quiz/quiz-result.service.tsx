@@ -10,6 +10,7 @@ export interface QuizResult {
     word: string
     grade: SuperMemoGrade;
     languageCode: string;
+    hiddenFields: string[];
 }
 
 export enum QuizComponent {
@@ -44,11 +45,12 @@ export class QuizResultService {
                 wordRecognitionProgressService.addRecords$.next([record])
             })
     }
-    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade) {
+    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade, hiddenFields: string[]) {
         this.quizResult$.next({
             grade: recognitionScore,
             word,
             languageCode,
+            hiddenFields
         })
 
         this.requestNextCard$.next()

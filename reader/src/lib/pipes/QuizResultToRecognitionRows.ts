@@ -9,15 +9,13 @@ import { add } from 'date-fns'
 import { QuizResult } from '../quiz/quiz-result.service'
 
 export const QuizResultToRecognitionRows = (
-    scheduleRows$: Observable<Dictionary<ScheduleRow<QuizScheduleRowData>>>,
+    scheduleRows$: Observable<ScheduleRow<QuizScheduleRowData>[]>,
 ) => (quizResults$: Observable<QuizResult>) =>
     quizResults$.pipe(
         withLatestFrom(scheduleRows$),
         map(
-            ([scorePair, wordScheduleRowDict]): WordRecognitionRow => {
-                const previousRecords =
-                    wordScheduleRowDict[scorePair.word]?.d
-                        .wordRecognitionRecords || []
+            ([scorePair, scheduleRows]): WordRecognitionRow => {
+                const previousRecords = scheduleRows.find(scheduleRow => scheduleRow.d.word === scorePair.word && scheduleRow.d.hiddenFields.join('') === scorePair.hiddenFields.join(''))?.d.wordRecognitionRecords || []
                 const nextRecognitionRecord = SrmService.getNextRecognitionRecord(
                     previousRecords,
                     scorePair.grade,

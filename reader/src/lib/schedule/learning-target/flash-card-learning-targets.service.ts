@@ -16,6 +16,15 @@ import { DocumentWordCount } from '../../../../../server/src/shared/DocumentWord
 import { PronunciationProgressRow } from '../pronunciation-progress-row.interface'
 import { mapIfThenDefault } from '../../util/map.module'
 import { SerializedTabulationAggregate } from '../../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import { IPositionedWord } from '../../../../../server/src/shared/Annotation/IPositionedWord'
+
+export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
+    const m = new Map<string, number>();
+    iPositionedWords.forEach(value => {
+        mapIfThenDefault(m, value.word, 1, v => v + 1)
+    })
+    return m;
+}
 
 
 export type FlashCardLearningTarget = {
@@ -96,10 +105,11 @@ export class FlashCardLearningTargetsService {
                 new SerializedTabulationAggregate(
                     selectedFrequencyVirtualTabulations,
                 ).serializedTabulations.forEach(
-                    ({ documentWordCounts }) => {
+                    ({ notableSubSequences }) => {
                         /**
                          * Prevent cards created only for visual purposes from showing up in the quiz rows
                          */
+                        const documentWordCounts = sumNotableSubSequences(notableSubSequences);
                         Object.entries(documentWordCounts).forEach(
                             ([word, wordCountRecords]) => {
                                 if (!syntheticWords.has(word)) {

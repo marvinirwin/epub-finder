@@ -24,7 +24,7 @@ export interface TranslationAttemptScheduleData {
 
 export class TranslationAttemptScheduleService
     implements ScheduleRowsService<TranslationAttemptScheduleData> {
-    scheduleRows$: Observable<ds_Dict<ScheduleRow<TranslationAttemptScheduleData>>>
+    scheduleRows$: Observable<ScheduleRow<TranslationAttemptScheduleData>[]>
 
     constructor({
                     translationAttemptRepository,
@@ -41,14 +41,14 @@ export class TranslationAttemptScheduleService
             selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
             translationAttemptRepository.indexOfOrderedRecords$,
             weightedVocabService.weightedVocab$,
-            languageConfigsService.readingLanguageCode$
+            languageConfigsService.readingLanguageCode$,
         ]).pipe(
             map(
                 ([
                      selectedVirtualTabulations,
                      translationAttempts,
                      weightedVocab,
-                    languageCode
+                     languageCode,
                  ]) => {
                     const virtualDocumentTabulation = new SerializedTabulationAggregate(
                         selectedVirtualTabulations,
@@ -64,7 +64,7 @@ export class TranslationAttemptScheduleService
                         }
                         return scheduleRows[segmentText]
                     }
-                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex;
+                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex
                     virtualDocumentTabulation.serializedTabulations.forEach(
                         (serialzedTabulation) => {
                             serialzedTabulation.segmentWordCountRecordsMap.forEach(
@@ -92,29 +92,22 @@ export class TranslationAttemptScheduleService
                             }
                         },
                     )
-                    return Object.fromEntries(
-                        orderBy(
-                            Object.values(
-                                scheduleRows,
-                            ).map((scheduleRowData) => [
-                                scheduleRowData.segmentText,
-                                new ScheduleRow(
-                                    scheduleRowData,
-                                    scheduleRowData.translationAttemptRecords,
-                                ),
-                            ]),
-                            ([segmentText, scheduleRow]: [
-                                string,
-                                ScheduleRow<TranslationAttemptScheduleData>,
-                            ]) =>
-                                averageKnownWords(
-                                    wordsFromCountRecordList(
-                                        scheduleRow.d.wordCountRecords,
-                                    ),
-                                    weightedVocab,
-                                ).average || 0,
-                            'desc',
+                    return orderBy(
+                        Object.values(
+                            scheduleRows,
+                        ).map((scheduleRowData) => new ScheduleRow(
+                            scheduleRowData,
+                            scheduleRowData.translationAttemptRecords,
+                            ),
                         ),
+                        (scheduleRow) =>
+                            averageKnownWords(
+                                wordsFromCountRecordList(
+                                    scheduleRow.d.wordCountRecords,
+                                ),
+                                weightedVocab,
+                            ).average || 0,
+                        'desc',
                     )
                 },
             ),

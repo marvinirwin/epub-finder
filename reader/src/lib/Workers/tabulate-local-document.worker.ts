@@ -52,8 +52,7 @@ ctx.onmessage = async (ev) => {
         ctx.postMessage({
             wordCounts: tabulated.wordCounts,
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
-            documentWordCounts: tabulated.documentWordCounts,
-            greedyDocumentWordCounts: tabulated.greedyDocumentWordCounts,
+            notableSubSequences: tabulated.notableSubSequences,
             segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
             id,
             label,
@@ -61,7 +60,6 @@ ctx.onmessage = async (ev) => {
     } catch (e) {
         console.error(e)
         ctx.postMessage({
-            documentWordCounts: {},
             wordElementsMap: {},
             wordSegmentMap: {},
             segments: [],
@@ -70,8 +68,9 @@ ctx.onmessage = async (ev) => {
             wordSegmentStringsMap: new Map(),
             greedyDocumentWordCounts: new Map(),
             segmentWordCountRecordsMap: new Map(),
+            notableSubSequences: [],
             id,
             label,
-        })
+        } as SerializedDocumentTabulation)
     }
 }

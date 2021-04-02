@@ -10,6 +10,7 @@ import { TabulationConfigurationService } from './language-maps/tabulation-confi
 import { TimeService } from '../time/time.service'
 
 export class VocabService {
+/*
     vocab$: Observable<SerializedTabulation>
 
     constructor({
@@ -83,4 +84,5 @@ export class VocabService {
             shareReplay(1),
         )
     }
+*/
 }

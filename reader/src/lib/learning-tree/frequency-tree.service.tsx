@@ -32,15 +32,19 @@ export class FrequencyTreeService {
         this.tree$ = combineLatest([
             frequencyDocumentsRepository.selectedTabulated$,
             settingsService.progressTreeRootId$,
-            vocabService.vocab$,
         ]).pipe(
-            map(([allFrequencyDocuments, rootId, vocab]) => {
+            map(([allFrequencyDocuments, rootId]) => {
                 const rootNode =
                     allFrequencyDocuments.find(
                         (d) => d.frequencyDocument.id() === rootId,
                     ) || allFrequencyDocuments[0]
                 if (!rootNode) return
-                return new FrequencyTree(allFrequencyDocuments, rootNode, vocab)
+                return new FrequencyTree(allFrequencyDocuments, rootNode, {
+                    notableSubSequences: [],
+                    segmentWordCountRecordsMap: new Map(),
+                    wordCounts: {},
+                    wordSegmentStringsMap: new Map()
+                })
                     .tree
                 // For each frequency doc calculate its distance to the others, oh this is n^2, I'll memo it
             }),

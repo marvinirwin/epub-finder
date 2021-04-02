@@ -52,21 +52,6 @@ const ProgressTypes = {
     hsk1: Object.values(HSK1).map(({ hanzi }) => hanzi),
 }
 
-export class ProgressManager {
-    constructor({
-        wordRecognitionRows$,
-        scheduleRows$,
-    }: {
-        wordRecognitionRows$: Observable<ds_Dict<WordRecognitionRow[]>>
-        scheduleRows$: Observable<ds_Dict<ScheduleRow<QuizScheduleRowData>>>
-    }) {
-        // Let's maintain some fractions
-        // Ultimate Progress
-        // HSK Progress
-        // Document-level progress
-        // Each one of these progress' is available by time periods IE monthly/daily/hourly/minutely
-    }
-}
 
 function dateBetween(timestamp: Date, startTime: Date, endTime: Date): boolean {
     return (

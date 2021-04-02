@@ -26,7 +26,6 @@ import { Segment } from '@shared/'
 import { mergeDictArrays } from '../util/mergeAnnotationDictionary'
 import EditingCardManager from './EditingCardManager'
 import { CardPageEditingCardCardDBAudio } from './manager-connections/Card-Page-EditingCard-CardDB-Audio'
-import { ProgressManager } from './ProgressManager'
 import { AppContext } from '../app-context/AppContext'
 import { RecordRequest } from '../util/RecordRequest'
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
@@ -130,9 +129,6 @@ function splitTextDataStreams$(textData$: Observable<TabulatedDocuments>) {
             map(({ wordElementsMap }) => wordElementsMap),
         ),
         wordCounts$: textData$.pipe(map(({ wordCounts }) => wordCounts)),
-        documentwordCounts: textData$.pipe(
-            map(({ documentWordCounts }) => documentWordCounts),
-        ),
         wordSentenceMap: textData$.pipe(
             map(({ wordSegmentMap }) => wordSegmentMap),
         ),
@@ -158,7 +154,6 @@ export class Manager {
     public createdSentenceManager: CreatedSentenceManager
     public browserInputsService: BrowserInputsService
     public editingCardManager: EditingCardManager
-    public progressManager: ProgressManager
     public visibleElementsService: VisibleService
     public loggedInUserService = new LoggedInUserService()
     public highlighter: Highlighter
@@ -178,8 +173,6 @@ export class Manager {
 
     readingwordElementMap!: Observable<Dictionary<AtomMetadata[]>>
     characterPagewordElementMap$ = new Subject<Dictionary<AtomMetadata[]>>()
-    readingWordCounts$: Observable<Dictionary<DocumentWordCount[]>>
-    readingwordSentenceMap: Observable<Dictionary<Segment[]>>
     highlightAllWithDifficultySignal$ = new BehaviorSubject<boolean>(true)
     libraryService: LibraryService
     modesService = new ModesService()
@@ -313,22 +306,6 @@ export class Manager {
         this.uploadingDocumentsService.uploadingMessages$.subscribe((msg) =>
             this.alertsService.info(msg),
         )
-        /*
-         * wordElementsMap: Dictionary<IAnnotatedCharacter[]>;
-         * wordCounts: Dictionary<number>;
-         * wordSentenceMap: Dictionary<AtomizedSentence[]>;
-         * sentenceMap: Dictionary<AtomizedSentence[]>;
-         */
-        const {
-            wordElementMap$,
-            sentenceMap$,
-            documentwordCounts,
-        } = splitTextDataStreams$(
-            this.openDocumentsService.displayDocumentTabulation$,
-        )
-        this.readingwordElementMap = wordElementMap$
-        this.readingWordCounts$ = documentwordCounts
-        this.readingwordSentenceMap = sentenceMap$
         this.translationAttemptRepository = new TranslationAttemptRepository(
             this,
         )
@@ -360,12 +337,6 @@ export class Manager {
             languageConfigsService: this.languageConfigsService,
         })
         this.editingCardManager = new EditingCardManager()
-        this.progressManager = new ProgressManager({
-            wordRecognitionRows$: this.wordRecognitionProgressService
-                .indexOfOrderedRecords$,
-            scheduleRows$: this.quizCardScheduleRowsService
-                .scheduleRows$,
-        })
         this.quizResultService = new QuizResultService({
             wordRecognitionProgressService: this.wordRecognitionProgressService,
             scheduleRowsService: this.quizCardScheduleRowsService,
@@ -419,6 +390,7 @@ export class Manager {
             this.editingCardManager.requestEditWord$.next(word)
         })
 
+/*
         combineLatest([
             this.highlightAllWithDifficultySignal$,
             this.quizCardScheduleRowsService.scheduleRows$,
@@ -429,6 +401,7 @@ export class Manager {
                   )
                 : this.highlighter.highlightWithDifficulty$.next({})
         })
+*/
 
         this.goalsService = new GoalsService(this)
 
@@ -517,7 +490,7 @@ export class Manager {
         this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(
             this,
         )
-        this.vocabService = new VocabService(this)
+        this.vocabService = new VocabService()
         this.progressTreeService = new FrequencyTreeService(this)
         this.quizHighlightService = new QuizHighlightService(this)
         this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(

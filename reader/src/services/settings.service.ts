@@ -25,8 +25,8 @@ export enum QuizCardField {
 
 }
 
-interface QuizCardConfiguration {
-    visibleFields: QuizCardField[]
+export interface QuizCardConfiguration {
+    hiddenFields: QuizCardField[]
 }
 
 export class SettingsService {
@@ -254,7 +254,7 @@ export class SettingsService {
             'quizCardConfigurations',
             [
                 {
-                    visibleFields: []
+                    hiddenFields: []
                 }
             ],
             'indexedDB',
