@@ -3,14 +3,11 @@ import { map, shareReplay } from 'rxjs/operators'
 import {
     annotatedAndTranslated,
     AtomizedDocument,
-    Segment,
     SerializedDocumentTabulation,
-    TabulatedDocuments,
-    tabulatedSentenceToTabulatedDocuments,
     tabulate,
+    TabulatedDocuments, TabulatedSegments,
 } from '@shared/'
 import { TabulateLocalDocument } from '../Workers/worker.helpers'
-import { mergeTabulations } from '../util/merge-tabulations'
 import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { SettingsService } from '../../services/settings.service'
@@ -23,7 +20,7 @@ import { resolvePartialTabulationConfig } from '../../../../server/src/shared/ta
 export class OpenDocument {
     public name: string
     public renderedSegments$ = new ReplaySubject<BrowserSegment[]>(1)
-    public renderedTabulation$: Observable<TabulatedDocuments>
+    public renderedTabulation$: Observable<TabulatedSegments>
     public virtualTabulation$: Observable<SerializedDocumentTabulation>
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1)
     public isLoadingVirtualTabulation$: Observable<boolean>
@@ -47,17 +44,10 @@ export class OpenDocument {
             services.languageConfigsService.readingLanguageCode$,
         ]).pipe(
             map(([segments, tabulationConfiguration, languageCode]) => {
-                const tabulatedSentences = mergeTabulations(
-                    tabulate({
-                        segments,
-                        ...tabulationConfiguration,
-                        ...resolvePartialTabulationConfig(languageCode),
-                    }),
-                )
-                return tabulatedSentenceToTabulatedDocuments({
-                    tabulatedSentences,
-                    label: this.label,
-                    id: this.id,
+                return tabulate({
+                    segments,
+                    ...tabulationConfiguration,
+                    ...resolvePartialTabulationConfig(languageCode),
                 })
             }),
             shareReplay(1),

@@ -14,10 +14,6 @@ export class FrequencyTree {
         ) => {
             return computeSimilarityTabulation(
                 {
-                    wordCounts: {
-                        ...t1.wordCounts,
-                        ...vocab.wordCounts,
-                    },
                     wordSegmentStringsMap: new Map(),
 /*
                     greedyWordCounts: new Map([

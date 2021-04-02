@@ -42,7 +42,6 @@ export class FrequencyTreeService {
                 return new FrequencyTree(allFrequencyDocuments, rootNode, {
                     notableSubSequences: [],
                     segmentWordCountRecordsMap: new Map(),
-                    wordCounts: {},
                     wordSegmentStringsMap: new Map()
                 })
                     .tree

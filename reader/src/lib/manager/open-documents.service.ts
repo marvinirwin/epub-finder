@@ -1,6 +1,6 @@
 import { combineLatest, merge, Observable, of } from 'rxjs'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
-import { SerializedDocumentTabulation } from '@shared/'
+import { SerializedDocumentTabulation, TabulatedSegments } from '@shared/'
 import { flattenTree, NamedDeltaScanner } from '../delta-scan/delta-scan.module'
 import { DatabaseService } from '../Storage/database.service'
 import { SettingsService } from '../../services/settings.service'
@@ -15,7 +15,6 @@ import { SerializedTabulation, TabulatedDocuments } from '@shared/'
 import { DocumentRepository } from '../documents/document.repository'
 import { TrieWrapper } from '../util/TrieWrapper'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
-import { mergeTabulations } from '../util/merge-tabulations'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
@@ -30,9 +29,9 @@ export const READING_DOCUMENT_NODE_LABEL = 'readingDocument'
 export class OpenDocumentsService {
     openDocumentTree = new NamedDeltaScanner<OpenDocument, string>()
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
-    displayDocumentTabulation$: Observable<TabulatedDocuments>
+    displayDocumentTabulation$: Observable<TabulatedSegments[]>
     sourceDocuments$: Observable<Map<string, OpenDocument>>
-    tabulationsOfCheckedOutDocuments$: Observable<TabulatedDocuments>
+    tabulationsOfCheckedOutDocuments$: Observable<TabulatedSegments[]>
     openDocumentBodies$: Observable<HTMLBodyElement>
     renderedSegments$: Observable<BrowserSegment[]>
     virtualDocumentTabulation$: Observable<SerializedTabulationAggregate>
@@ -105,7 +104,6 @@ export class OpenDocumentsService {
                     ),
                 ),
             ),
-            map((tabulations) => mergeTabulations(...tabulations)),
             shareReplay(1),
         )
 
@@ -128,9 +126,6 @@ export class OpenDocumentsService {
             (document) => document.renderedTabulation$,
             READING_DOCUMENT_NODE_LABEL,
         ).pipe(
-            map((documentTabulations: TabulatedDocuments[]) =>
-                mergeTabulations(...documentTabulations),
-            ),
             shareReplay(1),
         )
 

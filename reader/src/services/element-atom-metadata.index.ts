@@ -5,7 +5,10 @@ import { OpenDocumentsService } from '../lib/manager/open-documents.service'
 import { VisibleService } from '../lib/manager/visible.service'
 import { AtomMetadata } from '../../../server/src/shared/atom-metadata.interface.ts/atom-metadata'
 import { XMLDocumentNode } from '../../../server/src/shared/XMLDocumentNode'
-import { TabulatedDocuments } from '../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
+import {
+    TabulatedDocuments,
+    TabulatedSegments,
+} from '../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>
 
@@ -28,7 +31,7 @@ export class ElementAtomMetadataIndex {
                         ),
                     ),
                 ),
-                map((tabulations: TabulatedDocuments[]) => {
+                map((tabulations: TabulatedSegments[]) => {
                     const m: AtomMetadataMap = new Map()
                     tabulations.forEach((tabulation) =>
                         tabulation.atomMetadatas.forEach((value, key) =>

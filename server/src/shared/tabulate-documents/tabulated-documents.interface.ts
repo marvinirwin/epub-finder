@@ -22,7 +22,6 @@ export type TabulatedSegments = SerializedTabulation & {
 
 export interface SerializedTabulation {
     notableSubSequences: IPositionedWord[],
-    wordCounts: Dictionary<number>
     wordSegmentStringsMap: Map<string, Set<string>>
     segmentWordCountRecordsMap: Map<SerializedSegment, WordCountRecord[]>
 }

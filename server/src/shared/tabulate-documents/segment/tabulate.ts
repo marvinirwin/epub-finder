@@ -23,7 +23,6 @@ export const tabulate = ({
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
-        wordCounts,
         atomMetadatas,
         wordElementsMap,
     } = tabulationObject
@@ -48,7 +47,6 @@ export const tabulate = ({
         .map((node) => node.textContent)
         .join('')
     let notableSubsequencesInProgress: IWordInProgress[] = []
-    let greedyWord: IWordInProgress | undefined
     let currentSegment: Segment
     let segmentIndex = -1
     let currentSegmentStart
@@ -126,12 +124,6 @@ export const tabulate = ({
 
         notableSubsequencesInProgress.push(
             ...notableSequencesWhichStartHere.map((word) => {
-                // Side effects bad
-                if (wordCounts[word]) {
-                    wordCounts[word]++
-                } else {
-                    wordCounts[word] = 1
-                }
                 return { word, lengthRemaining: word.length }
             }),
         )

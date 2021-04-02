@@ -6,9 +6,7 @@ import { ManagerContext } from '../../../App'
 
 export const ManualMouseover = () => {
     const m = useContext(ManagerContext)
-    const segments =
-        useObservableState(m.openDocumentsService.displayDocumentTabulation$)
-            ?.segments || []
+    const segments = flatten(useObservableState(m.openDocumentsService.displayDocumentTabulation$)?.map(v => v.segments) || [])
     const nodes = flatten(
         segments.map((segment) => [
             ...segment.getSentenceHTMLElement().children,

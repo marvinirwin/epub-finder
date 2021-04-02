@@ -123,20 +123,6 @@ const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: 
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
 */
 
-function splitTextDataStreams$(textData$: Observable<TabulatedDocuments>) {
-    return {
-        wordElementMap$: textData$.pipe(
-            map(({ wordElementsMap }) => wordElementsMap),
-        ),
-        wordCounts$: textData$.pipe(map(({ wordCounts }) => wordCounts)),
-        wordSentenceMap: textData$.pipe(
-            map(({ wordSegmentMap }) => wordSegmentMap),
-        ),
-        sentenceMap$: textData$.pipe(
-            map(({ wordSegmentMap }) => wordSegmentMap),
-        ),
-    }
-}
 
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(

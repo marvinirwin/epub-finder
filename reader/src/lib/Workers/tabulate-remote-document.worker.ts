@@ -46,7 +46,6 @@ ctx.onmessage = async (ev) => {
         id: ltDoc.id(),
     })
     ctx.postMessage({
-        wordCounts: tabulated.wordCounts,
         wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
         notableSubSequences: [],
         segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
