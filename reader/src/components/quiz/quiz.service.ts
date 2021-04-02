@@ -78,6 +78,7 @@ export class QuizService {
         )
         const currentWord$ = this.currentScheduleRow$.pipe(
             map((row) => row?.d.word),
+            distinctUntilChanged(),
         )
         const openExampleSentencesDocument = OpenExampleSentencesFactory({
             tabulationConfigurationService,
@@ -99,7 +100,7 @@ export class QuizService {
                         const firstTranslationAttempt =
                             Object.values(translationAttemptScheduleIndex)[0]?.d
                                 ?.segmentText || ''
-                        if (!currentWord) return []
+                        if (!currentWord) return [];
                         const exampleSegmentTexts = Array.from(
                             sentenceMap.get(currentWord) || new Set<string>(),
                         )

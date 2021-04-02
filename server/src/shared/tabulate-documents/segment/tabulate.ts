@@ -133,7 +133,9 @@ export const tabulate = ({
                         .substr(i)
                         .split(isWordBoundaryRegex)
                     const wordEnd = strings[0]
-                    notableSequencesWhichStartHere.push(wordEnd)
+                    if (wordEnd.trim()) {
+                        notableSequencesWhichStartHere.push(wordEnd)
+                    }
                     break
             }
         }

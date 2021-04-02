@@ -72,9 +72,6 @@ export class LanguageConfigsService {
                 const potentialLearningSpoken = (textSpeechMapElement || []).map((code) =>
                     SupportedSpeechToTextService.ConfigMap.get(code),
                 ).filter(v => !!v) as SpeechToTextConfig[]
-                if (!potentialLearningSpoken.length) {
-                    debugger;console.log()
-                }
                 return potentialLearningSpoken
             },
         )
