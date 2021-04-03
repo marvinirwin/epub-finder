@@ -3,6 +3,7 @@ import { SpeechService, wavRoot } from './speech.service'
 import { SpeechSynthesisRequestDto } from './speech-synthesis-request-dto'
 import fs from 'fs-extra'
 import { join } from 'path'
+import { sleep } from '../../../reader/src/lib/util/Util'
 
 @Controller('speech-synthesis')
 export class SpeechSynthesisController {
@@ -16,11 +17,13 @@ export class SpeechSynthesisController {
     ) {
         if (await this.speechService.audioFileExists(speechSynthesisRequest)) {
             console.log(`Cache hit ${JSON.stringify(speechSynthesisRequest)}`)
-            fs.createReadStream(join(wavRoot, `${this.speechService.audioHash(speechSynthesisRequest)}.wav`)).pipe(res);
+            fs.createReadStream(this.speechService.audioFilePath(speechSynthesisRequest)).pipe(res);
             return;
         }
 
         console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
-        fs.createReadStream(await this.speechService.TextToSpeech(speechSynthesisRequest)).pipe(res)
+        const path = await this.speechService.TextToSpeech(speechSynthesisRequest)
+        await sleep(1000);
+        fs.createReadStream(path).pipe(res)
     }
 }
