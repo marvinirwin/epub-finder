@@ -12,7 +12,7 @@ import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { isLoading } from '../util/is-loading'
+import { createLoadingObservable } from '../util/create-loading-observable'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
@@ -52,7 +52,7 @@ export class OpenDocument {
             }),
             shareReplay(1),
         )
-        const { isLoading$, obs$ } = isLoading(
+        const { isLoading$, obs$ } = createLoadingObservable(
             combineLatest([
                 this.tabulationConfigurationService.tabulationConfiguration$,
                 this.atomizedDocument$,

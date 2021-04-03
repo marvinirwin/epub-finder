@@ -4,7 +4,7 @@ import { DatabaseService } from '../Storage/database.service'
 import { merge, Observable, ReplaySubject } from 'rxjs'
 import { mapFromId, mergeMaps } from '../util/map.module'
 import { LtDocument } from '@shared/'
-import { isLoading } from '../util/is-loading'
+import { createLoadingObservable } from '../util/create-loading-observable'
 import { TESTING } from '../util/url-params'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { map, scan } from 'rxjs/operators'
@@ -24,7 +24,7 @@ export class DocumentRepository {
         languageConfigsService: LanguageConfigsService
     }) {
         this.databaseService = databaseService
-        const { obs$, isLoading$ } = isLoading(languageConfigsService.readingLanguageCode$, async (languageCode) => {
+        const { obs$, isLoading$ } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (languageCode) => {
             const response = await axios.get(
                 `${process.env.PUBLIC_URL}/documents`,
                 {

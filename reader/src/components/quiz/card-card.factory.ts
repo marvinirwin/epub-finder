@@ -16,12 +16,13 @@ import { transliterate } from '../../lib/language/transliterate.service'
 import translate from 'google-translate-api'
 import { fetchTranslation } from '../../services/translate.service'
 import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
+import { WordCard } from './word-card.interface'
 
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
     cardService: CardsRepository,
     languageConfigsService: LanguageConfigsService,
-) => {
+): WordCard => {
     function update(propsToUpdate: Partial<ICard>, word: string) {
         cardService.updateICard(word, propsToUpdate)
     }

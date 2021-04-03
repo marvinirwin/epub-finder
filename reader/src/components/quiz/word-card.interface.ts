@@ -12,11 +12,16 @@ export type QuizCard = {
     answerIsRevealed$: BehaviorSubject<boolean>
 } & WordCard
 
+export type LoadingObservable<T> = {
+    obs$: T,
+    isLoading$: Observable<boolean>
+}
+
 export interface WordCard {
     word$: Observable<string | undefined>
     image$: EditableValue<string | undefined>
     description$: EditableValue<string | undefined>
-    romanization$: Observable<string | undefined>
-    translation$: Observable<string | undefined>
-    audio$: Observable<WavAudio | undefined>
+    romanization$: LoadingObservable<string | undefined>
+    translation$: LoadingObservable<string | undefined>
+    audio$: LoadingObservable<WavAudio | undefined>
 }

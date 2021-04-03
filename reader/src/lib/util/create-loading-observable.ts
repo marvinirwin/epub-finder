@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs'
 import { shareReplay, switchMap, tap } from 'rxjs/operators'
 
-export const isLoading = <T, U>(
+export const createLoadingObservable = <T, U>(
     o$: Observable<T>,
     switchMapFn: (v: T) => Promise<U> | Observable<U>,
 ): {
