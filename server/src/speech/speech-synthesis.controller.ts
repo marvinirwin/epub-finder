@@ -15,15 +15,13 @@ export class SpeechSynthesisController {
         @Body() speechSynthesisRequest: SpeechSynthesisRequestDto,
         @Res() res,
     ) {
-        if (await this.speechService.audioFileExists(speechSynthesisRequest)) {
+        if (!await this.speechService.audioFileExists(speechSynthesisRequest)) {
+            console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
+            await this.speechService.TextToSpeech(speechSynthesisRequest)
+        } else {
             console.log(`Cache hit ${JSON.stringify(speechSynthesisRequest)}`)
-            fs.createReadStream(this.speechService.audioFilePath(speechSynthesisRequest)).pipe(res);
-            return;
         }
-
-        console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
-        const path = await this.speechService.TextToSpeech(speechSynthesisRequest)
-        await sleep(1000);
-        fs.createReadStream(path).pipe(res)
+        fs.createReadStream(this.speechService.audioFilePath(speechSynthesisRequest)).pipe(res);
+        return;
     }
 }

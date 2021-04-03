@@ -80,8 +80,7 @@ export class LanguageConfigsService {
                     if (readingLanguage.startsWith('zh')) {
                         readingLanguage = 'zh';
                     }
-                    const textToSpeechConfigs = TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage))
-                    return textToSpeechConfigs
+                    return TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage))
                 }),
                 shareReplay(1),
             );

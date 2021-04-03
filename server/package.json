@@ -64,7 +64,7 @@
         "lodash": "^4.17.19",
         "lusca": "^1.6.1",
         "mailchecker": "^3.3.9",
-        "microsoft-cognitiveservices-speech-sdk": "^1.12.1",
+        "microsoft-cognitiveservices-speech-sdk": "^1.16.0",
         "moment": "^2.27.0",
         "morgan": "^1.10.0",
         "ms-rest-azure": "^3.0.0",

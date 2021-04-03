@@ -86,12 +86,14 @@ export class SpeechService {
                 ssml1,
                 async (result) => {
                     // TODO Put something here which checks if result is an error
+                    await new Promise((resolve, reject) => synthesizer.close(resolve, reject))
+                    await new Promise((resolve, reject) => audioConfig.close())
                     resolve()
-                    synthesizer.close()
                 },
                 (error) => {
                     console.log(error)
                     synthesizer.close()
+                    audioConfig.close()
                     reject(error)
                 },
             )
