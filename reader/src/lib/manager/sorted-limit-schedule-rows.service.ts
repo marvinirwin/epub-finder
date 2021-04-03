@@ -4,7 +4,7 @@ import { map, shareReplay } from 'rxjs/operators'
 import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/schedule-row'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
-import { safePushMap } from '@shared/*'
+import { safePushMap } from '@shared/'
 import { orderBy } from 'lodash'
 
 type LimitedScheduleRows = {
