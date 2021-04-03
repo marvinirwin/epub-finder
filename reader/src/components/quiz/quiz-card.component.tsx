@@ -16,14 +16,15 @@ import { QuizCardScheduleTable } from '../tables/quiz-card-due-date-schedule-tab
 import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translation-attempt-table.component'
 import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
+import { useLoadingObservable } from '../../lib/util/create-loading-observable'
 
 const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
-    const audio = useObservableState(quizCard.audio$)
+    const {value: audio, isLoading} = useLoadingObservable(quizCard.audio$)
     const isHidden = useIsFieldHidden({ quizCard, label: QuizCardField.Sound })
     const currentType = useObservableState(quizCard.flashCardType$);
     const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
     useEffect(() => {
-        if (audioRef && audio) {
+        if (audioRef && audio && !isLoading) {
             audioRef.currentTime = 0;
             audioRef.play()
         }

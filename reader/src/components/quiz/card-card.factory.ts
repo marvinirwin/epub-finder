@@ -4,19 +4,12 @@ import { ICard } from '../../../../server/src/shared/ICard'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { EditableValue } from './editing-value'
 import { resolveICardForWordLatest } from '../../lib/pipes/ResolveICardForWord'
-import {
-    debounceTime,
-    distinctUntilChanged,
-    map,
-    shareReplay,
-    switchMap,
-    withLatestFrom,
-} from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, map, shareReplay, withLatestFrom } from 'rxjs/operators'
 import { transliterate } from '../../lib/language/transliterate.service'
-import translate from 'google-translate-api'
 import { fetchTranslation } from '../../services/translate.service'
 import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
 import { WordCard } from './word-card.interface'
+import { createLoadingObservable } from '../../lib/util/create-loading-observable'
 
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
@@ -65,42 +58,36 @@ export const wordCardFactory = (
                         )
                     }),
         ),
-        romanization$: combineLatest([
-            languageConfigsService.learningToLatinTransliterateFn$,
-            currentWord$,
-        ]).pipe(
-            switchMap(([transliterateConfig, currentWord]) =>
+        romanization$: createLoadingObservable(combineLatest([
+                languageConfigsService.learningToLatinTransliterateFn$,
+                currentWord$,
+            ]),
+            ([transliterateConfig, currentWord]) =>
                 transliterateConfig
                     ? transliterate({
-                          ...transliterateConfig,
-                          text: currentWord || '',
-                      })
-                    : of(undefined),
-            ),
-            shareReplay(1),
-        ),
-        translation$: combineLatest([
-            languageConfigsService.learningToKnownTranslateConfig$,
-            currentWord$,
-        ]).pipe(
-            switchMap(([translateConfig, currentWord]) => {
+                        ...transliterateConfig,
+                        text: currentWord || '',
+                    })
+                    : of(undefined))
+        ,
+        translation$: createLoadingObservable(combineLatest([
+                languageConfigsService.learningToKnownTranslateConfig$,
+                currentWord$,
+            ]), ([translateConfig, currentWord]) => {
                 return translateConfig
                     ? fetchTranslation({
-                          text: currentWord || '',
-                          ...translateConfig,
-                      })
+                        text: currentWord || '',
+                        ...translateConfig,
+                    })
                     : of(undefined)
-            }),
-            shareReplay(1),
+            },
         ),
-        audio$: combineLatest([currentWord$, languageConfigsService.learningLanguageTextToSpeechConfig$]).pipe(
-            switchMap(async ([currentWord, learningLanguageToTextConfig]) => {
+        audio$: createLoadingObservable(combineLatest([currentWord$, languageConfigsService.learningLanguageTextToSpeechConfig$]),
+            async ([currentWord, learningLanguageToTextConfig]) => {
                 if (currentWord && learningLanguageToTextConfig) {
-                    return fetchSynthesizedAudio({...learningLanguageToTextConfig, text: currentWord})
+                    return fetchSynthesizedAudio({ ...learningLanguageToTextConfig, text: currentWord })
                 }
-            })
-        )
-        // I should make "hidden" deterministic somehow
-        // I'll worry about that later
+            },
+        ),
     }
 }

@@ -27,6 +27,7 @@ import {
 } from '../../lib/schedule/schedule-row'
 import { formatDueDate } from '../../lib/schedule/format-due-date'
 import { round } from 'lodash'
+import { useLoadingObservableString } from '../../lib/util/create-loading-observable'
 
 export const CardLearningLanguageText = ({ word }: { word: string }) => {
     const m = useContext(ManagerContext)
@@ -114,8 +115,8 @@ export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({
             m.quizCardScheduleRowsService.scheduleRows$,
         )
     const scheduleRow = scheduleRows?.find(row => row?.d.word === word);
-    const romanization = useObservableState(wordCard.romanization$)
-    const translation = useObservableState(wordCard.translation$)
+    const romanization = useLoadingObservableString(wordCard.romanization$, '')
+    const translation = useLoadingObservableString(wordCard.translation$, '')
     const description = useObservableState(wordCard.description$.value$)
     const now = useObservableState(m.timeService.quizNow$) || new Date()
     const sortInfo = scheduleRow?.d?.sortValues

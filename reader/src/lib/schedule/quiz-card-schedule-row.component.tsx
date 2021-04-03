@@ -1,6 +1,4 @@
-import { NormalizedQuizCardScheduleRowData, ScheduleRow } from './schedule-row'
 import React from 'react'
-import { DisplaySortValue } from './schedule-row-math.component'
 import { useObservableState } from 'observable-hooks'
 import { QuizCard } from '../../components/quiz/word-card.interface'
 import { TextField, Typography } from '@material-ui/core'
@@ -10,8 +8,8 @@ import {
     quizCardTranslation,
 } from '@shared/'
 import { useIsFieldHidden } from '../../components/quiz/useIsFieldHidden'
-import { QuizCardScheduleTable } from '../../components/tables/quiz-card-due-date-schedule-table.component'
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
+import { useLoadingObservableString } from '../util/create-loading-observable'
 
 export const QuizCardScheduleRowDisplay = ({
     quizCard,
@@ -19,8 +17,8 @@ export const QuizCardScheduleRowDisplay = ({
     quizCard: QuizCard
 }) => {
     const description = useObservableState(quizCard.description$.value$)
-    const romanization = useObservableState(quizCard.romanization$)
-    const translation = useObservableState(quizCard.translation$)
+    const romanization = useLoadingObservableString(quizCard.romanization$, '')
+    const translation = useLoadingObservableString(quizCard.translation$, '')
     const isDescriptionHidden = useIsFieldHidden({
         quizCard,
         label: QuizCardField.Description,

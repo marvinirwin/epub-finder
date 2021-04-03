@@ -13,7 +13,7 @@ export type QuizCard = {
 } & WordCard
 
 export type LoadingObservable<T> = {
-    obs$: T,
+    obs$: Observable<T>,
     isLoading$: Observable<boolean>
 }
 
