@@ -1,6 +1,6 @@
 import { SettingsService } from '../../services/settings.service'
 import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay } from 'rxjs/operators'
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/schedule-row'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
@@ -28,6 +28,7 @@ export class SortedLimitScheduleRowsService {
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
     }) {
+        const scheduleRowKey = (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => `${r.d.word}${r.d.flashCardType}`;
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
@@ -112,7 +113,9 @@ export class SortedLimitScheduleRowsService {
                     ],
                 }
             }),
+            distinctUntilChanged((x, y) => x.limitedScheduleRows.map(scheduleRowKey).join('') === y.limitedScheduleRows.map(scheduleRowKey).join('')),
             shareReplay(1),
         )
+
     }
 }

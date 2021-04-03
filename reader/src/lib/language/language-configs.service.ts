@@ -28,8 +28,8 @@ export class LanguageConfigsService {
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
         const knownLanguage$ = new ReplaySubject<string>(1);
+        knownLanguage$.next('en');
         this.learningLanguageTextToSpeechConfig$ = settingsService.textToSpeechConfiguration$;
-        knownLanguage$.next('en')
         const getLanguageCodeObservable = <T>(
             f: (knownLanguageCode: string, learningLanguageCode: string) => T,
         ) =>
@@ -77,7 +77,11 @@ export class LanguageConfigsService {
         this.potentialLearningLanguageTextToSpeechConfigs$ = settingsService.readingLanguage$
             .pipe(
                 map(readingLanguage => {
-                    return (TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage)))
+                    if (readingLanguage.startsWith('zh')) {
+                        readingLanguage = 'zh';
+                    }
+                    const textToSpeechConfigs = TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage))
+                    return textToSpeechConfigs
                 }),
                 shareReplay(1),
             );
@@ -96,8 +100,7 @@ export class LanguageConfigsService {
                 ).filter(v => !!v) as SpeechToTextConfig[]
             },
         )
-        const supportedTransliterations =
-            SupportedTransliterationService.SupportedTransliteration
+        const supportedTransliterations = SupportedTransliterationService.SupportedTransliteration
         this.learningToLatinTransliterateFn$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
                 const goesToLatin = supportedTransliterations.find(
