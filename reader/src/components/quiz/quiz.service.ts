@@ -132,7 +132,7 @@ export class QuizService {
 
         combineLatest([currentWord$, this.quizCard.flashCardType$])
             .pipe(distinctUntilChanged(
-                ([x1, x2], [y1, y2]) => x1 !== y1 || x2 !== y2),
+                ([x1, x2], [y1, y2]) => x1 === y1 && x2 === y2),
                 mapTo(false),
             )
             .subscribe(this.quizCard.answerIsRevealed$)
