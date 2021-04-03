@@ -20,6 +20,7 @@ export const LanguageSelect = () => {
         useObservableState(m.languageConfigsService.potentialLearningSpoken$) ||
         []
     const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
+    const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
     return (
         <Fragment>
             <Box m={2} p={1}>
@@ -75,7 +76,7 @@ export const LanguageSelect = () => {
                 <Select
                     variant={'filled'}
                     labelId={textToSpeechLanguageSelectLabel}
-                    value={spokenLanguageCode}
+                    value={chosenTextToSpeechConfig?.voice || ''}
                     onChange={(e) =>
                         m.settingsService.textToSpeechConfiguration$.next(
                             potentialTextToSpeech.find(potentialConfig => potentialConfig.voice === e.target.value)
