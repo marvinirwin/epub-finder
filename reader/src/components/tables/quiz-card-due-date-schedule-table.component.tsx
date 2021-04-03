@@ -26,7 +26,7 @@ export const QuizCardScheduleTable = () => {
                 </TableHead>
                 <TableBody>
                     {rows.slice(0, 3).map((row) => (
-                        <TableRow key={row.d.word}>
+                        <TableRow key={`${row.d.word}${row.d.flashCardType}`}>
                             <TableCell component='th' scope='row'>
                                 {row.d.word}
                             </TableCell>

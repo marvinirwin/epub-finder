@@ -14,10 +14,8 @@ import { QuizCardScheduleTable } from '../../components/tables/quiz-card-due-dat
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
 
 export const QuizCardScheduleRowDisplay = ({
-    scheduleRow,
     quizCard,
 }: {
-    scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData>
     quizCard: QuizCard
 }) => {
     const description = useObservableState(quizCard.description$.value$)

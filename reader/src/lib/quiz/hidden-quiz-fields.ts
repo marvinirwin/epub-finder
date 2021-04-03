@@ -16,6 +16,9 @@ export enum QuizCardField {
     ExampleSegments = 'ExampleSegments',
 }
 
+/**
+ * TODO, I'll have to put something where which makes it skip hidden fields if audio/translation/etc is not supported for the current language
+ */
 export const resolveHiddenFieldsForFlashcardType = (t: FlashCardType): Set<QuizCardField> => {
     function resolveHiddenFields() {
         switch (t) {

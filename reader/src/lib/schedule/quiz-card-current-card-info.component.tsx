@@ -14,7 +14,6 @@ export const CardInfo = ({ quizCard }: { quizCard: QuizCard }) => {
         <div>
             {scheduleRow && (
                 <QuizCardScheduleRowDisplay
-                    scheduleRow={scheduleRow}
                     quizCard={quizCard}
                 />
             )}
