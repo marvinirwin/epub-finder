@@ -7,6 +7,7 @@ import { HistoryService } from '../lib/app-context/history.service'
 import { SettingGetSet, SettingType } from './setting-get-set'
 import { MapSubject } from './map-subject'
 import { FlashCardType } from '../lib/quiz/hidden-quiz-fields'
+import { TextToSpeechConfig } from '../lib/language/supported-text-to-speech'
 
 const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
     const settingReplaySubject = new ReplaySubject<T>(1)
@@ -68,6 +69,7 @@ export class SettingsService {
     public flashCardTypesRequiredToProgress$: ReplaySubject<FlashCardType[]>
     public currentIntroTab$: ReplaySubject<number>
     selectedExampleSegmentDocuments$: ReplaySubject<string[]>
+    textToSpeechConfiguration$: ReplaySubject<TextToSpeechConfig | undefined>
 
     constructor({
         databaseService,
@@ -250,6 +252,11 @@ export class SettingsService {
             [],
             'indexedDB',
         );
+        this.textToSpeechConfiguration$ = this.createSetting$<TextToSpeechConfig | undefined>(
+            'textToSpeechConfiguration',
+            undefined,
+            'indexedDB',
+        )
     }
 
     public createSetting$<T>(

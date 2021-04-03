@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react'
+import React, { Fragment, useContext, useEffect, useState } from 'react'
 import { Paper } from '@material-ui/core'
 import { useObservableState, useSubscription } from 'observable-hooks'
 import { QuizCard } from './word-card.interface'
@@ -20,10 +20,20 @@ import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
     const audio = useObservableState(quizCard.audio$)
     const isHidden = useIsFieldHidden({ quizCard, label: QuizCardField.Sound })
+    const currentType = useObservableState(quizCard.flashCardType$);
+    const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
+    useEffect(() => {
+        if (audioRef && audio) {
+            audioRef.currentTime = 0;
+            audioRef.play()
+        }
+    }, [currentType, audio]);
+
     return (audio && !isHidden) ?
         <audio
             src={audio.url}
             controls
+            ref={setAudioRef}
             autoPlay
         /> :
         null

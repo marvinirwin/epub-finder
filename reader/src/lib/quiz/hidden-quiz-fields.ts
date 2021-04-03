@@ -42,8 +42,8 @@ export const resolveHiddenFieldsForFlashcardType = (t: FlashCardType): Set<QuizC
                     QuizCardField.KnownLanguageDefinition,
                     QuizCardField.Description,
                     QuizCardField.Romanization,
-                    QuizCardField.Picture,
                     QuizCardField.ExampleSegments,
+                    QuizCardField.LearningLanguage
                 ]
         }
     }

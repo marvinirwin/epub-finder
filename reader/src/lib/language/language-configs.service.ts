@@ -21,12 +21,14 @@ export class LanguageConfigsService {
     public learningToLatinTransliterateFn$: Observable<PossibleTransliterationConfig>
     public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>
-    public learningLanguageTextToSpeechConfig$: Observable<PossibleTextToSpeechConfig>
+    learningLanguageTextToSpeechConfig$: Observable<PossibleTextToSpeechConfig>
+    public potentialLearningLanguageTextToSpeechConfigs$: Observable<TextToSpeechConfig[]>
     readingLanguageCode$: Observable<string>
     strategy$: Observable<WordIdentifyingStrategy>
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
-        const knownLanguage$ = new ReplaySubject<string>(1)
+        const knownLanguage$ = new ReplaySubject<string>(1);
+        this.learningLanguageTextToSpeechConfig$ = settingsService.textToSpeechConfiguration$;
         knownLanguage$.next('en')
         const getLanguageCodeObservable = <T>(
             f: (knownLanguageCode: string, learningLanguageCode: string) => T,
@@ -72,13 +74,13 @@ export class LanguageConfigsService {
         )
 
 
-        this.learningLanguageTextToSpeechConfig$ = settingsService.readingLanguage$
+        this.potentialLearningLanguageTextToSpeechConfigs$ = settingsService.readingLanguage$
             .pipe(
                 map(readingLanguage => {
-                    return (TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage)))?.[0]
+                    return (TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage)))
                 }),
                 shareReplay(1),
-            )
+            );
 
         this.strategy$ = this.readingLanguageCode$.pipe(
             map(readingLanguageCode => resolvePartialTabulationConfig(readingLanguageCode).wordIdentifyingStrategy),
@@ -118,6 +120,26 @@ export class LanguageConfigsService {
                 }
             },
         )
+
+        combineLatest([
+            this.potentialLearningLanguageTextToSpeechConfigs$,
+            settingsService.textToSpeechConfiguration$
+        ]).subscribe(([potentialTextToSpeechConfigs, currentTextToSpeechConfig]) => {
+            const firstPotentialTextToSpeechConfig = potentialTextToSpeechConfigs[0];
+            const viableSpeechConfig = potentialTextToSpeechConfigs.find(speechConfig => speechConfig.voice === currentTextToSpeechConfig?.voice)
+            const shouldSetDefaultTextToSpeechLanguage = (
+                !currentTextToSpeechConfig ||
+                    !viableSpeechConfig
+            );
+
+            if (shouldSetDefaultTextToSpeechLanguage) {
+                settingsService.textToSpeechConfiguration$.next(firstPotentialTextToSpeechConfig);
+                return;
+            }
+            if (!viableSpeechConfig) {
+                settingsService.textToSpeechConfiguration$.next(undefined)
+            }
+        })
         const supportedTransliterations =
             SupportedTransliterationService.SupportedTransliteration
         this.learningToLatinTransliterateFn$ = getLanguageCodeObservable(

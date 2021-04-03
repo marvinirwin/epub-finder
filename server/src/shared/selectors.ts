@@ -65,3 +65,5 @@ export const readingLanguageSelect = 'readingLanguageSelect'
 export const spokenLanguageSelect = 'spokenLanguageSelect'
 export const notLoggedInProfileNode = 'notLoggedInProfileNode'
 export const loggedInProfileNode = 'loggedInProfileNode'
+export const textToSpeechLanguageSelectLabel = 'textToSpeechLanguageSelectLabel';
+export const textToSpeechSelect = 'textToSpeechSelect'
