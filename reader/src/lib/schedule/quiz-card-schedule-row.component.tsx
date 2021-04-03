@@ -35,7 +35,6 @@ export const QuizCardScheduleRowDisplay = ({
     })
     return (
         <div>
-            {!isDescriptionHidden && <QuizCardScheduleTable />}
             <div style={{ marginTop: '24px' }}>
                 <Typography variant="h4" className={quizCardRomanization}>
                     {isRomanizationHidden ? '' : romanization}

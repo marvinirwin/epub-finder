@@ -35,6 +35,7 @@ export const resolveHiddenFieldsForFlashcardType = (t: FlashCardType): Set<QuizC
                     QuizCardField.Picture,
                     QuizCardField.Sound,
                     QuizCardField.ExampleSegments,
+                    QuizCardField.LearningLanguage
                 ]
             case FlashCardType.LearningLanguageAudio:
                 return [

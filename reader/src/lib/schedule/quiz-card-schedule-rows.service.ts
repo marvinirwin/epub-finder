@@ -105,12 +105,16 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                             translationAttemptSentenceWeight,
                         }),
                         flatten(learningTargetsList.map(
-                            (learningTarget) =>
-                                flashCardTypesRequiredToProgress.map(configuration => new ScheduleRow<QuizScheduleRowData>(
-                                    { ...learningTarget, flashCardType: configuration },
-                                    learningTarget.wordRecognitionRecords,
-                                    ),
-                                ),
+                            (learningTarget) => {
+                                return flashCardTypesRequiredToProgress.map(flashCardType => {
+                                        const wordRecognitionRecords = learningTarget.wordRecognitionRecords.filter(recognitionRow => recognitionRow.flashCardType === flashCardType)
+                                        return new ScheduleRow<QuizScheduleRowData>(
+                                            { ...learningTarget, wordRecognitionRecords, flashCardType },
+                                            wordRecognitionRecords,
+                                        )
+                                    },
+                                )
+                            },
                         )),
                         (
                             [dueDate, count, length, sentencePriority],

@@ -17,21 +17,19 @@ import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translat
 import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 
-const QuizCardSound: React.FC<{quizCard: QuizCard}> = ({quizCard}) => {
-    const audio = useObservableState(quizCard.audio$);
-    const isHidden = useIsFieldHidden({quizCard, label: QuizCardField.Sound});
+const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
+    const audio = useObservableState(quizCard.audio$)
+    const isHidden = useIsFieldHidden({ quizCard, label: QuizCardField.Sound })
     return (audio && !isHidden) ?
         <audio
             src={audio.url}
             controls
             autoPlay
         /> :
-    null
+        null
 }
 
-export const QuizCardComponent: React.FC<
-    { quizCard: QuizCard } & PaperProps
-> = ({ quizCard, ...props }) => {
+export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({ quizCard, ...props }) => {
     const word = useObservableState(quizCard.word$)
     const m = useContext(ManagerContext)
     const isLearningLanguageHidden = useIsFieldHidden({
@@ -39,7 +37,7 @@ export const QuizCardComponent: React.FC<
         label: QuizCardField.LearningLanguage,
     })
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const flashCardType = useObservableState(quizCard.flashCardType$);
+    const flashCardType = useObservableState(quizCard.flashCardType$)
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,
@@ -68,8 +66,9 @@ export const QuizCardComponent: React.FC<
         useObservableState(m.settingsService.newQuizWordLimit$) || 0
     const cardLimitReached = cardsLearnedToday >= cardLimit
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
+    const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
     return (
-        <Paper className="quiz-card" {...props}>
+        <Paper className='quiz-card' {...props}>
             {!cardLimitReached ? (
                 <Fragment>
                     <div className={'quiz-card-data-sheet'}>
@@ -78,19 +77,19 @@ export const QuizCardComponent: React.FC<
                         </div>
                         <div className={'quiz-card-data-sheet-middle'}>
                             <CardImage quizCard={quizCard} />
-                            <QuizCardSound quizCard={quizCard}/>
+                            <QuizCardSound quizCard={quizCard} />
                             {!isLearningLanguageHidden && (
                                 <CardLearningLanguageText word={word || ''} />
                             )}
                         </div>
                         <div>
-                            {!answerIsRevealed && <QuizCardScheduleTable />}
+                            {answerIsRevealed && <QuizCardScheduleTable />}
                             {<CardInfo quizCard={quizCard} />}
                         </div>
                     </div>
-                    <OpenDocumentComponent
+                    {!exampleSegmentsHidden && <OpenDocumentComponent
                         openedDocument={quizCard.exampleSentenceOpenDocument}
-                    />
+                    />}
                     <QuizCardButtons quizCard={quizCard} />
                 </Fragment>
             ) : (

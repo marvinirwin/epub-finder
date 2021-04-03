@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { OpenExampleSentencesFactory } from '../../lib/document-frame/open-example-sentences-document.factory'
-import { distinctUntilChanged, map, mapTo, shareReplay, switchMap } from 'rxjs/operators'
+import { distinctUntilChanged, map, mapTo, shareReplay } from 'rxjs/operators'
 import { QuizCard } from './word-card.interface'
 import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
@@ -8,7 +8,7 @@ import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
 import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
 import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import { FlashCardType, resolveHiddenFieldsForFlashcardType } from '../../lib/quiz/hidden-quiz-fields'
+import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
 import { SortedLimitScheduleRowsService } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { wordCardFactory } from './card-card.factory'
@@ -16,7 +16,6 @@ import { TabulationConfigurationService } from '../../lib/language/language-maps
 import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
 import { TranslationAttemptScheduleService } from '../../lib/schedule/translation-attempt-schedule.service'
 import { OnSelectService } from '../../lib/user-interface/on-select.service'
-import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
 
 export const filterQuizRows = (
     rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
@@ -125,14 +124,17 @@ export class QuizService {
             ...wordCard,
             flashCardType$: this.currentScheduleRow$.pipe(
                 map(scheduleRow => scheduleRow?.d?.flashCardType || FlashCardType.WordExamplesAndPicture),
-                shareReplay(1)
+                shareReplay(1),
             ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
             exampleSentenceOpenDocument: openExampleSentencesDocument,
         }
 
-        currentWord$
-            .pipe(distinctUntilChanged(), mapTo(false))
+        combineLatest([currentWord$, this.quizCard.flashCardType$])
+            .pipe(distinctUntilChanged(
+                ([x1, x2], [y1, y2]) => x1 !== y1 || x2 !== y2),
+                mapTo(false),
+            )
             .subscribe(this.quizCard.answerIsRevealed$)
     }
 }

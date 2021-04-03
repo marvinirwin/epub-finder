@@ -64,7 +64,7 @@ export const QuizResultToRecognitionRows = (
                     ...nextRecognitionRecord,
                     nextDueDate: nextDueDate(),
                     grade: scorePair.grade,
-                    flashCardTypes: [],
+                    flashCardType: scorePair.flashCardType,
                     languageCode: scorePair.languageCode,
                 }
             },
