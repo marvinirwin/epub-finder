@@ -96,50 +96,6 @@ export class LanguageConfigsService {
                 ).filter(v => !!v) as SpeechToTextConfig[]
             },
         )
-        combineLatest([
-            this.potentialLearningSpoken$,
-            settingsService.spokenLanguage$,
-        ]).subscribe(
-            ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
-                const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0]
-                const shouldSetDefaultSpokenLanguage = (!currentSpokenLanguageCode || !potentialSpokenLanguageConfigs.find(config => config.code === currentSpokenLanguageCode)) &&
-                    firstPotentialSpokenLanguageConfig
-                if (shouldSetDefaultSpokenLanguage) {
-                    settingsService.spokenLanguage$.next(
-                        firstPotentialSpokenLanguageConfig.code,
-                    )
-                    return
-                }
-                const shouldClearSpokenLanguage =
-                    currentSpokenLanguageCode &&
-                    !potentialSpokenLanguageConfigs
-                        .map((c) => c.code)
-                        .includes(currentSpokenLanguageCode)
-                if (shouldClearSpokenLanguage) {
-                    settingsService.spokenLanguage$.next('')
-                }
-            },
-        )
-
-        combineLatest([
-            this.potentialLearningLanguageTextToSpeechConfigs$,
-            settingsService.textToSpeechConfiguration$
-        ]).subscribe(([potentialTextToSpeechConfigs, currentTextToSpeechConfig]) => {
-            const firstPotentialTextToSpeechConfig = potentialTextToSpeechConfigs[0];
-            const viableSpeechConfig = potentialTextToSpeechConfigs.find(speechConfig => speechConfig.voice === currentTextToSpeechConfig?.voice)
-            const shouldSetDefaultTextToSpeechLanguage = (
-                !currentTextToSpeechConfig ||
-                    !viableSpeechConfig
-            );
-
-            if (shouldSetDefaultTextToSpeechLanguage) {
-                settingsService.textToSpeechConfiguration$.next(firstPotentialTextToSpeechConfig);
-                return;
-            }
-            if (!viableSpeechConfig) {
-                settingsService.textToSpeechConfiguration$.next(undefined)
-            }
-        })
         const supportedTransliterations =
             SupportedTransliterationService.SupportedTransliteration
         this.learningToLatinTransliterateFn$ = getLanguageCodeObservable(
@@ -186,5 +142,50 @@ export class LanguageConfigsService {
                 }
             },
         )
+
+        combineLatest([
+            this.potentialLearningSpoken$,
+            settingsService.spokenLanguage$,
+        ]).subscribe(
+            ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
+                const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0]
+                const shouldSetDefaultSpokenLanguage = (!currentSpokenLanguageCode || !potentialSpokenLanguageConfigs.find(config => config.code === currentSpokenLanguageCode)) &&
+                    firstPotentialSpokenLanguageConfig
+                if (shouldSetDefaultSpokenLanguage) {
+                    settingsService.spokenLanguage$.next(
+                        firstPotentialSpokenLanguageConfig.code,
+                    )
+                    return
+                }
+                const shouldClearSpokenLanguage =
+                    currentSpokenLanguageCode &&
+                    !potentialSpokenLanguageConfigs
+                        .map((c) => c.code)
+                        .includes(currentSpokenLanguageCode)
+                if (shouldClearSpokenLanguage) {
+                    settingsService.spokenLanguage$.next('')
+                }
+            },
+        )
+
+        combineLatest([
+            this.potentialLearningLanguageTextToSpeechConfigs$,
+            settingsService.textToSpeechConfiguration$
+        ]).subscribe(([potentialTextToSpeechConfigs, currentTextToSpeechConfig]) => {
+            const firstPotentialTextToSpeechConfig = potentialTextToSpeechConfigs[0];
+            const isCurrentConfigViable = potentialTextToSpeechConfigs.find(speechConfig => speechConfig.voice === currentTextToSpeechConfig?.voice)
+            const shouldSetDefaultTextToSpeechLanguage = (
+                !currentTextToSpeechConfig ||
+                !isCurrentConfigViable
+            ) && firstPotentialTextToSpeechConfig;
+
+            if (shouldSetDefaultTextToSpeechLanguage) {
+                settingsService.textToSpeechConfiguration$.next(firstPotentialTextToSpeechConfig);
+                return;
+            }
+            if (!isCurrentConfigViable && currentTextToSpeechConfig) {
+                settingsService.textToSpeechConfiguration$.next(undefined)
+            }
+        })
     }
 }
