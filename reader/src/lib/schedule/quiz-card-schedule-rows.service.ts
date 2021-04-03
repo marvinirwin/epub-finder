@@ -8,6 +8,8 @@ import { TimeService } from '../time/time.service'
 import { FlashCardLearningTargetsService } from './learning-target/flash-card-learning-targets.service'
 import { ScheduleRowsService } from './schedule-rows-service.interface'
 import { flatten } from 'lodash'
+import { LanguageConfigsService } from '../language/language-configs.service'
+import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 function getSortConfigs({
                             dateWeight,
@@ -62,11 +64,13 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             translationAttemptService,
             timeService,
             flashCardLearningTargetsService,
+            languageConfigsService,
         }: {
             settingsService: SettingsService
             translationAttemptService: TranslationAttemptService
             timeService: TimeService,
-            flashCardLearningTargetsService: FlashCardLearningTargetsService
+            flashCardLearningTargetsService: FlashCardLearningTargetsService,
+            languageConfigsService: LanguageConfigsService
         },
     ) {
         this.scheduleRows$ = combineLatest([
@@ -80,6 +84,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             translationAttemptService.currentScheduleRow$,
             timeService.quizNow$,
             flashCardLearningTargetsService.learningTargets$,
+            settingsService.textToSpeechConfiguration$,
         ]).pipe(
             map(
                 ([
@@ -93,7 +98,11 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                      currentTranslationAttemptScheduleRow,
                      now,
                      learningTargets,
+                     textToSpeechConfiguration,
                  ]) => {
+                    if (!textToSpeechConfiguration) {
+                        flashCardTypesRequiredToProgress = flashCardTypesRequiredToProgress.filter(type => type !== FlashCardType.LearningLanguageAudio);
+                    }
                     const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
                     return ScheduleMathService.normalizeAndSortQuizScheduleRows(
