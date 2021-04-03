@@ -1,9 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common'
-import {
-    AudioConfig,
-    SpeechConfig,
-    SpeechSynthesizer,
-} from 'microsoft-cognitiveservices-speech-sdk'
+import { AudioConfig, SpeechConfig, SpeechSynthesizer } from 'microsoft-cognitiveservices-speech-sdk'
 import axios from 'axios'
 import { sha1 } from '../util/sha1'
 import { join } from 'path'
@@ -24,12 +20,25 @@ export const speechConfig = SpeechConfig.fromSubscription(
 const MAX_SPEECH_TOKENS = 1000
 
 
+function getSsml({ locale, voice, rate, text }: SpeechSynthesisRequestDto) {
+    return `<speak version = '1.0'
+    xmlns = 'http://www.w3.org/2001/10/synthesis'
+    xml:lang = '${locale}' >
+    <voice name = '${voice}' >
+    <prosody rate = '${rate}' >
+        ${text}
+        </prosody>
+        </voice>
+    </speak>`
+}
+
 @Injectable()
 export class SpeechService {
     constructor(
         @InjectRepository(SpeechToken)
         private speechTokenRepository: Repository<SpeechToken>,
-    ) {}
+    ) {
+    }
 
     async areSpeechTokensAvailable() {
         let speechTokenCount = await this.speechTokenRepository
@@ -89,22 +98,14 @@ export class SpeechService {
         })
     }
 
-    async TextToSpeech({ text, voice, rate, locale }: SpeechSynthesisRequestDto) {
-        const ssml = `
-<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${locale}">
-<voice name="${voice}">
-<prosody rate="${rate}">
-    ${text} 
-</prosody>
-</voice>
-</speak>`
-        const hash = sha1(ssml)
-        const filePath = join(wavRoot, `${hash}.wav`)
-        const audioFileExists = await fs.pathExists(filePath)
+    async TextToSpeech(c: SpeechSynthesisRequestDto) {
+        const ssml = ` ${getSsml(c)}`
+        const audioFileExists = await fs.pathExists(this.audioFilePath(c))
+        const audioFilePath = this.audioFilePath(c)
         if (!audioFileExists) {
-            await this.downloadSynthesizedSpeech(filePath, ssml)
+            await this.downloadSynthesizedSpeech(audioFilePath, ssml)
         }
-        return filePath
+        return audioFilePath
     }
 
     async audioFileExists(
@@ -115,6 +116,9 @@ export class SpeechService {
     }
 
     audioHash(speechSynthesisRequestDto: SpeechSynthesisRequestDto) {
-        return sha1(JSON.stringify(speechSynthesisRequestDto))
+        return sha1(getSsml(speechSynthesisRequestDto))
+    }
+    audioFilePath(speechSynthesisRequestDto: SpeechSynthesisRequestDto) {
+        return join(wavRoot, `${this.audioHash(speechSynthesisRequestDto)}.wav`);
     }
 }

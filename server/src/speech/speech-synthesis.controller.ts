@@ -17,6 +17,7 @@ export class SpeechSynthesisController {
         if (await this.speechService.audioFileExists(speechSynthesisRequest)) {
             console.log(`Cache hit ${JSON.stringify(speechSynthesisRequest)}`)
             fs.createReadStream(join(wavRoot, `${this.speechService.audioHash(speechSynthesisRequest)}.wav`)).pipe(res);
+            return;
         }
 
         console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
