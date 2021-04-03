@@ -17,6 +17,7 @@ export const QuizCardScheduleTable = () => {
                     <TableRow>
                         <TableCell>Word</TableCell>
                         <TableCell>Due In</TableCell>
+                        <TableCell>Type</TableCell>
                         {/*
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Sentence Priority</TableCell>
@@ -32,6 +33,9 @@ export const QuizCardScheduleTable = () => {
                             </TableCell>
                             <TableCell>
                                 {formatDistance(row.dueDate(), Date.now())}{' '}
+                            </TableCell>
+                            <TableCell>
+                                {row.d.flashCardType}
                             </TableCell>
                             {/*
                         <TableCell align="right">

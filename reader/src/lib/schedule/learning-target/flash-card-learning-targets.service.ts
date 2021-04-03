@@ -134,7 +134,7 @@ export class FlashCardLearningTargetsService {
                 Object.entries(wordRecognitionRows).forEach(
                     ([word, wordRecognitionRecords]) => {
                         vocabulary.add(word)
-                        learningTargetIndex.get(word)?.wordRecognitionRecords.push(
+                        ensureLearningTargetForWord(word).wordRecognitionRecords.push(
                             ...wordRecognitionRecords,
                         )
                     },

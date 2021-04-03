@@ -17,12 +17,6 @@ export interface QuizScheduleRowData {
     word: string
 }
 
-export type ScheduleRowRecord = SuperMemoItem & {
-    nextDueDate: Date
-    grade: SuperMemoGrade
-    timestamp: Date
-}
-
 export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData {
     count: SortValue<number>
     dueDate: SortValue<Date>

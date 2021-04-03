@@ -1,9 +1,7 @@
 import { Observable } from 'rxjs'
-import { Dictionary } from 'lodash'
 import { map, withLatestFrom } from 'rxjs/operators'
 import { SrmService } from '../srm/srm.service'
 import { WordRecognitionRow } from '../schedule/word-recognition-row'
-import moment from 'moment'
 import { QuizScheduleRowData, ScheduleRow } from '../schedule/schedule-row'
 import { add } from 'date-fns'
 import { QuizResult } from '../quiz/quiz-result.service'
@@ -15,7 +13,8 @@ export const QuizResultToRecognitionRows = (
         withLatestFrom(scheduleRows$),
         map(
             ([scorePair, scheduleRows]): WordRecognitionRow => {
-                const previousRecords = scheduleRows.find(scheduleRow => scheduleRow.d.word === scorePair.word && scheduleRow.d.flashCardType === scorePair.flashCardType)?.d.wordRecognitionRecords || []
+                const sameWord = scheduleRows.filter(scheduleRow => scheduleRow.d.word === scorePair.word);
+                const previousRecords = sameWord.find(scheduleRow => scheduleRow.d.flashCardType === scorePair.flashCardType)?.d?.wordRecognitionRecords || []
                 const nextRecognitionRecord = SrmService.getNextRecognitionRecord(
                     previousRecords,
                     scorePair.grade,
@@ -66,7 +65,7 @@ export const QuizResultToRecognitionRows = (
                     nextDueDate: nextDueDate(),
                     grade: scorePair.grade,
                     flashCardTypes: [],
-                    languageCode: scorePair.languageCode
+                    languageCode: scorePair.languageCode,
                 }
             },
         ),
