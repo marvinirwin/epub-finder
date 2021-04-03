@@ -7,11 +7,13 @@ import { SupportedTransliterationService } from './supported-transliteration.ser
 import { TextSpeechMap } from './text-speech-map'
 import { WordIdentifyingStrategy } from '../../../../server/src/shared/tabulation/tabulate'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { TextToSpeechConfig, TextToSpeechConfigs } from './supported-text-to-speech'
 
 export type PossibleTranslationConfig = { from: string; to: string } | undefined
 export type PossibleTransliterationConfig =
     | { language: string; fromScript: string; toScript: string }
-    | undefined
+    | undefined;
+export type PossibleTextToSpeechConfig = TextToSpeechConfig | undefined;
 
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleTranslationConfig>
@@ -19,6 +21,7 @@ export class LanguageConfigsService {
     public learningToLatinTransliterateFn$: Observable<PossibleTransliterationConfig>
     public latinToLearningTransliterate$: Observable<PossibleTransliterationConfig>
     public potentialLearningSpoken$: Observable<SpeechToTextConfig[]>
+    public learningLanguageTextToSpeechConfig$: Observable<PossibleTextToSpeechConfig>
     readingLanguageCode$: Observable<string>
     strategy$: Observable<WordIdentifyingStrategy>
 
@@ -66,11 +69,20 @@ export class LanguageConfigsService {
         this.readingLanguageCode$ = this.learningToKnownTranslateConfig$.pipe(
             map((translationConfig) => translationConfig?.from || 'en'),
             shareReplay(1),
-        );
+        )
+
+
+        this.learningLanguageTextToSpeechConfig$ = settingsService.readingLanguage$
+            .pipe(
+                map(readingLanguage => {
+                    return (TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage)))?.[0]
+                }),
+                shareReplay(1),
+            )
 
         this.strategy$ = this.readingLanguageCode$.pipe(
             map(readingLanguageCode => resolvePartialTabulationConfig(readingLanguageCode).wordIdentifyingStrategy),
-            shareReplay(1)
+            shareReplay(1),
         )
 
         this.potentialLearningSpoken$ = getLanguageCodeObservable(
@@ -89,12 +101,12 @@ export class LanguageConfigsService {
             ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
                 const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0]
                 const shouldSetDefaultSpokenLanguage = (!currentSpokenLanguageCode || !potentialSpokenLanguageConfigs.find(config => config.code === currentSpokenLanguageCode)) &&
-                    firstPotentialSpokenLanguageConfig;
+                    firstPotentialSpokenLanguageConfig
                 if (shouldSetDefaultSpokenLanguage) {
                     settingsService.spokenLanguage$.next(
                         firstPotentialSpokenLanguageConfig.code,
                     )
-                    return;
+                    return
                 }
                 const shouldClearSpokenLanguage =
                     currentSpokenLanguageCode &&

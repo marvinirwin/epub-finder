@@ -1,4 +1,7 @@
-export const textToSpeech = [
+import { chunk } from "lodash"
+
+export type TextToSpeechConfig = { label: string, locale: string, gender: string, voice: string }
+export const TextToSpeechConfigs: TextToSpeechConfig[] = chunk([
     'Arabic (Egypt)', 'ar-EG', 'Female', 'ar-EG-SalmaNeural',
     'Arabic (Egypt)', 'ar-EG', 'Male', 'ar-EG-ShakirNeural',
     'Arabic (Saudi Arabia)', 'ar-SA', 'Female', 'ar-SA-ZariyahNeural',
@@ -136,4 +139,4 @@ export const textToSpeech = [
     'Vietnamese (Vietnam)', 'vi-VN', 'Male', 'vi-VN-NamMinhNeural',
     'Welsh (UK)', 'cy-GB', 'Female', 'cy-GB-NiaNeural',
     'Welsh (UK)', 'cy-GB', 'Male', 'cy-GB-AledNeural',
-].map(([label, code, gender, ssmlName]) => ({label, code, gender, ssmlName}))
+], 4).map(([label, code, gender, ssmlName]) => ({ label, locale: code, gender, voice: ssmlName }))

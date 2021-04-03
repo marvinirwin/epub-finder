@@ -15,6 +15,7 @@ import {
 import { transliterate } from '../../lib/language/transliterate.service'
 import translate from 'google-translate-api'
 import { fetchTranslation } from '../../services/translate.service'
+import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
 
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
@@ -91,6 +92,13 @@ export const wordCardFactory = (
             }),
             shareReplay(1),
         ),
+        audio$: combineLatest([currentWord$, languageConfigsService.learningLanguageTextToSpeechConfig$]).pipe(
+            switchMap(async ([currentWord, learningLanguageToTextConfig]) => {
+                if (currentWord && learningLanguageToTextConfig) {
+                    return fetchSynthesizedAudio({...learningLanguageToTextConfig, text: currentWord})
+                }
+            })
+        )
         // I should make "hidden" deterministic somehow
         // I'll worry about that later
     }

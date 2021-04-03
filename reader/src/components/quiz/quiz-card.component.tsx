@@ -17,6 +17,13 @@ import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translat
 import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 
+const QuizCardSound: React.FC<{quizCard: QuizCard}> = ({quizCard}) => {
+    const audio = useObservableState(quizCard.audio$);
+    return audio ?
+        <audio src={audio.url}/> :
+    null
+}
+
 export const QuizCardComponent: React.FC<
     { quizCard: QuizCard } & PaperProps
 > = ({ quizCard, ...props }) => {
@@ -69,6 +76,7 @@ export const QuizCardComponent: React.FC<
                         </div>
                         <div className={'quiz-card-data-sheet-middle'}>
                             <CardImage quizCard={quizCard} />
+                            <QuizCardSound quizCard={quizCard}/>
                             {!isLearningLanguageHidden && (
                                 <CardLearningLanguageText word={word || ''} />
                             )}

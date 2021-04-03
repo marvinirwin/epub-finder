@@ -1,7 +1,8 @@
 import { Body, Controller, Header, Post, Res } from '@nestjs/common'
-import { SpeechService } from './speech.service'
+import { SpeechService, wavRoot } from './speech.service'
 import { SpeechSynthesisRequestDto } from './speech-synthesis-request-dto'
 import fs from 'fs-extra'
+import { join } from 'path'
 
 @Controller('speech-synthesis')
 export class SpeechSynthesisController {
@@ -15,10 +16,10 @@ export class SpeechSynthesisController {
     ) {
         if (await this.speechService.audioFileExists(speechSynthesisRequest)) {
             console.log(`Cache hit ${JSON.stringify(speechSynthesisRequest)}`)
-            return fs.createReadStream(this.speechService.audioFilePath(speechSynthesisRequest));
+            fs.createReadStream(join(wavRoot, `${this.speechService.audioHash(speechSynthesisRequest)}.wav`)).pipe(res);
         }
 
         console.log(`Cache miss ${JSON.stringify(speechSynthesisRequest)}`)
-        return fs.createReadStream(await this.speechService.TextToSpeech(speechSynthesisRequest))
+        fs.createReadStream(await this.speechService.TextToSpeech(speechSynthesisRequest)).pipe(res)
     }
 }

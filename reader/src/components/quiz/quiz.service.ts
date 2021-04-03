@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { OpenExampleSentencesFactory } from '../../lib/document-frame/open-example-sentences-document.factory'
-import { distinctUntilChanged, map, mapTo, shareReplay } from 'rxjs/operators'
+import { distinctUntilChanged, map, mapTo, shareReplay, switchMap } from 'rxjs/operators'
 import { QuizCard } from './word-card.interface'
 import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
@@ -16,6 +16,7 @@ import { TabulationConfigurationService } from '../../lib/language/language-maps
 import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
 import { TranslationAttemptScheduleService } from '../../lib/schedule/translation-attempt-schedule.service'
 import { OnSelectService } from '../../lib/user-interface/on-select.service'
+import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
 
 export const filterQuizRows = (
     rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
@@ -128,9 +129,6 @@ export class QuizService {
             ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),
             exampleSentenceOpenDocument: openExampleSentencesDocument,
-            audio: currentWord$.pipe(
-
-            )
         }
 
         currentWord$

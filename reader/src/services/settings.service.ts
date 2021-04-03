@@ -120,7 +120,7 @@ export class SettingsService {
         this.readingLanguage$ = this.createSetting$<string>(
             'reading',
             'zh-Hans',
-            'url',
+            'indexedDB',
         )
 
         this.spokenLanguage$ = this.createSetting$<string>(
@@ -231,7 +231,11 @@ export class SettingsService {
 
         this.flashCardTypesRequiredToProgress$ = this.createSetting$<FlashCardType[]>(
             'flashCardTypesRequiredToProgress',
-            [],
+            [
+                FlashCardType.WordExamplesAndPicture,
+                FlashCardType.KnownLanguage,
+                FlashCardType.LearningLanguageAudio
+            ],
             'indexedDB',
         )
 

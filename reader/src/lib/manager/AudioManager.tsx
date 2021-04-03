@@ -1,10 +1,7 @@
 import { AudioRecorder } from '../audio/audio-recorder.service'
 import { ReplaySubject } from 'rxjs'
 import { WavAudio } from '../audio/wav-audio'
-import { flatMap, take } from 'rxjs/operators'
 import { AudioSource } from '../audio/audio-source'
-import { fetchSynthesizedAudio } from '../audio/fetch-synthesized-audio'
-import { sleep } from '../util/Util'
 import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
 import { Typography } from '@material-ui/core'
 import React, { useContext, useEffect, useRef, useState } from 'react'
@@ -87,7 +84,6 @@ export const RecognizedTextComponent = (
 
 export class AudioManager {
     audioRecorder: AudioRecorder
-    currentSynthesizedAudio$ = new ReplaySubject<WavAudio>(1)
     queSynthesizedSpeechRequest$ = new ReplaySubject<string>(1)
 
     /*
@@ -108,22 +104,6 @@ export class AudioManager {
                 RecognizedTextComponent(recognizedText),
             ),
         )
-        this.queSynthesizedSpeechRequest$
-            .pipe(
-                flatMap(async (speechText) => {
-                    const wavAudio = await fetchSynthesizedAudio(speechText)
-                    if (!wavAudio) {
-                        return
-                    }
-                    this.currentSynthesizedAudio$.next(wavAudio)
-                    const duration = await wavAudio.duration$
-                        .pipe(take(1))
-                        .toPromise()
-                    // Is this seconds or milliseconds?
-                    await sleep(duration * 1000)
-                }, 1),
-            )
-            .subscribe()
         /*
          * Im probably going to have to pair synth audio with user audio emitted after
          */

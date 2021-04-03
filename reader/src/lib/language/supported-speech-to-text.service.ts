@@ -181,7 +181,7 @@ const speechToTextConfigs = chunk(
             `tr-TR`,
     ],
     2,
-).map(([label, id]) => ({ label, code: id }))
+).map(([label, id]) => ({ label, code: id }));
 
 export class SupportedSpeechToTextService {
     public static Configs: SpeechToTextConfig[] = speechToTextConfigs

@@ -25,7 +25,6 @@ import { RecordRequestModule } from './record-request/record-request.module'
         DatabaseModule,
         TranslateModule,
         TranslateHttpModule,
-        SpeechModule,
         SpeechHttpModule,
         ImageSearchModule,
         ImageSearchHttpModule,

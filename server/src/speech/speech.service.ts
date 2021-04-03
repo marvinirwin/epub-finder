@@ -14,7 +14,7 @@ import { Repository } from 'typeorm'
 import { SpeechToken } from '../entities/speech-token.entity'
 import jwt_decode from 'jwt-decode'
 
-const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string
+export const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string
 export const region = process.env.AZURE_SPEECH_LOCATION as string
 export const subscriptionKey = process.env.AZURE_SPEECH_KEY1 as string
 export const speechConfig = SpeechConfig.fromSubscription(
@@ -77,7 +77,6 @@ export class SpeechService {
                 ssml1,
                 async (result) => {
                     // TODO Put something here which checks if result is an error
-                    console.log(result)
                     resolve()
                     synthesizer.close()
                 },
@@ -100,24 +99,22 @@ export class SpeechService {
 </voice>
 </speak>`
         const hash = sha1(ssml)
-        const filename = join(wavRoot, `${hash}.wav`)
-        const audioFileExists = await fs.pathExists(filename)
+        const filePath = join(wavRoot, `${hash}.wav`)
+        const audioFileExists = await fs.pathExists(filePath)
         if (!audioFileExists) {
-            speechConfig.speechRecognitionLanguage = 'zh-CN'
-            speechConfig.speechSynthesisLanguage = 'zh-CN'
-            await this.downloadSynthesizedSpeech(filename, ssml)
+            await this.downloadSynthesizedSpeech(filePath, ssml)
         }
-        return filename
+        return filePath
     }
 
     async audioFileExists(
         speechSynthesisRequestDto: SpeechSynthesisRequestDto,
     ) {
-        const hash = this.audioFilePath(speechSynthesisRequestDto)
+        const hash = this.audioHash(speechSynthesisRequestDto)
         return pathExists(join(wavRoot, `${hash}.wav`))
     }
 
-    audioFilePath(speechSynthesisRequestDto: SpeechSynthesisRequestDto) {
+    audioHash(speechSynthesisRequestDto: SpeechSynthesisRequestDto) {
         return sha1(JSON.stringify(speechSynthesisRequestDto))
     }
 }
