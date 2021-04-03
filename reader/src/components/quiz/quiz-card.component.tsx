@@ -19,8 +19,13 @@ import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 
 const QuizCardSound: React.FC<{quizCard: QuizCard}> = ({quizCard}) => {
     const audio = useObservableState(quizCard.audio$);
-    return audio ?
-        <audio src={audio.url}/> :
+    const isHidden = useIsFieldHidden({quizCard, label: QuizCardField.Sound});
+    return (audio && !isHidden) ?
+        <audio
+            src={audio.url}
+            controls
+            autoPlay
+        /> :
     null
 }
 
@@ -70,9 +75,6 @@ export const QuizCardComponent: React.FC<
                     <div className={'quiz-card-data-sheet'}>
                         <div>
                             <QuizCardTranslationAttemptSchedule />
-                            {/*
-                            <QuizCardProgress quizCard={quizCard}/>
-*/}
                         </div>
                         <div className={'quiz-card-data-sheet-middle'}>
                             <CardImage quizCard={quizCard} />
