@@ -1,13 +1,11 @@
 import { SettingsService } from '../../services/settings.service'
 import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
-import { orderBy } from 'lodash'
-import {
-    NormalizedQuizCardScheduleRowData,
-    ScheduleRow,
-} from '../schedule/schedule-row'
+import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/schedule-row'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
+import { safePushMap } from '@shared/*'
+import { orderBy } from 'lodash'
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
@@ -20,11 +18,12 @@ type LimitedScheduleRows = {
 
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>
+
     constructor({
-        settingsService,
-        quizCardScheduleRowsService,
-        timeService,
-    }: {
+                    settingsService,
+                    quizCardScheduleRowsService,
+                    timeService,
+                }: {
         settingsService: SettingsService
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
@@ -54,27 +53,52 @@ export class SortedLimitScheduleRowsService {
                     0,
                     newQuizWordLimit - wordsLearnedToday.length,
                 )
+                /**
+                 * I want a function which is given a list of {type, subType, orderValue}
+                 * returns a new orderValue so that its less likely that a given type or subType will occur near each other
+                 */
+                const spaceOutRows = <T, U, V>(
+                    resolveTypes: (v: T) => {
+                        type: U,
+                        subType: V,
+                        sortValue: number
+                    },
+                    values: T[],
+                    sortValueOffset: number,
+                ) => {
+                    const typeMap = new Map<U, T[]>()
+                    values.forEach(value => {
+                            const r = resolveTypes(value)
+                            safePushMap(typeMap, r.type, value)
+                        },
+                    )
+                    const newOrderingMap = new Map<T, number>()
+                    typeMap.forEach((rows, type) => {
+                        let startValue: undefined | number
+                        rows.forEach(row => {
+                            const { sortValue } = resolveTypes(row)
+                            if (startValue === undefined) {
+                                startValue = sortValue
+                            } else {
+                                startValue = sortValue + sortValueOffset
+                            }
+                            newOrderingMap.set(row, startValue)
+                        })
+                    })
+                    return newOrderingMap
+                }
 
-                /**
-                 * The first rows are those which are overdue
-                 */
-                const overDue = orderBy(
-                    [...learning, ...wordsToReview].filter((r) =>
-                        r.isOverDue({ now }),
-                    ),
-                    (r) => r.isOverDue({ now }),
-                    'asc',
+                const overDue = [...learning, ...wordsToReview].filter((r) => r.isOverDue({ now }))
+                const notOverDue = [...learning, ...wordsToReview].filter((r) => !r.isOverDue({ now }))
+                const adjustScheduleRows = (scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => spaceOutRows<ScheduleRow<NormalizedQuizCardScheduleRowData>, string, string>(
+                    row => ({ type: row.d.word, subType: row.d.flashCardType, sortValue: row.dueDate().getTime() }),
+                    scheduleRows,
+                    1000 * 60 * 5, // 5 minutes
                 )
-                const notOverDue = orderBy(
-                    [...learning, ...wordsToReview].filter(
-                        (r) => !r.isOverDue({ now }),
-                    ),
-                    (r) => r.dueDate(),
-                    'asc',
-                )
-                /**
-                 * The second are those which are overDue and reviewing
-                 */
+
+                const overDueAdjustedSortValues = adjustScheduleRows(overDue)
+                const notOverDueAdjustedSortValues = adjustScheduleRows(notOverDue)
+                const wordsLeftForTodayAdjustedSortValues = adjustScheduleRows(wordsLeftForToday)
                 return {
                     wordsToReview,
                     wordsLearnedToday,
@@ -82,9 +106,9 @@ export class SortedLimitScheduleRowsService {
                     wordsReviewingOrLearning: learning,
                     unStartedWords,
                     limitedScheduleRows: [
-                        ...overDue,
-                        ...wordsLeftForToday,
-                        ...notOverDue,
+                        ...orderBy(overDue, r => overDueAdjustedSortValues.get(r)),
+                        ...orderBy(wordsLeftForToday, r => wordsLeftForTodayAdjustedSortValues.get(r)),
+                        ...orderBy(notOverDue, r => notOverDueAdjustedSortValues.get(r)),
                     ],
                 }
             }),
