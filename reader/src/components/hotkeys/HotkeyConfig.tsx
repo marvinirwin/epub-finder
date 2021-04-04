@@ -19,6 +19,7 @@ export function HotkeyConfig() {
                         <EditableHotkeyComponent
                             action={action}
                             keyCombo={arr}
+                            key={action}
                             m={m}
                         />
                     )

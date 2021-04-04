@@ -128,7 +128,7 @@ export class SettingsService {
         this.spokenLanguage$ = this.createSetting$<string>(
             'spoken',
             'zh-CN',
-            'url',
+            'indexedDB',
         )
 
         this.hotkeys$ = this.createSetting$<Partial<Hotkeys<string[]>>>(

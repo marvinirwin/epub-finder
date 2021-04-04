@@ -5,7 +5,7 @@ import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/sche
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
 import { safePushMap } from '@shared/'
-import { orderBy } from 'lodash'
+import { Dictionary, groupBy, orderBy } from 'lodash'
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
@@ -14,6 +14,36 @@ type LimitedScheduleRows = {
     wordsReviewingOrLearning: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
     wordsLeftForToday: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
     unStartedWords: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
+}
+
+export const groupByWord = <T, U extends string>(rows: T[], cb: (r: T) => U): Dictionary<T[]> => {
+    return groupBy(rows, cb)
+}
+
+export const gatherWhile = <T, U>(values: T[], filterFunc: (value: T) => boolean, limitReachedFunc: (gathered: T, acc: U) => boolean, acc: U): T[] => {
+    const gatheredValues = []
+    for (const value of values) {
+        if (filterFunc(value)) {
+            gatheredValues.push(value)
+            if (limitReachedFunc(value, acc)) {
+                return gatheredValues
+            }
+        }
+    }
+    return gatheredValues
+}
+
+export const gatherScheduleRows = (
+    scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
+    filterFunc: (s: ScheduleRow<NormalizedQuizCardScheduleRowData>) => boolean,
+    learningTargetLimit: number)=> {
+    const gathered: ScheduleRow<NormalizedQuizCardScheduleRowData>[] = []
+    const learningTargetsFound = new Set<string>()
+    for (const scheduleRow of scheduleRows) {
+        if (learningTargetsFound.size >= learningTargetLimit) {
+
+        }
+    }
 }
 
 export class SortedLimitScheduleRowsService {
@@ -38,21 +68,21 @@ export class SortedLimitScheduleRowsService {
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
                 )
-                const wordsToReview = sortedScheduleRows.filter((r) => {
+                const scheduleRowsToReview = sortedScheduleRows.filter((r) => {
                     return r.isToReview({ now })
                 })
-                const wordsLearnedToday = sortedScheduleRows.filter((r) => {
+                const scheduleRowsLearnedToday = sortedScheduleRows.filter((r) => {
                     return r.wasLearnedToday()
                 })
-                const learning = sortedScheduleRows.filter((r) =>
+                const learningScheduleRows = sortedScheduleRows.filter((r) =>
                     r.isLearning(),
                 )
-                const unStartedWords = sortedScheduleRows.filter(
+                const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const wordsLeftForToday = unStartedWords.slice(
+                const scheduleRowsLeftForToday = unStartedScheduleRows.slice(
                     0,
-                    newQuizWordLimit - wordsLearnedToday.length,
+                    newQuizWordLimit - scheduleRowsLearnedToday.length,
                 )
                 /**
                  * I want a function which is given a list of {type, subType, orderValue}
@@ -93,8 +123,8 @@ export class SortedLimitScheduleRowsService {
                     return newOrderingMap
                 }
 
-                const overDueRows = [...learning, ...wordsToReview].filter((r) => r.isOverDue({ now }))
-                const notOverDueRows = [...learning, ...wordsToReview].filter((r) => !r.isOverDue({ now }))
+                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview].filter((r) => r.isOverDue({ now }))
+                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview].filter((r) => !r.isOverDue({ now }))
                 const adjustScheduleRows = (scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => spaceOutRows<ScheduleRow<NormalizedQuizCardScheduleRowData>, string, string>(
                     row => ({ type: row.d.word, subType: row.d.flashCardType, sortValue: row.dueDate().getTime() }),
                     scheduleRows,
@@ -105,14 +135,14 @@ export class SortedLimitScheduleRowsService {
                 const notOverDueAdjustedSortValues = overDueAdjustedSortValues
                 const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues
                 return {
-                    wordsToReview,
-                    wordsLearnedToday,
-                    wordsLeftForToday,
-                    wordsReviewingOrLearning: learning,
-                    unStartedWords,
+                    wordsToReview: scheduleRowsToReview,
+                    wordsLearnedToday: scheduleRowsLearnedToday,
+                    wordsLeftForToday: scheduleRowsLeftForToday,
+                    wordsReviewingOrLearning: learningScheduleRows,
+                    unStartedWords: unStartedScheduleRows,
                     limitedScheduleRows: [
                         ...orderBy(overDueRows, r => overDueAdjustedSortValues.get(r)),
-                        ...orderBy(wordsLeftForToday, r => wordsLeftForTodayAdjustedSortValues.get(r)),
+                        ...orderBy(scheduleRowsLeftForToday, r => wordsLeftForTodayAdjustedSortValues.get(r)),
                         ...orderBy(notOverDueRows, r => notOverDueAdjustedSortValues.get(r)),
                     ],
                 }

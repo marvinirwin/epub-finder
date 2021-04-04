@@ -29,7 +29,7 @@ export const SetQuizWordLimit = () => {
                 )
             }
             inputProps={{
-                shrink: true,
+                shrink: "true",
                 id: newWordLimitInput,
             }}
         />
