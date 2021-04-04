@@ -41,7 +41,7 @@ export interface SortValue<T> {
     normalizedValueObject: NormalizedValue
 }
 
-export type ScheduleRowItem = {
+export type ScheduleItem = {
     nextDueDate: Date
     grade: SuperMemoGrade
     timestamp: Date
@@ -50,14 +50,14 @@ export type ScheduleRowItem = {
     efactor: number
 }
 
-export const recordsLearnedToday = (r1: ScheduleRowItem[]) => {
+export const recordsLearnedToday = (r1: ScheduleItem[]) => {
     const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
     return (
         lastTwoRecords.length === 2 &&
         lastTwoRecords.every((r) => r.grade >= 3 && isToday(r.timestamp))
     )
 }
-export const recordsLearnedAnyDay = (r1: ScheduleRowItem[]) => {
+export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
     const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
     return (
         lastTwoRecords.length === 2 && lastTwoRecords.every((r) => r.grade >= 3)
@@ -67,7 +67,7 @@ export const recordsLearnedAnyDay = (r1: ScheduleRowItem[]) => {
 export class ScheduleRow<T> {
     private _dueDate: Date
 
-    constructor(public d: T, private superMemoRecords: ScheduleRowItem[]) {
+    constructor(public d: T, private superMemoRecords: ScheduleItem[]) {
         this._dueDate = this.superMemoRecords[
             this.superMemoRecords.length - 1
         ]?.nextDueDate

@@ -8,9 +8,16 @@ import {
     QUIZ_BUTTON_IGNORE,
     QUIZ_BUTTON_MEDIUM,
 } from '@shared/'
+import { ScheduleItem } from '../../lib/schedule/schedule-row'
+import { quizCardNextDueDate, SrmService } from '../../lib/srm/srm.service'
+import { formatDistance, formatDuration } from 'date-fns'
 
-export const DifficultyButtons = () => {
+export const DifficultyButtons: React.FC<{previousScheduleItems: ScheduleItem[]}> = ({previousScheduleItems}) => {
     const m = useContext(ManagerContext)
+    const now = new Date();
+    const hardDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 5}), Date.now());
+    const mediumDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 3}), Date.now());
+    const easyDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 1}), Date.now());
     return (
         <Fragment>
             <HotkeyWrapper action={'QUIZ_RESULT_HARD'}>
@@ -18,7 +25,7 @@ export const DifficultyButtons = () => {
                     className={QUIZ_BUTTON_HARD}
                     onClick={() => m.hotkeyEvents.quizResultHard$.next()}
                 >
-                    Hard
+                    Hard ({hardDueDateDistance})
                 </Button>
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_MEDIUM'}>
@@ -26,7 +33,7 @@ export const DifficultyButtons = () => {
                     className={QUIZ_BUTTON_MEDIUM}
                     onClick={() => m.hotkeyEvents.quizResultMedium$.next()}
                 >
-                    Medium
+                    Medium ({mediumDueDateDistance})
                 </Button>
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_EASY'}>
@@ -35,7 +42,7 @@ export const DifficultyButtons = () => {
                     className={QUIZ_BUTTON_EASY}
                     onClick={() => m.hotkeyEvents.quizResultEasy$.next()}
                 >
-                    Easy
+                    Easy ({easyDueDateDistance})
                 </Button>
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_IGNORE'}>
