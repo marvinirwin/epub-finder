@@ -2,22 +2,27 @@ import React, { Fragment, useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { HotkeyWrapper } from '../hotkeys/hotkey-wrapper'
 import { Button } from '@material-ui/core'
-import {
-    QUIZ_BUTTON_EASY,
-    QUIZ_BUTTON_HARD,
-    QUIZ_BUTTON_IGNORE,
-    QUIZ_BUTTON_MEDIUM,
-} from '@shared/'
+import { QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM } from '@shared/'
 import { ScheduleItem } from '../../lib/schedule/schedule-row'
-import { quizCardNextDueDate, SrmService } from '../../lib/srm/srm.service'
-import { formatDistance, formatDuration } from 'date-fns'
+import { quizCardNextDueDate } from '../../lib/srm/srm.service'
+import { formatDistance } from 'date-fns'
 
-export const DifficultyButtons: React.FC<{previousScheduleItems: ScheduleItem[]}> = ({previousScheduleItems}) => {
+export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[] }> = ({ previousScheduleItems }) => {
     const m = useContext(ManagerContext)
-    const now = new Date();
-    const hardDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 5}), Date.now());
-    const mediumDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 3}), Date.now());
-    const easyDueDateDistance = formatDistance(quizCardNextDueDate({previousItems: previousScheduleItems, grade: 1}), Date.now());
+    const now = new Date()
+    debugger;
+    const hardDueDateDistance = formatDistance(quizCardNextDueDate({
+        previousItems: previousScheduleItems,
+        grade: 1,
+    }), Date.now())
+    const mediumDueDateDistance = formatDistance(quizCardNextDueDate({
+        previousItems: previousScheduleItems,
+        grade: 3,
+    }), Date.now())
+    const easyDueDateDistance = formatDistance(quizCardNextDueDate({
+        previousItems: previousScheduleItems,
+        grade: 5,
+    }), Date.now())
     return (
         <Fragment>
             <HotkeyWrapper action={'QUIZ_RESULT_HARD'}>
