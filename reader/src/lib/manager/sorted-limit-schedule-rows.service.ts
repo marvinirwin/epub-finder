@@ -28,7 +28,7 @@ export class SortedLimitScheduleRowsService {
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
     }) {
-        const scheduleRowKey = (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => `${r.d.word}${r.d.flashCardType}`;
+        const scheduleRowKey = (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => `${r.d.word}${r.d.flashCardType}`
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
@@ -69,15 +69,17 @@ export class SortedLimitScheduleRowsService {
                 ) => {
                     const typeMap = new Map<U, T[]>()
                     values.forEach(value => {
-                            const r = resolveTypes(value)
-                            safePushMap(typeMap, r.type, value)
+                            const { type } = resolveTypes(value)
+                            // @ts-ignore
+                            safePushMap(typeMap, type, value)
                         },
                     )
                     const newOrderingMap = new Map<T, number>()
                     typeMap.forEach((rows, type) => {
                         let previousValue: undefined | number
                         rows.forEach(row => {
-                            const { sortValue } = resolveTypes(row)
+                            // tslint:disable-next-line:no-shadowed-variable
+                            const { sortValue, type } = resolveTypes(row)
                             if (previousValue === undefined) {
                                 previousValue = sortValue
                             } else if ((previousValue + sortValueOffset) > sortValue) {
@@ -99,9 +101,9 @@ export class SortedLimitScheduleRowsService {
                     1000 * 60 * 5, // 5 minutes
                 )
 
-                const overDueAdjustedSortValues = adjustScheduleRows(orderBy(sortedScheduleRows, r => r.dueDate()))
-                const notOverDueAdjustedSortValues = overDueAdjustedSortValues;
-                const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues;
+                const overDueAdjustedSortValues = adjustScheduleRows(orderBy(sortedScheduleRows, r => `${r.d.word}${r.d.flashCardType}`))
+                const notOverDueAdjustedSortValues = overDueAdjustedSortValues
+                const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues
                 return {
                     wordsToReview,
                     wordsLearnedToday,
