@@ -1,5 +1,5 @@
 import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay } from 'rxjs/operators'
+import { debounceTime, map, shareReplay } from 'rxjs/operators'
 import { NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow } from './schedule-row'
 import { ScheduleMathService, sumWordCountRecords } from './schedule-math.service'
 import { SettingsService } from '../../services/settings.service'
@@ -86,6 +86,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             flashCardLearningTargetsService.learningTargets$,
             settingsService.textToSpeechConfiguration$,
         ]).pipe(
+            // Prevent this from firing synchronously
+            debounceTime(0),
             map(
                 ([
                      [

@@ -23,7 +23,8 @@ export class AdvanceTimeService {
             const currentComponent = await observableLastValue(
                 settingsService.componentPath$,
             )
-            if (currentComponent !== QUIZ_NODE) {
+            // TODO this is a hack, QUIZ_NODE is the default component
+            if (currentComponent !== QUIZ_NODE && currentComponent !== '') {
                 timeService.quizNow$.next(new Date())
             }
             /**
