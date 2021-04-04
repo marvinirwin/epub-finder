@@ -75,31 +75,33 @@ export class SortedLimitScheduleRowsService {
                     )
                     const newOrderingMap = new Map<T, number>()
                     typeMap.forEach((rows, type) => {
-                        let startValue: undefined | number
+                        let previousValue: undefined | number
                         rows.forEach(row => {
                             const { sortValue } = resolveTypes(row)
-                            if (startValue === undefined) {
-                                startValue = sortValue
+                            if (previousValue === undefined) {
+                                previousValue = sortValue
+                            } else if ((previousValue + sortValueOffset) > sortValue) {
+                                previousValue = previousValue + sortValueOffset
                             } else {
-                                startValue = sortValue + sortValueOffset
+                                previousValue = sortValue
                             }
-                            newOrderingMap.set(row, startValue)
+                            newOrderingMap.set(row, previousValue)
                         })
                     })
                     return newOrderingMap
                 }
 
-                const overDue = [...learning, ...wordsToReview].filter((r) => r.isOverDue({ now }))
-                const notOverDue = [...learning, ...wordsToReview].filter((r) => !r.isOverDue({ now }))
+                const overDueRows = [...learning, ...wordsToReview].filter((r) => r.isOverDue({ now }))
+                const notOverDueRows = [...learning, ...wordsToReview].filter((r) => !r.isOverDue({ now }))
                 const adjustScheduleRows = (scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => spaceOutRows<ScheduleRow<NormalizedQuizCardScheduleRowData>, string, string>(
                     row => ({ type: row.d.word, subType: row.d.flashCardType, sortValue: row.dueDate().getTime() }),
                     scheduleRows,
                     1000 * 60 * 5, // 5 minutes
                 )
 
-                const overDueAdjustedSortValues = adjustScheduleRows(overDue)
-                const notOverDueAdjustedSortValues = adjustScheduleRows(notOverDue)
-                const wordsLeftForTodayAdjustedSortValues = adjustScheduleRows(wordsLeftForToday)
+                const overDueAdjustedSortValues = adjustScheduleRows(orderBy(sortedScheduleRows, r => r.dueDate()))
+                const notOverDueAdjustedSortValues = overDueAdjustedSortValues;
+                const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues;
                 return {
                     wordsToReview,
                     wordsLearnedToday,
@@ -107,9 +109,9 @@ export class SortedLimitScheduleRowsService {
                     wordsReviewingOrLearning: learning,
                     unStartedWords,
                     limitedScheduleRows: [
-                        ...orderBy(overDue, r => overDueAdjustedSortValues.get(r)),
+                        ...orderBy(overDueRows, r => overDueAdjustedSortValues.get(r)),
                         ...orderBy(wordsLeftForToday, r => wordsLeftForTodayAdjustedSortValues.get(r)),
-                        ...orderBy(notOverDue, r => notOverDueAdjustedSortValues.get(r)),
+                        ...orderBy(notOverDueRows, r => notOverDueAdjustedSortValues.get(r)),
                     ],
                 }
             }),
