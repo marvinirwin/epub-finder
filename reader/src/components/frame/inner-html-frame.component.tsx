@@ -3,7 +3,6 @@ import { IframeComponent } from './iframe.component'
 import { BodyStyle } from '../../lib/document-frame/atomized-document-style.service'
 
 export type IFrameRenderHandler = (
-    head: HTMLTitleElement,
     body: HTMLDivElement,
 ) => void
 
@@ -16,14 +15,18 @@ export const InnerHtmlFrameComponent = React.forwardRef<
         title: string
     } & React.HTMLProps<HTMLIFrameElement>
 >(({ headText, bodyText, renderHandler, title, ...props }, ref) => {
+/*
     const [headRef, setHeadRef] = useState<HTMLTitleElement | null>()
+*/
     const [bodyRef, setBodyRef] = useState<HTMLDivElement | null>()
     useEffect(() => {
-        if (headRef && bodyRef) {
-            renderHandler(headRef, bodyRef)
+        if (/*headRef && */bodyRef) {
+            renderHandler(/*headRef,*/ bodyRef)
         }
-    }, [headText, bodyText, headRef, bodyRef])
+    }, [headText, bodyText, /*headRef,*/ bodyRef])
     return (
+        <div ref={setBodyRef} {...props} dangerouslySetInnerHTML={{__html: bodyText}}/>
+/*
         <IframeComponent title={title} {...props} ref={ref}>
             <Fragment>
                 <title ref={setHeadRef}>Ref</title>
@@ -34,5 +37,6 @@ export const InnerHtmlFrameComponent = React.forwardRef<
                 dangerouslySetInnerHTML={{ __html: bodyText }}
             />
         </IframeComponent>
+*/
     )
 })

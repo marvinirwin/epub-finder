@@ -572,3 +572,16 @@ $hideColor: #f5f5f5;
 iframe {
     border: 0;
 }
+mark {
+  font-size: 300%;
+    position: relative; /*  Required to keep our pseudo elements in check*/
+    background-color: transparent;
+    transition: background-color .25s ease-in-out;
+}
+.has-metadata {
+    background-color: lightgreen;
+}
+
+.no-metadata {
+    background-color: pink;
+}

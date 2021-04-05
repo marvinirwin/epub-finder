@@ -5,7 +5,7 @@ import {
     AtomizedDocument,
     SerializedDocumentTabulation,
     tabulate,
-    TabulatedDocuments, TabulatedSegments,
+    TabulatedSegments,
 } from '@shared/'
 import { TabulateLocalDocument } from '../Workers/worker.helpers'
 import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
@@ -75,11 +75,10 @@ export class OpenDocument {
     }
 
     async handleHTMLHasBeenRendered(
-        head: HTMLHeadElement,
         body: HTMLDivElement,
     ) {
         const segments = [
-            ...(body.ownerDocument as HTMLDocument).getElementsByClassName(
+            ...body.getElementsByClassName(
                 annotatedAndTranslated,
             ),
         ].map((element) => {

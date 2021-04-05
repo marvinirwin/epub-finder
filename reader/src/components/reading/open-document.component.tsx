@@ -16,8 +16,8 @@ export const OpenDocumentComponent = React.forwardRef<
             title={openedDocument.label}
             bodyText={document?.bodyInnerHTML() || ''}
             headText={document?.headInnerHTML() || ''}
-            renderHandler={(head, body) => {
-                openedDocument.handleHTMLHasBeenRendered(head, body)
+            renderHandler={(body) => {
+                openedDocument.handleHTMLHasBeenRendered(body)
             }}
             ref={ref}
         />
