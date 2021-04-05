@@ -54,15 +54,15 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
         quizCard.answerIsRevealed$.next(true),
     )
     return answerIsRevealed ? (
-        <div style={{
+        <Box m={2} p={1} style={{
             display: 'flex',
             flexFlow: 'row nowrap',
             width: '100%',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'space-around',
         }}>
             <DifficultyButtons previousScheduleItems={recognitionRecordsForThisCard} />
-        </div>
+        </Box>
     ) : (
         <Box m={2} p={1} style={{ display: 'flex', flexFlow: 'column nowrap', width: '100%', alignItems: 'center' }}>
             <AdvanceButton />
