@@ -2,8 +2,7 @@
 import { ImageSearchPom } from './image-search.pom'
 import {
     frequencyDocumentProgressPrefix,
-    leftTodayNumber,
-    manualQuizHiddenFieldConfigId,
+    quizLeftTodayNumber,
     noMoreQuizCards,
     QUIZ_BUTTON_EASY,
     QUIZ_BUTTON_HARD,
@@ -16,7 +15,7 @@ import {
     quizCardTranslation,
     quizLearningNumber,
     quizToReviewNumber,
-    quizUnlearnedNumber,
+    quizWordsLeftForTodayNumber,
     recognizedCount,
     somewhatRecognizedCount,
     unrecognizedCount,
@@ -141,10 +140,10 @@ export class QuizCarouselPom {
     }
 
     static unLearned() {
-        return cy.get(`.${quizUnlearnedNumber}`)
+        return cy.get(`.${quizWordsLeftForTodayNumber}`)
     }
 
     static leftToday() {
-        return cy.get(`.${leftTodayNumber}`)
+        return cy.get(`.${quizLeftTodayNumber}`)
     }
 }

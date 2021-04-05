@@ -1,12 +1,14 @@
 import React, { useContext, useState } from 'react'
 import { ManagerContext } from '../../App'
-import { Box, Button, Input, TextField, Typography } from '@material-ui/core'
+import { Box, Button, TextField, Typography } from '@material-ui/core'
 import { uploadTextArea, uploadTextButton, uploadTextName } from '@shared/'
+import { useObservableState } from 'observable-hooks'
 
 export const UploadText = () => {
     const m = useContext(ManagerContext)
     const [text, setText] = useState<string>('')
-    const [title, setTitle] = useState<string>('')
+    const [title, setTitle] = useState<string>('');
+    const languageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
     return (
         <Box m={2} style={{ display: 'flex', flexFlow: 'column nowrap' }}>
             <Box m={2} p={1}>
@@ -38,9 +40,12 @@ export const UploadText = () => {
                     color={'primary'}
                     variant={'contained'}
                     onClick={() => {
-                        m.droppedFilesService.uploadFileRequests$.next([
-                            new File([text], `${title}.txt`),
-                        ])
+                        if (languageCode && !!text.trim()) {
+                            m.uploadingDocumentsService.upload({
+                                languageCode,
+                                file: new File([text], `${title}.txt`),
+                            });
+                        }
                         setTitle('')
                         setText('')
                     }}

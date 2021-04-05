@@ -10,7 +10,6 @@ import { formatDistance } from 'date-fns'
 export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[] }> = ({ previousScheduleItems }) => {
     const m = useContext(ManagerContext)
     const now = new Date()
-    debugger;
     const hardDueDateDistance = formatDistance(quizCardNextDueDate({
         previousItems: previousScheduleItems,
         grade: 1,

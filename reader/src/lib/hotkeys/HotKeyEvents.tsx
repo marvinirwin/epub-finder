@@ -130,7 +130,7 @@ export class HotKeyEvents {
             QUIZ_RESULT_MEDIUM: ['2'],
             QUIZ_RESULT_HARD: ['1'],
             QUIZ_RESULT_IGNORE: ['z'],
-            ADVANCE_QUIZ: [' '],
+            ADVANCE_QUIZ: ['q'],
             RECORD_QUIZ_WORD: ['r'],
             REQUEST_EDIT_WORD: ['e'],
             HIDE_VIDEO: ['v'],

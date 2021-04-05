@@ -1,5 +1,11 @@
-import { Button, Typography } from '@material-ui/core'
-import { quizButtonReveal, quizLearningNumber, quizToReviewNumber, quizUnlearnedNumber } from '@shared/'
+import { Box, Button, Typography } from '@material-ui/core'
+import {
+    quizButtonReveal,
+    quizLearnedTodayNumber,
+    quizLearningNumber,
+    quizToReviewNumber,
+    quizWordsLeftForTodayNumber,
+} from '@shared/'
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { QuizCard } from './word-card.interface'
@@ -11,14 +17,17 @@ import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 export const AdvanceButton = () => {
     const m = useContext(ManagerContext)
     return (
-        <HotkeyWrapper action={'ADVANCE_QUIZ'}>
-            <Button
-                id={quizButtonReveal}
-                onClick={() => m.hotkeyEvents.advanceQuiz$.next()}
-            >
-                Reveal
-            </Button>
-        </HotkeyWrapper>
+        <Box m={2} p={1}>
+            <HotkeyWrapper action={'ADVANCE_QUIZ'}>
+                <Button
+                    variant={'contained'}
+                    id={quizButtonReveal}
+                    onClick={() => m.hotkeyEvents.advanceQuiz$.next()}
+                >
+                    Reveal
+                </Button>
+            </HotkeyWrapper>
+        </Box>
     )
 }
 
@@ -44,45 +53,43 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     useSubscription(m.hotkeyEvents.advanceQuiz$, () =>
         quizCard.answerIsRevealed$.next(true),
     )
-    return (
-        <div className={'quiz-button-row'}>
-            {answerIsRevealed ? (
-                <DifficultyButtons previousScheduleItems={recognitionRecordsForThisCard} />
-            ) : (
-                <div>
-                    <div
-                        style={{
-                            display: 'flex',
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            margin: '24px',
-                        }}
-                    >
-                        <Typography>
-                            New Words Left for Today:{' '}
-                            <span className={quizUnlearnedNumber}>
+    return answerIsRevealed ? (
+        <div style={{
+            display: 'flex',
+            flexFlow: 'row nowrap',
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        }}>
+            <DifficultyButtons previousScheduleItems={recognitionRecordsForThisCard} />
+        </div>
+    ) : (
+        <Box m={2} p={1} style={{ display: 'flex', flexFlow: 'column nowrap', width: '100%', alignItems: 'center' }}>
+            <AdvanceButton />
+            <Box m={2} p={1} className={'quiz-button-row'}>
+                <Typography variant={'h6'}>
+                    New Words Left for Today:{' '}
+                    <span className={quizWordsLeftForTodayNumber}>
                                 {scheduleInfo.wordsLeftForToday.length}
                             </span>
-                        </Typography>
-                        <Typography>
-                            Being Learned:{' '}
-                            <span className={quizLearningNumber}>
+                </Typography>
+                <Typography variant={'h6'}>
+                    Being Learned:{' '}
+                    <span className={quizLearningNumber}>
                                 {scheduleInfo.wordsReviewingOrLearning.length}
                             </span>
-                        </Typography>
-                        <Typography>
-                            To Review:{' '}
-                            <span className={quizToReviewNumber}>
+                </Typography>
+                <Typography variant={'h6'}>
+                    To Review:{' '}
+                    <span className={quizToReviewNumber}>
                                 {scheduleInfo.wordsToReview.length}
                             </span>
-                        </Typography>
-                        <Typography>
-                            Learned Today:{' '}
-                            <span>{scheduleInfo.wordsLearnedToday.length}</span>
-                        </Typography>
-                    </div>
-                </div>
-            )}
-        </div>
+                </Typography>
+                <Typography variant={'h6'}>
+                    Learned Today:{' '}
+                    <span className={quizLearnedTodayNumber}>{scheduleInfo.wordsLearnedToday.length}</span>
+                </Typography>
+            </Box>
+        </Box>
     )
 }

@@ -98,7 +98,8 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                             {<CardInfo quizCard={quizCard} />}
                         </div>
                     </div>
-                    {!exampleSegmentsHidden && <OpenDocumentComponent style={{alignSelf: 'start', margin: '24px'}}
+                    {!exampleSegmentsHidden && <OpenDocumentComponent
+                        style={{alignSelf: 'start', margin: '24px', flex: 1, overflow: 'auto'}}
                         openedDocument={quizCard.exampleSentenceOpenDocument}
                     />}
                     <QuizCardButtons quizCard={quizCard} />

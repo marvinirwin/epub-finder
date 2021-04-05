@@ -1,11 +1,11 @@
-import { combineLatest, ReplaySubject } from 'rxjs'
+import { ReplaySubject } from 'rxjs'
 import { DroppedFilesService } from './dropped-files.service'
 import { DocumentCheckingOutService } from '../../components/library/document-checking-out.service'
-import { LoggedInUserService } from '../auth/loggedInUserService'
-import { last, map, startWith, withLatestFrom } from 'rxjs/operators'
 import { LibraryService } from '../manager/library.service'
 import { ProgressItemService } from '../../components/item-in-progress/progress-item.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
+import { observableLastValue, SettingsService } from '../../services/settings.service'
+import { ModalService } from '../user-interface/modal.service'
 
 const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html'])
 
@@ -18,51 +18,62 @@ const supportedFileExtensions = new Set<string>(['pdf', 'docx', 'txt', 'html'])
 export class UploadingDocumentsService {
     uploadingMessages$ = new ReplaySubject<string>(1)
     currentUploadingFile$ = new ReplaySubject<File | undefined>(1)
+    private libraryService: LibraryService
+    private progressItemService: ProgressItemService
+    private settingsService: SettingsService
+    private modalService: ModalService
 
     constructor({
-        droppedFilesService,
-        libraryService,
-        progressItemService,
-        languageConfigsService
-    }: {
+                    libraryService,
+                    progressItemService,
+                    languageConfigsService,
+                    settingsService,
+        modalService
+                }: {
         progressItemService: ProgressItemService
         documentCheckingOutService: DocumentCheckingOutService
-        droppedFilesService: DroppedFilesService
         libraryService: LibraryService,
-        languageConfigsService: LanguageConfigsService
+        languageConfigsService: LanguageConfigsService,
+        settingsService: SettingsService
+        modalService: ModalService
     }) {
+        this.settingsService = settingsService
+        this.libraryService = libraryService
+        this.progressItemService = progressItemService
+        this.modalService = modalService;
         this.currentUploadingFile$.next()
-        // There will also have to be a document synchronization service
-        droppedFilesService.uploadFileRequests$
-            .pipe(
-                map((files) =>
-                    files.filter((file) =>
-                        supportedFileExtensions.has(
-                            DroppedFilesService.extensionFromFilename(
-                                file.name,
-                            ),
-                        ),
-                    ),
-                ),
-                withLatestFrom(languageConfigsService.readingLanguageCode$)
+    }
+
+    async upload({ file, languageCode }: { file: File, languageCode: string }) {
+        if (!supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name))) {
+            throw new Error(`Unsupported file extension ${file.name}`)
+        }
+        this.progressItemService.newProgressItem().exec(async () => {
+            let lastDocument: string | undefined
+            lastDocument = file.name
+            this.uploadingMessages$.next(
+                `Uploading ${file.name}.  This can take up to 30 seconds`,
             )
-            .subscribe(async ([customDocuments, languageCode]) => {
-                progressItemService.newProgressItem().exec(async () => {
-                    let lastDocument: string | undefined
-                    for (let i = 0; i < customDocuments.length; i++) {
-                        const basicDocument = customDocuments[i]
-                        lastDocument = basicDocument.name
-                        this.uploadingMessages$.next(
-                            `Uploading ${basicDocument.name}.  This can take up to 30 seconds`,
-                        )
-                        this.currentUploadingFile$.next(basicDocument)
-                        await libraryService.upsertDocument(basicDocument, languageCode)
-                        this.currentUploadingFile$.next(undefined)
-                        this.uploadingMessages$.next(
-                            `Uploading ${basicDocument.name} success!`,
-                        )
-                    }
-                })
-            })
+            this.currentUploadingFile$.next(file)
+            const uploadedDocuments = await this.libraryService.upsertDocument(file, languageCode)
+            this.currentUploadingFile$.next(undefined)
+            this.uploadingMessages$.next(
+                `Uploading ${file.name} success!`,
+            )
+            this.settingsService.selectedFrequencyDocuments$.next(
+                (await observableLastValue(this.settingsService.selectedFrequencyDocuments$))
+                    .concat(uploadedDocuments.id()),
+            );
+            this.settingsService.selectedExampleSegmentDocuments$.next(
+                (await observableLastValue(this.settingsService.selectedExampleSegmentDocuments$))
+                    .concat(uploadedDocuments.id()),
+
+            )
+            this.settingsService.readingDocument$.next(uploadedDocuments.id())
+        }).then(
+            () => {
+                this.modalService.fileUpload.open$.next(false)
+            }
+        )
     }
 }
