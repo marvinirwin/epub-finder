@@ -33,9 +33,9 @@ const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
     return (audio && !isHidden) ?
         <audio
             src={audio.url}
+            autoPlay={!isLoading}
             controls
             ref={setAudioRef}
-            autoPlay
         /> :
         null
 }
