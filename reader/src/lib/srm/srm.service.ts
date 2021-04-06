@@ -63,7 +63,7 @@ export const quizCardNextDueDate = ({grade, previousItems}:{grade: SuperMemoGrad
             return add(Date.now(), { minutes: 1 })
         }
         const correctRecordsInARow = inARow(
-            previousItems.reverse(),
+            Array.from(previousItems).reverse(),
             (r) => r.grade >= 3,
         )
         switch (correctRecordsInARow.length) {

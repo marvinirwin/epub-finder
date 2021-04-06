@@ -13,6 +13,7 @@ import { useObservableState, useSubscription } from 'observable-hooks'
 import { HotkeyWrapper } from '../hotkeys/hotkey-wrapper'
 import { DifficultyButtons } from '../translation-attempt/difficulty-buttons.component'
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
+import { orderBy } from 'lodash'
 
 export const AdvanceButton = () => {
     const m = useContext(ManagerContext)
@@ -48,8 +49,9 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     const flashCardType = useObservableState(quizCard.flashCardType$) || ''
     const word = useObservableState(quizCard.word$) || ''
     const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressService.indexOfOrderedRecords$) || {}
-    const recognitionRecordsForThisCard = (recognitionRecordIndex[word] || [])
-        .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flashCardType === flashCardType);
+    const recognitionRecordsForThisCard = orderBy(
+        (recognitionRecordIndex[word] || [])
+            .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flashCardType === flashCardType), r => r.timestamp.getTime())
     useSubscription(m.hotkeyEvents.advanceQuiz$, () =>
         quizCard.answerIsRevealed$.next(true),
     )
