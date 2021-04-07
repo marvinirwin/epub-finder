@@ -6,8 +6,12 @@ import { QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MED
 import { ScheduleItem } from '../../lib/schedule/schedule-row'
 import { quizCardNextDueDate } from '../../lib/srm/srm.service'
 import { formatDistance } from 'date-fns'
+import { useObservableState, useSubscription } from 'observable-hooks'
+import { Observable } from 'rxjs'
+import { SuperMemoGrade } from 'supermemo'
+import { QuizCard } from '../quiz/word-card.interface'
 
-export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[] }> = ({ previousScheduleItems }) => {
+export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[], quizCard: QuizCard}> = ({ previousScheduleItems, quizCard }) => {
     const m = useContext(ManagerContext)
     const hardDueDateDistance = formatDistance(quizCardNextDueDate({
         previousItems: previousScheduleItems,
@@ -20,7 +24,32 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     const easyDueDateDistance = formatDistance(quizCardNextDueDate({
         previousItems: previousScheduleItems,
         grade: 5,
-    }), Date.now())
+    }), Date.now());
+
+    const word = useObservableState(quizCard.word$)
+    const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
+    const flashCardType = useObservableState(quizCard.flashCardType$)
+
+    const useQuizResult = (
+        hotkeyObservable$: Observable<unknown>,
+        score: SuperMemoGrade,
+    ) => {
+        useSubscription(hotkeyObservable$.pipe(), async () => {
+            if (word && latestLanguageCode && flashCardType) {
+                m.quizResultService.completeQuiz(word, latestLanguageCode, score, flashCardType)
+            }
+        })
+    }
+    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
+    useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
+    useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
+    useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
+        if (word) {
+            m.ignoredWordsRepository.addRecords$.next([
+                { word, timestamp: new Date() },
+            ])
+        }
+    })
     return (
         <Fragment>
             <HotkeyWrapper action={'QUIZ_RESULT_HARD'}>

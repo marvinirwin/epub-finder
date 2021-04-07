@@ -10,13 +10,12 @@ import { QuizCardButtons } from './quiz-card-buttons.component'
 import { useIsFieldHidden } from './useIsFieldHidden'
 import { QuizCardLimitReached } from './empty-quiz-card.component'
 import { CardLearningLanguageText } from '../word-information/word-paper.component'
-import { Observable } from 'rxjs'
-import { SuperMemoGrade } from 'supermemo'
 import { QuizCardScheduleTable } from '../tables/quiz-card-due-date-schedule-table.component'
 import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translation-attempt-table.component'
 import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 import { useLoadingObservable } from '../../lib/util/create-loading-observable'
+import { groupBy } from 'lodash'
 
 const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
     const {value: audio, isLoading} = useLoadingObservable(quizCard.audio$)
@@ -47,35 +46,11 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
         quizCard,
         label: QuizCardField.LearningLanguage,
     })
-    const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const flashCardType = useObservableState(quizCard.flashCardType$)
 
-    const useQuizResult = (
-        hotkeyObservable$: Observable<unknown>,
-        score: SuperMemoGrade,
-    ) => {
-        useSubscription(hotkeyObservable$.pipe(), async () => {
-            if (word && latestLanguageCode && flashCardType) {
-                m.quizResultService.completeQuiz(word, latestLanguageCode, score, flashCardType)
-            }
-        })
-    }
-    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
-    useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
-    useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
-    useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
-        if (word) {
-            m.ignoredWordsRepository.addRecords$.next([
-                { word, timestamp: new Date() },
-            ])
-        }
-    })
-    const cardsLearnedToday =
-        useObservableState(m.quizCardScheduleService.cardsLearnedToday$)
-            ?.length || 0
+    const cardsLearnedToday = useObservableState(m.quizCardScheduleService.cardsLearnedToday$) || []
     const cardLimit =
         useObservableState(m.settingsService.newQuizWordLimit$) || 0
-    const cardLimitReached = cardsLearnedToday >= cardLimit
+    const cardLimitReached = Object.values(groupBy(cardsLearnedToday, r => r.d.word)).length >= cardLimit;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
     return (

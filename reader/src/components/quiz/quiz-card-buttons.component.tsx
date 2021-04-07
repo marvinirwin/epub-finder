@@ -14,6 +14,7 @@ import { HotkeyWrapper } from '../hotkeys/hotkey-wrapper'
 import { DifficultyButtons } from '../translation-attempt/difficulty-buttons.component'
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 import { orderBy } from 'lodash'
+import { allScheduleRowsForWord, anyScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
 
 export const AdvanceButton = () => {
     const m = useContext(ManagerContext)
@@ -48,6 +49,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     }
     const flashCardType = useObservableState(quizCard.flashCardType$) || ''
     const word = useObservableState(quizCard.word$) || ''
+    const flashCardTypes = useObservableState(m.settingsService.flashCardTypesRequiredToProgress$) || []
     const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressService.indexOfOrderedRecords$) || {}
     const recognitionRecordsForThisCard = orderBy(
         (recognitionRecordIndex[word] || [])
@@ -63,7 +65,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
             alignItems: 'center',
             justifyContent: 'space-around',
         }}>
-            <DifficultyButtons previousScheduleItems={recognitionRecordsForThisCard} />
+            <DifficultyButtons quizCard={quizCard} previousScheduleItems={recognitionRecordsForThisCard} />
         </Box>
     ) : (
         <Box m={2} p={1} style={{ display: 'flex', flexFlow: 'column nowrap', width: '100%', alignItems: 'center' }}>
@@ -72,24 +74,24 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
                 <Typography variant={'h6'}>
                     New Words Left for Today:{' '}
                     <span className={quizWordsLeftForTodayNumber}>
-                                {scheduleInfo.wordsLeftForToday.length}
+                                {allScheduleRowsForWord(scheduleInfo.wordsLeftForToday, flashCardTypes).length}
                             </span>
                 </Typography>
                 <Typography variant={'h6'}>
                     Being Learned:{' '}
                     <span className={quizLearningNumber}>
-                                {scheduleInfo.wordsReviewingOrLearning.length}
+                                {anyScheduleRowsForWord(scheduleInfo.wordsReviewingOrLearning, flashCardTypes).length}
                             </span>
                 </Typography>
                 <Typography variant={'h6'}>
                     To Review:{' '}
                     <span className={quizToReviewNumber}>
-                                {scheduleInfo.wordsToReview.length}
+                                {allScheduleRowsForWord(scheduleInfo.wordsToReview, flashCardTypes).length}
                             </span>
                 </Typography>
                 <Typography variant={'h6'}>
                     Learned Today:{' '}
-                    <span className={quizLearnedTodayNumber}>{scheduleInfo.wordsLearnedToday.length}</span>
+                    <span className={quizLearnedTodayNumber}>{allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes).length}</span>
                 </Typography>
             </Box>
         </Box>

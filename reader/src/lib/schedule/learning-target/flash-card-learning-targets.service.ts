@@ -55,13 +55,10 @@ export class FlashCardLearningTargetsService {
     constructor({
                     wordRecognitionProgressService,
                     temporaryHighlightService,
-                    pronunciationProgressService,
                     videoMetadataRepository,
                     ignoredWordsRepository,
                     allWordsRepository,
-                    translationAttemptService,
                     selectedVirtualTabulationsService,
-                    timeService,
                     languageConfigsService,
                 }: {
                     wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
@@ -90,7 +87,6 @@ export class FlashCardLearningTargetsService {
                 wordRecognitionProgressService.indexOfOrderedRecords$.pipe(
                     startWith({}),
                 ),
-                pronunciationProgressService.indexOfOrderedRecords$.pipe(startWith({})),
             ]),
             languageConfigsService.strategy$,
         ]).pipe(
@@ -101,7 +97,7 @@ export class FlashCardLearningTargetsService {
                          videoMetadataIndex,
                          temporaryHighlightedWord,
                      ],
-                     [wordRecognitionRows, pronunciationRows],
+                     [wordRecognitionRows],
                      strategy,
                  ]) => {
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()

@@ -29,9 +29,6 @@ export interface QuizCardConfiguration {
 }
 
 export class SettingsService {
-    private settingsReplaySubjects: {
-        [setting: string]: ReplaySubject<any>
-    } = {}
     private db: DatabaseService
 
     public historyService: HistoryService

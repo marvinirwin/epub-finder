@@ -193,10 +193,12 @@ export const TranslationAttempt: React.FC = () => {
                         value={translateAttempt}
                         onChange={(e) => setTranslateAttempt(e.target.value)}
                     />
+{/*
                     {answerIsShown ?  // TODO use records for this
                         <DifficultyButtons previousScheduleItems={[]} /> :
                         <AdvanceButton />
                     }
+*/}
                 </Fragment>
             )}
         </Paper>

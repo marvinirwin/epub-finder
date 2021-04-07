@@ -5,7 +5,8 @@ import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/sche
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
 import { safePushMap } from '@shared/'
-import { Dictionary, groupBy, orderBy } from 'lodash'
+import { Dictionary, groupBy, orderBy, flatten } from 'lodash'
+import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 type LimitedScheduleRows = {
     wordsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[]
@@ -36,7 +37,7 @@ export const gatherWhile = <T, U>(values: T[], filterFunc: (value: T) => boolean
 export const gatherScheduleRows = (
     scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
     filterFunc: (s: ScheduleRow<NormalizedQuizCardScheduleRowData>) => boolean,
-    learningTargetLimit: number)=> {
+    learningTargetLimit: number) => {
     const gathered: ScheduleRow<NormalizedQuizCardScheduleRowData>[] = []
     const learningTargetsFound = new Set<string>()
     for (const scheduleRow of scheduleRows) {
@@ -44,6 +45,29 @@ export const gatherScheduleRows = (
 
         }
     }
+}
+
+export const anyScheduleRowsForWord = (
+    scheduleRowsToReview: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
+    quizCardFieldConfig: FlashCardType[],
+) => {
+    // A word is to review if any of its rows are too review
+    return Object.values(groupBy(scheduleRowsToReview, row => row.d.word))
+}
+
+export const allScheduleRowsForWord = (
+    unStartedScheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
+    quizCardFieldConfig: FlashCardType[],
+) => {
+    /**
+     * For a word to be unStarted, all of its schedule rows must be unStarted
+     */
+    return Object.values(groupBy(unStartedScheduleRows, row => row.d.word))
+        .filter(scheduleRowsForOneWord => quizCardFieldConfig
+            .every(flashCardType => scheduleRowsForOneWord
+                .find(r => r.d.flashCardType === flashCardType),
+            ),
+        )
 }
 
 export class SortedLimitScheduleRowsService {
@@ -63,8 +87,9 @@ export class SortedLimitScheduleRowsService {
             quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
             timeService.quizNow$,
+            settingsService.flashCardTypesRequiredToProgress$,
         ]).pipe(
-            map(([sortedScheduleRows, newQuizWordLimit, now]) => {
+            map(([sortedScheduleRows, newQuizWordLimit, now, flashCardTypesRequiredToProgress]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
                 )
@@ -80,10 +105,10 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const scheduleRowsLeftForToday = unStartedScheduleRows.slice(
+                const scheduleRowsLeftForToday = flatten(Object.values(groupBy(unStartedScheduleRows, r => r.d.word)).slice(
                     0,
-                    newQuizWordLimit - scheduleRowsLearnedToday.length,
-                )
+                    newQuizWordLimit - Object.values(groupBy(scheduleRowsLearnedToday, r => r.d.word)).length,
+                ));
                 /**
                  * I want a function which is given a list of {type, subType, orderValue}
                  * returns a new orderValue so that its less likely that a given type or subType will occur near each other
