@@ -3,7 +3,7 @@ import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
 import React, { useContext } from 'react'
 import { LanguageSelect } from '../app-directory/nodes/language-select.component'
-import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit'
+import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 import {
     introAddLearningMaterial,
     introLanguageSelect,

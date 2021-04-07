@@ -11,7 +11,7 @@ import {
 } from '../../components/app-directory/adjust-date-weight.component'
 import { AdjustLengthWeight } from '../../components/app-directory/adjust-length-weight.component'
 import { LibraryTable } from '../../components/library/library-table.component'
-import { SetQuizWordLimit } from '../../components/settings/set-new-quiz-word-limit'
+import { SetQuizWordLimit } from '../../components/settings/set-new-quiz-word-limit.component'
 import { WordCardDisplay } from '../word-card/word-card.modal.component'
 import { ManagerContext } from '../../App'
 import { HotkeyConfig } from '../../components/hotkeys/HotkeyConfig'
