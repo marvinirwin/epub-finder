@@ -53,6 +53,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const cardLimitReached = Object.values(groupBy(cardsLearnedToday, r => r.d.word)).length >= cardLimit;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
+    // TODO add case for out of words
     return (
         <Paper className='quiz-card' {...props}>
             {!cardLimitReached ? (

@@ -9,15 +9,16 @@ import {
     uploadTextName,
 } from '@shared/*'
 import { ReadingPom } from '../../support/pom/reading.pom'
+import { setUploadName, setUploadText, uploadText } from '../upload.helpers'
+
 
 class TestDocument {
     constructor(private name: string, private text: string) {}
     upload() {
         DirectoryPom.OpenUploadDialog()
-        // Maybe I should clear these?
-        cy.get(`#${uploadTextName}`).type(this.name)
-        cy.get(`#${uploadTextArea}`).type(this.text)
-        cy.get(`#${uploadTextButton}`).click()
+        setUploadName(this.name);
+        setUploadText(this.text);
+        uploadText()
     }
     toggleReading() {
         DirectoryPom.OpenLibraryDialog()

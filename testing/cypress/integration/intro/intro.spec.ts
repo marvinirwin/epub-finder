@@ -4,16 +4,6 @@ import {
     spokenLanguageSelect,
 } from '@shared/*'
 
-const expectIntroLanguageSelect = () => {
-    cy.get(`#${introLanguageSelect}`).should('exist')
-}
-
-const selectReadingLanguage = (langCode: string) => {
-    cy.get(`.${readingLanguageSelect}`).select(langCode)
-}
-const selectSpokenLanguage = (langCode: string) => {
-    cy.get(`.${spokenLanguageSelect}`).select(langCode)
-}
 
 function expectIntroLearningMaterial() {}
 

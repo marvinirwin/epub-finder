@@ -2,8 +2,7 @@
 import { ImageSearchPom } from './image-search.pom'
 import {
     frequencyDocumentProgressPrefix,
-    quizLeftTodayNumber,
-    noMoreQuizCards,
+    cardLimitReached,
     QUIZ_BUTTON_EASY,
     QUIZ_BUTTON_HARD,
     QUIZ_BUTTON_IGNORE,
@@ -18,8 +17,9 @@ import {
     quizWordsLeftForTodayNumber,
     recognizedCount,
     somewhatRecognizedCount,
-    unrecognizedCount,
+    unrecognizedCount, outOfWords,
 } from '@shared/*'
+import { wordsLeft } from '../quiz-stats.helpers'
 
 export const defaultHotkeys = {
     quizScore5: '5',
@@ -44,27 +44,27 @@ export class QuizCarouselPom {
         return cy.find(`#${quizCardImage}`)
     }
 
-    easy() {
+    static easy() {
         return cy.find(`.${QUIZ_BUTTON_EASY}`)
     }
 
-    medium() {
+    static medium() {
         return cy.find(`.${QUIZ_BUTTON_MEDIUM}`)
     }
 
-    hard() {
+    static hard() {
         return cy.find(`.${QUIZ_BUTTON_HARD}`)
     }
 
-    hide() {
+    static hide() {
         return cy.find(`.${QUIZ_BUTTON_IGNORE}`)
     }
 
-    characters() {
+    static characters() {
         return cy.find('.quiz-text')
     }
 
-    exampleSentences() {
+    static exampleSentences() {
         return cy.find('iframe').iframeBody().find('.example-sentence')
     }
 
@@ -95,11 +95,14 @@ export class QuizCarouselPom {
     }
 
     static reveal() {
-        cy.get(`#${quizButtonReveal}`)
+        return cy.get(`#${quizButtonReveal}`)
     }
 
-    static assertNoQuizCard() {
-        cy.get(`.${noMoreQuizCards}`).should('be.visible')
+    static assertCardLimitReached() {
+        cy.get(`.${cardLimitReached}`).should('be.visible')
+    }
+    static assertOutOfWords() {
+        cy.get(`.${outOfWords}`).should('be.visible');
     }
 
     static submitQuizResult(
@@ -144,6 +147,6 @@ export class QuizCarouselPom {
     }
 
     static leftToday() {
-        return cy.get(`.${quizLeftTodayNumber}`)
+        return wordsLeft()
     }
 }

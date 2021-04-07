@@ -14,7 +14,7 @@ import {
 } from './components/snackbars/alert-snackbar.component'
 import { LoadingBackdrop } from './components/library/loading-backdrop.component'
 import { theme } from './theme'
-import { ActionModal } from './components/action-modal/action-modal'
+import { ActionModal } from './components/modals/action-modal.component'
 
 const urlParams = new URLSearchParams(window.location.search)
 

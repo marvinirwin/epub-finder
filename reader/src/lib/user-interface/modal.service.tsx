@@ -32,7 +32,8 @@ export class ModalService {
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
-        this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
+        this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />);
+
         this.languageSelect = new NavModal('spokenLanguage', () => (
             <Box m={2} p={1} style={{height: '90vh', width: '90vw'}}><LanguageSelect /></Box>
         ))
@@ -54,7 +55,7 @@ export class ModalService {
                     <HotkeyConfig />
                 </Box>
             )
-        })
+        });
 
         this.testingUtils = new NavModal('testingUtils ', ManualTestModal)
 

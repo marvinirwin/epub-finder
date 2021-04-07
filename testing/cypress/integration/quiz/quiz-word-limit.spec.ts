@@ -27,6 +27,6 @@ describe(`Limiting a user's new words every day`, () => {
 
         QuizCarouselPom.reveal()
         QuizCarouselPom.submitQuizResult(QUIZ_BUTTON_EASY)
-        QuizCarouselPom.assertNoQuizCard()
+        QuizCarouselPom.assertCardLimitReached()
     })
 })
