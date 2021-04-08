@@ -1,32 +1,26 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
+import { useObservable, useObservableState, useSubscription } from 'observable-hooks'
 import { TextField } from '@material-ui/core'
 import { newWordLimitInput } from '@shared/'
 import { useDebouncedFn } from 'beautiful-react-hooks'
+import { take } from 'rxjs/internal/operators/take'
 
 export const SetQuizWordLimit = () => {
     const m = useContext(ManagerContext)
-    const [quizWordLimitString, setQuizWordLimitString] = useState('')
-    const settingsQuizWordLimit = `${useObservableState(m.settingsService.newQuizWordLimit$)}`
+    const initialQuizWordLimit$ = useObservable(() => m.settingsService.newQuizWordLimit$.pipe(take(1)))
+    const [quizWordLimitString, setQuizWordLimitString] = useState<string>('')
+    useSubscription(initialQuizWordLimit$, (n) => {
+        setQuizWordLimitString(`${n}`)
+    })
     const setNewWordQuizLimitSetting = useDebouncedFn(
         (str: string) => {
-            if (str !== settingsQuizWordLimit) {
-                m.settingsService.newQuizWordLimit$.next(parseInt(str, 10) || 0)
-            }
+            m.settingsService.newQuizWordLimit$.next(parseInt(str, 10) || 0)
         },
-        10
-    );
-    useEffect(() => {
-            const shouldSetQuizWordLimit = settingsQuizWordLimit && settingsQuizWordLimit !== quizWordLimitString
-            if (shouldSetQuizWordLimit) {
-                setQuizWordLimitString(settingsQuizWordLimit)
-            }
-        },
-        [settingsQuizWordLimit],
+        10,
     )
     useEffect(() => {
-        setNewWordQuizLimitSetting(quizWordLimitString);
+        setNewWordQuizLimitSetting(quizWordLimitString)
     }, [quizWordLimitString])
 
     return (
