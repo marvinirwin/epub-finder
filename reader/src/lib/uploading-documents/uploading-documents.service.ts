@@ -48,11 +48,11 @@ export class UploadingDocumentsService {
         if (!supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name))) {
             throw new Error(`Unsupported file extension ${file.name}`)
         }
-        this.progressItemService.newProgressItem().exec(async () => {
+        return this.progressItemService.newProgressItem().exec(async () => {
             let lastDocument: string | undefined
             lastDocument = file.name
             this.uploadingMessages$.next(
-                `Uploading ${file.name}.  This can take up to 30 seconds`,
+                `Uploading ${file.name}...`,
             )
             this.currentUploadingFile$.next(file)
             const uploadedDocuments = await this.libraryService.upsertDocument(file, languageCode)
@@ -70,10 +70,6 @@ export class UploadingDocumentsService {
 
             )
             this.settingsService.readingDocument$.next(uploadedDocuments.id())
-        }).then(
-            () => {
-                this.modalService.fileUpload.open$.next(false)
-            }
-        )
+        })
     }
 }
