@@ -115,6 +115,8 @@ import { OnSelectService } from '../user-interface/on-select.service'
 import { TimeService } from '../time/time.service'
 import { AdvanceTimeService } from '../time/advance-time.service'
 import { FlashCardLearningTargetsService } from '../schedule/learning-target/flash-card-learning-targets.service'
+import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
+import { TabulationService } from '../tabulation/tabulation.service'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -215,8 +217,11 @@ export class Manager {
     timeService: TimeService
     advanceTimeService: AdvanceTimeService
     flashCardLearningTargetsService: FlashCardLearningTargetsService
+    customWordsRepository: CustomWordsRepository;
+    tabulationService: TabulationService;
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
+        this.customWordsRepository = new CustomWordsRepository(this)
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)
         this.allWordsRepository = new AllWordsRepository()
@@ -253,7 +258,8 @@ export class Manager {
         this.pronunciationProgressService = new PronunciationProgressRepository(this)
         this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
-        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
+        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this);
+        this.tabulationService = new TabulationService(this);
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map((component) => component?.name || ''),

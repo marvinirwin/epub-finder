@@ -2,7 +2,7 @@ import { OpenDocumentsService } from './open-documents.service'
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay } from 'rxjs/operators'
 import { combineLatest, Observable } from 'rxjs'
-import { SerializedDocumentTabulation } from '@shared/*'
+import { SerializedDocumentTabulation } from '@shared/'
 
 export class SelectedVirtualTabulationsService {
     selectedFrequencyVirtualTabulations$: Observable<SerializedDocumentTabulation[]>

@@ -8,6 +8,13 @@ import { BasicDocument } from '../../types'
 import { IgnoredWord } from '../schedule/ignored-word.interface'
 import { TranslationAttemptRecord } from '../schedule/translation-attempt.repository'
 
+export interface CustomWord {
+    word: string;
+    timestamp: Date;
+    id: number;
+    languageCode: string;
+}
+
 export class DatabaseService extends Dexie {
     static CURRENT_VERSION = 9
 
@@ -20,6 +27,7 @@ export class DatabaseService extends Dexie {
     public createdSentences: Dexie.Table<CreatedSentence, number>
     public settings: Dexie.Table<Setting, string>
     public customDocuments: Dexie.Table<BasicDocument, string>
+    public customWords: Dexie.Table<CustomWord, number>
 
     constructor() {
         super('DatabaseService')
@@ -33,6 +41,7 @@ export class DatabaseService extends Dexie {
             settings2: 'name, value',
             createdSentences: 'id++, learningLanguage',
             customDocuments: 'name, html',
+            customWords: 'id++, word, timestamp'
         })
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table('cards')
@@ -43,6 +52,7 @@ export class DatabaseService extends Dexie {
         this.createdSentences = this.table('createdSentences')
         this.customDocuments = this.table('customDocuments')
         this.translationAttempts = this.table('translationAttempts')
+        this.customWords = this.table('customWords')
     }
 
     async getCardsInDatabaseCount(): Promise<number> {

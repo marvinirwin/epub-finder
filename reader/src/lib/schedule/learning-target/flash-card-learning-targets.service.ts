@@ -10,13 +10,11 @@ import { TranslationAttemptService } from '../../../components/translation-attem
 import { SelectedVirtualTabulationsService } from '../../manager/selected-virtual-tabulations.service'
 import { TimeService } from '../../time/time.service'
 import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay, startWith } from 'rxjs/operators'
-import { DocumentWordCount } from '../../../../../server/src/shared/DocumentWordCount'
-import { PronunciationProgressRow } from '../pronunciation-progress-row.interface'
+import { map, shareReplay } from 'rxjs/operators'
 import { mapIfThenDefault } from '../../util/map.module'
-import { SerializedTabulationAggregate } from '../../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import { IPositionedWord } from '../../../../../server/src/shared/Annotation/IPositionedWord'
 import { LanguageConfigsService } from '../../language/language-configs.service'
+import { CustomWordsRepository } from './custom-words.repository'
 
 export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
     const m = new Map<string, number>()
@@ -28,25 +26,21 @@ export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
 
 
 export type FlashCardLearningTarget = {
-    wordCountRecords: DocumentWordCount[]
-    greedyWordCountRecords: DocumentWordCount[]
-    wordRecognitionRecords: WordRecognitionRow[]
-    pronunciationRecords: PronunciationProgressRow[]
     word: string
 }
 
-function subSequenceRecordHasNothingAdjacent(notableSubSequences: IPositionedWord[], notableSubSequence: IPositionedWord) {
+export const subSequenceRecordHasNothingAdjacent = (notableSubSequences: IPositionedWord[], notableSubSequence: IPositionedWord) => {
     const positionAfterMe = notableSubSequence.position + notableSubSequence.word.length
     const positionBeforeMe = notableSubSequence.position
     /**
      * This will fail if someone has whitespace before or after their word
      */
     const adjacentRecords = notableSubSequences.filter(potentialAdjacentSubSequence => {
-        const isInFrontOfMe = potentialAdjacentSubSequence.position + potentialAdjacentSubSequence.word.length === positionBeforeMe;
-        const isBehindMe = potentialAdjacentSubSequence.position === positionAfterMe;
-        return isInFrontOfMe || isBehindMe;
-    });
-    return adjacentRecords.length === 0;
+        const isInFrontOfMe = potentialAdjacentSubSequence.position + potentialAdjacentSubSequence.word.length === positionBeforeMe
+        const isBehindMe = potentialAdjacentSubSequence.position === positionAfterMe
+        return isInFrontOfMe || isBehindMe
+    })
+    return adjacentRecords.length === 0
 }
 
 export class FlashCardLearningTargetsService {
@@ -60,6 +54,7 @@ export class FlashCardLearningTargetsService {
                     allWordsRepository,
                     selectedVirtualTabulationsService,
                     languageConfigsService,
+                    customWordsRepository,
                 }: {
                     wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
                     pronunciationProgressService: PronunciationProgressRepository
@@ -72,40 +67,24 @@ export class FlashCardLearningTargetsService {
                     selectedVirtualTabulationsService: SelectedVirtualTabulationsService
                     timeService: TimeService
                     languageConfigsService: LanguageConfigsService
+                    customWordsRepository: CustomWordsRepository
                 },
     ) {
         this.learningTargets$ = combineLatest([
-            combineLatest([
-                    allWordsRepository.all$,
-                    selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
-                    ignoredWordsRepository.latestRecords$,
-                    videoMetadataRepository.all$.pipe(startWith(new Map())),
-                    temporaryHighlightService.temporaryHighlightRequests$.pipe(startWith(undefined)),
-                ],
-            ),
-            combineLatest([
-                wordRecognitionProgressService.indexOfOrderedRecords$.pipe(
-                    startWith({}),
-                ),
-            ]),
-            languageConfigsService.strategy$,
+            allWordsRepository.all$,
+            ignoredWordsRepository.latestRecords$,
+            customWordsRepository.indexOfOrderedRecords$,
         ]).pipe(
             map(([
-                     [builtInWords,
-                         selectedFrequencyVirtualTabulations,
-                         ignoredWords,
-                         videoMetadataIndex,
-                         temporaryHighlightedWord,
-                     ],
-                     [wordRecognitionRows],
-                     strategy,
+                     builtInWords,
+                     ignoredWords,
+                     customWordsIndex,
                  ]) => {
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()
                 /**
                  * This will break once there are real words with the same strings as the video metadata
                  * Same with temporary highlights :/
                  */
-                const syntheticWords = new Set<string>(Object.keys(videoMetadataIndex))
                 /*
                     if (temporaryHighlightRequest?.word) {
                         syntheticWords.add(temporaryHighlightRequest?.word);
@@ -116,68 +95,12 @@ export class FlashCardLearningTargetsService {
                         learningTargetIndex,
                         word,
                         {
-                            wordCountRecords: [],
                             word,
-                            wordRecognitionRecords: [],
-                            pronunciationRecords: [],
-                            greedyWordCountRecords: [],
                         },
                     )
                 }
-                builtInWords.forEach(word => ensureLearningTargetForWord(word))
-                const vocabulary = new Set(builtInWords)
-
-                Object.entries(wordRecognitionRows).forEach(
-                    ([word, wordRecognitionRecords]) => {
-                        vocabulary.add(word)
-                        ensureLearningTargetForWord(word).wordRecognitionRecords.push(
-                            ...wordRecognitionRecords,
-                        )
-                    },
-                )
-
-                new SerializedTabulationAggregate(
-                    selectedFrequencyVirtualTabulations,
-                ).serializedTabulations.forEach(
-                    ({ notableSubSequences }) => {
-                        /**
-                         * In the case of noSeparator, use only the subsequences which are part of our vocabulary
-                         *   What is our vocabulary?  It's allWords + all the non-ignored recognition rows from our past
-                         * In the case of spaceSeparator, use only the subsequences which are part of our vocabulary, or are bordered on either side by separators
-                         *   How do we tell if something is bordered on either side?  If it has no notable subsequences which immediately border it
-                         */
-                        const documentWordCounts = sumNotableSubSequences(
-                            notableSubSequences
-                                .filter((notableSubSequence, subSequenceIndex) => {
-                                    if (syntheticWords.has(notableSubSequence.word)) {
-                                        return false
-                                    }
-                                    switch (strategy) {
-                                        case "noSeparator":
-                                            return vocabulary.has(notableSubSequence.word)
-                                        case "spaceSeparator":
-                                            return vocabulary.has(notableSubSequence.word) ||
-                                                subSequenceRecordHasNothingAdjacent(notableSubSequences, notableSubSequence)
-                                    }
-                                }),
-                        )
-                        documentWordCounts.forEach(
-                            (count, word) => {
-                                /**
-                                 * Prevent cards created only for visual purposes from showing up in the quiz rows
-                                 */
-                                if (!syntheticWords.has(word)) {
-                                    // TODO, provide the document name
-                                    ensureLearningTargetForWord(word).wordCountRecords.push({
-                                        count,
-                                        word,
-                                        document: '',
-                                    })
-                                }
-                            },
-                        )
-                    },
-                )
+                builtInWords.forEach(ensureLearningTargetForWord)
+                Object.keys(customWordsIndex).forEach(ensureLearningTargetForWord)
                 ignoredWords.forEach(
                     ({ word }) => learningTargetIndex.delete(word),
                 )

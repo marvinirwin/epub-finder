@@ -8,7 +8,7 @@ import {
     Select,
     Switch,
 } from '@material-ui/core'
-import { LtDocument } from '@shared/*'
+import { LtDocument } from '@shared/'
 
 export const SetVocab = () => {
     const m = useContext(ManagerContext)

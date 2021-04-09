@@ -90,6 +90,7 @@ export class SortedLimitScheduleRowsService {
             settingsService.flashCardTypesRequiredToProgress$,
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit, now, flashCardTypesRequiredToProgress]) => {
+                debugger;
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
                 )

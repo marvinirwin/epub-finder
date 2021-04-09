@@ -12,7 +12,7 @@ import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
 import { safePush } from '@shared/'
 
-export class IndexedRowsRepository<T extends { id?: number }> {
+export class IndexedRowsRepository<T extends { id?: number  }> {
     indexOfOrderedRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<
         ds_Dict<T[]>
     >(1)

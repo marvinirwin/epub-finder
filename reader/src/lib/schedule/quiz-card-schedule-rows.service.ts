@@ -10,6 +10,9 @@ import { ScheduleRowsService } from './schedule-rows-service.interface'
 import { flatten } from 'lodash'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
+import { IndexedRowsRepository } from './indexed-rows.repository'
+import { WordRecognitionRow } from './word-recognition-row'
+import { TabulationService } from '../tabulation/tabulation.service'
 
 function getSortConfigs({
                             dateWeight,
@@ -64,13 +67,15 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             translationAttemptService,
             timeService,
             flashCardLearningTargetsService,
-            languageConfigsService,
+            wordRecognitionProgressService,
+            tabulationService
         }: {
             settingsService: SettingsService
             translationAttemptService: TranslationAttemptService
             timeService: TimeService,
             flashCardLearningTargetsService: FlashCardLearningTargetsService,
-            languageConfigsService: LanguageConfigsService
+            wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
+            tabulationService: TabulationService
         },
     ) {
         this.scheduleRows$ = combineLatest([
@@ -81,10 +86,14 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 settingsService.translationAttemptSentenceWeight$,
                 settingsService.flashCardTypesRequiredToProgress$,
             ]),
-            translationAttemptService.currentScheduleRow$,
-            timeService.quizNow$,
-            flashCardLearningTargetsService.learningTargets$,
-            settingsService.textToSpeechConfiguration$,
+            combineLatest([
+                translationAttemptService.currentScheduleRow$,
+                timeService.quizNow$,
+                flashCardLearningTargetsService.learningTargets$,
+                settingsService.textToSpeechConfiguration$,
+            ]),
+            wordRecognitionProgressService.indexOfOrderedRecords$,
+            tabulationService.tabulation$
         ]).pipe(
             // Prevent this from firing synchronously
             debounceTime(0),
@@ -97,13 +106,17 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                          translationAttemptSentenceWeight,
                          flashCardTypesRequiredToProgress,
                      ],
-                     currentTranslationAttemptScheduleRow,
-                     now,
-                     learningTargets,
-                     textToSpeechConfiguration,
+                     [
+                         currentTranslationAttemptScheduleRow,
+                         now,
+                         learningTargets,
+                         textToSpeechConfiguration,
+                     ],
+                    wordRecognitionRowIndex,
+                    tabulation
                  ]) => {
                     if (!textToSpeechConfiguration) {
-                        flashCardTypesRequiredToProgress = flashCardTypesRequiredToProgress.filter(type => type !== FlashCardType.LearningLanguageAudio);
+                        flashCardTypesRequiredToProgress = flashCardTypesRequiredToProgress.filter(type => type !== FlashCardType.LearningLanguageAudio)
                     }
                     const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
@@ -118,9 +131,15 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                         flatten(learningTargetsList.map(
                             (learningTarget) => {
                                 return flashCardTypesRequiredToProgress.map(flashCardType => {
-                                        const wordRecognitionRecords = learningTarget.wordRecognitionRecords.filter(recognitionRow => recognitionRow.flashCardType === flashCardType)
+                                        const wordRecognitionRecords = (wordRecognitionRowIndex[learningTarget.word] || []).filter(recognitionRow => recognitionRow.flashCardType === flashCardType)
                                         return new ScheduleRow<QuizScheduleRowData>(
-                                            { ...learningTarget, wordRecognitionRecords, flashCardType },
+                                            {
+                                                ...learningTarget,
+                                                wordRecognitionRecords,
+                                                wordCountRecords: (tabulation.wordCountMap.get(learningTarget.word) || []).map(v => ({...v, document: ''})),
+                                                greedyWordCountRecords: [],
+                                                flashCardType
+                                            },
                                             wordRecognitionRecords,
                                         )
                                     },

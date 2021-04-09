@@ -48,9 +48,9 @@ describe('Normal functioning of the app', () => {
     }
 
     it('Functions in the happy path', () => {
-        cy.visitHome();
         cy.clearIndexedDB()
         cy.clearLocalStorage()
+        cy.visitHome();
         selectChinese()
         pressIntroNext();
         putTextDocument('test', '你好');
