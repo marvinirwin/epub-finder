@@ -1,16 +1,20 @@
 import { selectReadingLanguage } from '../language.helpers'
-import { setUploadName, setUploadText } from '../upload.helpers'
+import { setUploadName, setUploadText, uploadText } from '../upload.helpers'
 import { QuizCarouselPom } from '../quiz/quiz-carousel.pom'
 import { finished, learning, toReview, wordsLeft } from '../quiz-stats.helpers'
-import { SettingsPom } from '../quiz/quiz-word-limit.spec'
+import { introNextButton } from '@shared/*'
+import { setNewQuizWordLimit } from '../settings.helpers'
 
 function selectChinese() {
-    selectReadingLanguage('zh-hans')
+    selectReadingLanguage('zh-Hans')
 }
+
+
 
 function putTextDocument(text: string, title: string) {
     setUploadName(title)
-    setUploadText(text)
+    setUploadText(text);
+    uploadText()
 }
 
 export const completeQuizCard = (word: string) => {
@@ -34,16 +38,23 @@ function expectStats(wordsLeft: number, learning: number, toReview: number, fini
     return expectTodaysStatsToBe({ wordsLeft, learning, toReview, finished })
 }
 
+const pressIntroNext = () => {
+    cy.get(`#${introNextButton}`).click({force: true})
+}
+
 describe('Normal functioning of the app', () => {
     function completeExpectedWord(expectedWords: string[]) {
         completeQuizCard(expectedWords.shift())
     }
 
-    it('', () => {
+    it('Functions in the happy path', () => {
+        cy.visitHome();
+        cy.clearIndexedDB()
+        cy.clearLocalStorage()
         selectChinese()
-        putTextDocument('test', '你好')
-        // setGoal(10);
-        // SubmitQuizResults({word: '你好', type: })
+        pressIntroNext();
+        putTextDocument('test', '你好');
+        setNewQuizWordLimit(10);
         const expectedWords = [
             '你好',
             '你',
@@ -81,7 +92,7 @@ describe('Normal functioning of the app', () => {
         expectStats(0, 0, 0, 3)
 
         QuizCarouselPom.assertCardLimitReached()
-        SettingsPom.SetNewQuizWordLimit(10)
+        setNewQuizWordLimit(10)
         QuizCarouselPom.assertOutOfWords()
     })
 })

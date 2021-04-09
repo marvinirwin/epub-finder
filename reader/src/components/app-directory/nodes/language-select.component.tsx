@@ -4,7 +4,7 @@ import { useObservableState } from 'observable-hooks'
 import { Box, InputLabel, MenuItem, Select } from '@material-ui/core'
 import { SupportedTranslationService } from '../../../lib/language/supported-translation.service'
 import {
-    readingLanguageSelect,
+    readingLanguageSelect, readingLanguageSelectOption,
     spokenLanguageSelect,
     textToSpeechLanguageSelectLabel,
     textToSpeechSelect,
@@ -42,7 +42,7 @@ export const LanguageSelect = () => {
                 >
                     {SupportedTranslationService.SupportedTranslations.map(
                         (c) => (
-                            <MenuItem key={c.code} value={c.code}>{c.label}</MenuItem>
+                            <MenuItem className={readingLanguageSelectOption} key={c.code} value={c.code}>{c.label}</MenuItem>
                         ),
                     )}
                 </Select>

@@ -1,16 +1,6 @@
 import { DirectoryPom } from '../../support/pom/directory.pom'
 import { QuizCarouselPom } from './quiz-carousel.pom'
-import { newWordLimitInput, QUIZ_BUTTON_EASY } from '@shared/*'
-
-export class SettingsPom {
-    static SetNewQuizWordLimit(newLimit: number) {
-        DirectoryPom.OpenSettings()
-        const limitInputSelector = `#${newWordLimitInput}`
-        cy.get(limitInputSelector).invoke('val', '0')
-        cy.get(limitInputSelector).click().clear().type(`${newLimit}`)
-        DirectoryPom.CloseAllDialogs()
-    }
-}
+import { QUIZ_BUTTON_EASY } from '@shared/*'
 
 describe(`Limiting a user's new words every day`, () => {
     it('Stops a user from learning more than 2 new words a day if 2 is the limit', () => {

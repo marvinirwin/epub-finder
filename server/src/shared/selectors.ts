@@ -68,3 +68,5 @@ export const loggedInProfileNode = 'loggedInProfileNode'
 export const textToSpeechLanguageSelectLabel = 'textToSpeechLanguageSelectLabel';
 export const textToSpeechSelect = 'textToSpeechSelect'
 export const outOfWords = 'outOfWords';
+export const introNextButton = 'introNextButton';
+export const readingLanguageSelectOption = 'readingLanguageSelectOption';
