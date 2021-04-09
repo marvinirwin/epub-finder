@@ -16,7 +16,7 @@ export interface CustomWord {
 }
 
 export class DatabaseService extends Dexie {
-    static CURRENT_VERSION = 9
+    static CURRENT_VERSION = 10
 
     public cards: Dexie.Table<ICard, number>
     public wordRecognitionRecords: Dexie.Table<WordRecognitionRow, number>

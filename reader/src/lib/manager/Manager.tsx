@@ -259,7 +259,6 @@ export class Manager {
         this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this);
-        this.tabulationService = new TabulationService(this);
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map((component) => component?.name || ''),
@@ -288,6 +287,7 @@ export class Manager {
         this.tabulationConfigurationService = new TabulationConfigurationService(
             this,
         )
+        this.tabulationService = new TabulationService(this);
 
         this.openDocumentsService.openDocumentBodies$.subscribe((body) =>
             this.browserInputsService.applyDocumentListeners(

@@ -25,16 +25,12 @@ export class TabulationService {
     tabulation$: Observable<{ wordCountMap: Map<string, DocumentWordCount[]> }>
     constructor(
         {
-            wordRecognitionProgressService,
-            temporaryHighlightService,
             videoMetadataRepository,
             ignoredWordsRepository,
             allWordsRepository,
             selectedVirtualTabulationsService,
             languageConfigsService,
         }: {
-            wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
-            pronunciationProgressService: PronunciationProgressRepository,
             temporaryHighlightService: TemporaryHighlightService,
             videoMetadataRepository: VideoMetadataRepository,
             cardsRepository: CardsRepository
