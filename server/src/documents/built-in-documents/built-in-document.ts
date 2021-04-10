@@ -63,6 +63,7 @@ export class BuiltInDocument {
             for_testing: this.config.for_testing,
             for_frequency: this.config.for_frequency,
             filename: convertedFile.index().s3Key,
+            language_code: 'zh-Hans'
         }
 
         console.log(`Inserting ${name} for the first time`)

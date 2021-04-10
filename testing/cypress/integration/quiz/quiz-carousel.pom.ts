@@ -41,35 +41,35 @@ export class QuizCarouselPom {
     }
 
     img() {
-        return cy.find(`#${quizCardImage}`)
+        return cy.get(`#${quizCardImage}`)
     }
 
     static easy() {
-        return cy.find(`.${QUIZ_BUTTON_EASY}`)
+        return cy.get(`.${QUIZ_BUTTON_EASY}`)
     }
 
     static medium() {
-        return cy.find(`.${QUIZ_BUTTON_MEDIUM}`)
+        return cy.get(`.${QUIZ_BUTTON_MEDIUM}`)
     }
 
     static hard() {
-        return cy.find(`.${QUIZ_BUTTON_HARD}`)
+        return cy.get(`.${QUIZ_BUTTON_HARD}`)
     }
 
     static hide() {
-        return cy.find(`.${QUIZ_BUTTON_IGNORE}`)
+        return cy.get(`.${QUIZ_BUTTON_IGNORE}`)
     }
 
     static characters() {
-        return cy.find('.quiz-text')
+        return cy.get('.quiz-text')
     }
 
     static exampleSentences() {
-        return cy.find('iframe').iframeBody().find('.example-sentence')
+        return cy.get('iframe').iframeBody().find('.example-sentence')
     }
 
     static editDescription(newDescription: string) {
-        cy.find(`.${quizCardDescription}`).type(newDescription)
+        cy.get(`.${quizCardDescription}`).type(newDescription)
     }
 
     static selectNewImage() {
@@ -77,7 +77,7 @@ export class QuizCarouselPom {
         const oldSrc = ''
         ImageSearchPom.SelectFirstSearchResult()
         // Now assert we have an image we clicked (Or since I'm lazy, just not the previous one
-        cy.find(`.${quizCardImage}`)
+        cy.get(`.${quizCardImage}`)
             .should('have.attr', 'src')
             .should('not.include', oldSrc)
     }

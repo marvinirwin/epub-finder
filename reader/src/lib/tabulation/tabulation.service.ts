@@ -12,7 +12,6 @@ import { TimeService } from '../time/time.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay, startWith } from 'rxjs/operators'
-import { mapIfThenDefault } from '../util/map.module'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import {
     FlashCardLearningTarget, subSequenceRecordHasNothingAdjacent,

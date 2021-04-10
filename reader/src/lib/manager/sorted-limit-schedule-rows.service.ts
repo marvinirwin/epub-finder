@@ -5,7 +5,7 @@ import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../schedule/sche
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
 import { safePushMap } from '@shared/'
-import { Dictionary, groupBy, orderBy, flatten } from 'lodash'
+import { Dictionary, flatten, groupBy, orderBy } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 type LimitedScheduleRows = {
@@ -90,7 +90,6 @@ export class SortedLimitScheduleRowsService {
             settingsService.flashCardTypesRequiredToProgress$,
         ]).pipe(
             map(([sortedScheduleRows, newQuizWordLimit, now, flashCardTypesRequiredToProgress]) => {
-                debugger;
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
                 )
@@ -109,7 +108,7 @@ export class SortedLimitScheduleRowsService {
                 const scheduleRowsLeftForToday = flatten(Object.values(groupBy(unStartedScheduleRows, r => r.d.word)).slice(
                     0,
                     newQuizWordLimit - Object.values(groupBy(scheduleRowsLearnedToday, r => r.d.word)).length,
-                ));
+                ))
                 /**
                  * I want a function which is given a list of {type, subType, orderValue}
                  * returns a new orderValue so that its less likely that a given type or subType will occur near each other
@@ -157,7 +156,9 @@ export class SortedLimitScheduleRowsService {
                     1000 * 60 * 5, // 5 minutes
                 )
 
-                const overDueAdjustedSortValues = adjustScheduleRows(orderBy(sortedScheduleRows, r => `${r.d.word}${r.d.flashCardType}`))
+                const overDueAdjustedSortValues = adjustScheduleRows(
+                    sortedScheduleRows,
+                )
                 const notOverDueAdjustedSortValues = overDueAdjustedSortValues
                 const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues
                 return {
@@ -167,9 +168,24 @@ export class SortedLimitScheduleRowsService {
                     wordsReviewingOrLearning: learningScheduleRows,
                     unStartedWords: unStartedScheduleRows,
                     limitedScheduleRows: [
-                        ...orderBy(overDueRows, r => overDueAdjustedSortValues.get(r)),
-                        ...orderBy(scheduleRowsLeftForToday, r => wordsLeftForTodayAdjustedSortValues.get(r)),
-                        ...orderBy(notOverDueRows, r => notOverDueAdjustedSortValues.get(r)),
+                        ...orderBy(
+                            overDueRows,
+                            r => [overDueAdjustedSortValues.get(r), r.d.finalSortValue],
+                            ['asc', 'desc'],
+                        ),
+                        ...(orderBy(
+                            scheduleRowsLeftForToday,
+                            [
+                                r => wordsLeftForTodayAdjustedSortValues.get(r),
+                                r => r.d.finalSortValue,
+                            ],
+                            ['asc', 'desc'],
+                        )),
+                        ...orderBy(
+                            notOverDueRows,
+                            r => [notOverDueAdjustedSortValues.get(r), r.d.finalSortValue],
+                            ['asc', 'desc'],
+                        ),
                     ],
                 }
             }),

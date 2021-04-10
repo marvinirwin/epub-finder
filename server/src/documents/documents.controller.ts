@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { Document, documentRootId } from '../entities/document.entity'
+import { Document } from '../entities/document.entity'
 import {
     Body,
     Controller,
@@ -104,7 +104,7 @@ export class DocumentsController {
             for_reading: !!for_reading,
             global: false,
             deleted: false,
-            language_code: language_code,
+            language_code,
             id: undefined,
             hash: await HashService.hashS3(output.index().s3Key),
             filename: output.index().s3Key,

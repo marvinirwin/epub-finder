@@ -53,20 +53,20 @@ describe('Normal functioning of the app', () => {
         cy.visitHome();
         selectChinese()
         pressIntroNext();
-        putTextDocument('test', '你好');
+        putTextDocument('中国', '中国');
         setNewQuizWordLimit(10);
         const expectedWords = [
-            '你好',
-            '你',
-            '好',
+            '中国',
+            '中',
+            '国',
 
-            '你好',
-            '你',
-            '好',
+            '中国',
+            '中',
+            '国',
 
-            '你好',
-            '你',
-            '好',
+            '中国',
+            '中',
+            '国',
         ]
         completeExpectedWord(expectedWords)
         // Expect 0 finished, 1 in progress and 2 left
