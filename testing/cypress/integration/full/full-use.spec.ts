@@ -22,7 +22,7 @@ export const completeQuizCard = (word: string) => {
     QuizCarouselPom.reveal().click()
     // Assert the word is what we expect
     QuizCarouselPom.learningLanguageTextShouldBe(word)
-    QuizCarouselPom.easy()
+    QuizCarouselPom.easy().click();
 }
 
 function expectTodaysStatsToBe(
