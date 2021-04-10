@@ -156,9 +156,7 @@ export class SortedLimitScheduleRowsService {
                     1000 * 60 * 5, // 5 minutes
                 )
 
-                const overDueAdjustedSortValues = adjustScheduleRows(
-                    sortedScheduleRows,
-                )
+                const overDueAdjustedSortValues = adjustScheduleRows(sortedScheduleRows)
                 const notOverDueAdjustedSortValues = overDueAdjustedSortValues
                 const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues
                 return {
@@ -173,14 +171,14 @@ export class SortedLimitScheduleRowsService {
                             r => [overDueAdjustedSortValues.get(r), r.d.finalSortValue],
                             ['asc', 'desc'],
                         ),
-                        ...(orderBy(
+                        ...orderBy(
                             scheduleRowsLeftForToday,
                             [
                                 r => wordsLeftForTodayAdjustedSortValues.get(r),
                                 r => r.d.finalSortValue,
                             ],
                             ['asc', 'desc'],
-                        )),
+                        ),
                         ...orderBy(
                             notOverDueRows,
                             r => [notOverDueAdjustedSortValues.get(r), r.d.finalSortValue],

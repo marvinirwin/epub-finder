@@ -9,8 +9,6 @@ function selectChinese() {
     selectReadingLanguage('zh-Hans')
 }
 
-
-
 function putTextDocument(text: string, title: string) {
     setUploadName(title)
     setUploadText(text);

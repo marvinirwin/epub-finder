@@ -122,23 +122,25 @@ export class ScheduleRow<T> {
     public isLearning() {
         const hasNoRecords = !this.superMemoRecords.length
         if (hasNoRecords) return false
+
         const lastRecord = this.superMemoRecords[
             this.superMemoRecords.length - 1
         ]
         const startedToday = isToday(lastRecord.timestamp)
+        if (this.superMemoRecords.length < 2) {
+            return startedToday;
+        }
         const lastTwoRecords = ScheduleRow.lastNRecords(
             this.superMemoRecords,
             2,
-        )
+        );
         const completed = lastTwoRecords.every(
             (record) => record.grade >= 3 && isToday(record.timestamp),
         )
         if (completed) {
             return false
         }
-        if (startedToday) {
-            return true
-        }
+        return startedToday;
     }
 
     public dueIn() {
