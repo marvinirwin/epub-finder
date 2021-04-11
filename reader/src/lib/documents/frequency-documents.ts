@@ -2,7 +2,7 @@ import { combineLatest, from, Observable } from 'rxjs'
 import { DocumentReadabilityProgress } from './document-readability-progress'
 import { LtDocument, SerializedTabulation } from '@shared/'
 import {
-    NormalizedQuizCardScheduleRowData,
+    SortQuizData,
     ScheduleRow,
 } from '../schedule/schedule-row'
 import { TabulateRemoteDocument } from '../Workers/worker.helpers'
@@ -16,7 +16,7 @@ export class FrequencyDocument {
     constructor(
         public frequencyDocument: LtDocument,
         private scheduleRows$: Observable<
-            Map<string, ScheduleRow<NormalizedQuizCardScheduleRowData>>
+            Map<string, ScheduleRow<SortQuizData>>
         >,
         private tabulationConfigurationService: TabulationConfigurationService,
     ) {

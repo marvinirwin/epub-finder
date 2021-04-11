@@ -481,7 +481,7 @@ export class Manager {
         this.quizHighlightService = new QuizHighlightService(this)
         this.filterScheduleTableRowsService = new FilterScheduleTableRowsService(
             {
-                scheduleService: this.quizCardScheduleRowsService,
+                scheduleService: this.sortedLimitedQuizScheduleRowsService,
                 settingsService: this.settingsService,
             },
         )

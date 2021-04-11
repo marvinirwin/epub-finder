@@ -1,5 +1,5 @@
 import {
-    NormalizedQuizCardScheduleRowData,
+    SortQuizData,
     ScheduleRow,
 } from '../schedule/schedule-row'
 import {
@@ -10,7 +10,7 @@ import { sum } from 'lodash'
 
 export interface WordReadabilityRecord {
     word: string
-    scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData> | undefined
+    scheduleRow: ScheduleRow<SortQuizData> | undefined
     count: number
     totalWordCount: number
 }
@@ -29,7 +29,7 @@ export class DocumentReadabilityProgress {
     }: {
         scheduleRows: Map<
             string,
-            ScheduleRow<NormalizedQuizCardScheduleRowData>
+            ScheduleRow<SortQuizData>
         >
         tabulatedDocument: SerializedTabulation
     }) {

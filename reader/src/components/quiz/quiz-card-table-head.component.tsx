@@ -10,7 +10,10 @@ export const QuizCardTableHead: React.FC<{}> = () => {
                 <TableCell>Due Date</TableCell>
                 <TableCell>Count</TableCell>
                 <TableCell>Length</TableCell>
+{/*
                 <TableCell>Sentences</TableCell>
+*/}
+                <TableCell>Spaced Date</TableCell>
             </TableRow>
         </TableHead>
     )

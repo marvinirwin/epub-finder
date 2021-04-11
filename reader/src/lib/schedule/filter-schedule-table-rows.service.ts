@@ -1,45 +1,58 @@
-import { ScheduleService } from './schedule.service'
 import { combineLatest, Observable } from 'rxjs'
-import {
-    NormalizedQuizCardScheduleRowData,
-    QuizScheduleRowData,
-    ScheduleRow,
-} from './schedule-row'
+import { ScheduleRow, SortQuizData } from './schedule-row'
 import { SettingsService } from '../../services/settings.service'
 import { debounceTime, map, shareReplay } from 'rxjs/operators'
 import { sumWordCountRecords } from './schedule-math.service'
-import { QuizCardScheduleRowsService } from './quiz-card-schedule-rows.service'
+import { SortedLimitScheduleRowsService, SpacedScheduleRow } from '../manager/sorted-limit-schedule-rows.service'
+import { uniq } from 'lodash'
 
 export class FilterScheduleTableRowsService {
-    public filteredScheduleRows$: Observable<
-        ScheduleRow<NormalizedQuizCardScheduleRowData>[]
-    >
+    public filteredScheduleRows$: Observable<SpacedScheduleRow[]>
+
     constructor({
-        scheduleService,
-        settingsService,
-    }: {
-        scheduleService: QuizCardScheduleRowsService
+                    scheduleService,
+                    settingsService,
+                }: {
+        scheduleService: SortedLimitScheduleRowsService
         settingsService: SettingsService
     }) {
         this.filteredScheduleRows$ = combineLatest([
             settingsService.scheduleTableWordFilterValue$,
             settingsService.scheduleTableShowUnderDue$,
             settingsService.scheduleTableShowUncounted$,
-            scheduleService.scheduleRows$.pipe(
-                map((v) => Object.values(v)),
+            scheduleService.sortedLimitedScheduleRows$.pipe(
+                map(({
+                         wordsToReview,
+                         limitedScheduleRows,
+                         wordsLearnedToday,
+                         wordsReviewingOrLearning,
+                         wordsLeftForToday,
+                         unStartedWords,
+                     }) => {
+                    return uniq(
+                        [
+                            ...wordsToReview,
+                            ...limitedScheduleRows,
+                            ...wordsLearnedToday,
+                            ...wordsReviewingOrLearning,
+                            ...wordsLeftForToday,
+                            ...unStartedWords,
+                        ],
+                    )
+                }),
             ),
         ]).pipe(
             debounceTime(500),
             map(
                 ([
-                    scheduleTableWordFilterValue,
-                    showUnderDue,
-                    showUncounted,
-                    sortedScheduleRows,
-                ]) => {
+                     scheduleTableWordFilterValue,
+                     showUnderDue,
+                     showUncounted,
+                     sortedScheduleRows,
+                 ]) => {
                     const now = new Date()
                     const filterFuncs: ((
-                        r: ScheduleRow<NormalizedQuizCardScheduleRowData>,
+                        r: ScheduleRow<SortQuizData>,
                     ) => boolean)[] = [
                         (row) =>
                             row.d.word.includes(scheduleTableWordFilterValue),

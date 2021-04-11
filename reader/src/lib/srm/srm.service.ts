@@ -14,9 +14,6 @@ export const RecognitionMap: { [key: string]: SuperMemoGrade } = {
 }
 
 export class SrmService {
-    private static getProgressScore(rows: ScheduleItem[]): number {
-        return rows[rows.length - 1]?.repetition || 0
-    }
 
     public static correctScore() {
         return 3
@@ -59,20 +56,22 @@ export const quizCardNextDueDate = ({grade, previousItems}:{grade: SuperMemoGrad
     const nextRecognitionRecord = SrmService.getNextRecognitionRecord(previousItems, grade);
 
     const nextDueDate = () => {
-        if (grade < 3) {
-            return add(Date.now(), { minutes: 1 })
+        // Make the card go to re-learning
+        if (grade === 1) {
+            return add(Date.now(), { minutes: 5 })
         }
         const correctRecordsInARow = inARow(
             Array.from(previousItems).reverse(),
             (r) => r.grade >= 3,
         )
         switch (correctRecordsInARow.length) {
+            // TODO implement an anki-like "steps"
             case 0:
-                return add(Date.now(), { minutes: 1 })
-            case 1:
                 return add(Date.now(), { minutes: 5 })
-            case 2:
+            case 1:
                 return add(Date.now(), { minutes: 10 })
+            case 2:
+                return add(Date.now(), { minutes: 15 })
             default:
                 return add(Date.now(), {
                     days: nextRecognitionRecord.interval,

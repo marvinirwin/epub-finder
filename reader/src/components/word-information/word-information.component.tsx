@@ -22,7 +22,7 @@ import {
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
 import {
-    NormalizedQuizCardScheduleRowData,
+    SortQuizData,
     ScheduleRow,
 } from '../../lib/schedule/schedule-row'
 import { formatDueDate } from '../../lib/schedule/format-due-date'
@@ -42,7 +42,7 @@ export const CardLearningLanguageText = ({ word }: { word: string }) => {
 }
 
 const RecognitionRowTable: React.FC<{
-    scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData>
+    scheduleRow: ScheduleRow<SortQuizData>
 }> = ({ scheduleRow }) => {
     return (
         <TableContainer component={Paper}>
@@ -53,6 +53,7 @@ const RecognitionRowTable: React.FC<{
                         <TableCell align="right">Next Due Date</TableCell>
                         <TableCell align="right">Timestamp</TableCell>
                         <TableCell align="right">Interval</TableCell>
+                        <TableCell align="right">Flash Card Type</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -68,6 +69,7 @@ const RecognitionRowTable: React.FC<{
                                 {formatDueDate(row.timestamp || new Date())}
                             </TableCell>
                             <TableCell align="right">{row.interval}</TableCell>
+                            <TableCell align="right">{row.flashCardType}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -77,7 +79,7 @@ const RecognitionRowTable: React.FC<{
 }
 
 const CountRecordTable: React.FC<{
-    scheduleRow: ScheduleRow<NormalizedQuizCardScheduleRowData>
+    scheduleRow: ScheduleRow<SortQuizData>
 }> = ({ scheduleRow }) => {
     return (
         <TableContainer component={Paper}>
@@ -105,7 +107,7 @@ const CountRecordTable: React.FC<{
     )
 }
 
-export const WordPaperComponent: React.FC<{ wordCard: WordCard }> = ({
+export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
     wordCard,
 }) => {
     const m = useContext(ManagerContext)

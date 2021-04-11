@@ -1,6 +1,6 @@
 import { orderBy, sum, sumBy } from 'lodash'
 import {
-    NormalizedQuizCardScheduleRowData,
+    SortQuizData,
     QuizScheduleRowData,
     ScheduleRow,
     SortValue,

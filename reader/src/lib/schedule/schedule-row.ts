@@ -16,7 +16,7 @@ export interface QuizScheduleRowData {
     word: string
 }
 
-export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData {
+export interface SortQuizData extends QuizScheduleRowData {
     count: SortValue<number>
     dueDate: SortValue<Date>
     length: SortValue<number>
@@ -29,6 +29,9 @@ export interface NormalizedQuizCardScheduleRowData extends QuizScheduleRowData {
         length: SortValue<number>
         sentencePriority: SortValue<number>
     }
+}
+export interface SpacedSortQuizData extends SortQuizData {
+    spacedDueDate: {source: Date, transformed: Date}
 }
 
 export interface SortValue<T> {
@@ -56,6 +59,7 @@ export const recordsLearnedToday = (r1: ScheduleItem[]) => {
         lastTwoRecords.every((r) => r.grade >= 3 && isToday(r.timestamp))
     )
 }
+
 export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
     const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
     return (

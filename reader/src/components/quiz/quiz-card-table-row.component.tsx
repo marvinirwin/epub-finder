@@ -1,30 +1,20 @@
-import {
-    NormalizedQuizCardScheduleRowData,
-    ScheduleRow,
-} from '../../lib/schedule/schedule-row'
 import { Button, TableCell, TableRow, Typography } from '@material-ui/core'
-import {
-    quizCardTableRow,
-    quizCardTableRowCounts,
-    quizCardTableRowLastAnswer,
-    quizCardTableRowRecognitions,
-    quizCardTableRowWord,
-} from '@shared/'
-import { round, sum } from 'lodash'
-import { lastN } from './last-n'
+import { quizCardTableRow, quizCardTableRowWord } from '@shared/'
+import { round } from 'lodash'
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
-import { formatDistance } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
+import { SpacedScheduleRow } from '../../lib/manager/sorted-limit-schedule-rows.service'
 
 export const QuizCardTableRow: React.FC<{
-    row: ScheduleRow<NormalizedQuizCardScheduleRowData>
+    row: SpacedScheduleRow
 }> = ({ row }) => {
     const m = useContext(ManagerContext)
     return (
         <TableRow key={row.d.word} className={`${quizCardTableRow}`}>
             <TableCell
-                component="th"
-                scope="row"
+                component='th'
+                scope='row'
                 className={quizCardTableRowWord}
             >
                 <Button
@@ -54,12 +44,23 @@ export const QuizCardTableRow: React.FC<{
                     2,
                 )}{' '}
             </TableCell>
+{/*
             <TableCell>
                 {round(
                     row.d.sortValues.sentencePriority
                         .weightedInverseLogNormalValue || 0,
                     2,
                 )}{' '}
+            </TableCell>
+*/}
+            <TableCell>
+                {
+                    format(row.d.spacedDueDate.source, 'H:m:s')
+                }
+                <br/>
+                {
+                    format(row.d.spacedDueDate.transformed, 'H:m:s')
+                }
             </TableCell>
         </TableRow>
     )

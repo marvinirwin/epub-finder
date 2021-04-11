@@ -6,7 +6,7 @@ import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
 import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
 import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
-import { NormalizedQuizCardScheduleRowData, ScheduleRow } from '../../lib/schedule/schedule-row'
+import { SortQuizData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
@@ -18,7 +18,7 @@ import { TranslationAttemptScheduleService } from '../../lib/schedule/translatio
 import { OnSelectService } from '../../lib/user-interface/on-select.service'
 
 export const filterQuizRows = (
-    rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[],
+    rows: ScheduleRow<SortQuizData>[],
 ) =>
     rows
         .filter((r) => r.dueDate() < new Date())
@@ -27,7 +27,7 @@ export const filterQuizRows = (
 
 export class QuizService {
     quizCard: QuizCard
-    currentScheduleRow$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>>
+    currentScheduleRow$: Observable<ScheduleRow<SortQuizData>>
     manualHiddenFieldConfig$ = new ReplaySubject<string>()
 
     constructor({

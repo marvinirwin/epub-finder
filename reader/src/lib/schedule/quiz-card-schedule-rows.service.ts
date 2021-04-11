@@ -1,19 +1,19 @@
 import { combineLatest, Observable } from 'rxjs'
 import { debounceTime, map, shareReplay } from 'rxjs/operators'
-import { NormalizedQuizCardScheduleRowData, QuizScheduleRowData, ScheduleRow } from './schedule-row'
+import { QuizScheduleRowData, ScheduleRow, SortQuizData, SpacedSortQuizData } from './schedule-row'
 import { ScheduleMathService, sumWordCountRecords } from './schedule-math.service'
 import { SettingsService } from '../../services/settings.service'
 import { TranslationAttemptService } from '../../components/translation-attempt/translation-attempt.service'
 import { TimeService } from '../time/time.service'
 import { FlashCardLearningTargetsService } from './learning-target/flash-card-learning-targets.service'
 import { ScheduleRowsService } from './schedule-rows-service.interface'
-import { flatten } from 'lodash'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { FlashCardType } from '../quiz/hidden-quiz-fields'
+import { flatten, orderBy } from 'lodash'
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { WordRecognitionRow } from './word-recognition-row'
 import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from './required-to-progress.service'
+import { spaceOutRows } from './space-out-rows'
+import { SpacedScheduleRow } from '../manager/sorted-limit-schedule-rows.service'
 
 function getSortConfigs({
                             dateWeight,
@@ -59,8 +59,8 @@ function getSortConfigs({
     }
 }
 
-export class QuizCardScheduleRowsService implements ScheduleRowsService<NormalizedQuizCardScheduleRowData> {
-    public scheduleRows$: Observable<ScheduleRow<NormalizedQuizCardScheduleRowData>[]>
+export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuizData> {
+    public scheduleRows$: Observable<SpacedScheduleRow[]>
 
     constructor(
         {
@@ -70,7 +70,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             flashCardLearningTargetsService,
             wordRecognitionProgressService,
             tabulationService,
-            flashCardTypesRequiredToProgressService
+            flashCardTypesRequiredToProgressService,
         }: {
             settingsService: SettingsService
             translationAttemptService: TranslationAttemptService
@@ -87,7 +87,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$,
                 settingsService.translationAttemptSentenceWeight$,
-                flashCardTypesRequiredToProgressService.activeFlashCardTypes$
+                flashCardTypesRequiredToProgressService.activeFlashCardTypes$,
             ]),
             combineLatest([
                 translationAttemptService.currentScheduleRow$,
@@ -95,7 +95,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 flashCardLearningTargetsService.learningTargets$,
             ]),
             wordRecognitionProgressService.indexOfOrderedRecords$,
-            tabulationService.tabulation$
+            tabulationService.tabulation$,
         ]).pipe(
             // Prevent this from firing synchronously
             debounceTime(0),
@@ -113,12 +113,12 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                          now,
                          learningTargets,
                      ],
-                    wordRecognitionRowIndex,
-                    tabulation
+                     wordRecognitionRowIndex,
+                     tabulation,
                  ]) => {
                     const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
-                    return ScheduleMathService.normalizeAndSortQuizScheduleRows(
+                    const sortedRows = ScheduleMathService.normalizeAndSortQuizScheduleRows(
                         getSortConfigs({
                             dateWeight,
                             frequencyWeight,
@@ -134,9 +134,12 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                                             {
                                                 ...learningTarget,
                                                 wordRecognitionRecords,
-                                                wordCountRecords: (tabulation.wordCountMap.get(learningTarget.word) || []).map(v => ({...v, document: ''})),
+                                                wordCountRecords: (tabulation.wordCountMap.get(learningTarget.word) || []).map(v => ({
+                                                    ...v,
+                                                    document: '',
+                                                })),
                                                 greedyWordCountRecords: [],
-                                                flashCardType
+                                                flashCardType,
                                             },
                                             wordRecognitionRecords,
                                         )
@@ -155,23 +158,34 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                                 sentencePriority,
                             }
                         },
-                    ).filter((row) => !!row.row.d.word)
-                        .map((row) => new ScheduleRow<NormalizedQuizCardScheduleRowData>(
-                            {
-                                ...row.row.d,
-                                ...row.sortValues,
-                                finalSortValue: row.finalSortValue,
-                                normalizedCount:
-                                row.sortValues.count
-                                    .normalizedValueObject,
-                                normalizedDate:
-                                row.sortValues.dueDate
-                                    .normalizedValueObject,
-                                sortValues: row.sortValues,
-                            },
-                            row.row.d.wordRecognitionRecords,
-                            ),
-                        )
+                    ).filter((row) => !!row.row.d.word);
+                    const spacedOutRowMap = spaceOutRows(
+                        row => ({ type: row.row.d.word, subType: row.row.d.flashCardType, sortValue: row.row.dueDate().getTime() }),
+                        // This order by is necessary or the offset wont do anything
+                        orderBy(sortedRows, v => `${v.row.d.word}${v.row.d.flashCardType}`),
+                        1000 * 60 * 5, // 5 minutes
+                    )
+
+                    return sortedRows.map((row) => new ScheduleRow<SpacedSortQuizData>(
+                        {
+                            ...row.row.d,
+                            ...row.sortValues,
+                            finalSortValue: row.finalSortValue,
+                            normalizedCount:
+                            row.sortValues.count
+                                .normalizedValueObject,
+                            normalizedDate:
+                            row.sortValues.dueDate
+                                .normalizedValueObject,
+                            sortValues: row.sortValues,
+                            spacedDueDate:  {
+                                source: row.row.dueDate(),
+                                transformed: new Date(spacedOutRowMap.get(row) as number)
+                            }
+                        },
+                        row.row.d.wordRecognitionRecords,
+                        ),
+                    )
                 },
             ),
             shareReplay(1),

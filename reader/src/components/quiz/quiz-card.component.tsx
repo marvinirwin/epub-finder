@@ -9,7 +9,7 @@ import { CardInfo } from '../../lib/schedule/quiz-card-current-card-info.compone
 import { QuizCardButtons } from './quiz-card-buttons.component'
 import { useIsFieldHidden } from './useIsFieldHidden'
 import { QuizCardLimitReached } from './empty-quiz-card.component'
-import { CardLearningLanguageText } from '../word-information/word-paper.component'
+import { CardLearningLanguageText } from '../word-information/word-information.component'
 import { QuizCardScheduleTable } from '../tables/quiz-card-due-date-schedule-table.component'
 import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translation-attempt-table.component'
 import { OpenDocumentComponent } from '../reading/open-document.component'

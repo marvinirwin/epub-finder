@@ -1,9 +1,9 @@
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
-import { WordPaperComponent } from '../../components/word-information/word-paper.component'
+import { WordInformationComponent } from '../../components/word-information/word-information.component'
 
 export const WordCardDisplay = () => {
     const m = useContext(ManagerContext)
     const wordCard = m.wordCardModalService.wordCard$
-    return <WordPaperComponent wordCard={wordCard} />
+    return <WordInformationComponent wordCard={wordCard} />
 }

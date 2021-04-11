@@ -46,6 +46,7 @@ describe('Normal functioning of the app', () => {
     }
 
     it('Functions in the happy path', () => {
+        cy.visitHome();
         cy.clearIndexedDB()
         cy.clearLocalStorage()
         cy.visitHome();
@@ -55,16 +56,16 @@ describe('Normal functioning of the app', () => {
         setNewQuizWordLimit(10);
         const expectedWords = [
             '中国',
-            '国',
             '中',
+            '国',
 
             '中国',
-            '国',
             '中',
+            '国',
 
             '中国',
-            '国',
             '中',
+            '国',
         ]
         completeExpectedWord(expectedWords)
         // Expect 0 finished, 1 in progress and 2 left
