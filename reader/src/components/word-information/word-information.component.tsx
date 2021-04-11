@@ -26,8 +26,11 @@ import {
     ScheduleRow,
 } from '../../lib/schedule/schedule-row'
 import { formatDueDate } from '../../lib/schedule/format-due-date'
-import { round } from 'lodash'
+import { round, flatten } from 'lodash'
 import { useLoadingObservableString } from '../../lib/util/create-loading-observable'
+import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
+import { WordCountRecord } from '../../../../server/src/shared/tabulation/tabulate'
+import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 
 export const CardLearningLanguageText = ({ word }: { word: string }) => {
     const m = useContext(ManagerContext)
@@ -42,8 +45,8 @@ export const CardLearningLanguageText = ({ word }: { word: string }) => {
 }
 
 const RecognitionRowTable: React.FC<{
-    scheduleRow: ScheduleRow<SortQuizData>
-}> = ({ scheduleRow }) => {
+    wordRecognitionRows: WordRecognitionRow[],
+}> = ({ wordRecognitionRows }) => {
     return (
         <TableContainer component={Paper}>
             <Table size="small" aria-label="a dense table">
@@ -57,7 +60,7 @@ const RecognitionRowTable: React.FC<{
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {scheduleRow.d.wordRecognitionRecords.map((row) => (
+                    {wordRecognitionRows.map((row) => (
                         <TableRow key={row.id}>
                             <TableCell component="th" scope="row">
                                 {row.grade}
@@ -79,8 +82,8 @@ const RecognitionRowTable: React.FC<{
 }
 
 const CountRecordTable: React.FC<{
-    scheduleRow: ScheduleRow<SortQuizData>
-}> = ({ scheduleRow }) => {
+    countRecords: DocumentWordCount[],
+}> = ({ countRecords }) => {
     return (
         <TableContainer component={Paper}>
             <Table size="small">
@@ -91,7 +94,7 @@ const CountRecordTable: React.FC<{
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {scheduleRow.d.wordCountRecords.map((row) => (
+                    {countRecords.map((row) => (
                         <TableRow
                             key={`${row.document}${row.word}${row.count}`}
                         >
@@ -107,6 +110,8 @@ const CountRecordTable: React.FC<{
     )
 }
 
+
+
 export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
     wordCard,
 }) => {
@@ -115,13 +120,10 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
     const scheduleRows =
         useObservableState(
             m.quizCardScheduleRowsService.scheduleRows$,
-        )
-    const scheduleRow = scheduleRows?.find(row => row?.d.word === word);
+        )?.filter(r => r.d.word === word) || [];
     const romanization = useLoadingObservableString(wordCard.romanization$, '')
     const translation = useLoadingObservableString(wordCard.translation$, '')
     const description = useObservableState(wordCard.description$.value$)
-    const now = useObservableState(m.timeService.quizNow$) || new Date()
-    const sortInfo = scheduleRow?.d?.sortValues
     return (
         <Paper
             style={{
@@ -149,39 +151,28 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                 value={description || ''}
                 onChange={(e) => wordCard.description$.set(e.target.value)}
             />
-            <Typography variant={'h6'}>
-                Learning: {scheduleRow?.isLearning() ? 'Yes' : 'No'}
-            </Typography>
-            <Typography variant={'h6'}>
-                To review: {scheduleRow?.isToReview({ now }) ? 'Yes' : 'No'}
-            </Typography>
-            <Typography variant={'h6'}>
-                Learned Today: {scheduleRow?.wasLearnedToday() ? 'Yes' : 'No'}
-            </Typography>
-            <Typography variant={'h6'}>
-                Unstarted: {scheduleRow?.isNotStarted() ? 'Yes' : 'No'}
-            </Typography>
+{/*
             {sortInfo && (
                 <Fragment>
-                    <Typography variant={'h6'}>
+                    <Typography variant={'subtitle1'}>
                         Count Weight:{' '}
                         {round(sortInfo.count.weightedInverseLogNormalValue, 2)}
                     </Typography>
-                    <Typography variant={'h6'}>
+                    <Typography variant={'subtitle1'}>
                         Date Weight:{' '}
                         {round(
                             sortInfo.dueDate.weightedInverseLogNormalValue,
                             2,
                         )}
                     </Typography>
-                    <Typography variant={'h6'}>
+                    <Typography variant={'subtitle1'}>
                         Length:{' '}
                         {round(
                             sortInfo.length.weightedInverseLogNormalValue,
                             2,
                         )}
                     </Typography>
-                    <Typography variant={'h6'}>
+                    <Typography variant={'subtitle1'}>
                         Sentence Priority:{' '}
                         {round(
                             sortInfo.sentencePriority
@@ -191,10 +182,11 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                     </Typography>
                 </Fragment>
             )}
+*/}
             <br />
-            {scheduleRow && <RecognitionRowTable scheduleRow={scheduleRow} />}
+            <RecognitionRowTable wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
             <br />
-            {scheduleRow && <CountRecordTable scheduleRow={scheduleRow} />}
+            <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />
         </Paper>
     )
 }

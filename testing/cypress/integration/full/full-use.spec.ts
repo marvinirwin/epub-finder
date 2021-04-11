@@ -66,6 +66,10 @@ describe('Normal functioning of the app', () => {
             '中国',
             '中',
             '国',
+
+            '中国',
+            '中',
+            '国',
         ]
         completeExpectedWord(expectedWords)
         // Expect 0 finished, 1 in progress and 2 left
@@ -76,6 +80,13 @@ describe('Normal functioning of the app', () => {
         expectStats(0, 3, 0, 0)
 
         // We have to compete each card thrice
+        completeExpectedWord(expectedWords)
+        expectStats(0, 3, 0, 0)
+        completeExpectedWord(expectedWords)
+        expectStats(0, 3, 0, 0)
+        completeExpectedWord(expectedWords)
+        expectStats(0, 3, 0, 0)
+
         completeExpectedWord(expectedWords)
         expectStats(0, 3, 0, 0)
         completeExpectedWord(expectedWords)
