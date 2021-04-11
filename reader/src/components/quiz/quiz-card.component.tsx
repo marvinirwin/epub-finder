@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react'
-import { Paper } from '@material-ui/core'
-import { useObservableState, useSubscription } from 'observable-hooks'
+import { Paper, Typography } from '@material-ui/core'
+import { useObservableState } from 'observable-hooks'
 import { QuizCard } from './word-card.interface'
 import { ManagerContext } from '../../App'
 import { PaperProps } from '@material-ui/core/Paper/Paper'
@@ -16,18 +16,19 @@ import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 import { useLoadingObservable } from '../../lib/util/create-loading-observable'
 import { groupBy } from 'lodash'
+import { outOfWords } from '@shared/'
 
 const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
-    const {value: audio, isLoading} = useLoadingObservable(quizCard.audio$)
+    const { value: audio, isLoading } = useLoadingObservable(quizCard.audio$)
     const isHidden = useIsFieldHidden({ quizCard, label: QuizCardField.Sound })
-    const currentType = useObservableState(quizCard.flashCardType$);
-    const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
+    const currentType = useObservableState(quizCard.flashCardType$)
+    const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null)
     useEffect(() => {
         if (audioRef && audio && !isLoading) {
-            audioRef.currentTime = 0;
+            audioRef.currentTime = 0
             audioRef.play()
         }
-    }, [currentType, audio]);
+    }, [currentType, audio])
 
     return (audio && !isHidden) ?
         <audio
@@ -50,39 +51,50 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const cardsLearnedToday = useObservableState(m.quizCardScheduleService.cardsLearnedToday$) || []
     const cardLimit =
         useObservableState(m.settingsService.newQuizWordLimit$) || 0
-    const cardLimitReached = Object.values(groupBy(cardsLearnedToday, r => r.d.word)).length >= cardLimit;
+    const cardLimitReached = Object.values(groupBy(cardsLearnedToday, r => r.d.word)).length >= cardLimit
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
-    // TODO add case for out of words
+    const noMoreWordsLeft = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
+        ?.limitedScheduleRows?.length === 0 && !cardLimitReached
     return (
         <Paper className='quiz-card' {...props}>
-            {!cardLimitReached ? (
-                <Fragment>
-                    <div className={'quiz-card-data-sheet'}>
-                        <div>
-                            <QuizCardTranslationAttemptSchedule />
+            {
+                noMoreWordsLeft && <Typography
+                    variant={'h3'}
+                    className={outOfWords}
+                >No more words left, try adding more learning material
+                </Typography>
+            }
+            {
+                cardLimitReached && <QuizCardLimitReached />
+            }
+            {
+                (!cardLimitReached && !noMoreWordsLeft) && (
+                    <Fragment>
+                        <div className={'quiz-card-data-sheet'}>
+                            <div>
+                                <QuizCardTranslationAttemptSchedule />
+                            </div>
+                            <div className={'quiz-card-data-sheet-middle'}>
+                                <CardImage quizCard={quizCard} />
+                                <QuizCardSound quizCard={quizCard} />
+                                {!isLearningLanguageHidden && (
+                                    <CardLearningLanguageText word={word || ''} />
+                                )}
+                            </div>
+                            <div>
+                                {answerIsRevealed && <QuizCardScheduleTable />}
+                                {<CardInfo quizCard={quizCard} />}
+                            </div>
                         </div>
-                        <div className={'quiz-card-data-sheet-middle'}>
-                            <CardImage quizCard={quizCard} />
-                            <QuizCardSound quizCard={quizCard} />
-                            {!isLearningLanguageHidden && (
-                                <CardLearningLanguageText word={word || ''} />
-                            )}
-                        </div>
-                        <div>
-                            {answerIsRevealed && <QuizCardScheduleTable />}
-                            {<CardInfo quizCard={quizCard} />}
-                        </div>
-                    </div>
-                    {!exampleSegmentsHidden && <OpenDocumentComponent
-                        style={{alignSelf: 'start', margin: '24px', flex: 1, overflow: 'auto'}}
-                        openedDocument={quizCard.exampleSentenceOpenDocument}
-                    />}
-                    <QuizCardButtons quizCard={quizCard} />
-                </Fragment>
-            ) : (
-                <QuizCardLimitReached />
-            )}
+                        {!exampleSegmentsHidden && <OpenDocumentComponent
+                            style={{ alignSelf: 'start', margin: '24px', flex: 1, overflow: 'auto' }}
+                            openedDocument={quizCard.exampleSentenceOpenDocument}
+                        />}
+                        <QuizCardButtons quizCard={quizCard} />
+                    </Fragment>
+                )
+            }
         </Paper>
     )
 }

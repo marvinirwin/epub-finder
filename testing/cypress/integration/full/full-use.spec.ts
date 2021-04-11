@@ -1,6 +1,6 @@
 import { selectReadingLanguage } from '../language.helpers'
 import { setUploadName, setUploadText, uploadText } from '../upload.helpers'
-import { QuizCarouselPom } from '../quiz/quiz-carousel.pom'
+import { assertOutOfWords, QuizCarouselPom } from '../quiz/quiz-carousel.pom'
 import { finished, learning, toReview, wordsLeft } from '../quiz-stats.helpers'
 import { introNextButton } from '@shared/*'
 import { setNewQuizWordLimit } from '../settings.helpers'
@@ -99,10 +99,7 @@ describe('Normal functioning of the app', () => {
         completeExpectedWord(expectedWords)
         expectStats(0, 1, 0, 2)
         completeExpectedWord(expectedWords)
-        expectStats(0, 0, 0, 3)
 
-        QuizCarouselPom.assertCardLimitReached()
-        setNewQuizWordLimit(10)
-        QuizCarouselPom.assertOutOfWords()
+        assertOutOfWords()
     })
 })

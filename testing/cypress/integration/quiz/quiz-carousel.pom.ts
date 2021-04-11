@@ -35,6 +35,8 @@ type RecognizedCounts = {
     unrecognizedCount: number
 }
 
+export const assertOutOfWords = () => cy.get(`.${outOfWords}`).should('exist')
+
 export class QuizCarouselPom {
     static goToQuizCard(word: string) {
         // Probably some sort of while loop with promises
