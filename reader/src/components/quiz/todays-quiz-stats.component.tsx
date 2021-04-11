@@ -7,7 +7,7 @@ import { allScheduleRowsForWord, anyScheduleRowsForWord } from '../../lib/manage
 
 export const TodaysQuizStats = () => {
     const m = useContext(ManagerContext)
-    const flashCardTypes = useObservableState(m.settingsService.flashCardTypesRequiredToProgress$) || []
+    const flashCardTypes = useObservableState(m.flashCardTypesRequiredToProgressService.activeFlashCardTypes$) || []
     const scheduleInfo = useObservableState(
         m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
     ) || {

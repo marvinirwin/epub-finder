@@ -87,9 +87,8 @@ export class SortedLimitScheduleRowsService {
             quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
             timeService.quizNow$,
-            settingsService.flashCardTypesRequiredToProgress$,
         ]).pipe(
-            map(([sortedScheduleRows, newQuizWordLimit, now, flashCardTypesRequiredToProgress]) => {
+            map(([sortedScheduleRows, newQuizWordLimit, now]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
                 )
@@ -105,6 +104,7 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
+                debugger;
                 const scheduleRowsLeftForToday = flatten(Object.values(groupBy(unStartedScheduleRows, r => r.d.word)).slice(
                     0,
                     newQuizWordLimit - Object.values(groupBy(scheduleRowsLearnedToday, r => r.d.word)).length,

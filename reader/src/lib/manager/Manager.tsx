@@ -117,6 +117,7 @@ import { AdvanceTimeService } from '../time/advance-time.service'
 import { FlashCardLearningTargetsService } from '../schedule/learning-target/flash-card-learning-targets.service'
 import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
 import { TabulationService } from '../tabulation/tabulation.service'
+import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to-progress.service'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -219,6 +220,7 @@ export class Manager {
     flashCardLearningTargetsService: FlashCardLearningTargetsService
     customWordsRepository: CustomWordsRepository;
     tabulationService: TabulationService;
+    flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -236,6 +238,7 @@ export class Manager {
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this)
         this.languageConfigsService = new LanguageConfigsService(this)
+        this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this);
         this.settingsService.spokenLanguage$.subscribe(
             audioSource.learningToKnownSpeech$,
         )

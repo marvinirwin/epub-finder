@@ -13,6 +13,7 @@ import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { WordRecognitionRow } from './word-recognition-row'
 import { TabulationService } from '../tabulation/tabulation.service'
+import { FlashCardTypesRequiredToProgressService } from './required-to-progress.service'
 
 function getSortConfigs({
                             dateWeight,
@@ -68,7 +69,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             timeService,
             flashCardLearningTargetsService,
             wordRecognitionProgressService,
-            tabulationService
+            tabulationService,
+            flashCardTypesRequiredToProgressService
         }: {
             settingsService: SettingsService
             translationAttemptService: TranslationAttemptService
@@ -76,6 +78,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
             flashCardLearningTargetsService: FlashCardLearningTargetsService,
             wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
             tabulationService: TabulationService
+            flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
         },
     ) {
         this.scheduleRows$ = combineLatest([
@@ -84,13 +87,12 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$,
                 settingsService.translationAttemptSentenceWeight$,
-                settingsService.flashCardTypesRequiredToProgress$,
+                flashCardTypesRequiredToProgressService.activeFlashCardTypes$
             ]),
             combineLatest([
                 translationAttemptService.currentScheduleRow$,
                 timeService.quizNow$,
                 flashCardLearningTargetsService.learningTargets$,
-                settingsService.textToSpeechConfiguration$,
             ]),
             wordRecognitionProgressService.indexOfOrderedRecords$,
             tabulationService.tabulation$
@@ -110,14 +112,10 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<Normaliz
                          currentTranslationAttemptScheduleRow,
                          now,
                          learningTargets,
-                         textToSpeechConfiguration,
                      ],
                     wordRecognitionRowIndex,
                     tabulation
                  ]) => {
-                    if (!textToSpeechConfiguration) {
-                        flashCardTypesRequiredToProgress = flashCardTypesRequiredToProgress.filter(type => type !== FlashCardType.LearningLanguageAudio)
-                    }
                     const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
                     return ScheduleMathService.normalizeAndSortQuizScheduleRows(
