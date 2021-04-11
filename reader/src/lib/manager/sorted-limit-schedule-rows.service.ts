@@ -104,7 +104,6 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                debugger;
                 const scheduleRowsLeftForToday = flatten(Object.values(groupBy(unStartedScheduleRows, r => r.d.word)).slice(
                     0,
                     newQuizWordLimit - Object.values(groupBy(scheduleRowsLearnedToday, r => r.d.word)).length,
@@ -152,38 +151,29 @@ export class SortedLimitScheduleRowsService {
                 const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview].filter((r) => !r.isOverDue({ now }))
                 const adjustScheduleRows = (scheduleRows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => spaceOutRows<ScheduleRow<NormalizedQuizCardScheduleRowData>, string, string>(
                     row => ({ type: row.d.word, subType: row.d.flashCardType, sortValue: row.dueDate().getTime() }),
-                    scheduleRows,
+                    // This order by is necessary or the offset wont do anything
+                    orderBy(scheduleRows, v => `${v.d.word}${v.d.flashCardType}`),
                     1000 * 60 * 5, // 5 minutes
                 )
 
-                const overDueAdjustedSortValues = adjustScheduleRows(sortedScheduleRows)
-                const notOverDueAdjustedSortValues = overDueAdjustedSortValues
-                const wordsLeftForTodayAdjustedSortValues = overDueAdjustedSortValues
+                const wordsLeftForTodayAdjustedSortValues = adjustScheduleRows(sortedScheduleRows)
+                const iteratees = [
+                    (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => wordsLeftForTodayAdjustedSortValues.get(r),
+                    (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => r.d.finalSortValue,
+                    (r: ScheduleRow<NormalizedQuizCardScheduleRowData>) => r.d.word,
+                ]
+                const orders: ('asc' | 'desc')[] = ['asc', 'desc', 'asc']
+                const orderFunc = (rows: ScheduleRow<NormalizedQuizCardScheduleRowData>[]) => orderBy(rows, iteratees, orders)
                 return {
-                    wordsToReview: scheduleRowsToReview,
-                    wordsLearnedToday: scheduleRowsLearnedToday,
-                    wordsLeftForToday: scheduleRowsLeftForToday,
-                    wordsReviewingOrLearning: learningScheduleRows,
-                    unStartedWords: unStartedScheduleRows,
+                    wordsToReview: orderFunc(scheduleRowsToReview),
+                    wordsLearnedToday: orderFunc(scheduleRowsLearnedToday),
+                    wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
+                    wordsReviewingOrLearning: orderFunc(learningScheduleRows),
+                    unStartedWords: orderFunc(unStartedScheduleRows),
                     limitedScheduleRows: [
-                        ...orderBy(
-                            overDueRows,
-                            r => [overDueAdjustedSortValues.get(r), r.d.finalSortValue],
-                            ['asc', 'desc'],
-                        ),
-                        ...orderBy(
-                            scheduleRowsLeftForToday,
-                            [
-                                r => wordsLeftForTodayAdjustedSortValues.get(r),
-                                r => r.d.finalSortValue,
-                            ],
-                            ['asc', 'desc'],
-                        ),
-                        ...orderBy(
-                            notOverDueRows,
-                            r => [notOverDueAdjustedSortValues.get(r), r.d.finalSortValue],
-                            ['asc', 'desc'],
-                        ),
+                        ...orderFunc(overDueRows),
+                        ...orderFunc(scheduleRowsLeftForToday),
+                        ...orderFunc(notOverDueRows),
                     ],
                 }
             }),

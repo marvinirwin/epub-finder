@@ -55,16 +55,16 @@ describe('Normal functioning of the app', () => {
         setNewQuizWordLimit(10);
         const expectedWords = [
             '中国',
-            '中',
             '国',
+            '中',
 
             '中国',
-            '中',
             '国',
+            '中',
 
             '中国',
-            '中',
             '国',
+            '中',
         ]
         completeExpectedWord(expectedWords)
         // Expect 0 finished, 1 in progress and 2 left

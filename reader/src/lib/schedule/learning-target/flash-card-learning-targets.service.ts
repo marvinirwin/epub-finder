@@ -47,26 +47,16 @@ export class FlashCardLearningTargetsService {
     learningTargets$: Observable<Map<string, FlashCardLearningTarget>>
 
     constructor({
-                    wordRecognitionProgressService,
-                    temporaryHighlightService,
-                    videoMetadataRepository,
                     ignoredWordsRepository,
                     allWordsRepository,
-                    selectedVirtualTabulationsService,
-                    languageConfigsService,
                     customWordsRepository,
                 }: {
-                    wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
-                    pronunciationProgressService: PronunciationProgressRepository
-                    temporaryHighlightService: TemporaryHighlightService,
                     videoMetadataRepository: VideoMetadataRepository,
                     cardsRepository: CardsRepository
                     ignoredWordsRepository: IgnoredWordsRepository
                     allWordsRepository: AllWordsRepository
                     translationAttemptService: TranslationAttemptService
-                    selectedVirtualTabulationsService: SelectedVirtualTabulationsService
                     timeService: TimeService
-                    languageConfigsService: LanguageConfigsService
                     customWordsRepository: CustomWordsRepository
                 },
     ) {
