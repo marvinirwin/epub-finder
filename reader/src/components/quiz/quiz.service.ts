@@ -10,7 +10,11 @@ import { SortQuizData, ScheduleRow } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
-import { SortedLimitScheduleRowsService } from '../../lib/manager/sorted-limit-schedule-rows.service'
+import {
+    scheduleRowKey,
+    SortedLimitScheduleRowsService,
+    SpacedScheduleRow,
+} from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { wordCardFactory } from './card-card.factory'
 import { TabulationConfigurationService } from '../../lib/language/language-maps/tabulation-configuration.service'
 import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
@@ -27,7 +31,7 @@ export const filterQuizRows = (
 
 export class QuizService {
     quizCard: QuizCard
-    currentScheduleRow$: Observable<ScheduleRow<SortQuizData>>
+    currentScheduleRow$: Observable<SpacedScheduleRow | undefined>
     manualHiddenFieldConfig$ = new ReplaySubject<string>()
 
     constructor({
@@ -130,9 +134,12 @@ export class QuizService {
             exampleSentenceOpenDocument: openExampleSentencesDocument,
         }
 
-        combineLatest([currentWord$, this.quizCard.flashCardType$])
+        this.currentScheduleRow$
             .pipe(distinctUntilChanged(
-                ([x1, x2], [y1, y2]) => x1 === y1 && x2 === y2),
+                (r1, r2) => {
+                    if (!r1 || !r2) return false
+                    return scheduleRowKey(r1) === scheduleRowKey(r2)
+                }),
                 mapTo(false),
             )
             .subscribe(this.quizCard.answerIsRevealed$)

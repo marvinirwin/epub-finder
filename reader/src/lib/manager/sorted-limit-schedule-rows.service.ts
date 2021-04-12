@@ -59,6 +59,8 @@ export const allScheduleRowsForWord = (
         )
 }
 
+export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flashCardType}${r.d.wordRecognitionRecords.length}`
+
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>
 
@@ -71,7 +73,6 @@ export class SortedLimitScheduleRowsService {
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
     }) {
-        const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flashCardType}`
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$,
             settingsService.newQuizWordLimit$,
@@ -93,9 +94,12 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const scheduleRowsLeftForToday = flatten(Object.values(groupBy(unStartedScheduleRows, r => r.d.word)).slice(
+                const unStartedWords = Object.values(groupBy(unStartedScheduleRows, r => r.d.word))
+                const learningWords = Object.keys(groupBy(learningScheduleRows, r => r.d.word))
+                const finishedWords = Object.keys(groupBy(scheduleRowsLearnedToday, r => r.d.word))
+                const scheduleRowsLeftForToday = flatten(unStartedWords.slice(
                     0,
-                    newQuizWordLimit - Object.values(groupBy(scheduleRowsLearnedToday, r => r.d.word)).length,
+                    newQuizWordLimit - new Set([...finishedWords, ...learningWords]).size,
                 ))
                 /**
                  * I want a function which is given a list of {type, subType, orderValue}

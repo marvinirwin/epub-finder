@@ -5,9 +5,8 @@ import { Box, Typography } from '@material-ui/core'
 import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWordsLeftForTodayNumber } from '@shared/'
 import { allScheduleRowsForWord, anyScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
 
-export const TodaysQuizStats = () => {
-    const m = useContext(ManagerContext)
-    const flashCardTypes = useObservableState(m.flashCardTypesRequiredToProgressService.activeFlashCardTypes$) || []
+export const useScheduleInfo = () => {
+    const m = useContext(ManagerContext);
     const scheduleInfo = useObservableState(
         m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
     ) || {
@@ -17,6 +16,13 @@ export const TodaysQuizStats = () => {
         wordsReviewingOrLearning: [],
         wordsLeftForToday: [],
     }
+    return scheduleInfo;
+}
+
+export const TodaysQuizStats = () => {
+    const m = useContext(ManagerContext)
+    const flashCardTypes = useObservableState(m.flashCardTypesRequiredToProgressService.activeFlashCardTypes$) || []
+    const scheduleInfo = useScheduleInfo();
     return <Box m={2} p={1} className={'quiz-button-row'}>
         <Typography variant={'h6'}>
             New Words Left for Today:{' '}

@@ -15,8 +15,9 @@ import { QuizCardTranslationAttemptSchedule } from '../tables/quiz-card-translat
 import { OpenDocumentComponent } from '../reading/open-document.component'
 import { QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
 import { useLoadingObservable } from '../../lib/util/create-loading-observable'
-import { groupBy } from 'lodash'
 import { outOfWords } from '@shared/'
+import { allScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
+import { useScheduleInfo } from './todays-quiz-stats.component'
 
 const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
     const { value: audio, isLoading } = useLoadingObservable(quizCard.audio$)
@@ -40,6 +41,11 @@ const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) => {
         null
 }
 
+export const useActiveFlashCardTypes = () => {
+    const m = useContext(ManagerContext)
+    return useObservableState(m.flashCardTypesRequiredToProgressService.activeFlashCardTypes$) || []
+}
+
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({ quizCard, ...props }) => {
     const word = useObservableState(quizCard.word$)
     const m = useContext(ManagerContext)
@@ -47,14 +53,15 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
         quizCard,
         label: QuizCardField.LearningLanguage,
     })
-
+    const scheduleInfo = useScheduleInfo()
     const cardsLearnedToday = useObservableState(m.quizCardScheduleService.cardsLearnedToday$) || []
-    const cardLimit =
-        useObservableState(m.settingsService.newQuizWordLimit$) || 0
-    const cardLimitReached = Object.values(groupBy(cardsLearnedToday, r => r.d.word)).length >= cardLimit
+    const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
+    const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
+    const flashCardTypes = useActiveFlashCardTypes();
+    const cardLimitReached = Object.values(allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes).length).length >= cardLimit
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
-    const noMoreWordsLeft = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
+    const noMoreWordsLeft = limitedScheduleRowData
         ?.limitedScheduleRows?.length === 0 && !cardLimitReached
     return (
         <Paper className='quiz-card' {...props}>
