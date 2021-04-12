@@ -54,11 +54,11 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
         label: QuizCardField.LearningLanguage,
     })
     const scheduleInfo = useScheduleInfo()
-    const cardsLearnedToday = useObservableState(m.quizCardScheduleService.cardsLearnedToday$) || []
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
     const flashCardTypes = useActiveFlashCardTypes();
-    const cardLimitReached = Object.values(allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes).length).length >= cardLimit
+    const wordsLearnedToday = Object.values(allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes));
+    const cardLimitReached = wordsLearnedToday.length >= cardLimit
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
     const noMoreWordsLeft = limitedScheduleRowData

@@ -6,7 +6,6 @@ import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows
 import { TimeService } from '../time/time.service'
 import { Dictionary, flatten, groupBy, orderBy } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
-import { spaceOutRows } from '../schedule/space-out-rows'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
@@ -45,21 +44,23 @@ export const anyScheduleRowsForWord = (
 }
 
 export const allScheduleRowsForWord = (
-    unStartedScheduleRows: ScheduleRow<SortQuizData>[],
+    scheduleRows: ScheduleRow<SortQuizData>[],
     quizCardFieldConfig: FlashCardType[],
 ) => {
     /**
      * For a word to be unStarted, all of its schedule rows must be unStarted
      */
-    return Object.values(groupBy(unStartedScheduleRows, row => row.d.word))
-        .filter(scheduleRowsForOneWord => quizCardFieldConfig
-            .every(flashCardType => scheduleRowsForOneWord
-                .find(r => r.d.flashCardType === flashCardType),
-            ),
-        )
+    return Object.values(groupBy(scheduleRows, row => row.d.word))
+        .filter(scheduleRowsForOneWord => {
+            return quizCardFieldConfig.every(flashCardType => {
+                return scheduleRowsForOneWord.find(r => r.d.flashCardType === flashCardType)
+            })
+        })
 }
 
 export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flashCardType}${r.d.wordRecognitionRecords.length}`
+
+const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedScheduleRows: SpacedScheduleRow[]) => flatten(learningScheduleRows.map(learningScheduleRow => unStartedScheduleRows.filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word)))
 
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>
@@ -94,20 +95,19 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const unStartedWords = Object.values(groupBy(unStartedScheduleRows, r => r.d.word))
+                const unStartedSiblings =[
+                    ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
+                    ...getSiblingRecords(scheduleRowsLearnedToday, unStartedScheduleRows)
+                ];
+                const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblings.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy(learningScheduleRows, r => r.d.word))
                 const finishedWords = Object.keys(groupBy(scheduleRowsLearnedToday, r => r.d.word))
                 const scheduleRowsLeftForToday = flatten(unStartedWords.slice(
                     0,
                     newQuizWordLimit - new Set([...finishedWords, ...learningWords]).size,
                 ))
-                /**
-                 * I want a function which is given a list of {type, subType, orderValue}
-                 * returns a new orderValue so that its less likely that a given type or subType will occur near each other
-                 */
-
-                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview].filter((r) => r.isOverDue({ now }))
-                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview].filter((r) => !r.isOverDue({ now }))
+                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblings].filter((r) => r.isOverDue({ now }))
+                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblings].filter((r) => !r.isOverDue({ now }))
 
                 const iteratees = [
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.spacedDueDate.transformed,
