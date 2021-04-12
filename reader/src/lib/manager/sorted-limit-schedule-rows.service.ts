@@ -95,19 +95,19 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const unStartedSiblings =[
+                const unStartedSiblingsWhichShouldBe =[
                     ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
                     ...getSiblingRecords(scheduleRowsLearnedToday, unStartedScheduleRows)
                 ];
-                const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblings.includes(r)), r => r.d.word))
+                const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy(learningScheduleRows, r => r.d.word))
                 const finishedWords = Object.keys(groupBy(scheduleRowsLearnedToday, r => r.d.word))
                 const scheduleRowsLeftForToday = flatten(unStartedWords.slice(
                     0,
                     newQuizWordLimit - new Set([...finishedWords, ...learningWords]).size,
                 ))
-                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblings].filter((r) => r.isOverDue({ now }))
-                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblings].filter((r) => !r.isOverDue({ now }))
+                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({ now }))
+                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({ now }))
 
                 const iteratees = [
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.spacedDueDate.transformed,
@@ -120,7 +120,7 @@ export class SortedLimitScheduleRowsService {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     wordsLearnedToday: orderFunc(scheduleRowsLearnedToday),
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
-                    wordsReviewingOrLearning: orderFunc(learningScheduleRows),
+                    wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
                     unStartedWords: orderFunc(unStartedScheduleRows),
                     limitedScheduleRows: [
                         ...orderFunc(overDueRows),
