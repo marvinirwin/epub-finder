@@ -86,7 +86,7 @@ export class SortedLimitScheduleRowsService {
                 const scheduleRowsToReview = sortedScheduleRows.filter((r) => {
                     return r.isToReview({ now })
                 })
-                const scheduleRowsLearnedToday = sortedScheduleRows.filter((r) => {
+                const scheduleRowsLearnedOrReviewedToday = sortedScheduleRows.filter((r) => {
                     return r.wasLearnedToday()
                 })
                 const learningScheduleRows = sortedScheduleRows.filter((r) =>
@@ -94,17 +94,18 @@ export class SortedLimitScheduleRowsService {
                 )
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
-                )
+                );
+                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedForTheFirstTimeToday());
                 const unStartedSiblingsWhichShouldBe =[
                     ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
-                    ...getSiblingRecords(scheduleRowsLearnedToday, unStartedScheduleRows)
+                    ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows)
                 ];
                 const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy(learningScheduleRows, r => r.d.word))
-                const finishedWords = Object.keys(groupBy(scheduleRowsLearnedToday, r => r.d.word))
+                const wordsLearnedForTheFirstTime = Object.keys(groupBy(scheduleRowsLearnedForTheFirstTimeToday, r => r.d.word))
                 const scheduleRowsLeftForToday = flatten(unStartedWords.slice(
                     0,
-                    newQuizWordLimit - new Set([...finishedWords, ...learningWords]).size,
+                    newQuizWordLimit - new Set([...learningWords, ...wordsLearnedForTheFirstTime]).size,
                 ))
                 const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({ now }))
                 const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({ now }))
@@ -116,9 +117,10 @@ export class SortedLimitScheduleRowsService {
                 ]
                 const orders: ('asc' | 'desc')[] = ['asc', 'desc', 'asc']
                 const orderFunc = (rows: SpacedScheduleRow[]) => orderBy(rows, iteratees, orders);
+                debugger;
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
-                    wordsLearnedToday: orderFunc(scheduleRowsLearnedToday),
+                    wordsLearnedToday: orderFunc(scheduleRowsLearnedOrReviewedToday),
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
                     wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
                     unStartedWords: orderFunc(unStartedScheduleRows),

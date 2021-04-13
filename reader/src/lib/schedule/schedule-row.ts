@@ -52,12 +52,28 @@ export type ScheduleItem = {
     efactor: number
 }
 
-export const recordsLearnedToday = (r1: ScheduleItem[]) => {
+export const wasLearnedToday = (r1: ScheduleItem[]) => {
     const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
     return (
         lastTwoRecords.length === 2 &&
         lastTwoRecords.every((r) => r.grade >= 3 && isToday(r.timestamp))
     )
+}
+
+export const dateLearnedForTheFirstTime = (records: ScheduleItem[]): Date | undefined => {
+    let successInARow: ScheduleItem[] = [];
+    for (let i = 0; i < records.length; i++) {
+        const record = records[i]
+        if (successInARow.length === 3) {
+            return successInARow[0].timestamp;
+        }
+        if (record.grade >= 3) {
+            successInARow.push(record)
+        } else {
+            successInARow = [];
+        }
+    }
+    return undefined
 }
 
 export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
@@ -167,7 +183,15 @@ export class ScheduleRow<T> {
     }
 
     wasLearnedToday() {
-        return recordsLearnedToday(this.superMemoRecords)
+        return wasLearnedToday(this.superMemoRecords)
+    }
+
+    wasLearnedForTheFirstTimeToday() {
+        const dateLearned = dateLearnedForTheFirstTime(this.superMemoRecords);
+        if (!dateLearned) {
+            return false;
+        }
+        return isToday(dateLearned);
     }
 
     isNotStarted() {

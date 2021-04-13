@@ -4,7 +4,7 @@ import { map, shareReplay } from 'rxjs/operators'
 import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
 import {
     recordsLearnedAnyDay,
-    recordsLearnedToday,
+    wasLearnedToday,
 } from '../schedule/schedule-row'
 
 export class WeightedVocabService {

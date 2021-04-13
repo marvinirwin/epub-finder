@@ -5,7 +5,7 @@ import { distinctUntilChanged, filter, withLatestFrom } from 'rxjs/operators'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { fetchTranslation } from '../../services/translate.service'
 import React, { Fragment } from 'react'
-import { Typography } from '@material-ui/core'
+import { Box, Typography } from '@material-ui/core'
 
 export class OnSelectService {
     selectedText$ = new ReplaySubject<string | undefined>(1)
@@ -39,10 +39,11 @@ export class OnSelectService {
                     this.generalToastMessageService.addToastMessage$.next(
                         () => {
                             return (
-                                <Fragment>
-                                    <Typography>{str}</Typography>
-                                    <Typography>{translation}</Typography>
-                                </Fragment>
+                                <Box m={2} p={1}>
+                                    <Typography variant={'h4'}>{str}</Typography>
+                                    <br/>
+                                    <Typography variant={'h6'}>{translation}</Typography>
+                                </Box>
                             )
                         },
                     )

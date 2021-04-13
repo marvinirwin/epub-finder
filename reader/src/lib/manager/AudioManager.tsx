@@ -3,7 +3,7 @@ import { ReplaySubject } from 'rxjs'
 import { WavAudio } from '../audio/wav-audio'
 import { AudioSource } from '../audio/audio-source'
 import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
-import { Typography } from '@material-ui/core'
+import { Box, Typography } from '@material-ui/core'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
@@ -75,10 +75,11 @@ export const RecognizedTextComponent = (
         }
     }, [currentRomanizationFn])
     return (
-        <>
+        <Box m={2} p={1}>
             <Typography variant="h6">{recognizedText}</Typography>
+            <br/>
             <Typography variant="h6">{romanization}</Typography>
-        </>
+        </Box>
     )
 }
 
