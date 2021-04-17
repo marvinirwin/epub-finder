@@ -31,7 +31,6 @@ export class OpenDocumentsService {
     // Rendered means that their atomizedSentences exist, but aren't necessarily in the viewport
     displayDocumentTabulation$: Observable<TabulatedSegments[]>
     sourceDocuments$: Observable<Map<string, OpenDocument>>
-    tabulationsOfCheckedOutDocuments$: Observable<TabulatedSegments[]>
     openDocumentBodies$: Observable<HTMLBodyElement>
     renderedSegments$: Observable<BrowserSegment[]>
     virtualDocumentTabulation$: Observable<SerializedTabulationAggregate>
@@ -95,17 +94,6 @@ export class OpenDocumentsService {
             })
         })
 
-        this.tabulationsOfCheckedOutDocuments$ = this.sourceDocuments$.pipe(
-            switchMap((openDocuments) =>
-                combineLatest(
-                    mapToArray(
-                        openDocuments,
-                        (id, document) => document.renderedTabulation$,
-                    ),
-                ),
-            ),
-            shareReplay(1),
-        )
 
         const mapDocumentTree = <T>(
             mapFn: (d: OpenDocument) => Observable<T>,

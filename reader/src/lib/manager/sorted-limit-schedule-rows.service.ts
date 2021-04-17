@@ -117,7 +117,6 @@ export class SortedLimitScheduleRowsService {
                 ]
                 const orders: ('asc' | 'desc')[] = ['asc', 'desc', 'asc']
                 const orderFunc = (rows: SpacedScheduleRow[]) => orderBy(rows, iteratees, orders);
-                debugger;
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     wordsLearnedToday: orderFunc(scheduleRowsLearnedOrReviewedToday),

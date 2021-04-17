@@ -31,8 +31,64 @@ const segmentText = (text: string, languageCode: string) => {
 
 describe('Tabulating different languages', () => {
     it('Tabulates a toki pona sentence', () => {
-        expect(!segmentText('Él vive en un gallinero pequeño y normal en un barrio pequeño y normal', 'es').notableSubSequences).toEqual([
-
+        const segmentText1 = segmentText('Él vive en un gallinero pequeño y normal en un barrio pequeño y normal', 'es')
+        expect(!segmentText1.notableSubSequences).toEqual([
+            {
+                "position": 0,
+                "word": "Él"
+            },
+            {
+                "position": 3,
+                "word": "vive"
+            },
+            {
+                "position": 8,
+                "word": "en"
+            },
+            {
+                "position": 11,
+                "word": "un"
+            },
+            {
+                "position": 14,
+                "word": "gallinero"
+            },
+            {
+                "position": 24,
+                "word": "pequeño"
+            },
+            {
+                "position": 32,
+                "word": "y"
+            },
+            {
+                "position": 34,
+                "word": "normal"
+            },
+            {
+                "position": 41,
+                "word": "en"
+            },
+            {
+                "position": 44,
+                "word": "un"
+            },
+            {
+                "position": 47,
+                "word": "barrio"
+            },
+            {
+                "position": 54,
+                "word": "pequeño"
+            },
+            {
+                "position": 62,
+                "word": "y"
+            },
+            {
+                "position": 64,
+                "word": "normal"
+            }
         ])
         expect(segmentText('jan.sona toki pona', 'toki').notableSubSequences).toEqual([
 

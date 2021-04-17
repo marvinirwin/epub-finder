@@ -39,7 +39,7 @@ ctx.onmessage = async (ev) => {
         segments,
         ...resolvePartialTabulationConfig(languageCode),
         languageCode,
-    })
+    });
     try {
         ctx.postMessage({
             wordSegmentStringsMap: tabulated.wordSegmentStringsMap,

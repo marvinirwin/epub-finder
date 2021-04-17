@@ -91,7 +91,6 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
             ]),
             combineLatest([
                 translationAttemptService.currentScheduleRow$,
-                timeService.quizNow$,
                 flashCardLearningTargetsService.learningTargets$,
             ]),
             wordRecognitionProgressService.indexOfOrderedRecords$,
@@ -110,7 +109,6 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                      ],
                      [
                          currentTranslationAttemptScheduleRow,
-                         now,
                          learningTargets,
                      ],
                      wordRecognitionRowIndex,
@@ -158,9 +156,13 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                                 sentencePriority,
                             }
                         },
-                    ).filter((row) => !!row.row.d.word);
+                    ).filter((row) => !!row.row.d.word)
                     const spacedOutRowMap = spaceOutRows(
-                        row => ({ type: row.row.d.word, subType: row.row.d.flashCardType, sortValue: row.row.dueDate().getTime() }),
+                        row => ({
+                            type: row.row.d.word,
+                            subType: row.row.d.flashCardType,
+                            sortValue: row.row.dueDate().getTime(),
+                        }),
                         // This order by is necessary or the offset wont do anything
                         orderBy(sortedRows, v => `${v.row.d.word}${v.row.d.flashCardType}`),
                         1000 * 60 * 5, // 5 minutes
@@ -178,10 +180,10 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                             row.sortValues.dueDate
                                 .normalizedValueObject,
                             sortValues: row.sortValues,
-                            spacedDueDate:  {
+                            spacedDueDate: {
                                 source: row.row.dueDate(),
-                                transformed: new Date(spacedOutRowMap.get(row) as number)
-                            }
+                                transformed: new Date(spacedOutRowMap.get(row) as number),
+                            },
                         },
                         row.row.d.wordRecognitionRecords,
                         ),

@@ -1,17 +1,42 @@
 import axios from 'axios'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs'
+import { LanguageConfigsService } from './language-configs.service'
+import { map, shareReplay, switchMap } from 'rxjs/operators'
+import { createLoadingObservable } from '../util/create-loading-observable'
 
 export class AllWordsRepository {
-    all$ = new BehaviorSubject<Set<string>>(new Set())
+    all$: Observable<Set<string>>
 
-    constructor() {
-        axios
-            .get(`${process.env.PUBLIC_URL}/all_chinese_words.csv`)
-            .then((response) => {
-                const allWords = response.data
-                    .split('\n')
-                    .map((word: string) => word.trim())
-                this.all$.next(new Set(allWords))
-            })
+    constructor(
+        {
+            languageConfigsService
+        }:
+            {
+                languageConfigsService: LanguageConfigsService
+            },
+    ) {
+        const {isLoading$, obs$} = createLoadingObservable(
+            languageConfigsService.readingLanguageCode$,
+            async code => {
+                switch(code) {
+                    case 'zh-hans':
+                        const response = await axios
+                            .get(`${process.env.PUBLIC_URL}/all_chinese_words.csv`);
+                        const allWords = response.data
+                            .split('\n')
+                            .map((word: string) => word.trim())
+                        return new Set<string>(allWords)
+                    default:
+                        return new Set<string>();
+                }
+            }
+        )
+        this.all$ = combineLatest([
+            isLoading$,
+            obs$,
+        ]).pipe(
+            map(([loading, wordSet]) => loading ? new Set<string>() : wordSet),
+            shareReplay(1)
+        )
     }
 }

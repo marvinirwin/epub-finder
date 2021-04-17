@@ -13,8 +13,8 @@ import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { mapIfThenDefault } from '../../util/map.module'
 import { IPositionedWord } from '../../../../../server/src/shared/Annotation/IPositionedWord'
-import { LanguageConfigsService } from '../../language/language-configs.service'
 import { CustomWordsRepository } from './custom-words.repository'
+import { TabulationService } from '../../tabulation/tabulation.service'
 
 export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
     const m = new Map<string, number>()
@@ -50,6 +50,7 @@ export class FlashCardLearningTargetsService {
                     ignoredWordsRepository,
                     allWordsRepository,
                     customWordsRepository,
+                    tabulationService
                 }: {
                     videoMetadataRepository: VideoMetadataRepository,
                     cardsRepository: CardsRepository
@@ -58,17 +59,20 @@ export class FlashCardLearningTargetsService {
                     translationAttemptService: TranslationAttemptService
                     timeService: TimeService
                     customWordsRepository: CustomWordsRepository
+                    tabulationService: TabulationService
                 },
     ) {
         this.learningTargets$ = combineLatest([
             allWordsRepository.all$,
             ignoredWordsRepository.latestRecords$,
             customWordsRepository.indexOfOrderedRecords$,
+            tabulationService.tabulation$
         ]).pipe(
             map(([
                      builtInWords,
                      ignoredWords,
                      customWordsIndex,
+                     tabulation
                  ]) => {
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()
                 /**
@@ -90,6 +94,7 @@ export class FlashCardLearningTargetsService {
                     )
                 }
                 builtInWords.forEach(ensureLearningTargetForWord)
+                tabulation.wordCountMap.forEach((values, word) => ensureLearningTargetForWord(word))
                 Object.keys(customWordsIndex).forEach(ensureLearningTargetForWord)
                 ignoredWords.forEach(
                     ({ word }) => learningTargetIndex.delete(word),

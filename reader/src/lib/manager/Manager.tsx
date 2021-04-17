@@ -226,7 +226,6 @@ export class Manager {
         this.customWordsRepository = new CustomWordsRepository(this)
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)
-        this.allWordsRepository = new AllWordsRepository()
         this.alertToastMessageService = new ToastMessageService({
             addToastMessage$: this.alertsService.newAlerts$.pipe(
                 map((alert) => new ToastMessage(10000, alert)),
@@ -238,6 +237,7 @@ export class Manager {
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this)
         this.languageConfigsService = new LanguageConfigsService(this)
+        this.allWordsRepository = new AllWordsRepository(this)
         this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this);
         this.settingsService.spokenLanguage$.subscribe(
             audioSource.learningToKnownSpeech$,
