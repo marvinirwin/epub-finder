@@ -13,6 +13,7 @@ import {
 } from '../src/shared/tabulation/word-separator'
 
 const segmentText = (text: string, languageCode: string) => {
+    const foundRegexForLanguage = languageRegexMap.get(languageCode)
     return tabulate({
         notableCharacterSequences: new SetWithUniqueLengths([]),
         segments: AtomizedDocument.atomizeDocument(
@@ -20,16 +21,19 @@ const segmentText = (text: string, languageCode: string) => {
         ).segments(),
         greedyWordSet: new SetWithUniqueLengths([]),
         isNotableCharacterRegex:
-            languageRegexMap.get(languageCode)?.regexp || latinCharacterRegexp,
+            foundRegexForLanguage?.regexp || latinCharacterRegexp,
         isWordBoundaryRegex: wordBoundaryRegexp,
         wordIdentifyingStrategy:
-            languageRegexMap.get(languageCode)?.strategy ||
+            foundRegexForLanguage?.strategy ||
             'spaceSeparator',
         languageCode
     })
 }
 
 describe('Tabulating different languages', () => {
+    it('Tabulates a Korean sentence', () => {
+        expect(segmentText('아기 병아리와 함께하는 겹받침, 쌍받침 연습 동화', 'ko')).toEqual([]);
+    })
     it('Tabulates a toki pona sentence', () => {
         const segmentText1 = segmentText('Él vive en un gallinero pequeño y normal en un barrio pequeño y normal', 'es')
         expect(!segmentText1.notableSubSequences).toEqual([

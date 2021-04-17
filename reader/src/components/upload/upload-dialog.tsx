@@ -5,17 +5,19 @@ import { UploadText } from './upload-text.component'
 import { Box, Button, Typography } from '@material-ui/core'
 import { fileChooser, uploadProgressBar } from '@shared/'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
+import { languageCodeLabels } from '../../lib/language/supported-translation.service'
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
     const currentFile = useObservableState(
         m.uploadingDocumentsService.currentUploadingFile$,
-    )
+    );
     const languageCode = useObservableState(m.languageConfigsService.readingLanguageCode$);
+    const currentLanguageLabel = languageCodeLabels.get(languageCode || '') || '';
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
-                Use text as learning material
+                Copy and paste some text you'd like to read in <Button onClick={() => m.modalService.languageSelect.open$.next(true)}>{currentLanguageLabel}</Button>
             </Typography>
             <UploadText />
             <div>

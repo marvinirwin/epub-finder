@@ -19,12 +19,12 @@ export const devangariRegexp = /\u0900–\u097F\uA8E0–\uA8FF\u1CD0–\u1CFF/
  * Oh I think phoenician is out of range \u10900–\u1091F
  * And Imperial Aramaic might be too U+10840–U+1085F
  */
-export const hebrewRegexp = /\u0590-\u05FF\uFB1D-\uFB4F/
-export const greekRegexp = /\u0370-\u03FF\u1F00-\u1FFF/
-export const japaneseRegexp = /一-龯/
+export const hebrewRegexp = /\p{Script_Extensions=Hebrew}/u
+export const greekRegexp = /\p{Script_Extensions=Greek}/u
+export const japaneseRegexp = /[\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Han}]/u
 export const kannadaRegexp = /\u0C80–\u0CFF/
-export const kazakhRegexp = /[\p{Script=Latin}\u00C0-\u024F\u1E00-\u1EFF\u0400-\u04FF\u0500-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u1C80-\u1C8F\u0600-\u06ff\u0750-\u077f\ufb50-\ufbc1\ufbd3-\ufd3f\ufd50-\ufd8f\ufd92-\ufdc7\ufe70-\ufefc\uFDF0-\uFDFD]/u
-export const koreanRegexp = /\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF/
+export const kazakhRegexp = /[\p{Script=Latin}\p{Script_Extensions=Arabic}\p{Script_Extensions=Cyrillic}]/u
+export const koreanRegexp = /\p{Script_Extensions=Hangul}/u
 // TODO, the rest, i stopped at ko
 
 /**

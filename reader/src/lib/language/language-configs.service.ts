@@ -1,6 +1,6 @@
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay } from 'rxjs/operators'
-import { SupportedTranslationService } from './supported-translation.service'
+import { SupportedTranslations } from './supported-translation.service'
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { SpeechToTextConfig, SupportedSpeechToTextService } from './supported-speech-to-text.service'
 import { SupportedTransliterationService } from './supported-transliteration.service'
@@ -44,7 +44,7 @@ export class LanguageConfigsService {
             )
         this.knownToLearningTranslate$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
-                const supportedLanguage = SupportedTranslationService.SupportedTranslations.find(
+                const supportedLanguage = SupportedTranslations.find(
                     ({ code }) => code === knownLanguageCode,
                 )
                 if (supportedLanguage) {
@@ -57,7 +57,7 @@ export class LanguageConfigsService {
         )
         this.learningToKnownTranslateConfig$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
-                const supportedLanguage = SupportedTranslationService.SupportedTranslations.find(
+                const supportedLanguage = SupportedTranslations.find(
                     ({ code }) => code === knownLanguageCode,
                 )
                 if (supportedLanguage) {

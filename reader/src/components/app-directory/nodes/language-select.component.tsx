@@ -2,13 +2,13 @@ import React, { Fragment, useContext } from 'react'
 import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
 import { Box, InputLabel, MenuItem, Select } from '@material-ui/core'
-import { SupportedTranslationService } from '../../../lib/language/supported-translation.service'
 import {
     readingLanguageSelect, readingLanguageSelectOption,
     spokenLanguageSelect,
     textToSpeechLanguageSelectLabel,
     textToSpeechSelect,
 } from '@shared/'
+import { SupportedTranslations } from '../../../lib/language/supported-translation.service'
 
 export const LanguageSelect = () => {
     const m = useContext(ManagerContext)
@@ -40,7 +40,7 @@ export const LanguageSelect = () => {
                         className: readingLanguageSelect,
                     }}
                 >
-                    {SupportedTranslationService.SupportedTranslations.map(
+                    {SupportedTranslations.map(
                         (c) => (
                             <MenuItem className={readingLanguageSelectOption} key={c.code} value={c.code}>{c.label}</MenuItem>
                         ),
