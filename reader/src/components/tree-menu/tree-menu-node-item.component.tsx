@@ -20,7 +20,9 @@ export function TreeMenuNodeItem({
 }) {
     return (
         treeNode.ReplaceComponent ? <treeNode.ReplaceComponent /> :
+            // @ts-ignore
             <ListItem
+                {...treeNode.props || {}}
                 button
                 selected={false}
                 id={treeNode.name}

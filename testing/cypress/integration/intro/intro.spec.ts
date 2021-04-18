@@ -15,7 +15,7 @@ describe('The introduction', () => {
     it('Shows the introduction of its the users first time', () => {
         cy.visitHome()
         expectIntroLanguageSelect()
-        selectReadingLanguage('zh-hans')
+        selectReadingLanguage('zh-Hans')
         selectSpokenLanguage('zh-han')
         expectIntroLearningMaterial()
         enterLearningMaterial('好', '好')

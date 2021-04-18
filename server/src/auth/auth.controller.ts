@@ -61,7 +61,7 @@ export class AuthController {
     @Public()
     @Get('/keycloak/callback')
     @UseGuards(KeycloakGuard)
-    @Redirect(`localhost:3000`)
+    @Redirect(process.env.APP_URL)
     public googleLoginCallback(@UserFromReq() user: User): string {
         // Redirect to index.html
         return ''

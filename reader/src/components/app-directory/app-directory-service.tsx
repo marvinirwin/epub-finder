@@ -40,7 +40,9 @@ export function AppDirectory(m: Manager) {
 */
         SettingsNode(m),
         TestingUtilsNode(m),
+/*
         TranslationAttemptSchedule,
+*/
         TranslationAttemptNode,
         QuizCarouselNode(),
         QuizScheduleNode(m),

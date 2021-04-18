@@ -17,7 +17,7 @@ export const TabulateChineseText = async (text: string) => {
             InterpolateService.text(text),
         ).segments(),
         greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet,
-        ...resolvePartialTabulationConfig('zh-hans'),
-        languageCode: 'zh-hans',
+        ...resolvePartialTabulationConfig('zh-Hans'),
+        languageCode: 'zh-Hans',
     })
 }

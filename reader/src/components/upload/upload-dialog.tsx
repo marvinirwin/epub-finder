@@ -17,7 +17,7 @@ export const UploadDialog = () => {
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
-                Copy and paste some text you'd like to read in <Button onClick={() => m.modalService.languageSelect.open$.next(true)}>{currentLanguageLabel}</Button>
+                Copy and paste some text you'd like to read in <Button onClick={() => m.modalService.languageSelect.open$.next(true)}><Typography variant={'h5'} color="textSecondary">{currentLanguageLabel}</Typography></Button>
             </Typography>
             <UploadText />
             <div>

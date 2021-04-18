@@ -60,18 +60,18 @@ export class UsersService {
     ): Promise<User> {
         const userWithTheSameEmail = await this.findOne({ email })
         if (userWithTheSameEmail) {
-            if (userWithTheSameEmail.reserved_for_provider === provider) {
+            const currentProviderId = userWithTheSameEmail[provider]
+            if (userWithTheSameEmail.reserved_for_provider === provider && !currentProviderId) {
                 return this.linkUserToProvider(
                     userWithTheSameEmail,
                     provider,
                     providerIdValue,
                 )
             }
-            const providerDoesntMatch =
-                userWithTheSameEmail[provider] !== providerIdValue
+            const providerDoesntMatch = currentProviderId !== providerIdValue
             if (providerDoesntMatch) {
                 throw new Error(
-                    'This email account has already been registered with a different provider',
+                    `Provider id values do not match ${provider} ${currentProviderId} !== ${providerIdValue}`,
                 )
             }
             return userWithTheSameEmail

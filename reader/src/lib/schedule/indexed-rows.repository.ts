@@ -11,6 +11,7 @@ import {
 import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
 import { safePush } from '@shared/'
+import { SuperMemoGrade } from 'supermemo'
 
 export class IndexedRowsRepository<T extends { id?: number  }> {
     indexOfOrderedRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<
@@ -37,25 +38,32 @@ export class IndexedRowsRepository<T extends { id?: number  }> {
             .pipe(
                 filter((rows) => !!rows.length),
                 withLatestFrom(this.indexOfOrderedRecords$.pipe(startWith({}))),
-                tap(([rows, wordRecognitionRecords]: [T[], ds_Dict<T[]>]) => {
+                tap(([rows, recordIndex]: [T[], ds_Dict<T[]>]) => {
                     const newLatestRecords = new Map<string, T>(
                         this.latestRecords$.getValue(),
                     )
+                    const indexValuesPushed = new Set<string>();
                     rows.forEach((row) => {
                         const { indexValue } = getIndexValue(row)
-                        safePush(wordRecognitionRecords, indexValue, row)
-                        wordRecognitionRecords[indexValue] = orderBy(
-                            wordRecognitionRecords[indexValue],
-                            'timestamp',
-                        )
+                        // @ts-ignore
+                        if (typeof row.timestamp === 'string') row.timestamp = new Date(row.timestamp)
+                        // @ts-ignore
+                        if (typeof row.nextDueDate === 'string') row.nextDueDate = new Date(row.nextDueDate)
+                        safePush(recordIndex, indexValue, row)
+                        indexValuesPushed.add(indexValue);
                         newLatestRecords.set(indexValue, row)
                     })
+                    indexValuesPushed.forEach((indexValue => {
+                        recordIndex[indexValue] = orderBy(
+                            recordIndex[indexValue],
+                            'timestamp',
+                        )
+                    }))
                     // This is a hack side effect
-                    this.indexOfOrderedRecords$.next(wordRecognitionRecords)
+                    this.indexOfOrderedRecords$.next(recordIndex)
                     this.latestRecords$.next(newLatestRecords)
                 }),
-            )
-            .subscribe(([rows]) => {
+            ).subscribe(([rows]) => {
                 for (let i = 0; i < rows.length; i++) {
                     const row = rows[i]
                     if (!row.id) {

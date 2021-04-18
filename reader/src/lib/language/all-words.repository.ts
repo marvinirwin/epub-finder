@@ -19,7 +19,7 @@ export class AllWordsRepository {
             languageConfigsService.readingLanguageCode$,
             async code => {
                 switch(code) {
-                    case 'zh-hans':
+                    case 'zh-Hans':
                         const response = await axios
                             .get(`${process.env.PUBLIC_URL}/all_chinese_words.csv`);
                         const allWords = response.data

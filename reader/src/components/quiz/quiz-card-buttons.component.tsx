@@ -1,6 +1,6 @@
 import { Box, Button } from '@material-ui/core'
 import { quizButtonReveal } from '@shared/'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { ManagerContext } from '../../App'
 import { QuizCard } from './word-card.interface'
 import { useObservableState, useSubscription } from 'observable-hooks'
@@ -19,6 +19,7 @@ export const AdvanceButton = () => {
                     variant={'contained'}
                     id={quizButtonReveal}
                     onClick={() => m.hotkeyEvents.advanceQuiz$.next()}
+
                 >
                     Reveal
                 </Button>

@@ -1,20 +1,6 @@
-import React, { ReactNode, useEffect, useState } from 'react'
-import { usePopper } from 'react-popper'
-import { makeStyles } from '@material-ui/core/styles'
+import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 import { Placement } from '@popperjs/core'
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        backgroundColor: '#78c800',
-        color: 'white',
-        padding: '5px 10px',
-        borderRadius: '4px',
-        maxWidth: '300px',
-        '&:hover': {
-            cursor: 'pointer',
-        },
-    },
-}))
+import { Box, Popover } from '@material-ui/core'
 
 export function tryParse<T>(serialized: string, defaultVal: T): T {
     try {
@@ -25,44 +11,66 @@ export function tryParse<T>(serialized: string, defaultVal: T): T {
 }
 
 export const TutorialPopper = ({
-    referenceElement,
-    storageKey,
-    children,
-    placement,
-}: {
-    referenceElement: HTMLDivElement | null
+                                   referenceElement,
+                                   storageKey,
+                                   children,
+                                   placement,
+                               }: {
+    referenceElement: HTMLElement
     storageKey: string
     children?: ReactNode
-    placement: Placement
+    placement?: Placement
 }) => {
-    const [open, setOpen] = useState<boolean>()
-    const classes = useStyles()
+    const [mouseEntered, setMouseEntered] = useState<boolean>()
+    const [disabled, setDisabled] = useState<boolean>()
     useEffect(() => {
-        setOpen(tryParse(localStorage.getItem(storageKey) || 'false', false))
+        setDisabled(tryParse(localStorage.getItem(storageKey) || 'false', false))
+    }, [])
+    const onClick = useCallback(() => {
+        localStorage.setItem(storageKey, (disabled as unknown) as string)
+        setDisabled(true)
     }, [])
     useEffect(() => {
-        localStorage.setItem(storageKey, (open as unknown) as string)
-    }, [open])
-    const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
-        null,
-    )
-
-    const x = usePopper(referenceElement, popperElement, {
-        placement,
-        strategy: 'fixed',
-    })
-    if (open) {
+        referenceElement.onmouseenter = () => setMouseEntered(true)
+        referenceElement.onmouseleave = () => setMouseEntered(false)
+    }, [referenceElement])
+    if (mouseEntered && !disabled) {
         return (
-            <div
-                ref={setPopperElement}
-                style={x.styles.popper}
-                {...x.attributes.popper}
-                onClick={() => setOpen(false)}
+            <Popover
+                open={mouseEntered}
+                anchorEl={referenceElement}
+                onClick={onClick}
+                style={{ pointerEvents: 'none' }}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
             >
-                <div className={classes.root}>{children}</div>
-            </div>
+                <Box p={1}>
+                    {children}
+                </Box>
+            </Popover>
         )
     } else {
-        return <div />
+        return null
     }
+}
+
+export function useTutorialPopOver<T extends (HTMLElement | HTMLButtonElement)>(storageKey: string, text: string): [
+    (ref: null | T) => void,
+    React.FC
+] {
+    const [ref, setRef] = useState<T | null>(null)
+    return [
+        setRef,
+        () => ref ?
+            <TutorialPopper referenceElement={ref} storageKey={storageKey}>
+                {text}
+            </TutorialPopper> :
+            null,
+    ]
 }

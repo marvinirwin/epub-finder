@@ -1,10 +1,9 @@
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import { WordRecognitionRow } from './word-recognition-row'
-import { PronunciationProgressRow } from './pronunciation-progress-row.interface'
 import { NormalizedValue } from '../manager/normalized-value.interface'
 import { SrmService } from '../srm/srm.service'
 import { formatDistance, isToday } from 'date-fns'
-import { SuperMemoGrade, SuperMemoItem } from 'supermemo'
+import { SuperMemoGrade } from 'supermemo'
 import { lastN } from '../../components/quiz/last-n'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 

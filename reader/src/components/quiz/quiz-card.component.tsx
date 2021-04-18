@@ -80,7 +80,9 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                     <Fragment>
                         <div className={'quiz-card-data-sheet'}>
                             <div>
+{/*
                                 <QuizCardTranslationAttemptSchedule />
+*/}
                             </div>
                             <div className={'quiz-card-data-sheet-middle'}>
                                 <CardImage quizCard={quizCard} />
@@ -90,7 +92,9 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                                 )}
                             </div>
                             <div>
+{/*
                                 {answerIsRevealed && <QuizCardScheduleTable />}
+*/}
                                 {<CardInfo quizCard={quizCard} />}
                             </div>
                         </div>

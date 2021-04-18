@@ -5,21 +5,28 @@ import { removePunctuation } from '../../../lib/highlighting/temporary-highlight
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
-import { Mic, RecordVoiceOver } from '@material-ui/icons'
+import { RecordVoiceOver } from '@material-ui/icons'
 import { RECOGNIZE_SPEECH } from '@shared/'
 import { observableLastValue } from '../../../services/settings.service'
+import { TutorialPopper } from '../../tutorial-popover/tutorial-popper.component'
+import { Typography } from '@material-ui/core'
 
 export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
     return {
         name: RECOGNIZE_SPEECH,
         LeftIcon: () => {
-            const m = useContext(ManagerContext)
+            const manager = useContext(ManagerContext)
             const isRecording = useObservableState(
-                m.audioRecordingService.audioRecorder.isRecording$,
+                manager.audioRecordingService.audioRecorder.isRecording$,
             )
-            return (
+            const trySpeakingRef = useObservableState(m.introService.trySpeakingRef$)
+            return <>
                 <RecordVoiceOver color={isRecording ? 'primary' : 'disabled'} />
-            )
+                {trySpeakingRef && <TutorialPopper storageKey={'recognize-speech'} referenceElement={trySpeakingRef} >
+                    <Typography>Click this to test your pronunciation with speech recognition</Typography>
+                </TutorialPopper>
+                }
+            </>
         },
         label: 'Speak',
         action: async () => {
@@ -48,7 +55,9 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
         },
 
         props: {
-            ref: (ref) => m.introService.trySpeakingRef$.next(ref),
+            ref: (ref) => {
+                m.introService.trySpeakingRef$.next(ref)
+            },
         },
     }
 }
