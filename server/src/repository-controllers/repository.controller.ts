@@ -1,41 +1,11 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common'
 import { UserFromReq } from '../decorators/userFromReq'
 import { User } from '../entities/user.entity'
-import { UserSetting } from '../entities/user-setting.entity'
-import { Card } from 'src/entities/card.entity'
-import { SpacedRepitionEntity } from '../entities/spaced-repitition-record.entity'
-import { IgnoredWord } from '../entities/ignored-word.entity'
-import { CustomWord } from '../entities/custom-word.entity'
 import { Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
+import { RepositoryService } from './repository.service'
 
 
-class RepositoryControllerService {
-    public entityMap: {
-        [key: string]: Repository<any>
-    }
-
-    constructor(
-        @InjectRepository(UserSetting)
-        public userSettings: Repository<UserSetting>,
-        @InjectRepository(Card)
-        public cards: Repository<Card>,
-        @InjectRepository(SpacedRepitionEntity)
-        public spacedRepitionEntities: Repository<SpacedRepitionEntity>,
-        @InjectRepository(IgnoredWord)
-        public ignoredWords: Repository<IgnoredWord>,
-        @InjectRepository(CustomWord)
-        public customWords: Repository<CustomWord>,
-    ) {
-        this.entityMap = {
-            userSettings,
-            cards,
-            spacedRepitionEntities,
-            ignoredWords,
-            customWords,
-        }
-    }
-}
+export type RepositoryType = { view: Repository<any>, write: Repository<any> }
 
 interface SerializedSelect<T extends Record<string, any>> {
     where: Partial<T>,
@@ -49,7 +19,7 @@ interface SerializedSelect<T extends Record<string, any>> {
 @Controller('entities')
 export class RepositoryController {
     constructor(
-        private repositoryControllerService: RepositoryControllerService,
+        private repositoryControllerService: RepositoryService,
     ) {
     }
 
@@ -57,7 +27,7 @@ export class RepositoryController {
     async get(
         @UserFromReq() user: User,
         @Param('entity') entity: string,
-        @Req() request: Request,
+        @Req() request: Express.Request,
     ) {
         const foundEntity = this.resolveEntity(entity)
         // @ts-ignore
@@ -71,7 +41,7 @@ export class RepositoryController {
                 ),
         ) as SerializedSelect<any>
         where.user_id = user.id;
-        return await foundEntity.find({
+        return await foundEntity.view.find({
             where: [
                 where
             ],
@@ -93,10 +63,10 @@ export class RepositoryController {
         }
         body.user_id = user.id;
         delete body.id;
-        return await foundEntity.save(body)
+        return await foundEntity.write.save(body)
     }
 
-    private resolveEntity(entity: string) {
+    private resolveEntity<T>(entity: string): {view: Repository<T>, write: Repository<T>} {
         if (!entity) {
             throw new Error(`No entity provided to entities controller method`)
         }
@@ -104,7 +74,11 @@ export class RepositoryController {
         if (!foundEntity) {
             throw new Error(`Unknown entity ${entity}`)
         }
-        return foundEntity
+        if ((foundEntity as RepositoryType).view) {
+            return foundEntity as RepositoryType;
+        }
+        // @ts-ignore
+        return {view: foundEntity, write: foundEntity}
     }
 
 }
