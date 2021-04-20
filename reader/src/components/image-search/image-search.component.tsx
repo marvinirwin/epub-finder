@@ -89,7 +89,8 @@ export function ImageSearchComponent() {
 
     useEffect(() => {
         if (searchTerm) {
-            debounceSearch(searchTerm)
+            debounceSearch.cancel()
+            debounceSearch(searchTerm);
         }
     }, [searchTerm])
 

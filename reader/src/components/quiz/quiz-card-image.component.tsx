@@ -1,13 +1,12 @@
 import { EditableOnClick } from './editable-image.component'
-import { InsertPhoto } from '@material-ui/icons'
-import React, { useCallback, useContext } from 'react'
+import React, { useContext } from 'react'
 import { useObservableState } from 'observable-hooks'
-import { QuizCard, WordCard } from './word-card.interface'
+import { WordCard } from './word-card.interface'
 import { ManagerContext } from '../../App'
 import { observableLastValue } from '../../services/settings.service'
-import { Button, IconButton, Typography } from '@material-ui/core'
+import { Button, Typography } from '@material-ui/core'
 import { quizCardImage, selectQuizCardImageButton } from '@shared/'
-import { useIsFieldHidden } from './useIsFieldHidden'
+import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
 
 export function CardImage({ quizCard }: { quizCard: WordCard }) {
     const quizCardImageSource = useObservableState(quizCard.image$.value$)
@@ -15,6 +14,7 @@ export function CardImage({ quizCard }: { quizCard: WordCard }) {
     const isImageHidden = useIsFieldHidden({quizCard, label: 'picture'})
 */
     const m = useContext(ManagerContext)
+    const [setRef, TutorialPopOver] = useTutorialPopOver('selectCardImage', 'Find a picture to help stick the word in your memory')
     return (
         <EditableOnClick
             onEditClicked={async () => {
@@ -30,12 +30,16 @@ export function CardImage({ quizCard }: { quizCard: WordCard }) {
             {quizCardImageSource ? (
                 <img className={quizCardImage} src={quizCardImageSource} />
             ) : (
-                <Button
-                    id={selectQuizCardImageButton}
-                    style={{ margin: '24px' }}
-                >
-                    <Typography>Select Photo</Typography>
-                </Button>
+                <>
+                    <Button
+                        id={selectQuizCardImageButton}
+                        style={{ margin: '24px' }}
+                        ref={setRef}
+                    >
+                        <Typography>Select Photo</Typography>
+                    </Button>
+                    <TutorialPopOver />
+                </>
             )}
         </EditableOnClick>
     )

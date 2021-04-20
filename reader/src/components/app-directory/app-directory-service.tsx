@@ -43,7 +43,6 @@ export function AppDirectory(m: Manager) {
 /*
         TranslationAttemptSchedule,
 */
-        TranslationAttemptNode,
         QuizCarouselNode(),
         QuizScheduleNode(m),
         /*

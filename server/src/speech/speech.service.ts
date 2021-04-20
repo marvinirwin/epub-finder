@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { SpeechToken } from '../entities/speech-token.entity'
 import jwt_decode from 'jwt-decode'
+export const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n))
 
 export const wavRoot = process.env.SYTHTHESIZED_WAV_CACHE_DIR as string
 export const region = process.env.AZURE_SPEECH_LOCATION as string
@@ -86,13 +87,12 @@ export class SpeechService {
                 ssml1,
                 async (result) => {
                     await new Promise((resolve, reject) => synthesizer.close(resolve, reject))
-                    audioConfig.close()
+                    await new Promise(resolve => setTimeout(resolve, 500))
                     resolve()
                 },
                 (error) => {
                     console.log(error)
                     synthesizer.close()
-                    audioConfig.close()
                     reject(error)
                 },
             )

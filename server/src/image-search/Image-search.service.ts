@@ -23,7 +23,8 @@ const cognitiveServiceCredentials = new CognitiveServicesCredentials(
 
 const client = new ImageSearchClient(cognitiveServiceCredentials, {
     endpoint: imageSearchEndPoint,
-})
+});
+console.log(`Image search endpoint: ${imageSearchEndPoint}`)
 
 @Injectable()
 export class ImageSearchService {
