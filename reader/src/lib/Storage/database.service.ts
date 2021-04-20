@@ -8,6 +8,39 @@ import { BasicDocument } from '../../types'
 import { IgnoredWord } from '../schedule/ignored-word.interface'
 import { TranslationAttemptRecord } from '../schedule/translation-attempt.repository'
 
+type PersistableEntity = 'userSettings' |
+    'userSettingView' |
+    'cards' |
+    'spacedRepitionEntities' |
+    'ignoredWords' |
+    'customWords';
+
+const queryPersistableEntity = <T>(
+    {
+        entity,
+        where,
+        skip,
+        take,
+    }:
+        {
+            entity: PersistableEntity,
+            where?: Partial<T>,
+            skip?: number,
+            take?: number
+        },
+): Promise<T[]> => {
+    const url = new URL(`${process.env.PUBLIC_URL}/entities/${entity}`)
+    url.search = new URLSearchParams({
+            where: JSON.stringify(where),
+            skip: `${skip}`,
+            take: `${take}`,
+        },
+    ).toString()
+
+    return fetch(url.toString())
+        .then(response => response.json())
+}
+
 export interface CustomWord {
     word: string;
     timestamp: Date;
@@ -41,7 +74,7 @@ export class DatabaseService extends Dexie {
             settings2: 'name, value',
             createdSentences: 'id++, learningLanguage',
             customDocuments: 'name, html',
-            customWords: 'id++, word, timestamp'
+            customWords: 'id++, word, timestamp',
         })
         // The following lines are needed for it to work across typescipt using babel-preset-typescript:
         this.cards = this.table('cards')
@@ -59,7 +92,7 @@ export class DatabaseService extends Dexie {
         return this.cards.offset(0).count()
     }
 
-    async *getCardsFromDB(
+    async* getCardsFromDB(
         whereStmts: { [key: string]: any },
         chunkSize: number = 500,
     ): AsyncGenerator<ICard[]> {
@@ -67,10 +100,10 @@ export class DatabaseService extends Dexie {
         const f = Object.values(whereStmts).length
             ? () => this.cards.where(whereStmts).offset(offset)
             : () =>
-                  this.cards
-                      .where('learningLanguage')
-                      .notEqual('')
-                      .offset(offset)
+                this.cards
+                    .where('learningLanguage')
+                    .notEqual('')
+                    .offset(offset)
         while (await f().first()) {
             const chunkedCards = await f().limit(chunkSize).toArray()
             yield chunkedCards
@@ -78,7 +111,7 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async *getSentenceRowsFromDB(): AsyncGenerator<CreatedSentence[]> {
+    async* getSentenceRowsFromDB(): AsyncGenerator<CreatedSentence[]> {
         let offset = 0
         const chunkSize = 500
         while (await this.createdSentences.offset(offset).first()) {
@@ -91,23 +124,28 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async *getWordRecordsGenerator<T>(
-        table: Dexie.Table<T>,
+    async* getWordRecordsGenerator<T>(
+        entity: PersistableEntity,
         mapFn?: (v: T) => T,
     ): AsyncGenerator<T[]> {
-        let offset = 0
+        let skip = 0
         const chunkSize = 500
-        while (await table.offset(offset).first()) {
-            const chunkedRecognitionRows = await table
-                .offset(offset)
-                .limit(chunkSize)
-                .toArray()
+        let chunkedRecognitionRows: T[] = [];
+        while (chunkedRecognitionRows = await queryPersistableEntity<T>({
+            entity,
+            skip,
+            take: chunkSize
+        })) {
+            // HACK
+            if (!chunkedRecognitionRows.length) {
+                break;
+            }
             if (mapFn) {
                 yield chunkedRecognitionRows.map(mapFn)
             } else {
                 yield chunkedRecognitionRows
             }
-            offset += chunkSize
+            skip += chunkSize
         }
     }
 }
