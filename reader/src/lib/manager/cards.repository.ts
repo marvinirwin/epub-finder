@@ -9,7 +9,7 @@ import { getIsMeFunction, ICard } from '../../../../server/src/shared/ICard'
 import { Dictionary, flatten, maxBy } from 'lodash'
 import { map, scan, shareReplay, startWith } from 'rxjs/operators'
 import { Settings } from '../../../../server/src/shared/Message'
-import { DatabaseService } from '../Storage/database.service'
+import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
 import { cardForWord } from '../util/Util'
 import { observableLastValue } from '../../services/settings.service'
 import { AtomMetadata } from '../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata'
@@ -64,7 +64,13 @@ export default class CardsRepository {
         }
     }
 
-    public deleteWords: Subject<string[]> = new Subject<string[]>()
+
+    /**
+     * Don't use, doesn't do anything anymore.  use IgnoredWords instead
+     * @deprecated
+     * @private
+     */
+    private deleteWords: Subject<string[]> = new Subject<string[]>()
     addCardsWhichDoNotHaveToBePersisted$: Subject<ICard[]> = new Subject<
         ICard[]
     >()
@@ -138,42 +144,36 @@ export default class CardsRepository {
                 map((cards) => {
                     for (let i = 0; i < cards.length; i++) {
                         const card = cards[i]
-                        this.db.cards
-                            .put(card, card?.id)
-                            .then((id) => (card.id = id))
+                        putPersistableEntity(
+                            {
+                                entity: 'cards',
+                                record: card
+                            }
+                        ).then(({id}) => {
+                            return card.id = id
+                        })
                     }
                     return cards
                 }),
             )
             .subscribe(this.addCardsWhichDoNotHaveToBePersisted$)
+/*
         this.deleteWords.subscribe((cards) => {
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i]
                 this.db.cards.where({ learningLanguage: card }).delete()
             }
         })
+*/
     }
 
     async load() {
         this.cardProcessingSignal$.next(true)
-        const unloadedCardCount = await this.db.getCardsInDatabaseCount()
-        if (unloadedCardCount) {
-            await this.getCardsFromDB()
-        }
+        await this.getCardsFromDB()
         this.cardProcessingSignal$.next(false)
     }
 
     private async getCardsFromDB() {
-        const priorityCards = await this.db.settings
-            .where({ name: Settings.MOST_POPULAR_WORDS })
-            .first()
-        const priorityWords = priorityCards?.value || []
-        for await (const cards of this.db.getCardsFromDB(
-            { learningLanguage: priorityWords },
-            100,
-        )) {
-            this.addCardsWhichDoNotHaveToBePersisted$.next(cards)
-        }
         for await (const cards of this.db.getCardsFromDB({}, 500)) {
             this.addCardsWhichDoNotHaveToBePersisted$.next(cards)
         }

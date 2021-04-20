@@ -4,7 +4,6 @@ import { User } from '../entities/user.entity'
 import { Repository } from 'typeorm'
 import { RepositoryService } from './repository.service'
 
-
 export type RepositoryType = { view: Repository<any>, write: Repository<any> }
 
 interface SerializedSelect<T extends Record<string, any>> {
