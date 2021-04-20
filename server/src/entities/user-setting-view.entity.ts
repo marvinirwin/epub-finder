@@ -1,26 +1,28 @@
-import {
-    Column, CreateDateColumn,
-    OneToOne,
-    PrimaryColumn, PrimaryGeneratedColumn,
-    ViewColumn,
-    ViewEntity,
-} from 'typeorm'
-import { User } from './user.entity'
+import { Column, ViewColumn, ViewEntity } from 'typeorm'
+
+export const GroupwiseMax = ({
+                                 table,
+                                 groupingColumns,
+
+                             }: {
+                                 table: string,
+                                 groupingColumns: string[]
+                             },
+) => `
+SELECT 
+    s.*
+FROM ${table} s
+LEFT JOIN ${table} max_table 
+    ON ${table}.created_at > s.created_at
+    AND ${groupingColumns
+    .map(groupingColumn => `max_table.${groupingColumn} = s.${groupingColumn}`)
+.join(' AND ')}
+     AND max_table.creator_id = s.creator_id
+WHERE setting_max.id IS NULL
+`
 
 @ViewEntity({
-    expression: `
-    SELECT 
-        s.id,
-        s.value,
-        s.name,
-        s.created_at,
-        s.creator_id
-    FROM user_setting s
-    LEFT JOIN user_setting setting_max 
-        ON setting_max.created_at > s.created_at
-        AND setting_max.name = s.name AND setting_max.creator_id = s.creator_id
-    WHERE setting_max.id IS NULL
-`,
+    expression: GroupwiseMax({ table: 'user_setting', groupingColumn: 'name' }),
 })
 export class UserSettingView {
     @ViewColumn()
@@ -28,9 +30,9 @@ export class UserSettingView {
     @ViewColumn()
     value: any
     @Column()
-    name: string;
+    name: string
     @ViewColumn()
-    created_at: Date;
+    created_at: Date
     @ViewColumn()
-    creator_id: number;
+    creator_id: number
 }

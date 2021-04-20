@@ -8,6 +8,7 @@ import { SpacedRepitionEntity } from '../entities/spaced-repitition-record.entit
 import { IgnoredWord } from '../entities/ignored-word.entity'
 import { CustomWord } from '../entities/custom-word.entity'
 import { RepositoryType } from './repository.controller'
+import { CardView } from '../entities/card-view.entity'
 
 @Controller('repositories')
 export class RepositoryService {
@@ -28,10 +29,12 @@ export class RepositoryService {
         public ignoredWords: Repository<IgnoredWord>,
         @InjectRepository(CustomWord)
         public customWords: Repository<CustomWord>,
+        @InjectRepository(CardView)
+        public cardView: Repository<CardView>,
     ) {
         this.entityMap = {
             userSettings: { view: userSettingView, write: userSettings },
-            cards,
+            cards: {view: cardView, write: cards},
             spacedRepitionEntities,
             ignoredWords,
             customWords,
