@@ -1,13 +1,13 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { WordRecognitionRow } from './word-recognition-row'
-import { DatabaseService } from '../Storage/database.service'
+import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
 
 export class WordRecognitionProgressRepository extends IndexedRowsRepository<WordRecognitionRow> {
     constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
             databaseService,
-            load: () => databaseService.getWordRecordsGenerator(databaseService.wordRecognitionRecords),
-            add: (r) => databaseService.wordRecognitionRecords.add(r),
+            load: () => databaseService.getWordRecordsGenerator('spacedRepitionEntities'),
+            add: (r) => putPersistableEntity({entity: 'spacedRepitionEntities', record: r}),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

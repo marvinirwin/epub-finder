@@ -49,45 +49,6 @@ export class HotKeyEvents {
 
     public startListeners() {
         const m = this.m
-        this.openImageSearch$
-            .pipe(withLatestFrom(m.editingCardManager.editingCard$))
-            .subscribe(async ([_, editingCard]) => {
-                if (!editingCard) {
-                    return
-                }
-                const [characters, photos] = await Promise.all([
-                    editingCard.learningLanguage$.toPromise(),
-                    editingCard.photos$.toPromise(),
-                ])
-                m.imageSearchService.queryImageRequest$.next({
-                    term: characters,
-                    cb: (s: string) =>
-                        editingCard.photos$.next(photos?.concat(s)),
-                })
-            })
-
-        this.requestEditQuizWord$
-            .pipe(withLatestFrom(m.quizService.quizCard.word$))
-            .subscribe(async ([_, word]) => {
-                if (word) {
-                    m.editingCardManager.requestEditWord$.next(word)
-                }
-            })
-
-        this.hide$
-            .pipe(
-                withLatestFrom(
-                    m.imageSearchService.queryImageRequest$,
-                    m.editingCardManager.showEditingCardPopup$,
-                ),
-            )
-            .subscribe(([_, imageQuery, showEditingCard]) => {
-                if (imageQuery) {
-                    m.editingCardManager.showEditingCardPopup$.next(false)
-                } else if (showEditingCard) {
-                    m.imageSearchService.queryImageRequest$.next(undefined)
-                }
-            })
     }
 
     public hotkeyActions(): Hotkeys<Subject<void>> {

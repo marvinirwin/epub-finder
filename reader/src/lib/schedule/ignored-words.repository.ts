@@ -1,6 +1,6 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { PronunciationProgressRow } from './pronunciation-progress-row.interface'
-import { DatabaseService } from '../Storage/database.service'
+import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
 import { IgnoredWord } from './ignored-word.interface'
 
 export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
@@ -8,13 +8,13 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
         super({
             databaseService,
             load: () =>
-                databaseService.getWordRecordsGenerator(databaseService.ignoredWords, (v) => {
+                databaseService.getWordRecordsGenerator('ignoredWords', (v) => {
                     if (!v.timestamp) {
                         v.timestamp = new Date()
                     }
                     return v
                 }),
-            add: (r) => databaseService.ignoredWords.add(r),
+            add: (r) => putPersistableEntity({entity: 'ignoredWords', record: r}),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

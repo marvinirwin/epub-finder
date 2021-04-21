@@ -25,9 +25,6 @@ export class TrieService {
         const t = new TrieWrapper(new SetWithUniqueLengths())
         this.trie$ = t.changeSignal$
         cardsRepository.newWords$.subscribe((words) => t.addWords(...words))
-        cardsRepository.deleteWords.subscribe((words) =>
-            t.removeWords(...words),
-        )
         ;[pronunciationProgressService, wordRecognitionProgressService].map(
             (progressService: IndexedRowsRepository<any>) =>
                 progressService.addRecords$.subscribe((records) => {

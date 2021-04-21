@@ -22,13 +22,8 @@ import { BrowserInputsService } from '../hotkeys/browser-inputs-service'
 import { InputPage } from './manager-connections/Input-Page'
 import { CardPage } from './manager-connections/Card-Page'
 import { CreatedSentenceManager } from './CreatedSentenceManager'
-import { Segment } from '@shared/'
-import { mergeDictArrays } from '../util/mergeAnnotationDictionary'
-import EditingCardManager from './EditingCardManager'
-import { CardPageEditingCardCardDBAudio } from './manager-connections/Card-Page-EditingCard-CardDB-Audio'
 import { AppContext } from '../app-context/AppContext'
 import { RecordRequest } from '../util/RecordRequest'
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import { Highlighter } from '../highlighting/Highlighter'
 import { HotKeyEvents } from '../hotkeys/HotKeyEvents'
 import { ModesService } from '../modes/modes.service'
@@ -72,7 +67,6 @@ import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows
 import { GoalsService } from '../quiz/goals.service'
 import { ActiveSentenceService } from '../sentences/active-sentence.service'
 import { VisibleService } from './visible.service'
-import { TabulatedDocuments } from '@shared/'
 import { ElementAtomMetadataIndex } from '../../services/element-atom-metadata.index'
 import { WordMetadataMapService } from '../../services/word-metadata-map.service'
 import { AtomElementEventsService } from '../user-interface/atom-element-events.service'
@@ -142,7 +136,6 @@ export class Manager {
     public quizResultService: QuizResultService
     public createdSentenceManager: CreatedSentenceManager
     public browserInputsService: BrowserInputsService
-    public editingCardManager: EditingCardManager
     public visibleElementsService: VisibleService
     public loggedInUserService = new LoggedInUserService()
     public highlighter: Highlighter
@@ -331,7 +324,6 @@ export class Manager {
             audioRecorder: this.audioRecordingService.audioRecorder,
             languageConfigsService: this.languageConfigsService,
         })
-        this.editingCardManager = new EditingCardManager()
         this.quizResultService = new QuizResultService({
             wordRecognitionProgressService: this.wordRecognitionProgressService,
             scheduleRowsService: this.quizCardScheduleRowsService,
@@ -343,13 +335,6 @@ export class Manager {
         })
         InputPage(this.browserInputsService, this.openDocumentsService)
         CardPage(this.cardsRepository, this.openDocumentsService)
-        CardPageEditingCardCardDBAudio(
-            this.cardsRepository,
-            this.openDocumentsService,
-            this.editingCardManager,
-            this.cardDBManager,
-            this.audioRecordingService,
-        )
 
         this.openDocumentsService.renderedSegments$.subscribe((segments) => {
             this.browserInputsService.applySegmentListeners(segments)
@@ -358,22 +343,12 @@ export class Manager {
 
         this.highlighter = new Highlighter(this)
 
-        this.hotkeyEvents.hide$.subscribe(() => {
-            this.editingCardManager.showEditingCardPopup$.next(false)
-        })
-
-        /*
-                merge(
-                    this.inputManager.getKeyDownSubject("d").pipe(filterTextInputEvents),
-                ).subscribe(() => this.highlightAllWithDifficultySignal$.next(!this.highlightAllWithDifficultySignal$.getValue()))
-        */
 
         this.browserInputsService.selectedText$.subscribe((word) => {
             this.audioRecordingService.audioRecorder.recordRequest$.next(
                 new RecordRequest(word),
             )
             this.audioRecordingService.queSynthesizedSpeechRequest$.next(word)
-            this.editingCardManager.requestEditWord$.next(word)
         })
 
 /*

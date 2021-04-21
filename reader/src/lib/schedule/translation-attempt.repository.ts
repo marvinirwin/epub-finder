@@ -1,6 +1,7 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { DatabaseService } from '../Storage/database.service'
 import { SuperMemoGrade } from 'supermemo'
+import { emptyGenerator } from './pronunciation-progress.repository'
 
 export interface TranslationAttemptRecord {
     id?: number
@@ -19,8 +20,8 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
     constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
             databaseService,
-            load: () => databaseService.getWordRecordsGenerator(databaseService.translationAttempts),
-            add: (r) => databaseService.translationAttempts.add(r),
+            load: emptyGenerator,
+            add: (r) => Promise.resolve(1),
             getIndexValue: (r) => ({ indexValue: r.learningLanguage }),
         })
     }
