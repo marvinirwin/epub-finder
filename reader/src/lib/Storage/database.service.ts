@@ -10,7 +10,7 @@ export type PersistableEntity = 'userSettings' |
     'ignoredWords' |
     'customWords';
 
-const queryPersistableEntity = <T>(
+export const queryPersistableEntity = <T>(
     {
         entity,
         where,
@@ -24,7 +24,9 @@ const queryPersistableEntity = <T>(
             take?: number
         },
 ): Promise<T[]> => {
-    const url = new URL(`${process.env.PUBLIC_URL}/entities/${entity}`)
+    const url1 = `${process.env.PUBLIC_URL}/entities/${entity}`
+    debugger;
+    const url = new URL(url1)
     url.search = new URLSearchParams({
             where: JSON.stringify(where),
             skip: `${skip}`,
@@ -89,15 +91,18 @@ export class DatabaseService extends Dexie {
         chunkSize: number = 500,
     ): AsyncGenerator<ICard[]> {
         let offset = 0
-        const f = Object.values(whereStmts).length
-            ? () => this.cards.where(whereStmts).offset(offset)
-            : () =>
-                this.cards
-                    .where('learningLanguage')
-                    .notEqual('')
-                    .offset(offset)
-        while (await f().first()) {
-            const chunkedCards = await f().limit(chunkSize).toArray()
+        const f = () => queryPersistableEntity<ICard>({
+            entity: 'cards',
+            where: whereStmts,
+            skip: offset,
+            take: chunkSize,
+        });
+        while (true) {
+            const records = await f()
+            if (!records.length) {
+                break
+            }
+            const chunkedCards = await f()
             yield chunkedCards
             offset += chunkSize
         }

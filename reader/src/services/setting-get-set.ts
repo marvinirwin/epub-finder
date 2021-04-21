@@ -1,7 +1,8 @@
-import { DatabaseService } from '../lib/Storage/database.service'
+import { DatabaseService, putPersistableEntity, queryPersistableEntity } from '../lib/Storage/database.service'
 import { HistoryService } from '../lib/app-context/history.service'
 import { Observable, of } from 'rxjs'
 import { distinctUntilChanged, skip } from 'rxjs/operators'
+import { UserSetting } from '../../../server/src/entities/user-setting.entity'
 
 export type SettingType = 'url' | 'indexedDB' | 'REST'
 
@@ -19,26 +20,28 @@ export class SettingGetSet<T> {
                     name,
                     () =>
                         new Promise((resolve, reject) => {
-                            databaseService.settings
-                                .where({ name })
-                                .first()
-                                .then((row) => {
-                                    if (row) {
-                                        try {
-                                            resolve(JSON.parse(row.value))
-                                        } catch (e) {
-                                            resolve(defaultWhenNotAvailable)
-                                        }
-                                    } else {
+                            queryPersistableEntity<UserSetting>({
+                                entity: 'userSettings',
+                                skip: 1,
+                                take: 1,
+                            }).then((rows) => {
+                                const row = rows[0];
+                                if (row) {
+                                    try {
+                                        resolve(row.value)
+                                    } catch (e) {
                                         resolve(defaultWhenNotAvailable)
                                     }
-                                })
+                                } else {
+                                    resolve(defaultWhenNotAvailable)
+                                }
+                            })
                         }),
                     async (value: Value) => {
-                        await databaseService.settings.put(
-                            { name, value: JSON.stringify(value) },
-                            name,
-                        )
+                        await putPersistableEntity<UserSetting>({
+                            entity: 'userSettings',
+                            record: {name, value},
+                        })
                     },
                     of(),
                 )
