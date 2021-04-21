@@ -24,8 +24,7 @@ export const queryPersistableEntity = <T>(
             take?: number
         },
 ): Promise<T[]> => {
-    const url1 = `${process.env.PUBLIC_URL}/entities/${entity}`
-    debugger;
+    const url1 = `${window.location.href}/entities/${entity}`
     const url = new URL(url1)
     url.search = new URLSearchParams({
             where: JSON.stringify(where),
@@ -47,7 +46,7 @@ export const putPersistableEntity = <T>(
         record: Partial<T>
     },
 ) => {
-    const url = new URL(`${process.env.PUBLIC_URL}/entities/${entity}`)
+    const url = new URL(`${window.location.href}/entities/${entity}`)
     return fetch(
         url.toString(),
         {
