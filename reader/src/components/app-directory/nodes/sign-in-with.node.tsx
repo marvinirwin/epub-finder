@@ -26,7 +26,7 @@ export const IsNotLoggedInProfile = () => {
             <ListItemText primary={'Login or Sign Up'} />
         </ListItem>
         {ref && <TutorialPopper storageKey={'is-logged-in'} referenceElement={ref}>
-            <Typography>Log in to save your learning material</Typography>
+            <Typography>Log in to save your learning progress and learning material</Typography>
         </TutorialPopper>
         }
     </>

@@ -7,11 +7,11 @@ import { Card } from '../entities/card.entity'
 import { SpacedRepitionEntity } from '../entities/spaced-repitition-record.entity'
 import { IgnoredWord } from '../entities/ignored-word.entity'
 import { CustomWord } from '../entities/custom-word.entity'
-import { RepositoryType } from './repository.controller'
+import { RepositoryType } from './entities.controller'
 import { CardView } from '../entities/card-view.entity'
 
 @Controller('repositories')
-export class RepositoryService {
+export class EntitiesService {
     public entityMap: {
         [key: string]: Repository<any> | RepositoryType
     }

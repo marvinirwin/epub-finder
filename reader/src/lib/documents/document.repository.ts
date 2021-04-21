@@ -24,12 +24,15 @@ export class DocumentRepository {
         languageConfigsService: LanguageConfigsService
     }) {
         this.databaseService = databaseService
-        const { obs$, isLoading$ } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (languageCode) => {
+        const {
+            obs$,
+            isLoading$,
+        } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (languageCode) => {
             const response = await axios.get(
                 `${process.env.PUBLIC_URL}/documents`,
                 {
-                    params: {language_code: languageCode}
-                }
+                    params: { language_code: languageCode },
+                },
             )
             const responseDocuments = ((response?.data ||
                 []) as DocumentViewDto[]).map((d) => new LtDocument(d))

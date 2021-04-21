@@ -24,10 +24,10 @@ export const queryPersistableEntity = <T>(
             take?: number
         },
 ): Promise<T[]> => {
-    const url1 = `${window.location.href}/entities/${entity}`
+    const url1 = `${window.location.href}entities/${entity}`
     const url = new URL(url1)
     url.search = new URLSearchParams({
-            where: JSON.stringify(where),
+            where: where ? JSON.stringify(where) : '{}',
             skip: `${skip}`,
             take: `${take}`,
         },
@@ -46,7 +46,7 @@ export const putPersistableEntity = <T>(
         record: Partial<T>
     },
 ) => {
-    const url = new URL(`${window.location.href}/entities/${entity}`)
+    const url = new URL(`${window.location.href}entities/${entity}`)
     return fetch(
         url.toString(),
         {

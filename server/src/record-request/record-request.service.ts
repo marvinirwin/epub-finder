@@ -16,14 +16,14 @@ export class RecordRequestService {
         this.recordRequestRepository.save(
             sentences.map((sentence) => ({
                 sentence,
-                user_id: user.id,
+                creator_id: user.id,
             })),
         )
     }
 
     public async queryRecordRequestsForUser(user: User) {
         return this.recordRequestRepository
-            .find({ user_id: user.id })
+            .find({ creator_id: user.id })
             .then((records) => records.map(({ sentence }) => sentence))
     }
 }

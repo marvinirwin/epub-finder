@@ -11,7 +11,7 @@ export class RecordRequest {
     id: number
 
     @Column()
-    user_id: number
+    creator_id: number
 
     @CreateDateColumn()
     created_at: Date

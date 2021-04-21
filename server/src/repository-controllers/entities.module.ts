@@ -6,8 +6,8 @@ import { Card } from '../entities/card.entity'
 import { SpacedRepitionEntity } from '../entities/spaced-repitition-record.entity'
 import { IgnoredWord } from '../entities/ignored-word.entity'
 import { CustomWord } from '../entities/custom-word.entity'
-import { RepositoryController } from './repository.controller'
-import { RepositoryService } from './repository.service'
+import { EntitiesController } from './entities.controller'
+import { EntitiesService } from './entities.service'
 import { CardView } from '../entities/card-view.entity'
 
 @Module({
@@ -25,11 +25,11 @@ import { CardView } from '../entities/card-view.entity'
         ),
     ],
     controllers: [
-        RepositoryController
+        EntitiesController
     ],
     providers: [
-        RepositoryService,
+        EntitiesService,
     ],
 })
-export class RepositoryModule {
+export class EntitiesModule {
 }
