@@ -5,7 +5,9 @@ export class Card {
     @PrimaryGeneratedColumn('uuid')
     id: string
     @Column()
-    learningLanguage: string
+    learning_language: string
+    @Column()
+    language_code: string
     @Column({type: 'jsonb'})
     photos: string[]
     @Column({type: 'jsonb'})

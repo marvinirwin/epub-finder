@@ -8,6 +8,7 @@ import { IgnoredWord } from '../entities/ignored-word.entity'
 import { CustomWord } from '../entities/custom-word.entity'
 import { RepositoryController } from './repository.controller'
 import { RepositoryService } from './repository.service'
+import { CardView } from '../entities/card-view.entity'
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { RepositoryService } from './repository.service'
                 SpacedRepitionEntity,
                 IgnoredWord,
                 CustomWord,
+                CardView
             ],
         ),
     ],

@@ -8,21 +8,25 @@ export const GroupwiseMax = ({
                                  table: string,
                                  groupingColumns: string[]
                              },
-) => `
-SELECT 
-    s.*
-FROM ${table} s
-LEFT JOIN ${table} max_table 
-    ON ${table}.created_at > s.created_at
-    AND ${groupingColumns
-    .map(groupingColumn => `max_table.${groupingColumn} = s.${groupingColumn}`)
-.join(' AND ')}
-     AND max_table.creator_id = s.creator_id
-WHERE setting_max.id IS NULL
-`
+) => {
+    let s = `
+    SELECT 
+        s.*
+    FROM ${table} s
+    LEFT JOIN ${table} max_table 
+        ON max_table.created_at > s.created_at
+        AND ${groupingColumns
+        .map(groupingColumn => `max_table.${groupingColumn} = s.${groupingColumn}`)
+    .join(' AND ')}
+         AND max_table.creator_id = s.creator_id
+    WHERE max_table.id IS NULL
+    `
+    console.log(s);
+    return s
+}
 
 @ViewEntity({
-    expression: GroupwiseMax({ table: 'user_setting', groupingColumn: 'name' }),
+    expression: GroupwiseMax({ table: 'user_setting', groupingColumns: ['name'] }),
 })
 export class UserSettingView {
     @ViewColumn()
