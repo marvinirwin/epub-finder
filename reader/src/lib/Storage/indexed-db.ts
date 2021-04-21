@@ -1,20 +1,20 @@
-import { DatabaseService } from './database.service'
+import { DatabaseService, PersistableEntity, putPersistableEntity } from './database.service'
 import Dexie from 'dexie'
 
 export class IndexDBManager<T> {
     constructor(
         public db: DatabaseService,
-        public table: Dexie.Table<T, number>,
+        public table: PersistableEntity,
         public getId: (v: T) => number | undefined,
         public assignId: (newId: number, o: T) => T,
     ) {}
-    load(where: (t: Dexie.Table<T, number>) => Promise<T[]>): Promise<T[]> {
+    load(where: (t: PersistableEntity) => Promise<T[]>): Promise<T[]> {
         return where(this.table)
     }
 
     async upsert(
         m: T | T[],
-        isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>,
+        isMeWhere: (table: PersistableEntity) => Promise<T[]>,
     ) {
         return this.db.transaction('rw', this.table, async () => {
             try {
@@ -24,7 +24,6 @@ export class IndexDBManager<T> {
                 presentRecords
                     .map(this.getId)
                     .forEach((n) => n !== undefined && keys.push(n))
-                await this.table.bulkDelete(keys)
                 const recordsToPut = Array.isArray(m) ? m : [m]
                 const recordsWithAssignedIds = []
                 for (let i = 0; i < recordsToPut.length; i++) {
@@ -33,13 +32,13 @@ export class IndexDBManager<T> {
                     const id = this.getId(recordToInsert)
                     let newId
                     if (id) {
-                        newId = await this.table.put(recordToInsert, id)
+                        newId = await putPersistableEntity({entity: this.table, record: recordToInsert});
                     } else {
                         // @ts-ignore
                         if (recordToInsert.hasOwnProperty('id'))
                             // @ts-ignore If the id property is present, but undefined it will error when inserted
                             delete recordToInsert.id
-                        newId = await this.table.add(recordToInsert)
+                        newId = await putPersistableEntity({entity: this.table, record: recordToInsert});
                     }
                     recordsWithAssignedIds.push(
                         this.assignId(newId, recordToInsert),
@@ -50,17 +49,6 @@ export class IndexDBManager<T> {
                 console.error(e)
                 throw e
             }
-        })
-    }
-
-    delete(isMeWhere: (t: Dexie.Table<T, number>) => Promise<T[]>) {
-        return this.db.transaction('rw', this.table, async () => {
-            const presentRecords = await isMeWhere(this.table)
-            const keys: number[] = []
-            presentRecords
-                .map(this.getId)
-                .forEach((n) => n !== undefined && keys.push(n))
-            await this.table.bulkDelete(keys)
         })
     }
 }

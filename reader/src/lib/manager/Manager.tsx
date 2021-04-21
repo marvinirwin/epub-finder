@@ -130,7 +130,7 @@ const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
         this.databaseService,
-        this.databaseService.cards,
+        'cards',
         (c: ICard) => c.id,
         (i: number, c: ICard) => ({ ...c, id: i }),
     )

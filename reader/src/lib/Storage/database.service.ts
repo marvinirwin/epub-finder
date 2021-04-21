@@ -3,7 +3,7 @@ import { ICard } from '../../../../server/src/shared/ICard'
 import { CreatedSentence } from '../../../../server/src/shared/CreatedSentence'
 import { PronunciationProgressRow } from '../schedule/pronunciation-progress-row.interface'
 
-type PersistableEntity = 'userSettings' |
+export type PersistableEntity = 'userSettings' |
     'userSettingView' |
     'cards' |
     'spacedRepitionEntities' |

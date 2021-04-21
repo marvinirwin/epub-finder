@@ -1,9 +1,7 @@
 import { Manager } from '../manager/Manager'
 import { of, Subject } from 'rxjs'
 import { switchMap, withLatestFrom } from 'rxjs/operators'
-import { RecognitionMap } from '../srm/srm.service'
 import { Hotkeys } from './hotkeys.interface'
-import { SuperMemoGrade } from 'supermemo'
 
 export class HotKeyEvents {
     public get openImageSearch$() {
@@ -12,10 +10,6 @@ export class HotKeyEvents {
     public get hide$() {
         return this.subjects.HIDE
     }
-    public get deleteCard$() {
-        return this.subjects.DELETE_CARD
-    }
-
     public get quizResultEasy$() {
         return this.subjects.QUIZ_RESULT_EASY
     }
@@ -92,27 +86,6 @@ export class HotKeyEvents {
                     m.editingCardManager.showEditingCardPopup$.next(false)
                 } else if (showEditingCard) {
                     m.imageSearchService.queryImageRequest$.next(undefined)
-                }
-            })
-
-        this.deleteCard$
-            .pipe(
-                withLatestFrom(
-                    m.editingCardManager.editingCard$.pipe(
-                        switchMap((e) => {
-                            if (e) {
-                                return e?.learningLanguage$
-                            } else {
-                                return of('')
-                            }
-                        }),
-                    ),
-                ),
-            )
-            .subscribe(([_, learningLanguage]) => {
-                if (learningLanguage) {
-                    m.cardsRepository.deleteWords.next([learningLanguage])
-                    m.editingCardManager.queEditingCard$.next(undefined)
                 }
             })
     }
