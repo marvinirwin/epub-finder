@@ -246,7 +246,6 @@ export class Manager {
             ),
             activeSentenceService: this.activeSentenceService,
             settingsService: this.settingsService,
-            languageConfigsService: this.languageConfigsService,
         })
         this.onSelectService = new OnSelectService(this)
         this.documentRepository = new DocumentRepository(this)

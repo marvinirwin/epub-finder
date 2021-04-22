@@ -70,12 +70,10 @@ export class BrowserInputsService {
         hotkeys$,
         settingsService,
         activeSentenceService,
-        languageConfigsService,
     }: {
         hotkeys$: Observable<Map<string[], Subject<void>>>
         settingsService: SettingsService
         activeSentenceService: ActiveSentenceService
-        languageConfigsService: LanguageConfigsService
     }) {
         this.hotkeys$ = hotkeys$
         this.activeSentenceService = activeSentenceService

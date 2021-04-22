@@ -22,8 +22,11 @@ export class SettingGetSet<T> {
                         new Promise((resolve, reject) => {
                             queryPersistableEntity<UserSetting>({
                                 entity: 'userSettings',
-                                skip: 1,
+                                skip: 0,
                                 take: 1,
+                                where: {
+                                    name
+                                }
                             }).then((rows) => {
                                 const row = rows[0];
                                 if (row) {

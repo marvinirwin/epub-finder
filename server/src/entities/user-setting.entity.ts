@@ -4,7 +4,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeor
 export class UserSetting {
     @PrimaryGeneratedColumn('uuid')
     id: string
-    @Column({type: 'jsonb'})
+    @Column({type: 'jsonb', nullable: true})
     value: any
     @Column()
     name: string;
