@@ -127,7 +127,7 @@ export class QuizService {
         this.quizCard = {
             ...wordCard,
             flashCardType$: this.currentScheduleRow$.pipe(
-                map(scheduleRow => scheduleRow?.d?.flashCardType || FlashCardType.WordExamplesAndPicture),
+                map(scheduleRow => scheduleRow?.d?.flash_card_type || FlashCardType.WordExamplesAndPicture),
                 shareReplay(1),
             ),
             answerIsRevealed$: new BehaviorSubject<boolean>(false),

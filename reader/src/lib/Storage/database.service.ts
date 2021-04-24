@@ -24,7 +24,7 @@ export const queryPersistableEntity = <T>(
             take?: number
         },
 ): Promise<T[]> => {
-    const url1 = `${window.location.href}entities/${entity}`
+    const url1 = `${window.location.origin}/entities/${entity}`
     const url = new URL(url1)
     url.search = new URLSearchParams({
             where: where ? JSON.stringify(where) : '{}',
@@ -46,7 +46,7 @@ export const putPersistableEntity = <T>(
         record: Partial<T>
     },
 ) => {
-    const url = new URL(`${window.location.href}entities/${entity}`)
+    const url = new URL(`${window.location.origin}/entities/${entity}`)
     return fetch(
         url.toString(),
         {
@@ -63,7 +63,7 @@ export interface CustomWord {
     word: string;
     timestamp: Date;
     id: number;
-    languageCode: string;
+    language_code: string;
 }
 
 export class DatabaseService extends Dexie {

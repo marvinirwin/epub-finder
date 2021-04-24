@@ -4,5 +4,5 @@ export type TabulateLocalDocumentDto = {
     src: string
     label: string
     id: string
-    languageCode: string
+    language_code: string
 }

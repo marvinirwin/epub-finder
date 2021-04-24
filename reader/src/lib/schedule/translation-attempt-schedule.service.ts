@@ -48,7 +48,7 @@ export class TranslationAttemptScheduleService
                      selectedVirtualTabulations,
                      translationAttempts,
                      weightedVocab,
-                     languageCode,
+                     language_code,
                  ]) => {
                     const virtualDocumentTabulation = new SerializedTabulationAggregate(
                         selectedVirtualTabulations,
@@ -64,7 +64,7 @@ export class TranslationAttemptScheduleService
                         }
                         return scheduleRows[segmentText]
                     }
-                    const isNotableCharacterRegex = resolvePartialTabulationConfig(languageCode || 'en').isNotableCharacterRegex
+                    const isNotableCharacterRegex = resolvePartialTabulationConfig(language_code || 'en').isNotableCharacterRegex
                     virtualDocumentTabulation.serializedTabulations.forEach(
                         (serialzedTabulation) => {
                             serialzedTabulation.segmentWordCountRecordsMap.forEach(

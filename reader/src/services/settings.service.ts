@@ -25,7 +25,7 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
 
 
 export interface QuizCardConfiguration {
-    flashCardType: FlashCardType
+    flash_card_type: FlashCardType
 }
 
 export class SettingsService {

@@ -28,7 +28,7 @@ export class FrequencyDocument {
                     notableSubsequences: [
                         ...config.notableCharacterSequences.values(),
                     ],
-                    languageCode: config.languageCode,
+                    language_code: config.language_code,
                 }),
             ),
             shareReplay(1),

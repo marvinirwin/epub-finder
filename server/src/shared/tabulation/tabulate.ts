@@ -15,7 +15,7 @@ export type WordIdentifyingStrategy = 'noSeparator' | 'spaceSeparator'
 export type SerializableTabulationConfiguration = {
     notableCharacterSequences: SetWithUniqueLengths
     greedyWordSet: SetWithUniqueLengths
-    languageCode: string
+    language_code: string
 }
 export type TabulationConfiguration = SerializableTabulationConfiguration & {
     isNotableCharacterRegex: RegExp

@@ -43,7 +43,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
                         word,
                         success: true,
                         timestamp: new Date(),
-                        languageCode: currentLanguageCode,
+                        language_code: currentLanguageCode,
                     },
                 ])
                 // Add a highlight for each of these characters

@@ -25,7 +25,7 @@ export class DocumentSimilarityService {
         knownDocumentName: string,
         unknownDocumentName: string,
         words: string[],
-        languageCode: string,
+        language_code: string,
     ): Promise<SimilarityResults> {
         return this.cacheService.memo<SimilarityResults>({
             args: [knownDocumentName, unknownDocumentName, words],
@@ -34,12 +34,12 @@ export class DocumentSimilarityService {
                 const knownSerializedTabulation = await this.tabulateService.tabulate(
                     { where: { name: knownDocumentName } },
                     words,
-                    languageCode,
+                    language_code,
                 )
                 const unknownSerializedTabulation = await this.tabulateService.tabulate(
                     { where: { name: knownDocumentName } },
                     words,
-                    languageCode,
+                    language_code,
                 )
                 return computeSimilarityTabulation(
                     knownSerializedTabulation,

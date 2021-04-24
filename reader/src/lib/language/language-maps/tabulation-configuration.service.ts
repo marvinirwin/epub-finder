@@ -24,11 +24,11 @@ export class TabulationConfigurationService {
             notableSubsequencesService.notableSubsequenceSet$,
             languageConfigsService.readingLanguageCode$,
         ]).pipe(
-            map(([wordSet, notableSubsequenceSet, languageCode]) => {
+            map(([wordSet, notableSubsequenceSet, language_code]) => {
                 return {
                     notableCharacterSequences: notableSubsequenceSet,
                     greedyWordSet: wordSet,
-                    languageCode,
+                    language_code,
                 }
             }),
             shareReplay(1),

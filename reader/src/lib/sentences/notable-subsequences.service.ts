@@ -43,10 +43,10 @@ export class NotableSubsequencesService {
                     temporaryHighlightRequest,
                     videoMetadata,
                     words,
-                    languageCode
+                    language_code
                 ]) => {
                     const recognitionRecordsForCurrentLanguage = Object.values(wordRecognitionRecords)
-                        .filter(recognitionRows => recognitionRows.find(r => r.languageCode === languageCode))
+                        .filter(recognitionRows => recognitionRows.find(r => r.language_code === language_code))
                         .map(recognitionRows => recognitionRows[0].word)
                     const strings = [
                         ...Object.keys(pronunciationRecords),

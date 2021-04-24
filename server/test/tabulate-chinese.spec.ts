@@ -58,7 +58,7 @@ async function tabulateChineseSentence(...chineseSegments: string[]) {
         isNotableCharacterRegex: chineseCharacterRegexp,
         isWordBoundaryRegex: wordBoundaryRegexp,
         wordIdentifyingStrategy: 'noSeparator',
-        languageCode: 'zh-Hans'
+        language_code: 'zh-Hans'
     })
 }
 

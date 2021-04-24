@@ -11,7 +11,7 @@ export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[]
     greedyWordCountRecords: DocumentWordCount[]
     wordRecognitionRecords: WordRecognitionRow[]
-    flashCardType: FlashCardType;
+    flash_card_type: FlashCardType;
     word: string
 }
 

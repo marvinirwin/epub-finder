@@ -27,7 +27,7 @@ export const QuizCardScheduleTable = () => {
                 </TableHead>
                 <TableBody>
                     {rows.slice(0, 3).map((row) => (
-                        <TableRow key={`${row.d.word}${row.d.flashCardType}`}>
+                        <TableRow key={`${row.d.word}${row.d.flash_card_type}`}>
                             <TableCell component='th' scope='row'>
                                 {row.d.word}
                             </TableCell>
@@ -35,7 +35,7 @@ export const QuizCardScheduleTable = () => {
                                 {formatDistance(row.dueDate(), Date.now())}{' '}
                             </TableCell>
                             <TableCell>
-                                {row.d.flashCardType}
+                                {row.d.flash_card_type}
                             </TableCell>
                             {/*
                         <TableCell align="right">

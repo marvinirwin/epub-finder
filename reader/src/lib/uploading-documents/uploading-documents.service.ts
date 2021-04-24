@@ -44,7 +44,7 @@ export class UploadingDocumentsService {
         this.currentUploadingFile$.next()
     }
 
-    async upload({ file, languageCode }: { file: File, languageCode: string }) {
+    async upload({ file, language_code }: { file: File, language_code: string }) {
         if (!supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name))) {
             throw new Error(`Unsupported file extension ${file.name}`)
         }
@@ -55,7 +55,7 @@ export class UploadingDocumentsService {
                 `Uploading ${file.name}...`,
             )
             this.currentUploadingFile$.next(file)
-            const uploadedDocuments = await this.libraryService.upsertDocument(file, languageCode)
+            const uploadedDocuments = await this.libraryService.upsertDocument(file, language_code)
             this.currentUploadingFile$.next(undefined)
             this.uploadingMessages$.next(
                 `Uploading ${file.name} success!`,

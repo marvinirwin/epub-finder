@@ -15,13 +15,13 @@ export class TestHotkeysService {
     }) {
         hotkeyEvents.subjects.PRONUNCIATION_RECORD_SUCCESS.pipe(
             withLatestFrom(languageConfigsService.readingLanguageCode$),
-        ).subscribe(([_, languageCode]) => {
+        ).subscribe(([_, language_code]) => {
             pronunciationProgressService.addRecords$.next([
                 {
                     word: '大小姐',
                     success: true,
                     timestamp: new Date(),
-                    languageCode,
+                    language_code,
                 },
             ])
         })

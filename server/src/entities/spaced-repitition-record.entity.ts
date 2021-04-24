@@ -13,16 +13,16 @@ export class SpacedRepitionEntity {
     timestamp: Date
     @Column()
     nextDueDate: Date
-    @Column()
+    @Column({type: 'float'})
     interval: number
     @Column()
     repetition: number
-    @Column()
+    @Column({type: 'float'})
     efactor: number
     @Column()
     grade: SuperMemoGrade;
     @Column()
-    flashcard_type: string
+    flash_card_type: string
     @Column()
     language_code: string
 

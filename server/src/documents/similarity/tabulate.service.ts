@@ -19,7 +19,7 @@ export class TabulateService {
     async tabulate(
         findOptions: FindOneOptions<DocumentView>,
         words: string[],
-        languageCode: string,
+        language_code: string,
     ): Promise<SerializedTabulation> {
         return this.cacheService.memo<SerializedTabulation>({
             args: [findOptions, words],
@@ -28,7 +28,7 @@ export class TabulateService {
                 return await this.tabulateNoCache(
                     findOptions,
                     words,
-                    languageCode,
+                    language_code,
                 )
             },
         })
@@ -37,7 +37,7 @@ export class TabulateService {
     async tabulateNoCache(
         findOptions: FindOneOptions<DocumentView>,
         words: string[],
-        languageCode: string,
+        language_code: string,
     ) {
         const documentToTabulate = await this.documentViewRepository.findOne(
             findOptions,
@@ -57,8 +57,8 @@ export class TabulateService {
             notableCharacterSequences: setWithUniqueLengths,
             segments: atomizedDocument.segments(),
             greedyWordSet: setWithUniqueLengths,
-            ...resolvePartialTabulationConfig(languageCode),
-            languageCode,
+            ...resolvePartialTabulationConfig(language_code),
+            language_code,
         })
         /*
         return {

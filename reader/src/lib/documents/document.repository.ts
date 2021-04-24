@@ -27,11 +27,11 @@ export class DocumentRepository {
         const {
             obs$,
             isLoading$,
-        } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (languageCode) => {
+        } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (language_code) => {
             const response = await axios.get(
                 `${process.env.PUBLIC_URL}/documents`,
                 {
-                    params: { language_code: languageCode },
+                    params: { language_code: language_code },
                 },
             )
             const responseDocuments = ((response?.data ||
@@ -73,7 +73,7 @@ export class DocumentRepository {
 
     private static async uploadFile(
         file: File,
-        languageCode: string,
+        language_code: string,
         documentId?: string,
     ): Promise<LtDocument> {
         const formData = new FormData()
@@ -84,7 +84,7 @@ export class DocumentRepository {
             sandbox_file?: string
             language_code: string
         } = {
-            language_code: languageCode,
+            language_code: language_code,
         }
         if (documentId) {
             headers.document_id = documentId
@@ -117,13 +117,13 @@ export class DocumentRepository {
     public async upsert({
                             file,
                             documentId,
-                            languageCode,
+                            language_code,
                         }: {
         documentId?: string,
-        languageCode: string
+        language_code: string
         file: File
     }): Promise<LtDocument> {
-        const uploadedDocument = await DocumentRepository.uploadFile(file, languageCode, documentId)
+        const uploadedDocument = await DocumentRepository.uploadFile(file, language_code, documentId)
         this.newDocument$.next(uploadedDocument)
         return uploadedDocument
     }

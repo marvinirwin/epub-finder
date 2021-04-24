@@ -33,12 +33,12 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
                                                                   }) => {
     const m = useContext(ManagerContext)
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
-    const flashCardType = useObservableState(quizCard.flashCardType$) || ''
+    const flash_card_type = useObservableState(quizCard.flashCardType$) || ''
     const word = useObservableState(quizCard.word$) || ''
     const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressService.indexOfOrderedRecords$) || {}
     const recognitionRecordsForThisCard = orderBy(
         (recognitionRecordIndex[word] || [])
-            .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flashCardType === flashCardType), r => r.timestamp.getTime())
+            .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flash_card_type === flash_card_type), r => r.timestamp.getTime())
     useSubscription(m.hotkeyEvents.advanceQuiz$, () =>
         quizCard.answerIsRevealed$.next(true),
     )

@@ -17,7 +17,7 @@ export const QuizResultToRecognitionRows = (
         map(
             ([scorePair, scheduleRows]): WordRecognitionRow => {
                 const sameWord = scheduleRows.filter(scheduleRow => scheduleRow.d.word === scorePair.word);
-                const previousItems = sameWord.find(scheduleRow => scheduleRow.d.flashCardType === scorePair.flashCardType)?.d?.wordRecognitionRecords || []
+                const previousItems = sameWord.find(scheduleRow => scheduleRow.d.flash_card_type === scorePair.flash_card_type)?.d?.wordRecognitionRecords || []
                 const nextRecognitionRecord = SrmService.getNextRecognitionRecord(
                     previousItems,
                     scorePair.grade,
@@ -30,8 +30,8 @@ export const QuizResultToRecognitionRows = (
                     ...nextRecognitionRecord,
                     nextDueDate: quizCardNextDueDate({grade: scorePair.grade, previousItems}),
                     grade: scorePair.grade,
-                    flashCardType: scorePair.flashCardType,
-                    languageCode: scorePair.languageCode,
+                    flash_card_type: scorePair.flash_card_type,
+                    language_code: scorePair.language_code,
                 }
             },
         ),

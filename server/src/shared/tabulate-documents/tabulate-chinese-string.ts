@@ -18,6 +18,6 @@ export const TabulateChineseText = async (text: string) => {
         ).segments(),
         greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet,
         ...resolvePartialTabulationConfig('zh-Hans'),
-        languageCode: 'zh-Hans',
+        language_code: 'zh-Hans',
     })
 }

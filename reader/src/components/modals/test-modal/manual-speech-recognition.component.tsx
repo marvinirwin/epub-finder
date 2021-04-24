@@ -22,7 +22,7 @@ export const ManualSpeechRecognition = () => {
                             word: speechRecInput?.value || '',
                             success: true,
                             timestamp: new Date(),
-                            languageCode: await observableLastValue(
+                            language_code: await observableLastValue(
                                 m.languageConfigsService.readingLanguageCode$,
                             ),
                         },

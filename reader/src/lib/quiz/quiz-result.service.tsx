@@ -10,8 +10,8 @@ import { FlashCardType } from './hidden-quiz-fields'
 export interface QuizResult {
     word: string
     grade: SuperMemoGrade;
-    languageCode: string;
-    flashCardType: string;
+    language_code: string;
+    flash_card_type: string;
 }
 
 
@@ -42,12 +42,12 @@ export class QuizResultService {
                 wordRecognitionProgressService.addRecords$.next([record])
             })
     }
-    completeQuiz(word: string,languageCode: string, recognitionScore: SuperMemoGrade, flashCardType: FlashCardType) {
+    completeQuiz(word: string,language_code: string, recognitionScore: SuperMemoGrade, flash_card_type: FlashCardType) {
         this.quizResult$.next({
             grade: recognitionScore,
             word,
-            languageCode,
-            flashCardType
+            language_code,
+            flash_card_type
         })
 
         this.requestNextCard$.next()

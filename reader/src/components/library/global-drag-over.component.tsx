@@ -4,7 +4,7 @@ import { useObservableState } from 'observable-hooks'
 
 export const GlobalDragOver = () => {
     const m = useContext(ManagerContext)
-    const languageCode = useObservableState(m.languageConfigsService.readingLanguageCode$);
+    const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     const [draggingFilesOver, filesDraggedOver] = useState<boolean>(false)
     useEffect(() => {
         document.body.ondragover = (e) => {
@@ -25,10 +25,10 @@ export const GlobalDragOver = () => {
         document.body.ondrop = (e) => {
             e.preventDefault()
             filesDraggedOver(false);
-            if (e.dataTransfer && languageCode) {
+            if (e.dataTransfer && language_code) {
                 for (let i = 0; i < e.dataTransfer.files.length; i++) {
                     const file = e.dataTransfer.files[i]
-                    m.uploadingDocumentsService.upload({file, languageCode})
+                    m.uploadingDocumentsService.upload({file, language_code})
                 }
             }
         }

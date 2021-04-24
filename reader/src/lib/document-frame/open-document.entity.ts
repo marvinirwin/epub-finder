@@ -43,11 +43,11 @@ export class OpenDocument {
             tabulationConfigurationService.tabulationConfiguration$,
             services.languageConfigsService.readingLanguageCode$,
         ]).pipe(
-            map(([segments, tabulationConfiguration, languageCode]) => {
+            map(([segments, tabulationConfiguration, language_code]) => {
                 return tabulate({
                     segments,
                     ...tabulationConfiguration,
-                    ...resolvePartialTabulationConfig(languageCode),
+                    ...resolvePartialTabulationConfig(language_code),
                 })
             }),
             shareReplay(1),
@@ -66,7 +66,7 @@ export class OpenDocument {
                     words: [...tabulationConfiguration.greedyWordSet.values()],
                     src: document._originalSrc,
                     id: this.id,
-                    languageCode: tabulationConfiguration.languageCode,
+                    language_code: tabulationConfiguration.language_code,
                 })
             },
         )

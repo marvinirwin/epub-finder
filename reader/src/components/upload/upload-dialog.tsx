@@ -12,8 +12,8 @@ export const UploadDialog = () => {
     const currentFile = useObservableState(
         m.uploadingDocumentsService.currentUploadingFile$,
     );
-    const languageCode = useObservableState(m.languageConfigsService.readingLanguageCode$);
-    const currentLanguageLabel = languageCodeLabels.get(languageCode || '') || '';
+    const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
+    const currentLanguageLabel = languageCodeLabels.get(language_code || '') || '';
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
@@ -51,10 +51,10 @@ export const UploadDialog = () => {
                             type="file"
                             onChange={(e) => {
                                 const droppedFiles = e.target.files
-                                if (droppedFiles && languageCode) {
+                                if (droppedFiles && language_code) {
                                     for (let i = 0; i < droppedFiles.length; i++) {
                                         const file = droppedFiles[i]
-                                        m.uploadingDocumentsService.upload( {file, languageCode})
+                                        m.uploadingDocumentsService.upload( {file, language_code})
                                     }
                                 }
                             }}

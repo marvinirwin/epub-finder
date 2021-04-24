@@ -4,5 +4,5 @@ export type TabulateRemoteDocumentDto = {
     notableSubsequences: string[]
     words: string[]
     d: DocumentViewDto
-    languageCode: string
+    language_code: string
 }

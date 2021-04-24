@@ -27,7 +27,7 @@ ctx.onmessage = async (ev) => {
         src,
         label,
         id,
-        languageCode,
+        language_code,
     }: TabulateLocalDocumentDto = ev.data
     const doc = AtomizedDocument.fromAtomizedString(src)
     const segments = doc.segments()
@@ -37,8 +37,8 @@ ctx.onmessage = async (ev) => {
             notableSubsequences,
         ),
         segments,
-        ...resolvePartialTabulationConfig(languageCode),
-        languageCode,
+        ...resolvePartialTabulationConfig(language_code),
+        language_code,
     });
     try {
         ctx.postMessage({

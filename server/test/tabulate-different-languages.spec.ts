@@ -12,8 +12,8 @@ import {
     wordBoundaryRegexp,
 } from '../src/shared/tabulation/word-separator'
 
-const segmentText = (text: string, languageCode: string) => {
-    const foundRegexForLanguage = languageRegexMap.get(languageCode)
+const segmentText = (text: string, language_code: string) => {
+    const foundRegexForLanguage = languageRegexMap.get(language_code)
     return tabulate({
         notableCharacterSequences: new SetWithUniqueLengths([]),
         segments: AtomizedDocument.atomizeDocument(
@@ -26,7 +26,7 @@ const segmentText = (text: string, languageCode: string) => {
         wordIdentifyingStrategy:
             foundRegexForLanguage?.strategy ||
             'spaceSeparator',
-        languageCode
+        language_code
     })
 }
 

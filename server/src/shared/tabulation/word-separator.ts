@@ -76,13 +76,13 @@ export const languageRegexMap = new Map<
 )
 
 export const resolvePartialTabulationConfig = (
-    languageCode: string,
+    language_code: string,
 ): {
     isWordBoundaryRegex: RegExp
     wordIdentifyingStrategy: WordIdentifyingStrategy
     isNotableCharacterRegex: RegExp
 } => {
-    const result = languageRegexMap.get(languageCode)
+    const result = languageRegexMap.get(language_code)
     return {
         wordIdentifyingStrategy: result?.strategy || 'spaceSeparator',
         isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,

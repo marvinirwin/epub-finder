@@ -20,7 +20,7 @@ export class CliService {
     async exec(customArgv?: string[]) {
         const args = commandLineArgs(
             {
-                languageCode: {
+                language_code: {
                     type: String,
                 },
                 documents: {
@@ -39,7 +39,7 @@ export class CliService {
                 doc1Name,
                 doc2Name,
                 await ChineseVocabService.vocab(),
-                args.languageCode,
+                args.language_code,
             ),
         )
     }

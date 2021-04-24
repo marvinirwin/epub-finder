@@ -8,7 +8,7 @@ export const UploadText = () => {
     const m = useContext(ManagerContext)
     const [text, setText] = useState<string>('')
     const [title, setTitle] = useState<string>('');
-    const languageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
+    const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$)
     return (
         <Box m={2} style={{ display: 'flex', flexFlow: 'column nowrap' }}>
             <Box m={2} p={1}>
@@ -40,9 +40,9 @@ export const UploadText = () => {
                     color={'primary'}
                     variant={'contained'}
                     onClick={() => {
-                        if (languageCode && !!text.trim()) {
+                        if (language_code && !!text.trim()) {
                             m.uploadingDocumentsService.upload({
-                                languageCode,
+                                language_code,
                                 file: new File([text], `${title}.txt`),
                             });
                         }

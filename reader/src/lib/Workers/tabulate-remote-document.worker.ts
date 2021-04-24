@@ -23,7 +23,7 @@ ctx.onmessage = async (ev) => {
         words,
         notableSubsequences,
         d,
-        languageCode,
+        language_code,
     }: TabulateRemoteDocumentDto = ev.data
     const ltDoc = new LtDocument(d)
     const response = await fetch(
@@ -37,8 +37,8 @@ ctx.onmessage = async (ev) => {
             notableSubsequences,
         ),
         segments: doc.segments(),
-        ...resolvePartialTabulationConfig(languageCode),
-        languageCode,
+        ...resolvePartialTabulationConfig(language_code),
+        language_code,
     })
     ctx.postMessage({
         wordSegmentStringsMap: tabulated.wordSegmentStringsMap,

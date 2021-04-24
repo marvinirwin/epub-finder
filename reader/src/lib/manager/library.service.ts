@@ -23,10 +23,10 @@ export class LibraryService {
         this.db = databaseService
     }
 
-    public async upsertDocument(file: File, languageCode: string): Promise<LtDocument> {
+    public async upsertDocument(file: File, language_code: string): Promise<LtDocument> {
         const saved = await this.documentRepository.upsert({
             file,
-            languageCode
+            language_code
         })
         return saved;
     }

@@ -126,8 +126,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                         }),
                         flatten(learningTargetsList.map(
                             (learningTarget) => {
-                                return flashCardTypesRequiredToProgress.map(flashCardType => {
-                                        const wordRecognitionRecords = (wordRecognitionRowIndex[learningTarget.word] || []).filter(recognitionRow => recognitionRow.flashCardType === flashCardType)
+                                return flashCardTypesRequiredToProgress.map(flash_card_type => {
+                                        const wordRecognitionRecords = (wordRecognitionRowIndex[learningTarget.word] || []).filter(recognitionRow => recognitionRow.flash_card_type === flash_card_type)
                                         return new ScheduleRow<QuizScheduleRowData>(
                                             {
                                                 ...learningTarget,
@@ -137,7 +137,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                                                     document: '',
                                                 })),
                                                 greedyWordCountRecords: [],
-                                                flashCardType,
+                                                flash_card_type,
                                             },
                                             wordRecognitionRecords,
                                         )
@@ -160,11 +160,11 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                     const spacedOutRowMap = spaceOutRows(
                         row => ({
                             type: row.row.d.word,
-                            subType: row.row.d.flashCardType,
+                            subType: row.row.d.flash_card_type,
                             sortValue: row.row.dueDate().getTime(),
                         }),
                         // This order by is necessary or the offset wont do anything
-                        orderBy(sortedRows, v => `${v.row.d.word}${v.row.d.flashCardType}`),
+                        orderBy(sortedRows, v => `${v.row.d.word}${v.row.d.flash_card_type}`),
                         1000 * 60 * 5, // 5 minutes
                     )
 

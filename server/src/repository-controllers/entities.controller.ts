@@ -24,6 +24,7 @@ export class EntitiesController {
     }
 
     @Get(':entity')
+    @UseGuards(AnonymousGuard)
     async get(
         @UserFromReq() user: User,
         @Param('entity') entity: string,

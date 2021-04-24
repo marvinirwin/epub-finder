@@ -30,15 +30,15 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
 
     const word = useObservableState(quizCard.word$)
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
-    const flashCardType = useObservableState(quizCard.flashCardType$)
+    const flash_card_type = useObservableState(quizCard.flashCardType$)
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,
         score: SuperMemoGrade,
     ) => {
         useSubscription(hotkeyObservable$.pipe(), async () => {
-            if (word && latestLanguageCode && flashCardType) {
-                m.quizResultService.completeQuiz(word, latestLanguageCode, score, flashCardType)
+            if (word && latestLanguageCode && flash_card_type) {
+                m.quizResultService.completeQuiz(word, latestLanguageCode, score, flash_card_type)
             }
         })
     }
