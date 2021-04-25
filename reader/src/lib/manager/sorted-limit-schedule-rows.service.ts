@@ -4,7 +4,7 @@ import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { ScheduleRow, SortQuizData, SpacedSortQuizData } from '../schedule/schedule-row'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
-import { Dictionary, flatten, groupBy, orderBy } from 'lodash'
+import { Dictionary, flatten, groupBy, orderBy, uniq } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
@@ -60,7 +60,12 @@ export const allScheduleRowsForWord = (
 
 export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flash_card_type}${r.d.wordRecognitionRecords.length}`
 
-const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedScheduleRows: SpacedScheduleRow[]) => flatten(learningScheduleRows.map(learningScheduleRow => unStartedScheduleRows.filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word)))
+const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedScheduleRows: SpacedScheduleRow[]) =>
+    flatten(learningScheduleRows
+        .map(learningScheduleRow => unStartedScheduleRows
+            .filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word),
+        ),
+    )
 
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>
@@ -94,24 +99,27 @@ export class SortedLimitScheduleRowsService {
                 )
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
-                );
-                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedForTheFirstTimeToday());
-                const unStartedSiblingsWhichShouldBe =[
+                )
+                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedForTheFirstTimeToday())
+                const unStartedSiblingsWhichShouldBe = uniq([
                     ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
-                    ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows)
-                ];
+                    ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows),
+                ])
                 const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe], r => r.d.word))
                 const wordsLearnedForTheFirstTime = Object.keys(groupBy(scheduleRowsLearnedForTheFirstTimeToday, r => r.d.word))
                 const wordsRemaining = newQuizWordLimit - new Set([
                     ...learningWords,
-                    ...wordsLearnedForTheFirstTime
+                    ...wordsLearnedForTheFirstTime,
                 ]).size
                 const scheduleRowsLeftForToday = flatten(unStartedWords.slice(
                     0,
                     wordsRemaining >= 0 ? wordsRemaining : 0,
                 ))
                 const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({ now }))
+                /**
+                 * How does this contain to copies of 问题？
+                 */
                 const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({ now }))
 
                 const iteratees = [
@@ -120,7 +128,11 @@ export class SortedLimitScheduleRowsService {
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.word,
                 ]
                 const orders: ('asc' | 'desc')[] = ['asc', 'desc', 'asc']
-                const orderFunc = (rows: SpacedScheduleRow[]) => orderBy(rows, iteratees, orders);
+                const orderFunc = (rows: SpacedScheduleRow[]) => orderBy(rows, iteratees, orders)
+                /**
+                 * Oh, I know why I'm getting duplicate records in limitedScheduleRows, because 问题 becomes a member of
+                 * more than 1 of the 3 sets which form it.
+                 */
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     wordsLearnedToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
