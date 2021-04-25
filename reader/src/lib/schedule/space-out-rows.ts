@@ -21,7 +21,8 @@ export const spaceOutRows = <T, U, V>(
         let previousValue: undefined | number
         rows.forEach(row => {
             // tslint:disable-next-line:no-shadowed-variable
-            const { sortValue } = resolveTypes(row)
+            const { sortValue, type, subType } = resolveTypes(row)
+            // @ts-ignore
             if (previousValue === undefined) {
                 previousValue = sortValue
             } else if ((previousValue + sortValueOffset) > sortValue) {

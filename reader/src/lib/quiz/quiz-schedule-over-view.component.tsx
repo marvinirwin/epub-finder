@@ -44,38 +44,6 @@ export const QuizScheduleOverView = () => {
                 p={1}
                 style={{ display: 'flex', flexFlow: 'column nowrap', flex: 1 }}
             >
-                <TableContainer component={Paper} style={{ flex: 1 }}>
-                    <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        New words to learn
-                    </Typography>
-                    <Table size="small" id={quizRowsNotInProgressTable}>
-                        <QuizCardTableHead />
-                        <TableBody>
-                            {rowsUnStarted.slice(0, 20).map((row) => (
-                                <QuizCardTableRow row={row} key={row.d.word} />
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TableContainer component={Paper} style={{ flex: 1 }}>
-                    <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        Words to review
-                    </Typography>
-                    <Table size="small" id={quizRowsToReviewTable}>
-                        <QuizCardTableHead />
-                        <TableBody>
-                            {rowsToReview.map((row) => (
-                                <QuizCardTableRow row={row} key={row.d.word} />
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-            <Box
-                m={2}
-                p={1}
-                style={{ display: 'flex', flexFlow: 'column nowrap', flex: 1 }}
-            >
                 <TableContainer component={Paper}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
                         Words in progress
@@ -97,6 +65,38 @@ export const QuizScheduleOverView = () => {
                         <QuizCardTableHead />
                         <TableBody>
                             {wordsLearnedToday.map((row) => (
+                                <QuizCardTableRow row={row} key={row.d.word} />
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+            <Box
+                m={2}
+                p={1}
+                style={{ display: 'flex', flexFlow: 'column nowrap', flex: 1 }}
+            >
+                <TableContainer component={Paper} style={{ flex: 1 }}>
+                    <Typography style={{ margin: '24px' }} variant={'h6'}>
+                        New words to learn
+                    </Typography>
+                    <Table size="small" id={quizRowsNotInProgressTable}>
+                        <QuizCardTableHead />
+                        <TableBody>
+                            {rowsUnStarted.slice(0, 20).map((row) => (
+                                <QuizCardTableRow row={row} key={row.d.word} />
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TableContainer component={Paper} style={{ flex: 1 }}>
+                    <Typography style={{ margin: '24px' }} variant={'h6'}>
+                        Words to review
+                    </Typography>
+                    <Table size="small" id={quizRowsToReviewTable}>
+                        <QuizCardTableHead />
+                        <TableBody>
+                            {rowsToReview.map((row) => (
                                 <QuizCardTableRow row={row} key={row.d.word} />
                             ))}
                         </TableBody>

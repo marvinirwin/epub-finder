@@ -27,10 +27,7 @@ export const QuizCardTableRow: React.FC<{
             </TableCell>
             <TableCell>{formatDistance(row.dueDate(), Date.now())} </TableCell>
             <TableCell>
-                {round(
-                    row.d.sortValues.dueDate.weightedInverseLogNormalValue || 0,
-                    2,
-                )}
+                {row.d.flash_card_type}
             </TableCell>
             <TableCell>
                 {round(
