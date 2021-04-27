@@ -132,7 +132,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                 alignItems: 'center',
             }}
         >
-            <CardImage quizCard={wordCard} />
+            <CardImage wordInfo={wordCard} />
             <CardLearningLanguageText word={word || ''} />
             <Typography variant="h4" className={wordCardRomanization}>
                 {romanization}

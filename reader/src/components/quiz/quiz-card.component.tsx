@@ -17,6 +17,7 @@ import { useScheduleInfo } from './todays-quiz-stats.component'
 import { QuizCardSound } from './quiz-card-sound.component'
 import { NoScheduleRows } from './no-schedule-rows.component'
 import { RevealedQuizCard } from './card-types/revealed-quiz-card.component'
+import { UnRevealedQuizCardComponent } from './card-types/un-revealed-quiz-card.component'
 
 
 export const useActiveFlashCardTypes = () => {
@@ -49,7 +50,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
                         {
                             answerIsRevealed ?
                                 <RevealedQuizCard quizCard={quizCard}/> :
-                                <UnAnsweredQuizCard quizCard={quizCard}/>;
+                                <UnRevealedQuizCardComponent quizCard={quizCard}/>
                         }
                         <QuizCardButtons quizCard={quizCard} />
                     </Fragment>
