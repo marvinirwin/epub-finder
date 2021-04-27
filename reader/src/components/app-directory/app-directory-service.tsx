@@ -12,13 +12,14 @@ import { SettingsNode } from './nodes/settings.node'
 import { LanguageSelectNode } from './nodes/language-select.node'
 import { LibraryNode } from './nodes/library.node'
 import { SignInWithNode } from './nodes/sign-in-with.node'
-import { ProgressNode } from './nodes/progress.node'
+import { ScheduleNode } from './nodes/schedule.node'
 import {
     TranslationAttemptNode,
     TranslationAttemptSchedule,
 } from './nodes/translation-attempt-schedule'
 import { ReadingComponent } from '../reading/reading.component'
 import { DEV } from '../../lib/util/url-params'
+import { ReadingProgressNode } from './nodes/reading-progress.node'
 
 export const ReadingNode = (m: Manager): TreeMenuNode => ({
     Component: () => <ReadingComponent m={m} />,
@@ -35,6 +36,7 @@ export function AppDirectory(m: Manager) {
         RecognizeSpeechNode(m),
         WatchPronunciationNode(m),
         LibraryNode(m),
+        ReadingProgressNode(m),
         /*
             UploadNode(m),
 */
@@ -43,7 +45,9 @@ export function AppDirectory(m: Manager) {
 /*
         TranslationAttemptSchedule,
 */
+/*
         QuizCarouselNode(),
+*/
         QuizScheduleNode(m),
         /*
             ProgressNode,

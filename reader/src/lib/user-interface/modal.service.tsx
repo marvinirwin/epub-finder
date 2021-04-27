@@ -19,6 +19,7 @@ import { QuizScheduleOverView } from '../quiz/quiz-schedule-over-view.component'
 import { Intro } from '../../components/intro/intro.component'
 import { UploadDialog } from '../../components/upload/upload-dialog'
 import { Box } from '@material-ui/core'
+import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -29,6 +30,7 @@ export class ModalService {
     public wordPaperDisplay: NavModal
     public quizScheduleOverView: NavModal
     public intro: NavModal
+    readingProgress: NavModal
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
@@ -62,6 +64,10 @@ export class ModalService {
         this.wordPaperDisplay = new NavModal(
             'wordPaperDisplay',
             WordCardDisplay,
+        );
+        this.readingProgress = new NavModal(
+            'readingProgress',
+            ReadingProgress
         )
     }
 
@@ -75,6 +81,7 @@ export class ModalService {
             this.wordPaperDisplay,
             this.quizScheduleOverView,
             this.intro,
+            this.readingProgress
         ]
     }
 }

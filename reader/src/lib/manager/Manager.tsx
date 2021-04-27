@@ -112,6 +112,7 @@ import { FlashCardLearningTargetsService } from '../schedule/learning-target/fla
 import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
 import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to-progress.service'
+import { ReadingProgressService } from '../tabulation/reading-progress.service'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -214,6 +215,7 @@ export class Manager {
     customWordsRepository: CustomWordsRepository;
     tabulationService: TabulationService;
     flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
+    readingProgressService: ReadingProgressService
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -462,6 +464,7 @@ export class Manager {
         this.wordCardModalService = new WordCardModalService(this)
         this.loadingMessagesService = new LoadingMessagesService(this)
         this.advanceTimeService = new AdvanceTimeService(this)
+        this.readingProgressService = new ReadingProgressService(this);
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()

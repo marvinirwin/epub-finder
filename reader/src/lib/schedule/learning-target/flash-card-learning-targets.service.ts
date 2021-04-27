@@ -15,6 +15,7 @@ import { mapIfThenDefault } from '../../util/map.module'
 import { IPositionedWord } from '../../../../../server/src/shared/Annotation/IPositionedWord'
 import { CustomWordsRepository } from './custom-words.repository'
 import { TabulationService } from '../../tabulation/tabulation.service'
+import { groupBy } from 'lodash'
 
 export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
     const m = new Map<string, number>()
@@ -41,6 +42,20 @@ export const subSequenceRecordHasNothingAdjacent = (notableSubSequences: IPositi
         return isInFrontOfMe || isBehindMe
     })
     return adjacentRecords.length === 0
+}
+export const getGreedySubSequences = (subSequences: IPositionedWord[]): IPositionedWord[] => {
+    const greedySubSequences: IPositionedWord[] = [];
+    const groupedByPosition = Object.values(groupBy(subSequences, r => r.position));
+    for (let i = 0; i < groupedByPosition.length; i++) {
+        const currentGroup = groupedByPosition[i];
+        const subSequence = currentGroup[currentGroup.length - 1];
+        const previousSubSequence = greedySubSequences[greedySubSequences.length - 1];
+        if (previousSubSequence === undefined ||
+            subSequence.position >= (previousSubSequence.position + previousSubSequence.word.length)) {
+            greedySubSequences.push(subSequence)
+        }
+    }
+    return greedySubSequences;
 }
 
 export class FlashCardLearningTargetsService {

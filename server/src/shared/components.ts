@@ -12,6 +12,7 @@ export const TESTING_UTILS = 'manual-speech-recognition'
 export const QUIZ_NODE = 'quiz-carousel'
 export const QUIZ_SCHEDULE = 'quiz-schedule'
 export const PROGRESS_NODE = 'PROGRESS_NODE'
+export const READING_PROGRESS_NODE = 'READING_PROGRESS_NODE'
 
 export type PAGES =
     | typeof SPEECH_PRACTICE
@@ -27,3 +28,4 @@ export type PAGES =
     | typeof QUIZ_NODE
     | typeof QUIZ_SCHEDULE
     | typeof PROGRESS_TREE
+    | typeof READING_PROGRESS_NODE

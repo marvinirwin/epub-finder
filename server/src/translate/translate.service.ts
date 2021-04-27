@@ -11,6 +11,7 @@ export const projectId = 'mandarin-trainer'
 export const translate = new Translate({ projectId })
 
 import debug from 'debug'
+import { MAX_TRANSLATE_LENGTH } from './transliterate.service'
 const d = debug('service:translate')
 
 @Injectable()
@@ -21,6 +22,9 @@ export class TranslateService {
     ) {}
 
     async translate({ text, to }: TranslateRequestDto) {
+        if (text.length > MAX_TRANSLATE_LENGTH) {
+            throw new Error(`Cannot translate over ${MAX_TRANSLATE_LENGTH} characters at once`)
+        }
         const [translation] = await translate.translate(text, to)
         return { translation }
     }

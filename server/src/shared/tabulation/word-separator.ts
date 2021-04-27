@@ -23,7 +23,6 @@ export const hebrewRegexp = /\p{Script_Extensions=Hebrew}/u
 export const greekRegexp = /\p{Script_Extensions=Greek}/u
 export const japaneseRegexp = /[\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Han}]/u
 export const kannadaRegexp = /\u0C80–\u0CFF/
-export const kazakhRegexp = /[\p{Script=Latin}\p{Script_Extensions=Arabic}\p{Script_Extensions=Cyrillic}]/u
 export const koreanRegexp = /\p{Script_Extensions=Hangul}/u
 // TODO, the rest, i stopped at ko
 
@@ -89,3 +88,4 @@ export const resolvePartialTabulationConfig = (
         isWordBoundaryRegex: wordBoundaryRegexp,
     }
 }
+

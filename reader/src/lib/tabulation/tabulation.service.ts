@@ -19,6 +19,21 @@ import {
 } from '../schedule/learning-target/flash-card-learning-targets.service'
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import { safePushMap } from '@shared/'
+import { IPositionedWord } from '../../../../server/src/shared/Annotation/IPositionedWord'
+
+export const getNotableSubsequencesOfWords = (notableSubSequences: IPositionedWord[], syntheticWords: Set<string>, strategy: 'noSeparator' | 'spaceSeparator', vocabulary: Set<string>) => notableSubSequences
+    .filter((notableSubSequence, subSequenceIndex) => {
+        if (syntheticWords.has(notableSubSequence.word)) {
+            return false
+        }
+        switch (strategy) {
+            case 'noSeparator':
+                return vocabulary.has(notableSubSequence.word)
+            case 'spaceSeparator':
+                return vocabulary.has(notableSubSequence.word) ||
+                    subSequenceRecordHasNothingAdjacent(notableSubSequences, notableSubSequence)
+        }
+    })
 
 export class TabulationService {
     tabulation$: Observable<{ wordCountMap: Map<string, DocumentWordCount[]> }>
@@ -75,19 +90,7 @@ export class TabulationService {
                          *   How do we tell if something is bordered on either side?  If it has no notable subsequences which immediately border it
                          */
                         const documentWordCounts = sumNotableSubSequences(
-                            notableSubSequences
-                                .filter((notableSubSequence, subSequenceIndex) => {
-                                    if (syntheticWords.has(notableSubSequence.word)) {
-                                        return false
-                                    }
-                                    switch (strategy) {
-                                        case 'noSeparator':
-                                            return vocabulary.has(notableSubSequence.word)
-                                        case 'spaceSeparator':
-                                            return vocabulary.has(notableSubSequence.word) ||
-                                                subSequenceRecordHasNothingAdjacent(notableSubSequences, notableSubSequence)
-                                    }
-                                }),
+                            getNotableSubsequencesOfWords(notableSubSequences, syntheticWords, strategy, vocabulary),
                         )
                         documentWordCounts.forEach(
                             (count, word) => {

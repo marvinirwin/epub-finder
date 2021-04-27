@@ -33,6 +33,8 @@ function getSsml({ locale, voice, rate, text }: SpeechSynthesisRequestDto) {
     </speak>`
 }
 
+const MAX_SPEECH_SYNTHESIS_CHARACTERS = 1000
+
 @Injectable()
 export class SpeechService {
     constructor(
@@ -100,6 +102,9 @@ export class SpeechService {
     }
 
     async TextToSpeech(c: SpeechSynthesisRequestDto) {
+        if (c.text.length > MAX_SPEECH_SYNTHESIS_CHARACTERS) {
+            throw new Error(`Cannot synthesize speech for over ${MAX_SPEECH_SYNTHESIS_CHARACTERS} characters`);
+        }
         const ssml = ` ${getSsml(c)}`
         const audioFileExists = await fs.pathExists(this.audioFilePath(c))
         const audioFilePath = this.audioFilePath(c)

@@ -5,15 +5,20 @@ import { TransliterateResponseDto } from './transliterate-response.dto'
 
 const endpoint = 'https://api.cognitive.microsofttranslator.com'
 
+export const MAX_TRANSLATE_LENGTH = 10000;
 export const transliterate = ({
     text,
     language,
     fromScript,
     toScript,
-}: TransliterateRequestDto): Promise<TransliterateResponseDto> =>
+}: TransliterateRequestDto): Promise<TransliterateResponseDto> => {
     // Add your location, also known as region. The default is global.
     // This is required if using a Cognitive Services resource.
-    axios({
+    if (text.length > MAX_TRANSLATE_LENGTH) {
+        throw new Error(`Cannot transliterate text over ${MAX_TRANSLATE_LENGTH} characters long`);
+    }
+
+    return axios({
         baseURL: endpoint,
         url: '/transliterate',
         method: 'post',
@@ -38,3 +43,4 @@ export const transliterate = ({
     }).then((response) => {
         return response.data
     })
+}
