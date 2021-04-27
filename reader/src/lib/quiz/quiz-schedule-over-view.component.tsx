@@ -46,7 +46,7 @@ export const QuizScheduleOverView = () => {
             >
                 <TableContainer component={Paper}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        Words in progress
+                        Cards in progress
                     </Typography>
                     <Table size="small" id={quizRowsInProgressTable}>
                         <QuizCardTableHead />
@@ -59,7 +59,7 @@ export const QuizScheduleOverView = () => {
                 </TableContainer>
                 <TableContainer component={Paper}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        Words learned today
+                        Cards completed today
                     </Typography>
                     <Table size="small" id={quizRowsFinishedTodayTable}>
                         <QuizCardTableHead />
@@ -78,7 +78,7 @@ export const QuizScheduleOverView = () => {
             >
                 <TableContainer component={Paper} style={{ flex: 1 }}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        New words to learn
+                        Cards to be learned for the first time
                     </Typography>
                     <Table size="small" id={quizRowsNotInProgressTable}>
                         <QuizCardTableHead />
@@ -91,7 +91,7 @@ export const QuizScheduleOverView = () => {
                 </TableContainer>
                 <TableContainer component={Paper} style={{ flex: 1 }}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
-                        Words to review
+                        Cards to review
                     </Typography>
                     <Table size="small" id={quizRowsToReviewTable}>
                         <QuizCardTableHead />
