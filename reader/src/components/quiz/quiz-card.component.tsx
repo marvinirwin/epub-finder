@@ -16,6 +16,7 @@ import { allScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-
 import { useScheduleInfo } from './todays-quiz-stats.component'
 import { QuizCardSound } from './quiz-card-sound.component'
 import { NoScheduleRows } from './no-schedule-rows.component'
+import { RevealedQuizCard } from './card-types/revealed-quiz-card.component'
 
 
 export const useActiveFlashCardTypes = () => {
@@ -24,22 +25,16 @@ export const useActiveFlashCardTypes = () => {
 }
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({ quizCard, ...props }) => {
-    const word = useObservableState(quizCard.word$)
     const m = useContext(ManagerContext)
-    const isLearningLanguageHidden = useIsFieldHidden({
-        quizCard,
-        label: QuizCardField.LearningLanguage,
-    })
     const scheduleInfo = useScheduleInfo()
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
     const flashCardTypes = useActiveFlashCardTypes()
     const wordsLearnedToday = Object.values(allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes))
     const cardLimitReached = wordsLearnedToday.length >= cardLimit
-    const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
-    const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
     const noScheduleRows = limitedScheduleRowData
-        ?.limitedScheduleRows?.length === 0 && !cardLimitReached
+        ?.limitedScheduleRows?.length === 0 && !cardLimitReached;
+    const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
     return (
         <Paper className='quiz-card' {...props}>
             {
@@ -51,30 +46,11 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
             {
                 (!cardLimitReached && !noScheduleRows) && (
                     <Fragment>
-                        <div className={'quiz-card-data-sheet'}>
-                            <div>
-                                {/*
-                                <QuizCardTranslationAttemptSchedule />
-*/}
-                            </div>
-                            <div className={'quiz-card-data-sheet-middle'}>
-                                <CardImage quizCard={quizCard} />
-                                <QuizCardSound quizCard={quizCard} />
-                                {!isLearningLanguageHidden && (
-                                    <CardLearningLanguageText word={word || ''} />
-                                )}
-                            </div>
-                            <div>
-                                {/*
-                                {answerIsRevealed && <QuizCardScheduleTable />}
-*/}
-                                {<CardInfo quizCard={quizCard} />}
-                            </div>
-                        </div>
-                        {!exampleSegmentsHidden && <OpenDocumentComponent
-                            style={{ alignSelf: 'start', margin: '24px', flex: 1, overflow: 'auto', width: '100%' }}
-                            openedDocument={quizCard.exampleSentenceOpenDocument}
-                        />}
+                        {
+                            answerIsRevealed ?
+                                <RevealedQuizCard quizCard={quizCard}/> :
+                                <UnAnsweredQuizCard quizCard={quizCard}/>;
+                        }
                         <QuizCardButtons quizCard={quizCard} />
                     </Fragment>
                 )
