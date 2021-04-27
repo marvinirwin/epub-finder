@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { LibraryDocumentRow } from '../../lib/manager/library-document-row'
-import { TableCell, TableRow, Button } from '@material-ui/core'
+import { TableCell, TableRow, Button, Typography } from '@material-ui/core'
 import Checkbox from '@material-ui/core/Checkbox'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
@@ -33,7 +33,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                 }
             }}
         >
-            <TableCell>{document.ltDocument.d.name}</TableCell>
+            <TableCell><Typography variant='h6'>{document.ltDocument.d.name}</Typography></TableCell>
             <TableCell>
                 <Checkbox
                     className={libraryRowToggleFrequency}

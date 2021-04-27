@@ -1,5 +1,5 @@
 import { Box, Typography } from '@material-ui/core'
-import { outOfWords } from '@shared/*'
+import { outOfWords } from '@shared/'
 import { LibraryTable } from '../library/library-table.component'
 import React from 'react'
 
