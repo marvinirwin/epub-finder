@@ -22,11 +22,9 @@ export interface ReadingProgress {
 export const wordCountForSubsequence = (text: string, strategy: WordIdentifyingStrategy): number => {
     switch(strategy) {
         case "noSeparator":
-            const length = text.split('').filter(v => !segmentBoundaryRegexp.test(v)).length
-            return length;
+            return text.split('').filter(v => !segmentBoundaryRegexp.test(v)).length;
         case "spaceSeparator":
-            const length1 = text.split(wordBoundaryRegexp).length
-            return length1;
+            return text.split(wordBoundaryRegexp).length;
 
     }
 }
