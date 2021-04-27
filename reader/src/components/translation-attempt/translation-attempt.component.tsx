@@ -16,7 +16,6 @@ import { SuperMemoGrade } from 'supermemo'
 import { SrmService } from '../../lib/srm/srm.service'
 import moment from 'moment'
 import { Observable } from 'rxjs'
-import { AdvanceButton } from '../quiz/quiz-card-buttons.component'
 import { DifficultyButtons } from './difficulty-buttons.component'
 import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
 import {
@@ -28,6 +27,7 @@ import { sum, round } from 'lodash'
 import { TranslationAttemptScheduleData } from '../../lib/schedule/translation-attempt-schedule.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
 import { useTranslation } from '../tables/quiz-card-translation-attempt-table.component'
+import { AdvanceButton } from '../quiz/advance.button.component'
 
 export const translateRequest = ''
 
