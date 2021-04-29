@@ -10,7 +10,6 @@ import { useIsFieldHidden } from '../useIsFieldHidden'
 import { QuizCardField } from '../../../lib/quiz/hidden-quiz-fields'
 
 export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
-    const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const word = useObservableState(quizCard.word$)
     const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
     const isLearningLanguageHidden = useIsFieldHidden({

@@ -31,15 +31,16 @@ import { useLoadingObservableString } from '../../lib/util/create-loading-observ
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 import { WordCountRecord } from '../../../../server/src/shared/tabulation/tabulate'
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
+import { Variant } from '@material-ui/core/styles/createTypography'
 
-export const CardLearningLanguageText = ({ word }: { word: string }) => {
+export const CardLearningLanguageText = ({ word, variant }: { word: string, variant?: Variant }) => {
     const m = useContext(ManagerContext)
     return (
         <Button
             onClick={() => m.wordCardModalService.word$.next(word)}
             className={quizCardLearningLanguage}
         >
-            <Typography variant={'h1'}>{word || ''}</Typography>
+            <Typography variant={variant || 'h1'}>{word || ''}</Typography>
         </Button>
     )
 }
