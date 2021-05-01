@@ -1,18 +1,13 @@
 import { uniq, flatten } from 'lodash'
-import { ICard } from '../../../../server/src/shared/ICard'
+import { Card } from '@shared/'
 
-export function cardForWord(word: string): ICard {
-    return {
-        learningLanguage: word,
-        photos: [],
-        sounds: [],
-        knownLanguage: [],
-        deck: '',
-        fields: [],
-        illustrationPhotos: [],
-        timestamp: new Date(),
-    }
-}
+export const cardForWord = async (word: string, language_code: string): Promise<Partial<Card>> => ({
+    learning_language: word,
+    language_code,
+    photos: [],
+    sounds: [],
+    known_language: [],
+})
 
 export const sleep = (n: number) =>
     new Promise((resolve) => setTimeout(resolve, n))

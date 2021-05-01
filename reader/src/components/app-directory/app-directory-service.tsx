@@ -12,11 +12,6 @@ import { SettingsNode } from './nodes/settings.node'
 import { LanguageSelectNode } from './nodes/language-select.node'
 import { LibraryNode } from './nodes/library.node'
 import { SignInWithNode } from './nodes/sign-in-with.node'
-import { ScheduleNode } from './nodes/schedule.node'
-import {
-    TranslationAttemptNode,
-    TranslationAttemptSchedule,
-} from './nodes/translation-attempt-schedule'
 import { ReadingComponent } from '../reading/reading.component'
 import { DEV } from '../../lib/util/url-params'
 import { ReadingProgressNode } from './nodes/reading-progress.node'
@@ -37,23 +32,11 @@ export function AppDirectory(m: Manager) {
         WatchPronunciationNode(m),
         LibraryNode(m),
         ReadingProgressNode(m),
-        /*
-            UploadNode(m),
-*/
         SettingsNode(m),
+        QuizScheduleNode(m),
         TestingUtilsNode(m),
 /*
         TranslationAttemptSchedule,
-*/
-/*
-        QuizCarouselNode(),
-*/
-        QuizScheduleNode(m),
-        /*
-            ProgressNode,
-*/
-        /*
-            SpeechPracticeNode,
 */
     ] as ArrayToTreeParams<TreeMenuNode>)
 }

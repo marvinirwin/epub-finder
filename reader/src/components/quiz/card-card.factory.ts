@@ -16,7 +16,7 @@ export const wordCardFactory = (
     cardService: CardsRepository,
     languageConfigsService: LanguageConfigsService,
 ): WordCard => {
-    function update(propsToUpdate: Partial<ICard>, word: string) {
+    const update = (propsToUpdate: Partial<ICard>, word: string) => {
         cardService.updateICard(word, propsToUpdate)
     }
 
@@ -45,7 +45,7 @@ export const wordCardFactory = (
                 cardService.cardIndex$,
                 currentWord$,
             ).pipe(
-                map((c) => c?.knownLanguage?.[0]),
+                map((c) => c?.known_language?.[0]),
                 shareReplay(1),
             ),
             (description$) =>
@@ -53,7 +53,7 @@ export const wordCardFactory = (
                     .pipe(withLatestFrom(currentWord$), debounceTime(1000))
                     .subscribe(([description, word]) => {
                         update(
-                            { knownLanguage: [description || ''] },
+                            { known_language: [description || ''] },
                             word || '',
                         )
                     }),

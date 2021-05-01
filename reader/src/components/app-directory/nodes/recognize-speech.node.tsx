@@ -22,7 +22,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
             const trySpeakingRef = useObservableState(m.introService.trySpeakingRef$)
             return <>
                 <RecordVoiceOver color={isRecording ? 'primary' : 'disabled'} />
-                {trySpeakingRef && <TutorialPopper storageKey={'recognize-speech'} referenceElement={trySpeakingRef} >
+                {trySpeakingRef && <TutorialPopper storageKey={'recognize-speech'} referenceElement={trySpeakingRef}>
                     <Typography>Click this to test your pronunciation with speech recognition</Typography>
                 </TutorialPopper>
                 }

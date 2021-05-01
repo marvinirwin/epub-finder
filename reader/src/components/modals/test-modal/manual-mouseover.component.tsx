@@ -36,7 +36,7 @@ export const ManualMouseover = () => {
                             priorityMouseoverHighlightWord({
                                 atomMetadata,
                                 cardsRepository: m.cardsRepository,
-                            })?.learningLanguage || '',
+                            })?.learning_language || '',
                         )
                     }
                 }}

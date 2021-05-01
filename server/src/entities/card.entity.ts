@@ -13,7 +13,7 @@ export class Card {
     @Column({type: 'jsonb'})
     sounds: string[]
     @Column({type: 'jsonb'})
-    fields: string[]
+    known_language: string[]
     @CreateDateColumn()
     created_at: Date;
     @Column()

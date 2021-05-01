@@ -64,14 +64,14 @@ export class AtomElementEventsService {
             element.onmouseenter = (ev) => {
                 addHighlightedWord(
                     mousedOverWordHighlightService.mousedOverWord$,
-                    highestPriorityMouseoverCard()?.learningLanguage ||
+                    highestPriorityMouseoverCard()?.learning_language ||
                         (element.textContent as string),
                 )
             }
             element.onmouseleave = (ev) => {
                 addHighlightedWord(
                     mousedOverWordHighlightService.mousedOverWord$,
-                    highestPriorityMouseoverCard()?.learningLanguage ||
+                    highestPriorityMouseoverCard()?.learning_language ||
                         (element.textContent as string),
                 )
             }

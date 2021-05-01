@@ -1,9 +1,9 @@
 export interface ICard {
     id?: number // Primary key. Optional (autoincremented)
-    learningLanguage: string
+    learning_language: string
     photos: string[]
     sounds: string[]
-    knownLanguage: string[]
+    known_language: string[]
     deck: string | undefined
     fields: string[]
     illustrationPhotos: string[]
@@ -11,6 +11,7 @@ export interface ICard {
 
     // Created by the program and never interacted with by the user
     synthetic?: boolean
+    language_code: string;
 }
 
 export async function resolveMediaSources(
@@ -42,5 +43,5 @@ export function getIsMeFunction(c1: ICard) {
         id?: number | undefined
     }) =>
         (c1.id && c1.id === id) ||
-        (c1.deck === deck && c1.learningLanguage === learningLanguage)
+        (c1.deck === deck && c1.learning_language === learningLanguage)
 }

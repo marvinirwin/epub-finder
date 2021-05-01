@@ -61,7 +61,7 @@ export class EntitiesController {
     ) {
         const foundEntity = this.resolveEntity(entity);
         if (!user) {
-            throw new Error(`Authentication required in to persist entities, shouldn't you be an anonymous user thought?`)
+            throw new Error(`Authentication required in to persist entities, shouldn't you be an anonymous user though?`)
         }
         body.creator_id = user.id;
         delete body.id;
