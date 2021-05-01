@@ -10,11 +10,10 @@ import { debounce, flatten, maxBy } from 'lodash'
 import { Highlighter } from '../highlighting/Highlighter'
 import { ElementAtomMetadataIndex } from '../../services/element-atom-metadata.index'
 import { Segment } from '@shared/'
-import CardsRepository, {
-    priorityMouseoverHighlightWord,
-} from '../manager/cards.repository'
+import CardsRepository from '../manager/cards.repository'
 import { VideoMetadataRepository } from '../../services/video-metadata.repository'
 import { MousedOverWordHighlightService } from '../highlighting/moused-over-word-highlight.service'
+import { priorityMouseoverHighlightWord } from '../manager/priority-mouseover-highlight-word'
 
 const addHighlightedWord = debounce(
     (obs$: Subject<string | undefined>, word: string | undefined) =>

@@ -6,14 +6,15 @@ import { cardForWord } from '../util/Util'
 
 export const resolveICardForWords = (
     icardMap$: Observable<Dictionary<ICard[]>>,
+    readingLanguageCode$: Observable<string>
 ) => (obs$: Observable<string[]>): Observable<ICard[]> =>
     obs$.pipe(
-        withLatestFrom(icardMap$),
-        map(([words, cardIndex]: [string[], Dictionary<ICard[]>]) => {
+        withLatestFrom(icardMap$, readingLanguageCode$),
+        map(([words, cardIndex, readingLanguageCode]) => {
             return words.map((word) =>
                 cardIndex[word]?.length
                     ? cardIndex[word][0]
-                    : cardForWord(word),
+                    : cardForWord(word, readingLanguageCode),
             )
         }),
     )

@@ -1,7 +1,6 @@
 import { uniq, flatten } from 'lodash'
-import { Card } from '@shared/'
-
-export const cardForWord = async (word: string, language_code: string): Promise<Partial<Card>> => ({
+import { ICard } from '../../../../server/src/shared/ICard'
+export const cardForWord = async (word: string, language_code: string): Promise<Partial<ICard>> => ({
     learning_language: word,
     language_code,
     photos: [],
@@ -45,6 +44,7 @@ export const splitKeepDelim = (delim: string) => (
     ...strings: string[]
 ): string[] => {
     return flatten(
+        // tslint:disable-next-line:variable-name
         strings.map((string) =>
             string
                 .split(delim)

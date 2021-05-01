@@ -1,7 +1,7 @@
 import { combineLatest, Observable } from 'rxjs'
 import { Dictionary } from 'lodash'
 import { ICard } from '../../../../server/src/shared/ICard'
-import { catchError, map, shareReplay, withLatestFrom } from 'rxjs/operators'
+import { map, shareReplay, withLatestFrom } from 'rxjs/operators'
 import { cardForWord } from '../util/Util'
 
 export const resolveICardForWord = <T, U>(
@@ -24,26 +24,16 @@ export const resolveICardForWord = <T, U>(
 export const resolveICardForWordLatest = <T, U>(
     icardMap$: Observable<Dictionary<ICard[]>>,
     word$: Observable<string | undefined>,
+    readingLanguageCode$: Observable<string>,
 ): Observable<ICard | undefined> =>
-    combineLatest([icardMap$, word$]).pipe(
-        map(([cardIndex, word]) => {
+    combineLatest([icardMap$, word$, readingLanguageCode$]).pipe(
+        map(([cardIndex, word, readingLanguageCode]) => {
             if (word) {
                 return cardIndex[word]?.length
                     ? cardIndex[word][0]
-                    : cardForWord(word)
+                    : cardForWord(word, readingLanguageCode)
             }
             return undefined
         }),
         shareReplay(1),
     )
-/*
-    obs$.pipe(
-        withLatestFrom(icardMap$),
-        map(([word, cardIndex]: [T, Dictionary<ICard[]>]) => {
-            if (word) {
-                // @ts-ignore
-                return cardIndex[word]?.length ? cardIndex[word][0] : cardForWord(word, '')
-            }
-            return undefined;
-        })
-    );*/

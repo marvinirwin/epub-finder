@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react'
-import { priorityMouseoverHighlightWord } from '../../../lib/manager/cards.repository'
 import { flatten } from 'lodash'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../../App'
+import { priorityMouseoverHighlightWord } from '../../../lib/manager/priority-mouseover-highlight-word'
 
 export const ManualMouseover = () => {
     const m = useContext(ManagerContext)

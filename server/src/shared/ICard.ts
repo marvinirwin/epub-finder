@@ -1,18 +1,6 @@
-export interface ICard {
-    id?: number // Primary key. Optional (autoincremented)
-    learning_language: string
-    photos: string[]
-    sounds: string[]
-    known_language: string[]
-    deck: string | undefined
-    fields: string[]
-    illustrationPhotos: string[]
-    timestamp: number | Date
+import { Card } from "src/entities/card.entity";
 
-    // Created by the program and never interacted with by the user
-    synthetic?: boolean
-    language_code: string;
-}
+export type ICard = Card;
 
 export async function resolveMediaSources(
     audio: (HTMLAudioElement | HTMLImageElement)[],
@@ -40,8 +28,8 @@ export function getIsMeFunction(c1: ICard) {
     }: {
         deck: string | undefined
         learningLanguage: string
-        id?: number | undefined
+        id?: string | undefined
     }) =>
         (c1.id && c1.id === id) ||
-        (c1.deck === deck && c1.learning_language === learningLanguage)
+        (c1.learning_language === learningLanguage)
 }

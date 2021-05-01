@@ -26,6 +26,7 @@ export const wordCardFactory = (
             resolveICardForWordLatest(
                 cardService.cardIndex$,
                 currentWord$,
+                languageConfigsService.readingLanguageCode$
             ).pipe(
                 distinctUntilChanged(),
                 map((c) => {
@@ -44,6 +45,7 @@ export const wordCardFactory = (
             resolveICardForWordLatest(
                 cardService.cardIndex$,
                 currentWord$,
+                languageConfigsService.readingLanguageCode$
             ).pipe(
                 map((c) => c?.known_language?.[0]),
                 shareReplay(1),
