@@ -19,7 +19,7 @@ export const TogglePinyinComponent = () => {
                         }
                     />
                 }
-                label="Show Pinyin"
+                label="Show Romanization"
             />
         </ListItem>
     )

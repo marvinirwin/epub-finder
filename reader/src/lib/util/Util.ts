@@ -1,5 +1,6 @@
-import { uniq, flatten } from 'lodash'
+import { flatten } from 'lodash'
 import { ICard } from '../../../../server/src/shared/ICard'
+
 export const cardForWord = async (word: string, language_code: string): Promise<Partial<ICard>> => ({
     learning_language: word,
     language_code,
@@ -7,9 +8,6 @@ export const cardForWord = async (word: string, language_code: string): Promise<
     sounds: [],
     known_language: [],
 })
-
-export const sleep = (n: number) =>
-    new Promise((resolve) => setTimeout(resolve, n))
 
 /**
  * Changed this to split on linebreak because I'm lazy for now

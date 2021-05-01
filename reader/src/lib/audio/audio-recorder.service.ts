@@ -9,10 +9,10 @@ import {
     withLatestFrom,
 } from 'rxjs/operators'
 import { RecordRequest } from '../util/RecordRequest'
-import { sleep } from '../util/Util'
 import { AudioSource } from './audio-source'
 import { transliterate } from '../language/transliterate.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
+import { sleep } from '../util/sleep'
 
 export class AudioRecorder {
     public recordRequest$ = new Subject<RecordRequest>()

@@ -3,7 +3,7 @@ import { RGBA } from './color.service'
 import { HighlighterService } from './highlighter.service'
 import { filter, map } from 'rxjs/operators'
 import CardsRepository from '../manager/cards.repository'
-import { sleep } from '../util/Util'
+import { sleep } from '../util/sleep'
 
 export function removePunctuation(withPunctuation: string) {
     return withPunctuation
