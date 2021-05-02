@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
-import { Box, Button } from '@material-ui/core'
+import { Box, Button, Typography } from '@material-ui/core'
 import { HotkeyWrapper } from '../hotkeys/hotkey-wrapper'
 import { quizButtonReveal } from '@shared/'
 
@@ -15,7 +15,7 @@ export const AdvanceButton = () => {
                     onClick={() => m.hotkeyEvents.advanceQuiz$.next()}
 
                 >
-                    Reveal
+                    <Typography variant={'h3'}>Reveal</Typography>
                 </Button>
             </HotkeyWrapper>
         </Box>
