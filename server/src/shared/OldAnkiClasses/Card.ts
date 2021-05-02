@@ -1,6 +1,9 @@
 import { ICard } from '../ICard'
 import { chineseCharacterRegexp } from '../tabulation/word-separator'
 
+/**
+ * @deprecated
+ */
 export class Card {
     frontPhotos: string[]
     constructor(

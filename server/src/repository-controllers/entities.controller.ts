@@ -65,6 +65,7 @@ export class EntitiesController {
         }
         body.creator_id = user.id;
         delete body.id;
+        console.log(body)
         return await foundEntity.write.save(body)
     }
 

@@ -165,7 +165,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                         }),
                         // This order by is necessary or the offset wont do anything
                         orderBy(sortedRows, v => `${v.row.d.word}${v.row.d.flash_card_type}`),
-                        1000 * 60 * 5, // 5 minutes
+                        1000 * 60 * 10,
                     )
 
                     return sortedRows.map((row) => new ScheduleRow<SpacedSortQuizData>(
