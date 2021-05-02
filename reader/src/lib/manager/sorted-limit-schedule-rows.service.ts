@@ -1,6 +1,6 @@
 import { SettingsService } from '../../services/settings.service'
 import { combineLatest, Observable } from 'rxjs'
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { ScheduleRow, SortQuizData, SpacedSortQuizData } from '../schedule/schedule-row'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { TimeService } from '../time/time.service'
@@ -84,6 +84,7 @@ export class SortedLimitScheduleRowsService {
             settingsService.newQuizWordLimit$,
             timeService.quizNow$,
         ]).pipe(
+            debounceTime(0),
             map(([sortedScheduleRows, newQuizWordLimit, now]: [SpacedScheduleRow[], number, Date]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => row.d.count.value > 0,
@@ -133,7 +134,6 @@ export class SortedLimitScheduleRowsService {
                  * Oh, I know why I'm getting duplicate records in limitedScheduleRows, because 问题 becomes a member of
                  * more than 1 of the 3 sets which form it.
                  */
-                debugger;
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     wordsLearnedToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),

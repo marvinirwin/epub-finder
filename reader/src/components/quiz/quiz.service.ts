@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { OpenExampleSentencesFactory } from '../../lib/document-frame/open-example-sentences-document.factory'
-import { distinctUntilChanged, map, mapTo, shareReplay } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, map, mapTo, shareReplay } from 'rxjs/operators'
 import { QuizCard } from './word-card.interface'
 import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
@@ -76,6 +76,7 @@ export class QuizService {
                 currentWord$,
                 translationAttemptScheduleService.scheduleRows$,
             ]).pipe(
+                debounceTime(0),
                 map(
                     ([
                          exampleSegmentMap,
