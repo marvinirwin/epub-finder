@@ -80,7 +80,9 @@ export function ImageSearchComponent() {
             })
     }, 1000)
     useEffect(() => {
-        setSearchTerm(imageRequest?.term)
+        if (imageRequest?.term) {
+            setSearchTerm(imageRequest?.term)
+        }
     }, [imageRequest])
 
     function close() {

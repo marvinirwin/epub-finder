@@ -1,24 +1,13 @@
-import {
-    BehaviorSubject,
-    combineLatest,
-    Observable,
-    of,
-    ReplaySubject,
-    Subject,
-} from 'rxjs'
+import { BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject } from 'rxjs'
 import { Dictionary } from 'lodash'
 import { Segment } from '@shared/'
 import { filter, switchMap } from 'rxjs/operators'
 import { ds_Dict } from '../delta-scan/delta-scan.module'
 import { HotkeyModes } from './hotkey-modes'
 import { Hotkeys } from './hotkeys.interface'
-import {
-    observableLastValue,
-    SettingsService,
-} from '../../services/settings.service'
+import { observableLastValue, SettingsService } from '../../services/settings.service'
 import { ActiveSentenceService } from '../sentences/active-sentence.service'
 import { setMouseOverText } from '../../components/mouseover-div/mouseover-div'
-import { LanguageConfigsService } from '../language/language-configs.service'
 import { BrowserSegment } from '../sentences/browser-segment'
 
 export function isDocument(t: HTMLElement | Document): t is Document {
@@ -62,15 +51,15 @@ export class BrowserInputsService {
 
     showTranslations: boolean = false
     latestTranslationTarget: Segment | undefined
+    mouseoverSegment$ = new ReplaySubject<BrowserSegment | undefined>(1)
     private activeSentenceService: ActiveSentenceService
     private hotkeys$: Observable<Map<string[], Subject<void>>>
-    mouseoverSegment$ = new ReplaySubject<BrowserSegment | undefined>(1)
 
     constructor({
-        hotkeys$,
-        settingsService,
-        activeSentenceService,
-    }: {
+                    hotkeys$,
+                    settingsService,
+                    activeSentenceService,
+                }: {
         hotkeys$: Observable<Map<string[], Subject<void>>>
         settingsService: SettingsService
         activeSentenceService: ActiveSentenceService
@@ -106,6 +95,12 @@ export class BrowserInputsService {
 
     applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
+            const activeElement = document.activeElement
+            if (activeElement?.tagName === 'TEXTAREA' ||
+                (activeElement?.tagName === 'INPUT' && (activeElement as HTMLInputElement)?.type === 'text')
+            ) {
+                return
+            }
             this.keysPressed$.next({
                 ...this.keysPressed$.getValue(),
                 [ev.key]: true,

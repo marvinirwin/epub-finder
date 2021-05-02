@@ -139,11 +139,14 @@ export class SortedLimitScheduleRowsService {
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
                     wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
                     unStartedWords: orderFunc(unStartedScheduleRows),
-                    limitedScheduleRows: [
-                        ...orderFunc(overDueRows),
-                        ...orderFunc(scheduleRowsLeftForToday),
-                        ...orderFunc(notOverDueRows),
-                    ],
+                    /**
+                     * Is there a reason I didn't sort all these at once?
+                     */
+                    limitedScheduleRows: orderFunc([
+                        ...overDueRows,
+                        ...scheduleRowsLeftForToday,
+                        ...notOverDueRows,
+                    ]),
                 }
             }),
             distinctUntilChanged((x, y) => x.limitedScheduleRows.map(scheduleRowKey).join('') === y.limitedScheduleRows.map(scheduleRowKey).join('')),

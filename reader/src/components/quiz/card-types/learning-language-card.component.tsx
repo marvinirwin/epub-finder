@@ -8,8 +8,9 @@ import { useObservableState } from 'observable-hooks'
 
 export const LearningLanguageCard = ({quizCard}: {quizCard: QuizCard}) => {
     const word = useObservableState(quizCard.word$)
+    const image = useObservableState(quizCard.image$.value$);
     return <Paper style={{display: 'flex', flexFlow: 'column nowrap', width: '100%', height: '100%'}}>
-        <CardImage wordInfo={quizCard}/>
+        {image && <CardImage wordInfo={quizCard}/>}
         <CardLearningLanguageText word={word || ''} />
     </Paper>
 }
