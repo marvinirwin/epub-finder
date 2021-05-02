@@ -81,7 +81,7 @@ export class Progress {
                                 word,
                                 rows.filter((row) =>
                                     dateBetween(
-                                        row.timestamp,
+                                        row.created_at,
                                         startTime,
                                         endTime,
                                     ),

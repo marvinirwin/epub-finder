@@ -6,7 +6,6 @@ import { orderBy } from 'lodash'
 import { ProgressTableRow } from './progress-table-row.component'
 import { ProgressTableHead } from './progress-table-head.component'
 import { ProgressTableToolbar } from './progress-table-toolbar.component'
-
 export const ScheduleRowsComponent = () => {
     const m = useContext(ManagerContext)
     const recognitionRecords =
@@ -20,12 +19,12 @@ export const ScheduleRowsComponent = () => {
                     <TableBody>
                         {orderBy(
                             recognitionRecords.filter((r) => r.grade >= 3),
-                            (r) => r.timestamp,
+                            (r) => r.created_at,
                             'desc',
                         ).map((recognitionRecord) => (
                             <ProgressTableRow
                                 recognitionRecord={recognitionRecord}
-                                key={recognitionRecord.timestamp.getTime()}
+                                key={recognitionRecord.created_at.getTime()}
                             />
                         ))}
                     </TableBody>

@@ -70,7 +70,7 @@ const RecognitionRowTable: React.FC<{
                                 {formatDueDate(row.nextDueDate || new Date())}
                             </TableCell>
                             <TableCell align="right">
-                                {formatDueDate(row.timestamp || new Date())}
+                                {formatDueDate(row.created_at || new Date())}
                             </TableCell>
                             <TableCell align="right">{row.interval}</TableCell>
                             <TableCell align="right">{row.flash_card_type}</TableCell>

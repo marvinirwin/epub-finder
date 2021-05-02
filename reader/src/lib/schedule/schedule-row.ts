@@ -45,28 +45,34 @@ export interface SortValue<T> {
 export type ScheduleItem = {
     nextDueDate: Date
     grade: SuperMemoGrade
-    timestamp: Date
+    created_at: Date
     repetition: number
     interval: number
     efactor: number
 }
 
+const NUMBER_OF_CORRECT_ANSWERS_TO_LEARN = 2
+const CORRECT_SUPERMEMO_GRADE = 3
 export const wasLearnedToday = (r1: ScheduleItem[]) => {
-    const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
+    const lastTwoRecords = ScheduleRow.lastNRecords(r1, NUMBER_OF_CORRECT_ANSWERS_TO_LEARN)
     return (
-        lastTwoRecords.length === 2 &&
-        lastTwoRecords.every((r) => r.grade >= 3 && isToday(r.timestamp))
+        lastTwoRecords.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN &&
+        lastTwoRecords.every((r) => r.grade >= CORRECT_SUPERMEMO_GRADE && isToday(r.created_at))
     )
 }
 
 export const dateLearnedForTheFirstTime = (records: ScheduleItem[]): Date | undefined => {
+    // @ts-ignore
+    if (records[0]?.word === '制') {
+        // debugger;console.log()
+    }
     let successInARow: ScheduleItem[] = [];
     for (let i = 0; i < records.length; i++) {
         const record = records[i]
-        if (successInARow.length === 3) {
-            return successInARow[0].timestamp;
+        if (successInARow.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
+            return successInARow[0].created_at;
         }
-        if (record.grade >= 3) {
+        if (record.grade >= CORRECT_SUPERMEMO_GRADE) {
             successInARow.push(record)
         } else {
             successInARow = [];
@@ -76,9 +82,9 @@ export const dateLearnedForTheFirstTime = (records: ScheduleItem[]): Date | unde
 }
 
 export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
-    const lastTwoRecords = ScheduleRow.lastNRecords(r1, 2)
+    const lastTwoRecords = ScheduleRow.lastNRecords(r1, NUMBER_OF_CORRECT_ANSWERS_TO_LEARN)
     return (
-        lastTwoRecords.length === 2 && lastTwoRecords.every((r) => r.grade >= 3)
+        lastTwoRecords.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN && lastTwoRecords.every((r) => r.grade >= CORRECT_SUPERMEMO_GRADE)
     )
 }
 
@@ -110,14 +116,14 @@ export class ScheduleRow<T> {
         if (hasNeverBeenAttempted) {
             return false
         }
-        const isComplete = lastN(3)(this.superMemoRecords).every(
-            (r) => isToday(r.timestamp) && r.grade >= 3,
+        const isComplete = lastN(NUMBER_OF_CORRECT_ANSWERS_TO_LEARN)(this.superMemoRecords).every(
+            (r) => isToday(r.created_at) && r.grade >= CORRECT_SUPERMEMO_GRADE,
         )
         if (isComplete) {
             return false
         }
         const isCurrentlyReviewing = this.superMemoRecords.find((r) =>
-            isToday(r.timestamp),
+            isToday(r.created_at),
         )
         if (isCurrentlyReviewing) {
             return false
@@ -129,7 +135,7 @@ export class ScheduleRow<T> {
         return this.dueDate() < now
     }
 
-    public hasNRecognizedInARow(n = 2) {
+    public hasNRecognizedInARow(n = NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
         const last2 = this.superMemoRecords.slice(n * -1)
         return last2.every((rec) => rec.grade === SrmService.correctScore())
     }
@@ -145,16 +151,16 @@ export class ScheduleRow<T> {
         const lastRecord = this.superMemoRecords[
             this.superMemoRecords.length - 1
         ]
-        const startedToday = isToday(lastRecord.timestamp)
-        if (this.superMemoRecords.length < 2) {
+        const startedToday = isToday(lastRecord.created_at)
+        if (this.superMemoRecords.length < NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
             return startedToday;
         }
         const lastTwoRecords = ScheduleRow.lastNRecords(
             this.superMemoRecords,
-            2,
+            NUMBER_OF_CORRECT_ANSWERS_TO_LEARN,
         );
         const completed = lastTwoRecords.every(
-            (record) => record.grade >= 3 && isToday(record.timestamp),
+            (record) => record.grade >= CORRECT_SUPERMEMO_GRADE && isToday(record.created_at),
         )
         if (completed) {
             return false
@@ -171,17 +177,17 @@ export class ScheduleRow<T> {
     }
 
     public isSomewhatRecognized({ now }: { now: Date }) {
-        return this.hasNRecognizedInARow(2) && this.isOverDue({ now })
+        return this.hasNRecognizedInARow(NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) && this.isOverDue({ now })
     }
 
     public isRecognized() {
-        return this.recognitionScore() >= 3
+        return this.recognitionScore() >= CORRECT_SUPERMEMO_GRADE
         /*
                 return !this.isUnrecognized() && !this.isSomewhatRecognized()
         */
     }
 
-    wasLearnedToday() {
+    wasLearnedOrReviewedToday() {
         return wasLearnedToday(this.superMemoRecords)
     }
 

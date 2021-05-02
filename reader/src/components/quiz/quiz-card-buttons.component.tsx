@@ -19,7 +19,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressService.indexOfOrderedRecords$) || {}
     const recognitionRecordsForThisCard = orderBy(
         (recognitionRecordIndex[word] || [])
-            .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flash_card_type === flash_card_type), r => r.timestamp.getTime())
+            .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flash_card_type === flash_card_type), r => r.created_at.getTime())
     useSubscription(m.hotkeyEvents.advanceQuiz$, () =>
         quizCard.answerIsRevealed$.next(true),
     )

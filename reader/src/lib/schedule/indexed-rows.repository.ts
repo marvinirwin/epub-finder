@@ -46,7 +46,7 @@ export class IndexedRowsRepository<T extends { id?: number  }> {
                     rows.forEach((row) => {
                         const { indexValue } = getIndexValue(row)
                         // @ts-ignore
-                        if (typeof row.timestamp === 'string') row.timestamp = new Date(row.timestamp)
+                        if (typeof row.timestamp === 'string') row.created_at = new Date(row.timestamp)
                         // @ts-ignore
                         if (typeof row.nextDueDate === 'string') row.nextDueDate = new Date(row.nextDueDate)
                         safePush(recordIndex, indexValue, row)

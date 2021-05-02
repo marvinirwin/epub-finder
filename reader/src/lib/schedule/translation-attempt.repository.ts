@@ -7,7 +7,7 @@ export interface TranslationAttemptRecord {
     id?: number
     learningLanguage: string
     translationAttempt: string
-    timestamp: Date
+    created_at: Date
     nextDueDate: Date
 
     interval: number

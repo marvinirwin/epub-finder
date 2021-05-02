@@ -135,7 +135,7 @@ export const TranslationAttempt: React.FC = () => {
                     learningLanguage,
                     grade,
                     translationAttempt: translateAttempt,
-                    timestamp: new Date(),
+                    created_at: new Date(),
                     nextDueDate: moment()
                         .add(translationAttemptRow.interval, 'minute')
                         .toDate(),

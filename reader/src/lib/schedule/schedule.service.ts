@@ -62,7 +62,7 @@ export class ScheduleService<T> {
         // Third take from the new
 
         this.cardsLearnedToday$ = this.sortedScheduleRows$.pipe(
-            map((rows) => rows.filter((row) => row.wasLearnedToday())),
+            map((rows) => rows.filter((row) => row.wasLearnedOrReviewedToday())),
         )
     }
 }

@@ -2,6 +2,7 @@ import Dexie from 'dexie'
 import { ICard } from '../../../../server/src/shared/ICard'
 import { CreatedSentence } from '../../../../server/src/shared/CreatedSentence'
 import { PronunciationProgressRow } from '../schedule/pronunciation-progress-row.interface'
+import { parseISO } from 'date-fns'
 
 export type PersistableEntity = 'userSettings' |
     'userSettingView' |
@@ -10,7 +11,7 @@ export type PersistableEntity = 'userSettings' |
     'ignoredWords' |
     'customWords';
 
-export const queryPersistableEntity = <T>(
+export const queryPersistableEntity = <T extends {created_at: Date}>(
     {
         entity,
         where,
@@ -35,6 +36,7 @@ export const queryPersistableEntity = <T>(
 
     return fetch(url.toString())
         .then(response => response.json())
+        .then(items => items.map((item: T) => ({...item, created_at: parseISO(item.created_at.toString())})))
 }
 
 export const putPersistableEntity = <T>(
@@ -61,7 +63,7 @@ export const putPersistableEntity = <T>(
 
 export interface CustomWord {
     word: string;
-    timestamp: Date;
+    created_at: Date;
     id: number;
     language_code: string;
 }
@@ -120,7 +122,7 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async* getWordRecordsGenerator<T>(
+    async* getWordRecordsGenerator<T extends {created_at: Date}>(
         entity: PersistableEntity,
         mapFn?: (v: T) => T,
     ): AsyncGenerator<T[]> {

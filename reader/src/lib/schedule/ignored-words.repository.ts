@@ -9,9 +9,6 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
             databaseService,
             load: () =>
                 databaseService.getWordRecordsGenerator('ignoredWords', (v) => {
-                    if (!v.timestamp) {
-                        v.timestamp = new Date()
-                    }
                     return v
                 }),
             add: (r) => putPersistableEntity({entity: 'ignoredWords', record: r}),

@@ -7,9 +7,6 @@ export class CustomWordsRepository extends IndexedRowsRepository<CustomWord> {
             databaseService,
             load: () =>
                 databaseService.getWordRecordsGenerator('customWords', (v) => {
-                    if (!v.timestamp) {
-                        v.timestamp = new Date()
-                    }
                     return v
                 }),
             add: (r) => putPersistableEntity({entity: 'customWords', record: r}),

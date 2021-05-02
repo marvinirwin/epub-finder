@@ -64,7 +64,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
         if (word) {
             m.ignoredWordsRepository.addRecords$.next([
-                { word, timestamp: new Date() },
+                { word, created_at: new Date() },
             ])
         }
     })

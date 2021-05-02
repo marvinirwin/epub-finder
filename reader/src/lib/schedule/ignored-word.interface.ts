@@ -1,5 +1,5 @@
 export interface IgnoredWord {
     word: string
     id?: number
-    timestamp: Date
+    created_at: Date;
 }

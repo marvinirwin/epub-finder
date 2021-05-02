@@ -3,7 +3,7 @@ import { SuperMemoGrade } from 'supermemo'
 export interface WordRecognitionRow {
     id?: number
     word: string
-    timestamp: Date
+    created_at: Date
     nextDueDate: Date
 
     interval: number

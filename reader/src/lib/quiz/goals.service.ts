@@ -36,7 +36,7 @@ export class GoalsService {
                     recognition,
                 ).filter((recordsForword) =>
                     recordsForword.find(
-                        (r) => r.grade >= 3 && isInToday(r.timestamp),
+                        (r) => r.grade >= 3 && isInToday(r.created_at),
                     ),
                 )
                 const wordsPronouncedToday = Object.values(

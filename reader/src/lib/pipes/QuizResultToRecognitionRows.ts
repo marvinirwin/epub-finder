@@ -26,7 +26,7 @@ export const QuizResultToRecognitionRows = (
 
                 return {
                     word: scorePair.word,
-                    timestamp: new Date(),
+                    created_at: new Date(),
                     ...nextRecognitionRecord,
                     nextDueDate: quizCardNextDueDate({grade: scorePair.grade, previousItems}),
                     grade: scorePair.grade,

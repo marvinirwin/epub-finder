@@ -10,8 +10,6 @@ export class SpacedRepitionEntity {
     @Column()
     word: string
     @Column()
-    timestamp: Date
-    @Column()
     nextDueDate: Date
     @Column({type: 'float'})
     interval: number
