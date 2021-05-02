@@ -1,6 +1,4 @@
 import {
-    Column, CreateDateColumn,
-    PrimaryGeneratedColumn,
     ViewColumn,
     ViewEntity,
 } from 'typeorm'
