@@ -3,14 +3,14 @@ import { WordIdentifyingStrategy } from './tabulate'
 
 export type LanguageCode = string
 
-export const chineseCharacterRegexp = /[\u4E00-\uFA29]/
+export const chineseCharacterRegexp = /\p{Script_Extensions=Han}/u
 export const latinCharacterRegexp = /[\p{Script=Latin}\u00C0-\u024F\u1E00-\u1EFF]/u
-export const arabicCharacterRegexp = /[\u0600-\u06ff\u0750-\u077f\ufb50-\ufbc1\ufbd3-\ufd3f\ufd50-\ufd8f\ufd92-\ufdc7\ufe70-\ufefc\uFDF0-\uFDFD]/
-export const assameseBengaliCharacterRegexp = /[\u0980-\u09fe]/
+export const arabicCharacterRegexp = /\p{Script_Extensions=Arabic}/u
+export const assameseBengaliCharacterRegexp = /\p{Script_Extensions=Bengali}/u
 export const bosnianCharacterRegexp = /[\p{Script=Latin}\u0161\u0111\u010D\u0107\u017E]/u
-export const cyrillicRegexp = /\u0400–\u04FF\u0500–\u052F\u2DE0–\u2DFF\uA640–\uA69F\u1C80–\u1C8F/
-export const gujaratiRegexp = /\u0A80–\u0AFF/
-export const devangariRegexp = /\u0900–\u097F\uA8E0–\uA8FF\u1CD0–\u1CFF/
+export const cyrillicRegexp = /\p{Script_Extensions=Cyrillic}/u
+export const gujaratiRegexp = /\p{Script_Extensions=Gujarati}/u
+export const devangariRegexp = /\p{Script_Extensions=Devanagari}/u
 
 /**
  * https://en.wikipedia.org/wiki/Hebrew_alphabet
@@ -22,7 +22,7 @@ export const devangariRegexp = /\u0900–\u097F\uA8E0–\uA8FF\u1CD0–\u1CFF/
 export const hebrewRegexp = /\p{Script_Extensions=Hebrew}/u
 export const greekRegexp = /\p{Script_Extensions=Greek}/u
 export const japaneseRegexp = /[\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Han}]/u
-export const kannadaRegexp = /\u0C80–\u0CFF/
+export const kannadaRegexp = /\p{Script_Extensions=Kannada}/u
 export const koreanRegexp = /\p{Script_Extensions=Hangul}/u
 // TODO, the rest, i stopped at ko
 
