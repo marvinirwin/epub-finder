@@ -171,5 +171,6 @@ export const  SupportedTranslations: SupportedTranslation[] = chunk(
     2,
 ).map(([label, code]) => ({ label, code }));
 
-export const languageCodeTranslationConfigMap = new Map<string, string>(SupportedTranslations.map(({label, code}) => [code, label]));
+export const languageCodesMappedToLabels = new Map<string, string>(SupportedTranslations.map(({label, code}) => [code, label]));
+export const languageCodesMappedToTranslationConfigs = new Map<string, SupportedTranslation>(SupportedTranslations.map((config) => [config.code, config]));
 

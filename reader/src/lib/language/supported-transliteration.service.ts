@@ -1,4 +1,5 @@
 import { chunk } from 'lodash'
+import { languageCodesMappedToLabels } from './supported-translation.service'
 
 export interface SupportedTransliteration {
     languageLabel: string
@@ -125,6 +126,7 @@ export const SupportedTransliterations: SupportedTransliteration[] = chunk(
         script1,
         script2,
         bidirectional,
+            languageLabel: languageCodesMappedToLabels.get(code)
     }),
 )
 
