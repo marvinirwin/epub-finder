@@ -5,7 +5,7 @@ import { UploadText } from './upload-text.component'
 import { Box, Button, Typography } from '@material-ui/core'
 import { fileChooser, uploadProgressBar } from '@shared/'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
-import { languageCodeLabels } from '../../lib/language/supported-translation.service'
+import { languageCodeTranslationConfigMap } from '../../lib/language/supported-translation.service'
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
@@ -13,7 +13,7 @@ export const UploadDialog = () => {
         m.uploadingDocumentsService.currentUploadingFile$,
     );
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
-    const currentLanguageLabel = languageCodeLabels.get(language_code || '') || '';
+    const currentLanguageLabel = languageCodeTranslationConfigMap.get(language_code || '') || '';
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
             <Typography variant={'h5'} color="textSecondary" gutterBottom>

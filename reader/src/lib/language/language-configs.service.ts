@@ -3,7 +3,7 @@ import { map, shareReplay } from 'rxjs/operators'
 import { SupportedTranslations } from './supported-translation.service'
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { SpeechToTextConfig, SupportedSpeechToTextService } from './supported-speech-to-text.service'
-import { SupportedTransliterationService } from './supported-transliteration.service'
+import { resolveRomanizationConfig, SupportedTransliterations } from './supported-transliteration.service'
 import { TextSpeechMap } from './text-speech-map'
 import { WordIdentifyingStrategy } from '../../../../server/src/shared/tabulation/tabulate'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
@@ -14,6 +14,7 @@ export type PossibleTransliterationConfig =
     | { language: string; fromScript: string; toScript: string }
     | undefined;
 export type PossibleTextToSpeechConfig = TextToSpeechConfig | undefined;
+
 
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleTranslationConfig>
@@ -99,18 +100,9 @@ export class LanguageConfigsService {
                 ).filter(v => !!v) as SpeechToTextConfig[]
             },
         )
-        const supportedTransliterations = SupportedTransliterationService.SupportedTransliteration
         this.learningToLatinTransliterateFn$ = getLanguageCodeObservable(
             (knownLanguageCode, learningLanguageCode) => {
-                const goesToLatin = supportedTransliterations.find(
-                    ({ script1, script2, bidirectional, code }) => {
-                        return (
-                            code.toLowerCase() ===
-                            learningLanguageCode.toLowerCase() &&
-                            script2 === 'Latn'
-                        )
-                    },
-                )
+                const goesToLatin = resolveRomanizationConfig(learningLanguageCode)
                 if (goesToLatin) {
                     return {
                         language: goesToLatin.code,
@@ -125,7 +117,7 @@ export class LanguageConfigsService {
             (knownLanguageCode, learningLanguageCode) => {
                 // Need script2 and bidirectional
                 // Is there a script1 that's latin?  Only for serbian, but that's a serial case
-                const goesFromLatin = supportedTransliterations.find(
+                const goesFromLatin = SupportedTransliterations.find(
                     ({ script1, script2, bidirectional, code }) => {
                         return (
                             code.toLowerCase() ===

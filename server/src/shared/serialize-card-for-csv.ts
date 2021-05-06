@@ -1,4 +1,6 @@
 import { Card } from '../entities/card.entity'
+import { resolveRomanizationConfig } from '../../../reader/src/lib/language/supported-transliteration.service'
+import { languageCodeTranslationConfigMap } from '../../../reader/src/lib/language/supported-translation.service'
 
 const toDataURL = url => fetch(url)
     .then(response => response.blob())
@@ -9,26 +11,20 @@ const toDataURL = url => fetch(url)
         reader.readAsDataURL(blob)
     }))
 
-
-toDataURL('https://www.gravatar.com/avatar/d50c83cc0c6523b4d3f6085295c953e0')
-    .then(dataUrl => {
-        console.log('RESULT:', dataUrl)
-    })
-
 export const SerializeCardForCsv = async (
     {
         c,
-        learningToKnownTransliterationConfig,
-        learningToKnowTranslationConfig
     }: {
     c: Card
 }) => {
+    const learningToKnowTranslationConfig = languageCodeTranslationConfigMap.get(c.language_code);
+    const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code);
     return {
         photo: await toDataURL(c.photos[0]),
         // What extension does this file have?
         sound: await toDataURL(c.sounds[0]),
         description: c.known_language[0],
-        romanization: learningToKnowTranslationConfig ? fetchTransliteration(learningToKnowTranslationConfig) : '',
+        romanization: learningToKnowTranslationConfig ? fetchTransliteration(learningToKnownTransliterationConfig) : '',
         learningLanguage: learningToKnowTranslationConfig ? fetchTranslation(learningToKnowTranslationConfig) : '',
     }
 }
