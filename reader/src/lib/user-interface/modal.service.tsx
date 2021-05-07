@@ -19,6 +19,8 @@ import { Intro } from '../../components/intro/intro.component'
 import { UploadDialog } from '../../components/upload/upload-dialog'
 import { Box } from '@material-ui/core'
 import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
+import { useObservableState } from 'observable-hooks'
+import { ManagerContext } from '../../App'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -78,8 +80,12 @@ export class ModalService {
 
         this.csv = new NavModal(
             'csv',
-            () => <Box p={1} m={2}>
-            </Box>
+            () => {
+                const m = useContext(ManagerContext);
+                const cardsCount = useObservableState(m.quizCardScheduleService.sortedScheduleRows$) || [];
+                return <Box p={1} m={2}>
+                </Box>
+            }
         )
     }
 
