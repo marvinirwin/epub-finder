@@ -31,6 +31,7 @@ export class ModalService {
     public intro: NavModal
     readingProgress: NavModal
     imageSearch: NavModal
+    csv: NavModal
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
@@ -71,7 +72,14 @@ export class ModalService {
         );
         this.imageSearch = new NavModal(
             'imageSearch',
-            () => <div/>
+            () => <Box p={1} m={2}>
+            </Box>
+        );
+
+        this.csv = new NavModal(
+            'csv',
+            () => <Box p={1} m={2}>
+            </Box>
         )
     }
 
@@ -86,7 +94,8 @@ export class ModalService {
             this.quizScheduleOverView,
             this.intro,
             this.readingProgress,
-            this.imageSearch
+            this.imageSearch,
+            this.csv
         ]
     }
 }

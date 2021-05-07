@@ -8,6 +8,10 @@ import { useObservableState } from 'observable-hooks'
 import { ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core'
 import { TutorialPopper } from '../../tutorial-popover/tutorial-popper.component'
 
+export const goToSignIn = () => {
+    window.location.href = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`
+}
+
 export const IsNotLoggedInProfile = () => {
     const [ref, setRef] = useState<HTMLDivElement | null>()
     return <>
@@ -17,7 +21,7 @@ export const IsNotLoggedInProfile = () => {
             selected={false}
             id={notLoggedInProfileNode}
             onClick={() => {
-                window.location.href = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`
+                goToSignIn()
             }}
         >
             <ListItemIcon>
