@@ -6,19 +6,27 @@ import { fetchTranslation } from '../../../reader/src/services/translate.service
 
 const toDataURL = url => fetch(url)
     .then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
+    .then(blob => new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result)
+        // TODO figure out if this will ever be an arrayBuffer
+        reader.onloadend = () => resolve(reader.result as string)
         reader.onerror = reject
         reader.readAsDataURL(blob)
     }))
 
+export type CsvCard = {
+    photo: string,
+    sound: string,
+    description: string,
+    romanization: string,
+    learning_language: string
+}
 export const SerializeCardForCsv = async (
     {
         c,
     }: {
         c: Card
-    }) => {
+    }): Promise<CsvCard> => {
     const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code)
     const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code)
     return {
@@ -27,14 +35,14 @@ export const SerializeCardForCsv = async (
         sound: await toDataURL(c.sounds[0]),
         description: c.known_language[0],
         romanization: learningToKnowTranslationConfig ?
-            transliterate({
+            await transliterate({
                 fromScript: c.learning_language,
                 toScript: learningToKnownTransliterationConfig.script2,
                 language: c.learning_language,
-                text: c.learning_language }) :
+                text: c.learning_language }).then(r => r[0].text) :
             '',
-        learningLanguage: learningToKnowTranslationConfig ?
-            fetchTranslation({ from: c.language_code, to: 'en', text: c.learning_language }) :
+        learning_language: learningToKnowTranslationConfig ?
+            await fetchTranslation({ from: c.language_code, to: 'en', text: c.learning_language }) :
             '',
     }
 }
