@@ -13,7 +13,6 @@ import { AdjustLengthWeight } from '../../components/app-directory/adjust-length
 import { LibraryTable } from '../../components/library/library-table.component'
 import { SetQuizWordLimit } from '../../components/settings/set-new-quiz-word-limit.component'
 import { WordCardDisplay } from '../word-card/word-card.modal.component'
-import { ManagerContext } from '../../App'
 import { HotkeyConfig } from '../../components/hotkeys/HotkeyConfig'
 import { QuizScheduleOverView } from '../quiz/quiz-schedule-over-view.component'
 import { Intro } from '../../components/intro/intro.component'
@@ -31,6 +30,7 @@ export class ModalService {
     public quizScheduleOverView: NavModal
     public intro: NavModal
     readingProgress: NavModal
+    imageSearch: NavModal
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
@@ -68,6 +68,10 @@ export class ModalService {
         this.readingProgress = new NavModal(
             'readingProgress',
             ReadingProgress
+        );
+        this.imageSearch = new NavModal(
+            'imageSearch',
+            () => <div/>
         )
     }
 
@@ -81,7 +85,8 @@ export class ModalService {
             this.wordPaperDisplay,
             this.quizScheduleOverView,
             this.intro,
-            this.readingProgress
+            this.readingProgress,
+            this.imageSearch
         ]
     }
 }

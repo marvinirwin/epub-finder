@@ -126,7 +126,7 @@ export const SupportedTransliterations: SupportedTransliteration[] = chunk(
         script1,
         script2,
         bidirectional,
-            languageLabel: languageCodesMappedToLabels.get(code)
+            languageLabel: languageCodesMappedToLabels.get(code) || code
     }),
 )
 
