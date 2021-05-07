@@ -21,6 +21,9 @@ import { Box } from '@material-ui/core'
 import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
+import { cardForWord } from '../util/Util'
+import { ICard } from '../../../../server/src/shared/ICard'
+import { SerializeCardForCsv } from '../../../../server/src/shared/serialize-card-for-csv'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -82,8 +85,13 @@ export class ModalService {
             'csv',
             () => {
                 const m = useContext(ManagerContext);
-                const cardsCount = useObservableState(m.quizCardScheduleService.sortedScheduleRows$) || [];
+                const currentLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$) || ''
+                const scheduleRows = useObservableState(m.quizCardScheduleService.sortedScheduleRows$) || [];
+                const cardIndex = useObservableState(m.cardsRepository.cardIndex$) || {};
+                const scheduleRowsWithCount = scheduleRows.filter(r => r.d.wordCountRecords.length);
+                const cards: ICard[] = scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, currentLanguageCode));
                 return <Box p={1} m={2}>
+                    {cards.map(c => SerializeCardForCsv({c}))}
                 </Box>
             }
         )
