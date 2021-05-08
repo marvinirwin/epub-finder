@@ -34,12 +34,14 @@ export const wordCardFactory = (
                 }),
                 shareReplay(1),
             ),
-            (imageSrc$) =>
+            (imageSrc$) => {
                 imageSrc$
                     .pipe(withLatestFrom(currentWord$), debounceTime(1000))
-                    .subscribe(([imageSrc, word]) =>
-                        update({ photos: [imageSrc || ''] }, word || ''),
-                    ),
+                    .subscribe(([imageSrc, word]) => {
+                            update({ photos: [imageSrc || ''] }, word || '')
+                        },
+                    )
+            },
         ),
         description$: new EditableValue<string | undefined>(
             resolveICardForWordLatest(

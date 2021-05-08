@@ -14,7 +14,7 @@ export const ImageSearchResults = ({
             {searchResults.map((imageResult, index) => (
                 <GridListTile
                     style={{ overflow: 'hidden' }}
-                    key={index}
+                    key={imageResult.thumbnailUrl}
                     className={'image-search-result'}
                 >
                     <img

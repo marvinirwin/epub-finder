@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Box, createStyles, IconButton, Paper, TextField, Theme, Toolbar } from '@material-ui/core'
+import { Box, createStyles, IconButton, Paper, TextField, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useObservableState } from 'observable-hooks'
 import { ImageResult } from './image-search-result.interface'
@@ -7,6 +7,7 @@ import { ImageSearchResults } from './image-search-results.component'
 import { ManagerContext } from '../../App'
 import SearchIcon from '@material-ui/icons/Search'
 import CloseIcon from '@material-ui/icons/Close'
+import { observableLastValue } from '../../services/settings.service'
 
 export interface ImageSearchResponse {
     images: ImageResult[]
@@ -51,40 +52,39 @@ export function ImageSearchComponent() {
     const [searchTerm, setSearchTerm] = useState(imageRequest)
     const loading = useObservableState(m.imageSearchService.results$.isLoading$)
     const sources = useObservableState(m.imageSearchService.results$.obs$) || []
-    const cb = useObservableState(m.imageSearchService.queryImageCallback$)
     return (
-        <Paper id='image-search-dialog'>
+        <Paper id='image-search-dialog' style={{ height: '90vh', width: '90vw' }}>
             <Box m={2} p={1}>
-                <TextField
-                    placeholder='Search…'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <div>
-                    <div>
-                        <SearchIcon />
-                    </div>
-                </div>
                 <IconButton
-                    edge="start"
-                    color="inherit"
+                    edge='start'
+                    color='inherit'
                     onClick={() => m.modalService.imageSearch.open$.next(false)}
-                    aria-label="close"
+                    aria-label='close'
                 >
                     <CloseIcon />
                 </IconButton>
+                <div style={{ display: 'flex' }}><TextField
+                    placeholder='Search…'
+                    value={searchTerm}
+                    onChange={(e) => {
+                        m.imageSearchService.queryImageRequest$.next(e.target.value);
+                        setSearchTerm(e.target.value)
+                    }}
+                />
+                </div>
                 <div className={`image-search-container ${classes.root}`}>
                     {loading ? (
                         `Loading ${loading}`
                     ) : sources.length ? (
                         <ImageSearchResults
                             searchResults={sources}
-                            onClick={(result) => {
+                            onClick={async (result) => {
+                                const cb = await observableLastValue(m.imageSearchService.queryImageCallback$)
                                 if (cb) {
                                     // TODO should I use getDataUrl here?
                                     cb(result.thumbnailUrl || '')
                                 }
-                                close()
+                                m.modalService.imageSearch.open$.next(false);
                             }}
                         />
                     ) : (
