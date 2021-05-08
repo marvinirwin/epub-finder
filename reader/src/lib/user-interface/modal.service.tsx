@@ -86,8 +86,9 @@ export class ModalService {
             () => {
                 const m = useContext(ManagerContext);
                 const csvs = useObservableState(m.csvService.csv$) || [];
+                const tag = Math.random()
                 return <Box p={1} m={2} style={{whiteSpace: 'pre', height: '90vh', width: '90vw'}}>
-                    {csvs.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization].join('","')}"`).join('\n')}
+                    {csvs.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag].join('","')}"`).join('\n')}
                 </Box>
             }
         )

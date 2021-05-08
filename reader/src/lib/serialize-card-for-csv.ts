@@ -42,9 +42,7 @@ export const SerializeCardForCsv = async (
         sound: sound ? await toDataURL(sound) : '',
         description: `Definition: <b>${knownLanguage || (learningToKnowTranslationConfig ?
             await fetchTranslation({ from: c.language_code, to: 'en', text: c.learning_language }) :
-            '')}</b>
-            ${segments.join('\n')}
-            `,
+            '')}</b><br/>${segments.join('<br/>')}`,
         romanization: learningToKnownTransliterationConfig ?
             await fetchTransliteration({
                 fromScript: learningToKnownTransliterationConfig.script1,
