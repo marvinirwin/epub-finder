@@ -16,11 +16,9 @@ export function CardImage({ wordInfo }: { wordInfo: WordCard }) {
         <EditableOnClick
             onEditClicked={async () => {
                 const searchTerm = await observableLastValue(wordInfo.word$)
+                m.imageSearchService.queryImageCallback$.next(image => wordInfo.image$.set(image))
                 if (searchTerm) {
-                    m.imageSearchService.queryImageRequest$.next({
-                        term: searchTerm,
-                        cb: (v) => wordInfo.image$.set(v),
-                    })
+                    m.imageSearchService.queryImageRequest$.next(searchTerm)
                 }
             }}
         >

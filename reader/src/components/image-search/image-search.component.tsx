@@ -63,23 +63,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export function ImageSearchComponent() {
     const classes = useStyles()
     const m = useContext(ManagerContext)
-    const imageRequest = useObservableState(
-        m.imageSearchService.queryImageRequest$,
-    )
+    const imageRequest = useObservableState( m.imageSearchService.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest)
-    function close() {
-        m.imageSearchService.queryImageRequest$.next()
-    }
-    const onClose = () =>
-        m.imageSearchService.queryImageRequest$.next(undefined);
     const loading  = useObservableState(m.imageSearchService.results$.isLoading$);
     const sources = useObservableState(m.imageSearchService.results$.obs$) || [];
+    const cb = useObservableState(m.imageSearchService.queryImageCallback$);
     return (
         <Dialog
             id="image-search-dialog"
             fullScreen
             open={!!imageRequest}
-            onClose={onClose}
             TransitionComponent={Transition}
         >
             <div className={`image-search-container ${classes.root}`}>
@@ -94,7 +87,9 @@ export function ImageSearchComponent() {
                     <ImageSearchResults
                         searchResults={sources}
                         onClick={(result) => {
-                            imageRequest?.cb(result.thumbnailUrl || '')
+                            if (cb) {
+                                cb(result.thumbnailUrl || '')
+                            }
                             close()
                         }}
                     />

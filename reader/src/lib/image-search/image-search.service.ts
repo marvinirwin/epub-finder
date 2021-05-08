@@ -8,6 +8,7 @@ import { Image } from 'plotly.js'
 
 export class ImageSearchService {
     public queryImageRequest$: ReplaySubject< string > = new ReplaySubject<string>(1);
+    public queryImageCallback$ = new ReplaySubject<(v: string) => unknown>(1);
     results$: LoadingObservable<ImageSearchResult>
     constructor() {
         this.results$ = createLoadingObservable(
