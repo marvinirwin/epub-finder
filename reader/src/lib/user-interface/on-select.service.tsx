@@ -1,10 +1,10 @@
 import { ReplaySubject } from 'rxjs'
 import { BrowserInputsService } from '../hotkeys/browser-inputs-service'
 import { GeneralToastMessageService } from './general-toast-message.service'
-import { distinctUntilChanged, filter, withLatestFrom } from 'rxjs/operators'
+import { distinctUntilChanged,  withLatestFrom } from 'rxjs/operators'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { fetchTranslation } from '../../services/translate.service'
-import React, { Fragment } from 'react'
+import React from 'react'
 import { Box, Typography } from '@material-ui/core'
 
 export class OnSelectService {
@@ -66,7 +66,6 @@ export class OnSelectService {
                 }
             }
         }
-        document.onmouseup = checkForSelectedText
         this.browserInputsService
             .getKeyUpSubject('Shift')
             .subscribe(checkForSelectedText)
