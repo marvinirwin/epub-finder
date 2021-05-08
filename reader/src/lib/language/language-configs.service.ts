@@ -16,6 +16,13 @@ export type PossibleTransliterationConfig =
 export type PossibleTextToSpeechConfig = TextToSpeechConfig | undefined;
 
 
+export const resolveTextToSpeechConfig = (readingLanguage: string) => {
+    if (readingLanguage.startsWith('zh')) {
+        readingLanguage = 'zh'
+    }
+    return TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage))
+}
+
 export class LanguageConfigsService {
     public knownToLearningTranslate$: Observable<PossibleTranslationConfig>
     public learningToKnownTranslateConfig$: Observable<PossibleTranslationConfig>
@@ -25,7 +32,7 @@ export class LanguageConfigsService {
     learningLanguageTextToSpeechConfig$: Observable<PossibleTextToSpeechConfig>
     public potentialLearningLanguageTextToSpeechConfigs$: Observable<TextToSpeechConfig[]>
     readingLanguageCode$: Observable<string>
-    strategy$: Observable<WordIdentifyingStrategy>
+    wordSeparationStrategy$: Observable<WordIdentifyingStrategy>
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
         const knownLanguage$ = new ReplaySubject<string>(1);
@@ -78,15 +85,12 @@ export class LanguageConfigsService {
         this.potentialLearningLanguageTextToSpeechConfigs$ = settingsService.readingLanguage$
             .pipe(
                 map(readingLanguage => {
-                    if (readingLanguage.startsWith('zh')) {
-                        readingLanguage = 'zh';
-                    }
-                    return TextToSpeechConfigs.filter(config => config.locale.includes(readingLanguage))
+                    return resolveTextToSpeechConfig(readingLanguage)
                 }),
                 shareReplay(1),
             );
 
-        this.strategy$ = this.readingLanguageCode$.pipe(
+        this.wordSeparationStrategy$ = this.readingLanguageCode$.pipe(
             map(readingLanguageCode => resolvePartialTabulationConfig(readingLanguageCode).wordIdentifyingStrategy),
             shareReplay(1),
         )

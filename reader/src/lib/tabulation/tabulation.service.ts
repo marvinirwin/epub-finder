@@ -59,7 +59,7 @@ export class TabulationService {
             allWordsRepository.all$,
             selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
             videoMetadataRepository.all$.pipe(startWith(new Map())),
-            languageConfigsService.strategy$,
+            languageConfigsService.wordSeparationStrategy$,
         ]).pipe(
             map(([
                      builtInWords,

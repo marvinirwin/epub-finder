@@ -41,7 +41,7 @@ export class ReadingProgressService {
             allWordsRepository.all$,
             selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
             videoMetadataRepository.all$.pipe(startWith(new Map())),
-            languageConfigsService.strategy$,
+            languageConfigsService.wordSeparationStrategy$,
             weightedVocabService.weightedVocab$,
         ]).pipe(
             map(([

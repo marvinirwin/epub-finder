@@ -4,6 +4,10 @@ import { fetchTranslation } from '../services/translate.service'
 import { ICard } from '../../../server/src/shared/ICard'
 import { fetchTransliteration } from './language/transliterate.service'
 import { uniq } from 'lodash'
+import { fetchSynthesizedAudio } from './audio/fetch-synthesized-audio'
+import { SupportedSpeechToTextService } from '../../../server/src/shared/supported-speech-to-text.service'
+import { resolveTextToSpeechConfig } from './language/language-configs.service'
+import { TextToSpeechConfig } from '../../../server/src/shared/supported-text-to-speech'
 
 const toDataURL = (url: string) => fetch(url)
     .then(response => response.blob())
@@ -25,21 +29,23 @@ export type CsvCard = {
 export const SerializeCardForCsv = async (
     {
         c,
-        exampleSegments
+        exampleSegments,
+        textToSpeechConfig
     }: {
         c: ICard,
-        exampleSegments: Map<string, Set<string>>
+        exampleSegments: Map<string, Set<string>>,
+        textToSpeechConfig: TextToSpeechConfig | undefined
     }): Promise<CsvCard> => {
     const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code)
     const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code)
     const [photo] = c.photos;
-    const [sound] = c.sounds;
     const [knownLanguage] = c.known_language;
-    const segments = [...exampleSegments.get(c.learning_language)?.values() || []]
+    const segments = [...exampleSegments.get(c.learning_language)?.values() || []];
+    const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({ ...textToSpeechConfig, text: c.learning_language });
     return {
         photo: photo ? await toDataURL(photo) : '',
         // What extension does this file have?
-        sound: sound ? await toDataURL(sound) : '',
+        sound: wavAudio ? await toDataURL(wavAudio.url) : '',
         description: `Definition: <b>${knownLanguage || (learningToKnowTranslationConfig ?
             await fetchTranslation({ from: c.language_code, to: 'en', text: c.learning_language }) :
             '')}</b><br/>${segments.join('<br/>')}`,
@@ -51,5 +57,6 @@ export const SerializeCardForCsv = async (
                 text: c.learning_language }) :
             '',
         learning_language: c.learning_language,
+
     }
 }

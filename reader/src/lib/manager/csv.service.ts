@@ -14,10 +14,10 @@ export class CsvService {
 
     constructor(
         {
-            languageConfigsService,
             quizCardScheduleRowsService,
             cardsRepository,
             exampleSentencesService,
+            languageConfigsService,
         }:
             {
                 languageConfigsService: LanguageConfigsService,
@@ -31,13 +31,21 @@ export class CsvService {
             quizCardScheduleRowsService.scheduleRows$,
             cardsRepository.cardIndex$,
             exampleSentencesService.exampleSegmentMap$,
+            languageConfigsService.learningLanguageTextToSpeechConfig$,
         ]).pipe(
-            switchMap(async ([readingLanguageCode, scheduleRows, cardIndex, exampleSegments]) => {
+            switchMap(async ([
+                                 readingLanguageCode,
+                                 scheduleRows,
+                                 cardIndex,
+                                 exampleSegments,
+                                 textToSpeechConfig
+                             ]) => {
                 const scheduleRowsWithCount = scheduleRows.filter(r => r.d.wordCountRecords.length)
                 const cards: ICard[] = await Promise.all(scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, readingLanguageCode)))
                 return await Promise.all(uniqueBy(cards, c => c.learning_language).map(c => SerializeCardForCsv({
                     c,
                     exampleSegments,
+                    textToSpeechConfig,
                 })))
             }),
             shareReplay(1),
