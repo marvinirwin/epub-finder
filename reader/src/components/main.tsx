@@ -44,7 +44,6 @@ export function Main({ m }: { m: Manager }) {
                     <AudioRecorderResizedContext.Provider
                         value={audioRecorderResized$}
                     >
-                        <ImageSearchComponent />
                         <MiniDrawer />
                     </AudioRecorderResizedContext.Provider>
                 </PronunciationVideoResizedContext.Provider>

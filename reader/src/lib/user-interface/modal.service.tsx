@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from 'react'
+import React, { useContext } from 'react'
 import { LanguageSelect } from '../../components/app-directory/nodes/language-select.component'
 import { ToggleTranslateComponent } from '../../components/settings/toggle-translate.component'
 import { TogglePinyinComponent } from '../../components/settings/toggle-pinyin.component'
@@ -21,9 +21,7 @@ import { Box } from '@material-ui/core'
 import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
-import { cardForWord } from '../util/Util'
-import { ICard } from '../../../../server/src/shared/ICard'
-import { SerializeCardForCsv } from '../serialize-card-for-csv'
+import { ImageSearchComponent } from '../../components/image-search/image-search.component'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -40,10 +38,10 @@ export class ModalService {
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
-        this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />);
+        this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
 
         this.languageSelect = new NavModal('spokenLanguage', () => (
-            <Box m={2} p={1} style={{height: '90vh', width: '90vw'}}><LanguageSelect /></Box>
+            <Box m={2} p={1} style={{ height: '90vh', width: '90vw' }}><LanguageSelect /></Box>
         ))
         this.library = new NavModal('documentSelect', () => <Box m={2} p={1}><LibraryTable /></Box>)
         this.quizScheduleOverView = new NavModal('quizScheduleOverView', () => (
@@ -52,7 +50,7 @@ export class ModalService {
 
         this.settings = new NavModal('settings', () => {
             return (
-                <Box m={2} p={1} style={{width: '90vw'}}>
+                <Box m={2} p={1} style={{ width: '90vw' }}>
                     <ToggleTranslateComponent />
                     <TogglePinyinComponent />
                     <AdjustFrequencyWeight />
@@ -63,34 +61,35 @@ export class ModalService {
                     <HotkeyConfig />
                 </Box>
             )
-        });
+        })
 
         this.testingUtils = new NavModal('testingUtils ', ManualTestModal)
 
         this.wordPaperDisplay = new NavModal(
             'wordPaperDisplay',
             WordCardDisplay,
-        );
+        )
         this.readingProgress = new NavModal(
             'readingProgress',
-            ReadingProgress
-        );
+            ReadingProgress,
+        )
         this.imageSearch = new NavModal(
             'imageSearch',
             () => <Box p={1} m={2}>
-            </Box>
-        );
+                <ImageSearchComponent />
+            </Box>,
+        )
 
         this.csv = new NavModal(
             'csv',
             () => {
-                const m = useContext(ManagerContext);
-                const csvs = useObservableState(m.csvService.csv$) || [];
+                const m = useContext(ManagerContext)
+                const csvs = useObservableState(m.csvService.csv$) || []
                 const tag = Math.random()
-                return <Box p={1} m={2} style={{whiteSpace: 'pre', height: '90vh', width: '90vw'}}>
+                return <Box p={1} m={2} style={{ whiteSpace: 'pre', height: '90vh', width: '90vw' }}>
                     {csvs.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag].join('","')}"`).join('\n')}
                 </Box>
-            }
+            },
         )
     }
 
@@ -106,7 +105,7 @@ export class ModalService {
             this.intro,
             this.readingProgress,
             this.imageSearch,
-            this.csv
+            this.csv,
         ]
     }
 }

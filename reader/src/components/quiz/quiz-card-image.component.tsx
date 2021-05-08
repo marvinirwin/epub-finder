@@ -16,10 +16,11 @@ export function CardImage({ wordInfo }: { wordInfo: WordCard }) {
         <EditableOnClick
             onEditClicked={async () => {
                 const searchTerm = await observableLastValue(wordInfo.word$)
-                m.imageSearchService.queryImageCallback$.next(image => wordInfo.image$.set(image))
                 if (searchTerm) {
+                    m.imageSearchService.queryImageCallback$.next(image => wordInfo.image$.set(image))
                     m.imageSearchService.queryImageRequest$.next(searchTerm)
                 }
+                m.modalService.imageSearch.open$.next(true);
             }}
         >
             {quizCardImageSource ? (
