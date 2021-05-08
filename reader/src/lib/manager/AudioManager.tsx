@@ -7,7 +7,7 @@ import { Box, Typography } from '@material-ui/core'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
-import { transliterate } from '../language/transliterate.service'
+import { fetchTransliteration } from '../language/transliterate.service'
 
 export type AudioPair = { user: WavAudio; synth: WavAudio }
 
@@ -67,7 +67,7 @@ export const RecognizedTextComponent = (
     useEffect(() => {
         if (currentRomanizationFn) {
             cancellablePromise(
-                transliterate({
+                fetchTransliteration({
                     ...currentRomanizationFn,
                     text: recognizedText,
                 }),

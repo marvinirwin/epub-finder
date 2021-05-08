@@ -2,7 +2,7 @@ import { TransliterateResponseDto, TransliterateRequestDto } from '@server/'
 import axios, { AxiosResponse } from 'axios'
 import memoize from 'memoizee'
 
-export const transliterate = memoize(
+export const fetchTransliteration = memoize(
     (d: TransliterateRequestDto) => {
         return axios
             .post(`${process.env.PUBLIC_URL}/translate/transliterate`, d)

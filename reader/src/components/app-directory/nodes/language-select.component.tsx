@@ -8,7 +8,7 @@ import {
     textToSpeechLanguageSelectLabel,
     textToSpeechSelect,
 } from '@shared/'
-import { SupportedTranslations } from '../../../lib/language/supported-translation.service'
+import { SupportedTranslations } from '../../../../../server/src/shared/supported-translation.service'
 
 export const LanguageSelect = () => {
     const m = useContext(ManagerContext)

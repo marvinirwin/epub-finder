@@ -18,7 +18,7 @@ import {
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
 import { fetchTranslation } from '../../services/translate.service'
-import { transliterate } from '../../lib/language/transliterate.service'
+import { fetchTransliteration } from '../../lib/language/transliterate.service'
 
 export class TranslationAttemptService {
     currentTranslation$: Observable<string | undefined>
@@ -77,7 +77,7 @@ export class TranslationAttemptService {
         ]).pipe(
             switchMap(([currentTranslatableWord, learningToLatinConfig]) => {
                 return learningToLatinConfig && currentTranslatableWord
-                    ? transliterate({
+                    ? fetchTransliteration({
                           ...learningToLatinConfig,
                           text: currentTranslatableWord,
                       })

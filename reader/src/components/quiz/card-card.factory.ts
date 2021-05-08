@@ -5,7 +5,7 @@ import { LanguageConfigsService } from '../../lib/language/language-configs.serv
 import { EditableValue } from './editing-value'
 import { resolveICardForWordLatest } from '../../lib/pipes/ResolveICardForWord'
 import { debounceTime, distinctUntilChanged, map, shareReplay, withLatestFrom } from 'rxjs/operators'
-import { transliterate } from '../../lib/language/transliterate.service'
+import { fetchTransliteration } from '../../lib/language/transliterate.service'
 import { fetchTranslation } from '../../services/translate.service'
 import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
 import { WordCard } from './word-card.interface'
@@ -66,7 +66,7 @@ export const wordCardFactory = (
             ]),
             ([transliterateConfig, currentWord]) =>
                 transliterateConfig
-                    ? transliterate({
+                    ? fetchTransliteration({
                         ...transliterateConfig,
                         text: currentWord || '',
                     })

@@ -113,6 +113,7 @@ import { CustomWordsRepository } from '../schedule/learning-target/custom-words.
 import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to-progress.service'
 import { ReadingProgressService } from '../tabulation/reading-progress.service'
+import { CsvService } from './csv.service'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -216,6 +217,7 @@ export class Manager {
     tabulationService: TabulationService;
     flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
     readingProgressService: ReadingProgressService
+    csvService: CsvService
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -227,8 +229,8 @@ export class Manager {
                 shareReplay(1),
             ),
         })
-        this.hotkeyModeService = new HotkeyModeService(this)
         this.generalToastMessageService = new GeneralToastMessageService()
+        this.hotkeyModeService = new HotkeyModeService(this)
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this)
         this.languageConfigsService = new LanguageConfigsService(this)
@@ -465,6 +467,7 @@ export class Manager {
         this.loadingMessagesService = new LoadingMessagesService(this)
         this.advanceTimeService = new AdvanceTimeService(this)
         this.readingProgressService = new ReadingProgressService(this);
+        this.csvService = new CsvService(this);
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()

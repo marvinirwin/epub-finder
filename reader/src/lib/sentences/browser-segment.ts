@@ -5,7 +5,7 @@ import { LanguageConfigsService } from '../language/language-configs.service'
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { fetchTranslation } from '../../services/translate.service'
-import { transliterate } from '../language/transliterate.service'
+import { fetchTransliteration } from '../language/transliterate.service'
 
 export class BrowserSegment extends Segment {
     translation$: Observable<string>
@@ -35,7 +35,7 @@ export class BrowserSegment extends Segment {
         this.romanization$ = languageConfigsService.learningToLatinTransliterateFn$.pipe(
             switchMap((romanizationConfig) =>
                 romanizationConfig
-                    ? transliterate({
+                    ? fetchTransliteration({
                           ...romanizationConfig,
                           text: this.translatableText,
                       })

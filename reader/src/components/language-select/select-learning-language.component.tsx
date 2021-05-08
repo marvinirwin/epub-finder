@@ -1,4 +1,4 @@
-import { SupportedSpeechToTextService } from '../../lib/language/supported-speech-to-text.service'
+import { SupportedSpeechToTextService } from '../../../../server/src/shared/supported-speech-to-text.service'
 import { List, ListItem, Select, MenuItem } from '@material-ui/core'
 import { ManagerContext } from '../../App'
 import { useContext } from 'react'

@@ -13,16 +13,18 @@ export const NoScheduleRows = () => {
         </Typography>
 */}
         <Button
-            variant={'contained'}
+            variant={'outlined'}
             onClick={() => goToSignIn()}
+            style={{display: 'inline-block'}}
         >
-            Sign in
+            <Typography variant={'h3'}>Sign in to see your saved learning material</Typography>
         </Button>
         <Typography
+            style={{display: 'inline-block'}}
             className={outOfWords}
             variant={'h3'}
         >
-            or add more Learning Material
+            &nbsp; Or upload some new ones
         </Typography>
         <LibraryTable />
     </Box>

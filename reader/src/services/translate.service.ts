@@ -1,6 +1,5 @@
 import axios from 'axios'
 import memoize from 'memoizee'
-import { TransliterateRequestDto } from '../../../server/src/translate/transliterate-request.dto'
 
 export interface TranslateRequest extends TranslateConfig {
     text: string

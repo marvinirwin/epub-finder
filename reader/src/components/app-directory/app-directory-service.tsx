@@ -2,7 +2,6 @@ import React from 'react'
 import { Manager } from '../../lib/manager/Manager'
 import { ArrayToTreeParams, arrayToTreeRoot } from './directory.factory'
 import { TreeMenuNode } from './tree-menu-node.interface'
-import { UploadNode } from './nodes/upload.node'
 import { QuizScheduleNode } from './nodes/quiz-schedule.node'
 import { QuizCarouselNode } from './nodes/quiz-carousel.node'
 import { RecognizeSpeechNode } from './nodes/recognize-speech.node'
@@ -15,6 +14,7 @@ import { SignInWithNode } from './nodes/sign-in-with.node'
 import { ReadingComponent } from '../reading/reading.component'
 import { DEV } from '../../lib/util/url-params'
 import { ReadingProgressNode } from './nodes/reading-progress.node'
+import { CSV } from '@shared/'
 
 export const ReadingNode = (m: Manager): TreeMenuNode => ({
     Component: () => <ReadingComponent m={m} />,
@@ -35,6 +35,12 @@ export function AppDirectory(m: Manager) {
         QuizScheduleNode(m),
         SettingsNode(m),
         TestingUtilsNode(m),
+        {
+            name: CSV,
+            hidden: !DEV,
+            label: 'Csv',
+            action: () => m.modalService.csv.open$.next(true),
+        }
 /*
         TranslationAttemptSchedule,
 */

@@ -1,6 +1,4 @@
 import { Observable, ReplaySubject } from 'rxjs'
-import { setInterval } from 'timers'
-import { HotkeyModes } from './hotkey-modes'
 import { isDocument } from './browser-inputs-service'
 import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
 import { Typography } from '@material-ui/core'

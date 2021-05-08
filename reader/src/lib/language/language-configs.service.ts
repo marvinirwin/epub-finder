@@ -1,13 +1,13 @@
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay } from 'rxjs/operators'
-import { SupportedTranslations } from './supported-translation.service'
+import { SupportedTranslations } from '../../../../server/src/shared/supported-translation.service'
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { SpeechToTextConfig, SupportedSpeechToTextService } from './supported-speech-to-text.service'
-import { resolveRomanizationConfig, SupportedTransliterations } from './supported-transliteration.service'
+import { SpeechToTextConfig, SupportedSpeechToTextService } from '../../../../server/src/shared/supported-speech-to-text.service'
+import { resolveRomanizationConfig, SupportedTransliterations } from '../../../../server/src/shared/supported-transliteration.service'
 import { TextSpeechMap } from './text-speech-map'
 import { WordIdentifyingStrategy } from '../../../../server/src/shared/tabulation/tabulate'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
-import { TextToSpeechConfig, TextToSpeechConfigs } from './supported-text-to-speech'
+import { TextToSpeechConfig, TextToSpeechConfigs } from '../../../../server/src/shared/supported-text-to-speech'
 
 export type PossibleTranslationConfig = { from: string; to: string } | undefined
 export type PossibleTransliterationConfig =

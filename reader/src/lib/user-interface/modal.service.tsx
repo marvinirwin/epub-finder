@@ -23,7 +23,7 @@ import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
 import { cardForWord } from '../util/Util'
 import { ICard } from '../../../../server/src/shared/ICard'
-import { SerializeCardForCsv } from '../../../../server/src/shared/serialize-card-for-csv'
+import { SerializeCardForCsv } from '../serialize-card-for-csv'
 
 export class ModalService {
     public languageSelect: NavModal
@@ -85,13 +85,9 @@ export class ModalService {
             'csv',
             () => {
                 const m = useContext(ManagerContext);
-                const currentLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$) || ''
-                const scheduleRows = useObservableState(m.quizCardScheduleService.sortedScheduleRows$) || [];
-                const cardIndex = useObservableState(m.cardsRepository.cardIndex$) || {};
-                const scheduleRowsWithCount = scheduleRows.filter(r => r.d.wordCountRecords.length);
-                const cards: ICard[] = scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, currentLanguageCode));
-                return <Box p={1} m={2}>
-                    {cards.map(c => SerializeCardForCsv({c}))}
+                const csvs = useObservableState(m.csvService.csv$) || [];
+                return <Box p={1} m={2} style={{whiteSpace: 'pre'}}>
+                    {csvs.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization].join('","')}"`).join('\n')}
                 </Box>
             }
         )
