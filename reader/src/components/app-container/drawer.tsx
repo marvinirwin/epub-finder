@@ -1,11 +1,6 @@
 import React, { useContext } from 'react'
 import clsx from 'clsx'
-import {
-    createStyles,
-    makeStyles,
-    useTheme,
-    Theme,
-} from '@material-ui/core/styles'
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
@@ -92,44 +87,44 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
     const menuItemTree = useObservableState(treeMenuService.tree.updates$)
     const directoryPath =
         useObservableState(m.settingsService.directoryPath$) || ''
-    const open = useObservableState(m.settingsService.drawerClosed$) || false
+    const open = !useObservableState(m.settingsService.drawerClosed$)
 
     const classes = useStyles()
     const handleDrawerOpen = () => {
-        m.settingsService.drawerClosed$.next(true)
+        m.settingsService.drawerClosed$.next(false)
     }
 
     const handleDrawerClose = () => {
-        m.settingsService.drawerClosed$.next(false)
+        m.settingsService.drawerClosed$.next(true)
     }
 
     return (
         <div className={`app-container ${classes.root}`}>
             <AppBar
-                position="fixed"
+                position='fixed'
                 className={clsx(classes.appBar, {
                     [classes.appBarShift]: open,
                 })}
             >
                 <Toolbar>
                     <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
+                        color='inherit'
+                        aria-label='open drawer'
                         onClick={handleDrawerOpen}
-                        edge="start"
+                        edge='start'
                         className={clsx(classes.menuButton, {
                             [classes.hide]: open,
                         })}
                     >
                         <Menu />
                     </IconButton>
-                    <Typography variant="h6" noWrap>
+                    <Typography variant='h6' noWrap>
                         Language Trainer
                     </Typography>
                 </Toolbar>
             </AppBar>
             <Drawer
-                variant="permanent"
+                variant='permanent'
                 className={clsx(classes.drawer, {
                     [classes.drawerOpen]: open,
                     [classes.drawerClose]: !open,
@@ -159,8 +154,8 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                                     ref={(ref) =>
                                         m.introService.titleRef$.next(ref)
                                     }
-                                    variant="h6"
-                                ></Typography>
+                                    variant='h6'
+                                />
                             )}
                             tree={menuItemTree.sourced}
                             directoryPath={directoryPath

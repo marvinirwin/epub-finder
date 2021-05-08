@@ -270,20 +270,6 @@ export class SettingsService {
             ),
         )
     }
-
-    /*
-        public resolveReplaySubject$<T>(
-            settingsName: string,
-            defaultNoDb: T,
-        ): ReplaySubject<T> {
-            return this._resolveSetting$(
-                settingsName,
-                () => new ReplaySubject<T>(1),
-                this.settingsReplaySubjects,
-                defaultNoDb
-            )
-        }
-    */
 }
 
 export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
