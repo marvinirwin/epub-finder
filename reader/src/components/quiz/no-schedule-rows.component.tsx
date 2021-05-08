@@ -5,7 +5,7 @@ import React from 'react'
 import { goToSignIn } from '../app-directory/nodes/sign-in-with.node'
 
 export const NoScheduleRows = () => {
-    return <Box m={2} p={1}>
+    return <Box m={2} p={1} style={{width: '100%', height: '100%'}}>
 {/*
         <Typography
             variant={'h3'}
