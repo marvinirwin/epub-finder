@@ -30,7 +30,7 @@ export const LibraryTable = () => {
                         m.modalService.fileUpload.open$.next(true)
                     }}
                 >
-                    Add More
+                    Upload Learning Material
                 </Button>
             </Box>
             <Table size="small">

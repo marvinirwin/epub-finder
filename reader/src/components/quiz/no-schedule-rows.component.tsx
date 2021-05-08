@@ -15,16 +15,16 @@ export const NoScheduleRows = () => {
         <Button
             variant={'outlined'}
             onClick={() => goToSignIn()}
-            style={{display: 'inline-block'}}
+            style={{display: 'inline'}}
         >
-            <Typography variant={'h3'}>Sign in to see your saved learning material</Typography>
+            <Typography variant={'h3'}>Sign in </Typography>
         </Button>
         <Typography
-            style={{display: 'inline-block'}}
+            style={{display: 'inline'}}
             className={outOfWords}
             variant={'h3'}
         >
-            &nbsp; Or upload some new ones
+            &nbsp; to see your saved learning material, or try uploading some
         </Typography>
         <LibraryTable />
     </Box>
