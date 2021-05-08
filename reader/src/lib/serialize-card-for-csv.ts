@@ -3,10 +3,7 @@ import { languageCodesMappedToTranslationConfigs } from '../../../server/src/sha
 import { fetchTranslation } from '../services/translate.service'
 import { ICard } from '../../../server/src/shared/ICard'
 import { fetchTransliteration } from './language/transliterate.service'
-import { uniq } from 'lodash'
 import { fetchSynthesizedAudio } from './audio/fetch-synthesized-audio'
-import { SupportedSpeechToTextService } from '../../../server/src/shared/supported-speech-to-text.service'
-import { resolveTextToSpeechConfig } from './language/language-configs.service'
 import { TextToSpeechConfig } from '../../../server/src/shared/supported-text-to-speech'
 
 const toDataURL = (url: string) => fetch(url)
