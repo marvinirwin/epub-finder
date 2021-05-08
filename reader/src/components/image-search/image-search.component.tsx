@@ -1,28 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
-import Dialog from '@material-ui/core/Dialog'
-import { ImageObject } from '@server/types'
-import {
-    AppBar,
-    createStyles,
-    fade,
-    GridList,
-    GridListTile,
-    IconButton,
-    TextField,
-    Theme,
-    Toolbar,
-    Typography,
-} from '@material-ui/core'
+import React, { useContext, useState } from 'react'
+import { Box, createStyles, IconButton, Paper, TextField, Theme, Toolbar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { debounce } from 'lodash'
 import { useObservableState } from 'observable-hooks'
-import { getImages } from '../../services/image-search.service'
 import { ImageResult } from './image-search-result.interface'
-import { Transition } from './slide-up.component'
 import { ImageSearchResults } from './image-search-results.component'
-import { ImageSearchAppBar } from './image-search-app-bar.component'
 import { ManagerContext } from '../../App'
-import { useDebouncedFn } from 'beautiful-react-hooks'
+import SearchIcon from '@material-ui/icons/Search'
+import CloseIcon from '@material-ui/icons/Close'
 
 export interface ImageSearchResponse {
     images: ImageResult[]
@@ -63,40 +47,51 @@ const useStyles = makeStyles((theme: Theme) =>
 export function ImageSearchComponent() {
     const classes = useStyles()
     const m = useContext(ManagerContext)
-    const imageRequest = useObservableState( m.imageSearchService.queryImageRequest$)
+    const imageRequest = useObservableState(m.imageSearchService.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest)
-    const loading  = useObservableState(m.imageSearchService.results$.isLoading$);
-    const sources = useObservableState(m.imageSearchService.results$.obs$) || [];
-    const cb = useObservableState(m.imageSearchService.queryImageCallback$);
+    const loading = useObservableState(m.imageSearchService.results$.isLoading$)
+    const sources = useObservableState(m.imageSearchService.results$.obs$) || []
+    const cb = useObservableState(m.imageSearchService.queryImageCallback$)
     return (
-        <Dialog
-            id="image-search-dialog"
-            fullScreen
-            open={!!imageRequest}
-            TransitionComponent={Transition}
-        >
-            <div className={`image-search-container ${classes.root}`}>
-                <ImageSearchAppBar
-                    onClose={close}
-                    searchTerm={searchTerm}
-                    onSearchTermChanged={setSearchTerm}
+        <Paper id='image-search-dialog'>
+            <Box m={2} p={1}>
+                <TextField
+                    placeholder='Search…'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                {loading ? (
-                    `Loading ${loading}`
-                ) : sources.length ? (
-                    <ImageSearchResults
-                        searchResults={sources}
-                        onClick={(result) => {
-                            if (cb) {
-                                cb(result.thumbnailUrl || '')
-                            }
-                            close()
-                        }}
-                    />
-                ) : (
-                    <div>No search results for {searchTerm}?</div>
-                )}
-            </div>
-        </Dialog>
+                <div>
+                    <div>
+                        <SearchIcon />
+                    </div>
+                </div>
+                <IconButton
+                    edge="start"
+                    color="inherit"
+                    onClick={() => m.modalService.imageSearch.open$.next(false)}
+                    aria-label="close"
+                >
+                    <CloseIcon />
+                </IconButton>
+                <div className={`image-search-container ${classes.root}`}>
+                    {loading ? (
+                        `Loading ${loading}`
+                    ) : sources.length ? (
+                        <ImageSearchResults
+                            searchResults={sources}
+                            onClick={(result) => {
+                                if (cb) {
+                                    // TODO should I use getDataUrl here?
+                                    cb(result.thumbnailUrl || '')
+                                }
+                                close()
+                            }}
+                        />
+                    ) : (
+                        <div>No search results for {searchTerm}?</div>
+                    )}
+                </div>
+            </Box>
+        </Paper>
     )
 }
