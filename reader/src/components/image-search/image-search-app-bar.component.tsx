@@ -44,12 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export const ImageSearchAppBar = ({
-    imageRequest,
     onClose,
     searchTerm,
     onSearchTermChanged,
 }: {
-    imageRequest: undefined | ImageSearchRequest
     onClose: () => void
     searchTerm: string | undefined
     onSearchTermChanged: (s: string | undefined) => void
@@ -59,7 +57,7 @@ export const ImageSearchAppBar = ({
         <AppBar className={'image-search-app-bar'} position={'sticky'}>
             <Toolbar className={'image-search-toolbar'}>
                 <Typography variant="h6" noWrap className={'image-search-term'}>
-                    {imageRequest?.term}
+                    {searchTerm}
                 </Typography>
                 <div className={classes.search}>
                     <div className={classes.searchIcon}>

@@ -66,38 +66,14 @@ export function ImageSearchComponent() {
     const imageRequest = useObservableState(
         m.imageSearchService.queryImageRequest$,
     )
-    const [searchTerm, setSearchTerm] = useState(imageRequest?.term)
-    const [loading, setLoading] = useState('')
-    const [sources, setSrces] = useState<ImageObject[]>([])
-    const debounceSearch = useDebouncedFn((term: string) => {
-        setLoading(term)
-        getImages(term)
-            .then((response) => {
-                setSrces(response)
-            })
-            .finally(() => {
-                setLoading('')
-            })
-    }, 1000)
-    useEffect(() => {
-        if (imageRequest?.term) {
-            setSearchTerm(imageRequest?.term)
-        }
-    }, [imageRequest])
-
+    const [searchTerm, setSearchTerm] = useState(imageRequest)
     function close() {
         m.imageSearchService.queryImageRequest$.next()
     }
-
-    useEffect(() => {
-        if (searchTerm) {
-            debounceSearch.cancel()
-            debounceSearch(searchTerm);
-        }
-    }, [searchTerm])
-
     const onClose = () =>
-        m.imageSearchService.queryImageRequest$.next(undefined)
+        m.imageSearchService.queryImageRequest$.next(undefined);
+    const loading  = useObservableState(m.imageSearchService.results$.isLoading$);
+    const sources = useObservableState(m.imageSearchService.results$.obs$) || [];
     return (
         <Dialog
             id="image-search-dialog"
@@ -108,7 +84,6 @@ export function ImageSearchComponent() {
         >
             <div className={`image-search-container ${classes.root}`}>
                 <ImageSearchAppBar
-                    imageRequest={imageRequest}
                     onClose={close}
                     searchTerm={searchTerm}
                     onSearchTermChanged={setSearchTerm}
