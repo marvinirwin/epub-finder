@@ -42,7 +42,14 @@ export const SerializeCardForCsv = async (
     const [knownLanguage] = c.known_language;
     const segments = [...exampleSegments.get(c.learning_language)?.values() || []];
     const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({ ...textToSpeechConfig, text: c.learning_language });
-    zip.
+    if (wavAudio){
+        // Put ${learningLanguage}.wav into the zip file
+        await zip.file(`${c.learningLanguage}.wav`, wavAudio.blob)
+    }
+    if (photo) {
+        // Put ${learningLanguage}.${photoExt} into the zip file
+        await zip.file(`${c.learningLanguage}.${''}`, )
+    }
     return {
         photo: photo ? `` : '',
         // What extension does this file have?
