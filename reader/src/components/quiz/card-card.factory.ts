@@ -38,7 +38,11 @@ export const wordCardFactory = (
                 imageSrc$
                     .pipe(withLatestFrom(currentWord$), debounceTime(1000))
                     .subscribe(([imageSrc, word]) => {
-                            update({ photos: [imageSrc || ''] }, word || '')
+                        const newPhotos = [];
+                        if (imageSrc) {
+                            newPhotos.push(imageSrc);
+                        }
+                        update({ photos: newPhotos }, word || '')
                         },
                     )
             },

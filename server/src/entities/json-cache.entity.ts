@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm'
 
 @Entity()
 export class JsonCache {
@@ -12,4 +12,6 @@ export class JsonCache {
     value: string
     @Column('text', { default: '' })
     key: string
+    @CreateDateColumn({default: new Date()})
+    created_at: Date;
 }

@@ -58,7 +58,14 @@ export function ImageSearchComponent() {
                 <IconButton
                     edge='start'
                     color='inherit'
-                    onClick={() => m.modalService.imageSearch.open$.next(false)}
+                    onClick={async () => {
+                        const cb = await observableLastValue(m.imageSearchService.queryImageCallback$)
+                        if (cb) {
+                            // TODO should I use getDataUrl here?
+                            cb('')
+                        }
+                        m.modalService.imageSearch.open$.next(false);
+                    }}
                     aria-label='close'
                 >
                     <CloseIcon />

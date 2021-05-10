@@ -42,7 +42,7 @@ export class CsvService {
                              ]) => {
                 const scheduleRowsWithCount = scheduleRows.filter(r => r.d.wordCountRecords.length)
                 const cards: ICard[] = await Promise.all(scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, readingLanguageCode)))
-                return await Promise.all(uniqueBy(cards, c => c.learning_language).map(c => SerializeCardForCsv({
+                return await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0, 1).map(c => SerializeCardForCsv({
                     c,
                     exampleSegments,
                     textToSpeechConfig,
