@@ -8,9 +8,10 @@ import { shareReplay, switchMap } from 'rxjs/operators'
 import { CsvCard, SerializeCardForCsv } from '../serialize-card-for-csv'
 import { ExampleSegmentsService } from '../quiz/example-segments.service'
 import uniqueBy from '@popperjs/core/lib/utils/uniqueBy'
+import JSZip from 'jszip'
 
 export class CsvService {
-    csv$: Observable<CsvCard[]>
+    csvAndZip$: Observable<{ csvRows: CsvCard[], zip: JSZip }>
 
     constructor(
         {
@@ -26,7 +27,7 @@ export class CsvService {
                 exampleSentencesService: ExampleSegmentsService,
             },
     ) {
-        this.csv$ = combineLatest([
+        this.csvAndZip$ = combineLatest([
             languageConfigsService.readingLanguageCode$,
             quizCardScheduleRowsService.scheduleRows$,
             cardsRepository.cardIndex$,
@@ -38,15 +39,20 @@ export class CsvService {
                                  scheduleRows,
                                  cardIndex,
                                  exampleSegments,
-                                 textToSpeechConfig
+                                 textToSpeechConfig,
                              ]) => {
                 const scheduleRowsWithCount = scheduleRows.filter(r => r.d.wordCountRecords.length)
+                const zip = new JSZip()
                 const cards: ICard[] = await Promise.all(scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, readingLanguageCode)))
-                return await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0, 1).map(c => SerializeCardForCsv({
-                    c,
-                    exampleSegments,
-                    textToSpeechConfig,
-                })))
+                return {
+                    csvRows: await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0, 1).map(c => SerializeCardForCsv({
+                        c,
+                        exampleSegments,
+                        textToSpeechConfig,
+                        zip,
+                    }))),
+                    zip
+                }
             }),
             shareReplay(1),
         )

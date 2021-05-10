@@ -4,6 +4,7 @@ import { ToggleTranslateComponent } from '../../components/settings/toggle-trans
 import { TogglePinyinComponent } from '../../components/settings/toggle-pinyin.component'
 import { ManualTestModal } from '../../components/modals/test-modal/manual-test-modal.component'
 import { AdjustFrequencyWeight } from '../../components/app-directory/adjust-frequency-weight.component'
+import {saveAs} from 'file-saver';
 import { NavModal } from './nav-modal'
 import {
     AdjustDateWeight,
@@ -17,7 +18,7 @@ import { HotkeyConfig } from '../../components/hotkeys/HotkeyConfig'
 import { QuizScheduleOverView } from '../quiz/quiz-schedule-over-view.component'
 import { Intro } from '../../components/intro/intro.component'
 import { UploadDialog } from '../../components/upload/upload-dialog'
-import { Box } from '@material-ui/core'
+import { Box, Button } from '@material-ui/core'
 import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
@@ -84,10 +85,19 @@ export class ModalService {
             'csv',
             () => {
                 const m = useContext(ManagerContext)
-                const csvs = useObservableState(m.csvService.csv$) || []
+                const csvs = useObservableState(m.csvService.csvAndZip$)
                 const tag = Math.random()
                 return <Box p={1} m={2} style={{ whiteSpace: 'pre', height: '90vh', width: '90vw' }}>
-                    {csvs.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag].join('","')}"`).join('\n')}
+                    <Button onClick={() => {
+                        if (csvs) {
+                            csvs.zip.generateAsync({type: 'blob'}).then(blob => saveAs(blob, 'anki-media.zip'))
+                        }
+                    }}>
+                        Download Zip
+                    </Button>
+                    <div>
+                        {csvs?.csvRows?.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag].join('","')}"`).join('\n')}
+                    </div>
                 </Box>
             },
         )

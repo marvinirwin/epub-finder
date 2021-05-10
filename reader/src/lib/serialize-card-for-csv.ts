@@ -39,21 +39,27 @@ export const SerializeCardForCsv = async (
     const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code)
     const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code)
     const [photo] = c.photos;
+    const photoSplitByPeriod = photo?.split('.');
+    const photoSplitBySlash = photo?.split('/');
     const [knownLanguage] = c.known_language;
     const segments = [...exampleSegments.get(c.learning_language)?.values() || []];
     const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({ ...textToSpeechConfig, text: c.learning_language });
+    const audioFilename = `${c.learning_language}.wav`
     if (wavAudio){
         // Put ${learningLanguage}.wav into the zip file
-        await zip.file(`${c.learningLanguage}.wav`, wavAudio.blob)
+        await zip.file(audioFilename, wavAudio.blob)
     }
-    if (photo) {
+    const ext = photoSplitByPeriod ? photoSplitByPeriod[photoSplitByPeriod.length - 1] : '';
+    const photoAnkiPath = `${c.learning_language}.${ext}`
+    if (photoSplitByPeriod) {
+        debugger;
         // Put ${learningLanguage}.${photoExt} into the zip file
-        await zip.file(`${c.learningLanguage}.${''}`, )
+        await zip.file(photoAnkiPath, await toDataURL(photo))
     }
     return {
-        photo: photo ? `` : '',
+        photo: photo ? `<img src=\\"${photoAnkiPath}\\"/>` : '',
         // What extension does this file have?
-        sound: wavAudio ? `<audio controls autoplay src='${await toDataURL(wavAudio.url)}'/>` : '',
+        sound: wavAudio ? `<audio controls autoplay src=\\"${audioFilename}\\"/>` : '',
         description: `Definition: <b>${knownLanguage || (learningToKnowTranslationConfig ?
             await fetchTranslation({ from: c.language_code, to: 'en', text: c.learning_language }) :
             '')}</b><br/>${segments.join('<br/>')}`,
