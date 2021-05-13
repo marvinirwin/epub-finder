@@ -6,7 +6,7 @@ import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWor
 import { allScheduleRowsForWord, anyScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state'
 
-const wrapItemsWIth: React.FC<{ items: string[], onClick: (v: string) => unknown }> = ({
+const WrapInContext: React.FC<{ items: string[], onClick: (v: string) => unknown, clickChild: React.FC<{}> }> = ({
                                                                                            children,
                                                                                            items,
                                                                                            onClick,
@@ -14,8 +14,9 @@ const wrapItemsWIth: React.FC<{ items: string[], onClick: (v: string) => unknown
     return <PopupState variant='popover' popupId='demo-popup-menu'>
         {(popupState) => (
             <React.Fragment>
+                {children}
                 <Button variant='contained' color='primary' {...bindTrigger(popupState)}>
-                    Open Menu
+                    {children}
                 </Button>
                 <Menu {...bindMenu(popupState)}>
                     {
@@ -32,7 +33,7 @@ const wrapItemsWIth: React.FC<{ items: string[], onClick: (v: string) => unknown
 
 export const useScheduleInfo = () => {
     const m = useContext(ManagerContext)
-    const scheduleInfo = useObservableState(
+    return useObservableState(
         m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
     ) || {
         wordsToReview: [],
@@ -41,7 +42,6 @@ export const useScheduleInfo = () => {
         wordsReviewingOrLearning: [],
         wordsLeftForToday: [],
     }
-    return scheduleInfo
 }
 
 export const TodaysQuizStats = () => {
