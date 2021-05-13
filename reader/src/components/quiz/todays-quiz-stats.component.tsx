@@ -1,35 +1,10 @@
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
-import { Box, Button, Menu, MenuItem, Typography } from '@material-ui/core'
+import { Box, Typography } from '@material-ui/core'
 import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWordsLeftForTodayNumber } from '@shared/'
 import { allScheduleRowsForWord, anyScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
-import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state'
-
-const WrapInContext: React.FC<{ items: string[], onClick: (v: string) => unknown, clickChild: React.FC<{}> }> = ({
-                                                                                           children,
-                                                                                           items,
-                                                                                           onClick,
-                                                                                       }) => {
-    return <PopupState variant='popover' popupId='demo-popup-menu'>
-        {(popupState) => (
-            <React.Fragment>
-                {children}
-                <Button variant='contained' color='primary' {...bindTrigger(popupState)}>
-                    {children}
-                </Button>
-                <Menu {...bindMenu(popupState)}>
-                    {
-                        items.map(item => <MenuItem key={item} onClick={() => {
-                            popupState.close()
-                            onClick(item)
-                        }}>{item}</MenuItem>)
-                    }
-                </Menu>
-            </React.Fragment>
-        )}
-    </PopupState>
-}
+import { WrapInContext } from './wrap-in-menu'
 
 export const useScheduleInfo = () => {
     const m = useContext(ManagerContext)
@@ -53,28 +28,37 @@ export const TodaysQuizStats = () => {
     const wordsReviewingOrLearning = anyScheduleRowsForWord(scheduleInfo.wordsReviewingOrLearning, flashCardTypes)
     const wordsLeft = allScheduleRowsForWord(scheduleInfo.wordsLeftForToday, flashCardTypes)
     return <Box m={2} p={1} className={'quiz-button-row'}>
-        <Typography variant={'h6'}>
-            New Words Left for Today:{' '}
-            <span className={quizWordsLeftForTodayNumber}>
+        <WrapInContext items={wordsLeft.map(([r]) => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
+            <Typography variant={'subtitle1'}>
+                New Words Left for Today:{' '}
+                <span className={quizWordsLeftForTodayNumber}>
                                 {wordsLeft.length}
                             </span>
-        </Typography>
-        <Typography variant={'h6'}>
-            Being Learned:{' '}
-            <span className={quizLearningNumber}>
+            </Typography>
+        </WrapInContext>
+        <WrapInContext items={wordsReviewingOrLearning.map(([r]) => r.d.word)}
+                       onClick={v => m.wordCardModalService.word$.next(v)}>
+            <Typography variant={'subtitle1'}>
+                Being Learned:{' '}
+                <span className={quizLearningNumber}>
                                 {wordsReviewingOrLearning.length}
                             </span>
-        </Typography>
-        <Typography variant={'h6'}>
-            To Review:{' '}
-            <span className={quizToReviewNumber}>
+            </Typography>
+        </WrapInContext>
+        <WrapInContext items={wordsToReview.map(([r]) => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
+            <Typography variant={'subtitle1'}>
+                To Review:{' '}
+                <span className={quizToReviewNumber}>
                                 {wordsToReview.length}
                             </span>
-        </Typography>
-        <Typography variant={'h6'}>
-            Learned Today:{' '}
-            <span
-                className={quizLearnedTodayNumber}>{learnedToday.length}</span>
-        </Typography>
+            </Typography>
+        </WrapInContext>
+        <WrapInContext items={learnedToday.map(([r]) => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
+            <Typography variant={'subtitle1'}>
+                Learned Today:{' '}
+                <span
+                    className={quizLearnedTodayNumber}>{learnedToday.length}</span>
+            </Typography>
+        </WrapInContext>
     </Box>
 }
