@@ -1,5 +1,7 @@
 import React from 'react'
-import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state'
+import PopupState, { bindMenu, bindTrigger, bindHover } from 'material-ui-popup-state'
+import HoverMenu from 'material-ui-popup-state/HoverMenu'
+import HoverPopover from 'material-ui-popup-state/HoverPopover'
 import { Button, Menu, MenuItem } from '@material-ui/core'
 
 export const WrapInContext: React.FC<{
@@ -10,11 +12,10 @@ export const WrapInContext: React.FC<{
           items,
           onClick,
       }) => {
-    return <PopupState variant='popover' popupId='demo-popup-menu'>
+    return <PopupState variant='popover' >
         {(popupState) => (
             <React.Fragment>
-                {children}
-                <Button variant='contained' color='primary' {...bindTrigger(popupState)}>
+                <Button variant='outlined'  {...bindTrigger(popupState)}>
                     {children}
                 </Button>
                 <Menu {...bindMenu(popupState)}>
