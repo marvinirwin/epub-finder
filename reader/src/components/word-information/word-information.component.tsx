@@ -13,14 +13,14 @@ import { CountRecordTable } from './count-record.table.component'
 
 
 export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
-    wordCard,
-}) => {
+                                                                               wordCard,
+                                                                           }) => {
     const m = useContext(ManagerContext)
     const word = useObservableState(wordCard.word$)
     const scheduleRows =
         useObservableState(
             m.quizCardScheduleRowsService.scheduleRows$,
-        )?.filter(r => r.d.word === word) || [];
+        )?.filter(r => r.d.word === word) || []
     const romanization = useLoadingObservableString(wordCard.romanization$, '')
     const translation = useLoadingObservableString(wordCard.translation$, '')
     const description = useObservableState(wordCard.description$.value$)
@@ -28,30 +28,34 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
         <Paper
             style={{
                 display: 'flex',
-                flexFlow: 'column nowrap',
-                alignItems: 'center',
+                flexFlow: 'row wrap',
+                height: '90vh',
+                width: '90vw',
+                justifyContent: 'space-between'
             }}
         >
             <CardImage wordInfo={wordCard} />
             <CardLearningLanguageText word={word || ''} />
-            <Typography variant="h4" className={wordCardRomanization}>
-                {romanization}
-            </Typography>
-            <br />
-            <Typography variant="h4" className={wordCardTranslation}>
-                {translation}
-            </Typography>
+            <div style={{margin: '24px'}}>
+                <Typography variant='h4' className={wordCardRomanization}>
+                    {romanization}
+                </Typography>
+                <br />
+                <Typography variant='h4' className={wordCardTranslation}>
+                    {translation}
+                </Typography>
+            </div>
             <br />
             <TextField
-                label="Description"
+                label='Description'
                 inputProps={{ className: quizCardDescription }}
                 multiline
                 rows={3}
-                variant="filled"
+                variant='filled'
                 value={description || ''}
                 onChange={(e) => wordCard.description$.set(e.target.value)}
             />
-{/*
+            {/*
             {sortInfo && (
                 <Fragment>
                     <Typography variant={'subtitle1'}>
@@ -84,7 +88,8 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
             )}
 */}
             <br />
-            <RecognitionRowTableComponent wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
+            <RecognitionRowTableComponent
+                wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
             <br />
             <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />
         </Paper>
