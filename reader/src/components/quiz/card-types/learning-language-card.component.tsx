@@ -2,8 +2,8 @@ import { QuizCard } from '../word-card.interface'
 import { Paper } from '@material-ui/core'
 import { CardImage } from '../quiz-card-image.component'
 import React from 'react'
-import { CardLearningLanguageText } from '../../word-information/word-information.component'
 import { useObservableState } from 'observable-hooks'
+import { CardLearningLanguageText } from '../../word-information/card-learning-language.component'
 
 export const LearningLanguageCard = ({quizCard}: {quizCard: QuizCard}) => {
     const word = useObservableState(quizCard.word$)

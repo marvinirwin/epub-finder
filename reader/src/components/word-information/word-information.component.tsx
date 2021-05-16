@@ -1,116 +1,15 @@
 import { WordCard } from '../quiz/word-card.interface'
-import React, { useContext, Fragment } from 'react'
-import {
-    Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Typography,
-} from '@material-ui/core'
+import React, { useContext } from 'react'
+import { Paper, TextField, Typography } from '@material-ui/core'
 import { CardImage } from '../quiz/quiz-card-image.component'
-import {
-    quizCardDescription,
-    quizCardLearningLanguage,
-    wordCardRomanization,
-    wordCardTranslation,
-} from '@shared/'
+import { quizCardDescription, wordCardRomanization, wordCardTranslation } from '@shared/'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
-import {
-    SortQuizData,
-    ScheduleRow,
-} from '../../lib/schedule/schedule-row'
-import { formatDueDate } from '../../lib/schedule/format-due-date'
-import { round, flatten } from 'lodash'
+import { flatten } from 'lodash'
 import { useLoadingObservableString } from '../../lib/util/create-loading-observable'
-import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
-import { WordCountRecord } from '../../../../server/src/shared/tabulation/tabulate'
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
-import { Variant } from '@material-ui/core/styles/createTypography'
-
-export const CardLearningLanguageText = ({ word, variant }: { word: string, variant?: Variant }) => {
-    const m = useContext(ManagerContext)
-    return (
-        <Button
-            onClick={() => m.wordCardModalService.word$.next(word)}
-            className={quizCardLearningLanguage}
-        >
-            <Typography variant={variant || 'h1'}>{word || ''}</Typography>
-        </Button>
-    )
-}
-
-const RecognitionRowTable: React.FC<{
-    wordRecognitionRows: WordRecognitionRow[],
-}> = ({ wordRecognitionRows }) => {
-    return (
-        <TableContainer component={Paper}>
-            <Table size="small" aria-label="a dense table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Grade</TableCell>
-                        <TableCell align="right">Next Due Date</TableCell>
-                        <TableCell align="right">Timestamp</TableCell>
-                        <TableCell align="right">Interval</TableCell>
-                        <TableCell align="right">Flash Card Type</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {wordRecognitionRows.map((row) => (
-                        <TableRow key={row.id}>
-                            <TableCell component="th" scope="row">
-                                {row.grade}
-                            </TableCell>
-                            <TableCell align="right">
-                                {formatDueDate(row.nextDueDate || new Date())}
-                            </TableCell>
-                            <TableCell align="right">
-                                {formatDueDate(row.created_at || new Date())}
-                            </TableCell>
-                            <TableCell align="right">{row.interval}</TableCell>
-                            <TableCell align="right">{row.flash_card_type}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    )
-}
-
-const CountRecordTable: React.FC<{
-    countRecords: DocumentWordCount[],
-}> = ({ countRecords }) => {
-    return (
-        <TableContainer component={Paper}>
-            <Table size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Document</TableCell>
-                        <TableCell align="right">Count</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {countRecords.map((row) => (
-                        <TableRow
-                            key={`${row.document}${row.word}${row.count}`}
-                        >
-                            <TableCell component="th" scope="row">
-                                {row.document}
-                            </TableCell>
-                            <TableCell align="right">{row.count}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    )
-}
-
+import { CardLearningLanguageText } from './card-learning-language.component'
+import { RecognitionRowTableComponent } from './recognition-row-table.component'
+import { CountRecordTable } from './count-record.table.component'
 
 
 export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
@@ -185,7 +84,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
             )}
 */}
             <br />
-            <RecognitionRowTable wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
+            <RecognitionRowTableComponent wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
             <br />
             <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />
         </Paper>

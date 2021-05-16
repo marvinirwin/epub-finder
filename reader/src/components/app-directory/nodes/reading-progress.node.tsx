@@ -7,7 +7,7 @@ import { ManagerContext } from '../../../App'
 import { Box, Fade, Menu, Paper, Typography } from '@material-ui/core'
 import { useObservableState } from 'observable-hooks'
 import { Manager } from '../../../lib/manager/Manager'
-import { CardLearningLanguageText } from '../../word-information/word-information.component'
+import { CardLearningLanguageText } from '../../word-information/card-learning-language.component'
 
 export const WordGrid: React.FC<{ words: string[], limit?: number }> = ({ words, limit }) => {
     const [extraOpen, setExtraOpen] = useState(false)
