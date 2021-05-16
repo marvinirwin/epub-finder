@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import clsx from 'clsx'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
@@ -10,9 +10,9 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { TreeMenu } from '../tree-menu/tree-menu.component'
 import { AllItemsContainer } from './all-items-container.component'
-import { AppBar, Divider, List, Toolbar } from '@material-ui/core'
+import { AppBar, Divider, Input, List, Toolbar } from '@material-ui/core'
 import { theme } from '../../theme'
-import { Menu } from '@material-ui/icons'
+import { Menu, Search } from '@material-ui/icons'
 
 const drawerWidth = 240
 
@@ -96,7 +96,9 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
 
     const handleDrawerClose = () => {
         m.settingsService.drawerClosed$.next(true)
-    }
+    };
+
+    const [wordSearchInputValue, setWordSearchInputValue] = useState('');
 
     return (
         <div className={`app-container ${classes.root}`}>
@@ -121,6 +123,21 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     <Typography variant='h6' noWrap>
                         Language Trainer
                     </Typography>
+                    <Input
+                        style={{marginLeft: '24px', marginRight: '24px'}}
+                        value={wordSearchInputValue}
+                        onKeyDown={k => {
+                            if (k.key === 'Enter') {
+                                m.wordCardModalService.word$.next(wordSearchInputValue)
+                            }
+                        }}
+                        onChange={v => {
+                            setWordSearchInputValue(v.target.value)
+                        }}
+                    />
+                    <IconButton onClick={() => m.wordCardModalService.word$.next(wordSearchInputValue)}>
+                        <Search/>
+                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Drawer
