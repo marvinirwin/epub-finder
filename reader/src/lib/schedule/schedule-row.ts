@@ -2,10 +2,11 @@ import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCou
 import { WordRecognitionRow } from './word-recognition-row'
 import { NormalizedValue } from '../manager/normalized-value.interface'
 import { SrmService } from '../srm/srm.service'
-import { formatDistance, isToday } from 'date-fns'
+import { format, formatDistance, isSameDay, isToday } from 'date-fns'
 import { SuperMemoGrade } from 'supermemo'
 import { lastN } from '../../components/quiz/last-n'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
+import { groupBy } from 'lodash'
 
 export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[]
@@ -52,25 +53,49 @@ export type ScheduleItem = {
 }
 
 const NUMBER_OF_CORRECT_ANSWERS_TO_LEARN = 2
+const NUMBER_OF_CORRECT_ANSWERS_TO_REVIEW = 1
 const CORRECT_SUPERMEMO_GRADE = 3
-export const wasLearnedToday = (r1: ScheduleItem[]) => {
-    const lastTwoRecords = ScheduleRow.lastNRecords(r1, NUMBER_OF_CORRECT_ANSWERS_TO_LEARN)
-    return (
-        lastTwoRecords.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN &&
-        lastTwoRecords.every((r) => r.grade >= CORRECT_SUPERMEMO_GRADE && isToday(r.created_at))
-    )
+
+export const wasLearnedToday = (r1: ScheduleItem[]): boolean => {
+    const d = mostRecentLearningRecord(r1);
+    return d ? isToday(d.created_at) : false;
 }
 
-export const dateLearnedForTheFirstTime = (records: ScheduleItem[]): Date | undefined => {
-    // @ts-ignore
-    if (records[0]?.word === '制') {
-        // debugger;console.log()
+function getRecordsGroupedByDayInDescOrder(records: ScheduleItem[]) {
+    return Object.values(groupBy(records, r => format(r.created_at, 'mm dd yyyy')))
+        .reverse()
+}
+
+export const mostRecentLearningRecord = (records: ScheduleItem[]): ScheduleItem | undefined => {
+    const recordsGroupedByDayInDescOrder = getRecordsGroupedByDayInDescOrder(records);
+    for (let i = 0; i < recordsGroupedByDayInDescOrder.length; i++) {
+        const recordsForADay = recordsGroupedByDayInDescOrder[i];
+        const learnedForTheFirstTimeRecord = learnedForThefirstTime(recordsForADay);
+        if (learnedForTheFirstTimeRecord) {
+            return learnedForTheFirstTimeRecord;
+        }
     }
+    return undefined
+}
+
+export const getReviewRecords = (recordsInAscOrder: ScheduleItem[]): ScheduleItem[] | undefined => {
+    // I need the most recent date learned, and then all the successive records after that
+    // Then I have to make usre all of those records are successful and then take the date of the last one
+    const dateLearned = mostRecentLearningRecord(recordsInAscOrder);
+    if (!dateLearned) return undefined;
+    // Now get all the records where the created_at is greater than dateLearned
+    const successiveRecords  = recordsInAscOrder.filter(r => +r.created_at > +dateLearned);
+    const allSuccessiveRecordsAreSuccessful = successiveRecords.every(r => r.grade >= CORRECT_SUPERMEMO_GRADE);
+    return allSuccessiveRecordsAreSuccessful ? successiveRecords : undefined;
+}
+
+
+const learnedForThefirstTime = (recordsForThisDay: ScheduleItem[]) => {
     let successInARow: ScheduleItem[] = [];
-    for (let i = 0; i < records.length; i++) {
-        const record = records[i]
+    for (let i = 0; i < recordsForThisDay.length; i++) {
+        const record = recordsForThisDay[i]
         if (successInARow.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
-            return successInARow[0].created_at;
+            return successInARow[successInARow.length - 1];
         }
         if (record.grade >= CORRECT_SUPERMEMO_GRADE) {
             successInARow.push(record)
@@ -78,7 +103,6 @@ export const dateLearnedForTheFirstTime = (records: ScheduleItem[]): Date | unde
             successInARow = [];
         }
     }
-    return undefined
 }
 
 export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
@@ -112,21 +136,15 @@ export class ScheduleRow<T> {
     }
 
     public isToReview({ now }: { now: Date }) {
-        const hasNeverBeenAttempted = this.superMemoRecords.length <= 0
-        if (hasNeverBeenAttempted) {
-            return false
-        }
-        const isComplete = lastN(NUMBER_OF_CORRECT_ANSWERS_TO_LEARN)(this.superMemoRecords).every(
-            (r) => isToday(r.created_at) && r.grade >= CORRECT_SUPERMEMO_GRADE,
-        )
-        if (isComplete) {
-            return false
-        }
-        const isCurrentlyReviewing = this.superMemoRecords.find((r) =>
-            isToday(r.created_at),
-        )
-        if (isCurrentlyReviewing) {
-            return false
+        /**
+         * To review records are
+         * 1. Overdue
+         * 2. Have been learned, and have had all successive records be correct, or no successive records
+         */
+        const reviewRecords = getReviewRecords(this.superMemoRecords);
+        // recordWasNeverLearned
+        if (reviewRecords === undefined) {
+            return false;
         }
         return this.isOverDue({ now })
     }
@@ -191,15 +209,23 @@ export class ScheduleRow<T> {
         return wasLearnedToday(this.superMemoRecords)
     }
 
-    wasLearnedForTheFirstTimeToday() {
-        const dateLearned = dateLearnedForTheFirstTime(this.superMemoRecords);
+    wasLearnedToday() {
+        const dateLearned = mostRecentLearningRecord(this.superMemoRecords);
         if (!dateLearned) {
             return false;
         }
-        return isToday(dateLearned);
+        return isToday(dateLearned.created_at);
     }
 
     isNotStarted() {
         return this.superMemoRecords.length === 0
+    }
+
+    wasReviewedToday() {
+        const latestItem = this.superMemoRecords[this.superMemoRecords.length - 1]
+        return !this.wasLearnedToday() &&
+            latestItem &&
+            latestItem.grade >= CORRECT_SUPERMEMO_GRADE &&
+            isToday(latestItem.created_at);
     }
 }

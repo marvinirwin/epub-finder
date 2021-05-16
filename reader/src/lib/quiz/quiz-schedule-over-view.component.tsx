@@ -29,7 +29,7 @@ export const QuizScheduleOverView = () => {
     const rowsUnStarted = quizSchedule?.unStartedWords || []
     const rowsToReview = quizSchedule?.wordsToReview || []
     const rowsInProgress = quizSchedule?.wordsReviewingOrLearning || []
-    const wordsLearnedToday = quizSchedule?.wordsLearnedToday || []
+    const wordsLearnedToday = quizSchedule?.wordsLearnedForTheFirstTimeToday || []
     return (
         <Paper
             style={{

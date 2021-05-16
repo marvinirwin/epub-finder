@@ -6,13 +6,15 @@ import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows
 import { TimeService } from '../time/time.service'
 import { Dictionary, flatten, groupBy, orderBy, uniq } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
+import { isToday, isSameDay } from 'date-fns'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
 type LimitedScheduleRows = {
     wordsToReview: SpacedScheduleRow[];
     limitedScheduleRows: SpacedScheduleRow[];
-    wordsLearnedToday: SpacedScheduleRow[];
+    wordsLearnedForTheFirstTimeToday: SpacedScheduleRow[];
+    wordsReviewedToday: SpacedScheduleRow[];
     wordsReviewingOrLearning: SpacedScheduleRow[];
     wordsLeftForToday: SpacedScheduleRow[];
     unStartedWords: SpacedScheduleRow[];
@@ -43,19 +45,32 @@ export const anyScheduleRowsForWord = (
     return Object.values(groupBy(scheduleRowsToReview, row => row.d.word))
 }
 
-export const allScheduleRowsForWord = (
-    scheduleRows: ScheduleRow<SortQuizData>[],
-    quizCardFieldConfig: FlashCardType[],
+export const allScheduleRowsForWordToday = (
+    {
+        scheduleRows,
+        allScheduleRows,
+    }:
+        {
+            scheduleRows: ScheduleRow<SortQuizData>[],
+            allScheduleRows: ScheduleRow<SortQuizData>[]
+        },
 ) => {
+    // So we take all the schedule rows which are due today and then apply the evewry function
     /**
-     * For a word to be unStarted, all of its schedule rows must be unStarted
+     * For a word to be unStarted, all of its schedule rows must be unStarted for that day
      */
-    return Object.values(groupBy(scheduleRows, row => row.d.word))
-        .filter(scheduleRowsForOneWord => {
-            return quizCardFieldConfig.every(flash_card_type => {
-                return scheduleRowsForOneWord.find(r => r.d.flash_card_type === flash_card_type)
-            })
-        })
+    const selectScheduleRowsGrouped = groupBy(scheduleRows, r => r.d.word);
+    const allScheduleRowsGrouped = groupBy(allScheduleRows, r => r.d.word);
+    const selectEntriesGrouped = Object.entries(selectScheduleRowsGrouped);
+    const filteredItems = [];
+    for (const [word, rows] of selectEntriesGrouped) {
+        const allScheduleRowEntries = allScheduleRowsGrouped[word]?.filter(r => isToday(r.dueDate()));
+        const allRowsComplete = allScheduleRowEntries.length === rows.length
+        if (allRowsComplete) {
+            filteredItems.push(rows);
+        }
+    }
+    return filteredItems;
 }
 
 export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flash_card_type}${r.d.wordRecognitionRecords.length}`
@@ -101,7 +116,7 @@ export class SortedLimitScheduleRowsService {
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
-                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedForTheFirstTimeToday())
+                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedToday())
                 const unStartedSiblingsWhichShouldBe = uniq([
                     ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
                     ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows),
@@ -118,9 +133,6 @@ export class SortedLimitScheduleRowsService {
                     wordsRemaining >= 0 ? wordsRemaining : 0,
                 ))
                 const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({ now }))
-                /**
-                 * How does this contain to copies of 问题？
-                 */
                 const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({ now }))
 
                 const iteratees = [
@@ -136,7 +148,8 @@ export class SortedLimitScheduleRowsService {
                  */
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
-                    wordsLearnedToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
+                    wordsLearnedForTheFirstTimeToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
+                    wordsReviewedToday: orderFunc(sortedScheduleRows.filter(r => r.wasReviewedToday())),
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
                     wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
                     unStartedWords: orderFunc(unStartedScheduleRows),

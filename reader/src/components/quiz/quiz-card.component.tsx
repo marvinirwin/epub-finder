@@ -6,7 +6,7 @@ import { ManagerContext } from '../../App'
 import { PaperProps } from '@material-ui/core/Paper/Paper'
 import { QuizCardButtons } from './quiz-card-buttons.component'
 import { QuizCardLimitReached } from './empty-quiz-card.component'
-import { allScheduleRowsForWord } from '../../lib/manager/sorted-limit-schedule-rows.service'
+import { allScheduleRowsForWordToday } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { useScheduleInfo } from './todays-quiz-stats.component'
 import { NoScheduleRows } from './no-schedule-rows.component'
 import { RevealedQuizCard } from './card-types/revealed-quiz-card.component'
@@ -23,8 +23,11 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const scheduleInfo = useScheduleInfo()
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
-    const flashCardTypes = useActiveFlashCardTypes()
-    const wordsLearnedToday = Object.values(allScheduleRowsForWord(scheduleInfo.wordsLearnedToday, flashCardTypes))
+    const allScheduleRows = useObservableState(m.quizCardScheduleRowsService.scheduleRows$) || [];
+    const wordsLearnedToday = Object.values(allScheduleRowsForWordToday({
+        allScheduleRows,
+        scheduleRows: scheduleInfo.wordsLearnedForTheFirstTimeToday,
+    }))
     const cardLimitReached = wordsLearnedToday.length >= cardLimit
     const noScheduleRows = !limitedScheduleRowData
         ?.limitedScheduleRows?.length && !cardLimitReached;
