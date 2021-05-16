@@ -132,7 +132,7 @@ export default class CardsRepository {
         this.upsertCards$.next([
             {
                 ...card,
-                timestamp: new Date(), ...propsToUpdate,
+                ...propsToUpdate,
             },
         ])
     }

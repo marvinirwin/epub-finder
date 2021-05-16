@@ -47,6 +47,14 @@ export const TodaysQuizStats = () => {
                             </span>
             </Typography>
         </WrapInContext>
+        <WrapInContext items={reviewedToday.map(([r]) => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
+            <Typography variant={'subtitle1'}>
+                Reviewed Today:{' '}
+                <span className={quizToReviewNumber}>
+                                {reviewedToday.length}
+                            </span>
+            </Typography>
+        </WrapInContext>
         <WrapInContext items={wordsToReview.map(([r]) => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
             <Typography variant={'subtitle1'}>
                 To Review:{' '}

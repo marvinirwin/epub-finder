@@ -36,7 +36,7 @@ export const queryPersistableEntity = <T extends {created_at: Date}>(
 
     return fetch(url.toString())
         .then(response => response.json())
-        .then(items => items.map((item: T) => ({...item, created_at: parseISO(item.created_at.toString())})))
+        .then(items => items.map((item: T) => ({...item, created_at: parseISO(`${item.created_at.toString()}Z`)})))
 }
 
 export const putPersistableEntity = <T>(
