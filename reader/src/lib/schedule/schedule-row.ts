@@ -69,7 +69,7 @@ function getRecordsGroupedByDayInDescOrder(records: ScheduleItem[]) {
 export const mostRecentLearningRecord = (records: ScheduleItem[]): ScheduleItem | undefined => {
     const recordsGroupedByDayInDescOrder = getRecordsGroupedByDayInDescOrder(records);
     for (let i = 0; i < recordsGroupedByDayInDescOrder.length; i++) {
-        const recordsForADay = recordsGroupedByDayInDescOrder[i];
+    const recordsForADay = recordsGroupedByDayInDescOrder[i];
         const learnedForTheFirstTimeRecord = learnedForThefirstTime(recordsForADay);
         if (learnedForTheFirstTimeRecord) {
             return learnedForTheFirstTimeRecord;
@@ -94,13 +94,13 @@ const learnedForThefirstTime = (recordsForThisDay: ScheduleItem[]) => {
     let successInARow: ScheduleItem[] = [];
     for (let i = 0; i < recordsForThisDay.length; i++) {
         const record = recordsForThisDay[i]
-        if (successInARow.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
-            return successInARow[successInARow.length - 1];
-        }
         if (record.grade >= CORRECT_SUPERMEMO_GRADE) {
             successInARow.push(record)
         } else {
             successInARow = [];
+        }
+        if (successInARow.length === NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
+            return successInARow[successInARow.length - 1];
         }
     }
 }
@@ -206,6 +206,10 @@ export class ScheduleRow<T> {
     }
 
     wasLearnedOrReviewedToday() {
+        // @ts-ignore
+        if (this.d.word === '喜欢') {
+            debugger;console.log()
+        }
         return wasLearnedToday(this.superMemoRecords)
     }
 
