@@ -18,6 +18,13 @@ type LimitedScheduleRows = {
     wordsReviewingOrLearning: SpacedScheduleRow[];
     wordsLeftForToday: SpacedScheduleRow[];
     unStartedWords: SpacedScheduleRow[];
+    debug: {
+        limitedScheduleRows: {
+            overDueRows: ScheduleRow<SpacedSortQuizData>[]
+            scheduleRowsLeftForToday: ScheduleRow<SpacedSortQuizData>[]
+            notOverDueRows: ScheduleRow<SpacedSortQuizData>[]
+        }
+    },
 }
 
 export const groupByWord = <T, U extends string>(rows: T[], cb: (r: T) => U): Dictionary<T[]> => {
@@ -117,12 +124,14 @@ export class SortedLimitScheduleRowsService {
                     (scheduleRow) => scheduleRow.isNotStarted(),
                 )
                 const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedToday())
+                const unStartedSiblingLearningRecords = uniq(getSiblingRecords(learningScheduleRows, unStartedScheduleRows));
                 const unStartedSiblingsWhichShouldBe = uniq([
-                    ...getSiblingRecords(learningScheduleRows, unStartedScheduleRows),
+                    ...unStartedSiblingLearningRecords,
                     ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows),
-                ])
+                ]);
+
                 const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
-                const learningWords = Object.keys(groupBy([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe], r => r.d.word))
+                const learningWords = Object.keys(groupBy([...learningScheduleRows, ...unStartedSiblingLearningRecords], r => r.d.word))
                 const wordsLearnedForTheFirstTime = Object.keys(groupBy(scheduleRowsLearnedForTheFirstTimeToday, r => r.d.word))
                 const wordsRemaining = newQuizWordLimit - new Set([
                     ...learningWords,
@@ -153,6 +162,13 @@ export class SortedLimitScheduleRowsService {
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
                     wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
                     unStartedWords: orderFunc(unStartedScheduleRows),
+                    debug: {
+                        limitedScheduleRows: {
+                            overDueRows,
+                            scheduleRowsLeftForToday,
+                            notOverDueRows,
+                        }
+                    },
                     /**
                      * Is there a reason I didn't sort all these at once?
                      */
