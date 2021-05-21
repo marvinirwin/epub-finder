@@ -16,6 +16,7 @@ import { IPositionedWord } from '../../../../../server/src/shared/Annotation/IPo
 import { CustomWordsRepository } from './custom-words.repository'
 import { TabulationService } from '../../tabulation/tabulation.service'
 import { groupBy } from 'lodash'
+import { pipeLog } from '../../manager/pipe.log'
 
 export const sumNotableSubSequences = (iPositionedWords: IPositionedWord[]) => {
     const m = new Map<string, number>()
@@ -79,14 +80,14 @@ export class FlashCardLearningTargetsService {
     ) {
         this.learningTargets$ = combineLatest([
             allWordsRepository.all$,
-            ignoredWordsRepository.latestRecords$,
             customWordsRepository.indexOfOrderedRecords$,
-            tabulationService.tabulation$
+            ignoredWordsRepository.latestRecords$,
+            tabulationService.tabulation$.pipe(pipeLog("learning-targets:tabulation"))
         ]).pipe(
             map(([
                      builtInWords,
-                     ignoredWords,
                      customWordsIndex,
+                     ignoredWords,
                      tabulation
                  ]) => {
                 const learningTargetIndex: Map<string, FlashCardLearningTarget> = new Map()

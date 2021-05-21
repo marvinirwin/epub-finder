@@ -52,7 +52,6 @@ export const SerializeCardForCsv = async (
     const ext = photoSplitByPeriod ? photoSplitByPeriod[photoSplitByPeriod.length - 1] : '';
     const photoAnkiPath = `${c.learning_language}.${ext}`
     if (photoSplitByPeriod) {
-        debugger;
         // Put ${learningLanguage}.${photoExt} into the zip file
         await zip.file(photoAnkiPath, await toDataURL(photo))
     }

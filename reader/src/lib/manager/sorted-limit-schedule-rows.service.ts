@@ -6,7 +6,8 @@ import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows
 import { TimeService } from '../time/time.service'
 import { Dictionary, flatten, groupBy, orderBy, uniq } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
-import { isToday, isSameDay } from 'date-fns'
+import { isToday } from 'date-fns'
+import { pipeLog } from './pipe.log'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
@@ -102,9 +103,9 @@ export class SortedLimitScheduleRowsService {
         timeService: TimeService
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            quizCardScheduleRowsService.scheduleRows$,
-            settingsService.newQuizWordLimit$,
-            timeService.quizNow$,
+            quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog("limit:scheduleRows")),
+            settingsService.newQuizWordLimit$.pipe(pipeLog("limit:newQuizWordLimit")),
+            timeService.quizNow$.pipe(pipeLog("limit:quizNow")),
         ]).pipe(
             debounceTime(0),
             map(([sortedScheduleRows, newQuizWordLimit, now]: [SpacedScheduleRow[], number, Date]) => {

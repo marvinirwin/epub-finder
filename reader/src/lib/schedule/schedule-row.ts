@@ -206,10 +206,6 @@ export class ScheduleRow<T> {
     }
 
     wasLearnedOrReviewedToday() {
-        // @ts-ignore
-        if (this.d.word === '喜欢') {
-            debugger;console.log()
-        }
         return wasLearnedToday(this.superMemoRecords)
     }
 

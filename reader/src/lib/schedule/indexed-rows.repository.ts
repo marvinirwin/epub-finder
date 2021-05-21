@@ -23,7 +23,6 @@ export class IndexedRowsRepository<T extends { id?: number  }> {
     clearRecords$ = new ReplaySubject<void>(1)
 
     constructor({
-        databaseService,
         load,
         add,
         getIndexValue,

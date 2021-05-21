@@ -14,6 +14,7 @@ import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from './required-to-progress.service'
 import { spaceOutRows } from './space-out-rows'
 import { SpacedScheduleRow } from '../manager/sorted-limit-schedule-rows.service'
+import { pipeLog } from '../manager/pipe.log'
 
 function getSortConfigs({
                             dateWeight,
@@ -90,8 +91,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                 flashCardTypesRequiredToProgressService.activeFlashCardTypes$,
             ]),
             combineLatest([
-                translationAttemptService.currentScheduleRow$,
-                flashCardLearningTargetsService.learningTargets$,
+                translationAttemptService.currentScheduleRow$.pipe(pipeLog("quiz-schedule-rows:currentScheduleRow")),
+                flashCardLearningTargetsService.learningTargets$.pipe(pipeLog("quiz-schedule-rows:learningTargets")),
             ]),
             wordRecognitionProgressService.indexOfOrderedRecords$,
             tabulationService.tabulation$,

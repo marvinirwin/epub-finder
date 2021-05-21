@@ -16,6 +16,7 @@ import { createLoadingObservable } from '../util/create-loading-observable'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { pipeLog } from '../manager/pipe.log'
 
 export class OpenDocument {
     public name: string
@@ -54,8 +55,8 @@ export class OpenDocument {
         )
         const { isLoading$, obs$ } = createLoadingObservable(
             combineLatest([
-                this.tabulationConfigurationService.tabulationConfiguration$,
-                this.atomizedDocument$,
+                this.tabulationConfigurationService.tabulationConfiguration$.pipe(pipeLog("open-document:tabulationConfiguration")),
+                this.atomizedDocument$.pipe(pipeLog('open-document:atomizedDocument')),
             ]),
             ([tabulationConfiguration, document]) => {
                 return TabulateLocalDocument({

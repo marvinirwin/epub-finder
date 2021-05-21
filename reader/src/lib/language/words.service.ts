@@ -2,25 +2,26 @@ import CardsRepository from '../manager/cards.repository'
 import { AllWordsRepository } from './all-words.repository'
 import { combineLatest, Observable } from 'rxjs'
 import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
-import { map, shareReplay } from 'rxjs/operators'
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
+import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
 
 export class WordsService {
     words$: Observable<SetWithUniqueLengths>
 
     constructor({
-        cardsRepository,
+        customWordsRepository,
         allWordsRepository,
     }: {
-        cardsRepository: CardsRepository
+        customWordsRepository: CustomWordsRepository
         allWordsRepository: AllWordsRepository
     }) {
         this.words$ = combineLatest([
-            cardsRepository.all$,
+            customWordsRepository.indexOfOrderedRecords$,
             allWordsRepository.all$,
         ]).pipe(
-            map(([cards, words]) => {
+            map(([customWordsIndex, words]) => {
                 return new SetWithUniqueLengths([
-                    ...Object.keys(cards),
+                    ...Object.keys(customWordsIndex),
                     ...words.values(),
                 ])
             }),
