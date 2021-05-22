@@ -4,7 +4,7 @@ import {
     filter,
     map,
     shareReplay,
-    startWith,
+    startWith, switchMap,
     tap,
     withLatestFrom,
 } from 'rxjs/operators'
@@ -29,13 +29,21 @@ export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }>
     }: {
         databaseService: DatabaseService
         load: () => AsyncGenerator<T[]>
-        add: (t: T) => Promise<number>
+        add: (t: T) => Promise<T>
         getIndexValue: (v: T) => { indexValue: string }
     }) {
         this.indexOfOrderedRecords$.next({})
         this.addRecords$
             .pipe(
                 filter((rows) => !!rows.length),
+                switchMap(async rows => Promise.all(
+                    rows.map(async row => {
+                        if (!row.id) {
+                            return add(row);
+                        }
+                        return row;
+                    })
+                )),
                 withLatestFrom(this.indexOfOrderedRecords$.pipe(startWith({}))),
                 tap(([rows, recordIndex]: [T[], ds_Dict<T[]>]) => {
                     const newLatestRecords = new Map<string, T>(
@@ -62,14 +70,7 @@ export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }>
                     this.indexOfOrderedRecords$.next(recordIndex)
                     this.latestRecords$.next(newLatestRecords)
                 }),
-            ).subscribe(([rows]) => {
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i]
-                    if (!row.id) {
-                        add(row).then((id) => (row.id = id))
-                    }
-                }
-            })
+            ).subscribe();
         this.clearRecords$.subscribe((v) =>
             this.indexOfOrderedRecords$.next({}),
         )

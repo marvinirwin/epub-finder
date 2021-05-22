@@ -21,7 +21,7 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
         super({
             databaseService,
             load: emptyGenerator,
-            add: (r) => Promise.resolve(1),
+            add: (r) => Promise.resolve(r),
             getIndexValue: (r) => ({ indexValue: r.learningLanguage }),
         })
     }
