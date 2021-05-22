@@ -91,7 +91,9 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                 flashCardTypesRequiredToProgressService.activeFlashCardTypes$,
             ]),
             combineLatest([
+/*
                 translationAttemptService.currentScheduleRow$.pipe(pipeLog("quiz-schedule-rows:currentScheduleRow")),
+*/
                 flashCardLearningTargetsService.learningTargets$.pipe(pipeLog("quiz-schedule-rows:learningTargets")),
             ]),
             wordRecognitionProgressRepository.indexOfOrderedRecords$,
@@ -109,20 +111,20 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                          flashCardTypesRequiredToProgress,
                      ],
                      [
-                         currentTranslationAttemptScheduleRow,
+                         // currentTranslationAttemptScheduleRow,
                          learningTargets,
                      ],
                      wordRecognitionRowIndex,
                      tabulation,
                  ]) => {
-                    const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
+                    // const firstRecordSentence = currentTranslationAttemptScheduleRow?.d?.segmentText || ''
                     const learningTargetsList = [...learningTargets.values()]
                     const sortedRows = ScheduleMathService.normalizeAndSortQuizScheduleRows(
                         getSortConfigs({
                             dateWeight,
                             frequencyWeight,
                             wordLengthWeight,
-                            firstRecordSentence,
+                            firstRecordSentence: "",
                             translationAttemptSentenceWeight,
                         }),
                         flatten(learningTargetsList.map(

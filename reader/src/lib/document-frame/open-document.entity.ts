@@ -55,9 +55,9 @@ export class OpenDocument {
         )
         const { isLoading$, obs$ } = createLoadingObservable(
             combineLatest([
-                this.tabulationConfigurationService.tabulationConfiguration$.pipe(pipeLog("open-document:tabulationConfiguration")),
-                this.atomizedDocument$.pipe(pipeLog('open-document:atomizedDocument')),
-            ]),
+                this.tabulationConfigurationService.tabulationConfiguration$.pipe(pipeLog('open-document:tabulation-configuration')),
+                this.atomizedDocument$.pipe(pipeLog('open-document:atomized-document')),
+            ]).pipe(pipeLog("open-document:virtual-tabulation-combine-latest")),
             ([tabulationConfiguration, document]) => {
                 return TabulateLocalDocument({
                     label,
@@ -71,7 +71,7 @@ export class OpenDocument {
                 })
             },
         )
-        this.virtualTabulation$ = obs$
+        this.virtualTabulation$ = obs$.pipe(pipeLog("open-document:virtual-tabulation-loading"))
         this.isLoadingVirtualTabulation$ = isLoading$
     }
 

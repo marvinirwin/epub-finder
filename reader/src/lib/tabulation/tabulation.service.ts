@@ -20,6 +20,7 @@ import {
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import { safePushMap } from '@shared/'
 import { IPositionedWord } from '../../../../server/src/shared/Annotation/IPositionedWord'
+import { pipeLog } from '../manager/pipe.log'
 
 export const getNotableSubsequencesOfWords = (notableSubSequences: IPositionedWord[], syntheticWords: Set<string>, strategy: 'noSeparator' | 'spaceSeparator', vocabulary: Set<string>) => notableSubSequences
     .filter((notableSubSequence, subSequenceIndex) => {
@@ -57,7 +58,7 @@ export class TabulationService {
         }) {
         this.tabulation$ = combineLatest([
             allWordsRepository.all$,
-            selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$,
+            selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$.pipe(pipeLog("tabulation:selected-virtual-tabulations")),
             videoMetadataRepository.all$.pipe(startWith(new Map())),
             languageConfigsService.wordSeparationStrategy$,
         ]).pipe(

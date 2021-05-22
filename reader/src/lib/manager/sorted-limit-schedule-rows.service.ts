@@ -104,9 +104,9 @@ export class SortedLimitScheduleRowsService {
         timeService: TimeService
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog("limit:scheduleRows")),
-            settingsService.newQuizWordLimit$.pipe(pipeLog("limit:newQuizWordLimit")),
-            timeService.quizNow$.pipe(pipeLog("limit:quizNow")),
+            quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog("sorted-limited:scheduleRows")),
+            settingsService.newQuizWordLimit$.pipe(pipeLog("sorted-limited:newQuizWordLimit")),
+            timeService.quizNow$.pipe(pipeLog("sorted-limited:quizNow")),
         ]).pipe(
             debounceTime(0),
             map(([sortedScheduleRows, newQuizWordLimit, now]: [SpacedScheduleRow[], number, Date]) => {
