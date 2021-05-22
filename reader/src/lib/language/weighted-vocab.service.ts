@@ -11,11 +11,11 @@ export class WeightedVocabService {
     weightedVocab$: Observable<Map<string, number>>
 
     constructor({
-        wordRecognitionProgressService,
+        wordRecognitionProgressRepository,
     }: {
-        wordRecognitionProgressService: WordRecognitionProgressRepository
+        wordRecognitionProgressRepository: WordRecognitionProgressRepository
     }) {
-        this.weightedVocab$ = wordRecognitionProgressService.indexOfOrderedRecords$.pipe(
+        this.weightedVocab$ = wordRecognitionProgressRepository.indexOfOrderedRecords$.pipe(
             map((indexedWordRecognitionRecords) => {
                 return new Map(
                     Object.values(indexedWordRecognitionRecords).map(

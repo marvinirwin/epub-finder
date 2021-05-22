@@ -6,7 +6,7 @@ import { orderBy, uniq } from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
 import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
 import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
-import { SortQuizData, ScheduleRow } from '../../lib/schedule/schedule-row'
+import { ScheduleRow, SortQuizData } from '../../lib/schedule/schedule-row'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
@@ -20,6 +20,8 @@ import { TabulationConfigurationService } from '../../lib/language/language-maps
 import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
 import { TranslationAttemptScheduleService } from '../../lib/schedule/translation-attempt-schedule.service'
 import { OnSelectService } from '../../lib/user-interface/on-select.service'
+import { WordRecognitionProgressRepository } from '../../lib/schedule/word-recognition-progress.repository'
+import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 
 export const filterQuizRows = (
     rows: ScheduleRow<SortQuizData>[],
@@ -28,6 +30,12 @@ export const filterQuizRows = (
         .filter((r) => r.dueDate() < new Date())
         .filter((r) => sumWordCountRecords(r) > 0)
 
+const isNotRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
+    if (lastNItems.map(keyFunction).includes(keyFunction(nextItem))) {
+        return false
+    }
+    return true
+}
 
 export class QuizService {
     quizCard: QuizCard
@@ -44,6 +52,7 @@ export class QuizService {
                     tabulationConfigurationService,
                     translationAttemptScheduleService,
                     onSelectService,
+                    wordRecognitionProgressRepository,
                 }: {
         cardsRepository: CardsRepository
         sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
@@ -53,12 +62,31 @@ export class QuizService {
         settingsService: SettingsService
         tabulationConfigurationService: TabulationConfigurationService
         translationAttemptScheduleService: TranslationAttemptScheduleService
-        onSelectService: OnSelectService
+        onSelectService: OnSelectService,
+        wordRecognitionProgressRepository: WordRecognitionProgressRepository
     }) {
         this.manualHiddenFieldConfig$.next('')
-        this.currentScheduleRow$ = sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$.pipe(
-            map((rows) => {
-                return rows.limitedScheduleRows[0]
+        this.currentScheduleRow$ = combineLatest(
+            [
+                sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
+                wordRecognitionProgressRepository.recordList$.pipe(
+                    map(recordList => orderBy(recordList, r => r.created_at, 'desc') as WordRecognitionRow[]),
+                    shareReplay(1),
+                ),
+            ],
+        ).pipe(
+            map(([rows, previousRecords]) => {
+                const firstRow = rows.limitedScheduleRows[0]
+                const itemPreventedRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => isNotRepeatRecord<{ word: string }, string>(
+                    previousRecords.slice(0, 5),
+                    limitedScheduleRow.d,
+                    r => r.word,
+                    ),
+                )
+                if (itemPreventedRepeat) {
+                    return itemPreventedRepeat
+                }
+                return firstRow
             }),
         )
         const currentWord$ = this.currentScheduleRow$.pipe(

@@ -69,7 +69,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
             translationAttemptService,
             timeService,
             flashCardLearningTargetsService,
-            wordRecognitionProgressService,
+            wordRecognitionProgressRepository,
             tabulationService,
             flashCardTypesRequiredToProgressService,
         }: {
@@ -77,7 +77,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
             translationAttemptService: TranslationAttemptService
             timeService: TimeService,
             flashCardLearningTargetsService: FlashCardLearningTargetsService,
-            wordRecognitionProgressService: IndexedRowsRepository<WordRecognitionRow>
+            wordRecognitionProgressRepository: IndexedRowsRepository<WordRecognitionRow>
             tabulationService: TabulationService
             flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
         },
@@ -94,7 +94,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                 translationAttemptService.currentScheduleRow$.pipe(pipeLog("quiz-schedule-rows:currentScheduleRow")),
                 flashCardLearningTargetsService.learningTargets$.pipe(pipeLog("quiz-schedule-rows:learningTargets")),
             ]),
-            wordRecognitionProgressService.indexOfOrderedRecords$,
+            wordRecognitionProgressRepository.indexOfOrderedRecords$,
             tabulationService.tabulation$,
         ]).pipe(
             // Prevent this from firing synchronously

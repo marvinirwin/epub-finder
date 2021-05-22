@@ -14,18 +14,18 @@ export class TrieService {
     constructor({
         cardsRepository,
         pronunciationProgressService,
-        wordRecognitionProgressService,
+        wordRecognitionProgressRepository,
         allWordsRepository,
     }: {
         cardsRepository: CardsRepository
         pronunciationProgressService: PronunciationProgressRepository
-        wordRecognitionProgressService: WordRecognitionProgressRepository
+        wordRecognitionProgressRepository: WordRecognitionProgressRepository
         allWordsRepository: AllWordsRepository
     }) {
         const t = new TrieWrapper(new SetWithUniqueLengths())
         this.trie$ = t.changeSignal$
         cardsRepository.newWords$.subscribe((words) => t.addWords(...words))
-        ;[pronunciationProgressService, wordRecognitionProgressService].map(
+        ;[pronunciationProgressService, wordRecognitionProgressRepository].map(
             (progressService: IndexedRowsRepository<any>) =>
                 progressService.addRecords$.subscribe((records) => {
                     t.addWords(...records.map((record) => record.word))

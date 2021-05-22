@@ -16,7 +16,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$)
     const flash_card_type = useObservableState(quizCard.flashCardType$) || ''
     const word = useObservableState(quizCard.word$) || ''
-    const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressService.indexOfOrderedRecords$) || {}
+    const recognitionRecordIndex = useObservableState(m.wordRecognitionProgressRepository.indexOfOrderedRecords$) || {}
     const recognitionRecordsForThisCard = orderBy(
         (recognitionRecordIndex[word] || [])
             .filter((recognitionRow: WordRecognitionRow) => recognitionRow.flash_card_type === flash_card_type), r => r.created_at.getTime())

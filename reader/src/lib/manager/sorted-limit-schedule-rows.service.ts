@@ -88,7 +88,8 @@ const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedS
         .map(learningScheduleRow => unStartedScheduleRows
             .filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word),
         ),
-    )
+    );
+
 
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>

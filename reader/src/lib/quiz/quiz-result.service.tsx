@@ -19,12 +19,12 @@ export class QuizResultService {
     quizResult$ = new Subject<QuizResult>()
     requestNextCard$ = new Subject<void>()
     constructor({
-        wordRecognitionProgressService,
+        wordRecognitionProgressRepository,
         scheduleRowsService,
         generalToastMessageService,
     }: {
         scheduleRowsService: QuizCardScheduleRowsService
-        wordRecognitionProgressService: WordRecognitionProgressRepository
+        wordRecognitionProgressRepository: WordRecognitionProgressRepository
         generalToastMessageService: GeneralToastMessageService
     }) {
         this.quizResult$
@@ -39,7 +39,7 @@ export class QuizResultService {
                 {record.word} next due date {format(record.nextDueDate, "yyyy MMM-do HH:mm")}
             </Typography>)
 */
-                wordRecognitionProgressService.addRecords$.next([record])
+                wordRecognitionProgressRepository.addRecords$.next([record])
             })
     }
     completeQuiz(word: string,language_code: string, recognitionScore: SuperMemoGrade, flash_card_type: FlashCardType) {

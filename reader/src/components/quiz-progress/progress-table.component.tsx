@@ -9,7 +9,7 @@ import { ProgressTableToolbar } from './progress-table-toolbar.component'
 export const ScheduleRowsComponent = () => {
     const m = useContext(ManagerContext)
     const recognitionRecords =
-        useObservableState(m.wordRecognitionProgressService.recordList$) || []
+        useObservableState(m.wordRecognitionProgressRepository.recordList$) || []
     return (
         <div>
             <ProgressTableToolbar />

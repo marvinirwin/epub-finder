@@ -13,14 +13,14 @@ export class NotableSubsequencesService {
 
     constructor({
         pronunciationProgressService,
-        wordRecognitionProgressService,
+        wordRecognitionProgressRepository,
         temporaryHighlightService,
         videoMetadataRepository,
         wordsService,
         languageConfigsService
     }: {
         pronunciationProgressService: PronunciationProgressRepository
-        wordRecognitionProgressService: WordRecognitionProgressRepository
+        wordRecognitionProgressRepository: WordRecognitionProgressRepository
         temporaryHighlightService: TemporaryHighlightService
         videoMetadataRepository: VideoMetadataRepository
         wordsService: WordsService
@@ -28,7 +28,7 @@ export class NotableSubsequencesService {
     }) {
         this.notableSubsequenceSet$ = combineLatest([
             pronunciationProgressService.indexOfOrderedRecords$,
-            wordRecognitionProgressService.indexOfOrderedRecords$,
+            wordRecognitionProgressRepository.indexOfOrderedRecords$,
             temporaryHighlightService.temporaryHighlightRequests$.pipe(
                 startWith(undefined),
             ),

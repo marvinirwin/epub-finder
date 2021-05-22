@@ -6,7 +6,6 @@ import { AppDirectory } from './app-directory/app-directory-service'
 import { Subject } from 'rxjs'
 import { Hotkeys } from '../lib/hotkeys/hotkeys.interface'
 import { MiniDrawer } from './app-container/drawer'
-import { ImageSearchComponent } from './image-search/image-search.component'
 import './mouseover-div/mouseover-div'
 import { useShowIntroModal } from '../lib/intro/use-show-intro-modal'
 

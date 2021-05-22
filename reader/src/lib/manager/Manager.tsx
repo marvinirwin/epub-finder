@@ -122,7 +122,6 @@ const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: 
 const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number | undefined) => obs$.next(index), 100)
 */
 
-
 export class Manager {
     public cardDBManager = new IndexDBManager<ICard>(
         this.databaseService,
@@ -142,7 +141,7 @@ export class Manager {
     public loggedInUserService = new LoggedInUserService()
     public highlighter: Highlighter
     public pronunciationProgressService: PronunciationProgressRepository
-    public wordRecognitionProgressService: WordRecognitionProgressRepository
+    public wordRecognitionProgressRepository: WordRecognitionProgressRepository
     public introService: IntroService
     public alertsService = new AlertsService()
     public requestRecordingService: RequestRecordingService
@@ -255,7 +254,7 @@ export class Manager {
         this.documentRepository = new DocumentRepository(this)
         this.cardsRepository = new CardsRepository(this)
         this.pronunciationProgressService = new PronunciationProgressRepository(this)
-        this.wordRecognitionProgressService = new WordRecognitionProgressRepository(this)
+        this.wordRecognitionProgressRepository = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this);
         this.visibleElementsService = new VisibleService({
@@ -328,7 +327,7 @@ export class Manager {
             languageConfigsService: this.languageConfigsService,
         })
         this.quizResultService = new QuizResultService({
-            wordRecognitionProgressService: this.wordRecognitionProgressService,
+            wordRecognitionProgressRepository: this.wordRecognitionProgressRepository,
             scheduleRowsService: this.quizCardScheduleRowsService,
             generalToastMessageService: this.generalToastMessageService,
         })
@@ -399,7 +398,7 @@ export class Manager {
             highlighterService: this.highlighterService,
         })
         const hrds = new HighlightRecollectionDifficultyService({
-            wordRecognitionRowService: this.wordRecognitionProgressService,
+            wordRecognitionRowService: this.wordRecognitionProgressRepository,
             highlighterService: this.highlighterService,
         })
 
