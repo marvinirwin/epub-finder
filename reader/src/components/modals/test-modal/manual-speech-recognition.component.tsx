@@ -21,7 +21,7 @@ export const ManualSpeechRecognition = () => {
                         {
                             word: speechRecInput?.value || '',
                             success: true,
-                            timestamp: new Date(),
+                            created_at: new Date(),
                             language_code: await observableLastValue(
                                 m.languageConfigsService.readingLanguageCode$,
                             ),

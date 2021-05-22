@@ -42,7 +42,7 @@ export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
                     {
                         word,
                         success: true,
-                        timestamp: new Date(),
+                        created_at: new Date(),
                         language_code: currentLanguageCode,
                     },
                 ])

@@ -30,11 +30,13 @@ export const filterQuizRows = (
         .filter((r) => r.dueDate() < new Date())
         .filter((r) => sumWordCountRecords(r) > 0)
 
-const isNotRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
-    if (lastNItems.map(keyFunction).includes(keyFunction(nextItem))) {
-        return false
+const isRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
+    const us = lastNItems.map(keyFunction)
+    const searchElement = keyFunction(nextItem)
+    if (us.includes(searchElement)) {
+        return true
     }
-    return true
+    return false;
 }
 
 export class QuizService {
@@ -77,7 +79,7 @@ export class QuizService {
         ).pipe(
             map(([rows, previousRecords]) => {
                 const firstRow = rows.limitedScheduleRows[0]
-                const itemPreventedRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => isNotRepeatRecord<{ word: string }, string>(
+                const itemPreventedRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string }, string>(
                     previousRecords.slice(0, 5),
                     limitedScheduleRow.d,
                     r => r.word,

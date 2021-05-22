@@ -1,6 +1,6 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { PronunciationProgressRow } from './pronunciation-progress-row.interface'
-import { DatabaseService, PersistableEntity } from '../Storage/database.service'
+import { DatabaseService } from '../Storage/database.service'
 
 
 export async function* emptyGenerator<T>(

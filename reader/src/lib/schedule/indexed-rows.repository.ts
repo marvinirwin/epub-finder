@@ -13,7 +13,7 @@ import { DatabaseService } from '../Storage/database.service'
 import { safePush } from '@shared/'
 import { SuperMemoGrade } from 'supermemo'
 
-export class IndexedRowsRepository<T extends { id?: number  }> {
+export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }> {
     indexOfOrderedRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<
         ds_Dict<T[]>
     >(1)
@@ -45,7 +45,7 @@ export class IndexedRowsRepository<T extends { id?: number  }> {
                     rows.forEach((row) => {
                         const { indexValue } = getIndexValue(row)
                         // @ts-ignore
-                        if (typeof row.timestamp === 'string') row.created_at = new Date(row.timestamp)
+                        if (typeof row.created_at === 'string') row.created_at = new Date(row.created_at)
                         // @ts-ignore
                         if (typeof row.nextDueDate === 'string') row.nextDueDate = new Date(row.nextDueDate)
                         safePush(recordIndex, indexValue, row)
@@ -55,7 +55,7 @@ export class IndexedRowsRepository<T extends { id?: number  }> {
                     indexValuesPushed.forEach((indexValue => {
                         recordIndex[indexValue] = orderBy(
                             recordIndex[indexValue],
-                            'timestamp',
+                            r => r.created_at,
                         )
                     }))
                     // This is a hack side effect

@@ -43,7 +43,7 @@ export class GoalsService {
                     pronunciation,
                 ).filter((recordsForword) =>
                     recordsForword.find(
-                        (r) => r.success && isInToday(r.timestamp),
+                        (r) => r.success && isInToday(r.created_at),
                     ),
                 )
                 return wordsRecognizedToday.length + wordsPronouncedToday.length

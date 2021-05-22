@@ -20,7 +20,7 @@ export class TestHotkeysService {
                 {
                     word: '大小姐',
                     success: true,
-                    timestamp: new Date(),
+                    created_at: new Date(),
                     language_code,
                 },
             ])
