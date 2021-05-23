@@ -1,6 +1,6 @@
 import { WordCard } from '../quiz/word-card.interface'
 import React, { useContext } from 'react'
-import { Paper, TextField, Typography } from '@material-ui/core'
+import { Box, Paper, TextField, Typography } from '@material-ui/core'
 import { CardImage } from '../quiz/quiz-card-image.component'
 import { quizCardDescription, wordCardRomanization, wordCardTranslation } from '@shared/'
 import { useObservableState } from 'observable-hooks'
@@ -55,42 +55,16 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                 value={description || ''}
                 onChange={(e) => wordCard.description$.set(e.target.value)}
             />
-            {/*
-            {sortInfo && (
-                <Fragment>
-                    <Typography variant={'subtitle1'}>
-                        Count Weight:{' '}
-                        {round(sortInfo.count.weightedInverseLogNormalValue, 2)}
-                    </Typography>
-                    <Typography variant={'subtitle1'}>
-                        Date Weight:{' '}
-                        {round(
-                            sortInfo.dueDate.weightedInverseLogNormalValue,
-                            2,
-                        )}
-                    </Typography>
-                    <Typography variant={'subtitle1'}>
-                        Length:{' '}
-                        {round(
-                            sortInfo.length.weightedInverseLogNormalValue,
-                            2,
-                        )}
-                    </Typography>
-                    <Typography variant={'subtitle1'}>
-                        Sentence Priority:{' '}
-                        {round(
-                            sortInfo.sentencePriority
-                                .weightedInverseLogNormalValue,
-                            2,
-                        )}
-                    </Typography>
-                </Fragment>
-            )}
-*/}
             <br />
-            {scheduleRows.map(scheduleRow => <ScheduleRowTable scheduleRow={scheduleRow} key={`${scheduleRow.d.word}.${scheduleRow.d.flash_card_type}`}/>)}
+            {scheduleRows.map(scheduleRow => <Box m={2} p={1} key={`${scheduleRow.d.word}.${scheduleRow.d.flash_card_type}`}>
+                <Typography variant={'subtitle1'}>{scheduleRow.d.flash_card_type}</Typography>
+                <br/>
+                <ScheduleRowTable scheduleRow={scheduleRow} />
+            </Box>)}
             <br />
+{/*
             <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />
+*/}
         </Paper>
     )
 }
