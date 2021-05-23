@@ -2,9 +2,8 @@ import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCou
 import { WordRecognitionRow } from './word-recognition-row'
 import { NormalizedValue } from '../manager/normalized-value.interface'
 import { SrmService } from '../srm/srm.service'
-import { format, formatDistance, isSameDay, isToday } from 'date-fns'
+import { format, formatDistance, isToday } from 'date-fns'
 import { SuperMemoGrade } from 'supermemo'
-import { lastN } from '../../components/quiz/last-n'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { groupBy } from 'lodash'
 
@@ -52,9 +51,9 @@ export type ScheduleItem = {
     efactor: number
 }
 
-const NUMBER_OF_CORRECT_ANSWERS_TO_LEARN = 2
-const NUMBER_OF_CORRECT_ANSWERS_TO_REVIEW = 1
-const CORRECT_SUPERMEMO_GRADE = 3
+export const NUMBER_OF_CORRECT_ANSWERS_TO_LEARN = 2
+export const NUMBER_OF_CORRECT_ANSWERS_TO_REVIEW = 1
+export const CORRECT_SUPERMEMO_GRADE = 3
 
 export const wasLearnedToday = (r1: ScheduleItem[]): boolean => {
     const d = mostRecentLearningRecord(r1);
@@ -112,76 +111,6 @@ export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
     )
 }
 
-
-export enum SrmStates {
-    learning='learning',
-    learned='learned',
-    reviewed='reviewed'
-}
-export interface SrmStateChangeRecord <T> {
-    r: T,
-    type: SrmStates,
-}
-
-type SrmRecord = { grade: number, created_at: Date }
-export const srmStateChangeRecords = <T extends SrmRecord>(srmRecords: T[]): SrmStateChangeRecord<T>[] => {
-    const stateChangeRecords: SrmStateChangeRecord<T>[] = [];
-    let latestStateChangeRecord: SrmStateChangeRecord<T> | undefined;
-    let correctRecordsToday = [];
-    let currentDay: Date | undefined;
-    const pushStateRecord = (r: T, type: SrmStates) => {
-        const item = { type, r }
-        stateChangeRecords.push(item);
-        currentDay = r.created_at;
-        latestStateChangeRecord = item;
-    }
-    let previousRecord: T | undefined;
-    for (const currentRecord of srmRecords) {
-        const isFirstRecord = !previousRecord;
-        // Reset correctRecordsToday, if necessary
-        if (previousRecord) {
-            if (!isSameDay(previousRecord.created_at, currentRecord.created_at)) {
-                correctRecordsToday = [];
-            }
-        }
-        // Add some to our correct-in-a-row
-        if (currentRecord.grade >= CORRECT_SUPERMEMO_GRADE) {
-            correctRecordsToday.push(currentRecord);
-        } else {
-            correctRecordsToday = [];
-        }
-        // Set the previousRecord
-        previousRecord = currentRecord;
-        const wasLearningAndIsThirdCorrectInARowToday =
-            correctRecordsToday.length === 3 &&
-            latestStateChangeRecord?.type === 'learning';
-        const currentStateIsReviewingOrLearning = latestStateChangeRecord?.type === SrmStates.reviewed ||
-            latestStateChangeRecord?.type === SrmStates.learned;
-        const previousRecordWasLearnedOrReviewingAndNewOneIsCorrect =
-            currentStateIsReviewingOrLearning &&
-            currentRecord.grade >= CORRECT_SUPERMEMO_GRADE;
-        const previousRecordWasLearnedOrReviewingAndNewOneIsIncorrect =
-            currentStateIsReviewingOrLearning &&
-            currentRecord.grade < CORRECT_SUPERMEMO_GRADE;
-        if (isFirstRecord) {
-            pushStateRecord(currentRecord, SrmStates.learning);
-            continue;
-        }
-        if (wasLearningAndIsThirdCorrectInARowToday) {
-            pushStateRecord(currentRecord, SrmStates.learned);
-            continue;
-        }
-        if (previousRecordWasLearnedOrReviewingAndNewOneIsCorrect) {
-            pushStateRecord(currentRecord, SrmStates.reviewed)
-            continue;
-        }
-        if (previousRecordWasLearnedOrReviewingAndNewOneIsIncorrect) {
-            pushStateRecord(currentRecord, SrmStates.learning)
-            continue;
-        }
-    }
-    return stateChangeRecords;
-}
 
 export class ScheduleRow<T> {
     private _dueDate: Date
