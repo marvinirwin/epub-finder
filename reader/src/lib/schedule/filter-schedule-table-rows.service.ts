@@ -24,8 +24,8 @@ export class FilterScheduleTableRowsService {
                 map(({
                          wordsToReview,
                          limitedScheduleRows,
-                         wordsLearnedForTheFirstTimeToday,
-                         wordsReviewingOrLearning,
+                         wordsLearnedToday,
+                         wordsLearning,
                          wordsLeftForToday,
                          unStartedWords,
                      }) => {
@@ -33,8 +33,8 @@ export class FilterScheduleTableRowsService {
                         [
                             ...wordsToReview,
                             ...limitedScheduleRows,
-                            ...wordsLearnedForTheFirstTimeToday,
-                            ...wordsReviewingOrLearning,
+                            ...wordsLearnedToday,
+                            ...wordsLearning,
                             ...wordsLeftForToday,
                             ...unStartedWords,
                         ],

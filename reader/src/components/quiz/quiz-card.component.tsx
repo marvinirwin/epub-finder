@@ -26,7 +26,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
     const allScheduleRows = useObservableState(m.quizCardScheduleRowsService.scheduleRows$) || [];
     const wordsLearnedToday = Object.values(allScheduleRowsForWordToday({
         allScheduleRows,
-        scheduleRows: scheduleInfo.wordsLearnedForTheFirstTimeToday,
+        scheduleRows: scheduleInfo.wordsLearnedToday,
     }))
     const cardLimitReached = wordsLearnedToday.length >= cardLimit
     const noScheduleRows = !limitedScheduleRowData

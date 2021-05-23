@@ -41,7 +41,7 @@ export const WordGrid: React.FC<{ words: string[], limit?: number }> = ({ words,
 export const ReadingProgress = () => {
     const m = useContext(ManagerContext)
     const readingProgress = useObservableState(m.readingProgressService.readingProgressRecords$)
-    const learnedToday = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)?.wordsLearnedForTheFirstTimeToday || []
+    const learnedToday = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)?.wordsLearnedToday || []
     return <Box m={2} p={1} style={{ width: '90vw', height: '90vh' }}>
         <Box m={2} p={1}>
             {learnedToday.length > 0 ?

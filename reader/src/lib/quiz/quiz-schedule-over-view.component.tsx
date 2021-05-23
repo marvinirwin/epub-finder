@@ -28,8 +28,8 @@ export const QuizScheduleOverView = () => {
     )
     const rowsUnStarted = quizSchedule?.unStartedWords || []
     const rowsToReview = quizSchedule?.wordsToReview || []
-    const rowsInProgress = quizSchedule?.wordsReviewingOrLearning || []
-    const wordsLearnedToday = quizSchedule?.wordsLearnedForTheFirstTimeToday || []
+    const rowsInProgress = quizSchedule?.wordsLearning || []
+    const wordsLearnedToday = quizSchedule?.wordsLearnedToday || []
     return (
         <Paper
             style={{

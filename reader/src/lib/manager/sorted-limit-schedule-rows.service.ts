@@ -11,12 +11,12 @@ import { pipeLog } from './pipe.log'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
-type LimitedScheduleRows = {
+export type LimitedScheduleRows = {
     wordsToReview: SpacedScheduleRow[];
     limitedScheduleRows: SpacedScheduleRow[];
-    wordsLearnedForTheFirstTimeToday: SpacedScheduleRow[];
+    wordsLearnedToday: SpacedScheduleRow[];
     wordsReviewedToday: SpacedScheduleRow[];
-    wordsReviewingOrLearning: SpacedScheduleRow[];
+    wordsLearning: SpacedScheduleRow[];
     wordsLeftForToday: SpacedScheduleRow[];
     unStartedWords: SpacedScheduleRow[];
     debug: {
@@ -159,18 +159,6 @@ export class SortedLimitScheduleRowsService {
                  */
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
-                    wordsLearnedForTheFirstTimeToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
-                    wordsReviewedToday: orderFunc(sortedScheduleRows.filter(r => r.wasReviewedToday())),
-                    wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
-                    wordsReviewingOrLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
-                    unStartedWords: orderFunc(unStartedScheduleRows),
-                    debug: {
-                        limitedScheduleRows: {
-                            overDueRows,
-                            scheduleRowsLeftForToday,
-                            notOverDueRows,
-                        }
-                    },
                     /**
                      * Is there a reason I didn't sort all these at once?
                      */
@@ -179,6 +167,18 @@ export class SortedLimitScheduleRowsService {
                         ...scheduleRowsLeftForToday,
                         ...notOverDueRows,
                     ]),
+                    wordsLearnedToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
+                    wordsReviewedToday: orderFunc(sortedScheduleRows.filter(r => r.wasReviewedToday())),
+                    wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
+                    wordsLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),
+                    unStartedWords: orderFunc(unStartedScheduleRows),
+                    debug: {
+                        limitedScheduleRows: {
+                            overDueRows,
+                            scheduleRowsLeftForToday,
+                            notOverDueRows,
+                        }
+                    },
                 }
             }),
             distinctUntilChanged((x, y) => x.limitedScheduleRows.map(scheduleRowKey).join('') === y.limitedScheduleRows.map(scheduleRowKey).join('')),
