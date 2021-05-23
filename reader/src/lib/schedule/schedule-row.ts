@@ -115,7 +115,7 @@ export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
 
 export class ScheduleRow<T> {
     private _dueDate: Date
-    private stateChangeRecords: SrmStateChangeRecord<ScheduleItem>[]
+    public stateChangeRecords: SrmStateChangeRecord<ScheduleItem>[]
     private lastStateChangeRecord: SrmStateChangeRecord<ScheduleItem> | undefined;
 
     constructor(public d: T, private superMemoRecords: ScheduleItem[]) {

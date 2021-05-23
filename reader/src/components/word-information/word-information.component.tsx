@@ -8,7 +8,7 @@ import { ManagerContext } from '../../App'
 import { flatten } from 'lodash'
 import { useLoadingObservableString } from '../../lib/util/create-loading-observable'
 import { CardLearningLanguageText } from './card-learning-language.component'
-import { RecognitionRowTableComponent } from './recognition-row-table.component'
+import { ScheduleRowTable } from './schedule-row.table'
 import { CountRecordTable } from './count-record.table.component'
 
 
@@ -88,8 +88,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
             )}
 */}
             <br />
-            <RecognitionRowTableComponent
-                wordRecognitionRows={flatten(scheduleRows.map(r => r.d.wordRecognitionRecords))} />
+            {scheduleRows.map(scheduleRow => <ScheduleRowTable scheduleRow={scheduleRow} key={`${scheduleRow.d.word}.${scheduleRow.d.flash_card_type}`}/>)}
             <br />
             <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />
         </Paper>
