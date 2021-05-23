@@ -8,7 +8,7 @@ export class UserSetting {
     value: any
     @Column()
     name: string;
-    @CreateDateColumn()
+    @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date;
     @Column()
     creator_id: number;

@@ -13,7 +13,7 @@ export class RecordRequest {
     @Column()
     creator_id: number
 
-    @CreateDateColumn()
+    @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date
 
     @Column()

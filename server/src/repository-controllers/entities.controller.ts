@@ -42,14 +42,21 @@ export class EntitiesController {
                 ),
         ) as SerializedSelect<any>
         where.creator_id = user.id;
-        return await foundEntity.view.find({
+        let entities = await foundEntity.view.find({
             where: [
                 where
             ],
             skip,
             take,
             order
-        });
+        })
+        // @ts-ignore
+        const found = entities.find(r => r.id === '4874e599-55b5-4011-8a4f-d9a5396f80a0')
+        if (found) {
+            debugger;
+            console.log()
+        }
+        return entities;
     }
 
     @Post(':entity')

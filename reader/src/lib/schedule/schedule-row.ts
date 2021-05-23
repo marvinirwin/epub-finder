@@ -6,6 +6,7 @@ import { format, formatDistance, isToday } from 'date-fns'
 import { SuperMemoGrade } from 'supermemo'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { groupBy } from 'lodash'
+import { SrmStateChangeRecord, srmStateChangeRecords, SrmStates } from './srm-state-change-records'
 
 export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[]
@@ -114,11 +115,16 @@ export const recordsLearnedAnyDay = (r1: ScheduleItem[]) => {
 
 export class ScheduleRow<T> {
     private _dueDate: Date
+    private stateChangeRecords: SrmStateChangeRecord<ScheduleItem>[]
+    private lastStateChangeRecord: SrmStateChangeRecord<ScheduleItem> | undefined;
 
     constructor(public d: T, private superMemoRecords: ScheduleItem[]) {
         this._dueDate = this.superMemoRecords[
             this.superMemoRecords.length - 1
-        ]?.nextDueDate
+        ]?.nextDueDate;
+
+        this.stateChangeRecords = srmStateChangeRecords(this.superMemoRecords);
+        this.lastStateChangeRecord = this.stateChangeRecords[this.superMemoRecords.length - 1];
     }
 
     public dueDate() {
@@ -136,17 +142,11 @@ export class ScheduleRow<T> {
     }
 
     public isToReview({ now }: { now: Date }) {
-        /**
-         * To review records are
-         * 1. Overdue
-         * 2. Have been learned, and have had all successive records be correct, or no successive records
-         */
-        const reviewRecords = getReviewRecords(this.superMemoRecords);
-        // recordWasNeverLearned
-        if (reviewRecords === undefined) {
-            return false;
-        }
-        return this.isOverDue({ now })
+        return (
+            this.lastStateChangeRecord?.type === SrmStates.learned ||
+            this.lastStateChangeRecord?.type === SrmStates.reviewed
+            ) &&
+            this.isOverDue({ now })
     }
 
     public isOverDue({ now }: { now: Date }) {
@@ -155,35 +155,19 @@ export class ScheduleRow<T> {
 
     public hasNRecognizedInARow(n = NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
         const last2 = this.superMemoRecords.slice(n * -1)
-        return last2.every((rec) => rec.grade === SrmService.correctScore())
+        return last2.every((rec) => rec.grade >= SrmService.correctScore())
     }
 
     static lastNRecords<T>(r: T[], n: number) {
         return r.slice(n * -1)
     }
 
-    public isLearning() {
-        const hasNoRecords = !this.superMemoRecords.length
-        if (hasNoRecords) return false
-
-        const lastRecord = this.superMemoRecords[
-            this.superMemoRecords.length - 1
-        ]
-        const startedToday = isToday(lastRecord.created_at)
-        if (this.superMemoRecords.length < NUMBER_OF_CORRECT_ANSWERS_TO_LEARN) {
-            return startedToday;
+    public isLearningToday() {
+        if (!this.lastStateChangeRecord) {
+            return false;
         }
-        const lastTwoRecords = ScheduleRow.lastNRecords(
-            this.superMemoRecords,
-            NUMBER_OF_CORRECT_ANSWERS_TO_LEARN,
-        );
-        const completed = lastTwoRecords.every(
-            (record) => record.grade >= CORRECT_SUPERMEMO_GRADE && isToday(record.created_at),
-        )
-        if (completed) {
-            return false
-        }
-        return startedToday;
+        return this.lastStateChangeRecord.type === SrmStates.learning &&
+            isToday(this.lastStateChangeRecord.r.created_at);
     }
 
     public dueIn() {
@@ -206,15 +190,19 @@ export class ScheduleRow<T> {
     }
 
     wasLearnedOrReviewedToday() {
-        return wasLearnedToday(this.superMemoRecords)
+        if (!this.lastStateChangeRecord) {
+            return false;
+        }
+        return (this.lastStateChangeRecord.type === SrmStates.reviewed || this.lastStateChangeRecord.type === SrmStates.learned) &&
+            isToday(this.lastStateChangeRecord.r.created_at);
     }
 
     wasLearnedToday() {
-        const dateLearned = mostRecentLearningRecord(this.superMemoRecords);
-        if (!dateLearned) {
+        if (!this.lastStateChangeRecord) {
             return false;
         }
-        return isToday(dateLearned.created_at);
+        return (this.lastStateChangeRecord.type === SrmStates.learned) &&
+            isToday(this.lastStateChangeRecord.r.created_at);
     }
 
     isNotStarted() {
@@ -222,10 +210,10 @@ export class ScheduleRow<T> {
     }
 
     wasReviewedToday() {
-        const latestItem = this.superMemoRecords[this.superMemoRecords.length - 1]
-        return !this.wasLearnedToday() &&
-            latestItem &&
-            latestItem.grade >= CORRECT_SUPERMEMO_GRADE &&
-            isToday(latestItem.created_at);
+        if (!this.lastStateChangeRecord) {
+            return false;
+        }
+        return (this.lastStateChangeRecord.type === SrmStates.reviewed) &&
+            isToday(this.lastStateChangeRecord.r.created_at);
     }
 }

@@ -36,7 +36,7 @@ export class ScheduleService<T> {
         )
 
         this.learningCards$ = this.sortedScheduleRows$.pipe(
-            map((rows) => rows.filter((row) => row.isLearning())),
+            map((rows) => rows.filter((row) => row.isLearningToday())),
             shareReplay(1),
         )
         this.newCards$ = this.sortedScheduleRows$.pipe(

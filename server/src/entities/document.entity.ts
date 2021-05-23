@@ -44,7 +44,7 @@ export class Document {
     @Column({ default: false })
     deleted: boolean = false
 
-    @CreateDateColumn()
+    @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date
 }
 export const documentRootId = (d: {

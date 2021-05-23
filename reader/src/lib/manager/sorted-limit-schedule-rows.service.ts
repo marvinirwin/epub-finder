@@ -120,7 +120,7 @@ export class SortedLimitScheduleRowsService {
                     return r.wasLearnedOrReviewedToday()
                 })
                 const learningScheduleRows = sortedScheduleRows.filter((r) =>
-                    r.isLearning(),
+                    r.isLearningToday(),
                 )
                 const unStartedScheduleRows = sortedScheduleRows.filter(
                     (scheduleRow) => scheduleRow.isNotStarted(),

@@ -13,7 +13,7 @@ export class s3File {
     @Column()
     document_id: string
 
-    @CreateDateColumn()
+    @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date
 
     @Column()

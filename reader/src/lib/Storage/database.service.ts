@@ -11,6 +11,10 @@ export type PersistableEntity = 'userSettings' |
     'ignoredWords' |
     'customWords';
 
+function parseCreatedAt<T extends {created_at: string}>(item: T) {
+    return ({ ...item, created_at: parseISO(`${item.created_at.toString()}Z`) })
+}
+
 export const queryPersistableEntity = <T extends {created_at: Date}>(
     {
         entity,
@@ -36,7 +40,10 @@ export const queryPersistableEntity = <T extends {created_at: Date}>(
 
     return fetch(url.toString())
         .then(response => response.json())
-        .then(items => items.map((item: T) => ({...item, created_at: parseISO(`${item.created_at.toString()}Z`)})))
+        .then(items => items.map((item: T) => {
+            // @ts-ignore
+            return parseCreatedAt(item)
+        }))
 }
 
 export const putPersistableEntity = <T>(
@@ -58,7 +65,10 @@ export const putPersistableEntity = <T>(
             },
             body: JSON.stringify(record),
         },
-    ).then(response => response.json())
+    ).then(async response => {
+        const item = await response.json();
+        return parseCreatedAt(item);
+    })
 }
 
 export interface CustomWord {

@@ -1,7 +1,5 @@
 import { ScheduleRow} from '../src/lib/schedule/schedule-row'
-import { WordRecognitionRow } from '../src/lib/schedule/word-recognition-row'
 import { SuperMemoGrade } from 'supermemo'
-import { addDays, subDays } from 'date-fns'
 import { srmStateChangeRecords, SrmStates } from '../src/lib/schedule/srm-state-change-records'
 
 /*

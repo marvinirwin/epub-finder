@@ -8,7 +8,7 @@ export class IgnoredWord {
     language_code: string
     @Column()
     word: string;
-    @CreateDateColumn()
+    @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date;
 
     @Column()

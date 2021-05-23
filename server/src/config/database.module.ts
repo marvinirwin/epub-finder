@@ -25,4 +25,5 @@ export const DatabaseModule = TypeOrmModule.forRoot({
         entitiesDir: 'src/entities',
     },
     synchronize: true,
+    timezone: 'Z'
 })
