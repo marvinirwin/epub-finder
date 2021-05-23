@@ -1,27 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ManagerContext } from '../../App'
-import { useObservable, useObservableState, useSubscription } from 'observable-hooks'
 import { TextField } from '@material-ui/core'
 import { newWordLimitInput } from '@shared/'
-import { useDebouncedFn } from 'beautiful-react-hooks'
-import { take } from 'rxjs/internal/operators/take'
+import { observableLastValue } from '../../services/settings.service'
+import { Manager } from '../../lib/manager/Manager'
+import * as _ from 'lodash'
+
+const setQuizWordLimitDebounced = _.debounce((m: Manager, newLimit: number) => m.settingsService.newQuizWordLimit$.next(newLimit), 1000)
 
 export const SetQuizWordLimit = () => {
     const m = useContext(ManagerContext)
-    const initialQuizWordLimit$ = useObservable(() => m.settingsService.newQuizWordLimit$.pipe(take(1)))
     const [quizWordLimitString, setQuizWordLimitString] = useState<string>('')
-    useSubscription(initialQuizWordLimit$, (n) => {
-        setQuizWordLimitString(`${n}`)
-    })
-    const setNewWordQuizLimitSetting = useDebouncedFn(
-        (str: string) => {
-            m.settingsService.newQuizWordLimit$.next(parseInt(str, 10) || 0)
-        },
-        10,
-    )
+    const setNewWordQuizLimitSetting = (str: string) => setQuizWordLimitDebounced(m, parseInt(str, 10) || 0)
     useEffect(() => {
-        setNewWordQuizLimitSetting(quizWordLimitString)
-    }, [quizWordLimitString])
+        observableLastValue(m.settingsService.newQuizWordLimit$)
+            .then(r => setQuizWordLimitString(`${r}`))
+    }, [])
 
     return (
         <TextField
@@ -29,8 +23,10 @@ export const SetQuizWordLimit = () => {
             label={'new words per day'}
             variant={'filled'}
             value={quizWordLimitString}
-            onChange={(e) =>
+            onChange={(e) => {
                 setQuizWordLimitString(e.target.value || '')
+                setNewWordQuizLimitSetting(e.target.value)
+            }
             }
             inputProps={{
                 shrink: 'true',
