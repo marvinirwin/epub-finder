@@ -39,7 +39,7 @@ export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }>
                 switchMap(async rows => Promise.all(
                     rows.map(async row => {
                         if (!row.id) {
-                            return add(row);
+                            add(row).then(returnedRow => row.id = returnedRow.id);
                         }
                         return row;
                     })
