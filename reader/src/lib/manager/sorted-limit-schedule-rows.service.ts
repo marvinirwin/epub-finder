@@ -123,9 +123,9 @@ export class SortedLimitScheduleRowsService {
                     r.isLearningToday(),
                 )
                 const unStartedScheduleRows = sortedScheduleRows.filter(
-                    (scheduleRow) => scheduleRow.isNotStarted(),
+                    (scheduleRow) => scheduleRow.unStartedToday(),
                 )
-                const scheduleRowsLearnedForTheFirstTimeToday = sortedScheduleRows.filter(r => r.wasLearnedToday())
+                const scheduleRowsLearnedToday = sortedScheduleRows.filter(r => r.wasLearnedToday())
                 const unStartedSiblingLearningRecords = uniq(getSiblingRecords(learningScheduleRows, unStartedScheduleRows));
                 const unStartedSiblingsWhichShouldBe = uniq([
                     ...unStartedSiblingLearningRecords,
@@ -134,7 +134,7 @@ export class SortedLimitScheduleRowsService {
 
                 const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy([...learningScheduleRows, ...unStartedSiblingLearningRecords], r => r.d.word))
-                const wordsLearnedForTheFirstTime = Object.keys(groupBy(scheduleRowsLearnedForTheFirstTimeToday, r => r.d.word))
+                const wordsLearnedForTheFirstTime = Object.keys(groupBy(scheduleRowsLearnedToday, r => r.d.word))
                 const wordsRemaining = newQuizWordLimit - new Set([
                     ...learningWords,
                     ...wordsLearnedForTheFirstTime,
@@ -157,6 +157,7 @@ export class SortedLimitScheduleRowsService {
                  * Oh, I know why I'm getting duplicate records in limitedScheduleRows, because 问题 becomes a member of
                  * more than 1 of the 3 sets which form it.
                  */
+                debugger;
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     /**
@@ -167,7 +168,7 @@ export class SortedLimitScheduleRowsService {
                         ...scheduleRowsLeftForToday,
                         ...notOverDueRows,
                     ]),
-                    wordsLearnedToday: orderFunc(scheduleRowsLearnedForTheFirstTimeToday),
+                    wordsLearnedToday: orderFunc(scheduleRowsLearnedToday),
                     wordsReviewedToday: orderFunc(sortedScheduleRows.filter(r => r.wasReviewedToday())),
                     wordsLeftForToday: orderFunc(scheduleRowsLeftForToday),
                     wordsLearning: orderFunc([...learningScheduleRows, ...unStartedSiblingsWhichShouldBe]),

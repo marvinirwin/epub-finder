@@ -124,7 +124,7 @@ export class ScheduleRow<T> {
         ]?.nextDueDate;
 
         this.stateChangeRecords = srmStateChangeRecords(this.superMemoRecords);
-        this.lastStateChangeRecord = this.stateChangeRecords[this.superMemoRecords.length - 1];
+        this.lastStateChangeRecord = this.stateChangeRecords[this.stateChangeRecords.length - 1];
     }
 
     public dueDate() {
@@ -205,8 +205,10 @@ export class ScheduleRow<T> {
             isToday(this.lastStateChangeRecord.r.created_at);
     }
 
-    isNotStarted() {
-        return this.superMemoRecords.length === 0
+    unStartedToday() {
+        return this.superMemoRecords.length === 0 ||
+            (this.lastStateChangeRecord?.type === SrmStates.learning &&
+            !isToday(this.lastStateChangeRecord.r.created_at))
     }
 
     wasReviewedToday() {
