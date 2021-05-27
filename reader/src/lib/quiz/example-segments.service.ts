@@ -2,6 +2,7 @@ import { Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import { pipeLog } from '../manager/pipe.log'
 
 export class ExampleSegmentsService {
     exampleSegmentMap$: Observable<Map<string, Set<string>>>
@@ -18,6 +19,7 @@ export class ExampleSegmentsService {
                     tabulation,
                 ).wordSegmentStringsMap()
             }),
+            pipeLog('example-segments:exampleSegmentMap'),
             shareReplay(1),
         )
     }

@@ -104,18 +104,14 @@ export class QuizService {
             sentences$: combineLatest([
                 exampleSentencesService.exampleSegmentMap$,
                 currentWord$,
-                translationAttemptScheduleService.scheduleRows$,
             ]).pipe(
                 debounceTime(0),
                 map(
                     ([
                          exampleSegmentMap,
                          currentWord,
-                         translationAttemptScheduleIndex,
                      ]) => {
                         if (!currentWord) return []
-                        const firstTranslationAttempt =
-                            translationAttemptScheduleIndex[0]?.d?.segmentText || ''
                         const exampleSegmentTexts = Array.from(
                             exampleSegmentMap.get(currentWord) || new Set<string>(),
                         )
@@ -124,7 +120,7 @@ export class QuizService {
                                 exampleSegmentTexts,
                                 [
                                     (segmentText) =>
-                                        firstTranslationAttempt.includes(
+                                        [''].includes(
                                             segmentText,
                                         )
                                             ? 1

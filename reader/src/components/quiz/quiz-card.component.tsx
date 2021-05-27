@@ -28,7 +28,8 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
         allScheduleRows,
         scheduleRows: scheduleInfo.wordsLearnedToday,
     }))
-    const cardLimitReached = wordsLearnedToday.length >= cardLimit
+    const cardLimitReached = wordsLearnedToday.length >= cardLimit &&
+        limitedScheduleRowData?.limitedScheduleRows?.length === 0;
     const noScheduleRows = !limitedScheduleRowData
         ?.limitedScheduleRows?.length && !cardLimitReached;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);

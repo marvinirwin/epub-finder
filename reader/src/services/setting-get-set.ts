@@ -9,6 +9,8 @@ export type SettingType = 'url' | 'indexedDB' | 'REST';
 
 const settings = queryPersistableEntity<UserSetting>({
     entity: 'userSettings',
+    skip: 0,
+    take: 100,
 }).then(records => new Map(records.map(userSettingReceord => [userSettingReceord.name, userSettingReceord])))
 
 export class SettingGetSet<T> {

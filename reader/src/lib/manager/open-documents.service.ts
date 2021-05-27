@@ -19,6 +19,7 @@ import { LanguageConfigsService } from '../language/language-configs.service'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
+import { pipeLog } from './pipe.log'
 
 export type TrieObservable = Observable<TrieWrapper>
 
@@ -121,6 +122,7 @@ export class OpenDocumentsService {
             (document) => document.virtualTabulation$,
             SOURCE_DOCUMENTS_NODE_LABEL,
         ).pipe(
+            pipeLog('open-documents:virtual-document-tabulation'),
             map(
                 (documentTabulations: SerializedDocumentTabulation[]) =>
                     new SerializedTabulationAggregate(documentTabulations),
