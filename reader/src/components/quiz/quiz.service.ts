@@ -78,13 +78,19 @@ export class QuizService {
             ],
         ).pipe(
             map(([rows, previousRecords]) => {
-                const firstRow = rows.limitedScheduleRows[0]
-                const itemPreventedRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string }, string>(
-                    previousRecords.slice(0, 5),
-                    limitedScheduleRow.d,
-                    r => r.word,
-                    ),
-                )
+                const firstRow = rows.limitedScheduleRows[0];
+                const resolveNoRepeat = () => {
+                    for (let i = 5; i >= 1; i--) {
+                        const itemThatDidntRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string }, string>(
+                            previousRecords.slice(0, i),
+                            limitedScheduleRow.d,
+                            r => r.word,
+                            ),
+                        );
+                        if (itemThatDidntRepeat) return itemThatDidntRepeat;
+                    }
+                };
+                const itemPreventedRepeat = resolveNoRepeat();
                 if (itemPreventedRepeat) {
                     return itemPreventedRepeat
                 }

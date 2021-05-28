@@ -2,7 +2,7 @@ import { PronunciationProgressRepository } from '../schedule/pronunciation-progr
 import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
 import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
 import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay, startWith } from 'rxjs/operators'
+import { distinctUntilChanged, map, shareReplay, startWith } from 'rxjs/operators'
 import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
 import { VideoMetadataRepository } from '../../services/video-metadata.repository'
 import { WordsService } from '../language/words.service'
@@ -60,6 +60,7 @@ export class NotableSubsequencesService {
                     return new SetWithUniqueLengths(strings)
                 },
             ),
+            distinctUntilChanged((a, b) => Array(a).join('') === Array(b).join('')),
             shareReplay(1),
         )
     }

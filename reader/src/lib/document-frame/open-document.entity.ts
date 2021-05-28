@@ -71,6 +71,7 @@ export class OpenDocument {
                 })
             },
         )
+        // This might be the source of the 4x processing
         this.virtualTabulation$ = obs$.pipe(pipeLog("open-document:virtual-tabulation-loading"))
         this.isLoadingVirtualTabulation$ = isLoading$
     }
