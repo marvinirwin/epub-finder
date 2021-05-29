@@ -15,9 +15,10 @@ import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-t
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { PotentialExcludedDbColumns } from './indexed-rows.repository'
 
 export interface TranslationAttemptScheduleData {
-    translationAttemptRecords: TranslationAttemptRecord[]
+    translationAttemptRecords: PotentialExcludedDbColumns<TranslationAttemptRecord>[]
     segmentText: string
     wordCountRecords: WordCountRecord[]
 }
@@ -85,13 +86,11 @@ export class TranslationAttemptScheduleService
                     )
                     Object.entries(translationAttempts).forEach(
                         ([key, value]) => {
-/*
                             if (scheduleRows[key]) {
                                 scheduleRows[
                                     key
                                     ].translationAttemptRecords.push(...value)
                             }
-*/
                         },
                     )
                     return orderBy(
