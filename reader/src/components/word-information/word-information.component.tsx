@@ -1,6 +1,6 @@
 import { WordCard } from '../quiz/word-card.interface'
 import React, { useContext } from 'react'
-import { Box, Paper, TextField, Typography } from '@material-ui/core'
+import { Box, Button, Paper, TextField, Typography } from '@material-ui/core'
 import { CardImage } from '../quiz/quiz-card-image.component'
 import { quizCardDescription, wordCardRomanization, wordCardTranslation } from '@shared/'
 import { useObservableState } from 'observable-hooks'
@@ -9,6 +9,15 @@ import { useLoadingObservableString } from '../../lib/util/create-loading-observ
 import { CardLearningLanguageText } from './card-learning-language.component'
 import { ScheduleRowTable } from './schedule-row.table'
 
+
+export const useIsMarkedAsKnown = (word: string) => {
+    const m = useContext(ManagerContext);
+    const knownWordsIndex = useObservableState(m.knownWordsRepository.indexOfOrderedRecords$) || {};
+    const records = knownWordsIndex[word];
+    if (records) {
+        return records[records.length - 1]?.is_known;
+    }
+}
 
 export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                                                                                wordCard,
@@ -21,7 +30,9 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
         )?.filter(r => r.d.word === word) || []
     const romanization = useLoadingObservableString(wordCard.romanization$, '')
     const translation = useLoadingObservableString(wordCard.translation$, '')
-    const description = useObservableState(wordCard.description$.value$)
+    const description = useObservableState(wordCard.description$.value$);
+    const isMarkedAsKnown = useIsMarkedAsKnown(word || '');
+    const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     return (
         <Paper
             style={{
@@ -44,6 +55,18 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                     <Typography variant='h4' className={wordCardTranslation}>
                         {translation}
                     </Typography>
+                    <Button onClick={() => {
+                        if (word && language_code) {
+                            m.knownWordsRepository.addRecords$.next([{
+                                language_code,
+                                is_known: !isMarkedAsKnown,
+                                word,
+                                created_at: new Date()
+                            }])
+                        }
+                    }}>
+
+                    </Button>
                 </div>
                 <br />
                 <TextField
