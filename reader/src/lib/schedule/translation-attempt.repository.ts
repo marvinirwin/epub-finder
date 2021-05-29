@@ -4,7 +4,8 @@ import { SuperMemoGrade } from 'supermemo'
 import { emptyGenerator } from './pronunciation-progress.repository'
 
 export interface TranslationAttemptRecord {
-    id?: number
+    id: number
+    creator_id: number | string;
     learningLanguage: string
     translationAttempt: string
     created_at: Date
@@ -21,7 +22,7 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
         super({
             databaseService,
             load: emptyGenerator,
-            add: (r) => Promise.resolve(r),
+            add: (r) => Promise.resolve(r as TranslationAttemptRecord),
             getIndexValue: (r) => ({ indexValue: r.learningLanguage }),
         })
     }

@@ -7,11 +7,12 @@ import { SuperMemoGrade } from 'supermemo'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { groupBy } from 'lodash'
 import { SrmStateChangeRecord, srmStateChangeRecords, SrmStates } from './srm-state-change-records'
+import { PotentialExcludedDbColumns } from './indexed-rows.repository'
 
 export interface QuizScheduleRowData {
     wordCountRecords: DocumentWordCount[]
     greedyWordCountRecords: DocumentWordCount[]
-    wordRecognitionRecords: WordRecognitionRow[]
+    wordRecognitionRecords: PotentialExcludedDbColumns<WordRecognitionRow>[]
     flash_card_type: FlashCardType;
     word: string
 }

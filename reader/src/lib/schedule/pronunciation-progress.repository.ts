@@ -22,7 +22,7 @@ export class PronunciationProgressRepository extends IndexedRowsRepository<Pronu
                 }),
 */
             add: (r) => databaseService.pronunciationRecords
-                .add(r).then(id => ({...r, id})),
+                .add(r as PronunciationProgressRow).then(id => ({...r, id})),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })
     }

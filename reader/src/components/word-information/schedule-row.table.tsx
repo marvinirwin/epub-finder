@@ -4,11 +4,12 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import { formatDueDate } from '../../lib/schedule/format-due-date'
 import { SpacedScheduleRow } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { SrmStates } from '../../lib/schedule/srm-state-change-records'
+import { PotentialExcludedDbColumns } from '../../lib/schedule/indexed-rows.repository'
 
 export const ScheduleRowTable: React.FC<{
     scheduleRow: SpacedScheduleRow
 }> = ({ scheduleRow }) => {
-    const getCorrespondingStateEvent = (recognitionRow: WordRecognitionRow) => scheduleRow.stateChangeRecords.find(stateChangeRecord => stateChangeRecord.r === recognitionRow)
+    const getCorrespondingStateEvent = (recognitionRow: PotentialExcludedDbColumns<WordRecognitionRow>) => scheduleRow.stateChangeRecords.find(stateChangeRecord => stateChangeRecord.r === recognitionRow)
     return (
         <TableContainer component={Paper}>
             <Table size='small' aria-label='a dense table'>
@@ -25,7 +26,7 @@ export const ScheduleRowTable: React.FC<{
                     {scheduleRow.d.wordRecognitionRecords.map((row) => {
                         const correspondingEvent = getCorrespondingStateEvent(row)
                         return (
-                            <TableRow key={row.id}>
+                            <TableRow key={row.created_at.getTime()}>
                                 <TableCell component='th' scope='row'>
                                     {row.grade}
                                 </TableCell>

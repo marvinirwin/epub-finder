@@ -7,10 +7,11 @@ import { HighlightDelta } from './highlight.interface'
 import { RGBA } from './color.service'
 import { colorForPercentage } from '../color/Range'
 import debug from 'debug'
+import { PotentialExcludedDbColumns } from '../schedule/indexed-rows.repository'
 const d = debug('highlight:pronunciation')
 
 export class HighlightPronunciationProgressService extends HighlightDifficultyService<
-    ds_Dict<PronunciationProgressRow[]>
+    ds_Dict<PotentialExcludedDbColumns<PronunciationProgressRow>[]>
 > {
     constructor({
         pronunciationProgressService,

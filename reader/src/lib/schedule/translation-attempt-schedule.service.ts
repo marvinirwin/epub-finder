@@ -85,11 +85,13 @@ export class TranslationAttemptScheduleService
                     )
                     Object.entries(translationAttempts).forEach(
                         ([key, value]) => {
+/*
                             if (scheduleRows[key]) {
                                 scheduleRows[
                                     key
                                     ].translationAttemptRecords.push(...value)
                             }
+*/
                         },
                     )
                     return orderBy(
