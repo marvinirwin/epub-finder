@@ -1,7 +1,7 @@
 import { SuperMemoGrade } from 'supermemo'
 
 export interface WordRecognitionRow {
-    id?: number
+    id: number | string;
     word: string
     created_at: Date
     nextDueDate: Date
@@ -14,4 +14,5 @@ export interface WordRecognitionRow {
     flash_card_type: string
 
     language_code: string
+    creator_id: string | number;
 }

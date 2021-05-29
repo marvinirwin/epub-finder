@@ -1,15 +1,6 @@
-import {
-    BehaviorSubject,
-    combineLatest,
-    Observable,
-    Subject,
-} from 'rxjs'
+import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { Dictionary } from 'lodash'
-import {
-    map,
-    shareReplay,
-    startWith,
-} from 'rxjs/operators'
+import { map, shareReplay } from 'rxjs/operators'
 import { DatabaseService } from '../Storage/database.service'
 import React from 'react'
 import { ICard } from '../../../../server/src/shared/ICard'
@@ -30,10 +21,7 @@ import { ModesService } from '../modes/modes.service'
 import { PronunciationVideoService } from '../../components/pronunciation-video/pronunciation-video.service'
 import { ObservableService } from '../../services/observable.service'
 import { HighlighterService } from '../highlighting/highlighter.service'
-import {
-    removePunctuation,
-    TemporaryHighlightService,
-} from '../highlighting/temporary-highlight.service'
+import { removePunctuation, TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
 import { RGBA } from '../highlighting/color.service'
 import { EditingVideoMetadataService } from '../../services/editing-video-metadata.service'
 import { SettingsService } from '../../services/settings.service'
@@ -70,10 +58,7 @@ import { VisibleService } from './visible.service'
 import { ElementAtomMetadataIndex } from '../../services/element-atom-metadata.index'
 import { WordMetadataMapService } from '../../services/word-metadata-map.service'
 import { AtomElementEventsService } from '../user-interface/atom-element-events.service'
-import {
-    ToastMessage,
-    ToastMessageService,
-} from '../user-interface/toast-message.service'
+import { ToastMessage, ToastMessageService } from '../user-interface/toast-message.service'
 import { ProgressItemService } from '../../components/item-in-progress/progress-item.service'
 import { IsRecordingService } from '../audio/is-recording.service'
 import { HistoryService } from '../app-context/history.service'
@@ -114,6 +99,7 @@ import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to-progress.service'
 import { ReadingProgressService } from '../tabulation/reading-progress.service'
 import { CsvService } from './csv.service'
+import { KnownWordsRepository } from '../schedule/known-words.repository'
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -212,11 +198,12 @@ export class Manager {
     timeService: TimeService
     advanceTimeService: AdvanceTimeService
     flashCardLearningTargetsService: FlashCardLearningTargetsService
-    customWordsRepository: CustomWordsRepository;
-    tabulationService: TabulationService;
+    customWordsRepository: CustomWordsRepository
+    tabulationService: TabulationService
     flashCardTypesRequiredToProgressService: FlashCardTypesRequiredToProgressService
     readingProgressService: ReadingProgressService
     csvService: CsvService
+    knownWordsRepository: KnownWordsRepository
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -233,11 +220,10 @@ export class Manager {
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this)
         this.languageConfigsService = new LanguageConfigsService(this)
-        this.allWordsRepository = new AllWordsRepository(this)
-        this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this);
-        this.settingsService.spokenLanguage$.subscribe(
-            audioSource.learningToKnownSpeech$,
-        )
+        this.allWordsRepository = new AllWordsRepository(this);
+        this.knownWordsRepository = new KnownWordsRepository(this);
+        this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this)
+        this.settingsService.spokenLanguage$.subscribe(audioSource.learningToKnownSpeech$)
         this.treeMenuService = new TreeMenuService<any, { value: any }>(this)
         this.hotkeysService = new HotkeysService(this)
         this.hotkeyEvents = new HotKeyEvents(this)
@@ -256,7 +242,7 @@ export class Manager {
         this.pronunciationProgressService = new PronunciationProgressRepository(this)
         this.wordRecognitionProgressRepository = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
-        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this);
+        this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
             componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
                 map((component) => component?.name || ''),
@@ -285,7 +271,7 @@ export class Manager {
         this.tabulationConfigurationService = new TabulationConfigurationService(
             this,
         )
-        this.tabulationService = new TabulationService(this);
+        this.tabulationService = new TabulationService(this)
 
         this.openDocumentsService.openDocumentBodies$.subscribe((body) =>
             this.browserInputsService.applyDocumentListeners(
@@ -306,7 +292,10 @@ export class Manager {
         this.translationAttemptService = new TranslationAttemptService(this)
         this.flashCardLearningTargetsService = new FlashCardLearningTargetsService(this)
         this.quizCardScheduleRowsService = new QuizCardScheduleRowsService(this)
-        this.quizCardScheduleService = new ScheduleService({scheduleRowsService: this.quizCardScheduleRowsService, timeService: this.timeService})
+        this.quizCardScheduleService = new ScheduleService({
+            scheduleRowsService: this.quizCardScheduleRowsService,
+            timeService: this.timeService,
+        })
         this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService(
             this,
         )
@@ -353,18 +342,18 @@ export class Manager {
             this.audioRecordingService.queSynthesizedSpeechRequest$.next(word)
         })
 
-/*
-        combineLatest([
-            this.highlightAllWithDifficultySignal$,
-            this.quizCardScheduleRowsService.scheduleRows$,
-        ]).subscribe(([signal, indexedScheduleRows]) => {
-            signal
-                ? this.highlighter.highlightWithDifficulty$.next(
-                      indexedScheduleRows,
-                  )
-                : this.highlighter.highlightWithDifficulty$.next({})
-        })
-*/
+        /*
+                combineLatest([
+                    this.highlightAllWithDifficultySignal$,
+                    this.quizCardScheduleRowsService.scheduleRows$,
+                ]).subscribe(([signal, indexedScheduleRows]) => {
+                    signal
+                        ? this.highlighter.highlightWithDifficulty$.next(
+                              indexedScheduleRows,
+                          )
+                        : this.highlighter.highlightWithDifficulty$.next({})
+                })
+        */
 
         this.goalsService = new GoalsService(this)
 
@@ -444,15 +433,9 @@ export class Manager {
             mousedOverWordHighlightService: this.mousedOverWordHighlightService,
         })
 
-        const vhs = new VideoMetadataHighlight({
-            highlighterService: this.highlighterService,
-            videoMetadataRepository: this.videoMetadataRepository,
-            modesService: this.modesService,
-        })
+        const vhs = new VideoMetadataHighlight(this)
 
-        this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(
-            this,
-        )
+        this.frequencyDocumentsRepository = new FrequencyDocumentsRepository(this)
         this.vocabService = new VocabService()
         this.progressTreeService = new FrequencyTreeService(this)
         this.quizHighlightService = new QuizHighlightService(this)
@@ -465,8 +448,8 @@ export class Manager {
         this.wordCardModalService = new WordCardModalService(this)
         this.loadingMessagesService = new LoadingMessagesService(this)
         this.advanceTimeService = new AdvanceTimeService(this)
-        this.readingProgressService = new ReadingProgressService(this);
-        this.csvService = new CsvService(this);
+        this.readingProgressService = new ReadingProgressService(this)
+        this.csvService = new CsvService(this)
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()

@@ -9,7 +9,8 @@ export type PersistableEntity = 'userSettings' |
     'cards' |
     'spacedRepitionEntities' |
     'ignoredWords' |
-    'customWords';
+    'customWords' |
+    'knownWords';
 
 function parseCreatedAt<T extends {created_at: string}>(item: T) {
     return ({ ...item, created_at: parseISO(`${item.created_at.toString()}Z`) })
@@ -75,6 +76,7 @@ export interface CustomWord {
     word: string;
     created_at: Date;
     id: number;
+    creator_id: number | string;
     language_code: string;
 }
 

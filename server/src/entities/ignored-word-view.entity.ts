@@ -3,7 +3,7 @@ import { GroupwiseMax } from './user-setting-view.entity'
 
 @ViewEntity({
     expression: GroupwiseMax({
-        table: 'known_word',
+        table: 'ignored_word',
         groupingColumns: [
             'creator_id',
             'language_code',
@@ -21,7 +21,7 @@ export class IgnoredWordView {
     @ViewColumn()
     created_at: Date;
     @ViewColumn()
-    is_known: boolean;
+    is_ignored: boolean;
     @ViewColumn()
     creator_id: number;
 }

@@ -7,9 +7,10 @@ import { WordRecognitionProgressRepository } from '../schedule/word-recognition-
 import { RGBA } from './color.service'
 import { CORRECT_RECOGNITION_SCORE } from './Highlighter'
 import { colorForPercentage } from '../color/Range'
+import { PotentialExcludedDbColumns } from '../schedule/indexed-rows.repository'
 
 export class HighlightRecollectionDifficultyService extends HighlightDifficultyService<
-    ds_Dict<WordRecognitionRow[]>
+    ds_Dict<PotentialExcludedDbColumns<WordRecognitionRow>[]>
 > {
     constructor({
         wordRecognitionRowService,

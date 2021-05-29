@@ -2,9 +2,10 @@ import React from 'react'
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 import { TableCell, TableRow, Typography } from '@material-ui/core'
 import moment from 'moment'
+import { PotentialExcludedDbColumns } from '../../lib/schedule/indexed-rows.repository'
 
 export const ProgressTableRow: React.FC<{
-    recognitionRecord: WordRecognitionRow
+    recognitionRecord: PotentialExcludedDbColumns<WordRecognitionRow>
 }> = ({ recognitionRecord }) => {
     return (
         <TableRow>

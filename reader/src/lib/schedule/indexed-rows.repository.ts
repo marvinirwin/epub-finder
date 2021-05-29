@@ -13,13 +13,14 @@ import { DatabaseService } from '../Storage/database.service'
 import { safePush } from '@shared/'
 import { SuperMemoGrade } from 'supermemo'
 
-export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }> {
-    indexOfOrderedRecords$: ReplaySubject<ds_Dict<T[]>> = new ReplaySubject<
-        ds_Dict<T[]>
-    >(1)
-    recordList$: Observable<T[]>
-    latestRecords$ = new BehaviorSubject<Map<string, T>>(new Map())
-    addRecords$: ReplaySubject<T[]> = new ReplaySubject<T[]>(1)
+
+export type PotentialExcludedDbColumns<T> = Omit<T, 'creator_id' | 'id'> | T;
+
+export class IndexedRowsRepository<T extends { id: number | string, created_at: Date, creator_id: number | string }> {
+    indexOfOrderedRecords$: ReplaySubject<ds_Dict<PotentialExcludedDbColumns<T>[]>> = new ReplaySubject(1)
+    recordList$: Observable<PotentialExcludedDbColumns<T>[]>
+    latestRecords$ = new BehaviorSubject<Map<string, PotentialExcludedDbColumns<T>>>(new Map())
+    addRecords$: ReplaySubject<PotentialExcludedDbColumns<T>[]> = new ReplaySubject<PotentialExcludedDbColumns<T>[]>(1)
     clearRecords$ = new ReplaySubject<void>(1)
 
     constructor({
@@ -29,8 +30,8 @@ export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }>
     }: {
         databaseService: DatabaseService
         load: () => AsyncGenerator<T[]>
-        add: (t: T) => Promise<T>
-        getIndexValue: (v: T) => { indexValue: string }
+        add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
+        getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string }
     }) {
         this.indexOfOrderedRecords$.next({})
         this.addRecords$
@@ -38,15 +39,15 @@ export class IndexedRowsRepository<T extends { id?: number, created_at: Date  }>
                 filter((rows) => !!rows.length),
                 switchMap(async rows => Promise.all(
                     rows.map(async row => {
-                        if (!row.id) {
-                            add(row).then(returnedRow => row.id = returnedRow.id);
+                        if (!(row as T).id) {
+                            add(row).then(returnedRow => (row as T).id = returnedRow.id);
                         }
                         return row;
                     })
                 )),
                 withLatestFrom(this.indexOfOrderedRecords$.pipe(startWith({}))),
-                tap(([rows, recordIndex]: [T[], ds_Dict<T[]>]) => {
-                    const newLatestRecords = new Map<string, T>(
+                tap(([rows, recordIndex]: [PotentialExcludedDbColumns<T>[], ds_Dict<PotentialExcludedDbColumns<T>[]>]) => {
+                    const newLatestRecords = new Map<string, PotentialExcludedDbColumns<T>>(
                         this.latestRecords$.getValue(),
                     )
                     const indexValuesPushed = new Set<string>();

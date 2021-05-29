@@ -2,7 +2,7 @@ import React, { Fragment, useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { HotkeyWrapper } from '../hotkeys/hotkey-wrapper'
 import { Button } from '@material-ui/core'
-import { QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM } from '@shared/'
+import { MARK_AS_KNOWN, QUIZ_BUTTON_EASY, QUIZ_BUTTON_HARD, QUIZ_BUTTON_IGNORE, QUIZ_BUTTON_MEDIUM } from '@shared/'
 import { ScheduleItem } from '../../lib/schedule/schedule-row'
 import { quizCardNextDueDate } from '../../lib/srm/srm.service'
 import { formatDistance } from 'date-fns'
@@ -12,7 +12,10 @@ import { SuperMemoGrade } from 'supermemo'
 import { QuizCard } from '../quiz/word-card.interface'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
 
-export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[], quizCard: QuizCard}> = ({ previousScheduleItems, quizCard }) => {
+export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[], quizCard: QuizCard }> = ({
+                                                                                                               previousScheduleItems,
+                                                                                                               quizCard,
+                                                                                                           }) => {
     const m = useContext(ManagerContext)
 
     const hardDueDateDistance = formatDistance(quizCardNextDueDate({
@@ -26,11 +29,12 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     const easyDueDateDistance = formatDistance(quizCardNextDueDate({
         previousItems: previousScheduleItems,
         grade: 5,
-    }), Date.now());
+    }), Date.now())
 
     const word = useObservableState(quizCard.word$)
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
     const flash_card_type = useObservableState(quizCard.flashCardType$)
+    const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$)
 
     const useQuizResult = (
         hotkeyObservable$: Observable<unknown>,
@@ -42,29 +46,36 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
             }
         })
     }
-    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5);
+    useQuizResult(m.hotkeyEvents.quizResultEasy$, 5)
     const [easyRef, EasyTutorialPopOver] = useTutorialPopOver(
         'EasyButton',
-        'If you recalled the answer easily'
+        'If you recalled the answer easily',
     )
     useQuizResult(m.hotkeyEvents.quizResultMedium$, 3)
     const [mediumRef, MediumTutorialPopOver] = useTutorialPopOver(
         'MediumButton',
-        'If you recalled the answer with some difficulty'
+        'If you recalled the answer with some difficulty',
     )
     useQuizResult(m.hotkeyEvents.quizResultHard$, 1)
     const [hardRef, HardTutorialPopOver] = useTutorialPopOver(
         'HardButton',
-        'If you could not recall the answer'
-    );
+        'If you could not recall the answer',
+    )
     const [ignoreRef, IgnoreTutorialPopOver] = useTutorialPopOver(
         'IgnoreButton',
-        `If you don't want to review this word`
-    );
+        `If you don't want to review this word`,
+    )
     useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
-        if (word) {
+        if (word && language_code) {
             m.ignoredWordsRepository.addRecords$.next([
-                { word, created_at: new Date() },
+                { word, created_at: new Date(), language_code, is_ignored: true },
+            ])
+        }
+    })
+    useSubscription(m.hotkeyEvents.markWordAsKnown$, () => {
+        if (word && language_code) {
+            m.knownWordsRepository.addRecords$.next([
+                { word, created_at: new Date(), is_known: true, language_code },
             ])
         }
     })
@@ -78,7 +89,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 >
                     Hard ({hardDueDateDistance})
                 </Button>
-                <HardTutorialPopOver/>
+                <HardTutorialPopOver />
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_MEDIUM'}>
                 <Button
@@ -88,7 +99,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 >
                     Medium ({mediumDueDateDistance})
                 </Button>
-                <MediumTutorialPopOver/>
+                <MediumTutorialPopOver />
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_EASY'}>
                 {' '}
@@ -99,7 +110,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 >
                     Easy ({easyDueDateDistance})
                 </Button>
-                <EasyTutorialPopOver/>
+                <EasyTutorialPopOver />
             </HotkeyWrapper>
             <HotkeyWrapper action={'QUIZ_RESULT_IGNORE'}>
                 <Button
@@ -111,18 +122,19 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 >
                     Ignore
                 </Button>
-                <IgnoreTutorialPopOver/>
+                <IgnoreTutorialPopOver />
             </HotkeyWrapper>
             <HotkeyWrapper action={'MARK_WORD_AS_KNOWN'}>
                 <Button
+                    className={MARK_AS_KNOWN}
                     ref={ignoreRef}
                     onClick={() => {
                         m.hotkeyEvents.markWordAsKnown$.next()
                     }}
                 >
-                    Ignore
+                    Mark as known
                 </Button>
-                <IgnoreTutorialPopOver/>
+                <IgnoreTutorialPopOver />
             </HotkeyWrapper>
         </Fragment>
     )

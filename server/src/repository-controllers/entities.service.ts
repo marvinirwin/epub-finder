@@ -9,6 +9,9 @@ import { IgnoredWord } from '../entities/ignored-word.entity'
 import { CustomWord } from '../entities/custom-word.entity'
 import { RepositoryType } from './entities.controller'
 import { CardView } from '../entities/card-view.entity'
+import { IgnoredWordView } from '../entities/ignored-word-view.entity'
+import { KnownWordView } from '../entities/known-word-view.entity'
+import { KnownWord } from '../entities/known-word.entity'
 
 @Controller('repositories')
 export class EntitiesService {
@@ -31,13 +34,21 @@ export class EntitiesService {
         public customWords: Repository<CustomWord>,
         @InjectRepository(CardView)
         public cardView: Repository<CardView>,
+        @InjectRepository(IgnoredWordView)
+        public ignoredWordView: Repository<IgnoredWordView>,
+        @InjectRepository(KnownWordView)
+        public knownWord: Repository<KnownWord>,
+        @InjectRepository(KnownWordView)
+        public knownWordView: Repository<KnownWordView>,
     ) {
         this.entityMap = {
             userSettings: { view: userSettingView, write: userSettings },
-            cards: {view: cardView, write: cards},
+            cards: { view: cardView, write: cards },
             spacedRepitionEntities,
-            ignoredWords,
+            ignoredWords: { view: ignoredWordView, write: ignoredWords },
+            knownWords: { view: knownWordView, write: knownWord },
             customWords,
+
         }
     }
 }

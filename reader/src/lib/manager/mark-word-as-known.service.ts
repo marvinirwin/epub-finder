@@ -1,4 +1,5 @@
 import { HotkeysService } from '../../services/hotkeys.service'
+import { KnownWordsRepository } from '../schedule/known-words.repository'
 
 export class MarkWordAsKnownService {
     constructor(
@@ -7,6 +8,7 @@ export class MarkWordAsKnownService {
             knownWordsRepository
         }: {
             hotkeysService: HotkeysService,
+            knownWordsRepository: KnownWordsRepository
         }) {
     }
 }

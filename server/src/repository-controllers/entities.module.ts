@@ -9,6 +9,9 @@ import { CustomWord } from '../entities/custom-word.entity'
 import { EntitiesController } from './entities.controller'
 import { EntitiesService } from './entities.service'
 import { CardView } from '../entities/card-view.entity'
+import { IgnoredWordView } from '../entities/ignored-word-view.entity'
+import { KnownWord } from '../entities/known-word.entity'
+import { KnownWordView } from '../entities/known-word-view.entity'
 
 @Module({
     imports: [
@@ -20,7 +23,11 @@ import { CardView } from '../entities/card-view.entity'
                 SpacedRepitionEntity,
                 IgnoredWord,
                 CustomWord,
-                CardView
+                CardView,
+                IgnoredWord,
+                IgnoredWordView,
+                KnownWord,
+                KnownWordView
             ],
         ),
     ],
