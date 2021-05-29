@@ -8,6 +8,7 @@ import { Dictionary, flatten, groupBy, orderBy, uniq } from 'lodash'
 import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { isToday } from 'date-fns'
 import { pipeLog } from './pipe.log'
+import { KnownWordsRepository } from '../schedule/known-words.repository'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
@@ -67,18 +68,18 @@ export const allScheduleRowsForWordToday = (
     /**
      * For a word to be unStarted, all of its schedule rows must be unStarted for that day
      */
-    const selectScheduleRowsGrouped = groupBy(scheduleRows, r => r.d.word);
-    const allScheduleRowsGrouped = groupBy(allScheduleRows, r => r.d.word);
-    const selectEntriesGrouped = Object.entries(selectScheduleRowsGrouped);
-    const filteredItems = [];
+    const selectScheduleRowsGrouped = groupBy(scheduleRows, r => r.d.word)
+    const allScheduleRowsGrouped = groupBy(allScheduleRows, r => r.d.word)
+    const selectEntriesGrouped = Object.entries(selectScheduleRowsGrouped)
+    const filteredItems = []
     for (const [word, rows] of selectEntriesGrouped) {
-        const allScheduleRowEntries = allScheduleRowsGrouped[word]?.filter(r => isToday(r.dueDate()));
+        const allScheduleRowEntries = allScheduleRowsGrouped[word]?.filter(r => isToday(r.dueDate()))
         const allRowsComplete = allScheduleRowEntries.length === rows.length
         if (allRowsComplete) {
-            filteredItems.push(rows);
+            filteredItems.push(rows)
         }
     }
-    return filteredItems;
+    return filteredItems
 }
 
 export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flash_card_type}${r.d.wordRecognitionRecords.length}`
@@ -88,7 +89,7 @@ const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedS
         .map(learningScheduleRow => unStartedScheduleRows
             .filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word),
         ),
-    );
+    )
 
 
 export class SortedLimitScheduleRowsService {
@@ -98,20 +99,27 @@ export class SortedLimitScheduleRowsService {
                     settingsService,
                     quizCardScheduleRowsService,
                     timeService,
+                    knownWordsRepository,
                 }: {
         settingsService: SettingsService
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
+        knownWordsRepository: KnownWordsRepository
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
-            quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog("sorted-limited:scheduleRows")),
-            settingsService.newQuizWordLimit$.pipe(pipeLog("sorted-limited:newQuizWordLimit")),
-            timeService.quizNow$.pipe(pipeLog("sorted-limited:quizNow")),
+            quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog('sorted-limited:scheduleRows')),
+            settingsService.newQuizWordLimit$.pipe(pipeLog('sorted-limited:newQuizWordLimit')),
+            timeService.quizNow$.pipe(pipeLog('sorted-limited:quizNow')),
+            knownWordsRepository.indexOfOrderedRecords$,
         ]).pipe(
             debounceTime(0),
-            map(([sortedScheduleRows, newQuizWordLimit, now]: [SpacedScheduleRow[], number, Date]) => {
+            map(([sortedScheduleRows, newQuizWordLimit, now, knownWordsIndex]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(
-                    (row) => row.d.count.value > 0,
+                    (row) => {
+                        const knownWordsRecords = knownWordsIndex[row.d.word]
+                        const isKnown = knownWordsRecords && knownWordsRecords[knownWordsRecords.length - 1]?.is_known;
+                        return row.d.count.value > 0 && !isKnown
+                    },
                 )
                 const scheduleRowsToReview = sortedScheduleRows.filter((r) => {
                     return r.isToReview({ now })
@@ -126,11 +134,11 @@ export class SortedLimitScheduleRowsService {
                     (scheduleRow) => scheduleRow.unStartedToday(),
                 )
                 const scheduleRowsLearnedToday = sortedScheduleRows.filter(r => r.wasLearnedToday())
-                const unStartedSiblingLearningRecords = uniq(getSiblingRecords(learningScheduleRows, unStartedScheduleRows));
+                const unStartedSiblingLearningRecords = uniq(getSiblingRecords(learningScheduleRows, unStartedScheduleRows))
                 const unStartedSiblingsWhichShouldBe = uniq([
                     ...unStartedSiblingLearningRecords,
                     ...getSiblingRecords(scheduleRowsLearnedOrReviewedToday, unStartedScheduleRows),
-                ]);
+                ])
 
                 const unStartedWords = Object.values(groupBy(unStartedScheduleRows.filter(r => !unStartedSiblingsWhichShouldBe.includes(r)), r => r.d.word))
                 const learningWords = Object.keys(groupBy([...learningScheduleRows, ...unStartedSiblingLearningRecords], r => r.d.word))
@@ -177,7 +185,7 @@ export class SortedLimitScheduleRowsService {
                             overDueRows,
                             scheduleRowsLeftForToday,
                             notOverDueRows,
-                        }
+                        },
                     },
                 }
             }),
