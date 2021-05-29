@@ -4,6 +4,9 @@ import { switchMap, withLatestFrom } from 'rxjs/operators'
 import { Hotkeys } from './hotkeys.interface'
 
 export class HotKeyEvents {
+    public get markWordAsKnown$() {
+        return this.subjects.MARK_WORD_AS_KNOWN
+    }
     public get openImageSearch$() {
         return this.subjects.OPEN_IMAGE_SEARCH
     }
@@ -69,6 +72,7 @@ export class HotKeyEvents {
             REQUEST_EDIT_WORD: ['e'],
             HIDE_VIDEO: ['v'],
             PRONUNCIATION_RECORD_SUCCESS: ['p'],
+            MARK_WORD_AS_KNOWN: ['k']
         }
     }
 }

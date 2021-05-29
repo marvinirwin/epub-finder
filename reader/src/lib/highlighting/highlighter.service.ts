@@ -1,10 +1,10 @@
 import {
     ElementHighlightMap,
-    HighlightDeltaPriorityList,
     HighlightDelta,
-    TimedHighlightDelta,
-    TargetHighlightPriorityList,
+    HighlightDeltaPriorityList,
     HighlightTarget,
+    TargetHighlightPriorityList,
+    TimedHighlightDelta,
 } from './highlight.interface'
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { LtElement } from './Highlighter'
@@ -14,7 +14,6 @@ import { AtomMetadata } from '../../../../server/src/shared/atom-metadata.interf
 import { map, shareReplay } from 'rxjs/operators'
 import debug from 'debug'
 import { safePushMap } from '@shared/'
-const d = debug('highlight:highlighter')
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string]
@@ -71,8 +70,8 @@ export class HighlighterService {
             this.highlightTargetMap$,
         ]).subscribe(
             ([newHighlightDelta, currentHighlightMap, targetElementMap]) => {
-                d(highlightPath)
-                d(newHighlightDelta)
+                debug('highlighter:single-highlight:highlightPath')(highlightPath);
+                debug('highlighter:single-highlight:highlightDelta')(newHighlightDelta);
 
                 const highlightWordsToUpdate = new Set<string | HTMLElement>()
                 if (oldHighlightDelta) {
@@ -95,7 +94,7 @@ export class HighlighterService {
                         highlightWordsToUpdate,
                     )
                 }
-                d(highlightWordsToUpdate)
+                debug('highlight:highlighter')(highlightWordsToUpdate)
                 this.updateHighlightBackgroundColors(
                     highlightWordsToUpdate,
                     targetElementMap,

@@ -113,6 +113,17 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 </Button>
                 <IgnoreTutorialPopOver/>
             </HotkeyWrapper>
+            <HotkeyWrapper action={'MARK_WORD_AS_KNOWN'}>
+                <Button
+                    ref={ignoreRef}
+                    onClick={() => {
+                        m.hotkeyEvents.markWordAsKnown$.next()
+                    }}
+                >
+                    Ignore
+                </Button>
+                <IgnoreTutorialPopOver/>
+            </HotkeyWrapper>
         </Fragment>
     )
 }

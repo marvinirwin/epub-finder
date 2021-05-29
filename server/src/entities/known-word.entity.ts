@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
-export class IgnoredWord {
+export class KnownWord {
     @PrimaryGeneratedColumn('uuid')
     id: string
     @Column()
@@ -11,7 +11,7 @@ export class IgnoredWord {
     @CreateDateColumn({type: "timestamp with time zone"})
     created_at: Date;
     @Column({default: true})
-    is_ignored: boolean;
+    is_known: boolean;
     @Column()
     creator_id: number;
 }

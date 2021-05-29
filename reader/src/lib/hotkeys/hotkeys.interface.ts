@@ -13,4 +13,5 @@ export interface Hotkeys<T> {
     HIDE_VIDEO: T
 
     PRONUNCIATION_RECORD_SUCCESS: T
+    MARK_WORD_AS_KNOWN: T
 }
