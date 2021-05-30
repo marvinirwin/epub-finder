@@ -52,14 +52,14 @@ export const srmStateChangeRecords = <T extends SrmRecord>(srmRecords: T[]): Srm
         const previousRecordWasLearnedOrReviewingAndNewOneIsIncorrect =
             currentStateIsReviewingOrLearning &&
             currentRecord.grade < CORRECT_SUPERMEMO_GRADE;
-        const isFirstRecordTodayAndPreviousRecordWasLearning =
+        const latestStateChangeWasLearningAndOnADifferentDayFromThisRecognitionRow =
             latestStateChangeRecord?.type === SrmStates.learning &&
-            !isToday(latestStateChangeRecord.r.created_at);
+            !isSameDay(latestStateChangeRecord.r.created_at, currentRecord.created_at);
         if (isFirstRecord) {
             pushStateRecord(currentRecord, SrmStates.learning)
             continue
         }
-        if (isFirstRecordTodayAndPreviousRecordWasLearning) {
+        if (latestStateChangeWasLearningAndOnADifferentDayFromThisRecognitionRow) {
             pushStateRecord(currentRecord, SrmStates.learning);
         }
         if (wasLearningAndIsThirdCorrectInARowToday) {
