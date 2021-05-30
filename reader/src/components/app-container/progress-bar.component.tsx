@@ -13,13 +13,13 @@ export const ProgressBar = () => {
                 {readingProgress.label}
             </Typography>
             <WrapInContext onClick={clickedWord => m.wordCardModalService.word$.next(clickedWord)}
-                           items={readingProgress.knownSubSequences.map(({ word }) => word)}>
-                {readingProgress.knownCount}
+                           items={readingProgress.uniqueKnown}>
+                {readingProgress.uniqueKnownCount}
             </WrapInContext>
             /
             <WrapInContext onClick={clickedWord => m.wordCardModalService.word$.next(clickedWord)}
-                           items={readingProgress.unknownSubSequences.map(({ word }) => word)}>
-                {readingProgress.knownCount + readingProgress.unknownCount}
+                           items={readingProgress.uniqueUnknown}>
+                {readingProgress.uniqueKnownCount + readingProgress.uniqueUnknownCount}
             </WrapInContext>
         </Fragment>
         }

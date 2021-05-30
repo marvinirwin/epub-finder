@@ -17,6 +17,10 @@ export interface ReadingProgress {
     unknownSubSequences: KnowablePositionedWord[];
     knownCount: number;
     unknownCount: number;
+    uniqueKnownCount: number
+    uniqueUnknownCount: number
+    uniqueKnown: string[]
+    uniqueUnknown: string[]
 }
 
 export const wordCountForSubsequence = (text: string, strategy: WordIdentifyingStrategy): number => {

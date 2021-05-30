@@ -68,7 +68,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
                         )
                     }))
                     // This is a hack side effect
-                    this.indexOfOrderedRecords$.next(recordIndex)
+                    this.indexOfOrderedRecords$.next({...recordIndex})
                     this.latestRecords$.next(newLatestRecords)
                 }),
             ).subscribe();

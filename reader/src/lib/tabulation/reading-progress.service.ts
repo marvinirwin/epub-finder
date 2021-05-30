@@ -14,7 +14,7 @@ import {
     KnowablePositionedWord, ReadingProgress,
     wordCountForSubsequence,
 } from '../../../../server/src/shared/Annotation/IPositionedWord'
-import { sumBy } from 'lodash'
+import { sumBy, uniq } from 'lodash'
 
 export class ReadingProgressService {
     readingProgressRecords$: Observable<ReadingProgress[]>
@@ -68,6 +68,8 @@ export class ReadingProgressService {
                             );
                         const knownSubSequences = knowableSubSequences.filter(r => r.known)
                         const unknownSubSequences = knowableSubSequences.filter(r => !r.known)
+                        const uniqueKnown = uniq(knownSubSequences.map(w => w.word));
+                        const uniqueUnknown = uniq(unknownSubSequences.map(w => w.word));
                         return {
                             label,
                             knownSubSequences,
@@ -75,6 +77,10 @@ export class ReadingProgressService {
                             subSequences: knowableSubSequences,
                             knownCount: sumBy(knownSubSequences, v => v.wordCount),
                             unknownCount: sumBy(unknownSubSequences, v => v.wordCount),
+                            uniqueKnownCount: uniqueKnown.length,
+                            uniqueUnknownCount: uniqueUnknown.length,
+                            uniqueKnown,
+                            uniqueUnknown,
                         };
                     },
                 )
