@@ -18,6 +18,14 @@ export const useIsMarkedAsKnown = (word: string) => {
         return records[records.length - 1]?.is_known;
     }
 }
+export const useIsIgnored = (word: string) => {
+    const m = useContext(ManagerContext);
+    const knownWordsIndex = useObservableState(m.ignoredWordsRepository.indexOfOrderedRecords$) || {};
+    const records = knownWordsIndex[word];
+    if (records) {
+        return records[records.length - 1]?.is_ignored;
+    }
+}
 
 export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                                                                                wordCard,
@@ -32,6 +40,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
     const translation = useLoadingObservableString(wordCard.translation$, '')
     const description = useObservableState(wordCard.description$.value$);
     const isMarkedAsKnown = useIsMarkedAsKnown(word || '');
+    const isIgnored = useIsIgnored(word || '');
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     return (
         <Paper
@@ -66,6 +75,18 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                         }
                     }}>
                         Is marked as known: {isMarkedAsKnown ? 'true' : 'false'}
+                    </Button>
+                    <Button onClick={() => {
+                        if (word && language_code) {
+                            m.ignoredWordsRepository.addRecords$.next([{
+                                language_code,
+                                is_ignored: !isIgnored,
+                                word,
+                                created_at: new Date()
+                            }])
+                        }
+                    }}>
+                        Is ignored: {isIgnored ? 'true' : 'false'}
                     </Button>
                 </div>
                 <br />

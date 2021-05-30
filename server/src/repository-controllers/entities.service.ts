@@ -36,7 +36,7 @@ export class EntitiesService {
         public cardView: Repository<CardView>,
         @InjectRepository(IgnoredWordView)
         public ignoredWordView: Repository<IgnoredWordView>,
-        @InjectRepository(KnownWordView)
+        @InjectRepository(KnownWord)
         public knownWord: Repository<KnownWord>,
         @InjectRepository(KnownWordView)
         public knownWordView: Repository<KnownWordView>,
@@ -48,7 +48,6 @@ export class EntitiesService {
             ignoredWords: { view: ignoredWordView, write: ignoredWords },
             knownWords: { view: knownWordView, write: knownWord },
             customWords,
-
         }
     }
 }

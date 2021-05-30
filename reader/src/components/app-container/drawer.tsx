@@ -14,6 +14,7 @@ import { AppBar, Divider, Input, List, TextField, Toolbar } from '@material-ui/c
 import { theme } from '../../theme'
 import { Menu, Search } from '@material-ui/icons'
 import { WordSearch } from './word-search.component'
+import { ProgressBar } from './progress-bar.component'
 
 const drawerWidth = 240
 
@@ -120,10 +121,11 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     >
                         <Menu />
                     </IconButton>
-                    <WordSearch/>
                     <Typography variant='h6' noWrap>
                         Language Trainer
                     </Typography>
+                    <ProgressBar/>
+                    <WordSearch/>
                 </Toolbar>
             </AppBar>
             <Drawer

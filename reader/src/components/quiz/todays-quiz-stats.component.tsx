@@ -7,13 +7,16 @@ import { WrapInContext } from './wrap-in-menu'
 import { LimitedScheduleRows, SpacedScheduleRow } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { isToday } from 'date-fns'
 
-const WordCountInButton: React.FC<{ scheduleRows: SpacedScheduleRow[], className?: string }> = ({
-                                                                                             scheduleRows,
-                                                                                             className,
-                                                                                             children,
-                                                                                         }) => {
-    const m = useContext(ManagerContext)
-    return <WrapInContext items={scheduleRows.map(r => r.d.word)} onClick={v => m.wordCardModalService.word$.next(v)}>
+const WordCountInButton: React.FC<{ scheduleRows: SpacedScheduleRow[], className?: string }> = (
+    {
+        scheduleRows,
+        className,
+        children,
+    }) => {
+    const m = useContext(ManagerContext);
+    return <WrapInContext items={scheduleRows.map(r => r.d.word)}
+                          onClick={v => m.wordCardModalService.word$.next(v)}
+    >
         <Typography variant={'subtitle1'}>
             {children}{' '}
             <span className={className}> {scheduleRows.length} </span>
