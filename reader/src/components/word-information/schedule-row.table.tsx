@@ -26,7 +26,7 @@ export const ScheduleRowTable: React.FC<{
                     {scheduleRow.d.wordRecognitionRecords.map((row) => {
                         const correspondingEvent = getCorrespondingStateEvent(row)
                         return (
-                            <TableRow key={row.created_at.getTime()}>
+                            <TableRow key={`${row.created_at.getTime()}${row.flash_card_type}${row.word}`}>
                                 <TableCell component='th' scope='row'>
                                     {row.grade}
                                 </TableCell>

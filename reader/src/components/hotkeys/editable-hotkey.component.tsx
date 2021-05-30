@@ -24,7 +24,7 @@ export function EditableHotkeyComponent({
                         ...(await observableLastValue(
                             m.settingsService.hotkeys$,
                         )),
-                        [action]: e.target.value.split('+'),
+                        [action]: (e?.target?.value || '').split('+'),
                     })
                 }}
             />

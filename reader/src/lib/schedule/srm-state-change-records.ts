@@ -1,4 +1,4 @@
-import { isSameDay } from 'date-fns'
+import { isSameDay, isToday } from 'date-fns'
 import { CORRECT_SUPERMEMO_GRADE } from './schedule-row'
 
 export enum SrmStates {
@@ -43,7 +43,7 @@ export const srmStateChangeRecords = <T extends SrmRecord>(srmRecords: T[]): Srm
         previousRecord = currentRecord
         const wasLearningAndIsThirdCorrectInARowToday =
             correctRecordsToday.length === 3 &&
-            latestStateChangeRecord?.type === 'learning'
+            latestStateChangeRecord?.type === 'learning';
         const currentStateIsReviewingOrLearning = latestStateChangeRecord?.type === SrmStates.reviewed ||
             latestStateChangeRecord?.type === SrmStates.learned
         const previousRecordWasLearnedOrReviewingAndNewOneIsCorrect =
@@ -51,10 +51,16 @@ export const srmStateChangeRecords = <T extends SrmRecord>(srmRecords: T[]): Srm
             currentRecord.grade >= CORRECT_SUPERMEMO_GRADE
         const previousRecordWasLearnedOrReviewingAndNewOneIsIncorrect =
             currentStateIsReviewingOrLearning &&
-            currentRecord.grade < CORRECT_SUPERMEMO_GRADE
+            currentRecord.grade < CORRECT_SUPERMEMO_GRADE;
+        const isFirstRecordTodayAndPreviousRecordWasLearning =
+            latestStateChangeRecord?.type === SrmStates.learning &&
+            !isToday(latestStateChangeRecord.r.created_at);
         if (isFirstRecord) {
             pushStateRecord(currentRecord, SrmStates.learning)
             continue
+        }
+        if (isFirstRecordTodayAndPreviousRecordWasLearning) {
+            pushStateRecord(currentRecord, SrmStates.learning);
         }
         if (wasLearningAndIsThirdCorrectInARowToday) {
             pushStateRecord(currentRecord, SrmStates.learned)

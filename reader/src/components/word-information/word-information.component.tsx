@@ -65,7 +65,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                             }])
                         }
                     }}>
-                        Is marked as known: {isKnown ? 'true' : 'false'}
+                        Is marked as known: {isMarkedAsKnown ? 'true' : 'false'}
                     </Button>
                 </div>
                 <br />
