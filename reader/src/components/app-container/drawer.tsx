@@ -10,9 +10,10 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { TreeMenu } from '../tree-menu/tree-menu.component'
 import { AllItemsContainer } from './all-items-container.component'
-import { AppBar, Divider, Input, List, Toolbar } from '@material-ui/core'
+import { AppBar, Divider, Input, List, TextField, Toolbar } from '@material-ui/core'
 import { theme } from '../../theme'
 import { Menu, Search } from '@material-ui/icons'
+import { WordSearch } from './word-search.component'
 
 const drawerWidth = 240
 
@@ -98,7 +99,6 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
         m.settingsService.drawerClosed$.next(true)
     };
 
-    const [wordSearchInputValue, setWordSearchInputValue] = useState('');
 
     return (
         <div className={`app-container ${classes.root}`}>
@@ -120,24 +120,10 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     >
                         <Menu />
                     </IconButton>
+                    <WordSearch/>
                     <Typography variant='h6' noWrap>
                         Language Trainer
                     </Typography>
-                    <Input
-                        style={{marginLeft: '24px', marginRight: '24px'}}
-                        value={wordSearchInputValue}
-                        onKeyDown={k => {
-                            if (k.key === 'Enter') {
-                                m.wordCardModalService.word$.next(wordSearchInputValue)
-                            }
-                        }}
-                        onChange={v => {
-                            setWordSearchInputValue(v.target.value)
-                        }}
-                    />
-                    <IconButton onClick={() => m.wordCardModalService.word$.next(wordSearchInputValue)}>
-                        <Search/>
-                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Drawer
