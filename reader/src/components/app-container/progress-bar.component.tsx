@@ -12,14 +12,17 @@ export const ProgressBar = () => {
             <Typography variant='subtitle1'>
                 {readingProgress.label}
             </Typography>
+            &nbsp;
             <WrapInContext onClick={clickedWord => m.wordCardModalService.word$.next(clickedWord)}
                            items={readingProgress.uniqueKnown}>
-                {readingProgress.uniqueKnownCount}
+                <Typography style={{color: 'white'}} variant='subtitle2'>{readingProgress.uniqueKnownCount}</Typography>
             </WrapInContext>
+            &nbsp;
             /
+            &nbsp;
             <WrapInContext onClick={clickedWord => m.wordCardModalService.word$.next(clickedWord)}
                            items={readingProgress.uniqueUnknown}>
-                {readingProgress.uniqueKnownCount + readingProgress.uniqueUnknownCount}
+                <Typography style={{color: 'white'}} variant='subtitle2'>{readingProgress.uniqueKnownCount + readingProgress.uniqueUnknownCount}</Typography>
             </WrapInContext>
         </Fragment>
         }

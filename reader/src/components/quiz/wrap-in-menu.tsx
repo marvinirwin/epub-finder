@@ -15,7 +15,7 @@ export const WrapInContext: React.FC<{
     return <PopupState variant='popover' >
         {(popupState) => (
             <React.Fragment>
-                <Button variant='outlined'  {...bindTrigger(popupState)}>
+                <Button  {...bindTrigger(popupState)}>
                     {children}
                 </Button>
                 <Menu {...bindMenu(popupState)}>

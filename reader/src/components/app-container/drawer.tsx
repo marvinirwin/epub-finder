@@ -121,11 +121,8 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     >
                         <Menu />
                     </IconButton>
-                    <Typography variant='h6' noWrap>
-                        Language Trainer
-                    </Typography>
-                    <ProgressBar/>
                     <WordSearch/>
+                    <ProgressBar/>
                 </Toolbar>
             </AppBar>
             <Drawer

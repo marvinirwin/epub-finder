@@ -63,7 +63,7 @@ export const TodaysQuizStats = () => {
         <WordCountInButton
             scheduleRows={scheduleInfo.wordsLeftForToday}
             className={quizWordsLeftForTodayNumber}>
-            New Words Left for Today:
+            New Cards Left for Today:
         </WordCountInButton>
         <WordCountInButton
             scheduleRows={scheduleInfo.wordsLearning}
