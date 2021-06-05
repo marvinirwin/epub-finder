@@ -1,6 +1,7 @@
 import { GridList, GridListTile } from '@material-ui/core'
 import React from 'react'
 import { ImageObject } from '@server/'
+import Image from 'material-ui-image';
 
 export const ImageSearchResults = ({
     searchResults,
@@ -10,16 +11,18 @@ export const ImageSearchResults = ({
     onClick: (i: ImageObject) => void
 }) => {
     return (
-        <GridList cellHeight={160} cols={12} className={'image-search-results'}>
+        <GridList cellHeight={160} cols={6} className={'image-search-results'}>
             {searchResults.map((imageResult, index) => (
                 <GridListTile
-                    style={{ overflow: 'hidden' }}
+                    style={{ overflow: 'hidden'/*, width: '160x', height: '160px' */}}
                     key={imageResult.thumbnailUrl}
                     className={'image-search-result'}
                 >
-                    <img
+                    <Image
                         onClick={() => onClick(imageResult)}
-                        src={imageResult.thumbnailUrl}
+                        src={imageResult.thumbnailUrl as string}
+                        imageStyle={{width: '160px', height: '160px', objectFit: 'scale-down'}}
+                        style={{width: '160px', height: '160px'}}
                         alt={''}
                     />
                 </GridListTile>

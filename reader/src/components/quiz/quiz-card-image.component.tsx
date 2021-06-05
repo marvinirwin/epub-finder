@@ -7,6 +7,7 @@ import { observableLastValue } from '../../services/settings.service'
 import { Button, Typography } from '@material-ui/core'
 import { quizCardImage, selectQuizCardImageButton } from '@shared/'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
+import Image from 'material-ui-image';
 
 export function CardImage({ wordInfo }: { wordInfo: WordCard }) {
     const quizCardImageSource = useObservableState(wordInfo.image$.value$)
@@ -26,7 +27,7 @@ export function CardImage({ wordInfo }: { wordInfo: WordCard }) {
             }}
         >
             {quizCardImageSource ? (
-                <img className={quizCardImage} src={quizCardImageSource} />
+                <Image className={quizCardImage} src={quizCardImageSource}  aspectRatio={undefined}/>
             ) : (
                 <>
                     <Button
