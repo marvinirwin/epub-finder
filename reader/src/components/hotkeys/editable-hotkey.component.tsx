@@ -1,7 +1,6 @@
 import { Manager } from '../../lib/manager/Manager'
 import { TextField } from '@material-ui/core'
 import React from 'react'
-import { debounce } from 'lodash'
 import { observableLastValue } from '../../services/settings.service'
 
 export function EditableHotkeyComponent({

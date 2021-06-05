@@ -14,6 +14,7 @@ export class HotkeysService {
                 ...HotKeyEvents.defaultHotkeys(),
                 ...hotkeys,
             })),
+            shareReplay(1)
         )
         this.settingsService = settingsService
     }
