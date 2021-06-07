@@ -15,7 +15,7 @@ export const QuizCardLimitReached = () => {
     return (
         <div style={{display: 'flex', flexFlow: 'column nowrap'}}>
             <Typography className={cardLimitReached} variant="h3">
-                Word Limit {wordsDoneToday} / {limit} reached
+                Word Limit: {limit} reached
             </Typography>
             <SetQuizWordLimit />
         </div>

@@ -32,7 +32,9 @@ export function AppDirectory(m: Manager) {
         WatchPronunciationNode(m),
         LibraryNode(m),
         ReadingProgressNode(m),
+/*
         QuizScheduleNode(m),
+*/
         SettingsNode(m),
         TestingUtilsNode(m),
         {

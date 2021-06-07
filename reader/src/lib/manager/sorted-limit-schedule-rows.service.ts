@@ -1,4 +1,4 @@
-import { SettingsService } from '../../services/settings.service'
+import { observableLastValue, SettingsService } from '../../services/settings.service'
 import { combineLatest, Observable } from 'rxjs'
 import { debounceTime, distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { ScheduleRow, SortQuizData, SpacedSortQuizData } from '../schedule/schedule-row'
@@ -9,6 +9,8 @@ import { FlashCardType } from '../quiz/hidden-quiz-fields'
 import { isToday } from 'date-fns'
 import { pipeLog } from './pipe.log'
 import { KnownWordsRepository } from '../schedule/known-words.repository'
+import { tapCacheScheduleRowImages } from './image-cache'
+import CardsRepository from './cards.repository'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
 
@@ -100,11 +102,13 @@ export class SortedLimitScheduleRowsService {
                     quizCardScheduleRowsService,
                     timeService,
                     knownWordsRepository,
+        cardsRepository
                 }: {
         settingsService: SettingsService
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         timeService: TimeService
         knownWordsRepository: KnownWordsRepository
+        cardsRepository: CardsRepository
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog('sorted-limited:scheduleRows')),
@@ -190,8 +194,11 @@ export class SortedLimitScheduleRowsService {
                 }
             }),
             distinctUntilChanged((x, y) => x.limitedScheduleRows.map(scheduleRowKey).join('') === y.limitedScheduleRows.map(scheduleRowKey).join('')),
+            tapCacheScheduleRowImages(async sortedLimitedScheduleRowResult => {
+                const cardIndex = await observableLastValue(cardsRepository.cardIndex$);
+                return sortedLimitedScheduleRowResult.limitedScheduleRows.map(r => cardIndex[r.d.word]?.[0]?.photos?.[0])
+            }),
             shareReplay(1),
         )
-
     }
 }

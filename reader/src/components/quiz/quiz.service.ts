@@ -11,6 +11,7 @@ import { LanguageConfigsService } from '../../lib/language/language-configs.serv
 import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { SettingsService } from '../../services/settings.service'
 import {
+    LimitedScheduleRows,
     scheduleRowKey,
     SortedLimitScheduleRowsService,
     SpacedScheduleRow,
@@ -30,14 +31,26 @@ export const filterQuizRows = (
         .filter((r) => r.dueDate() < new Date())
         .filter((r) => sumWordCountRecords(r) > 0)
 
-const isRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
+export const isRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
     const us = lastNItems.map(keyFunction)
     const searchElement = keyFunction(nextItem)
     if (us.includes(searchElement)) {
         return true
     }
-    return false;
+    return false
 }
+
+export const getItemThatDidntRepeat = (
+    scheduleRows: LimitedScheduleRows,
+    previousRecords: WordRecognitionRow[],
+    i: number,
+    keyFunction: (r: { word: string, flash_card_type: FlashCardType }) => string) =>
+    scheduleRows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string, flash_card_type: FlashCardType }, string>(
+        previousRecords.slice(0, i),
+        limitedScheduleRow.d,
+        keyFunction,
+        ),
+    )
 
 export class QuizService {
     quizCard: QuizCard
@@ -77,20 +90,17 @@ export class QuizService {
                 ),
             ],
         ).pipe(
-            map(([rows, previousRecords]) => {
-                const firstRow = rows.limitedScheduleRows[0];
+            map(([scheduleRows, previousRecords]) => {
+                const firstRow = scheduleRows.limitedScheduleRows[0]
                 const resolveNoRepeat = () => {
                     for (let i = 5; i >= 1; i--) {
-                        const itemThatDidntRepeat = rows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string }, string>(
-                            previousRecords.slice(0, i),
-                            limitedScheduleRow.d,
-                            r => r.word,
-                            ),
-                        );
-                        if (itemThatDidntRepeat) return itemThatDidntRepeat;
+                        const wordThatDidntRepeat = getItemThatDidntRepeat(scheduleRows, previousRecords, i, r => r.word)
+                        const typeThatDidntRepeat = getItemThatDidntRepeat(scheduleRows, previousRecords, i, r => r.flash_card_type);
+                        // We want a different word, and a different flash_card_type
+                        if (wordThatDidntRepeat && (wordThatDidntRepeat === typeThatDidntRepeat)) return wordThatDidntRepeat
                     }
-                };
-                const itemPreventedRepeat = resolveNoRepeat();
+                }
+                const itemPreventedRepeat = resolveNoRepeat()
                 if (itemPreventedRepeat) {
                     return itemPreventedRepeat
                 }

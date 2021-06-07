@@ -1,4 +1,5 @@
 import { SuperMemoGrade } from 'supermemo'
+import { FlashCardType } from '../quiz/hidden-quiz-fields'
 
 export interface WordRecognitionRow {
     id: number | string;
@@ -11,7 +12,7 @@ export interface WordRecognitionRow {
     efactor: number
     grade: SuperMemoGrade
 
-    flash_card_type: string
+    flash_card_type: FlashCardType
 
     language_code: string
     creator_id: string | number;

@@ -11,7 +11,7 @@ export interface QuizResult {
     word: string
     grade: SuperMemoGrade;
     language_code: string;
-    flash_card_type: string;
+    flash_card_type: FlashCardType;
 }
 
 
@@ -42,7 +42,7 @@ export class QuizResultService {
                 wordRecognitionProgressRepository.addRecords$.next([record])
             })
     }
-    completeQuiz(word: string,language_code: string, recognitionScore: SuperMemoGrade, flash_card_type: FlashCardType) {
+    completeQuiz(word: string, language_code: string, recognitionScore: SuperMemoGrade, flash_card_type: FlashCardType) {
         this.quizResult$.next({
             grade: recognitionScore,
             word,

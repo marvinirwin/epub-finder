@@ -64,6 +64,10 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     const [ignoreRef, IgnoreTutorialPopOver] = useTutorialPopOver(
         'IgnoreButton',
         `If you don't want to review this word`,
+    );
+    const [markAsKnownRef, MarkAsKnownPopOver] = useTutorialPopOver(
+        'MarkAsKnownButton',
+        `If you know this word already and will never forget it`
     )
     useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
         if (word && language_code) {
@@ -126,15 +130,15 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
             </HotkeyWrapper>
             <HotkeyWrapper action={'MARK_WORD_AS_KNOWN'}>
                 <Button
+                    ref={markAsKnownRef}
                     className={MARK_AS_KNOWN}
-                    ref={ignoreRef}
                     onClick={() => {
                         m.hotkeyEvents.markWordAsKnown$.next()
                     }}
                 >
                     Mark as known
                 </Button>
-                <IgnoreTutorialPopOver />
+                <MarkAsKnownPopOver />
             </HotkeyWrapper>
         </Fragment>
     )
