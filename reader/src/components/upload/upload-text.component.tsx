@@ -7,7 +7,7 @@ import { useObservableState } from 'observable-hooks'
 export const UploadText = () => {
     const m = useContext(ManagerContext)
     const [text, setText] = useState<string>('')
-    const [title, setTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('')
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$)
     return (
         <Box m={2} style={{ display: 'flex', flexFlow: 'column nowrap' }}>
@@ -20,6 +20,23 @@ export const UploadText = () => {
                     variant={'filled'}
                     inputProps={{ id: uploadTextName }}
                 />
+                <Box style={{ display: 'inline-block' }}>
+                    <Button
+                        disabled={(!text.trim() || !title.trim())}
+                        onClick={() => {
+                            if (language_code && !!text.trim() && !!title.trim()) {
+                                m.uploadingDocumentsService.upload({
+                                    language_code,
+                                    file: new File([text], `${title}.txt`),
+                                })
+                            }
+                            setTitle('')
+                            setText('')
+                        }}
+                        id={uploadTextButton}
+                    >
+                        <Typography variant={'h4'}>Add </Typography>
+                    </Button></Box>
             </Box>
             <Box m={2} p={1} style={{ width: '100%' }}>
                 <TextField
@@ -34,26 +51,11 @@ export const UploadText = () => {
                     id={uploadTextArea}
                 />
             </Box>
+            {/*
             <Box m={2} p={1}>
                 {' '}
-                <Button
-                    color={'primary'}
-                    variant={'contained'}
-                    onClick={() => {
-                        if (language_code && !!text.trim()) {
-                            m.uploadingDocumentsService.upload({
-                                language_code,
-                                file: new File([text], `${title}.txt`),
-                            });
-                        }
-                        setTitle('')
-                        setText('')
-                    }}
-                    id={uploadTextButton}
-                >
-                    Use as Learning Material
-                </Button>
             </Box>{' '}
+*/}
         </Box>
     )
 }

@@ -9,7 +9,7 @@ import { UploadText } from '../upload/upload-text.component'
 
 export const AddNewOrSelectDifferentLearningMaterial = () => {
     return <Typography variant={'h4'}>
-        Out of learning material.  Select or add more text
+        Out of learning material.  Select existing text in the library, or add more
     </Typography>
 }
 export const LogInToSeeLearningMaterial = () => {
