@@ -5,7 +5,6 @@ import { QuizCard } from './word-card.interface'
 import { ManagerContext } from '../../App'
 import { PaperProps } from '@material-ui/core/Paper/Paper'
 import { QuizCardButtons } from './quiz-card-buttons.component'
-import { QuizCardLimitReached } from './empty-quiz-card.component'
 import { allScheduleRowsForWordToday } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { useScheduleInfo } from './todays-quiz-stats.component'
 import { NoScheduleRows } from './no-schedule-rows.component'
@@ -20,34 +19,38 @@ export const useActiveFlashCardTypes = () => {
 
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({ quizCard, ...props }) => {
     const m = useContext(ManagerContext)
+/*
     const scheduleInfo = useScheduleInfo()
+*/
+/*
     const cardLimit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
+*/
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
-    const allScheduleRows = useObservableState(m.quizCardScheduleRowsService.scheduleRows$) || [];
+/*
+    const allScheduleRows = useObservableState(m.quizCardScheduleRowsService.scheduleRows$) || []
+*/
+/*
     const wordsLearnedToday = Object.values(allScheduleRowsForWordToday({
         allScheduleRows,
         scheduleRows: scheduleInfo.wordsLearnedToday,
     }))
-    const cardLimitReached = wordsLearnedToday.length >= cardLimit &&
-        limitedScheduleRowData?.limitedScheduleRows?.length === 0;
-    const noScheduleRows = !limitedScheduleRowData
-        ?.limitedScheduleRows?.length && !cardLimitReached;
+*/
+    const noScheduleRows = !limitedScheduleRowData?.limitedScheduleRows?.length;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
+    const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0
+    const showNoScheduleRows = noScheduleRows || cardLimitReached
     return (
         <Paper className='quiz-card' {...props}>
             {
-                noScheduleRows && <NoScheduleRows />
+                showNoScheduleRows && <NoScheduleRows />
             }
             {
-                cardLimitReached && <QuizCardLimitReached />
-            }
-            {
-                (!cardLimitReached && !noScheduleRows) && (
+                !showNoScheduleRows && (
                     <Fragment>
                         {
                             answerIsRevealed ?
-                                <RevealedQuizCard quizCard={quizCard}/> :
-                                <UnRevealedQuizCardComponent quizCard={quizCard}/>
+                                <RevealedQuizCard quizCard={quizCard} /> :
+                                <UnRevealedQuizCardComponent quizCard={quizCard} />
                         }
                         <QuizCardButtons quizCard={quizCard} />
                     </Fragment>

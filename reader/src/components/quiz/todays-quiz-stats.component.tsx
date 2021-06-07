@@ -29,6 +29,7 @@ export const useScheduleInfo = (): LimitedScheduleRows => {
     return useObservableState(
         m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
     ) || {
+        scheduleRowsLeftForToday: [],
         wordsToReview: [],
         limitedScheduleRows: [],
         wordsLearnedToday: [],
