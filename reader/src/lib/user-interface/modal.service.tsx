@@ -11,7 +11,7 @@ import {
     AdjustTranslationAttemptSentenceWeight,
 } from '../../components/app-directory/adjust-date-weight.component'
 import { AdjustLengthWeight } from '../../components/app-directory/adjust-length-weight.component'
-import { LibraryTable } from '../../components/library/library-table.component'
+import { LibraryTable, LibraryTableAddText } from '../../components/library/library-table.component'
 import { SetQuizWordLimit } from '../../components/settings/set-new-quiz-word-limit.component'
 import { WordCardDisplay } from '../word-card/word-card.modal.component'
 import { HotkeyConfig } from '../../components/hotkeys/HotkeyConfig'
@@ -44,7 +44,7 @@ export class ModalService {
         this.languageSelect = new NavModal('spokenLanguage', () => (
             <Box m={2} p={1} style={{ height: '90vh', width: '90vw' }}><LanguageSelect /></Box>
         ))
-        this.library = new NavModal('documentSelect', () => <Box m={2} p={1}><LibraryTable /></Box>)
+        this.library = new NavModal('documentSelect', () => <Box m={2} p={1}><LibraryTable ><LibraryTableAddText/></LibraryTable></Box>)
         this.quizScheduleOverView = new NavModal('quizScheduleOverView', () => (
             <QuizScheduleOverView />
         ))

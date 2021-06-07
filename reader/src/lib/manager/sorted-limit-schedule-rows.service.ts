@@ -169,6 +169,7 @@ export class SortedLimitScheduleRowsService {
                  * Oh, I know why I'm getting duplicate records in limitedScheduleRows, because 问题 becomes a member of
                  * more than 1 of the 3 sets which form it.
                  */
+                debugger;
                 return {
                     wordsToReview: orderFunc(scheduleRowsToReview),
                     /**

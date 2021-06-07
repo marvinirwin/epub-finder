@@ -14,7 +14,21 @@ import { LibraryTableHead } from './library-table-head.component'
 import { LibraryDocumentRow } from '../../lib/manager/library-document-row'
 import { LibraryDocumentRowComponent } from './library-table-row.component'
 
-export const LibraryTable = () => {
+
+export const LibraryTableAddText = () => {
+    const m = useContext(ManagerContext);
+    return <Box m={2} p={1}>
+        <Button
+            variant={'contained'}
+            onClick={() => {
+                m.modalService.fileUpload.open$.next(true)
+            }}
+        >
+            Upload Learning Material
+        </Button>
+    </Box>
+}
+export const LibraryTable: React.FC = ({children}) => {
     const m = useContext(ManagerContext)
     const readingDocuments =
         useObservableState(m.documentRepository.collection$) || new Map()
@@ -23,16 +37,7 @@ export const LibraryTable = () => {
             component={Paper}
             style={{ width: '90vw', height: '90vh' }}
         >
-            <Box m={2} p={1}>
-                <Button
-                    variant={'contained'}
-                    onClick={() => {
-                        m.modalService.fileUpload.open$.next(true)
-                    }}
-                >
-                    Upload Learning Material
-                </Button>
-            </Box>
+            {children}
             <Table size="small">
                 <LibraryTableHead />
                 <TableBody>

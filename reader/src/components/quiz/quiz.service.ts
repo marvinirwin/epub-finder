@@ -44,13 +44,16 @@ export const getItemThatDidntRepeat = (
     scheduleRows: LimitedScheduleRows,
     previousRecords: WordRecognitionRow[],
     i: number,
-    keyFunction: (r: { word: string, flash_card_type: FlashCardType }) => string) =>
-    scheduleRows.limitedScheduleRows.find(limitedScheduleRow => !isRepeatRecord<{ word: string, flash_card_type: FlashCardType }, string>(
-        previousRecords.slice(0, i),
-        limitedScheduleRow.d,
-        keyFunction,
-        ),
+    keyFunction: (r: { word: string, flash_card_type: FlashCardType }) => string) => {
+    return scheduleRows.limitedScheduleRows.find(limitedScheduleRow => {
+            return !isRepeatRecord<{ word: string, flash_card_type: FlashCardType }, string>(
+                previousRecords.slice(0, i),
+                limitedScheduleRow.d,
+                keyFunction,
+            )
+        },
     )
+}
 
 export class QuizService {
     quizCard: QuizCard
@@ -95,9 +98,10 @@ export class QuizService {
                 const resolveNoRepeat = () => {
                     for (let i = 5; i >= 1; i--) {
                         const wordThatDidntRepeat = getItemThatDidntRepeat(scheduleRows, previousRecords, i, r => r.word)
-                        const typeThatDidntRepeat = getItemThatDidntRepeat(scheduleRows, previousRecords, i, r => r.flash_card_type);
                         // We want a different word, and a different flash_card_type
-                        if (wordThatDidntRepeat && (wordThatDidntRepeat === typeThatDidntRepeat)) return wordThatDidntRepeat
+                        if (wordThatDidntRepeat) {
+                            return wordThatDidntRepeat
+                        }
                     }
                 }
                 const itemPreventedRepeat = resolveNoRepeat()
