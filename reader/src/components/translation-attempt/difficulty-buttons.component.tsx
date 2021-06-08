@@ -11,25 +11,30 @@ import { Observable } from 'rxjs'
 import { SuperMemoGrade } from 'supermemo'
 import { QuizCard } from '../quiz/word-card.interface'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
+import debug from 'debug'
 
-export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[], quizCard: QuizCard }> = ({
-                                                                                                               previousScheduleItems,
-                                                                                                               quizCard,
-                                                                                                           }) => {
+const d = debug('difficulty-buttons')
+
+export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[], quizCard: QuizCard }> = (
+    {
+        previousScheduleItems,
+        quizCard,
+    },
+) => {
     const m = useContext(ManagerContext)
 
-    const hardDueDateDistance = formatDistance(quizCardNextDueDate({
-        previousItems: previousScheduleItems,
-        grade: 1,
-    }), Date.now())
-    const mediumDueDateDistance = formatDistance(quizCardNextDueDate({
-        previousItems: previousScheduleItems,
-        grade: 3,
-    }), Date.now())
-    const easyDueDateDistance = formatDistance(quizCardNextDueDate({
-        previousItems: previousScheduleItems,
-        grade: 5,
-    }), Date.now())
+    const getDUeDateDistance = (grade: SuperMemoGrade) => {
+        const date = quizCardNextDueDate({
+            previousItems: previousScheduleItems,
+            grade,
+        })
+        d(`${grade}.${date}`)
+        return formatDistance(date, Date.now())
+    }
+
+    const hardDueDateDistance = getDUeDateDistance(1)
+    const mediumDueDateDistance = getDUeDateDistance(3)
+    const easyDueDateDistance = getDUeDateDistance(5)
 
     const word = useObservableState(quizCard.word$)
     const latestLanguageCode = useObservableState(m.languageConfigsService.readingLanguageCode$)
@@ -64,10 +69,10 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     const [ignoreRef, IgnoreTutorialPopOver] = useTutorialPopOver(
         'IgnoreButton',
         `If you don't want to review this word`,
-    );
+    )
     const [markAsKnownRef, MarkAsKnownPopOver] = useTutorialPopOver(
         'MarkAsKnownButton',
-        `If you know this word already and will never forget it`
+        `If you know this word already and will never forget it`,
     )
     useSubscription(m.hotkeyEvents.quizResultIgnore$, () => {
         if (word && language_code) {
