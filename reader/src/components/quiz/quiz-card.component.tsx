@@ -35,11 +35,12 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
         scheduleRows: scheduleInfo.wordsLearnedToday,
     }))
 */
-    const noScheduleRows = !limitedScheduleRowData?.limitedScheduleRows?.length;
+    const noScheduleRows = limitedScheduleRowData?.limitedScheduleRows?.length === 0;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
-    const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0
+    const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0 &&
+        noScheduleRows;
     const showNoScheduleRows = noScheduleRows || cardLimitReached
-    return (
+return (
         <Paper className='quiz-card' {...props}>
             {
                 showNoScheduleRows && <NoScheduleRows />
