@@ -1,11 +1,12 @@
 import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
 import { QuizResultToRecognitionRows } from '../pipes/QuizResultToRecognitionRows'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
-import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
 import React from 'react'
 import { Subject } from 'rxjs'
 import { SuperMemoGrade } from 'supermemo'
 import { FlashCardType } from './hidden-quiz-fields'
+import debug from 'debug';
+const d = debug('quiz-result-service');
 
 export interface QuizResult {
     word: string
@@ -21,11 +22,9 @@ export class QuizResultService {
     constructor({
         wordRecognitionProgressRepository,
         scheduleRowsService,
-        generalToastMessageService,
     }: {
         scheduleRowsService: QuizCardScheduleRowsService
         wordRecognitionProgressRepository: WordRecognitionProgressRepository
-        generalToastMessageService: GeneralToastMessageService
     }) {
         this.quizResult$
             .pipe(
@@ -34,6 +33,7 @@ export class QuizResultService {
                 ),
             )
             .subscribe((record) => {
+                d(`${record.word}.${record.flash_card_type}.${record.grade}.${record.nextDueDate}`);
                 /*
             generalToastMessageService.addToastMessage$.next(() => <Typography variant={'h6'}>
                 {record.word} next due date {format(record.nextDueDate, "yyyy MMM-do HH:mm")}

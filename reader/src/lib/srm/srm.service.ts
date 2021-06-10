@@ -65,7 +65,7 @@ export const quizCardNextDueDate = ({grade, previousItems}:{grade: SuperMemoGrad
             (r) => r.grade >= 3,
         )
         switch (correctRecordsInARow.length) {
-            // TODO implement an anki-like "steps"
+            // TODO implement configurable anki-like "steps"
             case 0:
                 return add(Date.now(), { minutes: 5 })
             case 1:
