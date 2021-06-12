@@ -1,59 +1,26 @@
-import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { OpenExampleSentencesFactory } from '../../lib/document-frame/open-example-sentences-document.factory'
-import { debounceTime, distinctUntilChanged, map, mapTo, shareReplay } from 'rxjs/operators'
-import { QuizCard } from './word-card.interface'
-import { orderBy, uniq } from 'lodash'
+import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from 'rxjs'
+import {OpenExampleSentencesFactory} from '../../lib/document-frame/open-example-sentences-document.factory'
+import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay} from 'rxjs/operators'
+import {QuizCard} from './word-card.interface'
+import {orderBy, uniq} from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
-import { ExampleSegmentsService } from '../../lib/quiz/example-segments.service'
-import { EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService } from '../../lib/manager/open-documents.service'
-import { ScheduleRow, SortQuizData } from '../../lib/schedule/schedule-row'
-import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
-import { SettingsService } from '../../services/settings.service'
+import {ExampleSegmentsService} from '../../lib/quiz/example-segments.service'
+import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from '../../lib/manager/open-documents.service'
+import {LanguageConfigsService} from '../../lib/language/language-configs.service'
+import {FlashCardType} from '../../lib/quiz/hidden-quiz-fields'
+import {SettingsService} from '../../services/settings.service'
 import {
-    LimitedScheduleRows,
     scheduleRowKey,
     SortedLimitScheduleRowsService,
     SpacedScheduleRow,
 } from '../../lib/manager/sorted-limit-schedule-rows.service'
-import { wordCardFactory } from './card-card.factory'
-import { TabulationConfigurationService } from '../../lib/language/language-maps/tabulation-configuration.service'
-import { sumWordCountRecords } from '../../lib/schedule/schedule-math.service'
-import { TranslationAttemptScheduleService } from '../../lib/schedule/translation-attempt-schedule.service'
-import { OnSelectService } from '../../lib/user-interface/on-select.service'
-import { WordRecognitionProgressRepository } from '../../lib/schedule/word-recognition-progress.repository'
-import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
-
-export const filterQuizRows = (
-    rows: ScheduleRow<SortQuizData>[],
-) =>
-    rows
-        .filter((r) => r.dueDate() < new Date())
-        .filter((r) => sumWordCountRecords(r) > 0)
-
-export const isRepeatRecord = <T, U>(lastNItems: T[], nextItem: T, keyFunction: (v: T) => U) => {
-    const us = lastNItems.map(keyFunction)
-    const searchElement = keyFunction(nextItem)
-    if (us.includes(searchElement)) {
-        return true
-    }
-    return false
-}
-
-export const getItemThatDidntRepeat = (
-    scheduleRows: LimitedScheduleRows,
-    previousRecords: WordRecognitionRow[],
-    i: number,
-    keyFunction: (r: { word: string, flash_card_type: FlashCardType }) => string) => {
-    return scheduleRows.limitedScheduleRows.find(limitedScheduleRow => {
-            return !isRepeatRecord<{ word: string, flash_card_type: FlashCardType }, string>(
-                previousRecords.slice(0, i),
-                limitedScheduleRow.d,
-                keyFunction,
-            )
-        },
-    )
-}
+import {wordCardFactory} from './card-card.factory'
+import {TabulationConfigurationService} from '../../lib/language/language-maps/tabulation-configuration.service'
+import {TranslationAttemptScheduleService} from '../../lib/schedule/translation-attempt-schedule.service'
+import {OnSelectService} from '../../lib/user-interface/on-select.service'
+import {WordRecognitionProgressRepository} from '../../lib/schedule/word-recognition-progress.repository'
+import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
+import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
 
 export class QuizService {
     quizCard: QuizCard
@@ -97,10 +64,11 @@ export class QuizService {
                 const firstRow = scheduleRows.limitedScheduleRows[0]
                 const resolveNoRepeat = () => {
                     for (let i = 5; i >= 1; i--) {
-                        const wordThatDidntRepeat = getItemThatDidntRepeat(scheduleRows, previousRecords, i, r => r.word)
+                        const wordThatDidntRepeat = getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word)
+                        // const typeThatDidntRepeat = getItemsThatDontRepeat(wordThatDidntRepeat, previousRecords, 3, r => r.flash_card_type)
                         // We want a different word, and a different flash_card_type
-                        if (wordThatDidntRepeat) {
-                            return wordThatDidntRepeat
+                        if (wordThatDidntRepeat?.length) {
+                            return wordThatDidntRepeat[0]
                         }
                     }
                 }

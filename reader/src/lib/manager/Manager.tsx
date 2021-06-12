@@ -318,7 +318,6 @@ export class Manager {
         this.quizResultService = new QuizResultService({
             wordRecognitionProgressRepository: this.wordRecognitionProgressRepository,
             scheduleRowsService: this.quizCardScheduleRowsService,
-            generalToastMessageService: this.generalToastMessageService,
         })
 
         this.observableService.videoMetadata$.subscribe((metadata) => {

@@ -100,7 +100,6 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
         m.settingsService.drawerClosed$.next(true)
     };
 
-
     return (
         <div className={`app-container ${classes.root}`}>
             <AppBar
