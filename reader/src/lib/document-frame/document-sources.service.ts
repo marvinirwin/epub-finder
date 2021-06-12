@@ -22,6 +22,7 @@ export class DocumentSourcesService {
                 unAtomizedDocument$.pipe(
                     AtomizedStringsForRawHTML,
                     map(AtomizedDocument.fromAtomizedString),
+                    shareReplay(1)
                 ),
             )
         }
@@ -30,6 +31,7 @@ export class DocumentSourcesService {
                 url$.pipe(
                     AtomizedStringsForURL,
                     map(AtomizedDocument.fromAtomizedString),
+                    shareReplay(1)
                 ),
             )
         }

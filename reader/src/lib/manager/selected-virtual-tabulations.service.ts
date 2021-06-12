@@ -1,9 +1,10 @@
 import { OpenDocumentsService } from './open-documents.service'
 import { SettingsService } from '../../services/settings.service'
-import { map, shareReplay } from 'rxjs/operators'
+import {map, shareReplay, switchMap} from 'rxjs/operators'
 import { combineLatest, Observable } from 'rxjs'
 import { SerializedDocumentTabulation } from '@shared/'
 import { pipeLog } from './pipe.log'
+import {OpenDocument} from "../document-frame/open-document.entity";
 
 export class SelectedVirtualTabulationsService {
     selectedFrequencyVirtualTabulations$: Observable<SerializedDocumentTabulation[]>
@@ -16,30 +17,36 @@ export class SelectedVirtualTabulationsService {
         openDocumentsService: OpenDocumentsService
         settingsService: SettingsService
     }) {
-        const selectedPipe = <T, U>(idFunc: (v: T) => U) => (o$: Observable<[ T[], U[] ]>): Observable<T[]> => o$.pipe(
-            map(([virtualDocumentTabulation, selectedFrequencyDocuments]) => {
-                const set = new Set(selectedFrequencyDocuments)
-                return virtualDocumentTabulation.filter(
+        const selectedPipe = <itemWithIdType, idType>(idFunc: (v: itemWithIdType) => idType) => (o$: Observable<[ itemWithIdType[], idType[] ]>): Observable<itemWithIdType[]> => o$.pipe(
+            map(([itemsWithIds, selectedIds]) => {
+                const set = new Set(selectedIds)
+                return itemsWithIds.filter(
                     (tabulation) => set.has(idFunc(tabulation)),
                 )
             }),
         )
+
+        function openDocumentList() {
+            return openDocumentsService.sourceDocuments$
+                .pipe(map(sourceDocumentMap => Array.from(sourceDocumentMap.values())));
+        }
+
         this.selectedFrequencyVirtualTabulations$ = combineLatest([
-            openDocumentsService.virtualDocumentTabulation$
-                .pipe(map(tabulationAggregate => tabulationAggregate.serializedTabulations))
+            openDocumentList()
                 .pipe(pipeLog("selected-virtual-tabulations:selected-frequency-virtualTabulations")),
             settingsService.selectedFrequencyDocuments$,
         ]).pipe(
-            selectedPipe<SerializedDocumentTabulation, string>(t => t.id),
+            selectedPipe<OpenDocument, string>(t => t.id),
+            switchMap(openDocuments => combineLatest(openDocuments.map(openDocument => openDocument.virtualTabulation$))),
             shareReplay(1),
         );
         this.selectedExampleVirtualTabulations$ = combineLatest([
-            openDocumentsService.virtualDocumentTabulation$
-                .pipe(map(tabulationAggregate => tabulationAggregate.serializedTabulations))
+            openDocumentList()
                 .pipe(pipeLog("selected-virtual-tabulations:example-virtual-tabulations")),
             settingsService.selectedExampleSegmentDocuments$,
         ]).pipe(
-            selectedPipe<SerializedDocumentTabulation, string>(t => t.id),
+            selectedPipe<OpenDocument, string>(t => t.id),
+            switchMap(openDocuments => combineLatest(openDocuments.map(openDocument => openDocument.virtualTabulation$))),
             shareReplay(1),
         )
     }
