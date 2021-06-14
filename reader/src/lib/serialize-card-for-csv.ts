@@ -50,6 +50,8 @@ export const SerializeCardForCsv = async (
         await zip.file(audioFilename, wavAudio.blob)
     }
     const ext = photoSplitByPeriod ? photoSplitByPeriod[photoSplitByPeriod.length - 1] : '';
+    // I can get the extension from the response headers
+    // But then I can't use toDataUrl
     const photoAnkiPath = `${c.learning_language}.${ext}`
     if (photoSplitByPeriod) {
         // Put ${learningLanguage}.${photoExt} into the zip file

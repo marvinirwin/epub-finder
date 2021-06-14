@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react'
-import { Box, createStyles, IconButton, Paper, TextField, Theme } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { useObservableState } from 'observable-hooks'
-import { ImageResult } from './image-search-result.interface'
-import { ImageSearchResults } from './image-search-results.component'
-import { ManagerContext } from '../../App'
-import SearchIcon from '@material-ui/icons/Search'
+import React, {useContext, useState} from 'react'
+import {Box, createStyles, IconButton, Paper, TextField, Theme} from '@material-ui/core'
+import {makeStyles} from '@material-ui/core/styles'
+import {useObservableState} from 'observable-hooks'
+import {ImageResult} from './image-search-result.interface'
+import {ImageSearchResults} from './image-search-results.component'
+import {ManagerContext} from '../../App'
 import CloseIcon from '@material-ui/icons/Close'
-import { observableLastValue } from '../../services/settings.service'
+import {observableLastValue} from '../../services/settings.service'
+import {useTutorialPopOver} from "../tutorial-popover/tutorial-popper.component";
 
 export interface ImageSearchResponse {
     images: ImageResult[]
@@ -51,33 +51,40 @@ export function ImageSearchComponent() {
     const imageRequest = useObservableState(m.imageSearchService.queryImageRequest$)
     const [searchTerm, setSearchTerm] = useState(imageRequest)
     const loading = useObservableState(m.imageSearchService.results$.isLoading$)
-    const sources = useObservableState(m.imageSearchService.results$.obs$) || []
+    const sources = useObservableState(m.imageSearchService.results$.obs$) || [];
+    const [removePictureRef, RemovePicture] = useTutorialPopOver(
+        'clearImage',
+        `Choose no image for this word`,
+    )
     return (
-        <Paper id='image-search-dialog' style={{ height: '90vh', width: '90vw' }}>
+        <Paper id='image-search-dialog' style={{height: '90vh', width: '90vw'}}>
             <Box m={2} p={1}>
-                <IconButton
-                    edge='start'
-                    color='inherit'
-                    onClick={async () => {
-                        const cb = await observableLastValue(m.imageSearchService.queryImageCallback$)
-                        if (cb) {
-                            // TODO should I use getDataUrl here?
-                            cb('')
-                        }
-                        m.modalService.imageSearch.open$.next(false);
-                    }}
-                    aria-label='close'
-                >
-                    <CloseIcon />
-                </IconButton>
-                <div style={{ display: 'flex' }}><TextField
-                    placeholder='Search…'
-                    value={searchTerm}
-                    onChange={(e) => {
-                        m.imageSearchService.queryImageRequest$.next(e.target.value);
-                        setSearchTerm(e.target.value)
-                    }}
-                />
+                <div style={{display: 'flex'}}>
+                        <IconButton
+                            ref={removePictureRef}
+                            edge='start'
+                            color='inherit'
+                            onClick={async () => {
+                                const cb = await observableLastValue(m.imageSearchService.queryImageCallback$)
+                                if (cb) {
+                                    // TODO should I use getDataUrl here?
+                                    cb('')
+                                }
+                                m.modalService.imageSearch.open$.next(false);
+                            }}
+                            aria-label='close'
+                        >
+                            <CloseIcon/>
+                            <RemovePicture/>
+                        </IconButton>
+                    <TextField
+                        placeholder='Search…'
+                        value={searchTerm}
+                        onChange={(e) => {
+                            m.imageSearchService.queryImageRequest$.next(e.target.value);
+                            setSearchTerm(e.target.value)
+                        }}
+                    />
                 </div>
                 <div className={`image-search-container ${classes.root}`}>
                     {loading ? (
