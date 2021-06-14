@@ -13,10 +13,10 @@ export const ReadingProgress = () => {
         <Box m={2} p={1}>
             {learnedToday.length > 0 ?
                 <Fragment>
-                    <Typography variant={'subtitle2'}>Words Learned Today</Typography>
+                    <Typography variant={'h6'}>Words Learned Today</Typography>
                     <WordGrid words={uniq(learnedToday.map(r => r.d.word))}/>
                 </Fragment> :
-                <Typography variant={'subtitle2'}>No words learned today</Typography>
+                <Typography variant={'h6'}>No words learned today</Typography>
             }
         </Box>
         {
@@ -28,13 +28,13 @@ export const ReadingProgress = () => {
                                       knownCount,
                                       unknownCount,
                                   }) => <Paper key={label}>
-                <Box m={2} p={1}><Typography variant={'subtitle2'}>{label}</Typography></Box>
+                <Box m={2} p={1}><Typography variant={'h4'}>{label}</Typography></Box>
                 <Box m={2} p={1}>
-                    <Typography variant={'subtitle2'}>Known</Typography>
+                    <Typography variant={'h6'}>Known</Typography>
                     <WordGrid words={uniq(knownSubSequences.map(r => r.word))}/>
                 </Box>
                 <Box m={2} p={1}>
-                    <Typography variant={'subtitle2'}>New Words</Typography>
+                    <Typography variant={'h6'}>New Words</Typography>
                     <WordGrid words={uniq(unknownSubSequences.map(r => r.word))}/>
                 </Box>
             </Paper>)

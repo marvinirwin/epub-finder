@@ -70,8 +70,10 @@ export const quizCardNextDueDate = ({grade, previousItems}:{grade: SuperMemoGrad
                 return add(Date.now(), { minutes: 5 })
             case 1:
                 return add(Date.now(), { minutes: 10 })
+/*
             case 2:
                 return add(Date.now(), { minutes: 15 })
+*/
             default:
                 return add(Date.now(), {
                     days: nextRecognitionRecord.interval,
