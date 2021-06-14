@@ -11,7 +11,6 @@ const ctx: Worker = self as any
 
 ctx.onmessage = async (ev) => {
     try {
-        debugger;
         const url = ev.data as string
         const response = await fetch(url)
         const srcdoc = new TextDecoder().decode(await response.arrayBuffer())

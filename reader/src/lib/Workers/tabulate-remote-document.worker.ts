@@ -31,12 +31,14 @@ ctx.onmessage = async (ev) => {
     )
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
     const doc = AtomizedDocument.atomizeDocument(documentSrc)
+    const segments = doc.segments();
+    debugger;
     const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),
         notableCharacterSequences: new SetWithUniqueLengths(
             notableSubsequences,
         ),
-        segments: doc.segments(),
+        segments,
         ...resolvePartialTabulationConfig(language_code),
         language_code,
     })

@@ -19,10 +19,10 @@ import { QuizScheduleOverView } from '../quiz/quiz-schedule-over-view.component'
 import { Intro } from '../../components/intro/intro.component'
 import { UploadDialog } from '../../components/upload/upload-dialog'
 import { Box, Button } from '@material-ui/core'
-import { ReadingProgress } from '../../components/app-directory/nodes/reading-progress.node'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
 import { ImageSearchComponent } from '../../components/image-search/image-search.component'
+import {ReadingProgress} from "../../components/reading-progress.component";
 
 export class ModalService {
     public languageSelect: NavModal

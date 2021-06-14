@@ -233,6 +233,7 @@ function updateElementBackgroundColor(
         new Map(highestPriorityKeyValues).forEach((rgba) => rgbas.push(rgba))
     }
     const backgroundColor = mixRGBA(rgbas)
+    debugger;
     // @ts-ignore
     elementToHighlight.element.style.backgroundColor = backgroundColor
 }
