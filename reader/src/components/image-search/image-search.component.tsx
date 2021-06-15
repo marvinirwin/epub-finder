@@ -67,7 +67,6 @@ export function ImageSearchComponent() {
                             onClick={async () => {
                                 const cb = await observableLastValue(m.imageSearchService.queryImageCallback$)
                                 if (cb) {
-                                    // TODO should I use getDataUrl here?
                                     cb('')
                                 }
                                 m.modalService.imageSearch.open$.next(false);
@@ -77,6 +76,8 @@ export function ImageSearchComponent() {
                             <CloseIcon/>
                             <RemovePicture/>
                         </IconButton>
+                    &nbsp;
+                    &nbsp;
                     <TextField
                         placeholder='Search…'
                         value={searchTerm}
