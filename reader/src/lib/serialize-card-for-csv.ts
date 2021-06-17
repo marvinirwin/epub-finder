@@ -18,10 +18,10 @@ function resolveExtFromResponseHeaders(response: Response): string | undefined {
 
 const toDataURL = (url: string) => fetch(url)
     .then(response => ({blob: response.blob(), ext: resolveExtFromResponseHeaders(response)}))
-    .then(({blob, ext}) => new Promise<{ ext: string | undefined, dataUrl: string }>(async (resolve, reject) => {
+    .then(({blob, ext}) => new Promise<{ ext: string | undefined, dataUrl: string, blob: Promise<Blob> }>(async (resolve, reject) => {
         const reader = new FileReader()
         // TODO figure out if this will ever be an arrayBuffer
-        reader.onloadend = () => resolve({dataUrl: reader.result as string, ext})
+        reader.onloadend = () => resolve({dataUrl: reader.result as string, blob, ext})
         reader.onerror = reject
         reader.readAsDataURL(await blob);
     }))
@@ -44,9 +44,9 @@ async function resolveImagePath({
     }
     // I can get the extension from the response headers
     // But then I can't use toDataUrl
-    const {ext, dataUrl} = await toDataURL(photo);
+    const {ext, /*dataUrl,*/ blob} = await toDataURL(photo);
     const photoAnkiPath = `${learning_language}.${ext}`
-    await zip.file(photoAnkiPath, dataUrl);
+    await zip.file(photoAnkiPath, await blob);
     return `<img src=\\"${photoAnkiPath}\\"/>`
 }
 
@@ -77,7 +77,7 @@ export const SerializeCardForCsv = async (
         await zip.file(audioFilename, wavAudio.blob)
     }
     return {
-        photo: (await resolveImagePath(photo)),
+        photo: (await resolveImagePath({photo, zip, learning_language: c.learning_language})),
         // What extension does this file have?
         sound: wavAudio ? `<audio controls autoplay src=\\"${audioFilename}\\"/>` : '',
         description: `Definition: <b>${knownLanguage || (learningToKnowTranslationConfig ?

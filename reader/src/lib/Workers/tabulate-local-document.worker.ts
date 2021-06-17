@@ -31,7 +31,6 @@ ctx.onmessage = async (ev) => {
     }: TabulateLocalDocumentDto = ev.data
     const doc = AtomizedDocument.fromAtomizedString(src)
     const segments = doc.segments()
-    debugger;
     const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),
         notableCharacterSequences: new SetWithUniqueLengths(
