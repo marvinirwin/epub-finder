@@ -160,7 +160,7 @@ export class AtomizedDocument {
         const text = textNode.nodeValue
         const subSegmentTextList = text
             .split(segmentBoundaryRegexp)
-            .filter((t) => !!t.trim())
+            .filter((t) => !!t.trim());
         const newParent = this.document.createElement('span')
         for (let i = 0; i < subSegmentTextList.length; i++) {
             const subSegmentTextListElement = subSegmentTextList[i]
@@ -185,7 +185,10 @@ export class AtomizedDocument {
         newTagType: string,
     ) {
         const indexOfMe = getIndexOfEl(textNode)
-        textNode.parentNode.removeChild(textNode)
+        // If we remove ourselves and we're not already there, I think things go weird
+        if (Array.from(textNode.parentNode.childNodes).includes(textNode)) {
+            textNode.parentNode.removeChild(textNode);
+        }
         const newParent = this.document.createElement('span')
         newSubStrings.forEach((string, index) => {
             // I'll probably need to do labelling later so the data can be rehydrated
