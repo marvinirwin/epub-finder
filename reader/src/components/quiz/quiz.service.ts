@@ -61,14 +61,18 @@ export class QuizService {
             ],
         ).pipe(
             map(([scheduleRows, previousRecords]) => {
-                const firstRow = scheduleRows.limitedScheduleRows[0]
+                const firstRow = scheduleRows.limitedScheduleRows[0];
+                const previousCardType = previousRecords[0]?.flash_card_type;
                 const resolveNoRepeat = () => {
                     for (let i = 5; i >= 1; i--) {
-                        const wordThatDidntRepeat = getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word)
-                        // const typeThatDidntRepeat = getItemsThatDontRepeat(wordThatDidntRepeat, previousRecords, 3, r => r.flash_card_type)
-                        // We want a different word, and a different flash_card_type
-                        if (wordThatDidntRepeat?.length) {
-                            return wordThatDidntRepeat[0]
+                        const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
+                        const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
+                            itemsThatDontRepeat,
+                            itemsWithADifferentFlashCardTypeAsLastTime
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
                         }
                     }
                 }

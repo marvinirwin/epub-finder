@@ -32,8 +32,8 @@ export type LimitedScheduleRows = {
     },
 }
 
-export const groupByWord = <T, U extends string>(rows: T[], cb: (r: T) => U): Dictionary<T[]> => {
-    return groupBy(rows, cb)
+export const groupByWord = <listItemType, itemKeyType extends string>(rows: listItemType[], keyExtractionFunction: (r: listItemType) => itemKeyType): Dictionary<listItemType[]> => {
+    return groupBy(rows, keyExtractionFunction)
 }
 
 export const gatherWhile = <T, U>(values: T[], filterFunc: (value: T) => boolean, limitReachedFunc: (gathered: T, acc: U) => boolean, acc: U): T[] => {

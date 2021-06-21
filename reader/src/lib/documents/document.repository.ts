@@ -8,6 +8,7 @@ import { createLoadingObservable } from '../util/create-loading-observable'
 import { TESTING } from '../util/url-params'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { map, scan } from 'rxjs/operators'
+import {ModalService} from "../user-interface/modal.service";
 
 export class DocumentRepository {
     collection$: Observable<Map<string, LtDocument>>
@@ -19,7 +20,9 @@ export class DocumentRepository {
     constructor({
                     databaseService,
                     languageConfigsService,
+        modalService
                 }: {
+        modalService: ModalService
         databaseService: DatabaseService,
         languageConfigsService: LanguageConfigsService
     }) {
@@ -67,8 +70,13 @@ export class DocumentRepository {
                 return acc
             }, new Map()),
         )
-        // !! Bad
-        this.isFetching$ = isLoading$
+        this.isFetching$ = isLoading$;
+        this.collection$.subscribe(collection => {
+            const noDocuments = !collection.size;
+            if (noDocuments) {
+                modalService.intro.open$.next(true);
+            }
+        })
     }
 
     private static async uploadFile(

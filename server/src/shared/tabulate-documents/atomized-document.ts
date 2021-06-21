@@ -160,8 +160,10 @@ export class AtomizedDocument {
         const text = textNode.nodeValue
         const subSegmentTextList = text
             .split(segmentBoundaryRegexp)
-            .filter((t) => !!t.trim());
-        const newParent = this.document.createElement('span')
+            .filter((t) => !!t.trim())
+            .reverse();
+        const newParent = this.document.createElement('div');
+        newParent.setAttribute('style', 'display: block;')
         for (let i = 0; i < subSegmentTextList.length; i++) {
             const subSegmentTextListElement = subSegmentTextList[i]
             const elementWithMarksUnderIt = this.replaceTextNodeWithSubTextNode(

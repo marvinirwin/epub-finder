@@ -42,7 +42,7 @@ export const QuizCardScheduleRowDisplay = ({
                     {isDefinitionHidden ? '' : translation}
                 </Typography>
             </div>
-            <div style={{ marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ marginTop: '24px', marginBottom: '24px', display: 'flex' }}>
                 {isDescriptionHidden ? (
                     ''
                 ) : (
@@ -53,6 +53,7 @@ export const QuizCardScheduleRowDisplay = ({
                         rows={3}
                         variant="filled"
                         value={description}
+                        style={{width: '300px', height: '300px'}}
                         onChange={(e) =>
                             quizCard.description$.set(e.target.value)
                         }
