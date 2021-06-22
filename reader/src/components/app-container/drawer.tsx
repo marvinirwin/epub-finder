@@ -1,20 +1,21 @@
-import React, { useContext, useState } from 'react'
+import React, {useContext} from 'react'
 import clsx from 'clsx'
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
+import {createStyles, makeStyles, Theme} from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
-import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
-import { TreeMenu } from '../tree-menu/tree-menu.component'
-import { AllItemsContainer } from './all-items-container.component'
-import { AppBar, Divider, Input, List, TextField, Toolbar } from '@material-ui/core'
-import { theme } from '../../theme'
-import { Menu, Search } from '@material-ui/icons'
-import { WordSearch } from './word-search.component'
-import { ProgressBar } from './progress-bar.component'
+import {ManagerContext} from '../../App'
+import {useObservableState} from 'observable-hooks'
+import {TreeMenu} from '../tree-menu/tree-menu.component'
+import {AllItemsContainer} from './all-items-container.component'
+import {AppBar, Divider, List, Toolbar} from '@material-ui/core'
+import {theme} from '../../theme'
+import {Menu} from '@material-ui/icons'
+import {WordSearch} from './word-search.component'
+import {ProgressBar} from './progress-bar.component'
+import {TranslationSelectionButton} from "./translate-selection-button.component";
 
 const drawerWidth = 240
 
@@ -120,6 +121,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     >
                         <Menu />
                     </IconButton>
+                    <TranslationSelectionButton/>
                     <WordSearch/>
                     <ProgressBar/>
                 </Toolbar>

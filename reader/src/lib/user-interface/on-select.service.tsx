@@ -1,11 +1,11 @@
-import { ReplaySubject } from 'rxjs'
-import { BrowserInputsService } from '../hotkeys/browser-inputs-service'
-import { GeneralToastMessageService } from './general-toast-message.service'
-import { distinctUntilChanged,  withLatestFrom } from 'rxjs/operators'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { fetchTranslation } from '../../services/translate.service'
+import {ReplaySubject} from 'rxjs'
+import {BrowserInputsService} from '../hotkeys/browser-inputs-service'
+import {GeneralToastMessageService} from './general-toast-message.service'
+import {distinctUntilChanged, withLatestFrom} from 'rxjs/operators'
+import {LanguageConfigsService} from '../language/language-configs.service'
+import {fetchTranslation} from '../../services/translate.service'
 import React from 'react'
-import { Box, Typography } from '@material-ui/core'
+import {Box, Typography} from '@material-ui/core'
 
 export class OnSelectService {
     selectedText$ = new ReplaySubject<string | undefined>(1)
@@ -13,10 +13,10 @@ export class OnSelectService {
     private generalToastMessageService: GeneralToastMessageService
 
     constructor({
-        browserInputsService,
-        generalToastMessageService,
-        languageConfigsService,
-    }: {
+                    browserInputsService,
+                    generalToastMessageService,
+                    languageConfigsService,
+                }: {
         browserInputsService: BrowserInputsService
         generalToastMessageService: GeneralToastMessageService
         languageConfigsService: LanguageConfigsService
@@ -53,21 +53,22 @@ export class OnSelectService {
     }
 
     handleSelection(document: HTMLDocument) {
-        const checkForSelectedText = () => {
-            const activeEl = document.activeElement
-            if (activeEl) {
-                const selObj = document.getSelection()
-                if (selObj) {
-                    const text = selObj.toString()
-                    if (text) {
-                        this.selectedText$.next(text)
-                    }
-                    return
-                }
-            }
-        }
         this.browserInputsService
             .getKeyUpSubject('Shift')
-            .subscribe(checkForSelectedText)
+            .subscribe(() => this.checkForSelectedText(document))
+    }
+
+    checkForSelectedText(document: HTMLDocument) {
+        const activeEl = document.activeElement
+        if (activeEl) {
+            const selObj = document.getSelection()
+            if (selObj) {
+                const text = selObj.toString()
+                if (text) {
+                    this.selectedText$.next(text)
+                }
+                return
+            }
+        }
     }
 }
