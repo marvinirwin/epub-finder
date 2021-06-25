@@ -111,12 +111,13 @@ export class QuizService {
                             orderBy(
                                 exampleSegmentTexts,
                                 [
-                                    (segmentText) =>
-                                        [''].includes(
+                                    (segmentText) => {
+                                        return [''].includes(
                                             segmentText,
                                         )
                                             ? 1
-                                            : 0,
+                                            : 0;
+                                    },
                                     (v) => v.length,
                                 ],
                                 ['desc', 'asc'],

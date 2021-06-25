@@ -8,8 +8,9 @@ import { useObservableState } from 'observable-hooks'
 import { ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core'
 import { TutorialPopper } from '../../tutorial-popover/tutorial-popper.component'
 
+export const signInUrl = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`;
 export const goToSignIn = () => {
-    window.location.href = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`
+    window.location.href = signInUrl
 }
 
 export const IsNotLoggedInProfile = () => {

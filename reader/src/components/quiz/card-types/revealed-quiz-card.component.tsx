@@ -23,9 +23,7 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
             <div className={'quiz-card-data-sheet-middle'}>
                 <CardImage wordInfo={quizCard} />
                 <QuizCardSound quizCard={quizCard} />
-                {!isLearningLanguageHidden && (
-                    <CardLearningLanguageText word={word || ''} />
-                )}
+                <CardLearningLanguageText word={word || ''} />
             </div>
             <div>
                 {/*

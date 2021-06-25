@@ -7,7 +7,6 @@ import {
     quizCardRomanization,
     quizCardTranslation,
 } from '@shared/'
-import { useIsFieldHidden } from '../../components/quiz/useIsFieldHidden'
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
 import { useLoadingObservableString } from '../util/create-loading-observable'
 
@@ -19,33 +18,19 @@ export const QuizCardScheduleRowDisplay = ({
     const description = useObservableState(quizCard.description$.value$)
     const romanization = useLoadingObservableString(quizCard.romanization$, '')
     const translation = useLoadingObservableString(quizCard.translation$, '')
-    const isDescriptionHidden = useIsFieldHidden({
-        quizCard,
-        label: QuizCardField.Description,
-    })
-    const isRomanizationHidden = useIsFieldHidden({
-        quizCard,
-        label: QuizCardField.Romanization,
-    })
-    const isDefinitionHidden = useIsFieldHidden({
-        quizCard,
-        label: QuizCardField.KnownLanguageDefinition
-    })
     return (
         <div>
             <div style={{ marginTop: '24px' }}>
                 <Typography variant="h4" className={quizCardRomanization}>
-                    {isRomanizationHidden ? '' : romanization}
+                    {romanization}
                 </Typography>
                 <br />
                 <Typography variant="h4" className={quizCardTranslation}>
-                    {isDefinitionHidden ? '' : translation}
+                    {translation}
                 </Typography>
             </div>
             <div style={{ marginTop: '24px', marginBottom: '24px', display: 'flex' }}>
-                {isDescriptionHidden ? (
-                    ''
-                ) : (
+                {
                     <TextField
                         label="Description"
                         inputProps={{ className: quizCardDescription }}
@@ -58,7 +43,7 @@ export const QuizCardScheduleRowDisplay = ({
                             quizCard.description$.set(e.target.value)
                         }
                     />
-                )}
+                }
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react'
-import {Box, createStyles, IconButton, Paper, TextField, Theme} from '@material-ui/core'
+import {Box, createStyles, IconButton, Paper, TextField, Theme, LinearProgress} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles'
 import {useObservableState} from 'observable-hooks'
 import {ImageResult} from './image-search-result.interface'
@@ -88,9 +88,7 @@ export function ImageSearchComponent() {
                     />
                 </div>
                 <div className={`image-search-container ${classes.root}`}>
-                    {loading ? (
-                        `Loading ${loading}`
-                    ) : sources.length ? (
+                    {loading ? <LinearProgress/> : sources.length ? (
                         <ImageSearchResults
                             searchResults={sources}
                             onClick={async (result) => {

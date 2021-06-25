@@ -123,7 +123,7 @@ export class SortedLimitScheduleRowsService {
                     (row) => {
                         const knownWordsRecords = knownWordsIndex[row.d.word]
                         const isKnown = knownWordsRecords && knownWordsRecords[knownWordsRecords.length - 1]?.is_known;
-                        return row.d.count.value > 0 && !isKnown
+                        return (row.d.count.value > 0 || row.isToReview({now})) && !isKnown;
                     },
                 )
                 const scheduleRowsToReview = sortedScheduleRows.filter((r) => {
