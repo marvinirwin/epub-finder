@@ -81,7 +81,7 @@ export class AtomElementEventsService {
                         const atomMetadata = elementAtomMetadataIndex.metadataForElement(
                             element,
                         )
-                        const wordWithVideoData = atomMetadata.words.find(
+                        const wordWithVideoData = atomMetadata.words.subsequences.find(
                             (word) =>
                                 videoMetadataRepository.all$
                                     .getValue()

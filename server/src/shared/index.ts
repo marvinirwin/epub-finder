@@ -1,3 +1,5 @@
+import {IPositionedWord} from "./Annotation/IPositionedWord";
+
 export { InterpolateService } from './interpolate.service'
 export { LtDocument } from './lt-document'
 export * from './selectors'
@@ -9,3 +11,8 @@ export * from './tabulate-documents/tabulated-documents.interface'
 export * from './IImageRequest'
 export * from './safe-push'
 export { tabulate } from './tabulate-documents/segment/tabulate'
+
+export interface SegmentSubsequences {
+    segmentText: string;
+    subsequences: IPositionedWord[];
+}

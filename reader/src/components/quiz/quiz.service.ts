@@ -21,6 +21,8 @@ import {OnSelectService} from '../../lib/user-interface/on-select.service'
 import {WordRecognitionProgressRepository} from '../../lib/schedule/word-recognition-progress.repository'
 import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
 import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
+import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
+import {getGreedySubSequences} from "../../lib/schedule/learning-target/get-greedy-subsequences";
 
 export class QuizService {
     quizCard: QuizCard
@@ -104,24 +106,14 @@ export class QuizService {
                          currentWord,
                      ]) => {
                         if (!currentWord) return []
-                        const exampleSegmentTexts = Array.from(
-                            exampleSegmentMap.get(currentWord) || new Set<string>(),
-                        )
-                        return uniq(
-                            orderBy(
-                                exampleSegmentTexts,
-                                [
-                                    (segmentText) => {
-                                        return [''].includes(
-                                            segmentText,
-                                        )
-                                            ? 1
-                                            : 0;
-                                    },
-                                    (v) => v.length,
-                                ],
-                                ['desc', 'asc'],
-                            ),
+                        const subSequences = exampleSegmentMap.get(currentWord) || [];
+                        /**
+                         * HACK this is a terrible hack because the spaces aren't preserved when I join.
+                         * I really should make a join function which considers positions with space s
+                         */
+                        return uniqueBy(
+                            subSequences,
+                            subSequence => subSequence.segmentText,
                         ).slice(0, 10)
                     },
                 ),

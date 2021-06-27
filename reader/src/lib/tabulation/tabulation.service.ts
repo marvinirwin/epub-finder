@@ -1,40 +1,21 @@
-import { IndexedRowsRepository } from '../schedule/indexed-rows.repository'
-import { WordRecognitionRow } from '../schedule/word-recognition-row'
-import { PronunciationProgressRepository } from '../schedule/pronunciation-progress.repository'
-import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
-import { VideoMetadataRepository } from '../../services/video-metadata.repository'
+import {TemporaryHighlightService} from '../highlighting/temporary-highlight.service'
+import {VideoMetadataRepository} from '../../services/video-metadata.repository'
 import CardsRepository from '../manager/cards.repository'
-import { IgnoredWordsRepository } from '../schedule/ignored-words.repository'
-import { AllWordsRepository } from '../language/all-words.repository'
-import { TranslationAttemptService } from '../../components/translation-attempt/translation-attempt.service'
-import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
-import { TimeService } from '../time/time.service'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay, startWith } from 'rxjs/operators'
-import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
-import {
-    FlashCardLearningTarget, subSequenceRecordHasNothingAdjacent,
-    sumNotableSubSequences,
-} from '../schedule/learning-target/flash-card-learning-targets.service'
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
-import { safePushMap } from '@shared/'
-import { IPositionedWord } from '../../../../server/src/shared/Annotation/IPositionedWord'
-import { pipeLog } from '../manager/pipe.log'
-
-export const getNotableSubsequencesOfWords = (notableSubSequences: IPositionedWord[], syntheticWords: Set<string>, strategy: 'noSeparator' | 'spaceSeparator', vocabulary: Set<string>) => notableSubSequences
-    .filter((notableSubSequence, subSequenceIndex) => {
-        if (syntheticWords.has(notableSubSequence.word)) {
-            return false
-        }
-        switch (strategy) {
-            case 'noSeparator':
-                return vocabulary.has(notableSubSequence.word)
-            case 'spaceSeparator':
-                return vocabulary.has(notableSubSequence.word) ||
-                    subSequenceRecordHasNothingAdjacent(notableSubSequences, notableSubSequence)
-        }
-    })
+import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
+import {AllWordsRepository} from '../language/all-words.repository'
+import {TranslationAttemptService} from '../../components/translation-attempt/translation-attempt.service'
+import {SelectedVirtualTabulationsService} from '../manager/selected-virtual-tabulations.service'
+import {TimeService} from '../time/time.service'
+import {LanguageConfigsService} from '../language/language-configs.service'
+import {combineLatest, Observable} from 'rxjs'
+import {map, shareReplay, startWith} from 'rxjs/operators'
+import {SerializedTabulationAggregate} from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import {sumNotableSubSequences,} from '../schedule/learning-target/flash-card-learning-targets.service'
+import {DocumentWordCount} from '../../../../server/src/shared/DocumentWordCount'
+import {safePushMap} from '@shared/'
+import {pipeLog} from '../manager/pipe.log'
+import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";
+import {combineSegmentSubSequences} from "./combine-segment-subsequences";
 
 export class TabulationService {
     tabulation$: Observable<{ wordCountMap: Map<string, DocumentWordCount[]> }>
@@ -91,7 +72,8 @@ export class TabulationService {
                          *   How do we tell if something is bordered on either side?  If it has no notable subsequences which immediately border it
                          */
                         const documentWordCounts = sumNotableSubSequences(
-                            getNotableSubsequencesOfWords(notableSubSequences, syntheticWords, strategy, vocabulary),
+                            combineSegmentSubSequences(notableSubSequences.map(notableSubSequence => getNotableSubsequencesOfWords(notableSubSequence, syntheticWords, strategy, vocabulary)))
+                            ,
                         )
                         documentWordCounts.forEach(
                             (count, word) => {

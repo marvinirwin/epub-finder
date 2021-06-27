@@ -9,6 +9,9 @@ import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
+import {IPositionedWord} from "../../../../server/src/shared/Annotation/IPositionedWord";
+import {getGreedySubSequences} from "../schedule/learning-target/get-greedy-subsequences";
+import {SegmentSubsequences} from "@shared/*";
 
 export const OpenExampleSentencesFactory = ({
     name,
@@ -19,7 +22,7 @@ export const OpenExampleSentencesFactory = ({
     onSelectService,
 }: {
     name: string
-    sentences$: Observable<string[]>
+    sentences$: Observable<SegmentSubsequences[]>
     tabulationConfigurationService: TabulationConfigurationService
     settingsService: SettingsService
     languageConfigsService: LanguageConfigsService
@@ -30,7 +33,7 @@ export const OpenExampleSentencesFactory = ({
         tabulationConfigurationService,
         DocumentSourcesService.document({
             unAtomizedDocument$: sentences$.pipe(
-                map(InterpolateExampleSentencesService.interpolate),
+                map(subSequences => InterpolateExampleSentencesService.interpolate(subSequences.map(({segmentText}) => segmentText))),
                 distinctUntilChanged(),
                 shareReplay(1),
             ),

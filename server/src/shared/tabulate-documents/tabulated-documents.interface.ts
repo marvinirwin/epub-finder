@@ -1,10 +1,9 @@
 import { Dictionary } from 'lodash'
 import { AtomMetadata } from '../atom-metadata.interface.ts/atom-metadata'
 import { Segment } from './segment/segment'
-import { DocumentWordCount } from '../DocumentWordCount'
 import { XMLDocumentNode } from '../XMLDocumentNode'
-import { SerializedSegment, WordCountRecord } from '../tabulation/tabulate'
-import { IPositionedWord } from '../Annotation/IPositionedWord'
+import { SerializedSegment, IPositionedWord } from '../tabulation/tabulate'
+import {SegmentSubsequences} from "../index";
 
 export type DocumentWordCounts = {
     id: string
@@ -21,9 +20,9 @@ export type TabulatedSegments = SerializedTabulation & {
 }
 
 export interface SerializedTabulation {
-    notableSubSequences: IPositionedWord[],
-    wordSegmentStringsMap: Map<string, Set<string>>
-    segmentWordCountRecordsMap: Map<SerializedSegment, WordCountRecord[]>
+    notableSubSequences: SegmentSubsequences[],
+    wordSegmentStringsMap: Map<string, Set<SegmentSubsequences>>
+    segmentWordCountRecordsMap: Map<SerializedSegment, IPositionedWord[]>
 }
 
 export type SerializedDocumentTabulation = SerializedTabulation &

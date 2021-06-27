@@ -1,5 +1,6 @@
 import { WordIdentifyingStrategy } from '../tabulation/tabulate'
 import { segmentBoundaryRegexp, wordBoundaryRegexp } from '../tabulation/word-separator'
+import {SegmentSubsequences} from "../index";
 
 export interface IPositionedWord {
     word: string
@@ -12,7 +13,7 @@ export interface KnowablePositionedWord extends IPositionedWord {
 
 export interface ReadingProgress {
     label: string;
-    subSequences: IPositionedWord[];
+    subSequences: SegmentSubsequences;
     knownSubSequences: KnowablePositionedWord[];
     unknownSubSequences: KnowablePositionedWord[];
     knownCount: number;

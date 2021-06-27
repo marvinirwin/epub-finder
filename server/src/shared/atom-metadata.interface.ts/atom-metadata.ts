@@ -3,17 +3,18 @@ import { XMLDocumentNode } from '../XMLDocumentNode'
 import { Segment } from '../tabulate-documents/segment/segment'
 import { flatten, maxBy } from 'lodash'
 import { ICard } from '../ICard'
+import {SegmentSubsequences} from "../index";
 
 export class AtomMetadata {
     m: {
-        words: IPositionedWord[]
+        words: SegmentSubsequences
         char: string
         element: XMLDocumentNode
         i: number
         parent: Segment
     }
     constructor(m: {
-        words: IPositionedWord[]
+        words: SegmentSubsequences
         char: string
         element: XMLDocumentNode
         i: number
@@ -22,7 +23,7 @@ export class AtomMetadata {
         this.m = m
     }
 
-    get words(): IPositionedWord[] {
+    get words(): SegmentSubsequences {
         return this.m.words
     }
     get char(): string {

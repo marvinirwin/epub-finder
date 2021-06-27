@@ -3,7 +3,7 @@ import { Segment } from '../tabulate-documents/segment/segment'
 import { TabulatedDocuments } from '../tabulate-documents/tabulated-documents.interface'
 import { AtomMetadata } from '../atom-metadata.interface.ts/atom-metadata'
 import { XMLDocumentNode } from '../XMLDocumentNode'
-import { IPositionedWord } from '../Annotation/IPositionedWord'
+import {SegmentSubsequences} from "../index";
 
 export type TabulationParameters = {
     segments: Segment[]
@@ -23,7 +23,7 @@ export type TabulationConfiguration = SerializableTabulationConfiguration & {
     wordIdentifyingStrategy: WordIdentifyingStrategy
 }
 
-export interface WordCountRecord {
+export interface IPositionedWord {
     position: number
     word: string
 }
@@ -38,9 +38,9 @@ export const tabulationFactory = (): TabulatedDocuments => ({
     wordSegmentMap: {},
     notableSubSequences: [],
     atomMetadatas: new Map<XMLDocumentNode, AtomMetadata>(),
-    wordSegmentStringsMap: new Map<string, Set<string>>(),
+    wordSegmentStringsMap: new Map<string, Set<SegmentSubsequences>>(),
     segments: [],
-    segmentWordCountRecordsMap: new Map<SerializedSegment, WordCountRecord[]>(),
+    segmentWordCountRecordsMap: new Map<SerializedSegment, IPositionedWord[]>(),
     label: '',
     id: '',
 })

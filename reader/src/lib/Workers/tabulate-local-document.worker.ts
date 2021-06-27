@@ -11,7 +11,7 @@ import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-doc
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import {
     SerializedSegment,
-    WordCountRecord,
+    IPositionedWord,
 } from '../../../../server/src/shared/tabulation/tabulate'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 

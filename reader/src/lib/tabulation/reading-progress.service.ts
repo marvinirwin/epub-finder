@@ -1,20 +1,21 @@
-import { combineLatest, Observable } from 'rxjs'
-import { map, shareReplay, startWith } from 'rxjs/operators'
-import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
-import { VideoMetadataRepository } from '../../services/video-metadata.repository'
-import { IgnoredWordsRepository } from '../schedule/ignored-words.repository'
-import { AllWordsRepository } from '../language/all-words.repository'
-import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { getNotableSubsequencesOfWords } from './tabulation.service'
-import { WeightedVocabService } from '../language/weighted-vocab.service'
-import { getGreedySubSequences } from '../schedule/learning-target/flash-card-learning-targets.service'
+import {combineLatest, Observable} from 'rxjs'
+import {map, shareReplay, startWith} from 'rxjs/operators'
+import {SerializedTabulationAggregate} from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import {VideoMetadataRepository} from '../../services/video-metadata.repository'
+import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
+import {AllWordsRepository} from '../language/all-words.repository'
+import {SelectedVirtualTabulationsService} from '../manager/selected-virtual-tabulations.service'
+import {LanguageConfigsService} from '../language/language-configs.service'
+import {WeightedVocabService} from '../language/weighted-vocab.service'
 import {
-    IPositionedWord,
-    KnowablePositionedWord, ReadingProgress,
+    KnowablePositionedWord,
+    ReadingProgress,
     wordCountForSubsequence,
 } from '../../../../server/src/shared/Annotation/IPositionedWord'
-import { sumBy, uniq } from 'lodash'
+import {sumBy, uniq} from 'lodash'
+import {getGreedySubSequences} from "../schedule/learning-target/get-greedy-subsequences";
+import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";
+import {combineSegmentSubSequences} from "./combine-segment-subsequences";
 
 export class ReadingProgressService {
     readingProgressRecords$: Observable<ReadingProgress[]>
@@ -56,10 +57,11 @@ export class ReadingProgressService {
                 return new SerializedTabulationAggregate(
                     selectedFrequencyVirtualTabulations,
                 ).serializedTabulations.map(
-                    ({ notableSubSequences, label }) => {
-                        const notableSubsequencesOfWords = getNotableSubsequencesOfWords(notableSubSequences, syntheticWords, strategy, vocabulary)
-                        const knowableSubSequences: KnowablePositionedWord[] = getGreedySubSequences(notableSubsequencesOfWords)
-                            .map(positionedWord => ({
+                    ({notableSubSequences, label}) => {
+                        const notableSubsequencesOfWords = notableSubSequences.map(notableSubsequence => getNotableSubsequencesOfWords(notableSubsequence, syntheticWords, strategy, vocabulary))
+                        const knowableSubSequences: KnowablePositionedWord[] = getGreedySubSequences(combineSegmentSubSequences(notableSubsequencesOfWords)
+                        )
+                            .subsequences.map(positionedWord => ({
                                         ...positionedWord,
                                         known: weightedVocab.get(positionedWord.word) === 1,
                                         wordCount: wordCountForSubsequence(positionedWord.word, strategy)
@@ -74,7 +76,11 @@ export class ReadingProgressService {
                             label,
                             knownSubSequences,
                             unknownSubSequences,
-                            subSequences: knowableSubSequences,
+                            subSequences: {
+                                subsequences: knowableSubSequences,
+                                segmentText: notableSubSequences.map(({segmentText}) => segmentText)
+                                    .join('\n')
+                            },
                             knownCount: sumBy(knownSubSequences, v => v.wordCount),
                             unknownCount: sumBy(unknownSubSequences, v => v.wordCount),
                             uniqueKnownCount: uniqueKnown.length,

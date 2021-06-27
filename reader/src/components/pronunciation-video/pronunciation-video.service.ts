@@ -18,9 +18,13 @@ import { VideoMetadata } from '../../types'
 import Ciseaux from '../../lib/ciseaux/browser'
 import { Tape } from 'ciseaux/browser'
 import { filterData } from '../../lib/audio/audio-graphing'
+import {audioContext} from "../../lib/audio/audio-context";
 
-// @ts-ignore
-Ciseaux.context = new AudioContext()
+export const ciseauxPromise = audioContext.then(ctx => {
+    // @ts-ignore
+    Ciseaux.context = ctx;
+    return Ciseaux;
+})
 
 export class PronunciationVideoService {
     public videoMetadata$ = new ReplaySubject<VideoMetadata | undefined>(1)
@@ -64,8 +68,8 @@ export class PronunciationVideoService {
         )
         this.tape$ = this.audioUrl$.pipe(
             // @ts-ignore
-            switchMap((audioUrl) => {
-                return Ciseaux.from(audioUrl).catch((e: any) => console.warn(e))
+            switchMap(async (audioUrl) => {
+                return (await ciseauxPromise).from(audioUrl).catch((e: any) => console.warn(e))
             }),
             shareReplay(1),
         )

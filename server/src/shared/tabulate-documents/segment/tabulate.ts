@@ -132,7 +132,7 @@ export const tabulate = ({
             }),
         )
         // Positioned words, what's this for?
-        const words: IPositionedWord[] = notableSubsequencesInProgress.map(
+        const words: SegmentSubsequences = notableSubsequencesInProgress.map(
             ({ word, lengthRemaining }) => {
                 const position = word.length - lengthRemaining
                 const newPositionedWord: IPositionedWord = {
@@ -170,7 +170,7 @@ export const tabulate = ({
             tabulationObject.wordSegmentMap,
         ).map(([word, segments]) => [
             word,
-            new Set(segments.map((segment) => segment.translatableText)),
+            new Set(segments.map((segment) => segmentWordCountRecordsMap[segment.translatableText])),
         ]),
     )
     return tabulationObject

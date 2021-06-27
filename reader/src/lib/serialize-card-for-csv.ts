@@ -9,6 +9,7 @@ import {CsvCard} from "./csv-card.interface";
 import {IPositionedWord} from "../../../server/src/shared/Annotation/IPositionedWord";
 import {resolveImagePath} from "./resolve-image-path";
 import {getCsvDescription} from "./get-csv-description";
+import {SegmentSubsequences} from "@shared/*";
 
 export const SerializeCardForCsv = async (
     {
@@ -18,7 +19,7 @@ export const SerializeCardForCsv = async (
         zip
     }: {
         c: ICard,
-        exampleSegments: Map<string, Set<IPositionedWord[]>>,
+        exampleSegments: Map<string, SegmentSubsequences[]>,
         textToSpeechConfig: TextToSpeechConfig | undefined,
         zip: JSZip
     }): Promise<CsvCard> => {

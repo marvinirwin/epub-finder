@@ -1,7 +1,7 @@
-import { WordCountRecord } from './tabulate'
+import { IPositionedWord } from './tabulate'
 import { maxBy, sum } from 'lodash'
 
-export const wordsFromCountRecordList = (records: WordCountRecord[]) => {
+export const wordsFromCountRecordList = (records: IPositionedWord[]) => {
     const words: string[] = []
     records = records.filter(r => r.word.length > 0);
     let index = 0

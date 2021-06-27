@@ -28,7 +28,7 @@ export class WordMetadataMapService {
                     const metadata = elementIndex.get(
                         (elementInView as unknown) as XMLDocumentNode,
                     )
-                    metadata?.words?.forEach((word) =>
+                    metadata?.words?.subsequences?.forEach((word) =>
                         safePushSet(map, word.word, metadata),
                     )
                 })

@@ -13,7 +13,7 @@ export const priorityMouseoverHighlightWord = ({
     const cardMap = cardsRepository.all$.getValue()
     return maxBy(
         flatten(
-            atomMetadata.words.map((word) => {
+            atomMetadata.words.subsequences.map((word) => {
                 return cardMap[word.word] || []
             }),
         ),

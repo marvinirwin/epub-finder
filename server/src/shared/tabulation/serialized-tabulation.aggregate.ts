@@ -2,7 +2,9 @@ import {
     SerializedDocumentTabulation,
     SerializedTabulation,
 } from '../tabulate-documents/tabulated-documents.interface'
-import { safePushMapSet } from '../safe-push'
+import {safePush, safePushMap, safePushMapSet} from '../safe-push'
+import {IPositionedWord} from "../Annotation/IPositionedWord";
+import {SegmentSubsequences} from "../index";
 
 export class SerializedTabulationAggregate {
     serializedTabulations: SerializedDocumentTabulation[]
@@ -11,15 +13,15 @@ export class SerializedTabulationAggregate {
         this.serializedTabulations = serializedTabulations
     }
 
-    wordSegmentStringsMap(): Map<string, Set<string>> {
-        const m = new Map<string, Set<string>>()
+    wordSegmentPositionedWordMap(): Map<string, SegmentSubsequences[]> {
+        const m = new Map<string, SegmentSubsequences[]>();
         this.serializedTabulations.forEach((t) =>
             t.wordSegmentStringsMap.forEach((set, word) =>
                 set.forEach((segmentString) =>
-                    safePushMapSet(m, word, segmentString),
+                    safePushMap(m, word, segmentString),
                 ),
             ),
-        )
+        );
         return m
     }
 }
