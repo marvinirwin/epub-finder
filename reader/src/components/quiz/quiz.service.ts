@@ -2,7 +2,7 @@ import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from 'rxjs'
 import {OpenExampleSentencesFactory} from '../../lib/document-frame/open-example-sentences-document.factory'
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay} from 'rxjs/operators'
 import {QuizCard} from './word-card.interface'
-import {orderBy, uniq} from 'lodash'
+import {orderBy, uniq, uniqBy} from 'lodash'
 import CardsRepository from 'src/lib/manager/cards.repository'
 import {ExampleSegmentsService} from '../../lib/quiz/example-segments.service'
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from '../../lib/manager/open-documents.service'
@@ -21,7 +21,6 @@ import {OnSelectService} from '../../lib/user-interface/on-select.service'
 import {WordRecognitionProgressRepository} from '../../lib/schedule/word-recognition-progress.repository'
 import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
 import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
-import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
 
 export class QuizService {
     quizCard: QuizCard
@@ -106,11 +105,12 @@ export class QuizService {
                      ]) => {
                         if (!currentWord) return []
                         const subSequences = exampleSegmentMap.get(currentWord) || [];
+                        debugger;
                         /**
                          * HACK this is a terrible hack because the spaces aren't preserved when I join.
                          * I really should make a join function which considers positions with space s
                          */
-                        return uniqueBy(
+                        return uniqBy(
                             subSequences,
                             subSequence => subSequence.segmentText,
                         ).slice(0, 10)

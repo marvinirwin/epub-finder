@@ -12,21 +12,27 @@ import { audioContext } from './audio-context'
 export class WavAudio {
     blob: Blob
     url: string
+/*
     el: HTMLAudioElement
+*/
     duration$: Observable<number>
     audioBuffer$: Observable<AudioBuffer>
     graphData$: Observable<number[]>
 
     private graphObservable$: Observable<Observable<number[]>>
+/*
     private src: string
+*/
 
     constructor(public buffer: ArrayBuffer) {
         // decodeAudioData detached the arraybuffer into the audio thread
         const newBuffer = buffer.slice(0)
         this.audioBuffer$ = from(
-            audioContext.then((ctx) => {
+            audioContext.then(async (ctx) => {
                 try {
-                    return ctx.decodeAudioData(buffer)
+                    // THis is the problem on safari
+                    const audioBufferPromise = await ctx.decodeAudioData(buffer);
+                    return audioBufferPromise
                 } catch (e) {
                     console.error(e)
                     throw e
@@ -35,8 +41,10 @@ export class WavAudio {
         )
         this.blob = new Blob([newBuffer], { type: 'audio/wav' })
         this.url = URL.createObjectURL(this.blob)
+/*
         this.src = 'data:audio/wav;base64,' + encode(newBuffer)
         this.el = new Audio(this.src)
+*/
         this.duration$ = this.audioBuffer$.pipe(map((b) => b.duration))
         this.graphData$ = this.audioBuffer$.pipe(
             map((b) => {
