@@ -22,7 +22,6 @@ import {WordRecognitionProgressRepository} from '../../lib/schedule/word-recogni
 import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
 import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
 import uniqueBy from "@popperjs/core/lib/utils/uniqueBy";
-import {getGreedySubSequences} from "../../lib/schedule/learning-target/get-greedy-subsequences";
 
 export class QuizService {
     quizCard: QuizCard

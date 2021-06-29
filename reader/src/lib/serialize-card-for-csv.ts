@@ -28,6 +28,7 @@ export const SerializeCardForCsv = async (
     const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code)
     const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code)
     const segments = [...exampleSegments.get(c.learning_language)?.values() || []];
+    debugger;
     const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({
         ...textToSpeechConfig,
         text: c.learning_language

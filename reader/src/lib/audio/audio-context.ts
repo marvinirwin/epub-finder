@@ -1,6 +1,8 @@
+import { AudioContext } from 'standardized-audio-context';
+
 export const audioContext = new Promise<AudioContext>((resolve) => {
     setTimeout(() => {
         // @ts-ignore
-        resolve(new (window.AudioContext || window.webkitAudioContext)())
+        resolve(new AudioContext())
     }, 1000)
 })

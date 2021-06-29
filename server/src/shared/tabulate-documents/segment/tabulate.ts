@@ -125,7 +125,8 @@ export const tabulate = ({
         }
 
         notableSequencesWhichStartHere.forEach((wordStartingHere) => {
-            tabulationObject.notableSubSequences[tabulationObject[tabulationObject.notableSubSequences.length - 1]]
+            const mostRecentSegmentSubsequence = tabulationObject.notableSubSequences[tabulationObject.notableSubSequences.length - 1];
+            mostRecentSegmentSubsequence
                 .subsequences.push({position: i, word: wordStartingHere});
             safePushMap(
                 segmentWordCountRecordsMap,

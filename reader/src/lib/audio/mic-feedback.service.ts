@@ -3,10 +3,11 @@ import { AudioSource } from './audio-source'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
 import { audioContext } from './audio-context'
 import { observableLastValue } from '../../services/settings.service'
+import {IAudioContext, AnalyserNode} from "standardized-audio-context";
 
 export class MicFeedbackService {
     micRef$ = new ReplaySubject<SVGSVGElement | null>(1)
-    private analyser$: Observable<AnalyserNode>
+    private analyser$: Observable<AnalyserNode<IAudioContext>>
 
     constructor({ audioSource }: { audioSource: AudioSource }) {
         this.analyser$ = audioSource.microphone$.pipe(

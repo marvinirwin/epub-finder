@@ -11,10 +11,16 @@ export const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) =>
     const currentType = useObservableState(quizCard.flashCardType$)
     const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null)
     useEffect(() => {
-        if (audioRef && audio && !isLoading) {
-            audioRef.currentTime = 0
-            audioRef.play()
-        }
+        (async () => {
+            try {
+                if (audioRef && audio && !isLoading) {
+                    audioRef.currentTime = 0
+                    await audioRef.play()
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        })()
     }, [currentType, audio])
 
     return (audio && !isHidden) ?
