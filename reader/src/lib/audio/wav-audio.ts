@@ -1,13 +1,8 @@
-import { from, Observable, of } from 'rxjs'
-import { encode } from 'base64-arraybuffer'
-import { concatMap, delay, filter, map, withLatestFrom } from 'rxjs/operators'
-import { chunk } from 'lodash'
-import {
-    AUDIO_GRAPH_SAMPLE_SIZE,
-    filterData,
-    normalizeData,
-} from './audio-graphing'
-import { audioContext } from './audio-context'
+import {from, Observable, of} from 'rxjs'
+import {concatMap, delay, map, withLatestFrom} from 'rxjs/operators'
+import {chunk} from 'lodash'
+import {AUDIO_GRAPH_SAMPLE_SIZE, filterData, normalizeData,} from './audio-graphing'
+import {audioContext} from './audio-context'
 
 export class WavAudio {
     blob: Blob
@@ -31,8 +26,7 @@ export class WavAudio {
             audioContext.then(async (ctx) => {
                 try {
                     // THis is the problem on safari
-                    const audioBufferPromise = await ctx.decodeAudioData(buffer);
-                    return audioBufferPromise
+                    return await ctx.decodeAudioData(buffer)
                 } catch (e) {
                     console.error(e)
                     throw e

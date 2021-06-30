@@ -16,9 +16,10 @@ export class SerializedTabulationAggregate {
     wordSegmentPositionedWordMap(): Map<string, SegmentSubsequences[]> {
         const m = new Map<string, SegmentSubsequences[]>();
         this.serializedTabulations.forEach((t) =>
-            t.wordSegmentStringsMap.forEach((set, word) =>
-                set.forEach((segmentString) =>
-                    safePushMap(m, word, segmentString),
+            t.wordSegmentSubSequencesMap.forEach((set, word) =>
+                set.forEach((segmentSubSequences) => {
+                        safePushMap(m, word, segmentSubSequences);
+                    },
                 ),
             ),
         );

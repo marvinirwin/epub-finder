@@ -42,7 +42,7 @@ ctx.onmessage = async (ev) => {
     });
     try {
         ctx.postMessage({
-            wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
+            wordSegmentSubSequencesMap: tabulated.wordSegmentSubSequencesMap,
             notableSubSequences: tabulated.notableSubSequences,
             segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
             id,
@@ -55,7 +55,7 @@ ctx.onmessage = async (ev) => {
             wordSegmentMap: {},
             segments: [],
             atomMetadatas: new Map(),
-            wordSegmentStringsMap: new Map(),
+            wordSegmentSubSequencesMap: new Map(),
             greedyDocumentWordCounts: new Map(),
             segmentWordCountRecordsMap: new Map(),
             notableSubSequences: [],

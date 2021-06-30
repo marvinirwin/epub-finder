@@ -38,7 +38,7 @@ export const tabulationFactory = (): TabulatedDocuments => ({
     wordSegmentMap: {},
     notableSubSequences: [],
     atomMetadatas: new Map<XMLDocumentNode, AtomMetadata>(),
-    wordSegmentStringsMap: new Map<string, Set<SegmentSubsequences>>(),
+    wordSegmentSubSequencesMap: new Map<string, Set<SegmentSubsequences>>(),
     segments: [],
     segmentWordCountRecordsMap: new Map<SerializedSegment, IPositionedWord[]>(),
     label: "",

@@ -42,7 +42,7 @@ ctx.onmessage = async (ev) => {
         language_code,
     })
     ctx.postMessage({
-        wordSegmentStringsMap: tabulated.wordSegmentStringsMap,
+        wordSegmentSubSequencesMap: tabulated.wordSegmentSubSequencesMap,
         notableSubSequences: tabulated.notableSubSequences,
         segmentWordCountRecordsMap: tabulated.segmentWordCountRecordsMap,
         id: ltDoc.id(),

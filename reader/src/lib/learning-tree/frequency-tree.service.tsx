@@ -42,7 +42,7 @@ export class FrequencyTreeService {
                 return new FrequencyTree(allFrequencyDocuments, rootNode, {
                     notableSubSequences: [],
                     segmentWordCountRecordsMap: new Map(),
-                    wordSegmentStringsMap: new Map()
+                    wordSegmentSubSequencesMap: new Map()
                 })
                     .tree
                 // For each frequency doc calculate its distance to the others, oh this is n^2, I'll memo it

@@ -19,7 +19,6 @@ export const QuizCardSound: React.FC<{ quizCard: QuizCard }> = ({ quizCard }) =>
                 if (audioRef && audio && !isLoading) {
                     audioRef.currentTime = 0
                     if (!safariBrowsers.has(detect()?.name as string)) {
-                        debugger;
                         await audioRef.play()
                     }
                 }

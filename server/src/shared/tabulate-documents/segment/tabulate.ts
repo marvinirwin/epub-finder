@@ -26,12 +26,14 @@ export const tabulate = ({
     const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
+    const segmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
         atomMetadatas,
         wordElementsMap,
     } = tabulationObject;
+
 
     const allMarks = flatten(
         segments.map((segment) => {
@@ -68,10 +70,13 @@ export const tabulate = ({
                 text: currentSegment.translatableText,
                 index: segmentIndex,
             };
-            tabulationObject.notableSubSequences.push({
+            const items = {
                 segmentText: currentSegment.translatableText,
                 subsequences: []
-            })
+            };
+            safePushMap(segmentSubsequencesMap, items.segmentText, items);
+            tabulationObject.notableSubSequences.push(items);
+
         }
 
         notableSubsequencesInProgress = notableSubsequencesInProgress
@@ -152,14 +157,14 @@ export const tabulate = ({
                 };
             },
         );
-        const words: SegmentSubsequences = {
+        const segmentSubsequences: SegmentSubsequences = {
             segmentText: textFromPositionedWordsAndAllText(currentSerialzedSegment.text, positionedWordsInProgress),
             subsequences: positionedWordsInProgress
         };
 
         const atomMetadata = new AtomMetadata({
             char: textContent[i],
-            words,
+            words: segmentSubsequences,
             element: currentMark,
             i,
             parent: elementSegmentMap.get(currentMark),
@@ -179,13 +184,15 @@ export const tabulate = ({
             Array.from(segmentSet),
         ]),
     );
-    tabulationObject.wordSegmentStringsMap = new Map(
+    tabulationObject.wordSegmentSubSequencesMap = new Map(
         Object.entries(
             tabulationObject.wordSegmentMap,
-        ).map(([word, segments]) => [
-            word,
-            new Set(segments.map((segment) => segmentWordCountRecordsMap[segment.translatableText])),
-        ]),
+        ).map(([word]) => {
+            return [
+                word,
+                new Set(segmentSubsequencesMap.get(word) as SegmentSubsequences[]),
+            ];
+        }),
     );
     return tabulationObject;
 };
