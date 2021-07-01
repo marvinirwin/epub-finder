@@ -16,6 +16,7 @@ import {Menu} from '@material-ui/icons'
 import {WordSearch} from './word-search.component'
 import {ProgressBar} from './progress-bar.component'
 import {TranslationSelectionButton} from "./translate-selection-button.component";
+import { ChangeLog } from '../change-log.component'
 
 const drawerWidth = 240
 
@@ -124,6 +125,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     <TranslationSelectionButton/>
                     <WordSearch/>
                     <ProgressBar/>
+                    <ChangeLog/>
                 </Toolbar>
             </AppBar>
             <Drawer
