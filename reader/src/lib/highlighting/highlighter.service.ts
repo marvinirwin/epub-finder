@@ -14,6 +14,8 @@ import { AtomMetadata } from '../../../../server/src/shared/atom-metadata.interf
 import { map, shareReplay } from 'rxjs/operators'
 import debug from 'debug'
 import { safePushMap } from '@shared/'
+import {RandomColorsService} from "../../services/random-colors.service";
+import {DEV} from "../util/url-params";
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string]
@@ -235,13 +237,20 @@ function updateElementBackgroundColor(
     const backgroundColor = mixRGBA(rgbas)
     // @ts-ignore
     elementToHighlight.element.style.backgroundColor = backgroundColor;
-    const el = document.createElement('div');
-    el.className = 'highlight-debug';
-    el.textContent = JSON.stringify(rgbas, null, '\t');
-    el.style.left = `${Math.random() * 100}px`;
-    setTimeout(() => {
-        el.remove();
-    }, 10000);
+    if (DEV) {
+        const el = document.createElement('div');
+        el.className = 'highlight-debug';
+        el.textContent = JSON.stringify(rgbas, null, '\t');
+        el.style.left = `${Math.random() * 100}px`;
+        el.style.top = `${Math.random() * 100}px`;
+        el.style.zIndex = `${Math.random() * 100}`;
+        el.style.backgroundColor = `RGBA(${RandomColorsService.randomColor()})`;
+        setTimeout(() => {
+            el.remove();
+        }, 10000);
+        // @ts-ignore
+        elementToHighlight.element.appendChild(el);
+    }
 }
 
 const computeElementHighlightMap = (

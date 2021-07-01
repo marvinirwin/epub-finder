@@ -649,8 +649,10 @@ mark {
 
 .highlight-debug {
   z-index: 1;
-
+  width: fit-content;
+  font-size: 12px;
   &:hover {
-    z-index: 10;
+    z-index: 100;
   }
+  position: absolute;
 }
