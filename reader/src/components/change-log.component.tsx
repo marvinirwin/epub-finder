@@ -5,8 +5,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const changes: { message: string, date: string }[] = [
+    ['2021-07-1', `Added ChangeLog`],
     ['2021-07-1', `Removed safari support because I couldn't decode audio data, or autoplay :(`],
-    ['2021-07-1', `Fixed the example sentence bug`],
+    ['2021-07-1', `Restore example sentences`],
+    ['2021-07-1', `Added highlight debug elements in dev`],
 ].map(([date, message]) => ({
     message,
     date,
@@ -19,7 +21,8 @@ const ChangeLogEntry: React.FC<{ date: string, message: string }> = ({date, mess
             variant='caption'
             style={{
                 color: 'grey',
-                marginRight: '8px'
+                marginRight: '8px',
+                minWidth: '9ch'
             }}
         >
             {date}
@@ -30,9 +33,9 @@ const ChangeLogEntry: React.FC<{ date: string, message: string }> = ({date, mess
 }
 export const ChangeLog = () => {
     const [showChangeLog, setShowChangeLog] = useLocalStorage('show-changelog', true);
-    return <div style={{position: 'relative', alignSelf: 'start', maxWidth: '45ch', justifySelf: 'flex-end'}}>
+    return <div style={{position: 'relative', alignSelf: 'start', maxWidth: '65ch', justifySelf: 'flex-end', flex: 1}}>
         <Accordion
-            style={{position: 'absolute', width: '100%'}}
+            style={{position: 'absolute', width: '100%', marginTop: '8px'}}
             expanded={showChangeLog}
             onChange={(event, isExpanded) => setShowChangeLog(isExpanded)}
         >

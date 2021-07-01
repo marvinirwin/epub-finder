@@ -125,6 +125,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     <TranslationSelectionButton/>
                     <WordSearch/>
                     <ProgressBar/>
+                    <div style={{flex: 1}}/>
                     <ChangeLog/>
                 </Toolbar>
             </AppBar>
