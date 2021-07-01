@@ -234,7 +234,14 @@ function updateElementBackgroundColor(
     }
     const backgroundColor = mixRGBA(rgbas)
     // @ts-ignore
-    elementToHighlight.element.style.backgroundColor = backgroundColor
+    elementToHighlight.element.style.backgroundColor = backgroundColor;
+    const el = document.createElement('div');
+    el.className = 'highlight-debug';
+    el.textContent = JSON.stringify(rgbas, null, '\t');
+    el.style.left = `${Math.random() * 100}px`;
+    setTimeout(() => {
+        el.remove();
+    }, 10000);
 }
 
 const computeElementHighlightMap = (

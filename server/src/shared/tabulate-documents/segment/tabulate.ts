@@ -26,12 +26,13 @@ export const tabulate = ({
     const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
-    const segmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
+    const wordSegmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
         atomMetadatas,
         wordElementsMap,
+        notableSubSequences
     } = tabulationObject;
 
 
@@ -70,12 +71,12 @@ export const tabulate = ({
                 text: currentSegment.translatableText,
                 index: segmentIndex,
             };
-            const items = {
+            const segmentSubSequences = {
                 segmentText: currentSegment.translatableText,
                 subsequences: []
             };
-            safePushMap(segmentSubsequencesMap, items.segmentText, items);
-            tabulationObject.notableSubSequences.push(items);
+            safePushMap(wordSegmentSubsequencesMap, segmentSubSequences.segmentText, segmentSubSequences);
+            notableSubSequences.push(segmentSubSequences);
 
         }
 
@@ -130,7 +131,7 @@ export const tabulate = ({
         }
 
         notableSequencesWhichStartHere.forEach((wordStartingHere) => {
-            const mostRecentSegmentSubsequence = tabulationObject.notableSubSequences[tabulationObject.notableSubSequences.length - 1];
+            const mostRecentSegmentSubsequence = notableSubSequences[notableSubSequences.length - 1];
             mostRecentSegmentSubsequence
                 .subsequences.push({position: i, word: wordStartingHere});
             safePushMap(
@@ -140,6 +141,11 @@ export const tabulate = ({
                     position: i - currentSegmentStart,
                     word: wordStartingHere,
                 },
+            );
+            safePushMap(
+                wordSegmentSubsequencesMap,
+                wordStartingHere,
+                mostRecentSegmentSubsequence
             );
         });
 
@@ -190,7 +196,7 @@ export const tabulate = ({
         ).map(([word]) => {
             return [
                 word,
-                new Set(segmentSubsequencesMap.get(word) as SegmentSubsequences[]),
+                new Set(wordSegmentSubsequencesMap.get(word) as SegmentSubsequences[]),
             ];
         }),
     );
