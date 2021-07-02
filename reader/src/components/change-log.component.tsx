@@ -9,6 +9,7 @@ const changes: { message: string, date: string }[] = [
     ['2021-07-1', `Removed safari support because I couldn't decode audio data, or autoplay :(`],
     ['2021-07-1', `Restore example sentences`],
     ['2021-07-1', `Added highlight debug elements in dev`],
+    ['2021-07-1', `Added way to contact me`],
 ].map(([date, message]) => ({
     message,
     date,
@@ -27,7 +28,7 @@ const ChangeLogEntry: React.FC<{ date: string, message: string }> = ({date, mess
         >
             {date}
         </Typography>
-        <Typography variant='body1'>
+        <Typography variant='caption'>
             {message}
         </Typography></>
 }
@@ -45,17 +46,13 @@ export const ChangeLog = () => {
             >
                 <ChangeLogEntry {...firstChange} />
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails style={{display: 'flex', flexFlow: 'column nowrap', maxWidth: '90vh'}}>
                 {
-                    otherChanges.map((changeEntry) => <>
+                    otherChanges.map((changeEntry) => <div style={{display: 'flex', flexFlow: ''}}>
                         <ChangeLogEntry {...changeEntry} />
                         <Divider/>
-                    </>)
+                    </div>)
                 }
-                <Typography>
-
-
-                </Typography>
             </AccordionDetails>
         </Accordion>
     </div>

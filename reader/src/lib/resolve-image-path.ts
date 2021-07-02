@@ -14,5 +14,5 @@ export async function resolveImagePath({
     const {ext, /*dataUrl,*/ blob} = await toDataUrl(photo);
     const photoAnkiPath = `${learning_language}.${ext}`
     await zip.file(photoAnkiPath, await blob);
-    return `<img src=\\"${photoAnkiPath}\\"/>`
+    return `<img src="${photoAnkiPath}"/>`
 }

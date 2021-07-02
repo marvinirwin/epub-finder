@@ -17,7 +17,8 @@ export const CsvComponent = () => {
             Download Zip
         </Button>
         <div>
-            {csvs?.csvRows?.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag].join('","')}"`).join('\n')}
+            {csvs?.csvRows?.map(v => `"${[v.learning_language, v.description, v.photo, v.sound, v.romanization, tag]
+                .map(str => `${str}`.replace(`"`, `&ldquo`)).join('","')}"`).join('\n')}
         </div>
     </Box>
 };

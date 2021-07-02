@@ -10,7 +10,7 @@ import {ManagerContext} from '../../App'
 import {useObservableState} from 'observable-hooks'
 import {TreeMenu} from '../tree-menu/tree-menu.component'
 import {AllItemsContainer} from './all-items-container.component'
-import {AppBar, Divider, List, Toolbar} from '@material-ui/core'
+import {AppBar, Divider, Link, List, Toolbar} from '@material-ui/core'
 import {theme} from '../../theme'
 import {Menu} from '@material-ui/icons'
 import {WordSearch} from './word-search.component'
@@ -125,7 +125,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     <TranslationSelectionButton/>
                     <WordSearch/>
                     <ProgressBar/>
-                    <div style={{flex: 1}}/>
+                    <Typography style={{flex: 1}}><Link style={{color: 'white'}} href={'https://twitter.com/marvinirwin7'}>Have Suggestions or find bugs?  @ me on Twitter</Link></Typography>
                     <ChangeLog/>
                 </Toolbar>
             </AppBar>
