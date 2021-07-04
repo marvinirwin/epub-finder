@@ -2,23 +2,13 @@ import {useLocalStorage} from "beautiful-react-hooks";
 import React from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Divider, Typography} from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {format} from "date-fns";
+import {changeLog} from "./change.log";
 
 
-const changes: { message: string, date: string }[] = [
-    ['2021-07-01', `Added ChangeLog`],
-    ['2021-07-01', `Removed safari support because I couldn't decode audio data, or autoplay :(`],
-    ['2021-07-01', `Restore example sentences`],
-    ['2021-07-01', `Added highlight debug elements in dev`],
-    ['2021-07-01', `Added way to contact me`],
-    ['2021-07-04', `Fixed blank quiz screen for new users with startWith`],
-    ['2021-07-04', `Clarified addMore dialog`],
-].map(([date, message]) => ({
-    message,
-    date,
-})).reverse();
-const [firstChange, ...otherChanges] = changes;
+const [firstChange, ...otherChanges] = changeLog;
 
-const ChangeLogEntry: React.FC<{ date: string, message: string }> = ({date, message}) => {
+const ChangeLogEntry: React.FC<{ date: Date, message: string }> = ({date, message}) => {
     return <>
         <Typography
             variant='caption'
@@ -28,7 +18,7 @@ const ChangeLogEntry: React.FC<{ date: string, message: string }> = ({date, mess
                 minWidth: '9ch'
             }}
         >
-            {date}
+            {format(date, 'MMMM dd, yyyy h:mmaaa')}
         </Typography>
         <Typography variant='caption'>
             {message}
