@@ -7,6 +7,7 @@ export const changeLog: { message: string, date: Date }[] = [
     ['Sun Jul 04 2021 13:02:12 GMT-0700 (Pacific Daylight Time)', `Fixed blank quiz screen for new users with startWith`],
     ["Sun Jul 04 2021 13:23:11 GMT-0700 (Pacific Daylight Time)", `Clarified addMore dialog`],
     ["Sun Jul 04 2021 14:41:04 GMT-0700 (Pacific Daylight Time)", `More detailed timestamps on the changeLog`],
+    ["Sun Jul 04 2021 14:51:20 GMT-0700 (Pacific Daylight Time)", `Made "add or select" text reflect the presence of library books `],
 ].map(([date, message]) => ({
     message,
     date: new Date(date),

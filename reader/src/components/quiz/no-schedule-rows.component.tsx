@@ -7,9 +7,14 @@ import { UploadText } from '../upload/upload-text.component'
 import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 
 
-export const AddNewOrSelectDifferentLearningMaterial = () => {
+export const AddNewOrSelectLearningMaterial = () => {
     return <Typography variant={'h4'}>
-        Add new or selected existing text in the library
+        Add New or Select Existing Text in the Library
+    </Typography>
+}
+export const AddLearningMaterial = () => {
+    return <Typography variant={'h4'}>
+        Add Some Learning Material
     </Typography>
 }
 export const LogInToSeeLearningMaterial = () => {
@@ -32,6 +37,7 @@ export const NoScheduleRows = () => {
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
     const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0 &&
         !!limitedScheduleRowData.limitedScheduleRows.length;
+    const libraryHasDocuments = !!useObservableState(m.documentRepository.collection$)?.size;
 
     return <Box m={2} p={1} style={{ width: '100%', height: '100%' }}>
 
@@ -43,7 +49,7 @@ export const NoScheduleRows = () => {
 */}
         <Box m={2} p={1}>
             {cardLimitReached && <LimitReached />}
-            {isLoggedIn && !cardLimitReached && <AddNewOrSelectDifferentLearningMaterial />}
+            {isLoggedIn && !cardLimitReached && (libraryHasDocuments ? <AddNewOrSelectLearningMaterial /> : <AddLearningMaterial/>)}
             {!isLoggedIn && !cardLimitReached && <LogInToSeeLearningMaterial />}
         </Box>
         <UploadText />

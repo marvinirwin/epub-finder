@@ -3,7 +3,7 @@ import React from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Divider, Typography} from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {format} from "date-fns";
-import {changeLog} from "./change.log";
+import {changeLog} from "./change-log";
 
 
 const [firstChange, ...otherChanges] = changeLog;
@@ -15,10 +15,10 @@ const ChangeLogEntry: React.FC<{ date: Date, message: string }> = ({date, messag
             style={{
                 color: 'grey',
                 marginRight: '8px',
-                minWidth: '9ch'
+                minWidth: '20ch'
             }}
         >
-            {format(date, 'MMMM dd, yyyy h:mmaaa')}
+            {format(date, 'MMM dd, yyyy h:mmaaa')}
         </Typography>
         <Typography variant='caption'>
             {message}

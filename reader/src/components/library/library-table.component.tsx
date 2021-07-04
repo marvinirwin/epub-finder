@@ -35,7 +35,7 @@ export const LibraryTable: React.FC = ({children}) => {
     return (
         <TableContainer
             component={Paper}
-            style={{ width: '90vw', height: '90vh' }}
+            style={{flex: 1}}
         >
             {children}
             <Table size="small">
