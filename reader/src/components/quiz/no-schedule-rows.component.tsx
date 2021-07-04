@@ -9,7 +9,7 @@ import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 
 export const AddNewOrSelectDifferentLearningMaterial = () => {
     return <Typography variant={'h4'}>
-        Out of learning material. Select existing text in the library, or add more
+        Add new or selected existing text in the library
     </Typography>
 }
 export const LogInToSeeLearningMaterial = () => {
@@ -30,7 +30,8 @@ export const NoScheduleRows = () => {
     const m = useContext(ManagerContext)
     const isLoggedIn = useObservableState(m.loggedInUserService.isLoggedIn$)
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
-    const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0
+    const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0 &&
+        !!limitedScheduleRowData.limitedScheduleRows.length;
 
     return <Box m={2} p={1} style={{ width: '100%', height: '100%' }}>
 

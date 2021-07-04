@@ -11,6 +11,7 @@ const changes: { message: string, date: string }[] = [
     ['2021-07-01', `Added highlight debug elements in dev`],
     ['2021-07-01', `Added way to contact me`],
     ['2021-07-04', `Fixed blank quiz screen for new users with startWith`],
+    ['2021-07-04', `Clarified addMore dialog`],
 ].map(([date, message]) => ({
     message,
     date,
