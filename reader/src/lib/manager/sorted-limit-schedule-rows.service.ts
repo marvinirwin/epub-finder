@@ -115,7 +115,7 @@ export class SortedLimitScheduleRowsService {
             quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog('sorted-limited:scheduleRows')),
             settingsService.newQuizWordLimit$.pipe(pipeLog('sorted-limited:newQuizWordLimit')),
             timeService.quizNow$.pipe(pipeLog('sorted-limited:quizNow')),
-            knownWordsRepository.indexOfOrderedRecords$,
+            knownWordsRepository.indexOfOrderedRecords$.pipe(pipeLog('sorted-limited:knownWords')),
         ]).pipe(
             debounceTime(0),
             map(([sortedScheduleRows, newQuizWordLimit, now, knownWordsIndex]) => {

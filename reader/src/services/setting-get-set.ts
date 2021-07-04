@@ -1,8 +1,8 @@
-import { DatabaseService, putPersistableEntity, queryPersistableEntity } from '../lib/Storage/database.service'
-import { HistoryService } from '../lib/app-context/history.service'
-import { Observable, of } from 'rxjs'
-import { distinctUntilChanged, skip } from 'rxjs/operators'
-import { UserSetting } from '../../../server/src/entities/user-setting.entity'
+import {DatabaseService, putPersistableEntity, queryPersistableEntity} from '../lib/Storage/database.service'
+import {HistoryService} from '../lib/app-context/history.service'
+import {Observable, of} from 'rxjs'
+import {distinctUntilChanged, skip} from 'rxjs/operators'
+import {UserSetting} from '../../../server/src/entities/user-setting.entity'
 
 export type SettingType = 'url' | 'indexedDB' | 'REST';
 
@@ -11,7 +11,7 @@ const settings = queryPersistableEntity<UserSetting>({
     entity: 'userSettings',
     skip: 0,
     take: 100,
-}).then(records => new Map(records.map(userSettingReceord => [userSettingReceord.name, userSettingReceord])))
+}).then(records => new Map(records.map(userSettingRecord => [userSettingRecord.name, userSettingRecord])))
 
 export class SettingGetSet<T> {
     constructor(
@@ -45,7 +45,8 @@ export class SettingGetSet<T> {
                     name,
                     () =>
                         new Promise((resolve, reject) =>
-                            settings.then(map => [map.get(name)])
+                            settings
+                                .then(map => [map.get(name)])
                                 .then((rows) => {
                                         const row = rows[0]
                                         if (row) {
@@ -63,7 +64,7 @@ export class SettingGetSet<T> {
                     async (value: Value) => {
                         await putPersistableEntity<UserSetting>({
                             entity: 'userSettings',
-                            record: { name, value },
+                            record: {name, value},
                         })
                     },
                     of(),

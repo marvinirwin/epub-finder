@@ -38,10 +38,10 @@ export class TabulationService {
             languageConfigsService: LanguageConfigsService
         }) {
         this.tabulation$ = combineLatest([
-            allWordsRepository.all$,
+            allWordsRepository.all$.pipe(pipeLog('tabulation:allWords')),
             selectedVirtualTabulationsService.selectedFrequencyVirtualTabulations$.pipe(pipeLog("tabulation:selected-virtual-tabulations")),
             videoMetadataRepository.all$.pipe(startWith(new Map())),
-            languageConfigsService.wordSeparationStrategy$,
+            languageConfigsService.wordSeparationStrategy$.pipe(pipeLog('tabulation:wordSeparationStrategy')),
         ]).pipe(
             map(([
                      builtInWords,

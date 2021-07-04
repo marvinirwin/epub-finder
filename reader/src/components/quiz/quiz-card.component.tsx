@@ -18,8 +18,8 @@ export const useActiveFlashCardTypes = () => {
 export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = ({ quizCard, ...props }) => {
     const m = useContext(ManagerContext)
     const limitedScheduleRowData = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
-    const noScheduleRows = limitedScheduleRowData?.limitedScheduleRows?.length === 0;
     const answerIsRevealed = useObservableState(quizCard.answerIsRevealed$);
+    const noScheduleRows = limitedScheduleRowData?.limitedScheduleRows?.length === 0;
     const cardLimitReached = limitedScheduleRowData?.scheduleRowsLeftForToday?.length === 0 &&
         noScheduleRows;
     const showNoScheduleRows = noScheduleRows || cardLimitReached

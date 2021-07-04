@@ -5,11 +5,12 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const changes: { message: string, date: string }[] = [
-    ['2021-07-1', `Added ChangeLog`],
-    ['2021-07-1', `Removed safari support because I couldn't decode audio data, or autoplay :(`],
-    ['2021-07-1', `Restore example sentences`],
-    ['2021-07-1', `Added highlight debug elements in dev`],
-    ['2021-07-1', `Added way to contact me`],
+    ['2021-07-01', `Added ChangeLog`],
+    ['2021-07-01', `Removed safari support because I couldn't decode audio data, or autoplay :(`],
+    ['2021-07-01', `Restore example sentences`],
+    ['2021-07-01', `Added highlight debug elements in dev`],
+    ['2021-07-01', `Added way to contact me`],
+    ['2021-07-04', `Fixed blank quiz screen for new users with startWith`],
 ].map(([date, message]) => ({
     message,
     date,

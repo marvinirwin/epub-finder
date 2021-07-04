@@ -88,7 +88,7 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                 settingsService.dateWeight$,
                 settingsService.wordLengthWeight$,
                 settingsService.translationAttemptSentenceWeight$,
-                flashCardTypesRequiredToProgressService.activeFlashCardTypes$,
+                flashCardTypesRequiredToProgressService.activeFlashCardTypes$.pipe(pipeLog('quiz-schedule-rows:activeFlashCardTypes')),
             ]),
             combineLatest([
 /*
@@ -96,8 +96,8 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
 */
                 flashCardLearningTargetsService.learningTargets$.pipe(pipeLog("quiz-schedule-rows:learningTargets")),
             ]),
-            wordRecognitionProgressRepository.indexOfOrderedRecords$,
-            tabulationService.tabulation$,
+            wordRecognitionProgressRepository.indexOfOrderedRecords$.pipe(pipeLog('quiz-schedule-rows:wordRecognitionProgressRecords')),
+            tabulationService.tabulation$.pipe(pipeLog('quiz-schedule-rows:tabulation')),
         ]).pipe(
             // Prevent this from firing synchronously
             debounceTime(0),
