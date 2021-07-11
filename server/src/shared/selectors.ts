@@ -43,6 +43,7 @@ export const libraryRowDelete = 'libraryRowDelete'
 export const libraryRowToggleExample = 'libraryRowToggleExample';
 export const libraryRow = 'libraryRow'
 export const newWordLimitInput = 'newWordLimitInput'
+export const quizWordLimitInput = 'quizWordLimitInput'
 export const cardLimitReached = 'noMoreQuizCards'
 export const scheduleRowOpenWordButton = 'scheduleRowOpenWordButton'
 export const wordCardCountRecords = 'wordCardCountRecords'

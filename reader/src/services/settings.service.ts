@@ -66,6 +66,8 @@ export class SettingsService {
     public currentIntroTab$: ReplaySubject<number>
     selectedExampleSegmentDocuments$: ReplaySubject<string[]>
     textToSpeechConfiguration$: ReplaySubject<TextToSpeechConfig | undefined>
+    onlyReviewPresentText$: ReplaySubject<boolean>;
+    maxReviewsPerDay$: ReplaySubject<number>;
 
     constructor({
         databaseService,
@@ -252,7 +254,17 @@ export class SettingsService {
             'textToSpeechConfiguration',
             undefined,
             'indexedDB',
-        )
+        );
+        this.onlyReviewPresentText$ = this.createSetting$<boolean>(
+            'textToSpeechConfiguration',
+            false,
+            'indexedDB',
+        );
+        this.maxReviewsPerDay$ = this.createSetting$<number>(
+            'maxReviewsPerDay',
+            20,
+            'indexedDB',
+        );
     }
 
     public createSetting$<T>(

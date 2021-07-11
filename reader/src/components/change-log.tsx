@@ -8,6 +8,7 @@ export const changeLog: { message: string, date: Date }[] = [
     ["Sun Jul 04 2021 13:23:11 GMT-0700 (Pacific Daylight Time)", `Clarified addMore dialog`],
     ["Sun Jul 04 2021 14:41:04 GMT-0700 (Pacific Daylight Time)", `More detailed timestamps on the changeLog`],
     ["Sun Jul 04 2021 14:51:20 GMT-0700 (Pacific Daylight Time)", `Made "add or select" text reflect the presence of library books `],
+    ["Thu Jul 08 2021 20:08:21 GMT-0700 (Pacific Daylight Time)", `Added Maximum Reviews Per Day and Only Review Present Words settings`],
 ].map(([date, message]) => ({
     message,
     date: new Date(date),

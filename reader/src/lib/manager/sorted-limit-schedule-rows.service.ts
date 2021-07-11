@@ -1,15 +1,15 @@
-import { observableLastValue, SettingsService } from '../../services/settings.service'
-import { combineLatest, Observable } from 'rxjs'
-import { debounceTime, distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
-import { ScheduleRow, SortQuizData, SpacedSortQuizData } from '../schedule/schedule-row'
-import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
-import { TimeService } from '../time/time.service'
-import { Dictionary, flatten, groupBy, orderBy, uniq } from 'lodash'
-import { FlashCardType } from '../quiz/hidden-quiz-fields'
-import { isToday } from 'date-fns'
-import { pipeLog } from './pipe.log'
-import { KnownWordsRepository } from '../schedule/known-words.repository'
-import { tapCacheScheduleRowImages } from './image-cache'
+import {observableLastValue, SettingsService} from '../../services/settings.service'
+import {combineLatest, Observable} from 'rxjs'
+import {debounceTime, distinctUntilChanged, map, shareReplay} from 'rxjs/operators'
+import {ScheduleRow, SortQuizData, SpacedSortQuizData} from '../schedule/schedule-row'
+import {QuizCardScheduleRowsService} from '../schedule/quiz-card-schedule-rows.service'
+import {TimeService} from '../time/time.service'
+import {Dictionary, flatten, groupBy, orderBy, uniq} from 'lodash'
+import {FlashCardType} from '../quiz/hidden-quiz-fields'
+import {isToday} from 'date-fns'
+import {pipeLog} from './pipe.log'
+import {KnownWordsRepository} from '../schedule/known-words.repository'
+import {tapCacheScheduleRowImages} from './image-cache'
 import CardsRepository from './cards.repository'
 
 export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
@@ -103,7 +103,7 @@ export class SortedLimitScheduleRowsService {
                     quizCardScheduleRowsService,
                     timeService,
                     knownWordsRepository,
-        cardsRepository
+                    cardsRepository
                 }: {
         settingsService: SettingsService
         quizCardScheduleRowsService: QuizCardScheduleRowsService
@@ -114,21 +114,32 @@ export class SortedLimitScheduleRowsService {
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog('sorted-limited:scheduleRows')),
             settingsService.newQuizWordLimit$.pipe(pipeLog('sorted-limited:newQuizWordLimit')),
+            settingsService.maxReviewsPerDay$.pipe(pipeLog('sorted-limited:maxReviewsPerDay')),
+            settingsService.onlyReviewPresentText$.pipe(pipeLog('sorted-limited:onlyReviewPresentText')),
             timeService.quizNow$.pipe(pipeLog('sorted-limited:quizNow')),
             knownWordsRepository.indexOfOrderedRecords$.pipe(pipeLog('sorted-limited:knownWords')),
         ]).pipe(
             debounceTime(0),
-            map(([sortedScheduleRows, newQuizWordLimit, now, knownWordsIndex]) => {
+            map(([sortedScheduleRows, newQuizWordLimit, maxReviewsPerDay, onlyReviewPresentText, now, knownWordsIndex]) => {
                 sortedScheduleRows = sortedScheduleRows.filter(
                     (row) => {
                         const knownWordsRecords = knownWordsIndex[row.d.word]
                         const isKnown = knownWordsRecords && knownWordsRecords[knownWordsRecords.length - 1]?.is_known;
-                        return (row.d.count.value > 0 || row.isToReview({now})) && !isKnown;
+                        const isPresentText = row.d.count.value > 0;
+                        const isToReview = row.isToReview({now})
+                        if (onlyReviewPresentText) {
+                            return isPresentText && !isKnown;
+                        } else {
+                            return (isPresentText || isToReview) && !isKnown;
+                        }
                     },
                 )
+                const scheduleRowsReviewedToday = sortedScheduleRows.filter(r => r.wasReviewedToday());
+
                 const scheduleRowsToReview = sortedScheduleRows.filter((r) => {
-                    return r.isToReview({ now })
-                })
+                    return r.isToReview({now})
+                }).slice(0, Math.max(maxReviewsPerDay - scheduleRowsReviewedToday.length, 0));
+
                 const scheduleRowsLearnedOrReviewedToday = sortedScheduleRows.filter((r) => {
                     return r.wasLearnedOrReviewedToday()
                 })
@@ -156,8 +167,8 @@ export class SortedLimitScheduleRowsService {
                     0,
                     wordsRemaining >= 0 ? wordsRemaining : 0,
                 ))
-                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({ now }))
-                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({ now }))
+                const overDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => r.isOverDue({now}))
+                const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({now}))
 
                 const iteratees = [
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.spacedDueDate.transformed,

@@ -21,6 +21,8 @@ import {Box} from '@material-ui/core'
 import {ImageSearchComponent} from '../../components/image-search/image-search.component'
 import {ReadingProgress} from "../../components/reading-progress.component";
 import {CsvComponent} from "./csv.component";
+import {SetReviewCardLimit} from "../../components/settings/set-review-card-limit.component";
+import {ToggleOnlyPresentText} from "../../components/settings/toggle-only-present-text.component";
 
 export class ModalService {
     public languageSelect: NavModal
@@ -57,6 +59,8 @@ export class ModalService {
                     <AdjustLengthWeight />
                     <AdjustTranslationAttemptSentenceWeight />
                     <SetQuizWordLimit />
+                    <SetReviewCardLimit />
+                    <ToggleOnlyPresentText/>
                     <HotkeyConfig />
                 </Box>
             )
