@@ -68,6 +68,7 @@ export class SettingsService {
     textToSpeechConfiguration$: ReplaySubject<TextToSpeechConfig | undefined>
     onlyReviewPresentText$: ReplaySubject<boolean>;
     maxReviewsPerDay$: ReplaySubject<number>;
+    showSoundQuizCard$: ReplaySubject<boolean>;
 
     constructor({
         databaseService,
@@ -263,6 +264,12 @@ export class SettingsService {
         this.maxReviewsPerDay$ = this.createSetting$<number>(
             'maxReviewsPerDay',
             20,
+            'indexedDB',
+        );
+
+        this.showSoundQuizCard$ = this.createSetting$<boolean>(
+            'showSoundQuizCard',
+            true,
             'indexedDB',
         );
     }

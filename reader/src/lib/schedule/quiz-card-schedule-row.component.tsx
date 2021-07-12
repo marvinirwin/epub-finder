@@ -38,7 +38,7 @@ export const QuizCardScheduleRowDisplay = ({
                         rows={3}
                         variant="filled"
                         value={description}
-                        style={{width: '300px', height: '300px'}}
+                        style={{width: '300px', minHeight: '300px', flex: 1}}
                         onChange={(e) =>
                             quizCard.description$.set(e.target.value)
                         }

@@ -19,9 +19,9 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
     return <Fragment>
         <div className={'quiz-card-data-sheet'}>
             <div>
+                <CardImage wordInfo={quizCard} />
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
-                <CardImage wordInfo={quizCard} />
                 <QuizCardSound quizCard={quizCard} />
                 <CardLearningLanguageText word={word || ''} />
             </div>

@@ -648,6 +648,8 @@ mark {
 }
 
 .highlight-debug {
+  display: flex;
+  flex-flow: column nowrap;
   z-index: 1;
   width: fit-content;
   font-size: 12px;

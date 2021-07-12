@@ -1,11 +1,18 @@
-import React, { useContext } from 'react'
-import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
-import { FormControlLabel, ListItem, Switch } from '@material-ui/core'
+import React, {useContext} from 'react'
+import {ManagerContext} from '../../App'
+import {useObservableState} from 'observable-hooks'
+import {FormControlLabel, ListItem, Switch} from '@material-ui/core'
+import { Subject} from "rxjs";
+import {Manager} from "../../lib/manager/Manager";
 
-export const TogglePinyinComponent = () => {
+
+const s = "Show Romanization";
+export const ToggleSettingComponent = ( cb: (m: Manager) => { setting$: Subject<boolean>, label: string }): React.FC => () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const m = useContext(ManagerContext)
-    const showPinyin = useObservableState(m.settingsService.showRomanization$)
+    const {label, setting$} = cb(m);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const showPinyin = useObservableState(setting$);
     return (
         <ListItem>
             <FormControlLabel
@@ -13,14 +20,17 @@ export const TogglePinyinComponent = () => {
                     <Switch
                         checked={!!showPinyin}
                         onChange={() =>
-                            m.settingsService.showRomanization$.next(
+                            setting$.next(
                                 !showPinyin,
                             )
                         }
                     />
                 }
-                label="Show Romanization"
+                label={label}
             />
         </ListItem>
     )
 }
+
+export const TogglePinyinComponent = ToggleSettingComponent(m => ({label: "Show Romanization", setting$: m.settingsService.showRomanization$}))
+export const ToggleShowSoundQuizCard = ToggleSettingComponent(m => ({label: "Show Sound Quiz Card", setting$: m.settingsService.showSoundQuizCard$}))
