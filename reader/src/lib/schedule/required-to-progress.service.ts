@@ -20,9 +20,11 @@ export class FlashCardTypesRequiredToProgressService {
         this.activeFlashCardTypes$ = combineLatest([
             languageConfigsService.learningLanguageTextToSpeechConfig$,
             settingsService.flashCardTypesRequiredToProgress$,
+            settingsService.showSoundQuizCard$
         ]).pipe(
-            map(([textToSpeechConfig, flashCardTypes]) => {
-                    if (!textToSpeechConfig) {
+            map(([textToSpeechConfig, flashCardTypes, showSoundQuizCard]) => {
+                const shouldRemovedSoundQuiz = !textToSpeechConfig || !showSoundQuizCard;
+                if (shouldRemovedSoundQuiz) {
                         return flashCardTypes.filter(type => type !== FlashCardType.LearningLanguageAudio)
                     }
                     return flashCardTypes

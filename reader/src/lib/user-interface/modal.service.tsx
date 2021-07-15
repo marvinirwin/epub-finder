@@ -1,7 +1,7 @@
 import React from 'react'
 import {LanguageSelect} from '../../components/app-directory/nodes/language-select.component'
 import {ToggleTranslateComponent} from '../../components/settings/toggle-translate.component'
-import {TogglePinyinComponent} from '../../components/settings/toggle-pinyin.component'
+import {TogglePinyinComponent, ToggleShowSoundQuizCard} from '../../components/settings/toggle-pinyin.component'
 import {ManualTestModal} from '../../components/modals/test-modal/manual-test-modal.component'
 import {AdjustFrequencyWeight} from '../../components/app-directory/adjust-frequency-weight.component'
 import {NavModal} from './nav-modal'
@@ -62,6 +62,7 @@ export class ModalService {
                     <SetReviewCardLimit />
                     <ToggleOnlyPresentText/>
                     <HotkeyConfig />
+                    <ToggleShowSoundQuizCard/>
                 </Box>
             )
         })
