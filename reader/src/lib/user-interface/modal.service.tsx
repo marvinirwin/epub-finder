@@ -23,6 +23,7 @@ import {ReadingProgress} from "../../components/reading-progress.component";
 import {CsvComponent} from "./csv.component";
 import {SetReviewCardLimit} from "../../components/settings/set-review-card-limit.component";
 import {ToggleOnlyPresentText} from "../../components/settings/toggle-only-present-text.component";
+import {LeaderBoard} from "./leader-board.component";
 
 export class ModalService {
     public languageSelect: NavModal
@@ -36,6 +37,7 @@ export class ModalService {
     readingProgress: NavModal
     imageSearch: NavModal
     csv: NavModal
+    leaderBoard: NavModal;
 
     constructor() {
         this.intro = new NavModal('intro', () => <Intro />)
@@ -87,6 +89,11 @@ export class ModalService {
         this.csv = new NavModal(
             'csv',
             () => <Box p={1} m={2}><CsvComponent/></Box>,
+        );
+
+        this.leaderBoard = new NavModal(
+            'leaderBoard',
+            LeaderBoard
         )
     }
 
@@ -103,6 +110,7 @@ export class ModalService {
             this.readingProgress,
             this.imageSearch,
             this.csv,
+            this.leaderBoard
         ]
     }
 }

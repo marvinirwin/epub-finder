@@ -46,7 +46,7 @@ export class CsvService {
                 const zip = new JSZip()
                 const cards: ICard[] = await Promise.all(scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, readingLanguageCode)))
                 return {
-                    csvRows: await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0,10).map(c => SerializeCardForCsv({
+                    csvRows: await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0,3).map(c => SerializeCardForCsv({
                         c,
                         exampleSegments,
                         textToSpeechConfig,

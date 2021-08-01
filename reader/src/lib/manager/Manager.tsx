@@ -100,6 +100,7 @@ import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to
 import { ReadingProgressService } from '../tabulation/reading-progress.service'
 import { CsvService } from './csv.service'
 import { KnownWordsRepository } from '../schedule/known-words.repository'
+import {LeaderBoardService} from "../../components/leader-board.service";
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -204,6 +205,7 @@ export class Manager {
     readingProgressService: ReadingProgressService
     csvService: CsvService
     knownWordsRepository: KnownWordsRepository
+    leaderBoardService: LeaderBoardService;
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -388,7 +390,9 @@ export class Manager {
         const hrds = new HighlightRecollectionDifficultyService({
             wordRecognitionRowService: this.wordRecognitionProgressRepository,
             highlighterService: this.highlighterService,
-        })
+        });
+
+        this.leaderBoardService = new LeaderBoardService(this)
 
         const ths = new TestHotkeysService(this)
         this.introSeriesService = new IntroSeriesService(this)

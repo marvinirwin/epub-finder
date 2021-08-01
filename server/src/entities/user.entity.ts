@@ -1,4 +1,4 @@
-import { Document } from './document.entity'
+import { Document } from "./document.entity";
 import {
     Entity,
     Column,
@@ -11,11 +11,10 @@ import {
     Repository,
     ManyToOne,
     JoinTable,
-} from 'typeorm'
+} from "typeorm";
 
-import bcrypt from 'bcrypt'
-import { DocumentView } from './document-view.entity'
-import { DocumentUpdateDto } from '../documents/document-update.dto'
+import bcrypt from "bcrypt";
+import { DocumentView } from "./document-view.entity";
 
 @Entity()
 export class User {
@@ -24,7 +23,7 @@ export class User {
     @Column({ unique: true, default: null })
     email: string | null
     @Column()
-    password: string = ''
+    password = ""
     @Column({ default: null })
     reserved_for_provider: string | null
     @Column({ default: null })
@@ -41,15 +40,15 @@ export class User {
 
     @AfterLoad()
     private storeInitialPassword(): void {
-        this._loadedPassword = this.password
+        this._loadedPassword = this.password;
     }
 
     @BeforeInsert()
     @BeforeUpdate()
     private async encryptPassword(): Promise<void> {
         if (this._loadedPassword !== this.password) {
-            const salt = await bcrypt.genSalt(10)
-            this.password = await bcrypt.hash(this.password, salt)
+            const salt = await bcrypt.genSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
         }
     }
 
@@ -59,10 +58,10 @@ export class User {
     ) {
         return new Promise((resolve, reject) => {
             bcrypt.compare(attemptingPassword, currentPassword, (err, res) => {
-                if (err) reject(err)
-                if (res) resolve(true)
-                resolve(false)
-            })
-        })
+                if (err) reject(err);
+                if (res) resolve(true);
+                resolve(false);
+            });
+        });
     }
 }

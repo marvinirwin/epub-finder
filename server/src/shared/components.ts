@@ -12,6 +12,7 @@ export const TESTING_UTILS = 'manual-speech-recognition'
 export const CSV = 'csv'
 export const QUIZ_NODE = 'quiz-carousel'
 export const QUIZ_SCHEDULE = 'quiz-schedule'
+export const LEADER_BOARD = 'leader-board'
 export const PROGRESS_NODE = 'PROGRESS_NODE'
 export const READING_PROGRESS_NODE = 'READING_PROGRESS_NODE'
 
