@@ -23,19 +23,21 @@ export class LeaderBoardService {
         // Also, I'll need to make up labels for users deterministically based on their emails until I add a lahel column
         // to the user object
         // TODO this is correct right, javascript dates do arithmetic in seconds?
-        const oneWeek = 60 * 60 * 24 * 7;
+        const oneWeek = 60 * 60 * 24 * 7 * 1000;
         const oneWeekAgo = +(new Date()) - oneWeek;
         // TODO check typeORM greater than/less than
+        const date = new Date(oneWeekAgo);
         const allCreatedAtRecordsLastWeek = await this.spacedRepitionEntityRepository.find({
-            where: {created_at: MoreThan(oneWeekAgo.toString())},
+            where: {created_at: MoreThan(date)},
             order: {created_at: "DESC"}
         });
         const recordsIndexedByCreator = groupBy(allCreatedAtRecordsLastWeek, r => r.creator_id);
         const users = await this.userRepository.findByIds(uniq(allCreatedAtRecordsLastWeek.map(v => v.creator_id)));
         return {
             records: users.map(user => {
-                const [latestRecord] = recordsIndexedByCreator[user.id];
-                return {userLabel: id(`${user.id}`.padStart(36, "0")), lastLearned: latestRecord};
+                const recordsThisWeek = recordsIndexedByCreator[user.id];
+                const latestRecord = recordsThisWeek[0];
+                return {userLabel: id.short(user.uuid), lastRecognitionRecord: latestRecord, recognitionRecordsThisWeek: recordsThisWeek.length};
             })
         };
 

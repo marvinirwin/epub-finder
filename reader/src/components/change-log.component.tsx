@@ -40,7 +40,7 @@ export const ChangeLog = () => {
             </AccordionSummary>
             <AccordionDetails style={{display: 'flex', flexFlow: 'column nowrap', maxWidth: '90vh'}}>
                 {
-                    otherChanges.map((changeEntry) => <div style={{display: 'flex', flexFlow: ''}}>
+                    otherChanges.map((changeEntry) => <div key={changeEntry.message} style={{display: 'flex', flexFlow: ''}}>
                         <ChangeLogEntry {...changeEntry} />
                         <Divider/>
                     </div>)

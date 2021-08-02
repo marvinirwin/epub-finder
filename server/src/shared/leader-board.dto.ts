@@ -3,6 +3,6 @@ export interface LeaderBoardDto {
 }
 export interface LeaderBoardRecord {
     userLabel: string;
-    lastLearned: {created_at: Date; word: string};
-    learnedThisWeek: number
+    lastRecognitionRecord: {created_at: Date; word: string};
+    recognitionRecordsThisWeek: number
 }

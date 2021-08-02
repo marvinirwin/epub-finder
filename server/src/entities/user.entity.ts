@@ -10,7 +10,7 @@ import {
     OneToMany,
     Repository,
     ManyToOne,
-    JoinTable,
+    JoinTable, Generated,
 } from "typeorm";
 
 import bcrypt from "bcrypt";
@@ -23,13 +23,16 @@ export class User {
     @Column({ unique: true, default: null })
     email: string | null
     @Column()
-    password = ""
+    password: string;
     @Column({ default: null })
     reserved_for_provider: string | null
     @Column({ default: null })
     is_anonymous: boolean | null
     @Column({ default: null })
     keycloak: string | null
+    @Column()
+    @Generated("uuid")
+    uuid: string;
     @OneToMany(
         () => DocumentView,
         (document: DocumentView) => document.creator_id,

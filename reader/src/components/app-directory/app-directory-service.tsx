@@ -15,6 +15,7 @@ import { ReadingComponent } from '../reading/reading.component'
 import { DEV } from '../../lib/util/url-params'
 import { ReadingProgressNode } from './nodes/reading-progress.node'
 import { CSV } from '@shared/'
+import {LeaderBoardNode} from "./nodes/leader-board.node";
 
 export const ReadingNode = (m: Manager): TreeMenuNode => ({
     Component: () => <ReadingComponent m={m} />,
@@ -33,6 +34,7 @@ export function AppDirectory(m: Manager) {
         LibraryNode(m),
         ReadingProgressNode(m),
         QuizScheduleNode(m),
+        LeaderBoardNode(m),
         SettingsNode(m),
         TestingUtilsNode(m),
         {

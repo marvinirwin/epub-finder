@@ -6,7 +6,7 @@ import {
     Param,
 } from "@nestjs/common";
 
-@Controller("leader_board")
+@Controller("leader-board")
 export class LeaderBoardController {
     constructor(private leaderBoardService: LeaderBoardService) {}
 
