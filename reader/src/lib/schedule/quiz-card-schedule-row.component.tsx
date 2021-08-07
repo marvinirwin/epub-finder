@@ -9,6 +9,7 @@ import {
 } from '@shared/'
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
 import { useLoadingObservableString } from '../util/create-loading-observable'
+import {DictionaryDefinition} from "../../components/quiz/card-types/dictionary-definition.component";
 
 export const QuizCardScheduleRowDisplay = ({
     quizCard,
@@ -18,6 +19,7 @@ export const QuizCardScheduleRowDisplay = ({
     const description = useObservableState(quizCard.description$.value$)
     const romanization = useLoadingObservableString(quizCard.romanization$, '')
     const translation = useLoadingObservableString(quizCard.translation$, '')
+    const word = useObservableState(quizCard.word$) || '';
     return (
         <div>
             <div style={{ marginTop: '24px' }}>
@@ -28,6 +30,7 @@ export const QuizCardScheduleRowDisplay = ({
                 <Typography variant="h4" className={quizCardTranslation}>
                     {translation}
                 </Typography>
+                <DictionaryDefinition word={word}/>
             </div>
             <div style={{ marginTop: '24px', marginBottom: '24px', display: 'flex' }}>
                 {

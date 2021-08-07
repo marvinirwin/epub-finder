@@ -1,22 +1,21 @@
 import {LanguageConfigsService} from "../language/language-configs.service";
 import {createLoadingObservable} from "../util/create-loading-observable";
 import {distinctUntilChanged} from "rxjs/operators";
-import axios from "axios";
 import {LoadingObservable} from "../../components/quiz/word-card.interface";
 import {ccEdictRegex, getCedict} from "../language/all-words.repository";
 
 export type LanguageDict = {
-    getDefinition(): Promise<string>
+    getDefinition(term: string): Promise<string>
 }
 
 export class DictionaryService {
-    private $dictionary: LoadingObservable<{ getDefinition: (term: string) => Promise<string> }>;
+    dictionary: LoadingObservable<{ getDefinition: (term: string) => Promise<string> }>;
     constructor({
         languageConfigsService
                 }: {
         languageConfigsService: LanguageConfigsService
     }) {
-        this.$dictionary = createLoadingObservable(
+        this.dictionary = createLoadingObservable(
             languageConfigsService.readingLanguageCode$.pipe(distinctUntilChanged()),
             async (code) => {
                 switch(code) {
