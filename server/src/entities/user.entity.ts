@@ -22,8 +22,8 @@ export class User {
     id: number | undefined
     @Column({ unique: true, default: null })
     email: string | null
-    @Column()
-    password: string;
+    @Column({default: null})
+    password: string | null;
     @Column({ default: null })
     reserved_for_provider: string | null
     @Column({ default: null })

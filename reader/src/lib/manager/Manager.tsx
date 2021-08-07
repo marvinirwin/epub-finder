@@ -101,6 +101,7 @@ import { ReadingProgressService } from '../tabulation/reading-progress.service'
 import { CsvService } from './csv.service'
 import { KnownWordsRepository } from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
+import {DictionaryService} from "../dictionary/dictionary.service";
 
 export type CardDB = IndexDBManager<ICard>
 
@@ -206,6 +207,7 @@ export class Manager {
     csvService: CsvService
     knownWordsRepository: KnownWordsRepository
     leaderBoardService: LeaderBoardService;
+    dictionaryService: DictionaryService;
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -453,6 +455,7 @@ export class Manager {
         this.advanceTimeService = new AdvanceTimeService(this)
         this.readingProgressService = new ReadingProgressService(this)
         this.csvService = new CsvService(this)
+        this.dictionaryService = new DictionaryService(this);
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()
