@@ -2,11 +2,12 @@ import { BehaviorSubject, merge, Observable, ReplaySubject, Subject } from 'rxjs
 import { getIsMeFunction, ICard } from '../../../../server/src/shared/ICard'
 import { Dictionary } from 'lodash'
 import { map, scan, shareReplay, startWith } from 'rxjs/operators'
-import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
+import { DatabaseService} from '../Storage/database.service'
 import { cardForWord } from '../util/Util'
 import { observableLastValue } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { highestPriorityCard } from './highest-priority-card'
+import {putPersistableEntity} from "../Storage/putPersistableEntity";
 
 export default class CardsRepository {
     private languageConfigsService: LanguageConfigsService

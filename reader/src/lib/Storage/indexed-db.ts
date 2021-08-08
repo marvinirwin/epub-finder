@@ -1,5 +1,6 @@
-import { DatabaseService, PersistableEntity, putPersistableEntity } from './database.service'
+import { DatabaseService, PersistableEntity} from './database.service'
 import Dexie from 'dexie'
+import {putPersistableEntity} from "./putPersistableEntity";
 
 export class IndexDBManager<T> {
     constructor(

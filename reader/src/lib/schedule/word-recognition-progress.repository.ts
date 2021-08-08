@@ -1,6 +1,7 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { WordRecognitionRow } from './word-recognition-row'
-import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
+import { DatabaseService} from '../Storage/database.service'
+import {putPersistableEntity} from "../Storage/putPersistableEntity";
 
 export class WordRecognitionProgressRepository extends IndexedRowsRepository<WordRecognitionRow> {
     constructor({ databaseService }: { databaseService: DatabaseService }) {

@@ -1,6 +1,7 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
-import { DatabaseService, putPersistableEntity } from '../Storage/database.service'
+import { DatabaseService} from '../Storage/database.service'
 import { IgnoredWord } from '../../../../server/src/entities/ignored-word.entity'
+import {putPersistableEntity} from "../Storage/putPersistableEntity";
 
 export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
     constructor({ databaseService }: { databaseService: DatabaseService }) {

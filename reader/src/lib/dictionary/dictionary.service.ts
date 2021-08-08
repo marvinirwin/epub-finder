@@ -26,7 +26,7 @@ export class DictionaryService {
                         response.data
                             .split('\n')
                             .forEach((line: string) => {
-                                const [traditional, simplified, definition] = ccEdictRegex.exec(line) || [];
+                                const [, traditional, simplified, definition] = ccEdictRegex.exec(line) || [];
                                 dictionary.set(traditional, definition);
                                 dictionary.set(simplified, definition);
                             });

@@ -1,8 +1,9 @@
-import Dexie from 'dexie'
-import { ICard } from '../../../../server/src/shared/ICard'
-import { CreatedSentence } from '../../../../server/src/shared/CreatedSentence'
-import { PronunciationProgressRow } from '../schedule/pronunciation-progress-row.interface'
-import { parseISO } from 'date-fns'
+import Dexie, {Table} from 'dexie'
+import {ICard} from '../../../../server/src/shared/ICard'
+import {CreatedSentence} from '../../../../server/src/shared/CreatedSentence'
+import {PronunciationProgressRow} from '../schedule/pronunciation-progress-row.interface'
+import {WordRecognitionRow} from "../schedule/word-recognition-row";
+import {queryPersistableEntity} from "./queryPersistableEntity";
 
 export type PersistableEntity = 'userSettings' |
     'userSettingView' |
@@ -11,66 +12,6 @@ export type PersistableEntity = 'userSettings' |
     'ignoredWords' |
     'customWords' |
     'knownWords';
-
-function parseCreatedAt<T extends {created_at: string}>(item: T) {
-    return ({ ...item, created_at: parseISO(`${item.created_at.toString()}Z`) })
-}
-
-export const queryPersistableEntity = <T extends {created_at: Date}>(
-    {
-        entity,
-        where,
-        skip,
-        take,
-    }:
-        {
-            entity: PersistableEntity,
-            where?: Partial<T>,
-            skip?: number,
-            take?: number
-        },
-): Promise<T[]> => {
-    const url1 = `${window.location.origin}/entities/${entity}`
-    const url = new URL(url1)
-    url.search = new URLSearchParams({
-            where: where ? JSON.stringify(where) : '{}',
-            skip: `${skip}`,
-            take: `${take}`,
-        },
-    ).toString()
-
-    return fetch(url.toString())
-        .then(response => response.json())
-        .then(items => items.map((item: T) => {
-            // @ts-ignore
-            return parseCreatedAt(item)
-        }))
-}
-
-export const putPersistableEntity = <T>(
-    {
-        entity,
-        record,
-    }: {
-        entity: PersistableEntity,
-        record: Partial<T>
-    },
-) => {
-    const url = new URL(`${window.location.origin}/entities/${entity}`)
-    return fetch(
-        url.toString(),
-        {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(record),
-        },
-    ).then(async response => {
-        const item = await response.json();
-        return parseCreatedAt(item);
-    })
-}
 
 export interface CustomWord {
     word: string;
@@ -81,11 +22,12 @@ export interface CustomWord {
 }
 
 export class DatabaseService extends Dexie {
-    static CURRENT_VERSION = 10
+    static CURRENT_VERSION = 11
 
     public pronunciationRecords: Dexie.Table<PronunciationProgressRow, number>
 
     public createdSentences: Dexie.Table<CreatedSentence, number>
+    public spacedRepitionEntityCache: Table<any, WordRecognitionRow>;
 
     constructor() {
         super('DatabaseService')
@@ -94,9 +36,11 @@ export class DatabaseService extends Dexie {
                 'id++, knownLanguage, learningLanguage, timestamp',
             pronunciationRecords: 'id++, word, timestamp',
             createdSentences: 'id++, learningLanguage',
+            spacedRepetitionEntityCache: 'id, created_at'
         })
         this.pronunciationRecords = this.table('pronunciationRecords')
         this.createdSentences = this.table('createdSentences')
+        this.spacedRepitionEntityCache = this.table('spacedRepetitionEntityCache');
     }
 
     async* getCardsFromDB(

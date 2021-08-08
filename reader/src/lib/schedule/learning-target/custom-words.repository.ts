@@ -1,5 +1,6 @@
-import { CustomWord, DatabaseService, putPersistableEntity } from '../../Storage/database.service'
+import { CustomWord, DatabaseService} from '../../Storage/database.service'
 import { IndexedRowsRepository } from '../indexed-rows.repository'
+import {putPersistableEntity} from "../../Storage/putPersistableEntity";
 
 export class CustomWordsRepository extends IndexedRowsRepository<CustomWord> {
     constructor({ databaseService }: { databaseService: DatabaseService }) {

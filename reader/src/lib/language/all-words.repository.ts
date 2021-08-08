@@ -7,7 +7,7 @@ import memoize from "memoizee";
 import {triggerAsyncId} from "async_hooks";
 
 export const getCedict = memoize(() => axios.get(`${process.env.PUBLIC_URL}/cedict_ts.u8`))
-export const ccEdictRegex = /(\p{Script_Extensions=Han}+) (\p{Script_Extensions=Han}+) (.*?)$/gmu;
+export const ccEdictRegex = /([\p{Script_Extensions=Han}\d]+) ([\p{Script_Extensions=Han}\d]+) (.*?)$/gmu;
 
 export class AllWordsRepository {
     all$: Observable<Set<string>>
@@ -30,7 +30,15 @@ export class AllWordsRepository {
                         response.data
                             .split('\n')
                             .forEach((line: string) => {
-                                const [traditional, simplified] = ccEdictRegex.exec(line) || [];
+                                const result = ccEdictRegex.exec(line) || [];
+                                const traditional = result[1];
+                                const simplified = result[2];
+                                if ((!traditional || !simplified)) {
+                                    if (result.length) {
+                                        debugger;console.log();
+                                    }
+                                    return
+                                }
                                 allWords.add(traditional);
                                 allWords.add(simplified);
                             })
