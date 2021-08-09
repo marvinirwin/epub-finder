@@ -8,7 +8,7 @@ export class KnownWordsRepository extends IndexedRowsRepository<KnownWord> {
         super({
             databaseService,
             load: () =>
-                databaseService.getWordRecordsGenerator('knownWords', (ignoredWordRecord) => {
+                DatabaseService.queryPaginatedPersistableEntities('knownWords', (ignoredWordRecord) => {
                     // TODO, maybe put a timestamp parser here?
                     return ignoredWordRecord;
                 }),

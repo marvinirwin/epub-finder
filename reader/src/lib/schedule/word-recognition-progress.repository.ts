@@ -7,7 +7,7 @@ export class WordRecognitionProgressRepository extends IndexedRowsRepository<Wor
     constructor({ databaseService }: { databaseService: DatabaseService }) {
         super({
             databaseService,
-            load: () => databaseService.getWordRecordsGenerator('spacedRepitionEntities'),
+            load: () => DatabaseService.queryPaginatedPersistableEntities('spacedRepitionEntities'),
             add: (r) => putPersistableEntity({entity: 'spacedRepitionEntities', record: r}),
             getIndexValue: (r) => ({ indexValue: r.word }),
         })

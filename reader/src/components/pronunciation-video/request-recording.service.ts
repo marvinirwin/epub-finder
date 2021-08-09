@@ -3,7 +3,7 @@ import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { observableLastValue } from '../../services/settings.service'
 import axios from 'axios'
-import { LoggedInUserService } from '../../lib/auth/loggedInUserService'
+import { LoggedInUserService } from '../../lib/auth/logged-in-user.service'
 
 export class RequestRecordingService {
     recordRequestSentences$ = new ReplaySubject<Map<string, boolean>>(1)

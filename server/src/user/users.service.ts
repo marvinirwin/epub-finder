@@ -3,9 +3,6 @@ import { User } from '../entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CreateUserDto } from './create-user.dto'
-import { Profiles } from '../types/custom'
-import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UsersService {

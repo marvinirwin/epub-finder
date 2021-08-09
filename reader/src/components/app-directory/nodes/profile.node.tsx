@@ -1,4 +1,4 @@
-import { Profile } from '../../../lib/auth/loggedInUserService'
+import { Profile } from '../../../lib/auth/logged-in-user.service'
 import React from 'react'
 import { Face } from '@material-ui/icons'
 import { TreeMenuNode } from '../tree-menu-node.interface'

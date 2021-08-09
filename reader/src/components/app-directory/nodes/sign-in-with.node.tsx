@@ -1,4 +1,4 @@
-import { Profile } from '../../../lib/auth/loggedInUserService'
+import { Profile } from '../../../lib/auth/logged-in-user.service'
 import { TreeMenuNode } from '../tree-menu-node.interface'
 import React, { useContext, useState } from 'react'
 import { AccountCircle } from '@material-ui/icons'

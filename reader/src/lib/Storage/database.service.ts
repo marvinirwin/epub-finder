@@ -4,6 +4,7 @@ import {CreatedSentence} from '../../../../server/src/shared/CreatedSentence'
 import {PronunciationProgressRow} from '../schedule/pronunciation-progress-row.interface'
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {queryPersistableEntity} from "./queryPersistableEntity";
+import {IgnoredWordView} from "../../../../server/src/entities/ignored-word-view.entity";
 
 export type PersistableEntity = 'userSettings' |
     'userSettingView' |
@@ -28,6 +29,7 @@ export class DatabaseService extends Dexie {
 
     public createdSentences: Dexie.Table<CreatedSentence, number>
     public spacedRepitionEntityCache: Table<any, WordRecognitionRow>;
+    public ignoredWordsEntityCache: Table<any, IgnoredWordView>;
 
     constructor() {
         super('DatabaseService')
@@ -36,11 +38,73 @@ export class DatabaseService extends Dexie {
                 'id++, knownLanguage, learningLanguage, timestamp',
             pronunciationRecords: 'id++, word, timestamp',
             createdSentences: 'id++, learningLanguage',
-            spacedRepetitionEntityCache: 'id, created_at'
+            spacedRepetitionEntityCache: 'id, created_at',
+            ignoredWordsEntityCache: 'id, created_at'
         })
         this.pronunciationRecords = this.table('pronunciationRecords')
         this.createdSentences = this.table('createdSentences')
         this.spacedRepitionEntityCache = this.table('spacedRepetitionEntityCache');
+        this.ignoredWordsEntityCache = this.table('spacedRepetitionEntityCache');
+    }
+
+    static async* queryPaginatedPersistableEntities<T extends { created_at: Date, creator_id: string }>(
+        entity: PersistableEntity,
+        mapFn: (v: T) => T,
+        cache: Dexie.Table<T>,
+        currentUserId: number | string
+    ): AsyncGenerator<T[]> {
+        let skip = 0;
+        const chunkSize = 500
+        let chunkedRecognitionRows: T[] = [];
+        const randomEntity = await cache.offset(0).first();
+        let startDate;
+        if (randomEntity?.creator_id !== currentUserId) {
+            // Delete everything from cache and fetch all
+            await cache.clear();
+        } else if (randomEntity) {
+            const totalEntitesCount = await cache.count();
+            const latestEntity = await cache.orderBy('created_at').offset(totalEntitesCount - 1).first()
+            if (!latestEntity) {
+                throw new Error(`LatestEntity is undefined, this should never happen`);
+            }
+            startDate = latestEntity.created_at;
+        }
+        while (chunkedRecognitionRows = await queryPersistableEntity<T>(this.getEntityWhereSkipTake({ entity, skip, chunkSize, startDate }))) {
+            // HACK
+            if (!chunkedRecognitionRows.length) {
+                break
+            }
+            if (mapFn) {
+                yield chunkedRecognitionRows.map(mapFn)
+            } else {
+                yield chunkedRecognitionRows
+            }
+            skip += chunkSize
+        }
+    }
+
+    private static getEntityWhereSkipTake(
+        {
+            entity, skip, chunkSize, startDate
+        }: {
+            entity: PersistableEntity,
+            skip: number,
+            chunkSize: number,
+            startDate: Date | undefined
+        }) {
+        const params = {
+            entity,
+            skip,
+            take: chunkSize,
+        } as any;
+        if (startDate) {
+            params.where = {
+                created_at: {
+                    gte: startDate
+                }
+            }
+        }
+        return params;
     }
 
     async* getCardsFromDB(
@@ -75,31 +139,6 @@ export class DatabaseService extends Dexie {
                 .toArray()
             yield chunkedCreatedSentences
             offset += chunkSize
-        }
-    }
-
-    async* getWordRecordsGenerator<T extends {created_at: Date}>(
-        entity: PersistableEntity,
-        mapFn?: (v: T) => T,
-    ): AsyncGenerator<T[]> {
-        let skip = 0
-        const chunkSize = 500
-        let chunkedRecognitionRows: T[] = []
-        while (chunkedRecognitionRows = await queryPersistableEntity<T>({
-            entity,
-            skip,
-            take: chunkSize,
-        })) {
-            // HACK
-            if (!chunkedRecognitionRows.length) {
-                break
-            }
-            if (mapFn) {
-                yield chunkedRecognitionRows.map(mapFn)
-            } else {
-                yield chunkedRecognitionRows
-            }
-            skip += chunkSize
         }
     }
 }

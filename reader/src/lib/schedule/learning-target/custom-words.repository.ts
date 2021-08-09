@@ -7,7 +7,7 @@ export class CustomWordsRepository extends IndexedRowsRepository<CustomWord> {
         super({
             databaseService,
             load: () =>
-                databaseService.getWordRecordsGenerator('customWords', (v) => {
+                DatabaseService.queryPaginatedPersistableEntities('customWords', (v) => {
                     return v
                 }),
             add: (r) => putPersistableEntity({entity: 'customWords', record: r}),
