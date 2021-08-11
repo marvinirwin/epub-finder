@@ -118,7 +118,7 @@ export class DatabaseService extends Dexie {
         if (startDate) {
             params.where = {
                 created_at: {
-                    gte: startDate
+                    gt: startDate
                 }
             }
         }

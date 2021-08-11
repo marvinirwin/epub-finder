@@ -19,8 +19,8 @@ import { ObservableModule } from "./observable/observable.module";
 import { DocumentsModule } from "./documents/documents.module";
 import { VideoMetadataModule } from "./video_metadata/video-metadata.module";
 import { RecordRequestModule } from "./record-request/record-request.module";
-import { EntitiesModule } from "./repository-controllers/entities.module";
 import {LeaderBoardModule} from "./leaderboard/leader-board.module";
+import {EntitiesModule} from "./entity-controller/entities.module";
 
 @Module({
     imports: [

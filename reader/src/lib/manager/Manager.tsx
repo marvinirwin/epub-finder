@@ -4,7 +4,6 @@ import { map, shareReplay } from 'rxjs/operators'
 import { DatabaseService } from '../Storage/database.service'
 import React from 'react'
 import { ICard } from '../../../../server/src/shared/ICard'
-import { IndexDBManager } from '../Storage/indexed-db'
 import { AtomMetadata } from '../../../../server/src/shared/atom-metadata.interface.ts/atom-metadata'
 import { AudioManager } from './AudioManager'
 import CardsRepository from './cards.repository'
@@ -103,7 +102,6 @@ import { KnownWordsRepository } from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
 
-export type CardDB = IndexDBManager<ICard>
 
 /*
 const addHighlightedPinyin = debounce((obs$: Subject<string | undefined>, word: string | undefined) => obs$.next(word), 100)
@@ -111,12 +109,6 @@ const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number
 */
 
 export class Manager {
-    public cardDBManager = new IndexDBManager<ICard>(
-        this.databaseService,
-        'cards',
-        (c: ICard) => c.id,
-        (i: number, c: ICard) => ({ ...c, id: i }),
-    )
     public hotkeyEvents: HotKeyEvents
     public audioRecordingService: AudioManager
     public cardsRepository: CardsRepository
