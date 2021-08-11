@@ -26,7 +26,8 @@ const processGteLte = (where: Record<string, any>) => {
             where[key] = LessThanOrEqual(value.lte);
         }
         if (value?.gt !== undefined) {
-            where[key] = MoreThan(value.gt);
+            // TODO REMOVE THIS BECAUSE ITS A HACK AND MIGHT NOT EVEN WORK
+            where[key] = MoreThan(new Date(value.gt));
         }
         if (value?.lt !== undefined) {
             where[key] = LessThan(value.lt);
@@ -59,6 +60,7 @@ export class EntitiesController {
                     ],
                 ),
         ) as SerializedSelect<any>;
+
         processGteLte(where);
         where.creator_id = user.id;
         // @ts-ignore

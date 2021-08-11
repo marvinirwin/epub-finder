@@ -65,7 +65,7 @@ export class DatabaseService extends Dexie {
     ): AsyncGenerator<T[]> {
         const chunkSize = 500
         const randomEntity = await cache.offset(0).first();
-        const shouldClearCache = currentUserEmail && randomEntity?.creator_email !== currentUserEmail;
+        const shouldClearCache = currentUserEmail && randomEntity && randomEntity.creator_email !== currentUserEmail;
         const cachedEntitiesFound = !!randomEntity;
         let skip = 0;
         let startDate;

@@ -22,7 +22,6 @@ export class LoggedInUserService {
             map((profile) => !!profile),
             shareReplay(1),
         )
-        this.profile$.next(undefined)
         // Right now we only sign in with some
         this.fetchProfile()
     }
@@ -33,6 +32,7 @@ export class LoggedInUserService {
             // If there's no user then an error will have been shown to the user
             this.profile$.next(user)
         } catch (e) {
+            this.profile$.next(undefined);
             console.warn(e)
         }
     }

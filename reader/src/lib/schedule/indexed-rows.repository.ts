@@ -78,7 +78,8 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         this.recordList$ = this.indexOfOrderedRecords$.pipe(
             map((recordObject) => flatten(Object.values(recordObject))),
             shareReplay(1),
-        )
+        );
+        this.loadGenerator(load);
     }
 
     private async loadGenerator(getGenerator: () => Promise<AsyncGenerator<T[]>> | AsyncGenerator<T[]>) {
