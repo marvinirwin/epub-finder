@@ -29,7 +29,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         getIndexValue,
     }: {
         databaseService: DatabaseService
-        load: () => AsyncGenerator<T[]>
+        load: () => Promise<AsyncGenerator<T[]>> | AsyncGenerator<T[]>
         add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
         getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string }
     }) {
@@ -79,11 +79,10 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
             map((recordObject) => flatten(Object.values(recordObject))),
             shareReplay(1),
         )
-        this.loadGenerator(load)
     }
 
-    private async loadGenerator(load: () => AsyncGenerator<T[]>) {
-        const generator = load()
+    private async loadGenerator(getGenerator: () => Promise<AsyncGenerator<T[]>> | AsyncGenerator<T[]>) {
+        const generator = await getGenerator()
         for await (const rowChunk of generator) {
             this.addRecords$.next(rowChunk)
         }
