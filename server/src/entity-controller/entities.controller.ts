@@ -26,8 +26,7 @@ const processGteLte = (where: Record<string, any>) => {
             where[key] = LessThanOrEqual(value.lte);
         }
         if (value?.gt !== undefined) {
-            // TODO REMOVE THIS BECAUSE ITS A HACK AND MIGHT NOT EVEN WORK
-            where[key] = MoreThan(new Date(value.gt));
+            where[key] = MoreThan(value.gt);
         }
         if (value?.lt !== undefined) {
             where[key] = LessThan(value.lt);

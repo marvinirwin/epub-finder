@@ -4,6 +4,11 @@ import { add } from 'date-fns'
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000
 const MINUTE_IN_MILLISECONDS = 60 * 1000
+/**
+ * Because we overload the first 3 interval values,
+ * subtract a set number of them to avoid a sudden jump in review intervals
+ */
+const INTERVAL_OFFSET = 1;
 
 const FLOOR = 0
 
@@ -76,7 +81,7 @@ export const quizCardNextDueDate = ({grade, previousItems}:{grade: SuperMemoGrad
 */
             default:
                 return add(Date.now(), {
-                    days: nextRecognitionRecord.interval,
+                    days: nextRecognitionRecord.interval - INTERVAL_OFFSET,
                 })
         }
     }
