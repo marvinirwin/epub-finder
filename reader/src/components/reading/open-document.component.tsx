@@ -23,6 +23,7 @@ export const OpenDocumentComponent = React.forwardRef<
             renderHandler={(body) => {
                 openedDocument.handleHTMLHasBeenRendered(body)
             }}
+            style={{padding: '24px'}}
             ref={ref}
         />
     )
