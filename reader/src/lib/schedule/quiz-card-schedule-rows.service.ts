@@ -127,7 +127,11 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
                             firstRecordSentence: "",
                             translationAttemptSentenceWeight,
                         }),
-                        flatten(learningTargetsList.map(
+                        flatten(learningTargetsList
+                            .filter(learningTarget => {
+                                return wordRecognitionRowIndex[learningTarget.word]?.length || tabulation.wordCountMap.get(learningTarget.word)?.length;
+                            })
+                            .map(
                             (learningTarget) => {
                                 return flashCardTypesRequiredToProgress.map(flash_card_type => {
                                         const wordRecognitionRecords = (wordRecognitionRowIndex[learningTarget.word] || []).filter(recognitionRow => recognitionRow.flash_card_type === flash_card_type)

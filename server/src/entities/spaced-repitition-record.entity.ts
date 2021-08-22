@@ -5,8 +5,8 @@ export type SuperMemoGrade = 1 | 2 | 3 | 4 | 5;
 
 @Entity()
 export class SpacedRepitionEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+    @PrimaryGeneratedColumn()
+    id: number | null
     @Column()
     word: string
     @Column()

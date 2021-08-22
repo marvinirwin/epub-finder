@@ -23,7 +23,7 @@ export interface CustomWord {
     language_code: string;
 }
 
-export type CachedEntity = {creator_email: string}
+export type CachedEntity = { creator_email: string, id: number }
 
 export class DatabaseService extends Dexie {
     static CURRENT_VERSION = 13
@@ -57,7 +57,7 @@ export class DatabaseService extends Dexie {
         this.customWordsEntityCache = this.table('customWordsEntityCache');
     }
 
-    static async* queryPaginatedPersistableEntities<T extends { created_at: Date}>(
+    static async* queryPaginatedPersistableEntities<T extends { id: number }>(
         entity: PersistableEntity,
         mapFn: (v: T) => T,
         cache: Dexie.Table<T & CachedEntity>,
@@ -68,23 +68,27 @@ export class DatabaseService extends Dexie {
         const shouldClearCache = currentUserEmail && randomEntity && randomEntity.creator_email !== currentUserEmail;
         const cachedEntitiesFound = !!randomEntity;
         let skip = 0;
-        let startDate;
+        let startId;
         let chunkedRecognitionRows: T[] = [];
-        debugger;
         if (shouldClearCache) {
             // Delete everything from cache and fetch all
             await cache.clear();
         } else if (cachedEntitiesFound) {
-            const allCachedEntities = await cache.orderBy('created_at').toArray();
+            const allCachedEntities = await cache.orderBy('id').toArray();
             const latestEntity = allCachedEntities[allCachedEntities.length - 1];
             if (!latestEntity) {
                 throw new Error(`LatestEntity is undefined after checking for randomEntity, this should never happen`);
             }
-            startDate = latestEntity.created_at;
+            startId = latestEntity.id;
             yield allCachedEntities;
         }
         // tslint:disable-next-line:no-conditional-assignment
-        while (chunkedRecognitionRows = await queryPersistableEntity<T>(this.getEntityWhereSkipTake({ entity, skip, chunkSize, startDate }))) {
+        while (chunkedRecognitionRows = await queryPersistableEntity<T>(this.getEntityWhereSkipTake({
+            entity,
+            skip,
+            chunkSize,
+            startId
+        }))) {
             // Store these in the cache
             if (currentUserEmail) {
                 await cache.bulkAdd(chunkedRecognitionRows.map(v => ({...v, creator_email: currentUserEmail})))
@@ -103,26 +107,26 @@ export class DatabaseService extends Dexie {
 
     private static getEntityWhereSkipTake(
         {
-            entity, skip, chunkSize, startDate
+            entity, skip, chunkSize, startId
         }: {
             entity: PersistableEntity,
             skip: number,
             chunkSize: number,
-            startDate: Date | undefined
+            startId: number | undefined
         }) {
-        const params = {
+        const whereParams = {
             entity,
             skip,
             take: chunkSize,
         } as any;
-        if (startDate) {
-            params.where = {
-                created_at: {
-                    gt: startDate
+        if (startId !== undefined) {
+            whereParams.where = {
+                id: {
+                    gt: startId
                 }
             }
         }
-        return params;
+        return whereParams;
     }
 
     async* getCardsFromDB(

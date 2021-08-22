@@ -15,7 +15,6 @@ export const DictionaryDefinition = (
     const dictionary = useLoadingObservable(m.dictionaryService.dictionary);
     const [definition] = usePromise(async () => {
         if (dictionary?.value && word) {
-            debugger;
             return dictionary.value.getDefinition(word)
         }
     }, [word, dictionary])

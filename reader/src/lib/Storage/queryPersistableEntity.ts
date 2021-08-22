@@ -1,7 +1,7 @@
 import {PersistableEntity} from "./database.service";
 import {parseCreatedAt} from "./parseCreatedAt";
 
-export const queryPersistableEntity = <T extends { created_at: Date }>(
+export const queryPersistableEntity = <T>(
     {
         entity,
         where,

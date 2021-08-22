@@ -48,10 +48,7 @@ export const useScheduleInfo = (): LimitedScheduleRows => {
 }
 
 export const TodaysQuizStats = () => {
-    const m = useContext(ManagerContext)
-    const flashCardTypes = useObservableState(m.flashCardTypesRequiredToProgressService.activeFlashCardTypes$) || []
     const scheduleInfo = useScheduleInfo()
-    const allScheduleRows = useObservableState(m.quizCardScheduleRowsService.scheduleRows$) || []
     /*
         const learnedToday = allScheduleRowsForWordToday({scheduleRows: scheduleInfo.wordsLearnedForTheFirstTimeToday, allScheduleRows})
         const reviewedToday = allScheduleRowsForWordToday({scheduleRows: scheduleInfo.wordsLearnedForTheFirstTimeToday, allScheduleRows})
@@ -59,7 +56,6 @@ export const TodaysQuizStats = () => {
         const wordsReviewingOrLearning = anyScheduleRowsForWord(scheduleInfo.wordsReviewingOrLearning, flashCardTypes)
         const wordsLeft = allScheduleRowsForWordToday({scheduleRows: scheduleInfo.wordsLeftForToday, allScheduleRows})
     */
-    const scheduleRowsForToday = allScheduleRows.filter(row => isToday(row.dueDate()))
     return <Box m={2} p={1} className={'quiz-button-row'}>
         <WordCountInButton
             scheduleRows={scheduleInfo.wordsLeftForToday}

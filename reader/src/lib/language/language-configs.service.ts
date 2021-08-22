@@ -147,14 +147,18 @@ export class LanguageConfigsService {
         ]).subscribe(
             ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
                 const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0]
+/*
                 const shouldSetDefaultSpokenLanguage = (!currentSpokenLanguageCode || !potentialSpokenLanguageConfigs.find(config => config.code === currentSpokenLanguageCode)) &&
                     firstPotentialSpokenLanguageConfig
+*/
+/*
                 if (shouldSetDefaultSpokenLanguage) {
                     settingsService.spokenLanguage$.next(
                         firstPotentialSpokenLanguageConfig.code,
                     )
                     return
                 }
+*/
                 const shouldClearSpokenLanguage =
                     currentSpokenLanguageCode &&
                     !potentialSpokenLanguageConfigs
