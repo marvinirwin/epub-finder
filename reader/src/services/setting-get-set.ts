@@ -64,7 +64,6 @@ export class SettingGetSet<T> {
                                 ),
                         ),
                     async (value: Value) => {
-                        debugger;
                         await putPersistableEntity<UserSetting>({
                             entity: 'userSettings',
                             record: {name, value},
