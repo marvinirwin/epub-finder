@@ -26,5 +26,4 @@ export const DatabaseModule = TypeOrmModule.forRoot({
     },
     synchronize: true,
     timezone: 'Z',
-    logging: ['query']
 })
