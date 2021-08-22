@@ -64,11 +64,32 @@ export class QuizService {
                 const firstRow = scheduleRows.limitedScheduleRows[0];
                 const previousCardType = previousRecords[0]?.flash_card_type;
                 const resolveNoRepeat = () => {
+                    /*
+                     * TODO make this generic
+                     */
                     for (let i = 5; i >= 1; i--) {
                         const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
                         const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
                         const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
                             itemsThatDontRepeat,
+                            itemsWithADifferentFlashCardTypeAsLastTime
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
+                        }
+                    }
+                    for (let i = 5; i >= 1; i--) {
+                        const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
+                            itemsThatDontRepeat,
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
+                        }
+                    }
+                    for (let i = 5; i >= 1; i--) {
+                        const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
                             itemsWithADifferentFlashCardTypeAsLastTime
                         ].every(set => set.has(r)))
                         if (filteredWords.length) {
