@@ -13,6 +13,7 @@ export const changeLog: { message: string, date: Date }[] = [
     ["Sun Aug 01 2021 20:22:21 GMT-0700 (Pacific Daylight Time)", `Added leader board`],
     ["Sat Aug 21 2021 21:11:31 GMT-0700 (Pacific Daylight Time)", `Caching recognition records!`],
     ["Sat Aug 21 2021 21:11:31 GMT-0700 (Pacific Daylight Time)", `Used CCDICT!`],
+    ["Sun Aug 22 2021 09:17:09 GMT-0700 (Pacific Daylight Time)", `Fixed height issue`],
 ].map(([date, message]) => ({
     message,
     date: new Date(date),
