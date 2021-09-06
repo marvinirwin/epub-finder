@@ -6,14 +6,10 @@ export const QuizCardTableHead: React.FC<{}> = () => {
         <TableHead>
             <TableRow>
                 <TableCell style={{ minWidth: '10em' }}>Word</TableCell>
-                <TableCell>Due In</TableCell>
+                <TableCell>Due</TableCell>
                 <TableCell>Card Type</TableCell>
                 <TableCell>Count</TableCell>
                 <TableCell>Length</TableCell>
-{/*
-                <TableCell>Sentences</TableCell>
-*/}
-                <TableCell>Spaced Date</TableCell>
             </TableRow>
         </TableHead>
     )

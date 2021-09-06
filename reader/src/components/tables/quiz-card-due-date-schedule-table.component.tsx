@@ -16,7 +16,7 @@ export const QuizCardScheduleTable = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>Word</TableCell>
-                        <TableCell>Due In</TableCell>
+                        <TableCell>Due</TableCell>
                         <TableCell>Type</TableCell>
                         {/*
                     <TableCell align="right">Count</TableCell>

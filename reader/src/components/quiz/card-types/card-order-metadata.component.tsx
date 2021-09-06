@@ -10,7 +10,9 @@ import {quizCardKey} from "../../../lib/util/Util";
 
 export const CardOrderMetadata = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);
-    const indexedSortedRows = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)?.limitedScheduleRows
+    const indexedSortedRows = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)
+        ?.limitedScheduleRows
+        ?.filter(r => r.d.count.value > 0)
     const word = useObservableState(quizCard.word$) || '';
     const flashCardType = useObservableState(quizCard.flashCardType$) || '';
     const endIndex = useMemo(() => {
@@ -25,7 +27,7 @@ export const CardOrderMetadata = ({quizCard}: { quizCard: QuizCard }) => {
             <QuizCardTableHead />
             <TableBody>
                 {indexedSortedRows.slice(0, endIndex + 1).map((row) => (
-                    <QuizCardTableRow row={row} key={row.d.word} />
+                    <QuizCardTableRow row={row} key={quizCardKey({word: row.d.word, flashCardType: row.d.flash_card_type})} />
                 ))}
             </TableBody>
         </Table>

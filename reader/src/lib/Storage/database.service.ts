@@ -75,6 +75,7 @@ export class DatabaseService extends Dexie {
             await cache.clear();
         } else if (cachedEntitiesFound) {
             const allCachedEntities = await cache.orderBy('id').toArray();
+            console.log(`${entity} Cached entitiy count ${allCachedEntities.length}`)
             const latestEntity = allCachedEntities[allCachedEntities.length - 1];
             if (!latestEntity) {
                 throw new Error(`LatestEntity is undefined after checking for randomEntity, this should never happen`);
@@ -82,6 +83,7 @@ export class DatabaseService extends Dexie {
             startId = latestEntity.id;
             yield allCachedEntities;
         }
+        console.log(`${entity} Start Id  ${startId}`)
         // tslint:disable-next-line:no-conditional-assignment
         while (chunkedRecognitionRows = await queryPersistableEntity<T>(this.getEntityWhereSkipTake({
             entity,
@@ -89,6 +91,7 @@ export class DatabaseService extends Dexie {
             chunkSize,
             startId
         }))) {
+            console.log(`${entity} fetched ${chunkedRecognitionRows.length} records`)
             // Store these in the cache
             if (currentUserEmail) {
                 await cache.bulkAdd(chunkedRecognitionRows.map(v => ({...v, creator_email: currentUserEmail})))
