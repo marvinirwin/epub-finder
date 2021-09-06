@@ -1,7 +1,7 @@
 import { Profile } from '../../../lib/auth/logged-in-user.service'
 import { TreeMenuNode } from '../tree-menu-node.interface'
 import React, { useContext, useState } from 'react'
-import { AccountCircle } from '@material-ui/icons'
+import {AccountCircle, Settings} from '@material-ui/icons'
 import { AUTH, loggedInProfileNode, notLoggedInProfileNode } from '@shared/'
 import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
@@ -42,7 +42,10 @@ export const LoggedInProfile: React.FC<{ profile: Profile }> = ({ profile }) => 
         selected={false}
         id={loggedInProfileNode}
     >
-        <ListItemText primary={profile.email} />
+        <ListItemIcon>
+            <AccountCircle/>
+        </ListItemIcon>
+        <ListItemText primaryTypographyProps={{variant: 'subtitle2'}} primary={profile.email} />
     </ListItem>
 }
 
@@ -50,6 +53,7 @@ export const ProfileNodeComponent = () => {
     const m = useContext(ManagerContext)
     const profile = useObservableState(m.loggedInUserService.profile$)
     const isTemporaryUser = !profile?.email
+
     return (profile && !isTemporaryUser) ? <LoggedInProfile profile={profile} /> : <IsNotLoggedInProfile />
 }
 

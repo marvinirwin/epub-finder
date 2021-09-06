@@ -1,7 +1,7 @@
 import { IndexedRowsRepository } from './indexed-rows.repository'
 import { WordRecognitionRow } from './word-recognition-row'
 import { DatabaseService} from '../Storage/database.service'
-import {putPersistableEntity} from "../Storage/putPersistableEntity";
+import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
 import {observableLastValue} from "../../services/settings.service";
 

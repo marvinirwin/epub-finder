@@ -1,20 +1,33 @@
-import React, {useContext} from "react";
+import React, {useContext, useMemo} from "react";
 import {QuizCard} from "../word-card.interface";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
+import {Paper, Table, TableBody, TableContainer} from "@material-ui/core";
+import {quizRowsNotInProgressTable} from "@shared/";
+import {QuizCardTableHead} from "../quiz-card-table-head.component";
+import {QuizCardTableRow} from "../quiz-card-table-row.component";
 import {quizCardKey} from "../../../lib/util/Util";
 
 export const CardOrderMetadata = ({quizCard}: { quizCard: QuizCard }) => {
     const m = useContext(ManagerContext);
-    const indexedSortedRows = useObservableState(m.sortedLimitedQuizScheduleRowsService.indexedSortedLimitedScheduleRows$) || new Map();
+    const indexedSortedRows = useObservableState(m.sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$)?.limitedScheduleRows
     const word = useObservableState(quizCard.word$) || '';
     const flashCardType = useObservableState(quizCard.flashCardType$) || '';
-    const key = quizCardKey({word, flashCardType});
-    const index = indexedSortedRows.get(key);
+    const endIndex = useMemo(() => {
+        return indexedSortedRows && indexedSortedRows
+            .findIndex(r => quizCardKey({word, flashCardType}) ===
+                quizCardKey({word: r.d.word, flashCardType: r.d.flash_card_type}))
+    }, [indexedSortedRows, word, flashCardType]);
 
-    return <div>
-        {
-            index !== undefined && <div>Total Index: {index} </div>
-        }
-    </div>
+
+    return (endIndex && indexedSortedRows) ? <TableContainer component={Paper} style={{ flex: 1, overflow: 'hidden' }}>
+        <Table size="small" id={quizRowsNotInProgressTable}>
+            <QuizCardTableHead />
+            <TableBody>
+                {indexedSortedRows.slice(0, endIndex + 1).map((row) => (
+                    <QuizCardTableRow row={row} key={row.d.word} />
+                ))}
+            </TableBody>
+        </Table>
+    </TableContainer> : <></>
 };

@@ -4,7 +4,7 @@ import {Observable, of} from 'rxjs'
 import {distinctUntilChanged, skip} from 'rxjs/operators'
 import {UserSetting} from '../../../server/src/entities/user-setting.entity'
 import {queryPersistableEntity} from "../lib/Storage/queryPersistableEntity";
-import {putPersistableEntity} from "../lib/Storage/putPersistableEntity";
+import {putPersistableEntity} from "../lib/Storage/put-persistable-entity";
 
 export type SettingType = 'url' | 'indexedDB' | 'REST';
 

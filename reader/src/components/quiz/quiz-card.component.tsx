@@ -30,14 +30,16 @@ return (
             }
             {
                 !showNoScheduleRows && (
-                    <Fragment>
+                    <div className={'quiz-card-revealed'}>
                         {
                             answerIsRevealed ?
                                 <RevealedQuizCard quizCard={quizCard} /> :
                                 <UnRevealedQuizCardComponent quizCard={quizCard} />
                         }
+                        {/* This element only exists for spacing purposes */}
+                        <div style={{flexGrow: 2}}/>
                         <QuizCardButtons quizCard={quizCard} />
-                    </Fragment>
+                    </div>
                 )
             }
         </Paper>

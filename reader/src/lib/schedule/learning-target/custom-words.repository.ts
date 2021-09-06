@@ -1,6 +1,6 @@
 import { CustomWord, DatabaseService} from '../../Storage/database.service'
 import { IndexedRowsRepository } from '../indexed-rows.repository'
-import {putPersistableEntity} from "../../Storage/putPersistableEntity";
+import {putPersistableEntity} from "../../Storage/put-persistable-entity";
 import {observableLastValue} from "../../../services/settings.service";
 import {LoggedInUserService} from "../../auth/logged-in-user.service";
 

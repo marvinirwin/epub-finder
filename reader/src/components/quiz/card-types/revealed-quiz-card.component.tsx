@@ -22,7 +22,7 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
                 <QuizCardSound quizCard={quizCard} />
                 <CardLearningLanguageText word={word || ''} />
             </div>
-            <div>
+            <div className={`revealed-quiz-card-info-tab`}>
                 {/*
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}
@@ -32,7 +32,7 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
         </div>
         {
             !exampleSegmentsHidden && <OpenDocumentComponent
-                style={{ alignSelf: 'start', margin: '24px', flex: 1, overflow: 'auto', width: '100%' }}
+                style={{ margin: '24px', flex: 1, overflow: 'auto', width: '100%' }}
                 openedDocument={quizCard.exampleSentenceOpenDocument}
             />
         }</Fragment>

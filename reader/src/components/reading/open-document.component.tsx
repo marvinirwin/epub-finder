@@ -23,7 +23,7 @@ export const OpenDocumentComponent = React.forwardRef<
             renderHandler={(body) => {
                 openedDocument.handleHTMLHasBeenRendered(body)
             }}
-            style={{paddingLeft: '24px', paddingRight: '24px', paddingTop: '24px', paddingBottom: '128px'}}
+            style={{alignSelf: 'flex-start', paddingLeft: '24px', paddingRight: '24px', paddingTop: '24px', paddingBottom: '128px'}}
             ref={ref}
         />
     )

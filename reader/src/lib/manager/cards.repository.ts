@@ -7,7 +7,7 @@ import { cardForWord } from '../util/Util'
 import { observableLastValue } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { highestPriorityCard } from './highest-priority-card'
-import {putPersistableEntity} from "../Storage/putPersistableEntity";
+import {putPersistableEntity} from "../Storage/put-persistable-entity";
 
 export default class CardsRepository {
     private languageConfigsService: LanguageConfigsService
