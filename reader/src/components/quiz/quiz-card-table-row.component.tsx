@@ -4,7 +4,7 @@ import { round } from 'lodash'
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { format, formatDistance } from 'date-fns'
-import { SpacedScheduleRow } from '../../lib/manager/sorted-limit-schedule-rows.service'
+import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 
 export const QuizCardTableRow: React.FC<{
     row: SpacedScheduleRow

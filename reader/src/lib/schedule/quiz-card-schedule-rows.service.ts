@@ -13,8 +13,8 @@ import { WordRecognitionRow } from './word-recognition-row'
 import { TabulationService } from '../tabulation/tabulation.service'
 import { FlashCardTypesRequiredToProgressService } from './required-to-progress.service'
 import { spaceOutRows } from './space-out-rows'
-import { SpacedScheduleRow } from '../manager/sorted-limit-schedule-rows.service'
 import { pipeLog } from '../manager/pipe.log'
+import {SpacedScheduleRow} from "../manager/space-schedule-row.type";
 
 function getSortConfigs({
                             dateWeight,

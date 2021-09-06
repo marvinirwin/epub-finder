@@ -1,7 +1,7 @@
-import {LimitedScheduleRows} from "../../lib/manager/sorted-limit-schedule-rows.service";
 import {WordRecognitionRow} from "../../lib/schedule/word-recognition-row";
 import {FlashCardType} from "../../lib/quiz/hidden-quiz-fields";
 import {isRepeatRecord} from "./is-repeat-record";
+import {LimitedScheduleRows} from "../../lib/manager/limit-schedule-rows.type";
 
 export const getItemsThatDontRepeat = (
     scheduleRows: LimitedScheduleRows,

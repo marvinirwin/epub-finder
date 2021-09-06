@@ -1,102 +1,23 @@
 import {observableLastValue, SettingsService} from '../../services/settings.service'
 import {combineLatest, Observable} from 'rxjs'
 import {debounceTime, distinctUntilChanged, map, shareReplay} from 'rxjs/operators'
-import {ScheduleRow, SortQuizData, SpacedSortQuizData} from '../schedule/schedule-row'
+import {ScheduleRow, SpacedSortQuizData} from '../schedule/schedule-row'
 import {QuizCardScheduleRowsService} from '../schedule/quiz-card-schedule-rows.service'
 import {TimeService} from '../time/time.service'
-import {Dictionary, flatten, groupBy, orderBy, uniq} from 'lodash'
-import {FlashCardType} from '../quiz/hidden-quiz-fields'
-import {isToday} from 'date-fns'
+import {flatten, groupBy, orderBy, uniq} from 'lodash'
 import {pipeLog} from './pipe.log'
 import {KnownWordsRepository} from '../schedule/known-words.repository'
 import {tapCacheScheduleRowImages} from './image-cache'
 import CardsRepository from './cards.repository'
-
-export type SpacedScheduleRow = ScheduleRow<SpacedSortQuizData>;
-
-export type LimitedScheduleRows = {
-    scheduleRowsLeftForToday: SpacedScheduleRow[]
-    wordsToReview: SpacedScheduleRow[];
-    limitedScheduleRows: SpacedScheduleRow[];
-    wordsLearnedToday: SpacedScheduleRow[];
-    wordsReviewedToday: SpacedScheduleRow[];
-    wordsLearning: SpacedScheduleRow[];
-    wordsLeftForToday: SpacedScheduleRow[];
-    unStartedWords: SpacedScheduleRow[];
-    debug: {
-        limitedScheduleRows: {
-            overDueRows: ScheduleRow<SpacedSortQuizData>[]
-            scheduleRowsLeftForToday: ScheduleRow<SpacedSortQuizData>[]
-            notOverDueRows: ScheduleRow<SpacedSortQuizData>[]
-        }
-    },
-}
-
-export const groupByWord = <listItemType, itemKeyType extends string>(rows: listItemType[], keyExtractionFunction: (r: listItemType) => itemKeyType): Dictionary<listItemType[]> => {
-    return groupBy(rows, keyExtractionFunction)
-}
-
-export const gatherWhile = <T, U>(values: T[], filterFunc: (value: T) => boolean, limitReachedFunc: (gathered: T, acc: U) => boolean, acc: U): T[] => {
-    const gatheredValues = []
-    for (const value of values) {
-        if (filterFunc(value)) {
-            gatheredValues.push(value)
-            if (limitReachedFunc(value, acc)) {
-                return gatheredValues
-            }
-        }
-    }
-    return gatheredValues
-}
-
-export const anyScheduleRowsForWord = (
-    scheduleRowsToReview: ScheduleRow<SpacedSortQuizData>[],
-    quizCardFieldConfig: FlashCardType[],
-) => {
-    // A word is to review if any of its rows are too review
-    return Object.values(groupBy(scheduleRowsToReview, row => row.d.word))
-}
-
-export const allScheduleRowsForWordToday = (
-    {
-        scheduleRows,
-        allScheduleRows,
-    }:
-        {
-            scheduleRows: ScheduleRow<SortQuizData>[],
-            allScheduleRows: ScheduleRow<SortQuizData>[]
-        },
-) => {
-    // So we take all the schedule rows which are due today and then apply the evewry function
-    /**
-     * For a word to be unStarted, all of its schedule rows must be unStarted for that day
-     */
-    const selectScheduleRowsGrouped = groupBy(scheduleRows, r => r.d.word)
-    const allScheduleRowsGrouped = groupBy(allScheduleRows, r => r.d.word)
-    const selectEntriesGrouped = Object.entries(selectScheduleRowsGrouped)
-    const filteredItems = []
-    for (const [word, rows] of selectEntriesGrouped) {
-        const allScheduleRowEntries = allScheduleRowsGrouped[word]?.filter(r => isToday(r.dueDate()))
-        const allRowsComplete = allScheduleRowEntries.length === rows.length
-        if (allRowsComplete) {
-            filteredItems.push(rows)
-        }
-    }
-    return filteredItems
-}
-
-export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flash_card_type}${r.d.wordRecognitionRecords.length}`
-
-const getSiblingRecords = (learningScheduleRows: SpacedScheduleRow[], unStartedScheduleRows: SpacedScheduleRow[]) =>
-    flatten(learningScheduleRows
-        .map(learningScheduleRow => unStartedScheduleRows
-            .filter(unStartedScheduleRow => unStartedScheduleRow.d.word === learningScheduleRow.d.word),
-        ),
-    )
+import {quizCardKey, scheduleRowKey} from "../util/Util";
+import {getSiblingRecords} from "./group-schedule-rows";
+import {LimitedScheduleRows} from "./limit-schedule-rows.type";
+import {SpacedScheduleRow} from "./space-schedule-row.type";
 
 
 export class SortedLimitScheduleRowsService {
     sortedLimitedScheduleRows$: Observable<LimitedScheduleRows>
+    indexedSortedLimitedScheduleRows$: Observable<Map<string, number>>;
 
     constructor({
                     settingsService,
@@ -212,6 +133,19 @@ export class SortedLimitScheduleRowsService {
                 return sortedLimitedScheduleRowResult.limitedScheduleRows.map(r => cardIndex[r.d.word]?.[0]?.photos?.[0])
             }),
             shareReplay(1),
-        )
+        );
+        this.indexedSortedLimitedScheduleRows$ = this.sortedLimitedScheduleRows$
+            .pipe(
+                map(scheduleRows => {
+                    const scheduleRowEntries: [string, number][] = scheduleRows
+                        .limitedScheduleRows
+                        .map((row, index) => {
+                            const key = quizCardKey({word: row.d.word, flashCardType: row.d.flash_card_type});
+                            return [key, index]
+                        })
+                    return new Map<string, number>(scheduleRowEntries);
+                }),
+                shareReplay(1)
+            )
     }
 }

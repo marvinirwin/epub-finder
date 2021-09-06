@@ -23,5 +23,7 @@ export const putPersistableEntity = <T>(
     ).then(async response => {
         const item = await response.json();
         return parseCreatedAt(item);
+    }).catch(e => {
+        alert(`Error saving entity ${entity}`);
     })
 }

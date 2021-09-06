@@ -10,9 +10,8 @@ import {LanguageConfigsService} from '../../lib/language/language-configs.servic
 import {FlashCardType} from '../../lib/quiz/hidden-quiz-fields'
 import {SettingsService} from '../../services/settings.service'
 import {
-    scheduleRowKey,
     SortedLimitScheduleRowsService,
-    SpacedScheduleRow,
+
 } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import {wordCardFactory} from './card-card.factory'
 import {TabulationConfigurationService} from '../../lib/language/language-maps/tabulation-configuration.service'
@@ -21,6 +20,8 @@ import {OnSelectService} from '../../lib/user-interface/on-select.service'
 import {WordRecognitionProgressRepository} from '../../lib/schedule/word-recognition-progress.repository'
 import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
 import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
+import {scheduleRowKey} from "../../lib/util/Util";
+import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 
 export class QuizService {
     quizCard: QuizCard

@@ -3,8 +3,9 @@ import { ScheduleRow, SortQuizData } from './schedule-row'
 import { SettingsService } from '../../services/settings.service'
 import { debounceTime, map, shareReplay } from 'rxjs/operators'
 import { sumWordCountRecords } from './schedule-math.service'
-import { SortedLimitScheduleRowsService, SpacedScheduleRow } from '../manager/sorted-limit-schedule-rows.service'
+import { SortedLimitScheduleRowsService} from '../manager/sorted-limit-schedule-rows.service'
 import { uniq } from 'lodash'
+import {SpacedScheduleRow} from "../manager/space-schedule-row.type";
 
 export class FilterScheduleTableRowsService {
     public filteredScheduleRows$: Observable<SpacedScheduleRow[]>
@@ -72,6 +73,6 @@ export class FilterScheduleTableRowsService {
             map(filterQuizRows),
 */
             shareReplay(1),
-        )
+        );
     }
 }

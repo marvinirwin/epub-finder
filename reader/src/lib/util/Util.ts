@@ -1,5 +1,6 @@
-import { flatten } from 'lodash'
-import { ICard } from '../../../../server/src/shared/ICard'
+import {flatten} from 'lodash'
+import {ICard} from '../../../../server/src/shared/ICard'
+import {ScheduleRow, SpacedSortQuizData} from "../schedule/schedule-row";
 
 export const cardForWord = async (word: string, language_code: string): Promise<Partial<ICard>> => ({
     learning_language: word,
@@ -61,3 +62,9 @@ export enum NavigationPages {
     SETTINGS_PAGE = 'SETTINGS_PAGE',
     LIBRARY_PAGE = 'LIBRARY_PAGE',
 }
+
+export const quizCardKey = ({
+                                word,
+                                flashCardType
+                            }: { word: string, flashCardType: string }) => `${word}-${flashCardType}`;
+export const scheduleRowKey = (r: ScheduleRow<SpacedSortQuizData>) => `${r.d.word}${r.d.flash_card_type}${r.d.wordRecognitionRecords.length}`

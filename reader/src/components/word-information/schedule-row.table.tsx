@@ -2,9 +2,9 @@ import React from 'react'
 import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
 import { formatDueDate } from '../../lib/schedule/format-due-date'
-import { SpacedScheduleRow } from '../../lib/manager/sorted-limit-schedule-rows.service'
 import { SrmStates } from '../../lib/schedule/srm-state-change-records'
 import { PotentialExcludedDbColumns } from '../../lib/schedule/indexed-rows.repository'
+import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 
 export const ScheduleRowTable: React.FC<{
     scheduleRow: SpacedScheduleRow

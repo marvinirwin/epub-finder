@@ -8,6 +8,7 @@ import {useObservableState} from 'observable-hooks'
 import {useIsFieldHidden} from '../useIsFieldHidden'
 import {QuizCardField} from '../../../lib/quiz/hidden-quiz-fields'
 import {CardLearningLanguageText} from '../../word-information/card-learning-language.component'
+import {CardOrderMetadata} from "./card-order.metadata.component";
 
 export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
@@ -26,6 +27,7 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}
                 {<CardInfo quizCard={quizCard} />}
+                <CardOrderMetadata quizCard={quizCard}/>
             </div>
         </div>
         {
