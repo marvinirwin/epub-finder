@@ -12,12 +12,12 @@ export const ScheduleRowTable: React.FC<{
     const getCorrespondingStateEvent = (recognitionRow: PotentialExcludedDbColumns<WordRecognitionRow>) => scheduleRow.stateChangeRecords.find(stateChangeRecord => stateChangeRecord.r === recognitionRow)
     return (
         <TableContainer component={Paper}>
-            <Table size='small' aria-label='a dense table'>
+            <Table size='small'>
                 <TableHead>
                     <TableRow>
                         <TableCell>Grade</TableCell>
-                        <TableCell align='right'>Next Due Date</TableCell>
                         <TableCell align='right'>Timestamp</TableCell>
+                        <TableCell align='right'>Next Due Date</TableCell>
                         <TableCell align='right'>Interval</TableCell>
                         <TableCell>Learning State Change</TableCell>
                     </TableRow>
@@ -31,10 +31,10 @@ export const ScheduleRowTable: React.FC<{
                                     {row.grade}
                                 </TableCell>
                                 <TableCell align='right'>
-                                    {formatDueDate(row.nextDueDate || new Date())}
+                                    {formatDueDate(row.created_at || new Date())}
                                 </TableCell>
                                 <TableCell align='right'>
-                                    {formatDueDate(row.created_at || new Date())}
+                                    {formatDueDate(row.nextDueDate || new Date())}
                                 </TableCell>
                                 <TableCell align='right'>{row.interval}</TableCell>
                                 <TableCell style={

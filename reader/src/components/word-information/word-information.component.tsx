@@ -1,13 +1,13 @@
-import { WordCard } from '../quiz/word-card.interface'
-import React, { useContext } from 'react'
-import { Box, Button, Paper, TextField, Typography } from '@material-ui/core'
-import { CardImage } from '../quiz/quiz-card-image.component'
-import { quizCardDescription, wordCardRomanization, wordCardTranslation } from '@shared/'
-import { useObservableState } from 'observable-hooks'
-import { ManagerContext } from '../../App'
-import { useLoadingObservableString } from '../../lib/util/create-loading-observable'
-import { CardLearningLanguageText } from './card-learning-language.component'
-import { ScheduleRowTable } from './schedule-row.table'
+import {WordCard} from '../quiz/word-card.interface'
+import React, {useContext} from 'react'
+import {Box, Button, Paper, TextField, Typography} from '@material-ui/core'
+import {CardImage} from '../quiz/quiz-card-image.component'
+import {quizCardDescription, wordCardRomanization, wordCardTranslation} from '@shared/'
+import {useObservableState} from 'observable-hooks'
+import {ManagerContext} from '../../App'
+import {useLoadingObservableString} from '../../lib/util/create-loading-observable'
+import {CardLearningLanguageText} from './card-learning-language.component'
+import {ScheduleRowsTables} from "./schedule-rows-tables.component";
 
 
 export const useIsMarkedAsKnown = (word: string) => {
@@ -32,10 +32,6 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                                                                            }) => {
     const m = useContext(ManagerContext)
     const word = useObservableState(wordCard.word$)
-    const scheduleRows =
-        useObservableState(
-            m.quizCardScheduleRowsService.scheduleRows$,
-        )?.filter(r => r.d.word === word) || []
     const romanization = useLoadingObservableString(wordCard.romanization$, '')
     const translation = useLoadingObservableString(wordCard.translation$, '')
     const description = useObservableState(wordCard.description$.value$);
@@ -100,12 +96,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
                     onChange={(e) => wordCard.description$.set(e.target.value)}
                 />
                 <br />
-                {scheduleRows.map(scheduleRow => <Box m={2} p={1}
-                                                      key={`${scheduleRow.d.word}.${scheduleRow.d.flash_card_type}`}>
-                    <Typography variant={'subtitle1'}>{scheduleRow.d.flash_card_type}</Typography>
-                    <br />
-                    <ScheduleRowTable scheduleRow={scheduleRow} />
-                </Box>)}
+                <ScheduleRowsTables word={word || ''}/>
                 <br />
                 {/*
             <CountRecordTable countRecords={flatten(scheduleRows.map(r => r.d.wordCountRecords))} />

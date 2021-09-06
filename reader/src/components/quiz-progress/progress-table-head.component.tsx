@@ -7,8 +7,8 @@ export const ProgressTableHead: React.FC<{}> = () => {
             <TableRow>
                 <TableCell>Word</TableCell>
                 <TableCell>Score</TableCell>
-                <TableCell>Next Due Date</TableCell>
                 <TableCell>Timestamp</TableCell>
+                <TableCell>Next Due Date</TableCell>
                 <TableCell>EFactor</TableCell>
             </TableRow>
         </TableHead>

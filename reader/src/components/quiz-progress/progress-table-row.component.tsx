@@ -19,14 +19,14 @@ export const ProgressTableRow: React.FC<{
             </TableCell>
             <TableCell component="th" scope="row">
                 <Typography>
-                    {moment(recognitionRecord.nextDueDate).format(
-                        'DD hh:mm:ss',
-                    )}{' '}
+                    {moment(recognitionRecord.created_at).format('DD hh:mm:ss')}{' '}
                 </Typography>
             </TableCell>
             <TableCell component="th" scope="row">
                 <Typography>
-                    {moment(recognitionRecord.created_at).format('DD hh:mm:ss')}{' '}
+                    {moment(recognitionRecord.nextDueDate).format(
+                        'DD hh:mm:ss',
+                    )}{' '}
                 </Typography>
             </TableCell>
             <TableCell component="th" scope="row">

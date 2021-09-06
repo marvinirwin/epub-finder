@@ -26,10 +26,6 @@ export const TranslationAttemptTableHead: React.FC<{}> = () => {
                 <TableCell>Text</TableCell>
                 <TableCell>Score</TableCell>
                 <TableCell>Next Due Date</TableCell>
-                {/*
-            <TableCell>Timestamp</TableCell>
-            <TableCell>EFactor</TableCell>
-*/}
             </TableRow>
         </TableHead>
     )
