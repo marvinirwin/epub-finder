@@ -21,6 +21,7 @@ export const changeLog: { message: string, date: Date }[] = [
     ["Mon Sep 06 2021 11:45:44 GMT-0700 (Pacific Daylight Time)", `Added order metadata to quiz card results`],
     ["Mon Sep 06 2021 11:45:44 GMT-0700 (Pacific Daylight Time)", `Made the bar on the left not off-center, added padding for quis card images`],
     ["Mon Sep 06 2021 12:46:34 GMT-0700 (Pacific Daylight Time)", `Made a bunch of small css improvements`],
+    ["Mon Sep 06 2021 15:57:18 GMT-0700 (Pacific Daylight Time)", `Added much more information to revealed quiz card and made big refactors`],
 ].map(([date, message]) => ({
     message,
     date: new Date(date),
