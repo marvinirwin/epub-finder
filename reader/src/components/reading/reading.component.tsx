@@ -12,7 +12,7 @@ import { OpenDocumentComponent } from './open-document.component'
 export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({
     m,
 }) => {
-    const openedDocument = m.readingDocumentService.readingDocument
+    const readingDocument = m.readingDocumentService.readingDocument
     const showPronunciationVideo = !!useObservableState(
         m.pronunciationVideoService.videoMetadata$,
     )
@@ -27,7 +27,7 @@ export const ReadingComponent: React.FunctionComponent<{ m: Manager }> = ({
             </ExpandableContainer>
             <OpenDocumentComponent
                 ref={(ref) => m.introService.readingFrameRef$.next(ref)}
-                openedDocument={openedDocument}
+                openedDocument={readingDocument}
                 id={'reading-document'}
             />
         </div>

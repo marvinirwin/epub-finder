@@ -17,7 +17,8 @@ export function createPopperElement(document1: XMLDocument) {
 }
 
 type atomizeConfiguration = {
-    splitDelims?: string[]
+    splitDelims?: string[];
+
 }
 
 export class AtomizedDocument {
