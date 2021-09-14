@@ -17,6 +17,7 @@ import { TabulationConfigurationService } from '../language/language-maps/tabula
 import { OnSelectService } from '../user-interface/on-select.service'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 import { pipeLog } from '../manager/pipe.log'
+import {ExampleSegmentsService} from "../quiz/example-segments.service";
 
 export class OpenDocument {
     public name: string
@@ -35,6 +36,7 @@ export class OpenDocument {
             settingsService: SettingsService
             languageConfigsService: LanguageConfigsService
             onSelectService: OnSelectService
+            exampleSegmentsService: ExampleSegmentsService
         },
     ) {
         this.name = id
@@ -88,6 +90,7 @@ export class OpenDocument {
                 element: (element as unknown) as XMLDocumentNode,
                 languageConfigsService: this.services.languageConfigsService,
                 settingsService: this.services.settingsService,
+                exampleSegmentsService: this.services.exampleSegmentsService
             })
         })
         this.services.onSelectService.handleSelection(body.ownerDocument)

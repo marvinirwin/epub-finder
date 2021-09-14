@@ -30,7 +30,7 @@ ctx.onmessage = async (ev) => {
         `${process.env.PUBLIC_URL}/documents/${ltDoc.filename}`,
     )
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
-    const doc = AtomizedDocument.atomizeDocument(documentSrc)
+    const doc = AtomizedDocument.atomizeDocument({documentId: ltDoc.id(), documentSrc})
     const segments = doc.segments();
     const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),

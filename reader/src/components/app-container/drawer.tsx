@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
             }),
+            height: 48
         },
         appBarShift: {
             marginLeft: drawerWidth,
@@ -109,7 +110,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     [classes.appBarShift]: open,
                 })}
             >
-                <Toolbar>
+                <Toolbar style={{minHeight: 48}}>
                     <IconButton
                         color='inherit'
                         aria-label='open drawer'

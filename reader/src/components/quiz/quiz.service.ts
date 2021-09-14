@@ -31,7 +31,7 @@ export class QuizService {
     constructor({
                     cardsRepository,
                     sortedLimitedQuizScheduleRowsService,
-                    exampleSentencesService,
+                    exampleSegmentsService,
                     openDocumentsService,
                     languageConfigsService,
                     settingsService,
@@ -42,7 +42,6 @@ export class QuizService {
                 }: {
         cardsRepository: CardsRepository
         sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
-        exampleSentencesService: ExampleSegmentsService
         openDocumentsService: OpenDocumentsService
         languageConfigsService: LanguageConfigsService
         settingsService: SettingsService
@@ -50,6 +49,7 @@ export class QuizService {
         translationAttemptScheduleService: TranslationAttemptScheduleService
         onSelectService: OnSelectService,
         wordRecognitionProgressRepository: WordRecognitionProgressRepository
+        exampleSegmentsService: ExampleSegmentsService
     }) {
         this.manualHiddenFieldConfig$.next('')
         this.currentScheduleRow$ = combineLatest(
@@ -114,9 +114,10 @@ export class QuizService {
             settingsService,
             languageConfigsService,
             onSelectService,
-            name: 'example-sentences',
+            exampleSegmentsService,
+            documentId: 'example-sentences',
             sentences$: combineLatest([
-                exampleSentencesService.exampleSegmentMap$,
+                exampleSegmentsService.exampleSegmentMap$,
                 currentWord$,
             ]).pipe(
                 debounceTime(0),

@@ -3,11 +3,13 @@ import { AtomizedDocument } from '../../../../server/src/shared/tabulate-documen
 import { AtomizedStringsForRawHTML } from '../pipes/AtomizedStringsForRawHTML'
 import { map, shareReplay } from 'rxjs/operators'
 import { AtomizedStringsForURL } from '../pipes/AtomizedStringsForURL'
+import {DocumentId} from "../../../../server/src/shared/sourced-text";
 
 export type AtomizedDocumentSources = {
     atomizedDocument$?: Observable<AtomizedDocument>
     url$?: Observable<string>
     unAtomizedDocument$?: Observable<string>
+    documentId: string
 }
 
 export class DocumentSourcesService {
@@ -15,11 +17,18 @@ export class DocumentSourcesService {
         atomizedDocument$,
         url$,
         unAtomizedDocument$,
+        documentId
     }: AtomizedDocumentSources): Observable<AtomizedDocument> {
         const sources: Observable<AtomizedDocument>[] = []
         if (unAtomizedDocument$) {
             sources.push(
                 unAtomizedDocument$.pipe(
+                    map(documentSrc => {
+                        return {
+                            documentId,
+                            documentSrc
+                        }
+                    }),
                     AtomizedStringsForRawHTML,
                     map(AtomizedDocument.fromAtomizedString),
                     shareReplay(1)
@@ -29,6 +38,12 @@ export class DocumentSourcesService {
         if (url$) {
             sources.push(
                 url$.pipe(
+                    map(url => {
+                        return {
+                            documentId,
+                            url,
+                        }
+                    }),
                     AtomizedStringsForURL,
                     map(AtomizedDocument.fromAtomizedString),
                     shareReplay(1)

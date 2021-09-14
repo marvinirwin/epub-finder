@@ -12,7 +12,9 @@ export const OpenDocumentComponent = React.forwardRef<
     const document = useObservableState(openedDocument.atomizedDocument$)
     const bodyInnerHTML = document?.bodyInnerHTML()
     useEffect(() => {
-         setMouseOverText('', '');
+        setTimeout(() => {
+            setMouseOverText('', '');
+        }, 10)
     }, [bodyInnerHTML])
     return (
         <InnerHtmlFrameComponent

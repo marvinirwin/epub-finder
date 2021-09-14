@@ -1,23 +1,22 @@
-import { InterpolateService } from '../interpolate.service'
-import { AtomizedDocument } from './atomized-document'
-import { TabulateService } from '../../documents/similarity/tabulate.service'
-import trie from 'trie-prefix-tree'
-import { Segment } from './segment/segment'
-import { ChineseVocabService } from './chinese-vocab.service'
-import { tabulate } from './segment/tabulate'
-import { resolvePartialTabulationConfig } from '../tabulation/word-separator'
+import { InterpolateService } from "../interpolate.service";
+import { AtomizedDocument } from "./atomized-document";
+import trie from "trie-prefix-tree";
+import { ChineseVocabService } from "./chinese-vocab.service";
+import { tabulate } from "./segment/tabulate";
+import { resolvePartialTabulationConfig } from "../tabulation/word-separator";
+import {DocumentId} from "../sourced-text";
 
-export const TabulateChineseText = async (text: string) => {
+export const TabulateChineseText = async ({text, documentId}: {text: string; documentId: DocumentId}) => {
     const notableCharacterSequencesSegmentsGreedyWordSet = trie(
         await ChineseVocabService.vocab(),
-    )
+    );
     return tabulate({
         notableCharacterSequences: notableCharacterSequencesSegmentsGreedyWordSet,
         segments: AtomizedDocument.atomizeDocument(
-            InterpolateService.text(text),
+            {documentSrc: InterpolateService.text(text), documentId},
         ).segments(),
         greedyWordSet: notableCharacterSequencesSegmentsGreedyWordSet,
-        ...resolvePartialTabulationConfig('zh-Hans'),
-        language_code: 'zh-Hans',
-    })
-}
+        ...resolvePartialTabulationConfig("zh-Hans"),
+        language_code: "zh-Hans",
+    });
+};

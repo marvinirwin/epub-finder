@@ -6,6 +6,7 @@ import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { fetchTranslation } from '../../services/translate.service'
 import { fetchTransliteration } from '../language/transliterate.service'
+import {ExampleSegmentsService} from "../quiz/example-segments.service";
 
 export class BrowserSegment extends Segment {
     translation$: Observable<string>
@@ -15,10 +16,12 @@ export class BrowserSegment extends Segment {
         element,
         languageConfigsService,
         settingsService,
+        exampleSegmentsService
     }: {
         element: XMLDocumentNode
         languageConfigsService: LanguageConfigsService
         settingsService: SettingsService
+        exampleSegmentsService: ExampleSegmentsService
     }) {
         super(element)
         this.translation$ = languageConfigsService.learningToKnownTranslateConfig$.pipe(
@@ -48,6 +51,7 @@ export class BrowserSegment extends Segment {
             this.romanization$.pipe(startWith('')),
             settingsService.showRomanization$,
             settingsService.showTranslation$,
+            exampleSegmentsService.exampleSegmentTabulationMap$
         ]).pipe(
             map(
                 ([
@@ -55,10 +59,20 @@ export class BrowserSegment extends Segment {
                     romanization,
                     showRomanization,
                     showTranslation,
+                    exampleSegmentMap
                 ]) => {
+                    const sourceTabulations = exampleSegmentMap.get(this.translatableText);
+                    const sourceTabulationLabels = sourceTabulations ? sourceTabulations.map(sourceTabulation => sourceTabulation.label).join(', ') : '';
+                    const titleText = showRomanization ? romanization || '' : '';
+                    const translationWithSource = (sourceTabulationLabels && translation) ?
+                        `${translation}
+
+                        ${sourceTabulationLabels}
+                        ` : translation;
+                    const subtitle = showTranslation ? translationWithSource : '';
                     return {
-                        title: showRomanization ? romanization || '' : '',
-                        subtitle: showTranslation ? translation || '' : '',
+                        title: showRomanization ? titleText || '' : '',
+                        subtitle,
                     }
                 },
             ),

@@ -9,6 +9,7 @@ import TabulateLocalDocumentWorker from 'Worker-loader?name=dist/[name].js!./tab
 // @ts-ignore
 import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker'
 import {
+    AtomizedDocumentFromUrlParams, AtomizeSrcDocParams,
     InterpolateService,
     SerializedDocumentTabulation,
     SerializedTabulation,
@@ -18,15 +19,14 @@ import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
 
 export type WorkerError = { errorMessage: string }
 
-export const AtomizeHtml = (HTMLString: string) =>
+export const AtomizeHtml = (HTMLString: AtomizeSrcDocParams) =>
     GetWorkerResults<string | WorkerError>(
         new AtomizeSrcdocWorker(),
         HTMLString,
     ).then(handleWorkerError)
 
-export const AtomizeUrl = async (url: string) => {
+export const AtomizeUrl = async (url: AtomizedDocumentFromUrlParams) => {
     return GetWorkerResults<string | WorkerError>(new AtomizeUrlWorker(), url)
-        .then(handleCacheSuccessfulAtomizeUrl(url))
         .then(handleWorkerError)
 }
 
@@ -45,12 +45,6 @@ export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) =>
     ).then((result: SerializedDocumentTabulation) => {
         return result
     })
-
-function handleCacheSuccessfulAtomizeUrl(url: string) {
-    return (result: string | WorkerError) => {
-        return result
-    }
-}
 
 export const AtomizeUrlKey = (url: string) => `ATOMIZED_URL_${url}`
 

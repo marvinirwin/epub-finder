@@ -1,4 +1,5 @@
 import {IPositionedWord} from "./Annotation/IPositionedWord";
+import {DocumentId} from "./sourced-text";
 
 export { InterpolateService } from './interpolate.service'
 export { LtDocument } from './lt-document'
@@ -15,4 +16,13 @@ export { tabulate } from './tabulate-documents/segment/tabulate'
 export interface SegmentSubsequences {
     segmentText: string;
     subsequences: IPositionedWord[];
+}
+
+export interface AtomizedDocumentFromUrlParams {
+    url: string;
+    documentId: string;
+}
+export interface AtomizeSrcDocParams {
+    documentId: DocumentId;
+    documentSrc: string;
 }

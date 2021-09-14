@@ -18,21 +18,21 @@ export class CsvService {
         {
             quizCardScheduleRowsService,
             cardsRepository,
-            exampleSentencesService,
+            exampleSegmentsService,
             languageConfigsService,
         }:
             {
                 languageConfigsService: LanguageConfigsService,
                 quizCardScheduleRowsService: QuizCardScheduleRowsService,
                 cardsRepository: CardsRepository,
-                exampleSentencesService: ExampleSegmentsService,
+                exampleSegmentsService: ExampleSegmentsService,
             },
     ) {
         this.csvAndZip$ = combineLatest([
             languageConfigsService.readingLanguageCode$,
             quizCardScheduleRowsService.scheduleRows$,
             cardsRepository.cardIndex$,
-            exampleSentencesService.exampleSegmentMap$,
+            exampleSegmentsService.exampleSegmentMap$,
             languageConfigsService.learningLanguageTextToSpeechConfig$,
         ]).pipe(
             switchMap(async ([

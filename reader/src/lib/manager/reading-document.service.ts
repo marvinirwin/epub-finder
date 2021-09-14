@@ -12,6 +12,7 @@ import { OpenDocument } from '../document-frame/open-document.entity'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
+import {ExampleSegmentsService} from "../quiz/example-segments.service";
 
 export class ReadingDocumentService {
     public readingDocument: OpenDocument
@@ -25,12 +26,14 @@ export class ReadingDocumentService {
         settingsService,
         languageConfigsService,
         onSelectService,
+        exampleSegmentsService
     }: {
         tabulationConfigurationService: TabulationConfigurationService
         openDocumentsService: OpenDocumentsService
         settingsService: SettingsService
         languageConfigsService: LanguageConfigsService
         onSelectService: OnSelectService
+        exampleSegmentsService: ExampleSegmentsService
     }) {
         this.readingDocument = new OpenDocument(
             'Reading Document',
@@ -46,6 +49,7 @@ export class ReadingDocumentService {
                 settingsService,
                 languageConfigsService,
                 onSelectService,
+                exampleSegmentsService,
             },
         )
 

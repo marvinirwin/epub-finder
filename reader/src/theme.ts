@@ -42,12 +42,8 @@ export const theme = createMuiTheme({
         primary: indigo,
         secondary: green,
     },
-    /*
-    spacing: factor => {
-        return `${factorFunc(factor)}rem`;
-    },
-*/
     typography: {
         fontFamily: '"Noto Sans", "Noto Sans CJK JP", sans-serif',
+        fontSize: 10.5
     },
 })

@@ -1,6 +1,6 @@
 import { InterpolateService } from '@shared/'
 
-export class InterpolateExampleSentencesService {
+export class InterpolateExampleSegmentsService {
     public static interpolate(sentences: string[]) {
         return InterpolateService.html(
             `

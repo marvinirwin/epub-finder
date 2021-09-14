@@ -1,46 +1,48 @@
-import { getIndexOfEl } from '../getIndexOfEl'
-import { Dictionary, uniqueId, flatten } from 'lodash'
-import { DOMParser, XMLSerializer } from 'xmldom'
-import { Segment } from './segment/segment'
-import { XMLDocumentNode } from '../XMLDocumentNode'
-import { annotatedAndTranslated } from '../selectors'
-import { InterpolateService } from '../interpolate.service'
-import { segmentBoundaryRegexp } from '../tabulation/word-separator'
-
-export function createPopperElement(document1: XMLDocument) {
-    const popperEl = document1.createElement('div')
-    const popperId = uniqueId()
-    popperEl.setAttribute('class', 'translation-popover')
-    popperEl.setAttribute('id', AtomizedDocument.getPopperId(popperId))
-    popperEl.setAttribute('class', 'POPPER_ELEMENT')
-    return { popperEl, popperId }
-}
+import {getIndexOfEl} from "../getIndexOfEl";
+import {DOMParser, XMLSerializer} from "xmldom";
+import {Segment} from "./segment/segment";
+import {XMLDocumentNode} from "../XMLDocumentNode";
+import {annotatedAndTranslated} from "../selectors";
+import {InterpolateService} from "../interpolate.service";
+import {segmentBoundaryRegexp} from "../tabulation/word-separator";
+import {DocumentId} from "../sourced-text";
 
 type atomizeConfiguration = {
     splitDelims?: string[];
-
 }
 
 export class AtomizedDocument {
     document: XMLDocument
     _originalSrc: string
 
+    constructor(
+        document: XMLDocument,
+    ) {
+        this._originalSrc = new XMLSerializer().serializeToString(document);
+        this.document = document;
+    }
+
     static getPopperId(popperId: string) {
-        return `translate-popper_${popperId}`
+        return `translate-popper_${popperId}`;
     }
 
     static atomizeDocument(
-        xmlsource: string,
-        atomizeConfiguration?: atomizeConfiguration,
+        {
+            documentSrc,
+            documentId,
+        }: {
+            documentSrc: string;
+            documentId: DocumentId;
+        }
     ): AtomizedDocument {
         const doc = new AtomizedDocument(
             AtomizedDocument.getDomParser().parseFromString(
-                xmlsource,
-                'text/html',
+                documentSrc,
+                "text/html",
             ),
-        )
-        doc.createMarksUnderLeaves(doc.getTextElements(doc.document))
-        return doc
+        );
+        doc.createMarksUnderLeaves(doc.getTextElements(doc.document));
+        return doc;
     }
 
     static find(
@@ -49,137 +51,131 @@ export class AtomizedDocument {
     ): Node | undefined {
         function walk(node: Node, cb: (n: Node) => any): Node | undefined {
             if (cb(node)) {
-                return node
+                return node;
             }
-            let child, next
-            const TEXT_NODE = 3
-            const ELEMENT_NODE = 1
-            const DOCUMENT_NODE = 9
+            let child, next;
+            const TEXT_NODE = 3;
+            const ELEMENT_NODE = 1;
+            const DOCUMENT_NODE = 9;
             switch (node.nodeType) {
                 case TEXT_NODE: // Text node
-                    break
+                    break;
                 case ELEMENT_NODE: // Element node
                     // @ts-ignore
-                    if (node.localName === 'script') break
+                    if (node.localName === "script") break;
                     // @ts-ignore
-                    if (node.localName === 'style') break
+                    if (node.localName === "style") break;
                 case DOCUMENT_NODE: // Document node
-                    child = node.firstChild
+                    child = node.firstChild;
                     while (child) {
-                        next = child.nextSibling
-                        const foundNode = walk(child, cb)
+                        next = child.nextSibling;
+                        const foundNode = walk(child, cb);
                         if (foundNode) {
-                            return foundNode
+                            return foundNode;
                         }
-                        child = next
+                        child = next;
                     }
-                    break
+                    break;
             }
         }
 
         return walk(document, (n) => {
-            return cb(n)
-        })
+            return cb(n);
+        });
     }
 
     static fromAtomizedString(atomizedString: string) {
         try {
             return new AtomizedDocument(
                 AtomizedDocument.getDomParser().parseFromString(atomizedString),
-            )
+            );
         } catch (e) {
-            return ERROR_DOCUMENT
+            return ERROR_DOCUMENT;
         }
     }
 
     static getDomParser() {
         return new DOMParser({
             errorHandler: {
-                warning: (w) => {},
-                error: (w) => {},
+                warning: (w) => {
+                },
+                error: (w) => {
+                },
                 fatalError: (w) => {
-                    throw w
+                    throw w;
                 },
             },
-        })
+        });
     }
 
     static replaceHrefOrSource(el: Element, qualifiedName: string) {
-        const currentSource = el.getAttribute(qualifiedName)
-        if (currentSource && !currentSource.startsWith('data')) {
+        const currentSource = el.getAttribute(qualifiedName);
+        if (currentSource && !currentSource.startsWith("data")) {
             el.setAttribute(
                 qualifiedName,
                 `${process.env.PUBLIC_URL}/${currentSource}`,
-            )
+            );
         }
     }
 
-    constructor(
-        document: XMLDocument,
-        atomizeConfiguration?: atomizeConfiguration,
-    ) {
-        this._originalSrc = new XMLSerializer().serializeToString(document)
-        this.document = document
-    }
-
     getTextElements(doc: Document) {
-        const leaves: Element[] = []
+        const leaves: Element[] = [];
 
         function walk(node: Node, cb: (n: Node) => any) {
-            let child, next
+            let child, next;
             switch (node.nodeType) {
                 case 3: // Text node
-                    cb(node)
-                    break
+                    cb(node);
+                    break;
                 case 1: // Element node
                     // @ts-ignore
-                    if (node.localName === 'script') break
+                    if (node.localName === "script") break;
                     // @ts-ignore
-                    if (node.localName === 'style') break
+                    if (node.localName === "style") break;
                 case 9: // Document node
-                    child = node.firstChild
+                    child = node.firstChild;
                     while (child) {
-                        next = child.nextSibling
-                        walk(child, cb)
-                        child = next
+                        next = child.nextSibling;
+                        walk(child, cb);
+                        child = next;
                     }
-                    break
+                    break;
             }
         }
 
         walk(doc, (node: Node) => {
-            const text = node.textContent.trim()
+            const text = node.textContent.trim();
             if (text) {
                 // @ts-ignore
-                leaves.push(node)
+                leaves.push(node);
             }
-        })
-        return leaves
+        });
+        return leaves;
     }
 
     convertTextNodeToAtomizedSegments(textNode: Element): XMLDocumentNode {
-        const text = textNode.nodeValue
+        const text = textNode.nodeValue;
         const subSegmentTextList = text
             .split(segmentBoundaryRegexp)
             .filter((t) => !!t.trim())
             .reverse();
-        const newParent = this.document.createElement('div');
-        newParent.setAttribute('style', 'display: block;')
+        const newParent = this.document.createElement("div");
+        newParent.setAttribute("style", "display: block;");
         for (let i = 0; i < subSegmentTextList.length; i++) {
-            const subSegmentTextListElement = subSegmentTextList[i]
+            const subSegmentTextListElement = subSegmentTextList[i];
             const elementWithMarksUnderIt = this.replaceTextNodeWithSubTextNode(
                 textNode,
-                subSegmentTextListElement.normalize().trim().split(''),
-                'mark',
-            )
+                subSegmentTextListElement.normalize().trim().split(""),
+                "mark",
+            );
             elementWithMarksUnderIt.setAttribute(
-                'class',
+                "class",
                 annotatedAndTranslated,
-            )
+            );
         }
 
         // @ts-ignore
-        return newParent
+        return newParent;
     }
 
     replaceTextNodeWithSubTextNode(
@@ -187,61 +183,61 @@ export class AtomizedDocument {
         newSubStrings: string[],
         newTagType: string,
     ) {
-        const indexOfMe = getIndexOfEl(textNode)
+        const indexOfMe = getIndexOfEl(textNode);
         // If we remove ourselves and we're not already there, I think things go weird
         if (Array.from(textNode.parentNode.childNodes).includes(textNode)) {
             textNode.parentNode.removeChild(textNode);
         }
-        const newParent = this.document.createElement('span')
+        const newParent = this.document.createElement("span");
         newSubStrings.forEach((string, index) => {
             // I'll probably need to do labelling later so the data can be rehydrated
             // Perhaps this is inefficient, but for character based stuff its probably fine
-            const mark = this.document.createElement(newTagType)
-            const textNode = this.document.createTextNode(string)
-            mark.setAttribute('nodeindex', `${index}`)
-            mark.insertBefore(textNode, null)
-            newParent.insertBefore(mark, null)
-        })
-        const oldParent = textNode.parentNode
+            const mark = this.document.createElement(newTagType);
+            const textNode = this.document.createTextNode(string);
+            mark.setAttribute("nodeindex", `${index}`);
+            mark.insertBefore(textNode, null);
+            newParent.insertBefore(mark, null);
+        });
+        const oldParent = textNode.parentNode;
         oldParent.insertBefore(
             newParent,
             oldParent.childNodes.length
                 ? oldParent.childNodes[indexOfMe]
                 : null,
-        )
-        return newParent
+        );
+        return newParent;
     }
 
     replaceDocumentSources(doc: Document) {
         const walk = (node: Node) => {
-            let child, next
+            let child, next;
             switch (node.nodeType) {
                 case 1: // Element node
-                    const el = node
+                    const el = node;
                     // @ts-ignore
-                    AtomizedDocument.replaceHrefOrSource(el, 'src')
+                    AtomizedDocument.replaceHrefOrSource(el, "src");
                     // @ts-ignore
-                    if (el.localName === 'link') {
+                    if (el.localName === "link") {
                         // @ts-ignore
-                        AtomizedDocument.replaceHrefOrSource(el, 'href')
+                        AtomizedDocument.replaceHrefOrSource(el, "href");
                     }
                 case 9: // Document node
-                    child = node.firstChild
+                    child = node.firstChild;
                     while (child) {
-                        next = child.nextSibling
-                        walk(child)
-                        child = next
+                        next = child.nextSibling;
+                        walk(child);
+                        child = next;
                     }
-                    break
+                    break;
             }
-        }
-        walk(doc)
-        return doc
+        };
+        walk(doc);
+        return doc;
     }
 
     createMarksUnderLeaves(textNodes: Element[]) {
         for (let i = 0; i < textNodes.length; i++) {
-            this.convertTextNodeToAtomizedSegments(textNodes[i])
+            this.convertTextNodeToAtomizedSegments(textNodes[i]);
         }
     }
 
@@ -249,78 +245,78 @@ export class AtomizedDocument {
         try {
             const segmentElements = this.document.getElementsByClassName(
                 annotatedAndTranslated,
-            )
-            const atomized = new Array(segmentElements.length)
+            );
+            const atomized = new Array(segmentElements.length);
             for (let i = 0; i < segmentElements.length; i++) {
-                const segmentElement = segmentElements[i]
+                const segmentElement = segmentElements[i];
                 // @ts-ignore
-                atomized[i] = new Segment(segmentElement)
+                atomized[i] = new Segment(segmentElement);
             }
-            return atomized
+            return atomized;
         } catch (e) {
-            console.warn(e)
-            return []
+            console.warn(e);
+            return [];
         }
     }
 
     headInnerHTML() {
-        const head = this.findHead()
-        return new XMLSerializer().serializeToString(head)
+        const head = this.findHead();
+        return new XMLSerializer().serializeToString(head);
     }
 
     findHead() {
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
-            return n.tagName === 'head'
-        })
+            return n.tagName === "head";
+        });
     }
 
     bodyInnerHTML() {
-        const body = this.findBody()
-        return new XMLSerializer().serializeToString(body)
+        const body = this.findBody();
+        return new XMLSerializer().serializeToString(body);
     }
 
     findBody(): Element {
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
-            return n.tagName === 'body'
-        })
+            return n.tagName === "body";
+        });
     }
 
     ensurePopperContainer() {
         if (!this.findPopperContainer()) {
-            const popperEl = this.document.createElement('div')
-            popperEl.setAttribute('class', 'popper-container')
-            const body = this.findBody()
-            body.insertBefore(popperEl, body.firstChild)
+            const popperEl = this.document.createElement("div");
+            popperEl.setAttribute("class", "popper-container");
+            const body = this.findBody();
+            body.insertBefore(popperEl, body.firstChild);
             if (!this.findPopperContainer()) {
-                throw new Error('Cannot find popper container')
+                throw new Error("Cannot find popper container");
             }
         }
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
-            return n.tagName === 'body'
-        })
+            return n.tagName === "body";
+        });
     }
 
     findPopperContainer() {
         // @ts-ignore
         return AtomizedDocument.find(this.document, (n) => {
             // @ts-ignore
-            const namedItem = n.attributes?.getNamedItem('class')?.nodeValue
-            return namedItem === 'popper-container'
-        })
+            const namedItem = n.attributes?.getNamedItem("class")?.nodeValue;
+            return namedItem === "popper-container";
+        });
     }
 
     toString() {
-        return new XMLSerializer().serializeToString(this.document)
+        return new XMLSerializer().serializeToString(this.document);
     }
 }
 
 const ERROR_DOCUMENT = new AtomizedDocument(
     AtomizedDocument.getDomParser().parseFromString(
-        InterpolateService.text(`There was an error parsing this document`),
+        InterpolateService.text("There was an error parsing this document"),
     ),
-)
+);

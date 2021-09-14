@@ -153,7 +153,7 @@ export class Manager {
     uploadingDocumentsService: UploadingDocumentsService
     documentSelectionService: DocumentSelectionService
     readingDocumentService: ReadingDocumentService
-    exampleSentencesService: ExampleSegmentsService
+    exampleSegmentsService: ExampleSegmentsService
     public quizService: QuizService
     public goalsService: GoalsService
     public activeSentenceService: ActiveSentenceService
@@ -295,7 +295,7 @@ export class Manager {
         this.sortedLimitedQuizScheduleRowsService = new SortedLimitScheduleRowsService(
             this,
         )
-        this.exampleSentencesService = new ExampleSegmentsService(this)
+        this.exampleSegmentsService = new ExampleSegmentsService(this)
         this.quizService = new QuizService(this)
 
         this.createdSentenceManager = new CreatedSentenceManager(this.databaseService)

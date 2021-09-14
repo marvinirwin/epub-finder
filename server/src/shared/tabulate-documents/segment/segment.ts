@@ -7,10 +7,12 @@ export class Segment {
     translated = false
     element: XMLDocumentNode
     translationCb: (s: string) => void | undefined
+    documentId: string;
 
     constructor(element: XMLDocumentNode) {
         this.element = element
-        this.translatableText = this.element.textContent || ''
+        this.documentId = this.element.getAttribute('documentId');
+        this.translatableText = this.element.textContent || '';
     }
 
     getSentenceHTMLElement(): HTMLElement {

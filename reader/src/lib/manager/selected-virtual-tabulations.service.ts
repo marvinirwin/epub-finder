@@ -1,7 +1,7 @@
 import {OpenDocumentsService} from './open-documents.service'
 import {SettingsService} from '../../services/settings.service'
-import {map, shareReplay, startWith, switchMap} from 'rxjs/operators'
-import {combineLatest, Observable} from 'rxjs'
+import {map, shareReplay, startWith, switchMap, tap} from 'rxjs/operators'
+import {combineLatest, Observable, pipe} from 'rxjs'
 import {SerializedDocumentTabulation} from '@shared/'
 import {pipeLog} from './pipe.log'
 import {OpenDocument} from "../document-frame/open-document.entity";

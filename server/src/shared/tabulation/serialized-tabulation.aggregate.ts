@@ -25,4 +25,11 @@ export class SerializedTabulationAggregate {
         debug("serialized-tabulation-aggregate:wordSegmentPositionedWordMap")(m);
         return m;
     }
+    segmentTabulationMap(): Map<string, SerializedDocumentTabulation[]> {
+        const m = new Map<string, SerializedDocumentTabulation[]>();
+        this.serializedTabulations.forEach(serializedTabulation => Array.from(serializedTabulation.segmentWordCountRecordsMap.keys())
+            .forEach(segment => safePushMap(m, segment.text, serializedTabulation))
+        );
+        return m;
+    }
 }

@@ -20,6 +20,7 @@ import { BrowserSegment } from '../sentences/browser-segment'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
 import { pipeLog } from './pipe.log'
+import {ExampleSegmentsService} from "../quiz/example-segments.service";
 
 export type TrieObservable = Observable<TrieWrapper>
 
@@ -45,12 +46,15 @@ export class OpenDocumentsService {
             languageConfigsService: LanguageConfigsService
             onSelectService: OnSelectService
             tabulationConfigurationService: TabulationConfigurationService
+            exampleSegmentsService: ExampleSegmentsService
         },
     ) {
         this.sourceDocuments$ = config.documentRepository.collection$.pipe(
             map((documents) => {
                 return mapMap(documents, (id, document) => {
-                    const documentSource: AtomizedDocumentSources = {}
+                    const documentSource: AtomizedDocumentSources = {
+                        documentId: document.id()
+                    }
                     if (document.filename) {
                         documentSource.url$ = of(
                             `/documents/${document.filename}`,
@@ -66,6 +70,7 @@ export class OpenDocumentsService {
                             languageConfigsService:
                                 config.languageConfigsService,
                             onSelectService: config.onSelectService,
+                            exampleSegmentsService: config.exampleSegmentsService,
                         },
                     )
                     return [id, openDocument]

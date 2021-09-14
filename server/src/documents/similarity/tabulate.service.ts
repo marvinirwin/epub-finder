@@ -51,7 +51,10 @@ export class TabulateService {
         const text = await streamToString(
             await s3ReadStream(documentToTabulate.filename),
         )
-        const atomizedDocument = AtomizedDocument.atomizeDocument(text)
+        const atomizedDocument = AtomizedDocument.atomizeDocument({
+            documentSrc: text,
+            documentId: documentToTabulate.document_id || documentToTabulate.id
+        })
         const setWithUniqueLengths = new SetWithUniqueLengths(words)
         return tabulate({
             notableCharacterSequences: setWithUniqueLengths,
