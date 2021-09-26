@@ -670,3 +670,29 @@ mark {
   flex-flow: column nowrap;
   overflow: hidden;
 }
+.expand-on-click {
+  overflow: hidden;
+  /*
+  position: relative;
+  transition: height, width 0.5s;
+  width: fit-content;
+  &:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+  overflow: hidden;
+  */
+  position: relative;
+}
+
+.expand-on-click-open {
+  overflow: visible;
+  /*
+  height: fit-content;
+  */
+}
+.expand-on-click-closed {
+  max-height: 10em;
+}
+.expand-on-click-child-container {
+  position: absolute;
+}

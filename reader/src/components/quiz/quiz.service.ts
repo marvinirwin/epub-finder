@@ -128,10 +128,6 @@ export class QuizService {
                      ]) => {
                         if (!currentWord) return []
                         const subSequences = exampleSegmentMap.get(currentWord) || [];
-                        /**
-                         * HACK this is a terrible hack because the spaces aren't preserved when I join.
-                         * I really should make a join function which considers positions with space s
-                         */
                         return uniqBy(
                             subSequences,
                             subSequence => subSequence.segmentText,

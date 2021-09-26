@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {
     useConditionalTimeout,
     useDebouncedFn,
@@ -70,4 +70,22 @@ export const ExpandableContainer: React.FC<{
             {children}
         </div>
     )
+}
+
+export const ExpandOnClick: React.FC = ({children}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const divClass = useMemo(() => {
+        return isExpanded ?
+            'expand-on-click-open' :
+            'expand-on-click-closed'
+    }, [isExpanded])
+    return <div className={`expand-on-click ${divClass}`} onClick={() => setIsExpanded(!isExpanded)}>
+        <div className={`expand-on-click-child-container`}>
+            {children}
+        </div>
+{/*
+        <div className={'expand-on-click-child-container'}>
+        </div>
+*/}
+    </div>
 }

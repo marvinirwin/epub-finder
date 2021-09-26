@@ -20,69 +20,74 @@ import { ChangeLog } from '../change-log.component'
 
 const drawerWidth = 240
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            display: 'flex',
-        },
-        appBar: {
-            zIndex: theme.zIndex.drawer + 1,
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            height: 48
-        },
-        appBarShift: {
-            marginLeft: drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`,
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        },
-        menuButton: {
-            marginRight: 36,
-        },
-        hide: {
-            display: 'none',
-        },
-        drawer: {
-            width: drawerWidth,
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-        },
-        drawerOpen: {
-            width: drawerWidth,
-            transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        },
-        drawerClose: {
-            transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            overflowX: 'hidden',
-            [theme.breakpoints.up('sm')]: {
-                width: 60,
+const useStyles = makeStyles((theme: Theme) => {
+    // @ts-ignore
+    const toolbar = Object.fromEntries(Object.entries(theme.mixins.toolbar).map(([key, value]) => [key, ({...value, minHeight: 48})]));
+    return createStyles({
+            root: {
+                display: 'flex',
             },
-        },
-        toolbar: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            padding: theme.spacing(0, 1),
-            // necessary for content to be below app bar
-            ...theme.mixins.toolbar,
-        },
-        content: {
-            flexGrow: 1,
-            display: 'flex',
-            flexFlow: 'column nowrap',
-        },
-    }),
+            appBar: {
+                zIndex: theme.zIndex.drawer + 1,
+                transition: theme.transitions.create(['width', 'margin'], {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                }),
+                height: 48
+            },
+            appBarShift: {
+                marginLeft: drawerWidth,
+                width: `calc(100% - ${drawerWidth}px)`,
+                transition: theme.transitions.create(['width', 'margin'], {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.enteringScreen,
+                }),
+            },
+            menuButton: {
+                marginRight: 36,
+                height: 48,
+            },
+            hide: {
+                display: 'none',
+            },
+            drawer: {
+                width: drawerWidth,
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
+            },
+            drawerOpen: {
+                width: drawerWidth,
+                transition: theme.transitions.create('width', {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.enteringScreen,
+                }),
+            },
+            drawerClose: {
+                transition: theme.transitions.create('width', {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                }),
+                overflowX: 'hidden',
+                [theme.breakpoints.up('sm')]: {
+                    width: 60,
+                },
+            },
+            toolbar: {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                padding: theme.spacing(0, 1),
+                // necessary for content to be below app bar
+                ...toolbar,
+                height: 48
+            },
+            content: {
+                flexGrow: 1,
+                display: 'flex',
+                flexFlow: 'column nowrap',
+            },
+        });
+    },
 )
 
 export const MiniDrawer: React.FC<{}> = ({ children }) => {

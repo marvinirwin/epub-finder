@@ -11,6 +11,7 @@ import {CardLearningLanguageText} from '../../word-information/card-learning-lan
 import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
 import Typography from '@material-ui/core/Typography'
+import {ExpandOnClick} from "../../app-container/expandable-container";
 
 export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
@@ -21,7 +22,6 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
             <div>
                 <CardImage wordInfo={quizCard} />
                 <Typography variant={'subtitle2'}>Card Type: {quizCardType || ''}</Typography>
-                <ScheduleRowsTables word={word || ''}/>
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
                 <QuizCardSound quizCard={quizCard} />
@@ -32,8 +32,11 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}
                 {<CardInfo quizCard={quizCard} />}
-                <CardOrderMetadata quizCard={quizCard}/>
             </div>
+        </div>
+        <div style={{display: 'flex'}}>
+            <ExpandOnClick><CardOrderMetadata quizCard={quizCard}/></ExpandOnClick>
+            <ScheduleRowsTables word={word || ''}/>
         </div>
         {
             !exampleSegmentsHidden && <OpenDocumentComponent
