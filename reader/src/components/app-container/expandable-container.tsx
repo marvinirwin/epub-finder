@@ -1,12 +1,7 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {
-    useConditionalTimeout,
-    useDebouncedFn,
-    useResizeObserver,
-    useTimeout,
-} from 'beautiful-react-hooks'
-import { Observable, of } from 'rxjs'
-import { useSubscription } from 'observable-hooks'
+import {useConditionalTimeout, useDebouncedFn, useResizeObserver,} from 'beautiful-react-hooks'
+import {Observable, of} from 'rxjs'
+import {useSubscription} from 'observable-hooks'
 
 const dimensions = (
     container: HTMLElement | undefined | null,
@@ -29,7 +24,7 @@ export const ExpandableContainer: React.FC<{
     hideDelay?: number
     resizeObservable$?: Observable<void>
     name?: string
-}> = ({ children, shouldShow, hideDelay, name, resizeObservable$ }) => {
+}> = ({children, shouldShow, hideDelay, name, resizeObservable$}) => {
     const ref = useRef<HTMLElement | null | undefined>()
     const [styles, setStyles] = useState({})
     // @ts-ignore
@@ -72,20 +67,17 @@ export const ExpandableContainer: React.FC<{
     )
 }
 
-export const ExpandOnClick: React.FC = ({children}) => {
+export const ExpandOnClick: React.FC<{className: string}> = (
+    {children, className}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const divClass = useMemo(() => {
         return isExpanded ?
-            'expand-on-click-open' :
-            'expand-on-click-closed'
+            'open' :
+            'closed'
     }, [isExpanded])
-    return <div className={`expand-on-click ${divClass}`} onClick={() => setIsExpanded(!isExpanded)}>
-        <div className={`expand-on-click-child-container`}>
+    return <div className={`expand-on-click ${divClass} ${className}`} onClick={() => setIsExpanded(!isExpanded)}>
+        <div className={`expand-on-click-child-container ${divClass}`}>
             {children}
         </div>
-{/*
-        <div className={'expand-on-click-child-container'}>
-        </div>
-*/}
     </div>
 }

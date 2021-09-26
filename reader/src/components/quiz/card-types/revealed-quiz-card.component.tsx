@@ -35,7 +35,8 @@ export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
             </div>
         </div>
         <div style={{display: 'flex'}}>
-            <ExpandOnClick><CardOrderMetadata quizCard={quizCard}/></ExpandOnClick>
+            <ExpandOnClick className={'card-order-expandable'}>
+                <CardOrderMetadata quizCard={quizCard}/></ExpandOnClick>
             <ScheduleRowsTables word={word || ''}/>
         </div>
         {

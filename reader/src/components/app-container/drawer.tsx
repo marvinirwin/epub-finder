@@ -76,7 +76,9 @@ const useStyles = makeStyles((theme: Theme) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
+/*
                 padding: theme.spacing(0, 1),
+*/
                 // necessary for content to be below app bar
                 ...toolbar,
                 height: 48
@@ -115,7 +117,7 @@ export const MiniDrawer: React.FC<{}> = ({ children }) => {
                     [classes.appBarShift]: open,
                 })}
             >
-                <Toolbar style={{minHeight: 48}}>
+                <Toolbar style={{minHeight: 48, paddingLeft: 16, paddingRight: 16}}>
                     <IconButton
                         color='inherit'
                         aria-label='open drawer'

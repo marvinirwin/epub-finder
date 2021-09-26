@@ -7,6 +7,7 @@ import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { fetchTranslation } from '../../services/translate.service'
 import { fetchTransliteration } from '../language/transliterate.service'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
+import { uniq } from 'lodash'
 
 export class BrowserSegment extends Segment {
     translation$: Observable<string>
@@ -62,7 +63,7 @@ export class BrowserSegment extends Segment {
                     exampleSegmentMap
                 ]) => {
                     const sourceTabulations = exampleSegmentMap.get(this.translatableText);
-                    const sourceTabulationLabels = sourceTabulations ? sourceTabulations.map(sourceTabulation => sourceTabulation.label).join(', ') : '';
+                    const sourceTabulationLabels = sourceTabulations ? uniq(sourceTabulations.map(sourceTabulation => sourceTabulation.label)).join(', ') : '';
                     const titleText = showRomanization ? romanization || '' : '';
                     const translationWithSource = (sourceTabulationLabels && translation) ?
                         `${translation}

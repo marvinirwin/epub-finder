@@ -672,6 +672,7 @@ mark {
 }
 .expand-on-click {
   overflow: hidden;
+  height: 5em;
   /*
   position: relative;
   transition: height, width 0.5s;
@@ -681,18 +682,31 @@ mark {
   }
   overflow: hidden;
   */
-  position: relative;
 }
 
-.expand-on-click-open {
+.expand-on-click.open {
   overflow: visible;
+  position: relative;
+  z-index:2;
   /*
   height: fit-content;
   */
 }
-.expand-on-click-closed {
-  max-height: 10em;
+.expand-on-click.closed {
+  z-index:1;
 }
 .expand-on-click-child-container {
+}
+.expand-on-click-child-container.open {
   position: absolute;
+}
+.expand-on-click-child-container.closed {
+}
+.schedule-row-table-expandable {
+  width: 250px;
+  background-color: white;
+}
+.card-order-expandable {
+  width: 250px;
+  background-color: white;
 }

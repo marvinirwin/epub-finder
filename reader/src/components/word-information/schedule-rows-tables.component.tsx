@@ -8,8 +8,10 @@ import { ExpandOnClick } from "../app-container/expandable-container";
 
 const ScheduleRowTableContainer: React.FC<{scheduleRow: SpacedScheduleRow}> = ({scheduleRow}) => <Box m={2} p={1}
                                                           key={`${scheduleRow.d.word}.${scheduleRow.d.flash_card_type}`}>
+{/*
     <Typography variant={'subtitle1'}>{scheduleRow.d.flash_card_type}</Typography>
     <br/>
+*/}
     <ScheduleRowTable scheduleRow={scheduleRow}/>
 </Box>;
 
@@ -20,7 +22,7 @@ export const ScheduleRowsTables = ({word}: { word: string }) => {
             m.quizCardScheduleRowsService.scheduleRows$,
         )?.filter(r => r.d.word === word) || []
     return <>
-        {scheduleRows.map(scheduleRow => <ExpandOnClick>
+        {scheduleRows.map(scheduleRow => <ExpandOnClick className={`schedule-row-table-expandable`}>
             <ScheduleRowTableContainer scheduleRow={scheduleRow}/>
         </ExpandOnClick>)}
     </>;
