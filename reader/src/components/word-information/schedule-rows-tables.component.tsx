@@ -22,7 +22,7 @@ export const ScheduleRowsTables = ({word}: { word: string }) => {
             m.quizCardScheduleRowsService.scheduleRows$,
         )?.filter(r => r.d.word === word) || []
     return <>
-        {scheduleRows.map(scheduleRow => <ExpandOnClick className={`schedule-row-table-expandable`}>
+        {scheduleRows.map(scheduleRow => <ExpandOnClick label={scheduleRow.d.flash_card_type}>
             <ScheduleRowTableContainer scheduleRow={scheduleRow}/>
         </ExpandOnClick>)}
     </>;

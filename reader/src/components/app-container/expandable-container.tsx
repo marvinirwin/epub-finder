@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useConditionalTimeout, useDebouncedFn, useResizeObserver,} from 'beautiful-react-hooks'
 import {Observable, of} from 'rxjs'
 import {useSubscription} from 'observable-hooks'
+import { Button, Typography } from '@material-ui/core'
 
 const dimensions = (
     container: HTMLElement | undefined | null,
@@ -67,17 +68,21 @@ export const ExpandableContainer: React.FC<{
     )
 }
 
-export const ExpandOnClick: React.FC<{className: string}> = (
-    {children, className}) => {
+export const ExpandOnClick: React.FC<{ label: string }> = (
+    {children, label}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const divClass = useMemo(() => {
         return isExpanded ?
             'open' :
             'closed'
     }, [isExpanded])
-    return <div className={`expand-on-click ${divClass} ${className}`} onClick={() => setIsExpanded(!isExpanded)}>
-        <div className={`expand-on-click-child-container ${divClass}`}>
-            {children}
-        </div>
+    return <div className={`expand-on-click ${divClass}`} onClick={() => setIsExpanded(!isExpanded)}>
+        {
+            isExpanded && <div className={`expand-on-click-child-container ${divClass}`}> {children} </div>
+
+        }<Button
+        onClick={() => setIsExpanded(!isExpanded)}>
+        <Typography variant={'h5'}>{label}</Typography>
+    </Button>
     </div>
 }

@@ -10,38 +10,38 @@ import {QuizCardField} from '../../../lib/quiz/hidden-quiz-fields'
 import {CardLearningLanguageText} from '../../word-information/card-learning-language.component'
 import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
-import Typography from '@material-ui/core/Typography'
 import {ExpandOnClick} from "../../app-container/expandable-container";
 
-export const RevealedQuizCard = ({ quizCard }: { quizCard: QuizCard }) => {
+export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
-    const exampleSegmentsHidden = useIsFieldHidden({ quizCard, label: QuizCardField.ExampleSegments })
-    const quizCardType = useObservableState(quizCard.flashCardType$)
+    const exampleSegmentsHidden = useIsFieldHidden({quizCard, label: QuizCardField.ExampleSegments})
     return <Fragment>
         <div className={'quiz-card-data-sheet'}>
             <div>
-                <CardImage wordInfo={quizCard} />
+                <CardImage wordInfo={quizCard}/>
+                {/*
                 <Typography variant={'subtitle2'}>Card Type: {quizCardType || ''}</Typography>
+*/}
             </div>
             <div className={'quiz-card-data-sheet-middle'}>
-                <QuizCardSound quizCard={quizCard} />
-                <CardLearningLanguageText word={word || ''} />
+                <QuizCardSound quizCard={quizCard}/>
+                <CardLearningLanguageText word={word || ''}/>
             </div>
             <div className={`revealed-quiz-card-info-tab`}>
                 {/*
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}
-                {<CardInfo quizCard={quizCard} />}
+                {<CardInfo quizCard={quizCard}/>}
             </div>
         </div>
-        <div style={{display: 'flex'}}>
-            <ExpandOnClick className={'card-order-expandable'}>
+        <div style={{display: 'flex', justifyContent: 'space-around', width: '100%'}}>
+            <ExpandOnClick label={"Quiz Ordering"}>
                 <CardOrderMetadata quizCard={quizCard}/></ExpandOnClick>
             <ScheduleRowsTables word={word || ''}/>
         </div>
         {
             !exampleSegmentsHidden && <OpenDocumentComponent
-                style={{ margin: '24px', flex: 1, overflow: 'auto', width: '100%' }}
+                style={{margin: '24px', flex: 1, overflow: 'auto', width: '100%'}}
                 openedDocument={quizCard.exampleSentenceOpenDocument}
             />
         }</Fragment>
