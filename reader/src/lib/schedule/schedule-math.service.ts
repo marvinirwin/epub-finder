@@ -53,7 +53,7 @@ export class ScheduleMathService {
             return {
                 row: scheduleRow,
                 finalSortValue: sumBy(
-                    sortValues,
+                    sortValues.filter(v => Boolean(v.weightedInverseLogNormalValue)),
                     (v) => v.weightedInverseLogNormalValue,
                 ),
                 sortValues: assembleSortObject(sortValues, sortConfigs),

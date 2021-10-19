@@ -1,22 +1,22 @@
-import { Controller } from '@nestjs/common'
-import { Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
-import { UserSetting } from '../entities/user-setting.entity'
-import { UserSettingView } from '../entities/user-setting-view.entity'
-import { Card } from '../entities/card.entity'
-import { SpacedRepitionEntity } from '../entities/spaced-repitition-record.entity'
-import { IgnoredWord } from '../entities/ignored-word.entity'
-import { CustomWord } from '../entities/custom-word.entity'
-import { RepositoryType } from './entities.controller'
-import { CardView } from '../entities/card-view.entity'
-import { IgnoredWordView } from '../entities/ignored-word-view.entity'
-import { KnownWordView } from '../entities/known-word-view.entity'
-import { KnownWord } from '../entities/known-word.entity'
+import { Controller } from "@nestjs/common";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UserSetting } from "../entities/user-setting.entity";
+import { UserSettingView } from "../entities/user-setting-view.entity";
+import { Card } from "../entities/card.entity";
+import { SpacedRepitionEntity } from "../entities/spaced-repitition-record.entity";
+import { IgnoredWord } from "../entities/ignored-word.entity";
+import { CustomWord } from "../entities/custom-word.entity";
+import { RepositoryType } from "./entities.controller";
+import { CardView } from "../entities/card-view.entity";
+import { IgnoredWordView } from "../entities/ignored-word-view.entity";
+import { KnownWordView } from "../entities/known-word-view.entity";
+import { KnownWord } from "../entities/known-word.entity";
 
-@Controller('repositories')
+@Controller("repositories")
 export class EntitiesService {
     public entityMap: {
-        [key: string]: Repository<any> | RepositoryType
+        [key: string]: Repository<any> | RepositoryType;
     }
 
     constructor(
@@ -48,6 +48,6 @@ export class EntitiesService {
             ignoredWords: { view: ignoredWordView, write: ignoredWords },
             knownWords: { view: knownWordView, write: knownWord },
             customWords,
-        }
+        };
     }
 }

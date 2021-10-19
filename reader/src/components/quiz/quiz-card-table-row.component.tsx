@@ -1,6 +1,5 @@
 import {Button, TableCell, TableRow, Typography} from '@material-ui/core'
 import {quizCardTableRow, quizCardTableRowWord} from '@shared/'
-import {round} from 'lodash'
 import React, {useContext} from 'react'
 import {ManagerContext} from '../../App'
 import {formatDistance} from 'date-fns'
@@ -30,20 +29,13 @@ export const QuizCardTableRow: React.FC<{
                 {row.d.flash_card_type}
             </TableCell>
             <TableCell>
-                {row.d.sortValues.count.value}
-                {'/'}
-                {round(
-                    row.d.sortValues.count.weightedInverseLogNormalValue || 0,
-                    2,
-                )}
-            </TableCell>
-            <TableCell>
-                {row.d.sortValues.length.value}
-                {'/'}
-                {round(
-                    row.d.sortValues.length.weightedInverseLogNormalValue || 0,
-                    2,
-                )}
+                {
+                    JSON.stringify(
+                        Object.entries(row.d.sortValues)
+                            .map(([key, sortValues]) => `${key} ${sortValues.value} ${sortValues.weightedInverseLogNormalValue}`)
+                            .join(', ')
+                    )
+                }
             </TableCell>
         </TableRow>
     )

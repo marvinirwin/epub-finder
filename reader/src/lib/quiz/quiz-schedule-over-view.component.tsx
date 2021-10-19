@@ -78,6 +78,24 @@ export const QuizScheduleOverView = () => {
             >
                 <TableContainer component={Paper} style={{ flex: 1 }}>
                     <Typography style={{ margin: '24px' }} variant={'h6'}>
+                        Quiz card ordering
+                    </Typography>
+                    <Table size="small">
+                        <QuizCardTableHead />
+                        <TableBody>
+                            {
+                                /**
+                                 * This is the one quiz schedule uses
+                                 */
+                            }
+                            {quizSchedule?.limitedScheduleRows.slice(0, 20).map((row) => (
+                                <QuizCardTableRow row={row} key={row.d.word} />
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TableContainer component={Paper} style={{ flex: 1 }}>
+                    <Typography style={{ margin: '24px' }} variant={'h6'}>
                         Cards to be learned for the first time
                     </Typography>
                     <Table size="small" id={quizRowsNotInProgressTable}>

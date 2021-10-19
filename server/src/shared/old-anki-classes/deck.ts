@@ -1,4 +1,4 @@
-import { Card, SerializedCard } from './Card'
+import { Card, SerializedCard } from './card'
 import { ICard } from '../ICard'
 
 export class Deck {

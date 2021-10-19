@@ -2,7 +2,8 @@ import {LanguageConfigsService} from "../language/language-configs.service";
 import {createLoadingObservable} from "../util/create-loading-observable";
 import {distinctUntilChanged} from "rxjs/operators";
 import {LoadingObservable} from "../../components/quiz/word-card.interface";
-import {ccEdictRegex, getCedict} from "../language/all-words.repository";
+import {getCedict} from "../language/all-words.repository";
+import { parseCedictDictionary } from "@shared/*";
 
 export type LanguageDict = {
     getDefinition(term: string): Promise<string>
@@ -22,14 +23,7 @@ export class DictionaryService {
                     case "zh-Hans":
                     case "zh-Hant":
                         const response = await getCedict();
-                        const dictionary = new Map<string, string>();
-                        response.data
-                            .split('\n')
-                            .forEach((line: string) => {
-                                const [, traditional, simplified, definition] = ccEdictRegex.exec(line) || [];
-                                dictionary.set(traditional, definition);
-                                dictionary.set(simplified, definition);
-                            });
+                        const dictionary = parseCedictDictionary(response.data);
                         return {
                             getDefinition: async (term: string) => {
                                 return dictionary.get(term) || ''
@@ -44,3 +38,4 @@ export class DictionaryService {
         )
     }
 }
+

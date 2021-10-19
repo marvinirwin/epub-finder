@@ -1,9 +1,9 @@
-import { Collection, SerializedCollection } from './Collection'
+import { Collection, SerializedCollection } from './collection'
 import { Dictionary, fromPairs } from 'lodash'
-import { Card, SerializedCard } from './Card'
+import { Card, SerializedCard } from './card'
 import { ICard } from '../ICard'
 
-export interface SerializedAnkiPackage {
+export interface SerializeAnkiPackage {
     name: string
     path: string
     message: string
@@ -21,7 +21,7 @@ export interface UnserializedAnkiPackage {
 }
 
 export function UnserializeAnkiPackage(
-    o: SerializedAnkiPackage,
+    o: SerializeAnkiPackage,
 ): UnserializedAnkiPackage {
     const entries = o.cardIndex ? Object.entries(o.cardIndex) : null
     const pairs =

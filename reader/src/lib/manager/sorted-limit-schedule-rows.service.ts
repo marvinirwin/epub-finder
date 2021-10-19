@@ -92,11 +92,10 @@ export class SortedLimitScheduleRowsService {
                 const notOverDueRows = [...learningScheduleRows, ...scheduleRowsToReview, ...unStartedSiblingsWhichShouldBe].filter((r) => !r.isOverDue({now}))
 
                 const iteratees = [
-                    (r: ScheduleRow<SpacedSortQuizData>) => r.d.spacedDueDate.transformed,
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.finalSortValue,
                     (r: ScheduleRow<SpacedSortQuizData>) => r.d.word,
                 ]
-                const orders: ('asc' | 'desc')[] = ['asc', 'desc', 'asc']
+                const orders: ('asc' | 'desc')[] = ['desc', 'asc']
                 const orderFunc = (rows: SpacedScheduleRow[]) => orderBy(rows, iteratees, orders)
                 /**
                  * Oh, I know why I'm getting duplicate records in limitedScheduleRows, because 问题 becomes a member of

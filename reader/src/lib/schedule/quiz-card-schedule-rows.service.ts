@@ -46,14 +46,13 @@ function getSortConfigs({
             ) => row.d.word.length,
             weight: wordLengthWeight,
         },
-        // How do we tell if we're included in the first row?
         sentencePriority: {
             fn: (
                 row: ScheduleRow<QuizScheduleRowData>,
             ) => {
                 return firstRecordSentence.includes(
                     row.d.word,
-                )
+                ) ? 1 : 0
             },
             weight: translationAttemptSentenceWeight,
         },

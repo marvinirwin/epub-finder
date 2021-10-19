@@ -37,6 +37,7 @@ export const WordInformationComponent: React.FC<{ wordCard: WordCard }> = ({
     const description = useObservableState(wordCard.description$.value$);
     const isMarkedAsKnown = useIsMarkedAsKnown(word || '');
     const isIgnored = useIsIgnored(word || '');
+    // tslint:disable-next-line:variable-name
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     return (
         <Paper

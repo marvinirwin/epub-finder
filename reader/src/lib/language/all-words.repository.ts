@@ -1,13 +1,12 @@
 import axios from 'axios'
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs'
+import { combineLatest, Observable } from 'rxjs'
 import { LanguageConfigsService } from './language-configs.service'
-import { map, shareReplay, switchMap } from 'rxjs/operators'
+import { map, shareReplay } from 'rxjs/operators'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import memoize from "memoizee";
-import {triggerAsyncId} from "async_hooks";
+import {ccEdictRegex} from "@shared/*";
 
 export const getCedict = memoize(() => axios.get(`${process.env.PUBLIC_URL}/cedict_ts.u8`))
-export const ccEdictRegex = /([\p{Script_Extensions=Han}\d]+) ([\p{Script_Extensions=Han}\d]+) (.*?)$/gmu;
 
 export class AllWordsRepository {
     all$: Observable<Set<string>>
@@ -26,8 +25,9 @@ export class AllWordsRepository {
                 switch(code) {
                     case 'zh-Hans':
                         const response = await getCedict();
+                        const data = response.data;
                         const allWords = new Set<string>();
-                        response.data
+                        data
                             .split('\n')
                             .forEach((line: string) => {
                                 const result = ccEdictRegex.exec(line) || [];

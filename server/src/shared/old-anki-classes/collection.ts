@@ -1,6 +1,6 @@
-import { Card } from './Card'
+import { Card } from './card'
 import { flattenDeep } from 'lodash'
-import { Deck, SerializedDeck } from './Deck'
+import { Deck, SerializedDeck } from './deck'
 import { ICard } from '../ICard'
 
 export class Collection {
