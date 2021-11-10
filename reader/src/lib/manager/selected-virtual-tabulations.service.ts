@@ -21,9 +21,13 @@ export class SelectedVirtualTabulationsService {
             (o$: Observable<[itemWithIdType[], idType[]]>): Observable<itemWithIdType[]> => o$.pipe(
                 map(([itemsWithIds, selectedIds]) => {
                     const set = new Set(selectedIds)
-                    return itemsWithIds.filter(
+                    const selectedItems = itemsWithIds.filter(
                         (tabulation) => set.has(idFunc(tabulation)),
-                    )
+                    );
+                    if (!selectedItems.length && itemsWithIds.length) {
+                        return [itemsWithIds[0]];
+                    }
+                    return selectedItems
                 }),
             )
 

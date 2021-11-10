@@ -11,7 +11,7 @@ import {
     KnowablePositionedWord,
     ReadingProgress,
     wordCountForSubsequence,
-} from '../../../../server/src/shared/Annotation/IPositionedWord'
+} from '@shared/'
 import {sumBy, uniq} from 'lodash'
 import {getGreedySubSequences} from "../schedule/learning-target/get-greedy-subsequences";
 import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";

@@ -3,7 +3,7 @@ import {createLoadingObservable} from "../util/create-loading-observable";
 import {distinctUntilChanged} from "rxjs/operators";
 import {LoadingObservable} from "../../components/quiz/word-card.interface";
 import {getCedict} from "../language/all-words.repository";
-import { parseCedictDictionary } from "@shared/*";
+import { parseCedictDictionary } from "@shared/";
 
 export type LanguageDict = {
     getDefinition(term: string): Promise<string>

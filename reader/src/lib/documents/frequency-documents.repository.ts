@@ -57,6 +57,15 @@ function frequencyDocumentFactory(
     );
 }
 
+const getDefaultFrequencyDocumentMap = ({firstDocument, quizCardScheduleRowsService, tabulationConfigurationService}:{firstDocument: LtDocument, quizCardScheduleRowsService: QuizCardScheduleRowsService, tabulationConfigurationService: TabulationConfigurationService}) => {
+    const frequencyDocument = frequencyDocumentFactory({
+        documentSelectedForFrequency: firstDocument,
+        quizCardScheduleRowsService,
+        tabulationConfigurationService
+    })
+    return new Map<string, FrequencyDocument>().set(frequencyDocument.frequencyDocument.id(), frequencyDocument)
+};
+
 export class FrequencyDocumentsRepository {
     public selected$: Observable<Map<string, FrequencyDocument>>
     public selectedTabulated$: Observable<TabulatedFrequencyDocument[]>
@@ -77,15 +86,11 @@ export class FrequencyDocumentsRepository {
             settingsService.selectedFrequencyDocuments$,
         ]).pipe(
             map(([allDocumentsMap, selectedFrequencyDocumentIds]) => {
-                if (!selectedFrequencyDocumentIds.length) {
+                const shouldSelectDefaultFrequencyDocument = !selectedFrequencyDocumentIds.length;
+                if (shouldSelectDefaultFrequencyDocument) {
                     const [firstDocument] = Array.from(allDocumentsMap.values());
                     if (firstDocument) {
-                        const frequencyDocument = frequencyDocumentFactory({
-                            documentSelectedForFrequency: firstDocument,
-                            quizCardScheduleRowsService,
-                            tabulationConfigurationService
-                        })
-                        return new Map<string, FrequencyDocument>().set(frequencyDocument.frequencyDocument.id(), frequencyDocument)
+                        return getDefaultFrequencyDocumentMap({firstDocument, quizCardScheduleRowsService, tabulationConfigurationService});
                     }
                 }
                 const newMap = new Map<string, FrequencyDocument>()

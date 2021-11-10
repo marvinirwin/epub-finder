@@ -4,9 +4,7 @@ import {
 } from '../schedule/schedule-row'
 import {
     SerializedTabulation,
-    TabulatedDocuments,
-} from '../../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
-import { sum } from 'lodash'
+} from '@shared/'
 
 export interface WordReadabilityRecord {
     word: string
