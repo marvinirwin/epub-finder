@@ -74,7 +74,7 @@ export class TabulateService {
     }
 }
 
-function streamToString(stream): Promise<string> {
+export function streamToString(stream): Promise<string> {
     const chunks = []
     return new Promise((resolve, reject) => {
         stream.on('data', (chunk) => chunks.push(chunk))

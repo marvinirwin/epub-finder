@@ -4,6 +4,9 @@ import {Repository} from "typeorm";
 import {CustomWord} from "../entities/custom-word.entity";
 import {DocumentView} from "../entities/document-view.entity";
 import fs from "fs-extra";
+import {parseCedictDictionary} from "../shared";
+import {s3ReadStream} from "../documents/uploading/s3.service";
+import {streamToString} from "../documents/similarity/tabulate.service";
 
 async function getDocuments({documentNames, documentRepository, languageCode, userId}: {
     documentNames: string[];
@@ -39,16 +42,36 @@ async function getCustomWords({
     return customWordRepository.find({language_code: languageCode, creator_id: userId});
 }
 
-async function resolveBuiltInWords({languageCode, cedictPath}: { languageCode: string, cedictPath: string }) {
+async function resolveBuiltInWords({languageCode, cedictPath}: { languageCode: string; cedictPath: string }) {
     const fileContents = await fs.readFile(cedictPath);
+    return parseCedictDictionary(fileContents.toString("utf8"));
+}
 
+async function getExampleSegmentMap({
+                                        exampleDocuments,
+                                        words,
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                        languageCode
+                                    }: {
+    exampleDocuments: DocumentView[];
+    words: Set<string>;
+    languageCode: string
+}) {
+    // TODO extract functionality from the atomize things
+    const atomizeDocument = (document: DocumentView) => {
+        // Fetch the document from S3 and then atomize it
+        const text = streamToString(
+            await s3ReadStream(document.filename),
+        )
+    }
 }
 
 export const generateAnkiDeck = async (
     {
         customArgv,
-        cards,
-        customWords
+        cardRepository,
+        customWordRepository,
+        documentRepository,
     }:
         {
             customArgv: string[];

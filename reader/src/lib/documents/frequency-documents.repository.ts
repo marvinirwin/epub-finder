@@ -1,12 +1,12 @@
-import { combineLatest, Observable } from 'rxjs'
-import { FrequencyDocument } from './frequency-documents'
-import { TrieService } from '../manager/trie.service'
-import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
-import { map, shareReplay, switchMap } from 'rxjs/operators'
-import { SettingsService } from '../../services/settings.service'
-import { TabulatedFrequencyDocument } from '../learning-tree/tabulated-frequency-document'
-import { DocumentRepository } from './document.repository'
-import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
+import {combineLatest, Observable} from 'rxjs'
+import {FrequencyDocument} from './frequency-documents'
+import {QuizCardScheduleRowsService} from '../schedule/quiz-card-schedule-rows.service'
+import {map, shareReplay, switchMap} from 'rxjs/operators'
+import {SettingsService} from '../../services/settings.service'
+import {TabulatedFrequencyDocument} from '../learning-tree/tabulated-frequency-document'
+import {DocumentRepository} from './document.repository'
+import {TabulationConfigurationService} from '../language/language-maps/tabulation-configuration.service'
+import {LtDocument} from "@shared/*";
 
 export const tabulateFrequencyDocuments = (
     frequencyDocuments$: Observable<FrequencyDocument[]>,
@@ -30,16 +30,43 @@ export const tabulateFrequencyDocuments = (
     )
 }
 
+function frequencyDocumentFactory(
+    {
+        documentSelectedForFrequency,
+        quizCardScheduleRowsService,
+        tabulationConfigurationService
+    }: {
+        documentSelectedForFrequency: LtDocument,
+        quizCardScheduleRowsService: QuizCardScheduleRowsService,
+        tabulationConfigurationService: TabulationConfigurationService
+    }) {
+    return new FrequencyDocument(
+        documentSelectedForFrequency,
+        quizCardScheduleRowsService.scheduleRows$.pipe(
+            map(
+                (indexedScheduleRows) =>
+                    new Map(
+                        Object.entries(
+                            indexedScheduleRows,
+                        ),
+                    ),
+            ),
+            shareReplay(1),
+        ),
+        tabulationConfigurationService,
+    );
+}
+
 export class FrequencyDocumentsRepository {
     public selected$: Observable<Map<string, FrequencyDocument>>
     public selectedTabulated$: Observable<TabulatedFrequencyDocument[]>
 
     constructor({
-        quizCardScheduleRowsService,
-        settingsService,
-        documentRepository,
-        tabulationConfigurationService,
-    }: {
+                    quizCardScheduleRowsService,
+                    settingsService,
+                    documentRepository,
+                    tabulationConfigurationService,
+                }: {
         quizCardScheduleRowsService: QuizCardScheduleRowsService
         settingsService: SettingsService
         documentRepository: DocumentRepository
@@ -49,29 +76,30 @@ export class FrequencyDocumentsRepository {
             documentRepository.collection$,
             settingsService.selectedFrequencyDocuments$,
         ]).pipe(
-            map(([allDocuments, selectedFrequencyDocumentIds]) => {
+            map(([allDocumentsMap, selectedFrequencyDocumentIds]) => {
+                if (!selectedFrequencyDocumentIds.length) {
+                    const [firstDocument] = Array.from(allDocumentsMap.values());
+                    if (firstDocument) {
+                        const frequencyDocument = frequencyDocumentFactory({
+                            documentSelectedForFrequency: firstDocument,
+                            quizCardScheduleRowsService,
+                            tabulationConfigurationService
+                        })
+                        return new Map<string, FrequencyDocument>().set(frequencyDocument.frequencyDocument.id(), frequencyDocument)
+                    }
+                }
                 const newMap = new Map<string, FrequencyDocument>()
                 selectedFrequencyDocumentIds.forEach(
                     (selectedFrequencyDocumentId) => {
-                        const documentSelectedForFrequency = allDocuments.get(
+                        const documentSelectedForFrequency = allDocumentsMap.get(
                             selectedFrequencyDocumentId,
                         )
                         if (documentSelectedForFrequency) {
-                            const frequencyDocument = new FrequencyDocument(
+                            const frequencyDocument = frequencyDocumentFactory({
                                 documentSelectedForFrequency,
-                                quizCardScheduleRowsService.scheduleRows$.pipe(
-                                    map(
-                                        (indexedScheduleRows) =>
-                                            new Map(
-                                                Object.entries(
-                                                    indexedScheduleRows,
-                                                ),
-                                            ),
-                                    ),
-                                    shareReplay(1),
-                                ),
-                                tabulationConfigurationService,
-                            )
+                                quizCardScheduleRowsService,
+                                tabulationConfigurationService
+                            })
                             newMap.set(
                                 frequencyDocument.frequencyDocument.id(),
                                 frequencyDocument,

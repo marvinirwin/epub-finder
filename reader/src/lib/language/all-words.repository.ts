@@ -4,7 +4,7 @@ import { LanguageConfigsService } from './language-configs.service'
 import { map, shareReplay } from 'rxjs/operators'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import memoize from "memoizee";
-import {ccEdictRegex} from "@shared/*";
+import {cEdictRegex} from "@shared/*";
 
 export const getCedict = memoize(() => axios.get(`${process.env.PUBLIC_URL}/cedict_ts.u8`))
 
@@ -30,7 +30,7 @@ export class AllWordsRepository {
                         data
                             .split('\n')
                             .forEach((line: string) => {
-                                const result = ccEdictRegex.exec(line) || [];
+                                const result = cEdictRegex.exec(line) || [];
                                 const traditional = result[1];
                                 const simplified = result[2];
                                 if ((!traditional || !simplified)) {
