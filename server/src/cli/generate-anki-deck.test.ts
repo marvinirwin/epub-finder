@@ -6,6 +6,7 @@ import {TabulateService} from "../documents/similarity/tabulate.service";
 it("Generates anki deck on the command line", async () => {
     const app = await NestFactory.create(AppModule);
     const tabulateService = app.get(TabulateService);
+/*
     generateAnkiDeck({
         customArgv: ["TODO"],
         // TODO are repositories injectable?
@@ -13,4 +14,5 @@ it("Generates anki deck on the command line", async () => {
         customWordRepository: app.get(),
         documentRepository: app.get(),
     });
+*/
 });

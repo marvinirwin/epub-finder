@@ -58,7 +58,7 @@ async function getExampleSegmentMap({
     languageCode: string
 }) {
     // TODO extract functionality from the atomize things
-    const atomizeDocument = (document: DocumentView) => {
+    const atomizeDocument = async (document: DocumentView) => {
         // Fetch the document from S3 and then atomize it
         const text = streamToString(
             await s3ReadStream(document.filename),
@@ -104,6 +104,7 @@ export const generateAnkiDeck = async (
             argv: customArgv || process.argv,
         },
     );
+/*
     const exampleDocuments = await getDocuments({userId, documentNames, languageCode, documentRepository});
     const frequencyDocuments = await getDocuments({userId, documentNames, languageCode, documentRepository});
     const flashCards = await getFlashCards({userId, languageCode, cardRepository});
@@ -113,4 +114,5 @@ export const generateAnkiDeck = async (
     const allWords = await getAllWords({exampleSegmentsMap, customWords, builtInWords});
     const orderedWords = await getOrderedWords({exampleSegmentsMap, allWords});
     await writeZipFile({orderedWords, flashCards});
+*/
 };

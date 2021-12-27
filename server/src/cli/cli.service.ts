@@ -10,11 +10,13 @@ export class CliService {
         private documentSimilarityService: DocumentSimilarityService,
         @Inject(ChineseVocabService)
         private chineseVocabService: ChineseVocabService,
-        @Inject()
-    ) {}
+    ) {
+
+    }
 
     async exec(customArgv?: string[]) {
         const customCommand = customArgv[0];
+/*
         switch(customCommand) {
             case 'compareDocuments':
                 compareDocuments(customArgv);
@@ -23,5 +25,6 @@ export class CliService {
             default:
                 throw new Error(`Unknown command ${customCommand}`)
         }
+*/
     }
 }
