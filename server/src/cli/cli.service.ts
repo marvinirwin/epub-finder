@@ -1,21 +1,22 @@
 import {DocumentSimilarityService} from '../documents/similarity/document-similarity.service'
 import {Inject} from '@nestjs/common'
 import {ChineseVocabService} from '../shared/tabulate-documents/chinese-vocab.service'
-import compareDocuments from "./compare-documents";
-import {generateAnkiDeck} from "./generate-anki-deck";
+import {InjectRepository} from "@nestjs/typeorm";
+import {VideoMetadata} from "../entities/video.metadata";
+import {Repository} from "typeorm";
+import {CardView} from "../entities/card-view.entity";
 
 export class CliService {
     constructor(
-        @Inject(DocumentSimilarityService)
-        private documentSimilarityService: DocumentSimilarityService,
         @Inject(ChineseVocabService)
         private chineseVocabService: ChineseVocabService,
+        @InjectRepository(CardView)
+        private cardViewRepository: Repository<CardView>,
     ) {
 
     }
 
     async exec(customArgv?: string[]) {
-        const customCommand = customArgv[0];
 /*
         switch(customCommand) {
             case 'compareDocuments':

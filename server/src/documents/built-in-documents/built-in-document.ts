@@ -66,8 +66,8 @@ export class BuiltInDocument {
             language_code: 'zh-Hans'
         }
 
-        console.log(`Inserting ${name} for the first time`)
+        // console.log(`Inserting ${name} for the first time`)
         await documentRepository.insert(baseEntity)
-        console.log(`Inserted ${name} for the first time`)
+        // console.log(`Inserted ${name} for the first time`)
     }
 }

@@ -5,7 +5,6 @@ import { SpeechHttpModule } from "./speech/speech-http.module";
 import { TranslateHttpModule } from "./translate/translate-http.module";
 import { UsersHttpModule } from "./user/users-http.module";
 import { TranslateModule } from "./translate/translate.module";
-import { SpeechModule } from "./speech/speech.module";
 import { ImageSearchModule } from "./image-search/image-search.module";
 import { UsersModule } from "./user/user.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
@@ -21,6 +20,9 @@ import { VideoMetadataModule } from "./video_metadata/video-metadata.module";
 import { RecordRequestModule } from "./record-request/record-request.module";
 import {LeaderBoardModule} from "./leaderboard/leader-board.module";
 import {EntitiesModule} from "./entity-controller/entities.module";
+import {CliService} from "./cli/cli.service";
+import {ChineseVocabService} from "./shared/tabulate-documents/chinese-vocab.service";
+import { CardView } from "./entities/card-view.entity";
 
 @Module({
     imports: [
@@ -37,7 +39,7 @@ import {EntitiesModule} from "./entity-controller/entities.module";
             serveRoot: "/",
         }),
         AuthModule,
-        TypeOrmModule.forFeature([JsonCache, session]),
+        TypeOrmModule.forFeature([JsonCache, session, CardView]),
         ObservableModule,
         DocumentsModule,
         VideoMetadataModule,
@@ -45,7 +47,7 @@ import {EntitiesModule} from "./entity-controller/entities.module";
         EntitiesModule,
         LeaderBoardModule,
     ],
-    providers: [SessionService, UsersService],
+    providers: [ChineseVocabService, SessionService, UsersService, CliService],
     controllers: [],
 })
 export class AppModule {}

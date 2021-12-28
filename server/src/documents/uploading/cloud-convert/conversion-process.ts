@@ -39,7 +39,7 @@ export class ConversionProcess {
             }
             lastInputKey = convertOperationKey
         }
-        console.log(`Waiting for job  to finish`)
+        // console.log(`Waiting for job  to finish`)
         const result = await cloudConvert.jobs.wait(
             (
                 await cloudConvert.jobs.create({
@@ -70,7 +70,7 @@ export class ConversionProcess {
                 500,
             )
         }
-        console.log(`job  finished`)
+        // console.log(`job  finished`)
         return new UploadOutput(getJobOutputFiles(result))
     }
 }
