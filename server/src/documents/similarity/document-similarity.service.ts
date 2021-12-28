@@ -31,12 +31,12 @@ export class DocumentSimilarityService {
             args: [knownDocumentName, unknownDocumentName, words],
             service: 'DocumentSimilarityService',
             cb: async () => {
-                const knownSerializedTabulation = await this.tabulateService.tabulate(
+                const knownSerializedTabulation = await this.tabulateService.tabulateRemoteDocument(
                     { where: { name: knownDocumentName } },
                     words,
                     language_code,
                 )
-                const unknownSerializedTabulation = await this.tabulateService.tabulate(
+                const unknownSerializedTabulation = await this.tabulateService.tabulateRemoteDocument(
                     { where: { name: knownDocumentName } },
                     words,
                     language_code,

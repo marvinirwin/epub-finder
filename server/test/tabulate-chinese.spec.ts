@@ -13,7 +13,7 @@ import { SetWithUniqueLengths } from '../src/shared/tabulate-documents/set-with-
 import { chineseCharacterRegexp, wordBoundaryRegexp } from '../src/shared/tabulation/word-separator'
 
 const tabulateHtml3 = async (tabulateService: TabulateService) =>
-    await tabulateService.tabulateNoCache(
+    await tabulateService.tabulateRemoteDocumentNoCach(
         { where: { name: 'Test Html 3 Sentences' } },
         [
             '你好',
@@ -76,7 +76,7 @@ describe('document tabulation', () => {
         tabulateService = moduleRef.get<TabulateService>(TabulateService)
     })
     it('tabulates Simplified Chinese documents', async () => {
-        const tabulation = await tabulateService.tabulate(
+        const tabulation = await tabulateService.tabulateRemoteDocument(
             { where: { name: 'Test Html' } },
             ['今天', '今', '天'],
             'zh-Hans',
@@ -84,7 +84,7 @@ describe('document tabulation', () => {
         expect(tabulation.wordCounts).toMatchObject({ 今天: 1, 今: 1, 天: 1 })
     })
     it('Greedily tabulates documents', async () => {
-        const tabulation = await tabulateService.tabulateNoCache(
+        const tabulation = await tabulateService.tabulateRemoteDocumentNoCach(
             { where: { name: 'Test Html' } },
             ['你好', '你', '好'],
             'zh-Hans',

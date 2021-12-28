@@ -21,7 +21,6 @@ export const GroupwiseMax = ({
          AND max_table.creator_id = s.creator_id
     WHERE max_table.id IS NULL
     `
-    console.log(s);
     return s
 }
 

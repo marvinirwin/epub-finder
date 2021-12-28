@@ -23,6 +23,10 @@ import {EntitiesModule} from "./entity-controller/entities.module";
 import {CliService} from "./cli/cli.service";
 import {ChineseVocabService} from "./shared/tabulate-documents/chinese-vocab.service";
 import { CardView } from "./entities/card-view.entity";
+import {TabulateService} from "./documents/similarity/tabulate.service";
+import { CacheService } from "./util/cache.service";
+import { DocumentView } from "./entities/document-view.entity";
+
 
 @Module({
     imports: [
@@ -39,7 +43,7 @@ import { CardView } from "./entities/card-view.entity";
             serveRoot: "/",
         }),
         AuthModule,
-        TypeOrmModule.forFeature([JsonCache, session, CardView]),
+        TypeOrmModule.forFeature([JsonCache, session, CardView, DocumentView]),
         ObservableModule,
         DocumentsModule,
         VideoMetadataModule,
@@ -47,7 +51,7 @@ import { CardView } from "./entities/card-view.entity";
         EntitiesModule,
         LeaderBoardModule,
     ],
-    providers: [ChineseVocabService, SessionService, UsersService, CliService],
+    providers: [CacheService, ChineseVocabService, SessionService, UsersService, CliService, TabulateService],
     controllers: [],
 })
 export class AppModule {}
