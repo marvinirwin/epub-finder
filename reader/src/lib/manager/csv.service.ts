@@ -5,11 +5,12 @@ import { ICard } from '../../../../server/src/shared/ICard'
 import { cardForWord } from '../util/Util'
 import { combineLatest, Observable } from 'rxjs'
 import { shareReplay, switchMap } from 'rxjs/operators'
-import { SerializeCardForCsv } from '../serialize-card-for-csv'
 import { ExampleSegmentsService } from '../quiz/example-segments.service'
 import uniqueBy from '@popperjs/core/lib/utils/uniqueBy'
 import JSZip from 'jszip'
 import {CsvCard} from "../csv-card.interface";
+import { SerializeCardForCsv } from '@shared/'
+import { fetchSynthesizedAudio } from '../audio/fetch-synthesized-audio'
 
 export class CsvService {
     csvAndZip$: Observable<{ csvRows: CsvCard[], zip: JSZip }>
@@ -46,12 +47,18 @@ export class CsvService {
                 const zip = new JSZip()
                 const cards: ICard[] = await Promise.all(scheduleRowsWithCount.map(r => cardIndex[r.d.word]?.[0] || cardForWord(r.d.word, readingLanguageCode)))
                 return {
-                    csvRows: await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0,3).map(c => SerializeCardForCsv({
-                        c,
-                        exampleSegments,
-                        textToSpeechConfig,
-                        zip,
-                    }))),
+                    csvRows: await Promise.all(uniqueBy(cards, c => c.learning_language).slice(0,3).map(async c => {
+                        const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({
+                            ...textToSpeechConfig,
+                            text: c.learning_language
+                        });
+                        return SerializeCardForCsv({
+                            c,
+                            exampleSegments,
+                            wavAudio,
+                            zip,
+                        });
+                    })),
                     zip
                 }
             }),
