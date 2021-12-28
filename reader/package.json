@@ -40,7 +40,7 @@
         "observable-hooks": "^3.0.0",
         "plotly.js": "^1.54.5",
         "prettier": "^2.2.1",
-        "react": "^16.13.1",
+        "react": "^16.14.0",
         "react-custom-scrollbars": "^4.2.1",
         "react-dom": "^16.13.1",
         "react-dropzone": "^11.2.4",

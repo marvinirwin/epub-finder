@@ -14,7 +14,8 @@
         "watch": "nest start --watch -p tsconfig.json",
         "test": "jest ",
         "lint-fix": "prettier --write .",
-        "nest-help": "nest --help"
+        "nest-help": "nest --help",
+        "clone-libxml": "cd node_modules && git clone https://github.com/fishilico/libxmljs && cd libxmljs && npm run install"
     },
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",
@@ -47,7 +48,7 @@
         "chalk": "^4.1.0",
         "cheerio": "^1.0.0-rc.3",
         "clockwork": "^0.1.4",
-        "cloudconvert": "^2.1.6",
+        "cloudconvert": "^2.2.4",
         "collections": "^5.1.11",
         "command-line-args": "^5.1.1",
         "compression": "^1.7.4",
@@ -59,7 +60,6 @@
         "google-translate-api": "^2.3.0",
         "googleapis": "^52.1.0",
         "jwt-decode": "^3.1.2",
-        "libxmljs": "^0.19.7",
         "lob": "^6.1.0",
         "lodash": "^4.17.19",
         "lusca": "^1.6.1",
@@ -95,6 +95,7 @@
         "popper.js": "^1.16.1",
         "prettier": "^2.2.1",
         "pug": "^3.0.0",
+        "react": "^17.0.2",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^6.6.3",
         "stripe": "^8.132.0",
