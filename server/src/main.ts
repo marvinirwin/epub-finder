@@ -21,6 +21,8 @@ async function bootstrap() {
     const { httpAdapter } = app.get(HttpAdapterHost)
     if (isCli) {
         const cliService = app.get(CliService);
+        await cliService.exec();
+        return;
     }
     app.useGlobalInterceptors(new LoggingInterceptor())
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter))
