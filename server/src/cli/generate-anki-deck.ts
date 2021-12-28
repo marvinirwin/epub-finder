@@ -55,15 +55,15 @@ async function getExampleSegmentMap({
                                     }: {
     exampleDocuments: DocumentView[];
     words: Set<string>;
-    languageCode: string
+    languageCode: string;
 }) {
     // TODO extract functionality from the atomize things
     const atomizeDocument = async (document: DocumentView) => {
         // Fetch the document from S3 and then atomize it
         const text = streamToString(
             await s3ReadStream(document.filename),
-        )
-    }
+        );
+    };
 }
 
 export const generateAnkiDeck = async (

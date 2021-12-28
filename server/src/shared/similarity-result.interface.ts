@@ -1,5 +1,5 @@
-import { SerializedTabulation } from './index'
-import { SimilarityResults } from './compre-similarity-result'
+import { SerializedTabulation } from "./index";
+import { SimilarityResults } from "./compre-similarity-result";
 
 export const computeSimilarityTabulation = (
     knownDocument: SerializedTabulation,
@@ -7,4 +7,4 @@ export const computeSimilarityTabulation = (
 ): SimilarityResults => ({
     knownWords: {},
     unknownWords: {},
-})
+});

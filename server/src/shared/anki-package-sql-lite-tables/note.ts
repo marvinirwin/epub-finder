@@ -1,3 +1,3 @@
 export interface note {
-    flds: string
+    flds: string;
 }

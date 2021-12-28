@@ -4,5 +4,5 @@ export interface LeaderBoardDto {
 export interface LeaderBoardRecord {
     userLabel: string;
     lastRecognitionRecord: {created_at: Date; word: string};
-    recognitionRecordsThisWeek: number
+    recognitionRecordsThisWeek: number;
 }

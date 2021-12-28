@@ -1,12 +1,12 @@
-import { config } from 'dotenv'
-import * as path from 'path'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { config } from "dotenv";
+import * as path from "path";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
-config({ path: '.env' })
+config({ path: ".env" });
 
-const baseDir = path.join(__dirname, '../')
-const entitiesPath = `${baseDir}${process.env.TYPEORM_ENTITIES}`
-const migrationPath = `${baseDir}${process.env.TYPEORM_MIGRATIONS}`
+const baseDir = path.join(__dirname, "../");
+const entitiesPath = `${baseDir}${process.env.TYPEORM_ENTITIES}`;
+const migrationPath = `${baseDir}${process.env.TYPEORM_MIGRATIONS}`;
 
 export const DatabaseModule = TypeOrmModule.forRoot({
     // @ts-ignore
@@ -18,12 +18,12 @@ export const DatabaseModule = TypeOrmModule.forRoot({
     port: Number.parseInt(process.env.TYPEORM_PORT, 10),
     entities: [entitiesPath],
     migrations: [migrationPath],
-    migrationsRun: process.env.TYPEORM_MIGRATIONS_RUN === 'true',
-    seeds: [`src/db/seeds/*.seed.ts`],
+    migrationsRun: process.env.TYPEORM_MIGRATIONS_RUN === "true",
+    seeds: ["src/db/seeds/*.seed.ts"],
     cli: {
-        migrationsDir: 'src/migrations',
-        entitiesDir: 'src/entities',
+        migrationsDir: "src/migrations",
+        entitiesDir: "src/entities",
     },
     synchronize: true,
-    timezone: 'Z',
-})
+    timezone: "Z",
+});

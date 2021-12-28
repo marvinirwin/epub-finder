@@ -1,9 +1,9 @@
-import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
-import { TransliterateRequestDto } from './transliterate-request.dto'
-import { TransliterateResponseDto } from './transliterate-response.dto'
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import { TransliterateRequestDto } from "./transliterate-request.dto";
+import { TransliterateResponseDto } from "./transliterate-response.dto";
 
-const endpoint = 'https://api.cognitive.microsofttranslator.com'
+const endpoint = "https://api.cognitive.microsofttranslator.com";
 
 export const MAX_TRANSLATE_LENGTH = 10000;
 export const transliterate = ({
@@ -20,16 +20,16 @@ export const transliterate = ({
 
     return axios({
         baseURL: endpoint,
-        url: '/transliterate',
-        method: 'post',
+        url: "/transliterate",
+        method: "post",
         headers: {
-            'Ocp-Apim-Subscription-Key': process.env.AZURE_TRANSLATOR_KEY1,
-            'Ocp-Apim-Subscription-Region': process.env.AZURE_TRANSLATOR_REGION,
-            'Content-type': 'application/json',
-            'X-ClientTraceId': uuidv4().toString(),
+            "Ocp-Apim-Subscription-Key": process.env.AZURE_TRANSLATOR_KEY1,
+            "Ocp-Apim-Subscription-Region": process.env.AZURE_TRANSLATOR_REGION,
+            "Content-type": "application/json",
+            "X-ClientTraceId": uuidv4().toString(),
         },
         params: {
-            'api-version': '3.0',
+            "api-version": "3.0",
             language,
             fromScript,
             toScript,
@@ -39,8 +39,8 @@ export const transliterate = ({
                 text,
             },
         ],
-        responseType: 'json',
+        responseType: "json",
     }).then((response) => {
-        return response.data
-    })
-}
+        return response.data;
+    });
+};

@@ -3,9 +3,9 @@ import {
     CreateDateColumn,
     Entity,
     PrimaryGeneratedColumn,
-} from 'typeorm'
+} from "typeorm";
 
-@Entity({ name: 's3_file' })
+@Entity({ name: "s3_file" })
 export class s3File {
     @PrimaryGeneratedColumn()
     id: number

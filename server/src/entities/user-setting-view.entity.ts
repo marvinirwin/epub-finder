@@ -1,15 +1,15 @@
-import { Column, ViewColumn, ViewEntity } from 'typeorm'
+import { Column, ViewColumn, ViewEntity } from "typeorm";
 
 export const GroupwiseMax = ({
                                  table,
                                  groupingColumns,
 
                              }: {
-                                 table: string,
-                                 groupingColumns: string[]
+                                 table: string;
+                                 groupingColumns: string[];
                              },
 ) => {
-    let s = `
+    const s = `
     SELECT 
         s.*
     FROM ${table} s
@@ -17,15 +17,15 @@ export const GroupwiseMax = ({
         ON max_table.created_at > s.created_at
         AND ${groupingColumns
         .map(groupingColumn => `max_table.${groupingColumn} = s.${groupingColumn}`)
-    .join(' AND ')}
+    .join(" AND ")}
          AND max_table.creator_id = s.creator_id
     WHERE max_table.id IS NULL
-    `
-    return s
-}
+    `;
+    return s;
+};
 
 @ViewEntity({
-    expression: GroupwiseMax({ table: 'user_setting', groupingColumns: ['name'] }),
+    expression: GroupwiseMax({ table: "user_setting", groupingColumns: ["name"] }),
 })
 export class UserSettingView {
     @ViewColumn()

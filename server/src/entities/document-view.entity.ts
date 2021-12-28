@@ -4,8 +4,8 @@ import {
     PrimaryColumn,
     ViewColumn,
     ViewEntity,
-} from 'typeorm'
-import { User } from './user.entity'
+} from "typeorm";
+import { User } from "./user.entity";
 
 @ViewEntity({
     expression: `

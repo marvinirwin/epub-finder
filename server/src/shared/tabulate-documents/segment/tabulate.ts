@@ -13,15 +13,15 @@ export const textFromPositionedWordsAndAllText = (allText: string, positionedWor
     const startPoint = Math.min(...positionedWords.map(({position}) => position));
     const endPoint = Math.min(...positionedWords.map(({position, word}) => position + word.length));
     return allText.substr(startPoint, endPoint);
-}
+};
 
-export const tabulate = ({
+export const tabulate = <T extends {} = Segment>({
                              notableCharacterSequences,
                              segments,
                              isNotableCharacterRegex,
                              wordIdentifyingStrategy,
                              isWordBoundaryRegex,
-                         }: TabulationParameters): TabulatedSegments => {
+                         }: TabulationParameters<Segment>): TabulatedSegments => {
     const tabulationObject = tabulationFactory();
     const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
     const isNotableCharacter = (character: string) =>

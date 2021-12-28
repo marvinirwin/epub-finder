@@ -72,15 +72,11 @@ export class TabulateService {
 */
     }
 
-    public  tabulate({text, documentId, words, language_code}: {text: string; documentId: string; words: string[]; language_code: string}) {
-        const atomizedDocument = AtomizedDocument.atomizeDocument({
-            documentSrc: text,
-            documentId: documentId
-        });
+    public  tabulate({text, words, language_code}: {text: string[]; words: string[]; language_code: string}) {
         const setWithUniqueLengths = new SetWithUniqueLengths(words);
         return tabulate({
             notableCharacterSequences: setWithUniqueLengths,
-            segments: atomizedDocument.segments(),
+            segments: text,
             greedyWordSet: setWithUniqueLengths,
             ...resolvePartialTabulationConfig(language_code),
             language_code,

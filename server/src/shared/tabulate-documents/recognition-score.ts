@@ -1,1 +1,1 @@
-export const recognitionScore = () => {}
+export const recognitionScore = () => {};

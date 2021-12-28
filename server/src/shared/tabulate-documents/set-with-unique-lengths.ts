@@ -3,25 +3,25 @@ export class SetWithUniqueLengths {
     set = new Set<string>()
     constructor(strings?: string[]) {
         if (strings) {
-            strings.forEach((string) => this.add(string))
+            strings.forEach((string) => this.add(string));
         }
     }
 
     add(v: string) {
         if (v.length) {
-            this.set.add(v)
-            this.uniqueLengths.add(v.length)
+            this.set.add(v);
+            this.uniqueLengths.add(v.length);
         }
     }
     delete(v: string) {
         // TODO this doesn't delete from uniqueLengths, might be a problem in future
         // Could be solved with a map with counts
-        this.set.delete(v)
+        this.set.delete(v);
     }
     has(v: string) {
-        return this.set.has(v)
+        return this.set.has(v);
     }
     values() {
-        return this.set.values()
+        return this.set.values();
     }
 }

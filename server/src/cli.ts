@@ -1,13 +1,13 @@
-import { config } from 'dotenv'
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { TabulateService } from './documents/similarity/tabulate.service'
+import { config } from "dotenv";
+import { NestFactory } from "@nestjs/core";
+import {CliService} from "./cli/cli.service";
 
-config({ path: '.env' })
+config({ path: ".env" });
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule)
-    const tabulateService = app.get(TabulateService)
+    const app = await NestFactory.create(CliModule);
+    const cliService = app.get(CliService);
+    cliService.exec();
 }
 
-bootstrap()
+bootstrap();

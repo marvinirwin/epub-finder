@@ -1,13 +1,13 @@
-import { InjectRepository } from '@nestjs/typeorm'
-import { SimilarityEdge } from '../../entities/count-edge.entity'
-import { Repository } from 'typeorm'
-import { SimilarityEdgeVersion } from '../../entities/count-edge.version.entity'
-import { Inject } from '@nestjs/common'
-import { TabulateService } from './tabulate.service'
-import { CacheService } from '../../util/cache.service'
-import { SimilarityResults } from '../../shared/compre-similarity-result'
-import { computeSimilarityTabulation } from '../../shared/similarity-result.interface'
-import { language } from 'googleapis/build/src/apis/language'
+import { InjectRepository } from "@nestjs/typeorm";
+import { SimilarityEdge } from "../../entities/count-edge.entity";
+import { Repository } from "typeorm";
+import { SimilarityEdgeVersion } from "../../entities/count-edge.version.entity";
+import { Inject } from "@nestjs/common";
+import { TabulateService } from "./tabulate.service";
+import { CacheService } from "../../util/cache.service";
+import { SimilarityResults } from "../../shared/compre-similarity-result";
+import { computeSimilarityTabulation } from "../../shared/similarity-result.interface";
+import { language } from "googleapis/build/src/apis/language";
 
 export class DocumentSimilarityService {
     constructor(
@@ -29,23 +29,23 @@ export class DocumentSimilarityService {
     ): Promise<SimilarityResults> {
         return this.cacheService.memo<SimilarityResults>({
             args: [knownDocumentName, unknownDocumentName, words],
-            service: 'DocumentSimilarityService',
+            service: "DocumentSimilarityService",
             cb: async () => {
                 const knownSerializedTabulation = await this.tabulateService.tabulateRemoteDocument(
                     { where: { name: knownDocumentName } },
                     words,
                     language_code,
-                )
+                );
                 const unknownSerializedTabulation = await this.tabulateService.tabulateRemoteDocument(
                     { where: { name: knownDocumentName } },
                     words,
                     language_code,
-                )
+                );
                 return computeSimilarityTabulation(
                     knownSerializedTabulation,
                     unknownSerializedTabulation,
-                )
+                );
             },
-        })
+        });
     }
 }

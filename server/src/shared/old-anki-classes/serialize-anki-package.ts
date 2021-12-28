@@ -1,33 +1,33 @@
-import { Collection, SerializedCollection } from './collection'
-import { Dictionary, fromPairs } from 'lodash'
-import { Card, SerializedCard } from './card'
-import { ICard } from '../ICard'
+import { Collection, SerializedCollection } from "./collection";
+import { Dictionary, fromPairs } from "lodash";
+import { Card, SerializedCard } from "./card";
+import { ICard } from "../ICard";
 
 export interface SerializeAnkiPackage {
-    name: string
-    path: string
-    message: string
-    collections: SerializedCollection[] | undefined
-    cardIndex: Dictionary<SerializedCard[]> | undefined
-    cards: ICard[] | undefined
+    name: string;
+    path: string;
+    message: string;
+    collections: SerializedCollection[] | undefined;
+    cardIndex: Dictionary<SerializedCard[]> | undefined;
+    cards: ICard[] | undefined;
 }
 
 export interface UnserializedAnkiPackage {
-    name: string
-    path: string
-    message: string
-    collections: Collection[] | null
-    cardIndex: Dictionary<Card[]> | null
+    name: string;
+    path: string;
+    message: string;
+    collections: Collection[] | null;
+    cardIndex: Dictionary<Card[]> | null;
 }
 
 export function UnserializeAnkiPackage(
     o: SerializeAnkiPackage,
 ): UnserializedAnkiPackage {
-    const entries = o.cardIndex ? Object.entries(o.cardIndex) : null
+    const entries = o.cardIndex ? Object.entries(o.cardIndex) : null;
     const pairs =
         entries &&
-        entries.map(([k, v]) => [k, v.map((sc) => Card.fromSerialized(sc))])
-    const cIndex = o.cardIndex ? fromPairs(pairs) : null
+        entries.map(([k, v]) => [k, v.map((sc) => Card.fromSerialized(sc))]);
+    const cIndex = o.cardIndex ? fromPairs(pairs) : null;
     return {
         name: o.name,
         path: o.path,
@@ -36,5 +36,5 @@ export function UnserializeAnkiPackage(
             ? o.collections.map((c) => Collection.fromSerialiazed(c))
             : null,
         cardIndex: cIndex,
-    }
+    };
 }

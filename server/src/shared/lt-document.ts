@@ -1,28 +1,28 @@
-import { DocumentViewDto } from '../documents/document-view.dto'
+import { DocumentViewDto } from "../documents/document-view.dto";
 
 export class LtDocument {
     d: DocumentViewDto
     constructor(d: DocumentViewDto) {
-        this.d = d
+        this.d = d;
     }
     id() {
-        return this.d.document_id || this.d.id
+        return this.d.document_id || this.d.id;
     }
     get name() {
-        return this.d.name
+        return this.d.name;
     }
     get global() {
-        return this.d.global
+        return this.d.global;
     }
     get createdAt() {
-        return this.d.created_at
+        return this.d.created_at;
     }
     get filename() {
-        return this.d.filename
+        return this.d.filename;
     }
 
     url() {
-        return `${process.env.PUBLIC_URL}/documents/${this.filename}`
+        return `${process.env.PUBLIC_URL}/documents/${this.filename}`;
     }
 }
 
@@ -30,8 +30,8 @@ export const ltDocId = ({
     document_id,
     id,
 }: {
-    id: string
-    document_id?: string
+    id: string;
+    document_id?: string;
 }) => {
-    return document_id || id
-}
+    return document_id || id;
+};

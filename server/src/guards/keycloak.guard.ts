@@ -1,21 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 
 @Injectable()
 export class KeycloakGuard
-    extends AuthGuard('keycloak')
+    extends AuthGuard("keycloak")
     implements CanActivate {
     public async canActivate(context: ExecutionContext): Promise<boolean> {
-        const result = (await super.canActivate(context)) as boolean
-        const request = context.switchToHttp().getRequest()
-        await super.logIn(request)
-        return result
+        const result = (await super.canActivate(context)) as boolean;
+        const request = context.switchToHttp().getRequest();
+        await super.logIn(request);
+        return result;
     }
 
     public handleRequest<UserEntity>(err: Error, user: UserEntity): UserEntity {
         if (err) {
-            throw err
+            throw err;
         }
-        return user
+        return user;
     }
 }

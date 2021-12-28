@@ -11,26 +11,26 @@ export const SerializeCardForCsv = async (
         wavAudio,
         zip
     }: {
-        c: ICard,
-        exampleSegments: Map<string, SegmentSubsequences[]>,
-        wavAudio: WavAudio | undefined,
-        zip: JSZip
+        c: ICard;
+        exampleSegments: Map<string, SegmentSubsequences[]>;
+        wavAudio: WavAudio | undefined;
+        zip: JSZip;
     }): Promise<CsvCard> => {
     const [photoSrc] = c.photos;
     const [knownLanguage] = c.known_language;
-    const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code)
-    const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code)
+    const learningToKnowTranslationConfig = languageCodesMappedToTranslationConfigs.get(c.language_code);
+    const learningToKnownTransliterationConfig = resolveRomanizationConfig(c.language_code);
     const segments = [...exampleSegments.get(c.learning_language)?.values() || []];
     /*const wavAudio = textToSpeechConfig && await fetchSynthesizedAudio({
         ...textToSpeechConfig,
         text: c.learning_language
     });*/
-    const audioFilename = `${c.learning_language}.wav`
+    const audioFilename = `${c.learning_language}.wav`;
     if (wavAudio) {
         // Put ${learningLanguage}.wav into the zip file
-        await zip.file(audioFilename, wavAudio.blob)
+        await zip.file(audioFilename, wavAudio.blob);
     }
-    const sound = wavAudio ? `<audio controls autoplay src="${audioFilename}"/>` : '';
+    const sound = wavAudio ? `<audio controls autoplay src="${audioFilename}"/>` : "";
     const photo = await resolveImagePath({photo: photoSrc, zip, learning_language: c.learning_language});
     return {
         photo,
@@ -44,8 +44,8 @@ export const SerializeCardForCsv = async (
                 language: c.language_code,
                 text: c.learning_language
             }) :
-            '',
+            "",
         learning_language: c.learning_language,
 
-    }
-}
+    };
+};

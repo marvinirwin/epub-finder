@@ -6,9 +6,9 @@ import {
     OneToOne,
     PrimaryColumn,
     PrimaryGeneratedColumn,
-} from 'typeorm'
-import { User } from './user.entity'
-import { JsonValueTransformer } from '../util/JsonValueTransformer'
+} from "typeorm";
+import { User } from "./user.entity";
+import { JsonValueTransformer } from "../util/JsonValueTransformer";
 
 type KeyValue = { [key: string]: any }
 
@@ -23,7 +23,7 @@ export class UsageEvent {
         transformer: new JsonValueTransformer<KeyValue>(),
     })
     public description: KeyValue = {}
-    @Column('int')
+    @Column("int")
     public cost: number
 
     @Column({ default: null })

@@ -5,8 +5,8 @@ import { AtomMetadata } from "../atom-metadata.interface.ts/atom-metadata";
 import { XMLDocumentNode } from "../XMLDocumentNode";
 import {SegmentSubsequences} from "../index";
 
-export type TabulationParameters = {
-    segments: Segment[];
+export type TabulationParameters<T> = {
+    segments: T[];
 } & TabulationConfiguration
 
 

@@ -1,11 +1,11 @@
-import { OnModuleInit } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { DocumentView } from '../../entities/document-view.entity'
-import { Repository } from 'typeorm'
-import { Document } from '../../entities/document.entity'
-import { promises as fs } from 'fs'
-import { join } from 'path'
-import { BuiltInDocument } from './built-in-document'
+import { OnModuleInit } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { DocumentView } from "../../entities/document-view.entity";
+import { Repository } from "typeorm";
+import { Document } from "../../entities/document.entity";
+import { promises as fs } from "fs";
+import { join } from "path";
+import { BuiltInDocument } from "./built-in-document";
 
 export class UploadOnStartupService implements OnModuleInit {
     constructor(
@@ -17,7 +17,7 @@ export class UploadOnStartupService implements OnModuleInit {
 
     async onModuleInit() {
         // TODO make this work with S3
-        this.insertDocumentsInDocumentsDir()
+        this.insertDocumentsInDocumentsDir();
     }
 
     private async insertDocumentsInDocumentsDir() {
@@ -30,22 +30,22 @@ export class UploadOnStartupService implements OnModuleInit {
                             ...props,
                         }),
                 ),
-            )
+            );
 
         const builtInReadingDocuments = await getBuiltInDocumentsInPath(
             process.env.READING_DOCUMENTS_DIR,
             {
                 global: true,
             },
-        )
+        );
         const testReadingDocumentPaths = await getBuiltInDocumentsInPath(
             process.env.TEST_READING_DOCUMENTS_DIR,
             { for_testing: true },
-        )
+        );
         const frequencyDocumentPaths = await getBuiltInDocumentsInPath(
             process.env.FREQUENCY_DOCUMENTS_DIR,
             { for_frequency: true },
-        )
+        );
         const testFrequencyDocumentPaths = await getBuiltInDocumentsInPath(
             process.env.TEST_FREQUENCY_DOCUMENTS_DIR,
             {
@@ -64,14 +64,14 @@ export class UploadOnStartupService implements OnModuleInit {
                 documentRepository: this.documentRepository,
                 documentViewRepository: this.documentViewRepository,
             }),
-        )
+        );
     }
 }
 
 const readPathsInDir = async (dir: string): Promise<string[]> => {
     try {
-        return (await fs.readdir(dir)).map((filename) => join(dir, filename))
+        return (await fs.readdir(dir)).map((filename) => join(dir, filename));
     } catch (e) {
-        return []
+        return [];
     }
-}
+};

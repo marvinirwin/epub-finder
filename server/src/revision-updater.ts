@@ -1,4 +1,4 @@
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export class RevisionUpdater<T, RevisionT extends Partial<T>> {
     constructor(
@@ -13,17 +13,17 @@ export class RevisionUpdater<T, RevisionT extends Partial<T>> {
         ) => Promise<Partial<T>> | Partial<T>,
     ) {}
     public async SubmitRevision(newRevision: RevisionT): Promise<T> {
-        const currentVersion = await this.getCurrentVersion(newRevision)
+        const currentVersion = await this.getCurrentVersion(newRevision);
         if (!currentVersion) {
-            const newVersion = await this.createNewVersion(newRevision)
-            return this.persistNewVersion(newVersion)
+            const newVersion = await this.createNewVersion(newRevision);
+            return this.persistNewVersion(newVersion);
         }
         if (!(await this.isAllowedFn(currentVersion))) {
-            throw new Error('Not authorized to submit revision')
+            throw new Error("Not authorized to submit revision");
         }
 
         return this.persistNewVersion(
             await this.mergeVersions(currentVersion, newRevision),
-        )
+        );
     }
 }

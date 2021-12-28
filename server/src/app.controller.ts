@@ -1,9 +1,9 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get } from "@nestjs/common";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
     @Get()
     findAll(): string {
-        return 'This action returns all cats'
+        return "This action returns all cats";
     }
 }

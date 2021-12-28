@@ -1,13 +1,13 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, ViewColumn, ViewEntity } from 'typeorm'
-import { GroupwiseMax } from './user-setting-view.entity'
+import { Column, CreateDateColumn, PrimaryGeneratedColumn, ViewColumn, ViewEntity } from "typeorm";
+import { GroupwiseMax } from "./user-setting-view.entity";
 
 @ViewEntity({
     expression: GroupwiseMax({
-        table: 'known_word',
+        table: "known_word",
         groupingColumns: [
-            'creator_id',
-            'language_code',
-            'word',
+            "creator_id",
+            "language_code",
+            "word",
         ]
     }),
 })

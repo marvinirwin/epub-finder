@@ -1,4 +1,4 @@
 export interface col {
-    decks: string
-    id: string
+    decks: string;
+    id: string;
 }

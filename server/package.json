@@ -13,7 +13,7 @@
         "build": "nest build -p tsconfig.json dist/server/src/main.js",
         "watch": "nest start --watch -p tsconfig.json",
         "test": "jest ",
-        "lint-fix": "prettier --write .",
+        "lint-fix": "eslint --fix .  --ext .ts --ext .tsx",
         "nest-help": "nest --help",
         "clone-libxml": "cd node_modules && git clone https://github.com/fishilico/libxmljs && cd libxmljs && npm run install"
     },

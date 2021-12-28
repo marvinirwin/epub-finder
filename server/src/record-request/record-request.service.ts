@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { JsonCache } from '../entities/json-cache.entity'
-import { Repository } from 'typeorm'
-import { RecordRequest } from '../entities/record-request.entity'
-import { User } from '../entities/user.entity'
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { JsonCache } from "../entities/json-cache.entity";
+import { Repository } from "typeorm";
+import { RecordRequest } from "../entities/record-request.entity";
+import { User } from "../entities/user.entity";
 
 @Injectable()
 export class RecordRequestService {
@@ -18,12 +18,12 @@ export class RecordRequestService {
                 sentence,
                 creator_id: user.id,
             })),
-        )
+        );
     }
 
     public async queryRecordRequestsForUser(user: User) {
         return this.recordRequestRepository
             .find({ creator_id: user.id })
-            .then((records) => records.map(({ sentence }) => sentence))
+            .then((records) => records.map(({ sentence }) => sentence));
     }
 }

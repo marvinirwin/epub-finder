@@ -1,5 +1,5 @@
-import { ICard } from '../ICard'
-import { chineseCharacterRegexp } from '../tabulation/word-separator'
+import { ICard } from "../ICard";
+import { chineseCharacterRegexp } from "../tabulation/word-separator";
 
 /**
  * @deprecated
@@ -14,19 +14,19 @@ export class Card {
         public ankiPackage: string,
         public iCard: ICard,
     ) {
-        this.frontPhotos = []
+        this.frontPhotos = [];
     }
 
     get front(): string {
-        return this.interpolatedFields[0].normalize()
+        return this.interpolatedFields[0].normalize();
     }
 
     get back(): string {
-        return this.interpolatedFields.slice(5).join('</br>').normalize()
+        return this.interpolatedFields.slice(5).join("</br>").normalize();
     }
 
     get matchCriteria(): string {
-        return this.fields.join('').split('').join('')
+        return this.fields.join("").split("").join("");
     }
 
     static fromSerialized(c: SerializedCard) {
@@ -37,7 +37,7 @@ export class Card {
             c.collection,
             c.ankiPackage,
             c.iCard,
-        )
+        );
     }
 
     /*
@@ -56,19 +56,19 @@ export class Card {
 */
 
     private getSounds() {
-        return []
+        return [];
     }
 
     private getPhotos() {
-        return []
+        return [];
     }
 }
 
 export interface SerializedCard {
-    interpolatedFields: string[]
-    fields: string[]
-    deck: string
-    collection: string
-    ankiPackage: string
-    iCard: ICard
+    interpolatedFields: string[];
+    fields: string[];
+    deck: string;
+    collection: string;
+    ankiPackage: string;
+    iCard: ICard;
 }

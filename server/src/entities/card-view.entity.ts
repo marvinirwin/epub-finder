@@ -1,14 +1,14 @@
 import {
     ViewColumn,
     ViewEntity,
-} from 'typeorm'
-import { GroupwiseMax } from './user-setting-view.entity'
+} from "typeorm";
+import { GroupwiseMax } from "./user-setting-view.entity";
 
 
 @ViewEntity({
     expression: GroupwiseMax({
-        table: 'card',
-        groupingColumns: ['learning_language', 'language_code']
+        table: "card",
+        groupingColumns: ["learning_language", "language_code"]
     }),
 })
 export class CardView {

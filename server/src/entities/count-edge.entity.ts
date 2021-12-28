@@ -1,7 +1,7 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, PrimaryGeneratedColumn } from "typeorm";
 
 export class SimilarityEdge {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     id: string
 
     @Column()

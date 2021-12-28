@@ -1,11 +1,11 @@
-import { PassportStrategy } from '@nestjs/passport'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { UsersService } from '../../user/users.service'
-import { User } from 'src/entities/user.entity'
-import Strategy from '@exlinc/keycloak-passport'
+import { PassportStrategy } from "@nestjs/passport";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { UsersService } from "../../user/users.service";
+import { User } from "src/entities/user.entity";
+import Strategy from "@exlinc/keycloak-passport";
 
 @Injectable()
-export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
+export class KeycloakStrategy extends PassportStrategy(Strategy, "keycloak") {
     constructor(private readonly userService: UsersService) {
         super({
             host: process.env.KEYCLOAK_URL,
@@ -13,12 +13,12 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
             realm: process.env.KEYCLOAK_REALM,
             clientID: process.env.KEYCLOAK_CLIENT_ID,
             clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-            callbackURL: '/languagetrainer-auth/keycloak/callback',
+            callbackURL: "/languagetrainer-auth/keycloak/callback",
             authorizationURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
             tokenURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
             userInfoURL: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
             passReqToCallback: true,
-        })
+        });
     }
 
     public async validate(
@@ -26,20 +26,20 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
         accessToken,
         unknown,
         profile: {
-            email: string,
-            fullName: string,
-            firstName: string,
-            lastName: string,
-            keycloakId: string,
+            email: string;
+            fullName: string;
+            firstName: string;
+            lastName: string;
+            keycloakId: string;
         },
         done,
         currentUser
     ): Promise<User> {
         return await this.userService.upsertUserByEmailAndProvider(
             profile.email,
-            'keycloak',
+            "keycloak",
             profile.keycloakId,
             currentUser,
-        )
+        );
     }
 }

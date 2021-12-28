@@ -3,7 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     PrimaryGeneratedColumn,
-} from 'typeorm'
+} from "typeorm";
 
 @Entity()
 export class RecordRequest {

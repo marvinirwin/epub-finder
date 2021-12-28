@@ -20,7 +20,7 @@ export class CliService {
     }
 
     async exec() {
-        const sentences = [(await doGoogleOcr({fileName: "C:\\Users\\marvi\\Downloads\\chinese.jpg"})).join('\n')];
+        const sentences = [(await doGoogleOcr({fileName: "C:\\Users\\marvi\\Downloads\\chinese.jpg"})).join("\n")];
 
         const flashcardDictionary = {};
         const allFlashCards = await this.cardViewRepository.find({});

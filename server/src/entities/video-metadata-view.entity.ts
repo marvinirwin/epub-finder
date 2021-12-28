@@ -5,8 +5,8 @@ import {
     PrimaryColumn,
     ViewColumn,
     ViewEntity,
-} from 'typeorm'
-import { VideoMetadata } from './video.metadata'
+} from "typeorm";
+import { VideoMetadata } from "./video.metadata";
 
 @ViewEntity({
     expression: `

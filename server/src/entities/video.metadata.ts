@@ -5,27 +5,27 @@ import {
     Generated,
     PrimaryColumn,
     PrimaryGeneratedColumn,
-} from 'typeorm'
+} from "typeorm";
 
-@Entity({ name: 'video_metadata' })
+@Entity({ name: "video_metadata" })
 export class VideoMetadata {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     id: string
 
     // Used in groupwise max
     @Column()
-    @Generated('uuid')
+    @Generated("uuid")
     video_metadata_id: string
 
-    @Column('text')
+    @Column("text")
     sentence: string
 
-    @Column('text')
+    @Column("text")
     sentence_hash: string
 
-    @Column('text')
+    @Column("text")
     metadata: string
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     created_at: Date
 }

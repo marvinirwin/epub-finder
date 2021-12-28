@@ -1,19 +1,19 @@
-import { TabulateService } from '../src/documents/similarity/tabulate.service'
+import { TabulateService } from "../src/documents/similarity/tabulate.service";
 import {
     AtomizedDocument,
     InterpolateService,
     tabulate,
     Segment,
-} from '../src/shared'
-import { SetWithUniqueLengths } from '../src/shared/tabulate-documents/set-with-unique-lengths'
+} from "../src/shared";
+import { SetWithUniqueLengths } from "../src/shared/tabulate-documents/set-with-unique-lengths";
 import {
     languageRegexMap,
     latinCharacterRegexp,
     wordBoundaryRegexp,
-} from '../src/shared/tabulation/word-separator'
+} from "../src/shared/tabulation/word-separator";
 
 const segmentText = (text: string, language_code: string) => {
-    const foundRegexForLanguage = languageRegexMap.get(language_code)
+    const foundRegexForLanguage = languageRegexMap.get(language_code);
     return tabulate({
         notableCharacterSequences: new SetWithUniqueLengths([]),
         segments: AtomizedDocument.atomizeDocument(
@@ -25,17 +25,17 @@ const segmentText = (text: string, language_code: string) => {
         isWordBoundaryRegex: wordBoundaryRegexp,
         wordIdentifyingStrategy:
             foundRegexForLanguage?.strategy ||
-            'spaceSeparator',
+            "spaceSeparator",
         language_code
-    })
-}
+    });
+};
 
-describe('Tabulating different languages', () => {
-    it('Tabulates a Korean sentence', () => {
-        expect(segmentText('아기 병아리와 함께하는 겹받침, 쌍받침 연습 동화', 'ko')).toEqual([]);
-    })
-    it('Tabulates a toki pona sentence', () => {
-        const segmentText1 = segmentText('Él vive en un gallinero pequeño y normal en un barrio pequeño y normal', 'es')
+describe("Tabulating different languages", () => {
+    it("Tabulates a Korean sentence", () => {
+        expect(segmentText("아기 병아리와 함께하는 겹받침, 쌍받침 연습 동화", "ko")).toEqual([]);
+    });
+    it("Tabulates a toki pona sentence", () => {
+        const segmentText1 = segmentText("Él vive en un gallinero pequeño y normal en un barrio pequeño y normal", "es");
         expect(!segmentText1.notableSubSequences).toEqual([
             {
                 "position": 0,
@@ -93,9 +93,9 @@ describe('Tabulating different languages', () => {
                 "position": 64,
                 "word": "normal"
             }
-        ])
-        expect(segmentText('jan.sona toki pona', 'toki').notableSubSequences).toEqual([
+        ]);
+        expect(segmentText("jan.sona toki pona", "toki").notableSubSequences).toEqual([
 
         ]);
-    })
-})
+    });
+});

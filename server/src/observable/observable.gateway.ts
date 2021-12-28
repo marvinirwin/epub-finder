@@ -3,8 +3,8 @@ import {
     OnGatewayDisconnect,
     WebSocketGateway,
     WebSocketServer,
-} from '@nestjs/websockets'
-import { ObservableService } from './observable.service'
+} from "@nestjs/websockets";
+import { ObservableService } from "./observable.service";
 
 @WebSocketGateway()
 export class ObservableGateway
@@ -13,8 +13,8 @@ export class ObservableGateway
 
     constructor(private observableService: ObservableService) {
         this.observableService.videoMetadataEvents$.subscribe((v) =>
-            this.server.emit('videoMetadata', v),
-        )
+            this.server.emit("videoMetadata", v),
+        );
         /*
 TODO this will require verifying users
         this.observableService.documentEvents$.subscribe(v => this.server.emit('document', v))
@@ -22,10 +22,10 @@ TODO this will require verifying users
     }
 
     async handleConnection() {
-        console.log(`Client connected`)
+        console.log("Client connected");
     }
 
     async handleDisconnect() {
-        console.log(`Client disconnected`)
+        console.log("Client disconnected");
     }
 }

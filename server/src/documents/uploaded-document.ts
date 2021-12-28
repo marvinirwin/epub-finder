@@ -1,4 +1,4 @@
-import { dirname, join, parse } from 'path'
+import { dirname, join, parse } from "path";
 
 export class UploadedDocument {
     constructor(
@@ -10,10 +10,10 @@ export class UploadedDocument {
         return `${join(
             dirname(this.uploadedFilePath),
             parse(this.uploadedFilePath).name,
-        )}.html`
+        )}.html`;
     }
 
     ext() {
-        return parse(this.sourceFilePath).ext
+        return parse(this.sourceFilePath).ext;
     }
 }

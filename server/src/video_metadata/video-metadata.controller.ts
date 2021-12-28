@@ -1,4 +1,4 @@
-import { VideoMetadataService } from './video-metadata.service'
+import { VideoMetadataService } from "./video-metadata.service";
 import {
     Body,
     Controller,
@@ -9,32 +9,32 @@ import {
     Put,
     HttpStatus,
     HttpCode,
-} from '@nestjs/common'
-import { VideoMetadataDto } from './video-metadata.dto'
-import { sha1 } from '../util/sha1'
-import { zip, zipObject } from 'lodash'
+} from "@nestjs/common";
+import { VideoMetadataDto } from "./video-metadata.dto";
+import { sha1 } from "../util/sha1";
+import { zip, zipObject } from "lodash";
 
-@Controller('video_metadata')
+@Controller("video_metadata")
 export class VideoMetadataController {
     constructor(private videoMetadataService: VideoMetadataService) {}
 
-    @Get(':hash')
-    @Header('content-type', 'application/json')
+    @Get(":hash")
+    @Header("content-type", "application/json")
     async metadataForHash(@Param() { hash }) {
         return (
             await this.videoMetadataService.resolveVideoMetadataByHash(hash)
-        )?.metadata
+        )?.metadata;
     }
 
     @Put()
     async put(@Body() videoMetadataDto: VideoMetadataDto) {
-        return this.videoMetadataService.saveVideoMetadata(videoMetadataDto)
+        return this.videoMetadataService.saveVideoMetadata(videoMetadataDto);
     }
 
     @Get()
     // TODO will this collide with the above :hash route?
-    @Header('content-type', 'application/json')
+    @Header("content-type", "application/json")
     async allMetadata() {
-        return this.videoMetadataService.allVideoMetadata()
+        return this.videoMetadataService.allVideoMetadata();
     }
 }

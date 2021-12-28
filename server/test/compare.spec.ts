@@ -1,6 +1,6 @@
-import { SerializedTabulation } from '../src/shared'
-import { SimilarityResults } from '../src/shared/compre-similarity-result'
-import { computeSimilarityTabulation } from '../src/shared/similarity-result.interface'
+import { SerializedTabulation } from "../src/shared";
+import { SimilarityResults } from "../src/shared/compre-similarity-result";
+import { computeSimilarityTabulation } from "../src/shared/similarity-result.interface";
 
 const tabulatedSimplifiedChineseDocuments: SerializedTabulation = {
     wordCounts: {
@@ -10,7 +10,7 @@ const tabulatedSimplifiedChineseDocuments: SerializedTabulation = {
         天: 3,
         气: 1,
     },
-}
+};
 
 const tabulatedSimplifiedChineseDocuments2: SerializedTabulation = {
     wordCounts: {
@@ -18,10 +18,10 @@ const tabulatedSimplifiedChineseDocuments2: SerializedTabulation = {
         天: 3,
         气: 3,
     },
-}
+};
 
-describe('Comparing the word frequencies of two documents', () => {
-    it('Computes a similarity tabulation between two documents', () => {
+describe("Comparing the word frequencies of two documents", () => {
+    it("Computes a similarity tabulation between two documents", () => {
         expect(
             computeSimilarityTabulation(
                 tabulatedSimplifiedChineseDocuments,
@@ -30,7 +30,7 @@ describe('Comparing the word frequencies of two documents', () => {
         ).toMatchObject({
             knownWords: tabulatedSimplifiedChineseDocuments2.wordCounts,
             unknownWords: {},
-        } as SimilarityResults)
+        } as SimilarityResults);
         expect(
             computeSimilarityTabulation(
                 tabulatedSimplifiedChineseDocuments2,
@@ -46,6 +46,6 @@ describe('Comparing the word frequencies of two documents', () => {
                 今天: 2,
                 今: 2,
             },
-        } as SimilarityResults)
-    })
-})
+        } as SimilarityResults);
+    });
+});

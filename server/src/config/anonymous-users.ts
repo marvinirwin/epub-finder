@@ -1,4 +1,4 @@
-import { Repositories } from './repositories'
+import { Repositories } from "./repositories";
 export default ({ user, session }: Repositories) => ({
     /*
     async queryFreeSessionCount() {
@@ -51,4 +51,4 @@ export default ({ user, session }: Repositories) => ({
         };
     }
 */
-})
+});

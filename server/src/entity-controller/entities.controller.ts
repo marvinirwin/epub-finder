@@ -31,7 +31,7 @@ const processGteLte = (where: Record<string, any>) => {
         if (value?.lt !== undefined) {
             where[key] = LessThan(value.lt);
         }
-    })
+    });
 };
 
 @Controller("entities")

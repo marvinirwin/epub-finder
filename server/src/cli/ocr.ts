@@ -11,7 +11,7 @@ const doGoogleOcr = async(param: { fileName: string }): Promise<string[]> => {
 
     // Performs text detection on the local file
     const [result] = await client.textDetection(param.fileName);
-    return [result.fullTextAnnotation.text]
+    return [result.fullTextAnnotation.text];
 };
 
 export default doGoogleOcr;

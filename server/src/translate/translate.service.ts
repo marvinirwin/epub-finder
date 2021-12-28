@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common'
-import { TranslateRequestDto } from './translate-request-dto'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { JsonCache } from '../entities/json-cache.entity'
-import { TranslateResponseDto } from './translate-response-dto'
-import { sha1 } from '../util/sha1'
+import { Injectable } from "@nestjs/common";
+import { TranslateRequestDto } from "./translate-request-dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { JsonCache } from "../entities/json-cache.entity";
+import { TranslateResponseDto } from "./translate-response-dto";
+import { sha1 } from "../util/sha1";
 
-const { Translate } = require('@google-cloud/translate').v2
-export const projectId = 'mandarin-trainer'
-export const translate = new Translate({ projectId })
+const { Translate } = require("@google-cloud/translate").v2;
+export const projectId = "mandarin-trainer";
+export const translate = new Translate({ projectId });
 
-import debug from 'debug'
-import { MAX_TRANSLATE_LENGTH } from './transliterate.service'
-const d = debug('service:translate')
+import debug from "debug";
+import { MAX_TRANSLATE_LENGTH } from "./transliterate.service";
+const d = debug("service:translate");
 
 @Injectable()
 export class TranslateService {
@@ -23,17 +23,17 @@ export class TranslateService {
 
     async translate({ text, to }: TranslateRequestDto) {
         if (text.length > MAX_TRANSLATE_LENGTH) {
-            throw new Error(`Cannot translate over ${MAX_TRANSLATE_LENGTH} characters at once`)
+            throw new Error(`Cannot translate over ${MAX_TRANSLATE_LENGTH} characters at once`);
         }
-        const [translation] = await translate.translate(text, to)
-        return { translation }
+        const [translation] = await translate.translate(text, to);
+        return { translation };
     }
     async transliterate({ text, to }: TranslateRequestDto) {
-        const [translation] = await translate.translate(text, to)
-        return { translation }
+        const [translation] = await translate.translate(text, to);
+        return { translation };
     }
 
-    private readonly _service = 'GOOGLE_TRANSLATIONS'
+    private readonly _service = "GOOGLE_TRANSLATIONS"
 
     async lookupCacheEntry<T>(
         translateRequestDto: any,
@@ -41,12 +41,12 @@ export class TranslateService {
         const conditions: Partial<JsonCache> = {
             service: this._service,
             key_hash: sha1([translateRequestDto]),
-        }
-        d(conditions)
-        const cacheEntry = await this.jsonCacheRepository.findOne(conditions)
+        };
+        d(conditions);
+        const cacheEntry = await this.jsonCacheRepository.findOne(conditions);
         if (cacheEntry) {
             // Kind of inefficient, since it will probably be stringified again
-            return JSON.parse(cacheEntry.value)
+            return JSON.parse(cacheEntry.value);
         }
     }
 
@@ -56,10 +56,10 @@ export class TranslateService {
             key_hash: sha1([translateRequestDto]),
             key: JSON.stringify([translateRequestDto]),
             value: JSON.stringify(translateResponseDto),
-        }
-        d(cacheEntry)
+        };
+        d(cacheEntry);
         this.jsonCacheRepository.save(
             Object.assign(new JsonCache(), cacheEntry),
-        )
+        );
     }
 }
