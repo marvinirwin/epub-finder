@@ -8,7 +8,6 @@ import { shareReplay, switchMap } from 'rxjs/operators'
 import { ExampleSegmentsService } from '../quiz/example-segments.service'
 import uniqueBy from '@popperjs/core/lib/utils/uniqueBy'
 import JSZip from 'jszip'
-import {CsvCard} from "../csv-card.interface";
 import { SerializeCardForCsv } from '@shared/'
 import { fetchSynthesizedAudio } from '../audio/fetch-synthesized-audio'
 

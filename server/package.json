@@ -10,6 +10,7 @@
     "license": "MIT",
     "scripts": {
         "start": "nest start -p tsconfig.json dist/server/src/main.js",
+        "start-cli": "nest start -p tsconfig.json dist/server/src/cli.js",
         "build": "nest build -p tsconfig.json dist/server/src/main.js",
         "watch": "nest start --watch -p tsconfig.json",
         "test": "jest ",

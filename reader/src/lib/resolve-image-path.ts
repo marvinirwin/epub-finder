@@ -9,8 +9,6 @@ export async function resolveImagePath({
     if (!photo) {
         return "";
     }
-    // I can get the extension from the response headers
-    // But then I can't use toDataUrl
     const {ext, /*dataUrl,*/ blob} = await toDataUrl(photo);
     const photoAnkiPath = `${learning_language}.${ext}`
     await zip.file(photoAnkiPath, await blob);

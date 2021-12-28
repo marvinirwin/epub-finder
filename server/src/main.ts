@@ -19,11 +19,6 @@ const isCli = Boolean(process.env.CLI);
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: true });
     const { httpAdapter } = app.get(HttpAdapterHost);
-    if (isCli) {
-        const cliService = app.get(CliService);
-        await cliService.exec();
-        return;
-    }
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
     const options = new DocumentBuilder()

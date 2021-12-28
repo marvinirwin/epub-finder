@@ -3,6 +3,8 @@ import {SegmentSubsequences} from "./index";
 import JSZip from "jszip";
 import {languageCodesMappedToTranslationConfigs} from "./supported-translation.service";
 import {resolveRomanizationConfig} from "./supported-transliteration.service";
+import {CsvCard} from "./csv-card.interface";
+
 
 export const SerializeCardForCsv = async (
     {
@@ -13,7 +15,7 @@ export const SerializeCardForCsv = async (
     }: {
         c: ICard;
         exampleSegments: Map<string, SegmentSubsequences[]>;
-        wavAudio: WavAudio | undefined;
+        wavAudio: {blob: Blob} | undefined;
         zip: JSZip;
     }): Promise<CsvCard> => {
     const [photoSrc] = c.photos;
