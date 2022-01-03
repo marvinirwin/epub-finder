@@ -4,6 +4,7 @@ import { TabulatedDocuments } from "../tabulate-documents/tabulated-documents.in
 import { AtomMetadata } from "../atom-metadata.interface.ts/atom-metadata";
 import { XMLDocumentNode } from "../XMLDocumentNode";
 import {SegmentSubsequences} from "../index";
+import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
 
 export type TabulationParameters<T> = {
     segments: T[];
@@ -33,11 +34,11 @@ export interface SerializedSegment {
     index: number;
 }
 
-export const tabulationFactory = (): TabulatedDocuments => ({
+export const tabulationFactory = <T extends AbstractSegment<U>, U extends AbstractNode>(): TabulatedDocuments<T, U> => ({
     wordElementsMap: {},
     wordSegmentMap: {},
     notableSubSequences: [],
-    atomMetadatas: new Map<XMLDocumentNode, AtomMetadata>(),
+    atomMetadatas: new Map<U, AtomMetadata<T, U>>(),
     wordSegmentSubSequencesMap: new Map<string, Set<SegmentSubsequences>>(),
     segments: [],
     segmentWordCountRecordsMap: new Map<SerializedSegment, IPositionedWord[]>(),

@@ -4,21 +4,22 @@ import { Segment } from "../tabulate-documents/segment/segment";
 import { flatten, maxBy } from "lodash";
 import { ICard } from "../ICard";
 import {SegmentSubsequences} from "../index";
+import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
 
-export class AtomMetadata {
+export class AtomMetadata<T extends AbstractSegment<U>, U extends AbstractNode> {
     m: {
         words: SegmentSubsequences;
         char: string;
-        element: XMLDocumentNode;
+        element: U;
         i: number;
-        parent: Segment;
+        parent: T;
     }
     constructor(m: {
         words: SegmentSubsequences;
         char: string;
-        element: XMLDocumentNode;
+        element: U;
         i: number;
-        parent: Segment;
+        parent: T;
     }) {
         this.m = m;
     }
@@ -29,13 +30,13 @@ export class AtomMetadata {
     get char(): string {
         return this.m.char;
     }
-    get element(): XMLDocumentNode {
+    get element(): U {
         return this.m.element;
     }
     get i(): number {
         return this.m.i;
     }
-    get parent(): Segment {
+    get parent(): T {
         return this.m.parent;
     }
 }

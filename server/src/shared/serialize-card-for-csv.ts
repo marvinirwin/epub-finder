@@ -33,19 +33,19 @@ export const SerializeCardForCsv = async (
         await zip.file(audioFilename, wavAudio.blob);
     }
     const sound = wavAudio ? `<audio controls autoplay src="${audioFilename}"/>` : "";
-    const photo = await resolveImagePath({photo: photoSrc, zip, learning_language: c.learning_language});
+    const photo = '';/*await resolveImagePath({photo: photoSrc, zip, learning_language: c.learning_language});*/
     return {
         photo,
         // What extension does this file have?
         sound,
-        description: await getCsvDescription({knownLanguage, learningToKnowTranslationConfig, c, segments}),
+        description: "",/*await getCsvDescription({knownLanguage, learningToKnowTranslationConfig, c, segments})*/
         romanization: learningToKnownTransliterationConfig ?
-            await fetchTransliteration({
+            await /*fetchTransliteration({
                 fromScript: learningToKnownTransliterationConfig.script1,
                 toScript: learningToKnownTransliterationConfig.script2,
                 language: c.language_code,
                 text: c.learning_language
-            }) :
+            })*/ "" :
             "",
         learning_language: c.learning_language,
 

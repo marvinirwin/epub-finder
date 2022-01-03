@@ -2,7 +2,7 @@ import { InterpolateService } from "../interpolate.service";
 import { AtomizedDocument } from "./atomized-document";
 import trie from "trie-prefix-tree";
 import { ChineseVocabService } from "./chinese-vocab.service";
-import { tabulate } from "./segment/tabulate";
+import { tabulate } from "./tabulate-segment/tabulate";
 import { resolvePartialTabulationConfig } from "../tabulation/word-separator";
 import {DocumentId} from "../sourced-text";
 

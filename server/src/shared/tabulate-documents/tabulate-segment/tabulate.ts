@@ -2,11 +2,10 @@ import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../
 import {TabulatedSegments} from "../tabulated-documents.interface";
 import {XMLDocumentNode} from "../../XMLDocumentNode";
 import {flatten, uniq} from "lodash";
-import {IWordInProgress} from "../../Annotation/IWordInProgress";
+import {IWordInProgress} from "../../annotation/IWordInProgress";
 import {safePush, safePushMap} from "../../safe-push";
-import {IPositionedWord} from "../../Annotation/IPositionedWord";
+import {IPositionedWord} from "../../annotation/IPositionedWord";
 import {AtomMetadata} from "../../atom-metadata.interface.ts/atom-metadata";
-import {Segment} from "./segment";
 import {SegmentSubsequences} from "../../index";
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
@@ -15,15 +14,24 @@ export const textFromPositionedWordsAndAllText = (allText: string, positionedWor
     return allText.substr(startPoint, endPoint);
 };
 
-export const tabulate = <T extends {} = Segment>({
+export type AbstractNode = {
+    textContent: string;
+}
+
+export type AbstractSegment<T extends AbstractNode> = {
+    children: T[];
+    translatableText: string;
+};
+
+export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
                              notableCharacterSequences,
                              segments,
                              isNotableCharacterRegex,
                              wordIdentifyingStrategy,
                              isWordBoundaryRegex,
-                         }: TabulationParameters<Segment>): TabulatedSegments => {
-    const tabulationObject = tabulationFactory();
-    const elementSegmentMap = new Map<XMLDocumentNode, Segment>();
+                         }: TabulationParameters<T>): TabulatedSegments<T, U> => {
+    const tabulationObject = tabulationFactory<T, U>();
+    const elementSegmentMap = new Map<U, T>();
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
     const wordSegmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
@@ -56,15 +64,18 @@ export const tabulate = <T extends {} = Segment>({
         .map((node) => node.textContent)
         .join("");
     let notableSubsequencesInProgress: IWordInProgress[] = [];
-    let currentSegment: Segment;
+    let currentSegment: T | undefined;
     let segmentIndex = -1;
-    let currentSegmentStart;
-    let currentSerialzedSegment;
+    let currentSegmentStart: number;
+    let currentSerialzedSegment: {
+        text: string;
+        index: number;
+    } = {text: "", index: 0};
     for (let i = 0; i < allMarks.length; i++) {
         const currentMark = allMarks[i];
         const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
-            currentSegment = elementSegmentMap.get(currentMark);
+            currentSegment = elementSegmentMap.get(currentMark) as T;
             segmentIndex++;
             currentSegmentStart = i;
             currentSerialzedSegment = {
@@ -173,7 +184,7 @@ export const tabulate = <T extends {} = Segment>({
             words: segmentSubsequences,
             element: currentMark,
             i,
-            parent: elementSegmentMap.get(currentMark),
+            parent: elementSegmentMap.get(currentMark) as T,
         });
         atomMetadatas.set(currentMark, atomMetadata);
         atomMetadata.words.subsequences.forEach((word) => {

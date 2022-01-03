@@ -11,7 +11,7 @@ export * from "./tabulate-documents/compute-element-index-map";
 export * from "./tabulate-documents/tabulated-documents.interface";
 export * from "./IImageRequest";
 export * from "./safe-push";
-export { tabulate } from "./tabulate-documents/segment/tabulate";
+export { tabulate } from "./tabulate-documents/tabulate-segment/tabulate";
 export * from "./built-in-words/parse-cedict";
 export * from "./annotation/IPositionedWord";
 

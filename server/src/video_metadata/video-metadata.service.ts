@@ -7,6 +7,9 @@ import { sha1 } from "../util/sha1";
 import fs from "fs-extra";
 import { join } from "path";
 
+
+
+
 export class VideoMetadataService {
     constructor(
         @InjectRepository(VideoMetadataView)
@@ -41,7 +44,7 @@ export class VideoMetadataService {
             { sentence_hash },
         );
         const filename = `${sentence_hash}.json`;
-        const filePath = join(process.env.VIDEO_DIR, filename);
+        const filePath = join(process.env.VIDEO_DIR as string, filename);
         if (existingMetadata) {
             return existingMetadata;
         }

@@ -17,6 +17,13 @@ export function streamToString(stream): Promise<string> {
     });
 }
 
+function segmentFromTextFactory(text: string[]) {
+    return text.map(text => ({
+        translatableText: text,
+        children: text.split("").map(character => ({textContent: character}))
+    }));
+}
+
 export class TabulateService {
     constructor(
         @InjectRepository(DocumentView)
@@ -60,8 +67,7 @@ export class TabulateService {
         const text = await streamToString(
             await s3ReadStream(documentToTabulate.filename),
         );
-        const documentId = documentToTabulate.document_id || documentToTabulate.id;
-        return this.tabulate({text, documentId, words, language_code});
+        return this.tabulate({text: [text], words, language_code});
         /*
         return {
             wordCounts: tabulation.wordCounts,
@@ -76,7 +82,7 @@ export class TabulateService {
         const setWithUniqueLengths = new SetWithUniqueLengths(words);
         return tabulate({
             notableCharacterSequences: setWithUniqueLengths,
-            segments: text,
+            segments: segmentFromTextFactory(text),
             greedyWordSet: setWithUniqueLengths,
             ...resolvePartialTabulationConfig(language_code),
             language_code,
