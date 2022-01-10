@@ -126,7 +126,7 @@ describe("Adding to a deck with anki connect", () => {
   it("Creates a model", () => {
 
   });
-  it("Inserts cards from a single card record", async () => {
+  it("Creates an anki package from a single card record", async () => {
     const record = {
       id: "5274cc3e-61b9-4157-acab-f37a600af42a",
       learning_language: "关系",

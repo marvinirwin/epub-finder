@@ -7,7 +7,7 @@ import {
     tabulate,
     TabulatedSegments,
 } from '@shared/'
-import { TabulateLocalDocument } from '../Workers/worker.helpers'
+import { TabulateLocalDocument } from '../workers/worker.helpers'
 import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { SettingsService } from '../../services/settings.service'

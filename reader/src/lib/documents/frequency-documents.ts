@@ -5,7 +5,7 @@ import {
     SortQuizData,
     ScheduleRow,
 } from '../schedule/schedule-row'
-import { TabulateRemoteDocument } from '../Workers/worker.helpers'
+import { TabulateRemoteDocument } from '../workers/worker.helpers'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 
