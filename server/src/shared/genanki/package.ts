@@ -1,49 +1,56 @@
+import JSZip from "jszip";
+import { APKG_SCHEMA } from "./apkg_schema";
+import SQL from "sql.js";
+import {saveAs} from "file-saver";
+import { Deck } from "./deck";
+
 export class Package {
-    media: {name: string, data: unknown}[]
+    media: {name: string; data?: unknown; filename?: string}[]
     decks: Deck[]
     constructor() {
-        this.decks = []
-        this.media = []
+        this.decks = [];
+        this.media = [];
     }
 
     addDeck(deck) {
-        this.decks.push(deck)
+        this.decks.push(deck);
     }
 
     addMedia(data, name) {
-        this.media.push({ name, data })
+        this.media.push({ name, data });
     }
 
-    addMediaFile(filename, name = null) {
-        this.media.push({ name: name || filename, filename })
+    addMediaFile(filename: string, name = null) {
+        this.media.push({ name: name || filename, filename });
     }
 
     writeToFile(filename) {
-        var db = new SQL.Database();
+        const db = new SQL.Database();
         db.run(APKG_SCHEMA);
 
-        this.write(db)
+        this.write(db);
 
-        var zip = new JSZip();
+        const zip = new JSZip();
 
         const data = db.export();
         const buffer = new Uint8Array(data).buffer;
         
         zip.file("collection.anki2", buffer);
 
-        const media_info = {}
+        const media_info = {};
 
         this.media.forEach((m, i) => {
             if (m.filename != null) {
-                zip.file(i.toString(), m.filename)
+                zip.file(i.toString(), m.filename);
             } else {
-                zip.file(i.toString(), m.data)
+                // @ts-ignore
+                zip.file(i.toString(), m.data);
             }
 
-            media_info[i] = m.name
-        })
+            media_info[i] = m.name;
+        });
 
-        zip.file('media', JSON.stringify(media_info))
+        zip.file("media", JSON.stringify(media_info));
 
         zip.generateAsync({ type: "blob", mimeType: "application/apkg" }).then(function (content) {
             // see FileSaver.js
@@ -53,22 +60,22 @@ export class Package {
 
 
     write(db) {
-        const now = new Date
-        const models = {}
-        const decks = {}
+        const now = new Date;
+        const models = {};
+        const decks = {};
 
         // AnkiDroid failed to import subdeck, So add a Default deck
-        decks["1"] = {...defaultDeck, id: 1, name: "Default"}
+        decks["1"] = {...defaultDeck, id: 1, name: "Default"};
 
         this.decks.forEach(d => {
-            d.notes.forEach(n => models[n.model.props.id] = n.model.props)
+            d.notes.forEach(n => models[n.model.props.id] = n.model.props);
             decks[d.id] = {
                 ...defaultDeck,
                 id: d.id,
                 name: d.name,
                 desc: d.desc,
-            }
-        })
+            };
+        });
 
         const col = [
             null,                           // id
@@ -84,21 +91,21 @@ export class Package {
             JSON.stringify(decks),          // decks
             JSON.stringify({ 1: { id: 1, ...defaultDeckConf } }),    // dconf
             JSON.stringify({}),             // tags
-        ]
+        ];
 
         db.prepare(`INSERT INTO col
          (id, crt, mod, scm, ver, dty, usn, ls, conf, models, decks, dconf, tags)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(col)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(col);
 
         const insert_notes = db.prepare(`INSERT INTO notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data) 
-        VALUES (null, ?, ?, ?, ?, ?, ?, ?, 0, 0, '')`)
+        VALUES (null, ?, ?, ?, ?, ?, ?, ?, 0, 0, '')`);
 
         const insert_cards = db.prepare(`INSERT INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) 
-        VALUES (null, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, '')`)
+        VALUES (null, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, '')`);
 
         for (const deck of this.decks) {
             for (const note of deck.notes) {
-                var tags = note.tags == null ? '' : note.tags.join(' ')
+                const tags = note.tags == null ? "" : note.tags.join(" ");
                 insert_notes.run(
                     [
                         note.guid,                  // guid
@@ -106,12 +113,12 @@ export class Package {
                         (+now / 1000) | 0,          // mod
                         -1,                         // usn
                         tags,                       // tags
-                        note.fields.join('\x1f'),   // flds
+                        note.fields.join("\x1f"),   // flds
                         0,                          // sfld
-                    ])
+                    ]);
 
-                var rowID = db.exec("select last_insert_rowid();")
-                var note_id = rowID[0]['values'][0][0];
+                const rowID = db.exec("select last_insert_rowid();");
+                const note_id = rowID[0]["values"][0][0];
 
                 for (const card_ord of note.cards) {
                     insert_cards.run(
@@ -123,7 +130,7 @@ export class Package {
                             -1,                 // usn
                             0,                  // type 0=new, 1=learning, 2=due 
                             0,                  // queue -1 for suspended
-                        ])
+                        ]);
                 }
             }
         }

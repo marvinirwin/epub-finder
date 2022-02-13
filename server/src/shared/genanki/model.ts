@@ -11,6 +11,7 @@ export class Model {
         type: number;
         req: [number, string, unknown][]
         tmpls: unknown
+        id: string
     }
     constructor(props) {
         this.props = {

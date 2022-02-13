@@ -1,6 +1,6 @@
 import { Note } from "./note";
 
-class Deck {
+export class Deck {
     notes: Note[]
     id: string;
     name: string;
