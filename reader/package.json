@@ -64,7 +64,7 @@
     },
     "proxy": "http://localhost:3001",
     "scripts": {
-        "start": "SKIP_PREFLIGHT_CHECK=true react-app-rewired start",
+        "start": "react-app-rewired start",
         "build": "react-app-rewired build ../server/public",
         "test": "jest --verbose ",
         "eject": "react-scripts eject",
