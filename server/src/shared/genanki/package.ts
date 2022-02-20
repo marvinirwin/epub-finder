@@ -58,7 +58,6 @@ export class Package {
         });
     }
 
-
     write(db) {
         const now = new Date;
         const models = {};
