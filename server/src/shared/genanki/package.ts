@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import { APKG_SCHEMA } from "./apkg_schema";
-import SQL from "sql.js";
+import initSqlJs from "sql.js";
 import {saveAs} from "file-saver";
 import { Deck } from "./deck";
 
@@ -25,37 +25,39 @@ export class Package {
     }
 
     writeToFile(filename) {
-        const db = new SQL.Database();
-        db.run(APKG_SCHEMA);
+        initSqlJs().then(SQL => {
+            const db = new SQL.Database();
+            db.run(APKG_SCHEMA);
 
-        this.write(db);
+            this.write(db);
 
-        const zip = new JSZip();
+            const zip = new JSZip();
 
-        const data = db.export();
-        const buffer = new Uint8Array(data).buffer;
-        
-        zip.file("collection.anki2", buffer);
+            const data = db.export();
+            const buffer = new Uint8Array(data).buffer;
 
-        const media_info = {};
+            zip.file("collection.anki2", buffer);
 
-        this.media.forEach((m, i) => {
-            if (m.filename != null) {
-                zip.file(i.toString(), m.filename);
-            } else {
-                // @ts-ignore
-                zip.file(i.toString(), m.data);
-            }
+            const media_info = {};
 
-            media_info[i] = m.name;
-        });
+            this.media.forEach((m, i) => {
+                if (m.filename != null) {
+                    zip.file(i.toString(), m.filename);
+                } else {
+                    // @ts-ignore
+                    zip.file(i.toString(), m.data);
+                }
 
-        zip.file("media", JSON.stringify(media_info));
+                media_info[i] = m.name;
+            });
 
-        zip.generateAsync({ type: "blob", mimeType: "application/apkg" }).then(function (content) {
-            // see FileSaver.js
-            saveAs(content, filename);
-        });
+            zip.file("media", JSON.stringify(media_info));
+
+            zip.generateAsync({ type: "blob", mimeType: "application/apkg" }).then(function (content) {
+                // see FileSaver.js
+                saveAs(content, filename);
+            });
+        })
     }
 
     write(db) {
