@@ -1,19 +1,22 @@
-import http from "http";
-import https from "https";
-import Stream from "stream";
+import {join} from 'path';
+import {resolveExtFromResponseHeaders} from '../../../reader/src/lib/resolve-ext-from-response-headers';
+import {getHashForString} from "../util/getHashForString";
 import fs from "fs";
+const fsPromises = fs.promises;
+const fetch = require('node-fetch');
 
-export const downloadPhotoWithCache = ({url, cacheDir}: {url: string; cacheDir: string}) => {
-    if (fs.existsSync(cacheDir)) return;
+export const downloadPhotoWithCache = async ({url, cacheDir, cachedFiles}:{url: string, cacheDir: string, cachedFiles: string[]}) => {
+    const urlHash  = getHashForString(url);
+    const foundCachedFile = cachedFiles.find(cachedFile => cachedFile.includes(urlHash));
+    if (foundCachedFile) {
+        return foundCachedFile;
+    }
 
-    const protocol = url.indexOf("https") === 0 ? https : http;
-    protocol.request(url, (response) => {
-        const data = new Stream.Transform();
-        response.on("data", (chunk) => {
-            data.push(chunk);
-        });
-        response.on("end", () => {
-            fs.writeFileSync(cacheDir, data.read());
-        });
-    }).end();
+    const response = await fetch(url);
+    const responseArrayBuffer = await response.arrayBuffer();
+    const fileExtension = resolveExtFromResponseHeaders(response);
+
+    const filePath = join(cacheDir, `${urlHash}.${fileExtension}`);
+    await fsPromises.writeFile(filePath, Buffer.from(responseArrayBuffer));
+    return filePath;
 };

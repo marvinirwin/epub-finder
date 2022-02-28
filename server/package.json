@@ -101,6 +101,7 @@
         "react": "^17.0.2",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^6.6.3",
+        "sha1-uint8array": "^0.10.3",
         "sql.js": "^1.6.2",
         "stripe": "^8.132.0",
         "swagger-ui-express": "^4.1.4",
