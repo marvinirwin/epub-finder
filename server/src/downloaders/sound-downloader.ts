@@ -13,7 +13,6 @@ export const downloadSoundWithCache = async ({url, cacheDir, cachedFiles}: {url:
     }
 
     const response = await fetch(url);
-    console.log(response.headers.get('content-type'));
     const responseArrayBuffer = await response.arrayBuffer();
     const fileExtension = resolveExtFromResponseHeaders(response);
 
