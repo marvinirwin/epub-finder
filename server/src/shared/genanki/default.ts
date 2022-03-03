@@ -1,4 +1,6 @@
-const defaultModel = {
+import { MODEL_STD } from "./model";
+
+export const defaultModel = {
     sortf: 0, // sort field
     did: 1, // deck id
     latexPre: `\\documentclass[12pt]{article}
@@ -30,7 +32,7 @@ const defaultModel = {
     tags: [],
 };
 
-const defaultField = {
+export const defaultField = {
     name: "",
     ord: null,
     sticky: false,
@@ -40,7 +42,7 @@ const defaultField = {
     media: [],
 };
 
-const defaultTemplate = {
+export const defaultTemplate = {
     name: "",
     ord: null,
     qfmt: "",
@@ -51,11 +53,11 @@ const defaultTemplate = {
 };
 
 // whether new cards should be mixed with reviews, or shown first or last
-const NEW_CARDS_DISTRIBUTE = 0;
-const NEW_CARDS_LAST = 1;
-const NEW_CARDS_FIRST = 2;
+export const NEW_CARDS_DISTRIBUTE = 0;
+export const NEW_CARDS_LAST = 1;
+export const NEW_CARDS_FIRST = 2;
 
-const defaultConf = {
+export const defaultConf = {
     // review options
     "activeDecks": [1],
     "curDeck": 1,
@@ -75,12 +77,12 @@ const defaultConf = {
 
 
 // new card insertion order
-const NEW_CARDS_RANDOM = 0;
-const NEW_CARDS_DUE = 1;
+export const NEW_CARDS_RANDOM = 0;
+export const NEW_CARDS_DUE = 1;
 
-const STARTING_FACTOR = 2500;
+export const STARTING_FACTOR = 2500;
 
-const defaultDeckConf = {
+export const defaultDeckConf = {
     "name": "Default",
     "new": {
         "delays": [1, 10],
@@ -119,7 +121,7 @@ const defaultDeckConf = {
     "usn": 0,
 };
 
-const defaultDeck = {
+export const defaultDeck = {
     newToday: [0, 0], // currentDay, count
     revToday: [0, 0],
     lrnToday: [0, 0],

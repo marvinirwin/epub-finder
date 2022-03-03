@@ -3,6 +3,7 @@ import { APKG_SCHEMA } from "./apkg_schema";
 import initSqlJs from "sql.js";
 import {saveAs} from "file-saver";
 import { Deck } from "./deck";
+import { defaultConf, defaultDeck, defaultDeckConf } from "./default";
 
 export class Package {
     media: {name: string; data?: unknown; filename?: string}[]
@@ -57,7 +58,7 @@ export class Package {
                 // see FileSaver.js
                 saveAs(content, filename);
             });
-        })
+        });
     }
 
     write(db) {
