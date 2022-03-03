@@ -1,6 +1,8 @@
 import { Card } from "src/entities/card.entity";
 import { Package } from "./package";
 import { Deck } from "./deck";
+const fetch = require("node-fetch");
+const apiUrl = "http://localhost:8765";
 
 const generateAnkiDeck = ({}: {
   cards: Card[];
@@ -24,15 +26,26 @@ describe("Generating anki decks", () => {
     const deck = new Deck("id", "test");
     ankiPackage.addDeck(deck);
     ankiPackage.writeToFile("test.apkg");
+
     const importAnkiDeckToLocalAnkiConnect = () => {
-      // POST http://127.0.0.1:8765 { "action": "importPackage", "version": 6, "params": { "path": "/data/Deck.apkg" } }
+      const body = JSON.stringify({ "action": "importPackage", "version": 6, "params": { "path": "/data/Deck.apkg" } });
+      fetch(apiUrl, {method: "POST", body});
     };
-    const getDeckList = () => {
-      // return the results of POST http://127.0.0.1:8765 { "action": "getDecks", "version": 6, "params": { "cards": [1502298036657, 1502298033753, 1502032366472] } }
+    const getDeckList = async () => {
+      const body = JSON.stringify({ "action": "getDecks", "version": 6, "params": { "cards": [1502298036657, 1502298033753, 1502032366472] } });
+      const response = await fetch(apiUrl, {method: "POST", body});
+      const result = await response.json();
+      return result;
     };
+
     importAnkiDeckToLocalAnkiConnect();
-    expect(await getDeckList()).toContain("test");
+    const deckList = await getDeckList();
+    const defaultCards = deckList.result.Default;
+    expect(defaultCards).toContain(1502298036657);
+    expect(defaultCards).toContain(1502298033753);
+    expect(defaultCards).toContain(1502032366472);
   });
+
   it("Generates anki decks from cards", () => {
     /**
      * TODO: This test isn't done yet
