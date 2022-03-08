@@ -1,4 +1,5 @@
 import { Note } from "./note";
+import { defaultField, defaultModel, defaultTemplate } from "./default";
 
 export const MODEL_STD = 0;
 export const MODEL_CLOZE = 1;
