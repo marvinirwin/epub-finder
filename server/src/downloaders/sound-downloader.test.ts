@@ -1,9 +1,11 @@
+jest.setTimeout(30000);
+
 import fs from "fs";
 import {downloadSoundWithCache} from "./sound-downloader";
 import {getHashForString} from "../util/getHashForString";
 
 const urlMp3 = "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3";
-const urlWav = "https://file-examples-com.github.io/uploads/2017/11/file_example_WAV_1MG.wav";
+const urlWav = "https://www.kozco.com/tech/LRMonoPhase4.wav";
 const urlHashMp3  = getHashForString(urlMp3);
 const urlHashWav  = getHashForString(urlWav);
 const filePathMp3 = `${__dirname}\\${urlHashMp3}.mp3`;

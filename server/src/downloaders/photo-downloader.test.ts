@@ -1,3 +1,5 @@
+jest.setTimeout(30000);
+
 import fs from "fs";
 import {downloadPhotoWithCache} from "./photo-downloader";
 import {getHashForString} from "../util/getHashForString";
