@@ -3,6 +3,7 @@ import { Package } from "./package";
 import { Deck } from "./deck";
 import { Note } from "./note";
 import { defaultModel } from "./default";
+import { Model } from "./model";
 const fetch = require("node-fetch");
 const apiUrl = "http://localhost:8765";
 
@@ -25,7 +26,10 @@ const getAnkiNotes = async (
   const notes = [];
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
-    notes.push(new Note(defaultModel, [
+    notes.push(new Note(new Model({
+      flds: [{}],
+      tmpls: [{}]
+      }), [
         card.learning_language,
         await dictionaryDefinitionResolver(card.learning_language)
       ]
