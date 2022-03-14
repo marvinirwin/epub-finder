@@ -23,7 +23,7 @@ const getAnkiNotes = async (
     photoDownloader: (card: Card) => Promise<string>;
   }) => {
   const notes = [];
-  for (let i = 0;cards.length; i++) {
+  for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
     notes.push(new Note(defaultModel, [
         card.learning_language,
@@ -70,6 +70,7 @@ describe("Generating anki decks", () => {
     const createDeckBody = JSON.stringify({ action: "createDeck", version: 6, params: { deck: "jest_test_deck" } });
     await fetch(apiUrl, { method: "POST", body: createDeckBody });
     const data = await getDeckNames();
+
     expect(data.result).toContain("jest_test_deck");
 
     // The "deleteDecks" action doesn't seem to work, it looks like there is an issue with the anki-connect implementation of "deleteDecks"
@@ -85,6 +86,7 @@ describe("Generating anki decks", () => {
     });
     await fetch(apiUrl, { method: "POST", body: deleteDecksBody });
     const deckNames = await getDeckNames();
+
     expect(deckNames.result).not.toContain("jest_test_deck");
     */
   });
