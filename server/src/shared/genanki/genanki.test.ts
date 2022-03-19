@@ -6,6 +6,9 @@ import { Model } from "./model";
 const fetch = require("node-fetch");
 const apiUrl = "http://localhost:8765";
 
+// I think models just need to have some constant id when they're inserted
+const testId = 1234;
+
 /**
  * Currently the notes are the default model, in the future they'll use a more complex model for
  * sound and photograph based cards
@@ -27,13 +30,15 @@ const getAnkiNotes = async (
     const card = cards[i];
     notes.push(new Note(new Model({
       flds: [{name: 'test', ord: 0}],
-      tmpls: [{}]
+      tmpls: [{}],
+      id: testId,
+      req: [],
       }), [
         card.learning_language,
         await dictionaryDefinitionResolver(card.learning_language)
       ],
       ['test tag'],
-      Math.ceil(Math.random()*100000000).toString()
+      Math.ceil(Math.random()*100000000).toString(),
     ));
   }
   return notes;
