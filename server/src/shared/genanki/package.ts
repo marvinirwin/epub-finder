@@ -35,7 +35,7 @@ export class Package {
             const zip = new JSZip();
 
             const data = db.export();
-            const buffer = new Uint8Array(data).buffer;
+            const buffer = new Uint8Array(data);
 
             zip.file("collection.anki2", buffer);
 
@@ -54,7 +54,7 @@ export class Package {
 
             zip.file("media", JSON.stringify(media_info));
 
-            zip.generateAsync({ type: "blob", mimeType: "application/apkg" }).then(function (content) {
+            zip.generateAsync({ type: "nodebuffer", mimeType: "application/apkg" }).then(function (content) {
                 // see FileSaver.js
                 saveAs(content, filename);
             });
