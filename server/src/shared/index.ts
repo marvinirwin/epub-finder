@@ -13,9 +13,10 @@ export * from "./IImageRequest";
 export * from "./safe-push";
 export { tabulate } from "./tabulate-documents/tabulate-segment/tabulate";
 export * from "./built-in-words/parse-cedict";
-export * from "./annotation/IPositionedWord";
+export * from "./Annotation/IPositionedWord";
 
 export * from "./serialize-card-for-csv";
+
 export interface SegmentSubsequences {
     segmentText: string;
     subsequences: IPositionedWord[];

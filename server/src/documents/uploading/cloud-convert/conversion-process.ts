@@ -6,8 +6,9 @@ import {
     cloudConvertSandbox,
 } from "./cloud-convert.configs";
 import { HttpException } from "@nestjs/common";
-import { S3UploadedFile, UploadOutput } from "../s3-uploaded-file";
+import { S3UploadedFile} from "../s3-uploaded-file";
 import { outputConfig } from "../s3.service";
+import {UploadOutput} from "../upload-output";
 
 export class ConversionProcess {
     constructor(public u: S3UploadedFile) {}

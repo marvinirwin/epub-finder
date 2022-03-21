@@ -1,19 +1,9 @@
-import { parse } from "path";
-import {
-    getS3FileString,
-    inputConfig,
-    outputConfig,
-    uploadToS3,
-} from "./s3.service";
-import { S3File } from "./cloud-convert/job-output.service";
-import { ConversionProcess } from "./cloud-convert/conversion-process";
-import { InterpolateService } from "../../shared";
-
-/**
- * WHat's a word describing documents which are ready for insertion?
- * It can't be s3 files beacuse they're in s3 before they're converted
- * It can't be procssed because html files aren't processed :/
- */
+import {parse} from "path";
+import {getS3FileString, inputConfig, outputConfig, uploadToS3,} from "./s3.service";
+import {ConversionProcess} from "./cloud-convert/conversion-process";
+import {InterpolateService} from "../../shared";
+import {UploadOutput} from "./upload-output";
+import {getImageText} from "./google-ocr";
 
 export class S3UploadedFile {
     constructor(
@@ -81,23 +71,37 @@ export class S3UploadedFile {
                     },
                     this.isSandboxFile,
                 ).output();
-            case "pdf":
             case "docx":
                 return new ConversionProcess(this).convert();
+            case "jpeg":
+            case "bmp":
+            case "png":
+            case "jpg":
+            case "pdf":
+            case "gif":
+                const buf = Buffer.from(await getS3FileString(key));
+                const result = await uploadToS3(
+                    Buffer.from(
+                        InterpolateService.sentences(await getImageText(buf)),
+                        "utf8",
+                    ),
+                );
+                return new S3UploadedFile(
+                    {
+                        originalname: `${
+                            parse(this.file.originalname).name
+                        }.html`,
+                        bucket: inputConfig.bucket,
+                        key: result.Key,
+                        location: inputConfig.region,
+                    },
+                    this.isSandboxFile,
+                ).output();
+
+
             default:
                 throw new Error(`Cannot upload file with extension: ${ext}`);
         }
     }
 }
 
-export class UploadOutput {
-    constructor(private f: S3File[]) {}
-
-    files() {
-        return this.f;
-    }
-
-    index() {
-        return this.f.find((file) => file.filename.endsWith(".html"));
-    }
-}

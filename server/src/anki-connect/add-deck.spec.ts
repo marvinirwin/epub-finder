@@ -6,12 +6,12 @@ import JSZip from "jszip";
 import { CsvCard } from "../shared/csv-card.interface";
 import { languageCodesMappedToTranslationConfigs } from "../shared/supported-translation.service";
 import { resolveRomanizationConfig } from "../shared/supported-transliteration.service";
-import {writeFile} from 'fs/promise'
 
 const deckName = "jest-deck";
 
 export const getDeckNames = async () => {
   const response = await fetch("127.0.0.1:8765", {
+      // @ts-ignore
     "action": "deckNames",
     "version": 6
   });
@@ -46,7 +46,8 @@ const importZipFileIntoAnki = async (filename: string) => {
 
 };
 export const getImageBytesAndExt = (url: string) => fetch(url)
-  .then(async response => ({arrayBuffer: await response.arrayBuffer(), ext: resolveExtFromResponseHeaders(response)}))
+    // @ts-ignore
+    .then(async response => ({arrayBuffer: await response.arrayBuffer(), ext: resolveExtFromResponseHeaders(response)}))
   .then(({
            arrayBuffer,
            ext
@@ -138,6 +139,7 @@ describe("Adding to a deck with anki connect", () => {
       created_at: new Date("2021-05-23 21:03:10.116120 +00:00")
     };
     const filename = await createZipFileForRecords(deckName, [record]);
+    // @ts-ignore
     await importZipFileIntoAnki(filename);
     expect(await getCardsForDeck(deckName, record.language_code)).toHaveLength(3);
   });

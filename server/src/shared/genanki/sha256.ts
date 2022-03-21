@@ -25,8 +25,11 @@
   } else if (WEB_WORKER) {
     root = self;
   }
+  // @ts-ignore
   const COMMON_JS = !root.JS_SHA256_NO_COMMON_JS && typeof module === "object" && module.exports;
+  // @ts-ignore
   const AMD = typeof define === "function" && define.amd;
+  // @ts-ignore
   const ARRAY_BUFFER = !root.JS_SHA256_NO_ARRAY_BUFFER && typeof ArrayBuffer !== "undefined";
   const HEX_CHARS = "0123456789abcdef".split("");
   const EXTRA = [-2147483648, 8388608, 32768, 128];
@@ -45,13 +48,17 @@
 
   const blocks = [];
 
+  // @ts-ignore
   if (root.JS_SHA256_NO_NODE_JS || !Array.isArray) {
+    // @ts-ignore
     Array.isArray = function (obj) {
       return Object.prototype.toString.call(obj) === "[object Array]";
     };
   }
 
+  // @ts-ignore
   if (ARRAY_BUFFER && (root.JS_SHA256_NO_ARRAY_BUFFER_IS_VIEW || !ArrayBuffer.isView)) {
+    // @ts-ignore
     ArrayBuffer.isView = function (obj) {
       return typeof obj === "object" && obj.buffer && obj.buffer.constructor === ArrayBuffer;
     };
@@ -59,6 +66,7 @@
 
   const createOutputMethod = function (outputType, is224) {
     return function (message) {
+      // @ts-ignore
       return new Sha256(is224, true).update(message)[outputType]();
     };
   };
@@ -66,12 +74,17 @@
   const createMethod = function (is224) {
     let method = createOutputMethod("hex", is224);
     if (NODE_JS) {
+      // @ts-ignore
       method = nodeWrap(method, is224);
     }
+    // @ts-ignore
     method.create = function () {
+      // @ts-ignore
       return new Sha256(is224);
     };
+    // @ts-ignore
     method.update = function (message) {
+      // @ts-ignore
       return method.create().update(message);
     };
     for (let i = 0; i < OUTPUT_TYPES.length; ++i) {
@@ -107,16 +120,21 @@
 
   const createHmacOutputMethod = function (outputType, is224) {
     return function (key, message) {
+      // @ts-ignore
       return new HmacSha256(key, is224, true).update(message)[outputType]();
     };
   };
 
   const createHmacMethod = function (is224) {
     const method = createHmacOutputMethod("hex", is224);
+    // @ts-ignore
     method.create = function (key) {
+      // @ts-ignore
       return new HmacSha256(key, is224);
     };
+    // @ts-ignore
     method.update = function (key, message) {
+      // @ts-ignore
       return method.create(key).update(message);
     };
     for (let i = 0; i < OUTPUT_TYPES.length; ++i) {
@@ -167,6 +185,7 @@
     if (this.finalized) {
       return;
     }
+    // @ts-ignore
     let notString, type = typeof message;
     if (type !== "string") {
       if (type === "object") {
@@ -184,6 +203,7 @@
       }
       notString = true;
     }
+    // @ts-ignore
     let code, index = 0, i, length = message.length, blocks = this.blocks;
 
     while (index < length) {
@@ -486,6 +506,7 @@
     this.inner = true;
     this.sharedMemory = sharedMemory;
   }
+  // @ts-ignore
   HmacSha256.prototype = new Sha256();
 
   HmacSha256.prototype.finalize = function () {
@@ -501,15 +522,23 @@
   };
 
   const exports = createMethod(false);
+  // @ts-ignore
   exports.sha256 = exports;
+  // @ts-ignore
   exports.sha224 = createMethod(true);
+  // @ts-ignore
   exports.sha256.hmac = createHmacMethod();
+  // @ts-ignore
   exports.sha224.hmac = createHmacMethod(true);
 
   if (COMMON_JS) {
     module.exports = exports;
   } else {
+    // @ts-ignore
     root.sha256 = exports.sha256;
+    // @ts-ignore
     root.sha224 = exports.sha224;
   }
 })();
+
+export const foo = 1;

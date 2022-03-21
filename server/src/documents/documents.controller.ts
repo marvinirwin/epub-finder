@@ -28,10 +28,11 @@ import { v4 as uuidv4 } from "uuid";
 import { s3, s3ReadStream } from "./uploading/s3.service";
 import { AnonymousGuard } from "../guards/anonymous.guard";
 import { DocumentViewDto } from "./document-view.dto";
-import { S3UploadedFile, UploadOutput } from "./uploading/s3-uploaded-file";
+import { S3UploadedFile} from "./uploading/s3-uploaded-file";
 import { RevisionUpdater } from "../revision-updater";
 import { DocumentUpdateDto } from "./document-update.dto";
 import { ltDocId } from "../shared/lt-document";
+import {UploadOutput} from "./uploading/upload-output";
 
 @Controller("documents")
 export class DocumentsController {

@@ -1,6 +1,10 @@
 import vision from "@google-cloud/vision";
 
 
+/**
+ * @deprecated
+ * @param param
+ */
 const doGoogleOcr = async(param: { fileName: string }): Promise<string[]> => {
     // Creates a client
     const client = new vision.ImageAnnotatorClient();
