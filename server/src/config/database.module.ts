@@ -10,7 +10,7 @@ const migrationPath = `${baseDir}${process.env.TYPEORM_MIGRATIONS}`;
 
 export const DatabaseModule = TypeOrmModule.forRoot({
     // @ts-ignore
-    type: process.env.TYPEORM_CONNECTION,
+    type: "postgres",
     host: process.env.TYPEORM_HOST,
     username: process.env.TYPEORM_USERNAME,
     password: process.env.TYPEORM_PASSWORD,
@@ -19,7 +19,6 @@ export const DatabaseModule = TypeOrmModule.forRoot({
     entities: [entitiesPath],
     migrations: [migrationPath],
     migrationsRun: process.env.TYPEORM_MIGRATIONS_RUN === "true",
-    seeds: ["src/db/seeds/*.seed.ts"],
     cli: {
         migrationsDir: "src/migrations",
         entitiesDir: "src/entities",
