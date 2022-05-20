@@ -23,28 +23,28 @@ export type AbstractSegment<T extends AbstractNode> = {
     translatableText: string;
 };
 
-export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
+export const tabulate = <NodeType extends AbstractNode, SegmentType extends AbstractSegment<NodeType>>({
                              notableCharacterSequences,
                              segments,
                              isNotableCharacterRegex,
                              wordIdentifyingStrategy,
                              isWordBoundaryRegex,
-                         }: TabulationParameters<T>): TabulatedSegments<T, U> => {
-    const tabulationObject = tabulationFactory<T, U>();
-    const elementSegmentMap = new Map<U, T>();
+                         }: TabulationParameters<SegmentType>): TabulatedSegments<NodeType, SegmentType> => {
+    const tabulationObject = tabulationFactory<SegmentType, NodeType>();
+    const elementSegmentMap = new Map<NodeType, SegmentType>();
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
     const wordSegmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
+    const atomMetadatas: Map<NodeType, AtomMetadata<SegmentType, NodeType>> = tabulationObject.atomMetadatas;
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
-        atomMetadatas,
         wordElementsMap,
         notableSubSequences
     } = tabulationObject;
 
 
-    const allMarks = flatten(
+    const allMarks: NodeType[] = flatten(
         segments.map((segment) => {
             segment.children.forEach((node) =>
                 elementSegmentMap.set(node, segment),
@@ -64,7 +64,7 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
         .map((node) => node.textContent)
         .join("");
     let notableSubsequencesInProgress: IWordInProgress[] = [];
-    let currentSegment: T | undefined;
+    let currentSegment: SegmentType | undefined;
     let segmentIndex = -1;
     let currentSegmentStart: number;
     let currentSerialzedSegment: {
@@ -72,10 +72,10 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
         index: number;
     } = {text: "", index: 0};
     for (let i = 0; i < allMarks.length; i++) {
-        const currentMark = allMarks[i];
+        const currentMark: NodeType = allMarks[i];
         const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
-            currentSegment = elementSegmentMap.get(currentMark) as T;
+            currentSegment = elementSegmentMap.get(currentMark) as SegmentType;
             segmentIndex++;
             currentSegmentStart = i;
             currentSerialzedSegment = {
@@ -184,7 +184,7 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
             words: segmentSubsequences,
             element: currentMark,
             i,
-            parent: elementSegmentMap.get(currentMark) as T,
+            parent: elementSegmentMap.get(currentMark) as SegmentType,
         });
         atomMetadatas.set(currentMark, atomMetadata);
         atomMetadata.words.subsequences.forEach((word) => {

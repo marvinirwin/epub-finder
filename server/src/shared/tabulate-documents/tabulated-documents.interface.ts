@@ -10,13 +10,13 @@ export type DocumentWordCounts = {
     label: string;
 }
 
-export type TabulatedDocuments<T extends AbstractSegment<U>, U extends AbstractNode> = TabulatedSegments<T, U> & DocumentWordCounts
+export type TabulatedDocuments<U extends AbstractNode = AbstractNode, T extends AbstractSegment<U> = AbstractSegment<U>> = TabulatedSegments<U, T> & DocumentWordCounts
 
-export type TabulatedSegments<T extends AbstractSegment<U>, U extends AbstractNode> = SerializedTabulation & {
-    wordElementsMap: Dictionary<AtomMetadata<T, U>[]>;
-    wordSegmentMap: Dictionary<T[]>;
+export type TabulatedSegments<NodeType extends AbstractNode = AbstractNode, SegmentType extends AbstractSegment<NodeType> = AbstractSegment<NodeType>> = SerializedTabulation & {
+    wordElementsMap: Dictionary<AtomMetadata<SegmentType, NodeType>[]>;
+    wordSegmentMap: Dictionary<SegmentType[]>;
     segments: Segment[];
-    atomMetadatas: Map<U, AtomMetadata<T, U>>;
+    atomMetadatas: Map<NodeType, AtomMetadata<SegmentType, NodeType>>;
 }
 
 export interface SerializedTabulation {
