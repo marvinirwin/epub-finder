@@ -43,9 +43,9 @@ const getAnkiNotes = async (
   }
   return notes;
 };
-const importAnkiDeckToLocalAnkiConnect = (path: string) => {
+const importAnkiDeckToLocalAnkiConnect = async (path: string) => {
   const body = JSON.stringify({ "action": "importPackage", "version": 6, "params": { "path": path } });
-  fetch(apiUrl, { method: "POST", body });
+  await fetch(apiUrl, { method: "POST", body });
 };
 const getDeckList = async (cards) => {
   const body = JSON.stringify({
@@ -141,7 +141,7 @@ describe("Generating anki decks", () => {
     ankiPackage.writeToFile("unit-test.apkg");
 
     // And POST this to the anki-connect instance and verify it exists
-    importAnkiDeckToLocalAnkiConnect("/data/unit-test.apkg");
+    await importAnkiDeckToLocalAnkiConnect(__dirname+"\\unit-test.apkg");
     const deckList = await getDeckList(["f7025165-737e-43fd-ad31-9630ddefc96b", "168f34dc-df7c-4518-9bad-121250a32611"]);
     const defaultCards = deckList.result.Default;
     expect(defaultCards).toContain("f7025165-737e-43fd-ad31-9630ddefc96b");
