@@ -104,7 +104,7 @@
         "sha1-uint8array": "^0.10.3",
         "sql.js": "^1.6.2",
         "stripe": "^8.132.0",
-        "swagger-ui-express": "^4.1.4",
+        "swagger-ui-express": "^4.4.0",
         "trie-prefix-tree": "^1.5.1",
         "typeorm": "^0.2.26",
         "typeorm-store": "^1.2.0",

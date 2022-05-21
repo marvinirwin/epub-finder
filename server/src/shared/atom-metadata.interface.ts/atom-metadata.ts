@@ -6,7 +6,7 @@ import { ICard } from "../ICard";
 import {SegmentSubsequences} from "../index";
 import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
 
-export class AtomMetadata<T extends AbstractSegment<U>, U extends AbstractNode> {
+export class AtomMetadata<U extends AbstractNode = AbstractNode, T extends AbstractSegment<U> = AbstractSegment<U>, > {
     m: {
         words: SegmentSubsequences;
         char: string;

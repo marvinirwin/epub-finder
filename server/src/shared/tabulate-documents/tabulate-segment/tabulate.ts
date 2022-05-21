@@ -1,12 +1,11 @@
-import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../tabulation/tabulate";
-import {TabulatedSegments} from "../tabulated-documents.interface";
-import {XMLDocumentNode} from "../../XMLDocumentNode";
-import {flatten, uniq} from "lodash";
-import {IWordInProgress} from "../../annotation/IWordInProgress";
-import {safePush, safePushMap} from "../../safe-push";
-import {IPositionedWord} from "../../annotation/IPositionedWord";
-import {AtomMetadata} from "../../atom-metadata.interface.ts/atom-metadata";
-import {SegmentSubsequences} from "../../index";
+import { SerializedSegment, tabulationFactory, TabulationParameters } from "../../tabulation/tabulate";
+import { TabulatedSegments } from "../tabulated-documents.interface";
+import { flatten, uniq } from "lodash";
+import { IWordInProgress } from "../../annotation/IWordInProgress";
+import { safePush, safePushMap } from "../../safe-push";
+import { IPositionedWord } from "../../annotation/IPositionedWord";
+import { AtomMetadata } from "../../atom-metadata.interface.ts/atom-metadata";
+import { SegmentSubsequences } from "../../index";
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
     const startPoint = Math.min(...positionedWords.map(({position}) => position));
@@ -15,11 +14,12 @@ export const textFromPositionedWordsAndAllText = (allText: string, positionedWor
 };
 
 export type AbstractNode = {
-    textContent: string;
+    textContent: string | null;
 }
 
 export type AbstractSegment<T extends AbstractNode> = {
     children: T[];
+    textContent: string | null;
     translatableText: string;
 };
 
@@ -35,7 +35,6 @@ export const tabulate = <NodeType extends AbstractNode, SegmentType extends Abst
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
     const wordSegmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
-    const atomMetadatas: Map<NodeType, AtomMetadata<SegmentType, NodeType>> = tabulationObject.atomMetadatas;
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
@@ -179,14 +178,14 @@ export const tabulate = <NodeType extends AbstractNode, SegmentType extends Abst
             subsequences: positionedWordsInProgress
         };
 
-        const atomMetadata = new AtomMetadata({
+        const atomMetadata = new AtomMetadata<NodeType, SegmentType>({
             char: textContent[i],
             words: segmentSubsequences,
             element: currentMark,
             i,
             parent: elementSegmentMap.get(currentMark) as SegmentType,
         });
-        atomMetadatas.set(currentMark, atomMetadata);
+        tabulationObject.atomMetadatas.set(currentMark, atomMetadata);
         atomMetadata.words.subsequences.forEach((word) => {
             if (wordElementsMap[word.word]) {
                 wordElementsMap[word.word].push(atomMetadata);

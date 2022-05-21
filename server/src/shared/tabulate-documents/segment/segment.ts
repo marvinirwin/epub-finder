@@ -8,11 +8,13 @@ export class Segment {
     element: XMLDocumentNode
     translationCb: (s: string) => void | undefined
     documentId: string;
+    textContent: string;
 
     constructor(element: XMLDocumentNode) {
         this.element = element;
         this.documentId = this.element.getAttribute("documentId");
         this.translatableText = this.element.textContent || "";
+        this.textContent = this.translatableText;
     }
 
     getSentenceHTMLElement(): HTMLElement {

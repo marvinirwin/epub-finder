@@ -24,7 +24,7 @@ export type TabulationConfiguration = SerializableTabulationConfiguration & {
     wordIdentifyingStrategy: WordIdentifyingStrategy;
 }
 
-export interface IPositionedWord {
+export interface PositionedWord {
     position: number;
     word: string;
 }
@@ -34,14 +34,14 @@ export interface SerializedSegment {
     index: number;
 }
 
-export const tabulationFactory = <T extends AbstractSegment<U>, U extends AbstractNode>(): TabulatedDocuments<T, U> => ({
+export const tabulationFactory = <T extends AbstractSegment<U>, U extends AbstractNode>(): TabulatedDocuments<U, T> => ({
     wordElementsMap: {},
     wordSegmentMap: {},
     notableSubSequences: [],
-    atomMetadatas: new Map<U, AtomMetadata<T, U>>(),
+    atomMetadatas: new Map<U, AtomMetadata<U, T>>(),
     wordSegmentSubSequencesMap: new Map<string, Set<SegmentSubsequences>>(),
     segments: [],
-    segmentWordCountRecordsMap: new Map<SerializedSegment, IPositionedWord[]>(),
+    segmentWordCountRecordsMap: new Map<SerializedSegment, PositionedWord[]>(),
     label: "",
     id: "",
 });
