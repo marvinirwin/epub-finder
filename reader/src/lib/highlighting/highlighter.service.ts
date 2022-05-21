@@ -16,6 +16,8 @@ import debug from 'debug'
 import { safePushMap } from '@shared/'
 import {RandomColorsService} from "../../services/random-colors.service";
 import {DEV} from "../util/url-params";
+import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
+import { AbstractSegment } from '../../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string]
@@ -41,7 +43,7 @@ export class HighlighterService {
     constructor({
         wordElementMap$,
     }: {
-        wordElementMap$: Observable<Dictionary<Set<AtomMetadata>>>
+        wordElementMap$: Observable<Dictionary<Set<AtomMetadata<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>>>>
     }) {
         this.highlightTargetMap$ = wordElementMap$.pipe(
             map((wordElementMap) => {

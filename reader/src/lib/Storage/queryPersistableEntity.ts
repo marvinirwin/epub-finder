@@ -26,7 +26,6 @@ export const queryPersistableEntity = <T>(
 
     return fetch(url.toString())
         .then(response => {
-          debugger;
           return response.json();
         })
         .then(items => items.map((item: T) => {

@@ -10,7 +10,7 @@ import {
     averageKnownWords,
     wordsFromCountRecordList,
 } from '../../../../server/src/shared/tabulation/word-count-records.module'
-import { IPositionedWord } from '../../../../server/src/shared/tabulation/tabulate'
+import { PositionedWord } from '../../../../server/src/shared/tabulation/tabulate'
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
 import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
 import { LanguageConfigsService } from '../language/language-configs.service'
@@ -20,7 +20,7 @@ import { PotentialExcludedDbColumns } from './indexed-rows.repository'
 export interface TranslationAttemptScheduleData {
     translationAttemptRecords: PotentialExcludedDbColumns<TranslationAttemptRecord>[]
     segmentText: string
-    wordCountRecords: IPositionedWord[]
+    wordCountRecords: PositionedWord[]
 }
 
 export class TranslationAttemptScheduleService

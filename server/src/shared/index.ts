@@ -29,3 +29,5 @@ export interface AtomizeSrcDocParams {
     documentId: DocumentId;
     documentSrc: string;
 }
+
+export * from "./resolve-ext-from-reponse-headers";

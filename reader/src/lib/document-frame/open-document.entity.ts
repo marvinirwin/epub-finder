@@ -18,11 +18,12 @@ import { OnSelectService } from '../user-interface/on-select.service'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 import { pipeLog } from '../manager/pipe.log'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
+import { AbstractSegment } from '../../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
 
 export class OpenDocument {
     public name: string
     public renderedSegments$ = new ReplaySubject<BrowserSegment[]>(1)
-    public renderedTabulation$: Observable<TabulatedSegments>
+    public renderedTabulation$: Observable<TabulatedSegments<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>>
     public virtualTabulation$: Observable<SerializedDocumentTabulation>
     public renderRoot$ = new ReplaySubject<HTMLBodyElement>(1)
     public isLoadingVirtualTabulation$: Observable<boolean>
@@ -47,7 +48,7 @@ export class OpenDocument {
             services.languageConfigsService.readingLanguageCode$,
         ]).pipe(
             map(([segments, tabulationConfiguration, language_code]) => {
-                return tabulate({
+                return tabulate<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>({
                     segments,
                     ...tabulationConfiguration,
                     ...resolvePartialTabulationConfig(language_code),

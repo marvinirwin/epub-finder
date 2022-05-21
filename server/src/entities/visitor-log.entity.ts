@@ -11,4 +11,3 @@ export class VisitorLog {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     timestamp: Date = new Date()
 }
-S

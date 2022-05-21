@@ -9,6 +9,7 @@ import {
     TabulatedDocuments,
     TabulatedSegments,
 } from '../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
+import { AbstractSegment } from '../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>
 
@@ -31,7 +32,7 @@ export class ElementAtomMetadataIndex {
                         ),
                     ),
                 ),
-                map((tabulations: TabulatedSegments[]) => {
+                map((tabulations: TabulatedSegments<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>[]) => {
                     const m: AtomMetadataMap = new Map()
                     tabulations.forEach((tabulation) =>
                         tabulation.atomMetadatas.forEach((value, key) =>

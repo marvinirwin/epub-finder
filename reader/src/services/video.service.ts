@@ -17,6 +17,7 @@ export const fetchVideoMetadata = async (
     sentence: string,
 ): Promise<VideoMetadata | undefined> => {
     try {
+        debugger;
         const response = await fetch(
             `${process.env.PUBLIC_URL}/video_metadata/${await sha1(sentence)}`,
         )
