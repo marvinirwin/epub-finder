@@ -28,6 +28,7 @@ export const queryPersistableEntity = <T>(
         .then(response => {
           return response.json();
         })
+      // @ts-ignore
         .then(items => items.map((item: T) => {
             // @ts-ignore
             return parseCreatedAt(item)

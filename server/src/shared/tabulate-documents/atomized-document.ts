@@ -243,9 +243,32 @@ export class AtomizedDocument {
 
     segments(): Segment[] {
         try {
-            const segmentElements = this.document.getElementsByClassName(
-                annotatedAndTranslated,
-            );
+            let segmentElements: XMLDocumentNode[] = [];
+            if (this.document.getElementsByClassName) {
+                // @ts-ignore
+                segmentElements = this.document.getElementsByClassName(
+                  annotatedAndTranslated,
+                );
+            } else {
+                const walk = (node: Node) => {
+                    let child, next;
+                    const attributes = node?.attributes;
+                    const className = attributes?.getNamedItem("class");
+                    if (className?.value?.includes(annotatedAndTranslated)) {
+                        // @ts-ignore
+                        segmentElements.push(node);
+                    }
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        walk(child);
+                        child = next;
+                    }
+                };
+                walk(this.document);
+            }
+
+
             const atomized = new Array(segmentElements.length);
             for (let i = 0; i < segmentElements.length; i++) {
                 const segmentElement = segmentElements[i];

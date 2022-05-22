@@ -46,12 +46,12 @@ export class SortedLimitScheduleRowsService {
                     (row) => {
                         const knownWordsRecords = knownWordsIndex[row.d.word]
                         const isKnown = knownWordsRecords && knownWordsRecords[knownWordsRecords.length - 1]?.is_known;
-                        const isPresentText = row.d.count.value > 0;
+                        const isWordContainedInCurrentReadingTexts = row.d.count.value > 0;
                         const isToReview = row.isToReview({now})
                         if (onlyReviewPresentText) {
-                            return isPresentText && !isKnown;
+                            return isWordContainedInCurrentReadingTexts && !isKnown;
                         } else {
-                            return (isPresentText || isToReview) && !isKnown;
+                            return (isWordContainedInCurrentReadingTexts || isToReview) && !isKnown;
                         }
                     },
                 )
