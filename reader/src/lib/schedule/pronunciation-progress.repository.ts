@@ -10,6 +10,7 @@ export async function* emptyGenerator<T>(
 
 export class PronunciationProgressRepository extends IndexedRowsRepository<PronunciationProgressRow> {
     constructor({ databaseService }: { databaseService: DatabaseService }) {
+        // @ts-ignore
         super({
             databaseService,
             load: emptyGenerator,
@@ -21,6 +22,7 @@ export class PronunciationProgressRepository extends IndexedRowsRepository<Pronu
                     return v
                 }),
 */
+            // @ts-ignore I don't know why this broke all of a sudden
             add: (r) => databaseService.pronunciationRecords
                 .add(r as PronunciationProgressRow).then(id => ({...r, id})),
             getIndexValue: (r) => ({ indexValue: r.word }),

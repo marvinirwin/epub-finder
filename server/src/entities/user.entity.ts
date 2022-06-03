@@ -1,14 +1,11 @@
-import { Document } from "./document.entity";
 import {
     Entity,
     Column,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
     AfterLoad,
     BeforeUpdate,
     BeforeInsert,
     OneToMany,
-    Repository,
     ManyToOne,
     JoinTable, Generated,
 } from "typeorm";
@@ -43,7 +40,7 @@ export class User {
 
     @AfterLoad()
     private storeInitialPassword(): void {
-        this._loadedPassword = this.password;
+        this._loadedPassword = this.password as string;
     }
 
     @BeforeInsert()

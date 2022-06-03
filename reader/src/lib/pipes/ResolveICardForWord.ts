@@ -31,7 +31,7 @@ export const resolveICardForWordLatest = <T, U>(
             if (word) {
                 return cardIndex[word]?.length
                     ? cardIndex[word][0]
-                    : cardForWord(word, readingLanguageCode)
+                    : cardForWord(word, readingLanguageCode) as unknown as ICard
             }
             return undefined
         }),

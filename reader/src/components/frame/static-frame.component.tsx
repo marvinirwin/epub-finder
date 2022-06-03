@@ -4,13 +4,13 @@ import React, {
     useEffect,
     useState,
 } from 'react'
-import { InnerHtmlFrameComponent } from './inner-html-frame.component'
 
-interface props {
+interface Props {
     visible: boolean
     visibleStyle: CSSProperties
+  children?: React.ReactNode
 }
-export const StaticFrameComponent: FunctionComponent<props> = ({
+export const StaticFrameComponent: FunctionComponent<Props> = ({
     visible,
     visibleStyle,
     children,

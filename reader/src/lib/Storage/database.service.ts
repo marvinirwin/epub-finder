@@ -154,7 +154,7 @@ export class DatabaseService extends Dexie {
         }
     }
 
-    async* getSentenceRowsFromDB(): AsyncGenerator<CreatedSentence[]> {
+    async* getCreatedSentencesFromDB(): AsyncGenerator<CreatedSentence[]> {
         let offset = 0
         const chunkSize = 500
         while (await this.createdSentences.offset(offset).first()) {

@@ -1,5 +1,5 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { Column, Generated, Repository } from "typeorm";
+import {  Repository } from "typeorm";
 import { VideoMetadataView } from "../entities/video-metadata-view.entity";
 import { VideoMetadata } from "../entities/video.metadata";
 import { VideoMetadataDto } from "./video-metadata.dto";
@@ -25,7 +25,7 @@ export class VideoMetadataService {
             sentence_hash: hash,
         });
         if (record) {
-            return record;
+            return record as VideoMetadata;
         }
         const json = await this.checkForJson(hash);
         if (json) {

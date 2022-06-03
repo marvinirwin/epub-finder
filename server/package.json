@@ -39,6 +39,7 @@
         "@octokit/rest": "^18.0.0",
         "@types/bcrypt": "^3.0.0",
         "@types/mysql2": "github:types/mysql2",
+        "@types/xmldom": "^0.1.31",
         "async": "^3.1.0",
         "aws-sdk": "^2.817.0",
         "axios": "^0.19.2",

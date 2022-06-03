@@ -1,8 +1,3 @@
-import { IPositionedWord } from "../Annotation/IPositionedWord";
-import { XMLDocumentNode } from "../XMLDocumentNode";
-import { Segment } from "../tabulate-documents/segment/segment";
-import { flatten, maxBy } from "lodash";
-import { ICard } from "../ICard";
 import {SegmentSubsequences} from "../index";
 import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
 

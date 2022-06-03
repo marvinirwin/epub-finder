@@ -1,4 +1,4 @@
-import {IPositionedWord} from "./Annotation/IPositionedWord";
+import {IPositionedWord} from "./annotation/IPositionedWord";
 import {DocumentId} from "./sourced-text";
 
 export { InterpolateService } from "./interpolate.service";
@@ -31,3 +31,13 @@ export interface AtomizeSrcDocParams {
 }
 
 export * from "./resolve-ext-from-reponse-headers";
+export * from "./video-metadata.interface";
+export * from "./video-character.interface";
+export * from "./annotation/IPositionedWord";
+export * from "./atom-metadata/atom-metadata";
+export type { VideoMetadataDto } from "../video_metadata/video-metadata.dto";
+export type { DocumentViewDto } from "../documents/document-view.dto";
+export type { TranslateRequestDto } from "../translate/translate-request-dto";
+export type { TransliterateRequestDto } from "../translate/transliterate-request.dto";
+export type { TransliterateResponseDto } from "../translate/transliterate-response.dto";
+export type { ImageObject } from "@azure/cognitiveservices-imagesearch/src/models/index";

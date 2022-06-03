@@ -5,6 +5,7 @@ import { useObservableState } from 'observable-hooks'
 interface Props {
     visible$: Observable<any>
     text$: Observable<string>
+    children?: React.ReactNode
 }
 
 const DebugMenuComponent: React.FunctionComponent<Props> = ({

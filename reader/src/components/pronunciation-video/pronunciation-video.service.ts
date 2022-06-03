@@ -1,24 +1,20 @@
 import {
     combineLatest,
-    fromEvent,
     Observable,
-    of,
     ReplaySubject,
     Subject,
 } from 'rxjs'
 import { fetchVideoMetadata, sha1 } from '../../services/video.service'
 import {
     distinctUntilChanged,
-    map,
-    mapTo,
     shareReplay,
     switchMap,
 } from 'rxjs/operators'
-import { VideoMetadata } from '../../types'
 import Ciseaux from '../../lib/ciseaux/browser'
 import { Tape } from 'ciseaux/browser'
 import { filterData } from '../../lib/audio/audio-graphing'
 import {audioContext} from "../../lib/audio/audio-context";
+import { VideoMetadata } from '@shared/'
 
 export const ciseauxPromise = audioContext.then(ctx => {
     // @ts-ignore

@@ -1,8 +1,7 @@
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs'
-import { VideoMetadata } from '../components/pronunciation-video/video-meta-data.interface'
+import { BehaviorSubject } from 'rxjs'
 import axios from 'axios'
 import { mapFromId } from '../lib/util/map.module'
-import CardsRepository from '../lib/manager/cards.repository'
+import { VideoMetadata } from '@shared/'
 
 export class VideoMetadataRepository {
     all$ = new BehaviorSubject<Map<string, VideoMetadata>>(new Map())

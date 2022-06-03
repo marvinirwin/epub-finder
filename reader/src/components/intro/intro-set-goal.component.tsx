@@ -3,7 +3,7 @@ import { Box, Container, Paper, Typography } from '@material-ui/core'
 import { introSetCardLimit } from '@shared/'
 import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 
-export const IntroSetGoal: React.FC = ({ children }) => {
+export const IntroSetGoal: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     return (
         <Container id={introSetCardLimit} style={{ flex: 1 }}>
             <Paper>

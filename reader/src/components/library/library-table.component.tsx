@@ -28,7 +28,7 @@ export const LibraryTableAddText = () => {
         </Button>
     </Box>
 }
-export const LibraryTable: React.FC = ({children}) => {
+export const LibraryTable: React.FC<{children?: React.ReactNode}> = ({children}) => {
     const m = useContext(ManagerContext)
     const readingDocuments =
         useObservableState(m.documentRepository.collection$) || new Map()

@@ -1,5 +1,5 @@
 import { Dictionary } from "lodash";
-import { AtomMetadata } from "../atom-metadata.interface.ts/atom-metadata";
+import { AtomMetadata } from "../atom-metadata/atom-metadata";
 import { Segment } from "./segment/segment";
 import { SerializedSegment, PositionedWord } from "../tabulation/tabulate";
 import {SegmentSubsequences} from "../index";

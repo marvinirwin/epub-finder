@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export const ActionModal: React.FC<{
-    navModal: NavModal
+    navModal: NavModal,
+    children?: React.ReactNode
 }> = ({ navModal, children }) => {
     const classes = useStyles()
     const open = !!useObservableState(navModal.open$)

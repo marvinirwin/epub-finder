@@ -22,8 +22,7 @@ export const Intro = () => {
             Component: IntroSetGoal,
         },
     ]
-    const SelectedComponent =
-        steps[currentIntroTab]?.Component || steps[0]?.Component
+    const SelectedComponent: React.FC<{children?: React.ReactNode}> = steps[currentIntroTab]?.Component || steps[0]?.Component
     return (
         <Paper
             style={{

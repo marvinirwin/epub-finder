@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme: Theme) => {
     },
 )
 
-export const MiniDrawer: React.FC<{}> = ({ children }) => {
+export const MiniDrawer: React.FC<{children?: React.ReactNode}> = ({ children }) => {
     const m = useContext(ManagerContext)
     const treeMenuService = m.treeMenuService
     const menuItemTree = useObservableState(treeMenuService.tree.updates$)

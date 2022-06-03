@@ -1,8 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { VideoCharacter } from './video-character.interface'
-import { VideoMetadata } from './video-meta-data.interface'
-import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
+import { VideoMetadata, VideoCharacter } from '@shared/'
 
 export const useChunkedCharacterTimings = (
     videoMetaData: VideoMetadata | undefined,

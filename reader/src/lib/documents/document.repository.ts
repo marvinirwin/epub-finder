@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { DocumentViewDto } from '@server/'
+import { DocumentViewDto } from '@shared/'
 import { DatabaseService } from '../Storage/database.service'
 import { merge, Observable, ReplaySubject } from 'rxjs'
 import { mapFromId, mergeMaps } from '../util/map.module'
@@ -34,7 +34,7 @@ export class DocumentRepository {
             const response = await axios.get(
                 `${process.env.PUBLIC_URL}/documents`,
                 {
-                    params: { language_code: language_code },
+                    params: { language_code },
                 },
             )
             const responseDocuments = ((response?.data ||

@@ -1,11 +1,11 @@
 import { SerializedSegment, tabulationFactory, TabulationParameters } from "../../tabulation/tabulate";
 import { TabulatedSegments } from "../tabulated-documents.interface";
 import { flatten, uniq } from "lodash";
-import { IWordInProgress } from "../../annotation/IWordInProgress";
 import { safePush, safePushMap } from "../../safe-push";
 import { IPositionedWord } from "../../annotation/IPositionedWord";
-import { AtomMetadata } from "../../atom-metadata.interface.ts/atom-metadata";
+import { AtomMetadata } from "../../atom-metadata/atom-metadata";
 import { SegmentSubsequences } from "../../index";
+import { IWordInProgress } from "../../annotation/IWordInProgress";
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
     const startPoint = Math.min(...positionedWords.map(({position}) => position));
@@ -51,10 +51,11 @@ export const tabulate = <NodeType extends AbstractNode, SegmentType extends Abst
             return segment.children;
         }),
     ).filter((n) => {
+        const text = n.textContent as string;
         if (wordIdentifyingStrategy === "noSeparator") {
-            return n.textContent.trim();
+            return text.trim();
         }
-        return n.textContent;
+        return text;
     });
     const uniqueLengths = uniq(
         Array.from(notableCharacterSequences.uniqueLengths).concat(1),
