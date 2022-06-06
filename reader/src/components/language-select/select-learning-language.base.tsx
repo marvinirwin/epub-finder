@@ -1,5 +1,4 @@
 import React from "react";
-import { MenuItem, Select } from "@material-ui/core";
 
 export type SelectLearningLanguageBaseProps = { onChange: ((languageCode: string) => unknown), options: { label: string, code: string }[], value: string };
 /**
