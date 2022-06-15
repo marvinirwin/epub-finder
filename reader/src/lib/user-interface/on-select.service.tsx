@@ -25,7 +25,6 @@ export class OnSelectService {
         this.generalToastMessageService = generalToastMessageService
         this.selectedText$
             .pipe(
-                distinctUntilChanged(),
                 withLatestFrom(
                     languageConfigsService.learningToKnownTranslateConfig$,
                 ),

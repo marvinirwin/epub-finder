@@ -17,7 +17,7 @@ export const fetchVideoMetadata = async (
 ): Promise<VideoMetadata | undefined> => {
     try {
         const response = await fetch(
-            `${process.env.PUBLIC_URL}/video_metadata/${await sha1(sentence)}`,
+            `${process.env.PUBLIC_URL}/api/video_metadata/${await sha1(sentence)}`,
         )
         if (response.status === 200) {
             return ((await response.json()) as unknown) as VideoMetadata

@@ -12,7 +12,7 @@ export class LoggedInUserService {
 
     public static async fetchLoggedInProfile(): Promise<Profile | undefined> {
         const response = await axios.get(
-            `${process.env.PUBLIC_URL}/users/profile`,
+            `${process.env.PUBLIC_URL}/api/users/profile`,
         )
         return response?.data as Profile
     }

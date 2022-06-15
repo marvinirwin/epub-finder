@@ -32,7 +32,7 @@ export class DocumentRepository {
             isLoading$,
         } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (language_code) => {
             const response = await axios.get(
-                `${process.env.PUBLIC_URL}/documents`,
+                `${process.env.PUBLIC_URL}/api/documents`,
                 {
                     params: { language_code },
                 },
@@ -101,7 +101,7 @@ export class DocumentRepository {
             headers.sandbox_file = '1'
         }
         const result = await axios.put(
-            `${process.env.PUBLIC_URL}/documents/`,
+            `${process.env.PUBLIC_URL}/api/documents/`,
             formData,
             {
                 headers,
@@ -113,7 +113,7 @@ export class DocumentRepository {
 
     public delete(ltDocument: LtDocument) {
         return axios
-            .post(`${process.env.PUBLIC_URL}/documents/update`, {
+            .post(`${process.env.PUBLIC_URL}/api/documents/update`, {
                 ...ltDocument.d,
                 deleted: true,
             })

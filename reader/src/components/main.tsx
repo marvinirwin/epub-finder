@@ -13,6 +13,8 @@ export const FocusedElement = React.createContext<
     HTMLElement | Document | null
 >(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
+// It's a string because I may want to filter observables to show, instead of showing/hiding all of them
+export const ShowObservableContext = React.createContext<string>("");
 const audioRecorderResized$ = new Subject<void>()
 const pronunciationVideoResized$ = new Subject<void>()
 export const AudioRecorderResizedContext = React.createContext<Subject<void>>(
@@ -35,18 +37,20 @@ export function Main({ m }: { m: Manager }) {
     const withDefaults = { ...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig }
 
     return (
-        <HotkeyContext.Provider value={withDefaults}>
-            <FocusedElement.Provider value={hotkeyHandler}>
-                <PronunciationVideoResizedContext.Provider
+      <ShowObservableContext.Provider value={"true"}>
+          <HotkeyContext.Provider value={withDefaults}>
+              <FocusedElement.Provider value={hotkeyHandler}>
+                  <PronunciationVideoResizedContext.Provider
                     value={pronunciationVideoResized$}
-                >
-                    <AudioRecorderResizedContext.Provider
+                  >
+                      <AudioRecorderResizedContext.Provider
                         value={audioRecorderResized$}
-                    >
-                        <MiniDrawer />
-                    </AudioRecorderResizedContext.Provider>
-                </PronunciationVideoResizedContext.Provider>
-            </FocusedElement.Provider>
-        </HotkeyContext.Provider>
+                      >
+                          <MiniDrawer />
+                      </AudioRecorderResizedContext.Provider>
+                  </PronunciationVideoResizedContext.Provider>
+              </FocusedElement.Provider>
+          </HotkeyContext.Provider>
+      </ShowObservableContext.Provider>
     )
 }

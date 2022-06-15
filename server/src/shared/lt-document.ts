@@ -22,7 +22,7 @@ export class LtDocument {
     }
 
     url() {
-        return `${process.env.PUBLIC_URL}/documents/${this.filename}`;
+        return `${process.env.PUBLIC_URL}/api/documents/${this.filename}`;
     }
 }
 

@@ -1,8 +1,9 @@
-import React, {useContext} from "react";
-import {ManagerContext} from "../../../App";
-import {useLoadingObservable} from "../../../lib/util/create-loading-observable";
+import React, { useContext } from "react";
+import { Typography } from "@material-ui/core";
+import { useDictionaryDefinition } from "../../../lib/util/useDictionaryDefinition";
+import { useLoadingObservable } from "../../../lib/util/create-loading-observable";
 import usePromise from "react-use-promise";
-import {Typography} from "@material-ui/core";
+import { ManagerContext } from "../../../App";
 
 export const DictionaryDefinition = (
     {
@@ -11,13 +12,7 @@ export const DictionaryDefinition = (
         word: string
     }
 ) => {
-    const m = useContext(ManagerContext);
-    const dictionary = useLoadingObservable(m.dictionaryService.dictionary);
-    const [definition] = usePromise(async () => {
-        if (dictionary?.value && word) {
-            return dictionary.value.getDefinition(word)
-        }
-    }, [word, dictionary])
+    const {definition, emittedValues} = useDictionaryDefinition(word);
     return <Typography variant='subtitle1'>
         {definition}
     </Typography>

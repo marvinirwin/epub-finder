@@ -9,8 +9,10 @@ export type LanguageDict = {
     getDefinition(term: string): Promise<string>
 }
 
+export type LtDictionary = { getDefinition: (term: string) => Promise<string>, name: string };
+
 export class DictionaryService {
-    dictionary: LoadingObservable<{ getDefinition: (term: string) => Promise<string> }>;
+    dictionary: LoadingObservable<LtDictionary>;
     constructor({
         languageConfigsService
                 }: {
@@ -27,11 +29,13 @@ export class DictionaryService {
                         return {
                             getDefinition: async (term: string) => {
                                 return dictionary.get(term) || ''
-                            }
+                            },
+                            name: 'cedict_ts chinese dictionary'
                         }
                     default:
                         return  {
-                            getDefinition: async (term: string) => ""
+                            getDefinition: async (term: string) => "",
+                            name: "No dictionary found for current language"
                         }
                 }
             }

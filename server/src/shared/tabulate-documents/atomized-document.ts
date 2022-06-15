@@ -185,7 +185,9 @@ export class AtomizedDocument {
     ) {
         const indexOfMe = getIndexOfEl(textNode);
         // If we remove ourselves and we're not already there, I think things go weird
+        // @ts-ignore
         if (Array.from((textNode.parentNode as ParentNode).childNodes).includes(textNode)) {
+            // @ts-ignore
             (textNode.parentNode as ParentNode).removeChild(textNode);
         }
         const newParent = this.document.createElement("span");
@@ -199,6 +201,7 @@ export class AtomizedDocument {
             newParent.insertBefore(mark, null);
         });
         const oldParent = textNode.parentNode as ParentNode;
+        // @ts-ignore
         oldParent.insertBefore(
             newParent,
             // @ts-ignore

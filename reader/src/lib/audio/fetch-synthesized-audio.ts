@@ -8,7 +8,7 @@ export async function fetchSynthesizedAudio(
 ): Promise<WavAudio | undefined> {
     try {
         const response = await axios.post(
-            `${process.env.PUBLIC_URL}/speech-synthesis`,
+            `${process.env.PUBLIC_URL}/api/speech-synthesis`,
              {...c, rate: 1} as SpeechSynthesisRequestDto,
             { responseType: 'blob' },
         )
