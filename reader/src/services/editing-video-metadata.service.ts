@@ -56,6 +56,6 @@ export class EditingVideoMetadataService {
     }
 
     private static async saveMetadata(metadata: VideoMetadataDto) {
-        await axios.put(`${process.env.PUBLIC_URL}/video_metadata`, metadata)
+        await axios.put(`${process.env.PUBLIC_URL}/api/video_metadata`, metadata)
     }
 }

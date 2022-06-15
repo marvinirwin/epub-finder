@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { UploadText } from './upload-text.component'
@@ -6,6 +6,7 @@ import { Box, Button, Typography } from '@material-ui/core'
 import { fileChooser, uploadProgressBar } from '@shared/'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
 import { languageCodesMappedToLabels } from '../../../../server/src/shared/supported-translation.service'
+import { EmittedValues, useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
@@ -14,8 +15,15 @@ export const UploadDialog = () => {
     );
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     const currentLanguageLabel = languageCodesMappedToLabels.get(language_code || '') || '';
+
+    const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
+    const emittedCurrentUploadingFiles = useVisibleObservableState(m.uploadingDocumentsService.currentUploadingFile$, (file: File | undefined) => `m.uploadingDocumentsService.currentUploadingFile$: ${file?.name}`);
+
+    const allEmittedValues = useMemo(() => [...emittedSelectedReadingLanguages, ...emittedCurrentUploadingFiles], [emittedSelectedReadingLanguages, emittedCurrentUploadingFiles]);
+
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
+            <EmittedValues emittedValues={allEmittedValues}  />
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
                 Copy and paste some text you'd like to read in <Button onClick={() => m.modalService.languageSelect.open$.next(true)}><Typography variant={'h5'} color="textSecondary">{currentLanguageLabel}</Typography></Button>
             </Typography>
@@ -72,3 +80,4 @@ export const UploadDialog = () => {
         </Box>
     )
 }
+

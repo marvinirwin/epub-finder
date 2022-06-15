@@ -27,7 +27,7 @@ ctx.onmessage = async (ev) => {
     }: TabulateRemoteDocumentDto = ev.data
     const ltDoc = new LtDocument(d)
     const response = await fetch(
-        `${process.env.PUBLIC_URL}/documents/${ltDoc.filename}`,
+        `${process.env.PUBLIC_URL}/api/documents/${ltDoc.filename}`,
     )
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
     const doc = AtomizedDocument.atomizeDocument({documentId: ltDoc.id(), documentSrc})

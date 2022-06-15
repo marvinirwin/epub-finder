@@ -57,7 +57,7 @@ export class OpenDocumentsService {
                     }
                     if (document.filename) {
                         documentSource.url$ = of(
-                            `/documents/${document.filename}`,
+                            `/api/documents/${document.filename}`,
                         )
                     }
                     const openDocument = new OpenDocument(
