@@ -10,4 +10,5 @@ package-lock.json
 server/package-lock.json
 server/public/video/
 server/src/subtitles/
+dashboar-store*
 

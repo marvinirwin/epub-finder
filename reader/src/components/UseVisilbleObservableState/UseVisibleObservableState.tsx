@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSubscription } from "observable-hooks";
-import { ShowObservableContext } from "../main";
+import { EmittedValues } from "./EmittedValues.component";
 
 let idCounter = 0;
 export type EmittedValue<U> = { id: number, value: U, formatFn?: (t: U) => string };
@@ -34,15 +34,5 @@ export const EmittedValuesWithRef = (
     emittedValues
   }: { ref: HTMLElement | null, emittedValues: EmittedValue<any>[] }) => {
   return ref ? <EmittedValues emittedValues={emittedValues} style={{top: ref.clientTop, left: ref.clientLeft}}/> : null
-};
-export const EmittedValues = ({
-                                emittedValues,
-                                style
-                              }: { emittedValues: EmittedValue<any>[], style?: Record<string, any> }) => {
-  const showObservables = useContext(ShowObservableContext);
-  return showObservables ? <ol style={{ position: "absolute", backgroundColor: "grey", ...(style || {}) }}>
-    {emittedValues.map(({ id, value, formatFn }) => <li
-      key={id}>{formatFn ? formatFn(value) : value ? `${value}` : `${id}`}</li>)}
-  </ol> : null;
 };
 

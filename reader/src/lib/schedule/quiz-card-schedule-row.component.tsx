@@ -10,9 +10,10 @@ import {
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
 import { useLoadingObservableString } from '../util/create-loading-observable'
 import {DictionaryDefinition} from "../../components/quiz/card-types/dictionary-definition.component";
-import { useVisibleObservableState, EmittedValues } from "../../components/UseVisilbleObservableState/UseVisibleObservableState";
+import { useVisibleObservableState} from "../../components/UseVisilbleObservableState/UseVisibleObservableState";
 import { LimitedScheduleRows } from "../manager/limit-schedule-rows.type";
 import { useConcatArray } from '../util/useConcatArray'
+import { EmittedValues } from "../../components/UseVisilbleObservableState/EmittedValues.component";
 
 export const QuizCardScheduleRowDisplay = ({
     quizCard,

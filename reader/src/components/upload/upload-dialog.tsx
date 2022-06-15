@@ -6,7 +6,8 @@ import { Box, Button, Typography } from '@material-ui/core'
 import { fileChooser, uploadProgressBar } from '@shared/'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
 import { languageCodesMappedToLabels } from '../../../../server/src/shared/supported-translation.service'
-import { EmittedValues, useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
+import { useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
+import { EmittedValues } from "../UseVisilbleObservableState/EmittedValues.component";
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
