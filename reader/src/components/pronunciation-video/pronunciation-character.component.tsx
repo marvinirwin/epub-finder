@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { VideoCharacter } from './video-character.interface'
+import { VideoCharacter } from "@shared/"
 import { percentagePosition } from './math.module'
 import { ManagerContext } from '../../App'
 

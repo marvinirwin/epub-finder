@@ -4,7 +4,7 @@ import { introLanguageSelect } from '@shared/'
 import { LanguageSelect } from '../app-directory/nodes/language-select.component'
 import { signInUrl } from '../app-directory/nodes/sign-in-with.node'
 
-export const IntroLanguageSelect: React.FC = ({ children }) => {
+export const IntroLanguageSelect: React.FC<{children?: React.ReactNode}> = ({ children }) => {
     return (
         <Container id={introLanguageSelect} style={{ flex: 1 }}>
             <Paper>

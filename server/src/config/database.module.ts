@@ -8,22 +8,28 @@ const baseDir = path.join(__dirname, "../");
 const entitiesPath = `${baseDir}${process.env.TYPEORM_ENTITIES}`;
 const migrationPath = `${baseDir}${process.env.TYPEORM_MIGRATIONS}`;
 
+const host = process.env.TYPEORM_HOST;
+const username = process.env.TYPEORM_USERNAME;
+const password = process.env.TYPEORM_PASSWORD;
+const database = process.env.TYPEORM_DATABASE;
+const port = process.env.TYPEORM_PORT;
+console.log({host, username, password, database, port});
 export const DatabaseModule = TypeOrmModule.forRoot({
     // @ts-ignore
-    type: process.env.TYPEORM_CONNECTION,
-    host: process.env.TYPEORM_HOST,
-    username: process.env.TYPEORM_USERNAME,
-    password: process.env.TYPEORM_PASSWORD,
-    database: process.env.TYPEORM_DATABASE,
-    port: Number.parseInt(process.env.TYPEORM_PORT, 10),
+    type: "postgres",
+    host: host,
+    username: username,
+    password: password,
+    database: database,
+    port: Number.parseInt(port, 10),
     entities: [entitiesPath],
     migrations: [migrationPath],
     migrationsRun: process.env.TYPEORM_MIGRATIONS_RUN === "true",
-    seeds: ["src/db/seeds/*.seed.ts"],
     cli: {
         migrationsDir: "src/migrations",
         entitiesDir: "src/entities",
     },
-    synchronize: true,
+    synchronize: false,
+    // @ts-ignore I dunno what this is for, it might be removable
     timezone: "Z",
 });

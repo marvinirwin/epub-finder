@@ -30,28 +30,32 @@ import { DocumentView } from "./entities/document-view.entity";
 
 @Module({
     imports: [
-        DatabaseModule,
-        TranslateModule,
-        TranslateHttpModule,
-        SpeechHttpModule,
-        ImageSearchModule,
-        ImageSearchHttpModule,
-        UsersModule,
-        UsersHttpModule,
-        ServeStaticModule.forRoot({
-            rootPath: "public",
-            serveRoot: "/",
-        }),
-        AuthModule,
-        TypeOrmModule.forFeature([JsonCache, session, CardView, DocumentView]),
-        ObservableModule,
-        DocumentsModule,
-        VideoMetadataModule,
-        RecordRequestModule,
-        EntitiesModule,
-        LeaderBoardModule,
+                DatabaseModule,
+                TranslateModule,
+                TranslateHttpModule,
+                SpeechHttpModule,
+                ImageSearchModule,
+                ImageSearchHttpModule,
+                UsersModule,
+                UsersHttpModule,
+                ServeStaticModule.forRoot({
+                    rootPath: "public",
+                    serveRoot: "/",
+                }),
+                AuthModule,
+                TypeOrmModule.forFeature([JsonCache, session, CardView, DocumentView]),
+                ObservableModule,
+                DocumentsModule,
+                VideoMetadataModule,
+                RecordRequestModule,
+                EntitiesModule,
+                LeaderBoardModule,
+        /*
+        */
     ],
-    providers: [CacheService, ChineseVocabService, SessionService, UsersService, CliService, TabulateService],
+    providers: [
+      CacheService, ChineseVocabService, SessionService, UsersService, CliService, TabulateService
+    ],
     controllers: [],
 })
 export class AppModule {}

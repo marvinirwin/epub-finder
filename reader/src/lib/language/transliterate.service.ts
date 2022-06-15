@@ -1,4 +1,4 @@
-import { TransliterateResponseDto, TransliterateRequestDto } from '@server/'
+import { TransliterateResponseDto, TransliterateRequestDto } from '@shared/'
 import axios, { AxiosResponse } from 'axios'
 import memoize from 'memoizee'
 

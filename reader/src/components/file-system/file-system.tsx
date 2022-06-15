@@ -46,12 +46,7 @@ export const AddLearningMaterial: React.FC<{
 
             {itemsInThisDirectory.map((tile) => {
                 return (
-                    <GridListTile
-                        key={fileNameFromFilepath(tile.path)}
-                        cols={1}
-                    >
-                        {tile.Component}
-                    </GridListTile>
+                    <GridListTile key={fileNameFromFilepath(tile.path)} cols={1} component={tile.Component} />
                 )
             })}
         </GridList>

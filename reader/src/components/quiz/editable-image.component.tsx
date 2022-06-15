@@ -1,7 +1,7 @@
 import React from 'react'
 import { Edit } from '@material-ui/icons'
 
-export const EditableOnClick: React.FC<{ onEditClicked: () => void }> = ({
+export const EditableOnClick: React.FC<{ children?: React.ReactNode, onEditClicked: () => void }> = ({
     children,
     onEditClicked,
 }) => {

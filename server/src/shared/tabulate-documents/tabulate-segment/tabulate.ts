@@ -1,12 +1,11 @@
-import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../tabulation/tabulate";
-import {TabulatedSegments} from "../tabulated-documents.interface";
-import {XMLDocumentNode} from "../../XMLDocumentNode";
-import {flatten, uniq} from "lodash";
-import {IWordInProgress} from "../../annotation/IWordInProgress";
-import {safePush, safePushMap} from "../../safe-push";
-import {IPositionedWord} from "../../annotation/IPositionedWord";
-import {AtomMetadata} from "../../atom-metadata.interface.ts/atom-metadata";
-import {SegmentSubsequences} from "../../index";
+import { SerializedSegment, tabulationFactory, TabulationParameters } from "../../tabulation/tabulate";
+import { TabulatedSegments } from "../tabulated-documents.interface";
+import { flatten, uniq } from "lodash";
+import { safePush, safePushMap } from "../../safe-push";
+import { IPositionedWord } from "../../annotation/IPositionedWord";
+import { AtomMetadata } from "../../atom-metadata/atom-metadata";
+import { SegmentSubsequences } from "../../index";
+import { IWordInProgress } from "../../annotation/IWordInProgress";
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
     const startPoint = Math.min(...positionedWords.map(({position}) => position));
@@ -15,36 +14,36 @@ export const textFromPositionedWordsAndAllText = (allText: string, positionedWor
 };
 
 export type AbstractNode = {
-    textContent: string;
+    textContent: string | null;
 }
 
 export type AbstractSegment<T extends AbstractNode> = {
     children: T[];
+    textContent: string | null;
     translatableText: string;
 };
 
-export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
+export const tabulate = <NodeType extends AbstractNode, SegmentType extends AbstractSegment<NodeType>>({
                              notableCharacterSequences,
                              segments,
                              isNotableCharacterRegex,
                              wordIdentifyingStrategy,
                              isWordBoundaryRegex,
-                         }: TabulationParameters<T>): TabulatedSegments<T, U> => {
-    const tabulationObject = tabulationFactory<T, U>();
-    const elementSegmentMap = new Map<U, T>();
+                         }: TabulationParameters<SegmentType>): TabulatedSegments<NodeType, SegmentType> => {
+    const tabulationObject = tabulationFactory<SegmentType, NodeType>();
+    const elementSegmentMap = new Map<NodeType, SegmentType>();
     const isNotableCharacter = (character: string) =>
         isNotableCharacterRegex.test(character);
     const wordSegmentSubsequencesMap = new Map<string, SegmentSubsequences[]>();
     const {
         wordSegmentMap,
         segmentWordCountRecordsMap,
-        atomMetadatas,
         wordElementsMap,
         notableSubSequences
     } = tabulationObject;
 
 
-    const allMarks = flatten(
+    const allMarks: NodeType[] = flatten(
         segments.map((segment) => {
             segment.children.forEach((node) =>
                 elementSegmentMap.set(node, segment),
@@ -52,10 +51,11 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
             return segment.children;
         }),
     ).filter((n) => {
+        const text = n.textContent as string;
         if (wordIdentifyingStrategy === "noSeparator") {
-            return n.textContent.trim();
+            return text.trim();
         }
-        return n.textContent;
+        return text;
     });
     const uniqueLengths = uniq(
         Array.from(notableCharacterSequences.uniqueLengths).concat(1),
@@ -64,7 +64,7 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
         .map((node) => node.textContent)
         .join("");
     let notableSubsequencesInProgress: IWordInProgress[] = [];
-    let currentSegment: T | undefined;
+    let currentSegment: SegmentType | undefined;
     let segmentIndex = -1;
     let currentSegmentStart: number;
     let currentSerialzedSegment: {
@@ -72,10 +72,10 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
         index: number;
     } = {text: "", index: 0};
     for (let i = 0; i < allMarks.length; i++) {
-        const currentMark = allMarks[i];
+        const currentMark: NodeType = allMarks[i];
         const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
-            currentSegment = elementSegmentMap.get(currentMark) as T;
+            currentSegment = elementSegmentMap.get(currentMark) as SegmentType;
             segmentIndex++;
             currentSegmentStart = i;
             currentSerialzedSegment = {
@@ -179,14 +179,14 @@ export const tabulate = <U extends AbstractNode, T extends AbstractSegment<U>>({
             subsequences: positionedWordsInProgress
         };
 
-        const atomMetadata = new AtomMetadata({
+        const atomMetadata = new AtomMetadata<NodeType, SegmentType>({
             char: textContent[i],
             words: segmentSubsequences,
             element: currentMark,
             i,
-            parent: elementSegmentMap.get(currentMark) as T,
+            parent: elementSegmentMap.get(currentMark) as SegmentType,
         });
-        atomMetadatas.set(currentMark, atomMetadata);
+        tabulationObject.atomMetadatas.set(currentMark, atomMetadata);
         atomMetadata.words.subsequences.forEach((word) => {
             if (wordElementsMap[word.word]) {
                 wordElementsMap[word.word].push(atomMetadata);

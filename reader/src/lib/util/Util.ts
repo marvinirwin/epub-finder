@@ -8,6 +8,7 @@ export const cardForWord = async (word: string, language_code: string): Promise<
     photos: [],
     sounds: [],
     known_language: [],
+
 })
 
 /**

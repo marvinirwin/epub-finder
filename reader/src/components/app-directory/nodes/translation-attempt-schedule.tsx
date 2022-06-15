@@ -12,12 +12,10 @@ import { TranslationAttemptScheduleData } from '../../../lib/schedule/translatio
 import { ScheduleRow } from '../../../lib/schedule/schedule-row'
 import { TranslationAttemptScheduleTable } from './translation-attempt-schedule-table.component'
 import {
-    TranslationAttempt,
     TranslationAttemptDataTable,
 } from '../../translation-attempt/translation-attempt.component'
 
 const TranslationAttemptScheduleNode = 'TranslationAttemptScheduleNode'
-const TranslationAttemptNodeLabel = 'TranslationAttemptNodeLabel'
 
 export const TranslationAttemptTableHead: React.FC<{}> = () => {
     return (
@@ -55,7 +53,7 @@ export const TranslationAttemptScheduleTableRow: React.FC<{
                 <Typography>{scheduleRow.recognitionScore()} </Typography>
             </TableCell>
             <TableCell component="th" scope="row">
-                <Typography>{scheduleRow.dueDate()} </Typography>
+                <Typography>{scheduleRow.dueDate().toString()}</Typography>
             </TableCell>
         </TableRow>
     )

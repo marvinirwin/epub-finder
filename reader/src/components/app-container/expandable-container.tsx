@@ -25,6 +25,7 @@ export const ExpandableContainer: React.FC<{
     hideDelay?: number
     resizeObservable$?: Observable<void>
     name?: string
+    children?: React.ReactNode
 }> = ({children, shouldShow, hideDelay, name, resizeObservable$}) => {
     const ref = useRef<HTMLElement | null | undefined>()
     const [styles, setStyles] = useState({})
@@ -68,7 +69,7 @@ export const ExpandableContainer: React.FC<{
     )
 }
 
-export const ExpandOnClick: React.FC<{ label: string }> = (
+export const ExpandOnClick: React.FC<{ label: string, children?: React.ReactNode }> = (
     {children, label}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const divClass = useMemo(() => {

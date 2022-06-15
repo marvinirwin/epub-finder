@@ -24,6 +24,7 @@ ctx.onmessage = async (ev) => {
     } catch (e) {
         ctx.postMessage({
             type: 'error',
+            // @ts-ignore
             errorMessage: `Could not find ${e.toString()}`,
         } as WorkerError)
     }

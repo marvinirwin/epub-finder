@@ -7,7 +7,7 @@ export class RandomColorsService {
         const p = v * (1 - s)
         const q = v * (1 - f * s)
         const t = v * (1 - (1 - f) * s)
-        const resolveRgb = () => {
+        const resolveRgb = (): [number, number, number] => {
             switch (h_i) {
                 case 0:
                     return [v, t, p]
@@ -20,7 +20,8 @@ export class RandomColorsService {
                 case 4:
                     return [t, p, v]
                 case 5:
-                    return [v, p, q]
+                default:
+                    return [v, p, q];
             }
         }
         const [r, g, b] = resolveRgb()

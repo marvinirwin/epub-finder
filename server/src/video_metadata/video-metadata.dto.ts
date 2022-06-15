@@ -1,4 +1,4 @@
-import { VideoMetadata } from "@reader/";
+import { VideoMetadata } from "../shared/video-metadata.interface";
 
 export interface VideoMetadataDto {
     metadata: VideoMetadata;

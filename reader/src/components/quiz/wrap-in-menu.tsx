@@ -1,12 +1,11 @@
 import React from 'react'
 import PopupState, { bindMenu, bindTrigger, bindHover } from 'material-ui-popup-state'
-import HoverMenu from 'material-ui-popup-state/HoverMenu'
-import HoverPopover from 'material-ui-popup-state/HoverPopover'
 import { Button, Menu, MenuItem } from '@material-ui/core'
 
 export const WrapInContext: React.FC<{
     items: string[],
     onClick: (v: string) => unknown,
+  children?: React.ReactNode
 }> = ({
           children,
           items,

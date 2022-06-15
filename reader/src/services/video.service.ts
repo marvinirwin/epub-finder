@@ -1,5 +1,4 @@
-import { VideoMetadata } from '../types/'
-import axios from 'axios'
+import { VideoMetadata } from "@shared/"
 
 async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize('NFC'))

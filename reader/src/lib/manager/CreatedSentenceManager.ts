@@ -44,7 +44,7 @@ export class CreatedSentenceManager {
         )
     }
     async load() {
-        for await (const sentences of this.db.getCardsFromDB({}, 500)) {
+        for await (const sentences of this.db.getCreatedSentencesFromDB()) {
             this.addPersistedCreatedSentence$.next(sentences)
         }
     }

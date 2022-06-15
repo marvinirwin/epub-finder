@@ -25,7 +25,10 @@ export const queryPersistableEntity = <T>(
     ).toString()
 
     return fetch(url.toString())
-        .then(response => response.json())
+        .then(response => {
+          return response.json();
+        })
+      // @ts-ignore
         .then(items => items.map((item: T) => {
             // @ts-ignore
             return parseCreatedAt(item)

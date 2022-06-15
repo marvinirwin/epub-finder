@@ -1,4 +1,4 @@
-export class SpeechSynthesisRequestDto {
+export interface SpeechSynthesisRequestDto {
     voice: string
     rate: number
     text: string

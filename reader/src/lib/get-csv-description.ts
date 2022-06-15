@@ -2,10 +2,10 @@ import {SupportedTranslation} from "../../../server/src/shared/supported-transla
 import {ICard} from "../../../server/src/shared/ICard";
 import {fetchTranslation} from "../services/translate.service";
 import {SegmentSubsequences} from "@shared/*";
-import {IPositionedWord} from "../../../server/src/shared/tabulation/tabulate";
+import {PositionedWord} from "../../../server/src/shared/tabulation/tabulate";
 import {flatten} from "lodash";
 
-function getSegmentTextWithWordsHighlighted(segments: SegmentSubsequences[], targetSubSequences: IPositionedWord[]) {
+function getSegmentTextWithWordsHighlighted(segments: SegmentSubsequences[], targetSubSequences: PositionedWord[]) {
     const textSections: string[] = [];
     segments.forEach(segment => {
         let normalTextStart = 0;

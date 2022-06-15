@@ -3,12 +3,13 @@ import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { mergeMaps } from '../lib/util/map.module'
 import { OpenDocumentsService } from '../lib/manager/open-documents.service'
 import { VisibleService } from '../lib/manager/visible.service'
-import { AtomMetadata } from '../../../server/src/shared/atom-metadata.interface.ts/atom-metadata'
+import { AtomMetadata } from '../../../server/src/shared/atom-metadata/atom-metadata'
 import { XMLDocumentNode } from '../../../server/src/shared/XMLDocumentNode'
 import {
     TabulatedDocuments,
     TabulatedSegments,
 } from '../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
+import { AbstractSegment } from '../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>
 
@@ -31,7 +32,7 @@ export class ElementAtomMetadataIndex {
                         ),
                     ),
                 ),
-                map((tabulations: TabulatedSegments[]) => {
+                map((tabulations: TabulatedSegments<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>[]) => {
                     const m: AtomMetadataMap = new Map()
                     tabulations.forEach((tabulation) =>
                         tabulation.atomMetadatas.forEach((value, key) =>

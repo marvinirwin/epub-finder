@@ -1,4 +1,4 @@
-import {resolveExtFromResponseHeaders} from "./resolve-ext-from-response-headers";
+import {resolveExtFromResponseHeaders} from "@shared/*";
 
 export const toDataUrl = (url: string) => fetch(url)
     .then(response => ({blob: response.blob(), ext: resolveExtFromResponseHeaders(response)}))

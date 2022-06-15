@@ -1,7 +1,7 @@
 import {join} from "path";
-import {resolveExtFromResponseHeaders} from '../../../reader/src/lib/resolve-ext-from-response-headers';
 import {getHashForString} from "../util/getHashForString";
 import fs from "fs";
+import { resolveExtFromResponseHeaders } from "../shared/resolve-ext-from-reponse-headers";
 const fsPromises = fs.promises;
 const fetch = require('node-fetch');
 

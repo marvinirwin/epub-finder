@@ -32,16 +32,16 @@ export class Document {
     @Column()
     global: boolean
 
-    @Column({ default: false })
+    @Column({ default: false, type: "bool" })
     for_testing = false
 
-    @Column({ default: false })
+    @Column({ default: false, type: "bool"  })
     for_frequency = false
 
-    @Column({ default: true })
+    @Column({ default: true, type: "bool"  })
     for_reading = true
 
-    @Column({ default: false })
+    @Column({ default: false, type: "bool" })
     deleted = false
 
     @CreateDateColumn({type: "timestamp with time zone"})

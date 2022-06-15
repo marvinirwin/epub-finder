@@ -10,6 +10,7 @@ import uniqueBy from '@popperjs/core/lib/utils/uniqueBy'
 import JSZip from 'jszip'
 import { SerializeCardForCsv } from '@shared/'
 import { fetchSynthesizedAudio } from '../audio/fetch-synthesized-audio'
+import { CsvCard } from '../../../../server/src/shared/csv-card.interface'
 
 export class CsvService {
     csvAndZip$: Observable<{ csvRows: CsvCard[], zip: JSZip }>

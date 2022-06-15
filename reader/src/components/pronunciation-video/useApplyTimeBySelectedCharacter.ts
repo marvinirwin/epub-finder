@@ -1,8 +1,7 @@
-import { useContext, useEffect } from 'react'
-import { VideoCharacter } from './video-character.interface'
-import { VideoMetadata } from '../../types/'
+import { useContext } from 'react'
 import { useSubscription } from 'observable-hooks'
 import { ManagerContext } from '../../App'
+import { VideoMetadata } from '@shared/'
 
 export function useApplyTimeBySelectedCharacter(
     videoElementRef: HTMLVideoElement | null | undefined,

@@ -97,11 +97,11 @@ export class AtomizedDocument {
     static getDomParser() {
         return new DOMParser({
             errorHandler: {
-                warning: (w) => {
+                warning: () => {
                 },
-                error: (w) => {
+                error: () => {
                 },
-                fatalError: (w) => {
+                fatalError: (w: Error) => {
                     throw w;
                 },
             },
@@ -144,7 +144,7 @@ export class AtomizedDocument {
         }
 
         walk(doc, (node: Node) => {
-            const text = node.textContent.trim();
+            const text = (node.textContent as string).trim();
             if (text) {
                 // @ts-ignore
                 leaves.push(node);
@@ -154,7 +154,7 @@ export class AtomizedDocument {
     }
 
     convertTextNodeToAtomizedSegments(textNode: Element): XMLDocumentNode {
-        const text = textNode.nodeValue;
+        const text = textNode.nodeValue as string;
         const subSegmentTextList = text
             .split(segmentBoundaryRegexp)
             .filter((t) => !!t.trim())
@@ -185,8 +185,8 @@ export class AtomizedDocument {
     ) {
         const indexOfMe = getIndexOfEl(textNode);
         // If we remove ourselves and we're not already there, I think things go weird
-        if (Array.from(textNode.parentNode.childNodes).includes(textNode)) {
-            textNode.parentNode.removeChild(textNode);
+        if (Array.from((textNode.parentNode as ParentNode).childNodes).includes(textNode)) {
+            (textNode.parentNode as ParentNode).removeChild(textNode);
         }
         const newParent = this.document.createElement("span");
         newSubStrings.forEach((string, index) => {
@@ -198,12 +198,11 @@ export class AtomizedDocument {
             mark.insertBefore(textNode, null);
             newParent.insertBefore(mark, null);
         });
-        const oldParent = textNode.parentNode;
+        const oldParent = textNode.parentNode as ParentNode;
         oldParent.insertBefore(
             newParent,
-            oldParent.childNodes.length
-                ? oldParent.childNodes[indexOfMe]
-                : null,
+            // @ts-ignore
+            oldParent.childNodes.length ? oldParent.childNodes[indexOfMe] : null,
         );
         return newParent;
     }
@@ -243,9 +242,33 @@ export class AtomizedDocument {
 
     segments(): Segment[] {
         try {
-            const segmentElements = this.document.getElementsByClassName(
-                annotatedAndTranslated,
-            );
+            let segmentElements: XMLDocumentNode[] = [];
+            if (this.document.getElementsByClassName) {
+                // @ts-ignore
+                segmentElements = this.document.getElementsByClassName(
+                  annotatedAndTranslated,
+                );
+            } else {
+                const walk = (node: Node) => {
+                    let child, next;
+                    // @ts-ignore
+                    const attributes = node?.attributes;
+                    const className = attributes?.getNamedItem("class");
+                    if (className?.value?.includes(annotatedAndTranslated)) {
+                        // @ts-ignore
+                        segmentElements.push(node);
+                    }
+                    child = node.firstChild;
+                    while (child) {
+                        next = child.nextSibling;
+                        walk(child);
+                        child = next;
+                    }
+                };
+                walk(this.document);
+            }
+
+
             const atomized = new Array(segmentElements.length);
             for (let i = 0; i < segmentElements.length; i++) {
                 const segmentElement = segmentElements[i];
@@ -261,7 +284,7 @@ export class AtomizedDocument {
 
     headInnerHTML() {
         const head = this.findHead();
-        return new XMLSerializer().serializeToString(head);
+        return new XMLSerializer().serializeToString(head as Node);
     }
 
     findHead() {

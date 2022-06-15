@@ -59,8 +59,8 @@ export class TabulationService {
                         syntheticWords.add(temporaryHighlightRequest?.word);
                     }
                 */
-                const vocabulary = new Set(builtInWords)
-                const wordCountMap = new Map<string, DocumentWordCount[]>()
+                const vocabulary = new Set(builtInWords);
+                const wordCountMap = new Map<string, DocumentWordCount[]>();
                 new SerializedTabulationAggregate(
                     selectedFrequencyVirtualTabulations,
                 ).serializedTabulations.forEach(
@@ -74,7 +74,7 @@ export class TabulationService {
                         const documentWordCounts = sumNotableSubSequences(
                             combineSegmentSubSequences(notableSubSequences.map(notableSubSequence => getNotableSubsequencesOfWords(notableSubSequence, syntheticWords, strategy, vocabulary)))
                             ,
-                        )
+                        );
                         documentWordCounts.forEach(
                             (count, word) => {
                                 /**

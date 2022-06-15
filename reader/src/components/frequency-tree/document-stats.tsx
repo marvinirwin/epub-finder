@@ -12,9 +12,10 @@ const hsk1Words = hsk1Array.map(({ hanzi }) => hanzi)
 const hsk1WordSet = new Set(hsk1Words)
 const hsk1Characters = new Set(flatten(hsk1Words))
 
-export const DocumentStats: React.FunctionComponent<{
+export const DocumentStats: React.FC<{
     m: Manager
-    b: OpenDocument
+    b: OpenDocument,
+  children?: React.ReactNode
 }> = ({ children, m, b }) => {
     const atomizedDocument = useObservableState(b.atomizedDocument$)
     const characterCounts: ds_Dict<number> = {}

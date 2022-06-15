@@ -1,14 +1,17 @@
 import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { Dictionary } from 'lodash'
-import { AtomMetadata } from '../../../server/src/shared/atom-metadata.interface.ts/atom-metadata'
+import { AtomMetadata } from '../../../server/src/shared/atom-metadata/atom-metadata'
 import { XMLDocumentNode } from '../../../server/src/shared/XMLDocumentNode'
 import { VisibleService } from '../lib/manager/visible.service'
 import { ElementAtomMetadataIndex } from './element-atom-metadata.index'
 import { Segment, safePushMapSet, safePushSet } from '@shared/'
+import { AbstractSegment } from '../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
+
+export type BrowserAtomMetadata = AtomMetadata<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>;
 
 export class WordMetadataMapService {
-    public visibleWordMetadataMap$: Observable<Dictionary<Set<AtomMetadata>>>
+    public visibleWordMetadataMap$: Observable<Dictionary<Set<BrowserAtomMetadata>>>
     public visibleWordSegmentMap: Observable<Map<string, Set<Segment>>>
 
     constructor({
@@ -23,7 +26,7 @@ export class WordMetadataMapService {
             aggregateElementIndexService.index$,
         ]).pipe(
             map(([elementsInView, elementIndex]) => {
-                const map = {} as Dictionary<Set<AtomMetadata>>
+                const map = {} as Dictionary<Set<BrowserAtomMetadata>>
                 elementsInView.forEach((elementInView) => {
                     const metadata = elementIndex.get(
                         (elementInView as unknown) as XMLDocumentNode,
