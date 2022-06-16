@@ -8,9 +8,10 @@ import { QuizCardButtons } from "./quiz-card-buttons.component";
 import { NoScheduleRows } from "./no-schedule-rows.component";
 import { RevealedQuizCard } from "./card-types/revealed-quiz-card.component";
 import { UnRevealedQuizCardComponent } from "./card-types/un-revealed-quiz-card.component";
-import { EmittedValues, useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
+import { useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
 import { LimitedScheduleRows } from "../../lib/manager/limit-schedule-rows.type";
 import { useConcatArray } from "../../lib/util/useConcatArray";
+import { EmittedValues } from "../UseVisilbleObservableState/EmittedValues.component";
 
 
 export const useActiveFlashCardTypes = () => {
