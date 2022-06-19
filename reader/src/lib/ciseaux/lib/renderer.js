@@ -1,8 +1,7 @@
 'use strict'
-/* eslint import/no-webpack-loader-syntax:0 */
-const RenderWorker = require('Worker-loader?name=dist/[name].js!./render-worker')
 
-const worker = new RenderWorker()
+// @ts-ignore
+const worker = new Worker(new URL("./render-worker.js", import.meta.url))
 var __callbacks = []
 var __data = 1 // data 0 is reserved for silence
 

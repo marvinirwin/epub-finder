@@ -19,32 +19,35 @@ import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
 
 export type WorkerError = { errorMessage: string }
 
-export const AtomizeHtml = (HTMLString: AtomizeSrcDocParams) =>
-    GetWorkerResults<string | WorkerError>(
-        new AtomizeSrcdocWorker(),
-        HTMLString,
-    ).then(handleWorkerError)
+export const AtomizeHtml = (HTMLString: AtomizeSrcDocParams) => {
+    return GetWorkerResults<string | WorkerError>(
+      new Worker(new URL("atomized-document-from-url.worker.ts", import.meta.url)),
+      HTMLString
+    ).then(handleWorkerError);
+}
 
 export const AtomizeUrl = async (url: AtomizedDocumentFromUrlParams) => {
-    return GetWorkerResults<string | WorkerError>(new AtomizeUrlWorker(), url)
+    return GetWorkerResults<string | WorkerError>(new Worker(new URL('./atomized-document-from-url.worker.ts', import.meta.url)), url)
         .then(handleWorkerError)
 }
 
-export const TabulateRemoteDocument = async (dto: TabulateRemoteDocumentDto) =>
-    GetWorkerResults<SerializedTabulation>(
-        new TabulateRemoteDocumentWorker(),
-        dto,
+export const TabulateRemoteDocument = async (dto: TabulateRemoteDocumentDto) => {
+    return GetWorkerResults<SerializedTabulation>(
+      new Worker(new URL("./tabulate-remote-document.worker.ts", import.meta.url)),
+      dto
     ).then((result: SerializedTabulation) => {
-        return result
-    })
+        return result;
+    });
+}
 
-export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) =>
-    GetWorkerResults<SerializedDocumentTabulation>(
-        new TabulateLocalDocumentWorker(),
-        dto,
+export const TabulateLocalDocument = async (dto: TabulateLocalDocumentDto) => {
+    return GetWorkerResults<SerializedDocumentTabulation>(
+      new Worker(new URL("./tabulate-local-document.worker.ts", import.meta.url), ),
+      dto
     ).then((result: SerializedDocumentTabulation) => {
-        return result
-    })
+        return result;
+    });
+}
 
 export const AtomizeUrlKey = (url: string) => `ATOMIZED_URL_${url}`
 
