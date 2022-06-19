@@ -11,7 +11,7 @@ import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-doc
 import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
 import {
     SerializedSegment,
-    IPositionedWord,
+    PositionedWord,
 } from '../../../../server/src/shared/tabulation/tabulate'
 import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
 
@@ -31,6 +31,7 @@ ctx.onmessage = async (ev) => {
     }: TabulateLocalDocumentDto = ev.data
     const doc = AtomizedDocument.fromAtomizedString(src)
     const segments = doc.segments()
+    debugger;
     const tabulated = tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),
         notableCharacterSequences: new SetWithUniqueLengths(

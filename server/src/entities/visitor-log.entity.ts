@@ -6,7 +6,7 @@ export class VisitorLog {
     id: number | undefined
 
     @Column()
-    ip = ""
+    ip: string  = ""
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     timestamp: Date = new Date()

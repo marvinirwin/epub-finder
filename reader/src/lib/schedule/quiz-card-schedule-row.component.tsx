@@ -10,6 +10,10 @@ import {
 import { QuizCardField } from '../quiz/hidden-quiz-fields'
 import { useLoadingObservableString } from '../util/create-loading-observable'
 import {DictionaryDefinition} from "../../components/quiz/card-types/dictionary-definition.component";
+import { useVisibleObservableState} from "../../components/UseVisilbleObservableState/UseVisibleObservableState";
+import { LimitedScheduleRows } from "../manager/limit-schedule-rows.type";
+import { useConcatArray } from '../util/useConcatArray'
+import { EmittedValues } from "../../components/UseVisilbleObservableState/EmittedValues.component";
 
 export const QuizCardScheduleRowDisplay = ({
     quizCard,
@@ -19,18 +23,23 @@ export const QuizCardScheduleRowDisplay = ({
     const description = useObservableState(quizCard.description$.value$)
     const romanization = useLoadingObservableString(quizCard.romanization$, '')
     const translation = useLoadingObservableString(quizCard.translation$, '')
+    const emittedTranslations = useVisibleObservableState(quizCard.translation$.obs$, (t) => `quizCard.translation$.obs$: ${t}`);
+    const emittedRomanizations = useVisibleObservableState(quizCard.romanization$.obs$, (t) => `quizCard.romanizations$.obs$: ${t}`);
+    const emittedDescriptions = useVisibleObservableState(quizCard.description$.value$, (t) => `quizCard.description$.value$.obs$: ${t}`);
+
     const word = useObservableState(quizCard.word$) || '';
     return (
-        <div>
+        <div style={{position: 'absolute'}}>
+            <EmittedValues emittedValues={useConcatArray(emittedTranslations, emittedRomanizations, emittedDescriptions)}/>
             <div style={{ marginTop: '24px' }}>
                 <Typography variant="h4" className={quizCardRomanization}>
                     {romanization}
                 </Typography>
                 <br />
+                <DictionaryDefinition word={word}/>
                 <Typography variant="h4" className={quizCardTranslation}>
                     {translation}
                 </Typography>
-                <DictionaryDefinition word={word}/>
             </div>
             <div style={{ marginTop: '24px', marginBottom: '24px', display: 'flex' }}>
                 {

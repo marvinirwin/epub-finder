@@ -4,11 +4,10 @@ import { useObservableState } from 'observable-hooks'
 import { Box, Typography } from '@material-ui/core'
 import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWordsLeftForTodayNumber } from '@shared/'
 import { WrapInContext } from './wrap-in-menu'
-import { isToday } from 'date-fns'
 import {LimitedScheduleRows} from "../../lib/manager/limit-schedule-rows.type";
 import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 
-const WordCountInButton: React.FC<{ scheduleRows: SpacedScheduleRow[], className?: string }> = (
+const WordCountInButton: React.FC<{ children?: React.ReactNode, scheduleRows: SpacedScheduleRow[], className?: string }> = (
     {
         scheduleRows,
         className,

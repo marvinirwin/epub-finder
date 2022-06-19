@@ -20,7 +20,8 @@ export function streamToString(stream): Promise<string> {
 function segmentFromTextFactory(text: string[]) {
     return text.map(text => ({
         translatableText: text,
-        children: text.split("").map(character => ({textContent: character}))
+        children: text.split("").map(character => ({textContent: character})),
+        textContent: text
     }));
 }
 

@@ -44,7 +44,7 @@ export class RequestRecordingService {
         )
         await axios
             .post(
-                `${process.env.PUBLIC_URL}/record-request`,
+                `${process.env.PUBLIC_URL}/api/record-request`,
                 submittingSentences,
             )
             .then((response) =>
@@ -61,7 +61,7 @@ export class RequestRecordingService {
 
     async fetchAllRecordRequests() {
         return axios
-            .get(`${process.env.PUBLIC_URL}/record-request`)
+            .get(`${process.env.PUBLIC_URL}/api/record-request`)
             .then(
                 (response) =>
                     response?.data &&

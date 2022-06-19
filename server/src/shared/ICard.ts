@@ -1,4 +1,4 @@
-import { Card } from "src/entities/card.entity";
+import { Card } from "../entities/card.entity";
 
 export type ICard = Card;
 
@@ -22,14 +22,12 @@ export async function resolveMediaSources(
 
 export function getIsMeFunction(c1: ICard) {
     return ({
-        deck,
-        learningLanguage,
+        learning_language,
         id,
     }: {
-        deck: string | undefined;
-        learningLanguage: string;
-        id?: string | undefined;
+        learning_language: string;
+        id?: string;
     }) =>
         (c1.id && c1.id === id) ||
-        (c1.learning_language === learningLanguage);
+        (c1.learning_language === learning_language);
 }

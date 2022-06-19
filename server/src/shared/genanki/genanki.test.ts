@@ -2,10 +2,12 @@ import { Card } from "src/entities/card.entity";
 import { Package } from "./package";
 import { Deck } from "./deck";
 import { Note } from "./note";
-import { defaultModel } from "./default";
-import fetch from "node-fetch";
-
+import { Model } from "./model";
+const fetch = require("node-fetch");
 const apiUrl = "http://localhost:8765";
+
+// I think models just need to have some constant id when they're inserted
+const testId = 1234;
 
 /**
  * Currently the notes are the default model, in the future they'll use a more complex model for
@@ -24,19 +26,46 @@ const getAnkiNotes = async (
     photoDownloader: (card: Card) => Promise<string>;
   }) => {
   const notes = [];
-  for (let i = 0;cards.length; i++) {
+  for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
-    notes.push(new Note(defaultModel, [
+    notes.push(new Note(new Model({
+      flds: [{name: 'test', ord: 0}],
+      tmpls: [{}],
+      id: testId,
+      req: [],
+      }), [
         card.learning_language,
         await dictionaryDefinitionResolver(card.learning_language)
-      ]
+      ],
+      ['test tag'],
+      Math.ceil(Math.random()*100000000).toString(),
     ));
   }
   return notes;
 };
+const importAnkiDeckToLocalAnkiConnect = async (path: string) => {
+  const body = JSON.stringify({ "action": "importPackage", "version": 6, "params": { "path": path } });
+  await fetch(apiUrl, { method: "POST", body });
+};
+const getDeckList = async (cards) => {
+  const body = JSON.stringify({
+    "action": "getDecks",
+    "version": 6,
+    "params": { "cards": cards }
+  });
+  const response = await fetch(apiUrl, { method: "POST", body });
+  const result = await response.json();
+  return result;
+};
+const getDeckNames = async () => {
+  const body = JSON.stringify({ action: "deckNames", version: 6 });
+  const response = await fetch(apiUrl, { method: "POST", body });
+  const result = await response.json();
+  return result;
+}
+
 describe("Generating anki decks", () => {
-  it("Is able to ping anki-connect", async () => {
-    /**
+  /**
      * To make these tests pass, it's required that Anki and anki-connect are both installed
      * Anki is a flashcard reviewing program which you install on our computer https://apps.ankiweb.net/
      * AnkiConnect is an addon for that program, which makes the program list for http requests https://ankiweb.net/shared/info/2055492159
@@ -45,32 +74,31 @@ describe("Generating anki decks", () => {
      * I think the way to import a package is POST http://127.0.0.1:8765 { "action": "importPackage", "version": 6, "params": { "path": "/data/Deck.apkg" } }
      * tip: use node-fetch to make HTTP requests, it's got the same interface as browser fetch
      */
-    const ankiPackage = new Package();
-    const deck = new Deck("id", "test");
-    ankiPackage.addDeck(deck);
-    ankiPackage.writeToFile("test.apkg");
 
-    const importAnkiDeckToLocalAnkiConnect = () => {
-      const body = JSON.stringify({ "action": "importPackage", "version": 6, "params": { "path": "/data/Deck.apkg" } });
-      fetch(apiUrl, { method: "POST", body });
-    };
-    const getDeckList = async () => {
-      const body = JSON.stringify({
-        "action": "getDecks",
-        "version": 6,
-        "params": { "cards": [1502298036657, 1502298033753, 1502032366472] }
-      });
-      const response = await fetch(apiUrl, { method: "POST", body });
-      const result = await response.json();
-      return result;
-    };
+  it("Is able to ping anki-connect", async () => {
+    // creates a test deck to see if a successful connection is made
+    const createDeckBody = JSON.stringify({ action: "createDeck", version: 6, params: { deck: "jest_test_deck" } });
+    await fetch(apiUrl, { method: "POST", body: createDeckBody });
+    const data = await getDeckNames();
 
-    importAnkiDeckToLocalAnkiConnect();
-    const deckList = await getDeckList();
-    const defaultCards = deckList.result.Default;
-    expect(defaultCards).toContain(1502298036657);
-    expect(defaultCards).toContain(1502298033753);
-    expect(defaultCards).toContain(1502032366472);
+    expect(data.result).toContain("jest_test_deck");
+
+    // The "deleteDecks" action doesn't seem to work, it looks like there is an issue with the anki-connect implementation of "deleteDecks"
+    /*
+    // deletes the test deck
+    const deleteDecksBody = JSON.stringify({
+      action: "deleteDecks",
+      version: 6,
+      params: {
+        decks: ["jest_test_deck"],
+        cardsToo: true
+      }
+    });
+    await fetch(apiUrl, { method: "POST", body: deleteDecksBody });
+    const deckNames = await getDeckNames();
+
+    expect(deckNames.result).not.toContain("jest_test_deck");
+    */
   });
 
   it("Generates anki decks from cards", async () => {
@@ -111,7 +139,13 @@ describe("Generating anki decks", () => {
     const ankiPackage = new Package();
     ankiPackage.addDeck(deck);
     ankiPackage.writeToFile("unit-test.apkg");
+
     // And POST this to the anki-connect instance and verify it exists
+    await importAnkiDeckToLocalAnkiConnect(__dirname+"\\unit-test.apkg");
+    const deckList = await getDeckList(["f7025165-737e-43fd-ad31-9630ddefc96b", "168f34dc-df7c-4518-9bad-121250a32611"]);
+    const defaultCards = deckList.result.Default;
+    expect(defaultCards).toContain("f7025165-737e-43fd-ad31-9630ddefc96b");
+    expect(defaultCards).toContain("168f34dc-df7c-4518-9bad-121250a32611");
   });
 
   it("Inserts decks with a custom model", async () => {

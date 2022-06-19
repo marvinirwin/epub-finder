@@ -1,8 +1,7 @@
 import { useObservableState } from 'observable-hooks'
-import { of } from 'rxjs'
-import { VideoMetadata } from '../../types/'
 import { ManagerContext } from '../../App'
 import { useContext } from 'react'
+import { VideoMetadata } from '@shared/'
 
 export const useVideoMetaData = (
     sentence: string | undefined,

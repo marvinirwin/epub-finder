@@ -11,7 +11,7 @@ export class LeaderBoardService {
         this.leaderBoard = createLoadingObservable(
             this.fetchLoaderBoardSignal$,
             () => axios
-                .get(`${process.env.PUBLIC_URL}/leader-board`)
+                .get(`${process.env.PUBLIC_URL}/api/leader-board`)
                 .then((response) => (response?.data as LeaderBoardDto) )
             ,
         );

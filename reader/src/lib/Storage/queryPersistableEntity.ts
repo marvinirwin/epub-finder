@@ -15,7 +15,7 @@ export const queryPersistableEntity = <T>(
             take?: number
         },
 ): Promise<T[]> => {
-    const url1 = `${window.location.origin}/entities/${entity}`
+    const url1 = `${window.location.origin}/api/entities/${entity}`
     const url = new URL(url1)
     url.search = new URLSearchParams({
             where: where ? JSON.stringify(where) : '{}',
@@ -25,7 +25,10 @@ export const queryPersistableEntity = <T>(
     ).toString()
 
     return fetch(url.toString())
-        .then(response => response.json())
+        .then(response => {
+          return response.json();
+        })
+      // @ts-ignore
         .then(items => items.map((item: T) => {
             // @ts-ignore
             return parseCreatedAt(item)

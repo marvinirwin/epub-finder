@@ -8,6 +8,7 @@ import {
 } from 'rxjs/operators'
 import { HighlightDelta } from '../lib/highlighting/highlight.interface'
 import { WordMetadataMapService } from './word-metadata-map.service'
+import { VideoCharacter, VideoMetadata } from "@shared/";
 
 export class HighlightPronunciationVideoService {
     constructor({
@@ -28,7 +29,7 @@ export class HighlightPronunciationVideoService {
                 }
                 // TODO binary search
                 return metadata.characters.findIndex(
-                    (char) =>
+                    (char: VideoCharacter) =>
                         playbackTimeMs < char.timestamp * metadata.timeScale,
                 )
             }),

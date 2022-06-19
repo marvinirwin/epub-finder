@@ -32,7 +32,7 @@ export class SpeechRecognitionConfigService {
 
     private static async loadToken() {
         return axios
-            .post(`${process.env.PUBLIC_URL}/speech-recognition-token`)
+            .post(`${process.env.PUBLIC_URL}/api/speech-recognition-token`)
             .then((result) => result.data)
     }
 }

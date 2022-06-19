@@ -3,16 +3,20 @@ import { XMLDocumentNode } from "../../XMLDocumentNode";
 export class Segment {
     _translation: string | undefined
     translatableText: string
-    popperElement: XMLDocumentNode
+    popperElement: XMLDocumentNode  | undefined
     translated = false
     element: XMLDocumentNode
-    translationCb: (s: string) => void | undefined
+    translationCb: (s: string) => void | undefined = () => {
+        throw new Error("Translation CB not initialized");
+    }
     documentId: string;
+    textContent: string;
 
     constructor(element: XMLDocumentNode) {
         this.element = element;
-        this.documentId = this.element.getAttribute("documentId");
+        this.documentId = this.element.getAttribute("documentId") as string;
         this.translatableText = this.element.textContent || "";
+        this.textContent = this.translatableText;
     }
 
     getSentenceHTMLElement(): HTMLElement {
@@ -22,7 +26,7 @@ export class Segment {
 
     async getTranslation(): Promise<string> {
         if (this.translated) {
-            return this._translation;
+            return this._translation as string;
         } else {
             this.translated = true;
             return this.translatableText;
@@ -31,7 +35,7 @@ export class Segment {
 
     destroy() {
         this.element.parentNode.removeChild(this.element);
-        this.popperElement.parentNode.removeChild(this.popperElement);
+        this.popperElement && this.popperElement.parentNode.removeChild(this.popperElement);
     }
 
     get children(): XMLDocumentNode[] {

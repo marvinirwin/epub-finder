@@ -54,7 +54,7 @@ export const RequestRecordingSentences = () => {
         m.requestRecordingService.allRecordRequestsSubmitted,
     )
     const toggleSentenceSelected = useCallback(
-        (sentence) => {
+        (sentence: string) => {
             m.requestRecordingService.recordRequestSentences$.next(
                 selectedSentenceMap &&
                     new Map(

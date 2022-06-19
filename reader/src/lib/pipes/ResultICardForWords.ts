@@ -14,7 +14,7 @@ export const resolveICardForWords = (
             return words.map((word) =>
                 cardIndex[word]?.length
                     ? cardIndex[word][0]
-                    : cardForWord(word, readingLanguageCode),
+                    : cardForWord(word, readingLanguageCode) as unknown as ICard,
             )
         }),
     )

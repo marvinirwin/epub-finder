@@ -146,7 +146,7 @@ export default class CardsRepository {
         }
         // tslint:disable-next-line:variable-name
         const language_code = await observableLastValue(this.languageConfigsService.readingLanguageCode$)
-        return cardForWord(word, language_code)
+        return await cardForWord(word, language_code) as unknown as ICard;
     }
 
     async load() {

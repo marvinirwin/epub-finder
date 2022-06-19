@@ -1,15 +1,10 @@
 import {
-    Divider,
-    List,
     ListItem,
-    ListItemIcon,
-    ListItemText,
 } from '@material-ui/core'
-import React, { Fragment, useContext } from 'react'
+import React, { Fragment } from 'react'
 import { ArrowBack } from '@material-ui/icons'
-import { ds_Tree, treeValue, walkTree } from '../../services/tree.service'
+import { ds_Tree, walkTree } from '../../services/tree.service'
 import { TreeMenuNode } from '../app-directory/tree-menu-node.interface'
-import { ManagerContext } from '../../App'
 import { TreeMenuNodeItem } from './tree-menu-node-item.component'
 import IconButton from '@material-ui/core/IconButton'
 import { flattenTree } from '../../lib/delta-scan/delta-scan.module'
@@ -22,6 +17,7 @@ export const TreeMenu: React.FunctionComponent<{
     directoryChanged: (s: string[]) => void
     componentChanged: (s: string[]) => void
     actionSelected: (s: string[]) => void
+    children?: React.ReactNode
 }> = ({
     title,
     tree,

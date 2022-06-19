@@ -1,11 +1,10 @@
 import { ReplaySubject } from 'rxjs'
-import { take } from 'rxjs/operators'
-import { cloneDeep, orderBy } from 'lodash'
+import { orderBy } from 'lodash'
 import { PronunciationVideoService } from '../components/pronunciation-video/pronunciation-video.service'
-import { VideoMetadata } from '../types/index'
 import axios from 'axios'
 import { debounce } from 'lodash'
-import { VideoMetadataDto } from '@server/'
+import { VideoMetadataDto } from '@shared/'
+import { VideoMetadata } from '@shared/'
 
 export class EditingVideoMetadataService {
     public editingCharacterIndex$ = new ReplaySubject<number | undefined>(1)
@@ -57,6 +56,6 @@ export class EditingVideoMetadataService {
     }
 
     private static async saveMetadata(metadata: VideoMetadataDto) {
-        await axios.put(`${process.env.PUBLIC_URL}/video_metadata`, metadata)
+        await axios.put(`${process.env.PUBLIC_URL}/api/video_metadata`, metadata)
     }
 }

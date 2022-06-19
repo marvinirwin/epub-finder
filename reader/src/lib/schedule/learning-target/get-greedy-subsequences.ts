@@ -1,5 +1,5 @@
 import {SegmentSubsequences} from "@shared/*";
-import {IPositionedWord} from "../../../../../server/src/shared/Annotation/IPositionedWord";
+import {IPositionedWord} from "@shared/";
 import {groupBy} from "lodash";
 
 export const getGreedySubSequences = (subSequences: SegmentSubsequences): SegmentSubsequences => {

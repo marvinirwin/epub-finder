@@ -8,7 +8,6 @@ import { TypeormStore } from "typeorm-store";
 import passport from "passport";
 import { SessionService } from "./session/session.service";
 import session from "express-session";
-import {CliService} from "./cli/cli.service";
 
 config({ path: ".env" });
 

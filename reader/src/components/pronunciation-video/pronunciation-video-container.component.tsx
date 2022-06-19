@@ -5,7 +5,7 @@ import { Card } from '@material-ui/core'
 import { CharacterTimingSectionComponent } from './character-timing-section.component'
 import { useChunkedCharacterTimings } from './useChunkedCharacterTimings'
 import { PronunciationVideo } from './pronunciation-video.component'
-import { useDebouncedFn, useResizeObserver } from 'beautiful-react-hooks'
+import { useResizeObserver } from 'beautiful-react-hooks'
 import { PronunciationSection } from './pronunciation-section'
 import { PlaybackSpeedComponent } from '../app-directory/playback-speed.component'
 import { useHighlightBarPositionPercentage } from './useSetHighlightBarPositionPercentage'
@@ -119,7 +119,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
                     videoMetadata &&
                     sectionLengthMs &&
                     chunkedCharacterTimings.map(
-                        (chunkedCharacterTiming, lineIndex) => {
+                        (chunkedCharacterTiming, lineIndex: number) => {
                             const section = new PronunciationSection({
                                 sectionLengthMs,
                                 lineIndex,

@@ -3,7 +3,7 @@ import { Box, Container, Paper, Typography } from '@material-ui/core'
 import { introAddLearningMaterial } from '@shared/'
 import { UploadText } from '../upload/upload-text.component'
 
-export const IntroAddLearningMaterial: React.FC = ({ children }) => {
+export const IntroAddLearningMaterial: React.FC<{children?: React.ReactNode}> = ({ children }) => {
     return (
         <Container id={introAddLearningMaterial} style={{ flex: 1 }}>
             <Paper>

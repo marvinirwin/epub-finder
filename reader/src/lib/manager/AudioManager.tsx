@@ -58,12 +58,17 @@ export function makeCancelable<T>(promise: Promise<T>) {
 export const RecognizedTextComponent = (
     recognizedText: string,
 ): React.FC => () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const m = useContext(ManagerContext)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [romanization, setRomanization] = useState<string>('')
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { cancellablePromise } = useCancellablePromise()
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const currentRomanizationFn = useObservableState(
         m.languageConfigsService.learningToLatinTransliterateFn$,
     )
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         if (currentRomanizationFn) {
             cancellablePromise(
