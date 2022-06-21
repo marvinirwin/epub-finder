@@ -11,4 +11,5 @@ server/package-lock.json
 server/public/video/
 server/src/subtitles/
 dashboar-store*
+server/.dev_wav_cache
 

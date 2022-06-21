@@ -12,7 +12,7 @@ export interface TranslateConfig {
 
 export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
-            .post(`${process.env.PUBLIC_URL}/translate`, t)
+            .post(`${process.env.PUBLIC_URL}/api/translate`, t)
             .then((response) => (response?.data?.translation as string) || ''),
     {
         promise: true,
