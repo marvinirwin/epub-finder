@@ -1,7 +1,6 @@
 import { Observable } from "rxjs";
 import React, { useEffect, useState } from "react";
 import { useSubscription } from "observable-hooks";
-import { EmittedValues } from "./EmittedValues.component";
 
 let idCounter = 0;
 export type EmittedValue<U> = { id: number, value: U, formatFn?: (t: U) => string };
@@ -26,13 +25,5 @@ export const useVisibleObservableState = <U, T extends Observable<U> = Observabl
 
   });
   return emittedValues;
-};
-
-export const EmittedValuesWithRef = (
-  {
-    ref,
-    emittedValues
-  }: { ref: HTMLElement | null, emittedValues: EmittedValue<any>[] }) => {
-  return ref ? <EmittedValues emittedValues={emittedValues} style={{top: ref.clientTop, left: ref.clientLeft}}/> : null
 };
 

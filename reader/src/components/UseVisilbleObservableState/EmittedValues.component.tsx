@@ -1,15 +1,51 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ShowObservableContext } from "../main";
-import { EmittedValue } from "./UseVisibleObservableState";
+import { EmittedValuesProps } from "./EmittedValuesProps";
+
+const defaultLinesVisible = 8;
+
+
+export function getJSONLocalStorageValue<T>(key: string, defaultValue: T) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key) || "");
+    return v;
+  } catch(e) {
+    return defaultValue;
+  }
+}
+
+function getLinesVisibleKey(key: string) {
+  return `EMITTED_VALUES_LINES_VISIBLE_${key}`;
+}
+
+export const getLinesVisible = (key: string) => {
+  const linesVisibleKey = getLinesVisibleKey(key);
+  return getJSONLocalStorageValue<number>(linesVisibleKey, defaultLinesVisible);
+}
 
 export const EmittedValues = ({
                                 emittedValues,
-                                style
-                              }: { emittedValues: EmittedValue<any>[], style?: Record<string, any> }) => {
+                                style,
+                                key
+                              }: EmittedValuesProps) => {
   const showObservables = useContext(ShowObservableContext);
-  return showObservables ? <ol style={{ position: "absolute", backgroundColor: "lightgrey", borderRadius: 5, padding: 24, ...(style || {}) }}>
-    {emittedValues.map(({ id, value, formatFn }) => <li
-      style={{lineHeight: '20px'}}
-      key={id}>{formatFn ? formatFn(value) : value ? `${value}` : `${id}`}</li>)}
-  </ol> : null;
+  const [ linesVisible, setLinesVisible ] = useState<number>(getLinesVisible(key))
+  {/* TODO add an expand button  */}
+  const onClickSetLinesVisible = (n: number) => {
+    setLinesVisible(n);
+    localStorage.setItem(getLinesVisibleKey(key), JSON.stringify(n))
+  }
+  return showObservables ?
+    <div>
+      <ol style={{ position: "absolute", backgroundColor: "lightgrey", borderRadius: 5, padding: 24, ...(style || {}) }} >
+      {emittedValues.slice(0, linesVisible ).map(({ id, value, formatFn }) => <li
+        style={{ lineHeight: "20px" }}
+        key={id}>{formatFn ? formatFn(value) : value ? `${value}` : `${id}`}</li>)}
+    </ol>
+      <button onClick={() => {
+        onClickSetLinesVisible(linesVisible + 1)
+      }
+      }>Add 1 more line </button>
+      <button onClick={() => onClickSetLinesVisible(linesVisible - 1 >= 0 ? linesVisible - 1 : 0)}>Hide 1 more line</button>
+    </div> : null;
 };

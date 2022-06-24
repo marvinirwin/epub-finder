@@ -3,7 +3,8 @@ import { ManagerContext } from "../../App";
 import React, { useContext, useState } from "react";
 import { useObservableState } from "observable-hooks";
 import { SelectLearningLanguageBase } from "./select-learning-language.base";
-import { EmittedValuesWithRef, useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
+import { useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
+import { EmittedValuesWithRef } from "../UseVisilbleObservableState/EmittedValuesWithRef.component";
 
 export const SelectLearningLanguage = () => {
     const m = useContext(ManagerContext)
