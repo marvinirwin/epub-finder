@@ -26,14 +26,14 @@ export const getLinesVisible = (key: string) => {
 export const EmittedValues = ({
                                 emittedValues,
                                 style,
-                                key
+                                id
                               }: EmittedValuesProps) => {
   const showObservables = useContext(ShowObservableContext);
-  const [ linesVisible, setLinesVisible ] = useState<number>(getLinesVisible(key))
+  const [ linesVisible, setLinesVisible ] = useState<number>(getLinesVisible(id))
   {/* TODO add an expand button  */}
   const onClickSetLinesVisible = (n: number) => {
     setLinesVisible(n);
-    localStorage.setItem(getLinesVisibleKey(key), JSON.stringify(n))
+    localStorage.setItem(getLinesVisibleKey(id), JSON.stringify(n))
   }
   return showObservables ?
     <div>

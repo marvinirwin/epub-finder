@@ -1,33 +1,22 @@
 /* eslint-disable */
-import React from 'react';
+import React from "react";
 import { EmittedValues } from "./EmittedValues.component";
-import { SelectLearningLanguageBase } from "../language-select/select-learning-language.base";
 import { EmittedValuesProps } from "./EmittedValuesProps";
 
 export default {
-  title: "EmittedValues",
+  title: "EmittedValues"
 };
 
 export const Default = (args: EmittedValuesProps) => <EmittedValues {...args} />;
 
 Default.story = {
-  name: 'default',
+  name: "default"
 };
 Default.args = {
-  value: 'ko',
-  options: [
-    {
-      label: "French",
-      code: 'fr'
-    },
-    {
-      label: "Korean",
-      code: "ko"
-    },
-    {
-      label: "Simplified Chinese",
-      code: "zh-CN-Simplified"
-    }
-  ],
-  onChange: () => undefined,
+  emittedValues: [{
+    id: 0,
+    value: "event fired",
+    formatFn: v => v.toString()
+  }],
+  id: "storybook"
 } as EmittedValuesProps;

@@ -33,7 +33,7 @@ export const QuizCardComponent: React.FC<{ quizCard: QuizCard } & PaperProps> = 
 
   return (
     <Paper className="quiz-card" {...props}>
-      <EmittedValues emittedValues={useConcatArray(emittedScheduleRows, emittedAnswerIsRevealed)} />
+      <EmittedValues emittedValues={useConcatArray(emittedScheduleRows, emittedAnswerIsRevealed)} id={'quiz-card-component'} />
       {
         showNoScheduleRows && <NoScheduleRows />
       }

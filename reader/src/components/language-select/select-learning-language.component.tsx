@@ -13,7 +13,7 @@ export const SelectLearningLanguage = () => {
     const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
     const [ref, setRef] = useState<HTMLSelectElement | null>(null);
     return <>
-        <EmittedValuesWithRef ref={ref} emittedValues={emittedSelectedReadingLanguages}/>
+        <EmittedValuesWithRef ref={ref} emittedValues={emittedSelectedReadingLanguages} id={'select-learning-language'}/>
         <SelectLearningLanguageBase options={allLanguages} value={lang} onChange={languageCode => m.settingsService.readingLanguage$.next(languageCode) } ref={setRef}/>
     </>
 }
