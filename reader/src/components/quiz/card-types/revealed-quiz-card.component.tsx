@@ -2,7 +2,7 @@ import {CardImage} from '../quiz-card-image.component'
 import {QuizCardSound} from '../quiz-card-sound.component'
 import {CardInfo} from '../../../lib/schedule/quiz-card-current-card-info.component'
 import {OpenDocumentComponent} from '../../reading/open-document.component'
-import React, {Fragment} from 'react'
+import React, {Fragment, useContext} from 'react'
 import {QuizCard} from '../word-card.interface'
 import {useObservableState} from 'observable-hooks'
 import {useIsFieldHidden} from '../useIsFieldHidden'
@@ -11,10 +11,15 @@ import {CardLearningLanguageText} from '../../word-information/card-learning-lan
 import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
 import {ExpandOnClick} from "../../app-container/expandable-container";
+import { ManagerContext } from '../../../App'
+import { useVisibleObservableState } from 'src/components/UseVisilbleObservableState/UseVisibleObservableState'
+import { SegmentSubsequences } from "@shared/*";
 
 export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
     const exampleSegmentsHidden = useIsFieldHidden({quizCard, label: QuizCardField.ExampleSegments})
+    const {exampleSegmentsService} = useContext(ManagerContext);
+    const emittedValues = useVisibleObservableState(exampleSegmentsService.exampleSegmentMap$, (v:Map<string, SegmentSubsequences[]>)  => `${Array.from(v.keys()).slice(0, 3).join(', ')} ${Array.from(v.keys()).length}`);
     return <Fragment>
         <div className={'quiz-card-data-sheet'}>
             <div>
