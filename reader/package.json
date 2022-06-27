@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/helper-validator-option": "^7.12.11",
+    "@craco/craco": "^6.4.3",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@material-ui/core": "^4.10.0",
@@ -50,6 +51,8 @@
     "plotly.js": "^1.54.5",
     "prettier": "^2.2.1",
     "react": "^18.1.0",
+    "react-app-alias": "^2.2.0",
+    "react-app-alias-ex": "^2.1.0",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^18.1.0",
     "react-dropzone": "^11.2.4",
@@ -74,10 +77,10 @@
     "xmldom": "^0.3.0"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build ../server/public",
+    "start": "craco start",
+    "build": "craco build ../server/public",
     "test": "jest --verbose ",
-    "eject": "react-scripts eject",
+    "eject": "craco eject",
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build",
     "lint-fix": "prettier --write .",
@@ -142,7 +145,6 @@
     "@types/plotly.js": "^1.50.13",
     "@types/react": "^18.0.14",
     "@types/react-custom-scrollbars": "^4.0.7",
-    "react-dom": "^18.1.0",
     "@types/react-facebook-login": "^4.1.2",
     "@types/react-plotly.js": "^2.2.4",
     "@types/sql.js": "^1.0.3",
@@ -158,6 +160,7 @@
     "python-shell": "^2.0.1",
     "react-app-rewire-alias": "^0.1.8",
     "react-app-rewired": "^2.1.6",
+    "react-dom": "^18.1.0",
     "tailwindcss": "^3.0.24",
     "tslint": "^6.1.3",
     "webpack": "^5.72.1"

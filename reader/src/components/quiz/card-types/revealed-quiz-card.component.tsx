@@ -12,7 +12,7 @@ import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
 import {ExpandOnClick} from "../../app-container/expandable-container";
 import { ManagerContext } from '../../../App'
-import { useVisibleObservableState } from 'src/components/UseVisilbleObservableState/UseVisibleObservableState'
+import { useVisibleObservableState } from '../../../components/UseVisilbleObservableState/UseVisibleObservableState'
 import { SegmentSubsequences } from "@shared/*";
 
 export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
