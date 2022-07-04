@@ -9,12 +9,12 @@ import { orderBy } from 'lodash'
 import {
     averageKnownWords,
     wordsFromCountRecordList,
-} from '../../../../server/src/shared/tabulation/word-count-records.module'
-import { PositionedWord } from '../../../../server/src/shared/tabulation/tabulate'
+} from "@shared/"
+import { PositionedWord } from "@shared/"
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
-import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import { SerializedTabulationAggregate } from "@shared/"
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { resolvePartialTabulationConfig } from "@shared/"
 import { PotentialExcludedDbColumns } from './indexed-rows.repository'
 
 export interface TranslationAttemptScheduleData {

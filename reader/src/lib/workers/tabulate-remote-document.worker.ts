@@ -10,8 +10,8 @@ import {
     tabulate,
 } from '@shared/'
 import trie from 'trie-prefix-tree'
-import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
-import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { SetWithUniqueLengths } from "@shared/"
+import { resolvePartialTabulationConfig } from "@shared/"
 
 // @ts-ignore
 self.window = self

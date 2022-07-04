@@ -7,13 +7,8 @@ import {
     tabulate,
 } from '@shared/'
 import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
-import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
-import {
-    SerializedSegment,
-    PositionedWord,
-} from '../../../../server/src/shared/tabulation/tabulate'
-import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { SetWithUniqueLengths } from '@shared/'
+import { resolvePartialTabulationConfig } from "@shared/"
 
 // @ts-ignore
 self.window = self

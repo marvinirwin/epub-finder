@@ -7,7 +7,7 @@ import { HistoryService } from '../lib/app-context/history.service'
 import { SettingGetSet, SettingType } from './setting-get-set'
 import { MapSubject } from './map-subject'
 import { FlashCardType } from '../lib/quiz/hidden-quiz-fields'
-import { TextToSpeechConfig } from '../../../server/src/shared/supported-text-to-speech'
+import { TextToSpeechConfig } from "@shared/"
 
 const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
     const settingReplaySubject = new ReplaySubject<T>(1)

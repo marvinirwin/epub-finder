@@ -1,7 +1,7 @@
 import { WavAudio } from './wav-audio'
 import axios from 'axios'
-import { TextToSpeechConfig } from '../../../../server/src/shared/supported-text-to-speech'
-import { SpeechSynthesisRequestDto } from '../../../../server/src/speech/speech-synthesis-request-dto'
+import { TextToSpeechConfig } from "@shared/"
+import { SpeechSynthesisRequestDto } from '@shared/'
 
 export async function fetchSynthesizedAudio(
     c: { text: string} & TextToSpeechConfig

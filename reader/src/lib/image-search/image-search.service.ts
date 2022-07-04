@@ -1,10 +1,8 @@
 import { Observable, ReplaySubject } from 'rxjs'
-import { ImageSearchRequest } from '../../../../server/src/shared/IImageRequest'
 import { getImages, ImageSearchResult } from '../../services/image-search.service'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { LoadingObservable } from '../../components/quiz/word-card.interface'
-import { Image } from 'plotly.js'
 
 export class ImageSearchService {
     public queryImageRequest$: ReplaySubject< string > = new ReplaySubject<string>(1);

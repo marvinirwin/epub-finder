@@ -1,9 +1,8 @@
 import { merge, Observable } from 'rxjs'
-import { AtomizedDocument } from '../../../../server/src/shared/tabulate-documents/atomized-document'
+import { AtomizedDocument } from "@shared/"
 import { AtomizedStringsForRawHTML } from '../pipes/AtomizedStringsForRawHTML'
 import { map, shareReplay } from 'rxjs/operators'
 import { AtomizedStringsForURL } from '../pipes/AtomizedStringsForURL'
-import {DocumentId} from "../../../../server/src/shared/sourced-text";
 
 export type AtomizedDocumentSources = {
     atomizedDocument$?: Observable<AtomizedDocument>

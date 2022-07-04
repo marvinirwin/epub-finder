@@ -1,6 +1,6 @@
 import { combineLatest, Observable, of } from 'rxjs'
 import CardsRepository from '../../lib/manager/cards.repository'
-import { ICard } from '../../../../server/src/shared/ICard'
+import { ICard } from "@shared/"
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { EditableValue } from './editing-value'
 import { resolveICardForWordLatest } from '../../lib/pipes/ResolveICardForWord'

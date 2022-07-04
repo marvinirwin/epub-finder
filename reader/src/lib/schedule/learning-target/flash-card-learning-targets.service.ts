@@ -7,7 +7,7 @@ import {TimeService} from '../../time/time.service'
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay} from 'rxjs/operators'
 import {mapIfThenDefault} from '../../util/map.module'
-import {IPositionedWord} from '../../../../../server/src/shared/annotation/IPositionedWord'
+import {IPositionedWord} from "@shared/"
 import {CustomWordsRepository} from './custom-words.repository'
 import {TabulationService} from '../../tabulation/tabulation.service'
 import {pipeLog} from '../../manager/pipe.log'

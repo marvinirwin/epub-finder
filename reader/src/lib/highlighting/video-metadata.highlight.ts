@@ -1,11 +1,9 @@
 import { HighlighterService } from './highlighter.service'
-import { VideoMetadataService } from '../../../../server/src/video_metadata/video-metadata.service'
 import { VideoMetadataRepository } from '../../services/video-metadata.repository'
 import { Modes, ModesService } from '../modes/modes.service'
 import { combineLatest } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { RGBA } from './color.service'
-import CardsRepository from '../manager/cards.repository'
 
 export class VideoMetadataHighlight {
     constructor({

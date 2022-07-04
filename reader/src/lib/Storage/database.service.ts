@@ -1,11 +1,11 @@
 import Dexie, {Table} from 'dexie'
-import {ICard} from '../../../../server/src/shared/ICard'
-import {CreatedSentence} from '../../../../server/src/shared/CreatedSentence'
+import {ICard} from "@shared/"
+import {CreatedSentence} from "@shared/"
 import {PronunciationProgressRow} from '../schedule/pronunciation-progress-row.interface'
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {queryPersistableEntity} from "./queryPersistableEntity";
-import {IgnoredWordView} from "../../../../server/src/entities/ignored-word-view.entity";
-import {KnownWordView} from "../../../../server/src/entities/known-word-view.entity";
+import {IgnoredWordView} from "@shared/";
+import {KnownWordView} from "@shared/";
 
 export type PersistableEntity = 'userSettings' |
     'userSettingView' |

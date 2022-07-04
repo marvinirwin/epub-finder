@@ -1,5 +1,5 @@
-import { AtomMetadata } from '../../../../server/src/shared/atom-metadata/atom-metadata'
-import { ICard } from '../../../../server/src/shared/ICard'
+import { AtomMetadata } from "@shared/"
+import { ICard } from "@shared/"
 import { flatten, maxBy } from 'lodash'
 import CardsRepository from './cards.repository'
 

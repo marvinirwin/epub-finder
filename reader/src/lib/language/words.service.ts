@@ -1,7 +1,7 @@
 import CardsRepository from '../manager/cards.repository'
 import { AllWordsRepository } from './all-words.repository'
 import { combineLatest, Observable } from 'rxjs'
-import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
+import { SetWithUniqueLengths } from "@shared/"
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
 

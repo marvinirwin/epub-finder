@@ -1,9 +1,6 @@
 import { Observable } from 'rxjs'
 import { Dictionary } from 'lodash'
-import { AtomMetadata } from '../../../../server/src/shared/atom-metadata/atom-metadata'
-import { Segment } from '../../../../server/src/shared/tabulate-documents/segment/segment'
-import { ds_Dict } from '../delta-scan/delta-scan.module'
-import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
+import { Segment } from "@shared/"
 import { RGBA } from './color.service'
 
 export interface HighlighterConfig {

@@ -1,4 +1,4 @@
-import { DocumentViewDto } from '../../../../server/src/documents/document-view.dto'
+import { DocumentViewDto } from '@shared/'
 
 export type TabulateRemoteDocumentDto = {
     notableSubsequences: string[]

@@ -1,15 +1,14 @@
 import { BehaviorSubject, combineLatest, merge, Observable } from 'rxjs'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
-import { mergeMaps } from '../lib/util/map.module'
 import { OpenDocumentsService } from '../lib/manager/open-documents.service'
 import { VisibleService } from '../lib/manager/visible.service'
-import { AtomMetadata } from '../../../server/src/shared/atom-metadata/atom-metadata'
-import { XMLDocumentNode } from '../../../server/src/shared/XMLDocumentNode'
+import { AtomMetadata } from "@shared/"
+import { XMLDocumentNode } from "@shared/"
 import {
     TabulatedDocuments,
     TabulatedSegments,
-} from '../../../server/src/shared/tabulate-documents/tabulated-documents.interface'
-import { AbstractSegment } from '../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
+} from "@shared/"
+import { AbstractSegment } from "@shared/"
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>
 

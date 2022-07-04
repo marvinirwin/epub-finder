@@ -1,9 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { OpenDocument } from '../../lib/document-frame/open-document.entity'
 import { EditableValue } from './editing-value'
-import { FlashCardType, HiddenQuizFields, QuizCardField } from '../../lib/quiz/hidden-quiz-fields'
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
-import { WordRecognitionRow } from '../../lib/schedule/word-recognition-row'
+import { FlashCardType } from '../../lib/quiz/hidden-quiz-fields'
 import { WavAudio } from '../../lib/audio/wav-audio'
 
 export type QuizCard = {

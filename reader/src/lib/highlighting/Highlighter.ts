@@ -1,7 +1,7 @@
 import { ReplaySubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ds_Dict } from '../delta-scan/delta-scan.module'
-import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
+import { XMLDocumentNode } from "@shared/"
 import { HighlighterService } from './highlighter.service'
 import { RGBA } from './color.service'
 import { QuizService } from '../../components/quiz/quiz.service'

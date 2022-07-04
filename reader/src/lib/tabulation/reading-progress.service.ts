@@ -1,6 +1,6 @@
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay, startWith} from 'rxjs/operators'
-import {SerializedTabulationAggregate} from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import {SerializedTabulationAggregate} from "@shared/"
 import {VideoMetadataRepository} from '../../services/video-metadata.repository'
 import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
 import {AllWordsRepository} from '../language/all-words.repository'

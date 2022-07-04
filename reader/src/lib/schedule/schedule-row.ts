@@ -1,4 +1,4 @@
-import { DocumentWordCount } from '../../../../server/src/shared/DocumentWordCount'
+import { DocumentWordCount } from "@shared/"
 import { WordRecognitionRow } from './word-recognition-row'
 import { NormalizedValue } from '../manager/normalized-value.interface'
 import { SrmService } from '../srm/srm.service'

@@ -1,5 +1,5 @@
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs'
-import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
+import { SetWithUniqueLengths } from "@shared/"
 
 export class TrieWrapper {
     public changeSignal$ = new ReplaySubject<TrieWrapper>(1)

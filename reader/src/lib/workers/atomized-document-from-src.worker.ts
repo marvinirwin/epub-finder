@@ -4,7 +4,6 @@
 import {AtomizedDocument, AtomizeSrcDocParams} from '@shared/'
 // @ts-ignore
 import { XMLSerializer } from 'xmldom'
-import {DocumentId} from "../../../../server/src/shared/sourced-text";
 
 // @ts-ignore
 self.window = self

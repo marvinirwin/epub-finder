@@ -22,12 +22,11 @@ import {
     averageKnownWords,
     AverageResult,
     wordsFromCountRecordList,
-} from '../../../../server/src/shared/tabulation/word-count-records.module'
+} from "@shared/"
 import { sum, round } from 'lodash'
 import { TranslationAttemptScheduleData } from '../../lib/schedule/translation-attempt-schedule.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
 import { useTranslation } from '../tables/quiz-card-translation-attempt-table.component'
-import { AdvanceButton } from '../quiz/advance.button.component'
 
 export const translateRequest = ''
 

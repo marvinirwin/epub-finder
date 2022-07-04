@@ -4,17 +4,15 @@ import { SerializedDocumentTabulation, TabulatedSegments } from '@shared/'
 import { flattenTree, NamedDeltaScanner } from '../delta-scan/delta-scan.module'
 import { DatabaseService } from '../Storage/database.service'
 import { SettingsService } from '../../services/settings.service'
-import { BasicDocument } from '../../types'
 import { mapMap, mapToArray } from '../util/map.module'
 import { OpenDocument } from '../document-frame/open-document.entity'
 import {
     AtomizedDocumentSources,
     DocumentSourcesService,
 } from '../document-frame/document-sources.service'
-import { SerializedTabulation, TabulatedDocuments } from '@shared/'
 import { DocumentRepository } from '../documents/document.repository'
 import { TrieWrapper } from '../util/TrieWrapper'
-import { SerializedTabulationAggregate } from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import { SerializedTabulationAggregate } from "@shared/"
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'

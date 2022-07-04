@@ -6,7 +6,7 @@ import { PronunciationProgressRepository } from '../schedule/pronunciation-progr
 import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
 import { IndexedRowsRepository } from '../schedule/indexed-rows.repository'
 import { AllWordsRepository } from '../language/all-words.repository'
-import { SetWithUniqueLengths } from '../../../../server/src/shared/tabulate-documents/set-with-unique-lengths'
+import { SetWithUniqueLengths } from "@shared/"
 
 export class TrieService {
     public trie$: Observable<TrieWrapper>

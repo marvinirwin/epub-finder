@@ -1,6 +1,6 @@
 import { SerializedTabulation } from '@shared/'
 import { orderBy, sum } from 'lodash'
-import { computeSimilarityTabulation } from '../../../../server/src/shared/similarity-result.interface'
+import { computeSimilarityTabulation } from "@shared/"
 import { ds_Tree } from '../../services/tree.service'
 import memoize from 'memoizee'
 import { TabulatedFrequencyDocument } from './tabulated-frequency-document'

@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, ReplaySubject, Subject } from 'rxjs'
-import { getIsMeFunction, ICard } from '../../../../server/src/shared/ICard'
+import { getIsMeFunction, ICard } from "@shared/"
 import { Dictionary } from 'lodash'
 import { map, scan, shareReplay, startWith } from 'rxjs/operators'
 import { DatabaseService} from '../Storage/database.service'

@@ -1,7 +1,7 @@
 import {createLoadingObservable} from "../lib/util/create-loading-observable";
 import {ReplaySubject} from "rxjs";
 import axios from "axios";
-import {LeaderBoardDto} from "../../../server/src/shared/leader-board.dto";
+import {LeaderBoardDto} from "@shared/";
 import {LoadingObservable} from "./quiz/word-card.interface";
 
 export class LeaderBoardService {

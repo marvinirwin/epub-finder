@@ -1,5 +1,5 @@
 import { Segment } from '@shared/'
-import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
+import { XMLDocumentNode } from "@shared/"
 import { combineLatest, Observable, of } from 'rxjs'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { SettingsService } from '../../services/settings.service'

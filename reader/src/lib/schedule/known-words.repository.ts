@@ -1,6 +1,6 @@
 import {IndexedRowsRepository} from './indexed-rows.repository'
 import {DatabaseService} from '../Storage/database.service'
-import {KnownWord} from '../../../../server/src/entities/known-word.entity'
+import {KnownWord} from '@shared/'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {observableLastValue} from "../../services/settings.service";
 import {LoggedInUserService} from "../auth/logged-in-user.service";

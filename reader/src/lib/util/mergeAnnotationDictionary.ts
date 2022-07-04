@@ -1,5 +1,5 @@
 import { Dictionary } from 'lodash'
-import { AtomMetadata } from '../../../../server/src/shared/atom-metadata/atom-metadata'
+import { AtomMetadata } from "@shared/"
 
 export function mergeWordTextNodeMap(
     cDict: Dictionary<AtomMetadata[]>,

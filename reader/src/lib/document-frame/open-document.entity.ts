@@ -8,17 +8,17 @@ import {
     TabulatedSegments,
 } from '@shared/'
 import { TabulateLocalDocument } from '../workers/worker.helpers'
-import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
+import { XMLDocumentNode } from "@shared/"
 import { BrowserSegment } from '../sentences/browser-segment'
 import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
-import { resolvePartialTabulationConfig } from '../../../../server/src/shared/tabulation/word-separator'
+import { resolvePartialTabulationConfig } from "@shared/"
 import { pipeLog } from '../manager/pipe.log'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
-import { AbstractSegment } from '../../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
+import { AbstractSegment } from "@shared/"
 
 export class OpenDocument {
     public name: string

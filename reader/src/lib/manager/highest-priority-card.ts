@@ -1,4 +1,4 @@
-import { ICard } from '../../../../server/src/shared/ICard'
+import { ICard } from "@shared/"
 
 export const highestPriorityCard = (c1: ICard, c2: ICard) => {
     /*

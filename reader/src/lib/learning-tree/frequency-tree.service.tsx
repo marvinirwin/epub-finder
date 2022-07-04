@@ -1,7 +1,7 @@
 import { combineLatest, Observable } from 'rxjs'
 import { ds_Tree } from '../../services/tree.service'
 import React from 'react'
-import { SimilarityResults } from '../../../../server/src/shared/compre-similarity-result'
+import { SimilarityResults } from "@shared/"
 import { SettingsService } from '../../services/settings.service'
 import { FrequencyDocumentsRepository } from '../documents/frequency-documents.repository'
 import { map } from 'rxjs/operators'

@@ -6,7 +6,7 @@ import {
 } from '../lib/delta-scan/delta-scan.module'
 import { Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
-import { Named } from '../../../server/src/shared/named.type'
+import { Named } from "@shared/"
 
 export type ds_Tree<T, U extends string = string> = {
     value?: T

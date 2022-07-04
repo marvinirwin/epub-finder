@@ -1,7 +1,7 @@
 import {Observable} from 'rxjs'
 import {map, shareReplay} from 'rxjs/operators'
 import {SelectedVirtualTabulationsService} from '../manager/selected-virtual-tabulations.service'
-import {SerializedTabulationAggregate} from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import {SerializedTabulationAggregate} from "@shared/"
 import {pipeLog} from '../manager/pipe.log'
 import {SegmentSubsequences, SerializedDocumentTabulation} from "@shared/*";
 

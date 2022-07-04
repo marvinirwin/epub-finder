@@ -2,7 +2,7 @@ import {DatabaseService} from '../lib/Storage/database.service'
 import {HistoryService} from '../lib/app-context/history.service'
 import {Observable, of} from 'rxjs'
 import {distinctUntilChanged, skip} from 'rxjs/operators'
-import {UserSetting} from '../../../server/src/entities/user-setting.entity'
+import {UserSetting} from '@shared/'
 import {queryPersistableEntity} from "../lib/Storage/queryPersistableEntity";
 import {putPersistableEntity} from "../lib/Storage/put-persistable-entity";
 

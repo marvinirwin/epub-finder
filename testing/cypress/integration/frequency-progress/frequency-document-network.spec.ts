@@ -1,9 +1,9 @@
 import { hsk1Node, QUIZ_BUTTON_EASY, testNode1, testNode2 } from '@shared/*'
 import { DirectoryPom } from '../../support/pom/directory.pom'
-import { SimilarityResults } from '../../../../server/src/shared/compre-similarity-result'
-import { TabulateChineseText } from '../../../../server/src/shared/tabulate-documents/tabulate-chinese-string'
+import { SimilarityResults } from "@shared/"
+import { TabulateChineseText } from "@shared/"
 import Chainable = Cypress.Chainable
-import { computeSimilarityTabulation } from '../../../../server/src/shared/similarity-result.interface'
+import { computeSimilarityTabulation } from "@shared/"
 
 const testFrequencyDocument1 = 'Test Freq1'
 const testFrequencyDocument2 = 'Test Freq2'

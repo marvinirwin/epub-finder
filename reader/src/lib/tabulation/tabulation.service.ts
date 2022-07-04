@@ -9,9 +9,9 @@ import {TimeService} from '../time/time.service'
 import {LanguageConfigsService} from '../language/language-configs.service'
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay, startWith} from 'rxjs/operators'
-import {SerializedTabulationAggregate} from '../../../../server/src/shared/tabulation/serialized-tabulation.aggregate'
+import {SerializedTabulationAggregate} from "@shared/"
 import {sumNotableSubSequences,} from '../schedule/learning-target/flash-card-learning-targets.service'
-import {DocumentWordCount} from '../../../../server/src/shared/DocumentWordCount'
+import {DocumentWordCount} from "@shared/"
 import {safePushMap} from '@shared/'
 import {pipeLog} from '../manager/pipe.log'
 import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";

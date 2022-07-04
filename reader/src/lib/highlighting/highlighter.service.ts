@@ -10,14 +10,14 @@ import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { LtElement } from './Highlighter'
 import { Dictionary } from 'lodash'
 import { mixRGBA, RGBA } from './color.service'
-import { AtomMetadata } from '../../../../server/src/shared/atom-metadata/atom-metadata'
+import { AtomMetadata } from "@shared/"
 import { map, shareReplay } from 'rxjs/operators'
 import debug from 'debug'
 import { safePushMap } from '@shared/'
 import {RandomColorsService} from "../../services/random-colors.service";
 import {DEV} from "../util/url-params";
-import { XMLDocumentNode } from '../../../../server/src/shared/XMLDocumentNode'
-import { AbstractSegment } from '../../../../server/src/shared/tabulate-documents/tabulate-segment/tabulate'
+import { XMLDocumentNode } from "@shared/"
+import { AbstractSegment } from "@shared/"
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string]

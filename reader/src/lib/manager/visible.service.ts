@@ -1,16 +1,14 @@
 import { ds_Dict, flattenTree } from '../delta-scan/delta-scan.module'
 import { Dictionary, flatten } from 'lodash'
-import { AtomMetadata } from '../../../../server/src/shared/atom-metadata/atom-metadata'
+import { AtomMetadata } from "@shared/"
 import { combineLatest, Observable } from 'rxjs'
 import {
     EXAMPLE_SENTENCE_DOCUMENT,
     OpenDocumentsService,
     READING_DOCUMENT_NODE_LABEL,
 } from './open-documents.service'
-import { QuizService } from '../../components/quiz/quiz.service'
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators'
-import { AtomizedDocument } from '../../../../server/src/shared/tabulate-documents/atomized-document'
-import { Segment } from '../../../../server/src/shared/tabulate-documents/segment/segment'
+import { Segment } from "@shared/"
 import { OpenDocument } from '../document-frame/open-document.entity'
 import { QUIZ_NODE, READING_NODE } from '@shared/'
 
