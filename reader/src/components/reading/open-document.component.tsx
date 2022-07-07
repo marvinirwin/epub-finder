@@ -2,7 +2,6 @@ import React, { useContext, useEffect } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { InnerHtmlFrameComponent } from '../frame/inner-html-frame.component'
 import { OpenDocument } from '../../lib/document-frame/open-document.entity'
-import { ManagerContext } from '../../App'
 import { setMouseOverText } from '../mouseover-div/mouseover-div'
 
 export const OpenDocumentComponent = React.forwardRef<

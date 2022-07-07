@@ -12,8 +12,10 @@ import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
 import {ExpandOnClick} from "../../app-container/expandable-container";
 import { ManagerContext } from '../../../App'
-import { useVisibleObservableState } from '../../../components/UseVisilbleObservableState/UseVisibleObservableState'
+import { useVisibleObservableState } from "../../UseVisilbleObservableState/UseVisibleObservableState"
 import { SegmentSubsequences } from "@shared/*";
+import { EmittedValues } from "../../UseVisilbleObservableState/EmittedValues.component";
+import { useConcatArray } from "../../../lib/util/useConcatArray";
 
 export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
@@ -22,6 +24,7 @@ export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const emittedValues = useVisibleObservableState(exampleSegmentsService.exampleSegmentMap$, (v:Map<string, SegmentSubsequences[]>)  => `${Array.from(v.keys()).slice(0, 3).join(', ')} ${Array.from(v.keys()).length}`);
     return <Fragment>
         <div className={'quiz-card-data-sheet'}>
+            <EmittedValues emittedValues={emittedValues} id={'revealed-quiz-card'} />
             <div>
                 <CardImage wordInfo={quizCard}/>
                 {/*
