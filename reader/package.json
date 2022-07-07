@@ -81,7 +81,7 @@
     "start": "craco start",
     "build": "craco build ../server/public",
     "test": "jest --verbose ",
-    "eject": "craco eject",
+    "eject": "react-scripts eject",
     "build:staging": "env-cmd -f .env.latest npm run build",
     "build:versioned": "env-cmd -f .env.versioned npm run build",
     "lint-fix": "prettier --write .",
