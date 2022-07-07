@@ -2,7 +2,7 @@ import React from 'react'
 import { Manager } from '../../lib/manager/Manager'
 import { useObservableState } from 'observable-hooks'
 import { Observable } from 'rxjs'
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export const AllSentences: React.FC<{ m: Manager }> = ({ m }) => {
     const allSentences /*useObservableState(m.videoMetadataService.allSentenceMetadata$, []);*/ = []

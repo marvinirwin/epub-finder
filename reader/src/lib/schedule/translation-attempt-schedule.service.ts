@@ -9,12 +9,12 @@ import { orderBy } from 'lodash'
 import {
     averageKnownWords,
     wordsFromCountRecordList,
-} from "@shared/"
-import { PositionedWord } from "@shared/"
+} from "languagetrainer-server/src/shared"
+import { PositionedWord } from "languagetrainer-server/src/shared"
 import { SelectedVirtualTabulationsService } from '../manager/selected-virtual-tabulations.service'
-import { SerializedTabulationAggregate } from "@shared/"
+import { SerializedTabulationAggregate } from "languagetrainer-server/src/shared"
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { resolvePartialTabulationConfig } from "@shared/"
+import { resolvePartialTabulationConfig } from "languagetrainer-server/src/shared"
 import { PotentialExcludedDbColumns } from './indexed-rows.repository'
 
 export interface TranslationAttemptScheduleData {

@@ -2,13 +2,13 @@ import { BehaviorSubject, combineLatest, merge, Observable } from 'rxjs'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { OpenDocumentsService } from '../lib/manager/open-documents.service'
 import { VisibleService } from '../lib/manager/visible.service'
-import { AtomMetadata } from "@shared/"
-import { XMLDocumentNode } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
+import { XMLDocumentNode } from "languagetrainer-server/src/shared"
 import {
     TabulatedDocuments,
     TabulatedSegments,
-} from "@shared/"
-import { AbstractSegment } from "@shared/"
+} from "languagetrainer-server/src/shared"
+import { AbstractSegment } from "languagetrainer-server/src/shared"
 
 export type AtomMetadataMap = Map<XMLDocumentNode, AtomMetadata>
 

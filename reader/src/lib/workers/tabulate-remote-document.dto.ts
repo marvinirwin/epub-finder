@@ -1,4 +1,4 @@
-import { DocumentViewDto } from '@shared/'
+import { DocumentViewDto } from 'languagetrainer-server/src/shared'
 
 export type TabulateRemoteDocumentDto = {
     notableSubsequences: string[]

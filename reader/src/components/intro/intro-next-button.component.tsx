@@ -1,7 +1,7 @@
 import { Box, Button } from '@material-ui/core'
 import React, { useCallback, useContext } from 'react'
 import { ManagerContext } from '../../App'
-import { introNextButton } from '@shared/'
+import { introNextButton } from 'languagetrainer-server/src/shared'
 
 export const NextButton: React.FC<{ currentTab: number; steps: unknown[] }> = ({
                                                                                    currentTab,

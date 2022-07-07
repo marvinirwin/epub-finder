@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs'
 import axios from 'axios'
 import { mapFromId } from '../lib/util/map.module'
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export class VideoMetadataRepository {
     all$ = new BehaviorSubject<Map<string, VideoMetadata>>(new Map())

@@ -16,6 +16,7 @@ export * from "./built-in-words/parse-cedict";
 export * from "./annotation/IPositionedWord";
 
 export * from "./serialize-card-for-csv";
+
 export interface SegmentSubsequences {
     segmentText: string;
     subsequences: IPositionedWord[];

@@ -1,5 +1,5 @@
 import {Button, TableCell, TableRow, Typography} from '@material-ui/core'
-import {quizCardTableRow, quizCardTableRowWord} from '@shared/'
+import {quizCardTableRow, quizCardTableRowWord} from 'languagetrainer-server/src/shared'
 import React, {useContext} from 'react'
 import {ManagerContext} from '../../App'
 import {formatDistance} from 'date-fns'

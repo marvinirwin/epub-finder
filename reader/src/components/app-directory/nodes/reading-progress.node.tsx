@@ -1,6 +1,6 @@
 import {TreeMenuNode} from '../tree-menu-node.interface'
 import React, {useState} from 'react'
-import {READING_PROGRESS_NODE} from '@shared/'
+import {READING_PROGRESS_NODE} from 'languagetrainer-server/src/shared'
 import {TrendingUp} from '@material-ui/icons'
 import {Box, Paper} from '@material-ui/core'
 import {Manager} from '../../../lib/manager/Manager'

@@ -1,4 +1,4 @@
-import { SerializedTabulation } from '@shared/'
+import { SerializedTabulation } from 'languagetrainer-server/src/shared'
 import { combineLatest, Observable } from 'rxjs'
 import { SettingsService } from '../../services/settings.service'
 import { tabulateFrequencyDocuments } from '../documents/frequency-documents.repository'

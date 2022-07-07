@@ -3,8 +3,8 @@ import { orderBy } from 'lodash'
 import { PronunciationVideoService } from '../components/pronunciation-video/pronunciation-video.service'
 import axios from 'axios'
 import { debounce } from 'lodash'
-import { VideoMetadataDto } from '@shared/'
-import { VideoMetadata } from '@shared/'
+import { VideoMetadataDto } from 'languagetrainer-server/src/shared'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export class EditingVideoMetadataService {
     public editingCharacterIndex$ = new ReplaySubject<number | undefined>(1)

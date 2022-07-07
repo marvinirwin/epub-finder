@@ -1,7 +1,7 @@
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'
 import { useContext } from 'react'
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export const useVideoMetaData = (
     sentence: string | undefined,

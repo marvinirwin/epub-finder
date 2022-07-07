@@ -9,7 +9,7 @@ import {
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
-import { LtDocument } from '@shared/'
+import { LtDocument } from 'languagetrainer-server/src/shared'
 import { LibraryTableHead } from './library-table-head.component'
 import { LibraryDocumentRow } from '../../lib/manager/library-document-row'
 import { LibraryDocumentRowComponent } from './library-table-row.component'

@@ -1,8 +1,8 @@
-import {SupportedTranslation} from "@shared/";
-import {ICard} from "@shared/";
+import {SupportedTranslation} from "languagetrainer-server/src/shared";
+import {ICard} from "languagetrainer-server/src/shared";
 import {fetchTranslation} from "../services/translate.service";
-import {SegmentSubsequences} from "@shared/";
-import {PositionedWord} from "@shared/";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
+import {PositionedWord} from "languagetrainer-server/src/shared";
 import {flatten} from "lodash";
 
 function getSegmentTextWithWordsHighlighted(segments: SegmentSubsequences[], targetSubSequences: PositionedWord[]) {

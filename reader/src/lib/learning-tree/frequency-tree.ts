@@ -1,6 +1,6 @@
-import { SerializedTabulation } from '@shared/'
+import { SerializedTabulation } from 'languagetrainer-server/src/shared'
 import { orderBy, sum } from 'lodash'
-import { computeSimilarityTabulation } from "@shared/"
+import { computeSimilarityTabulation } from "languagetrainer-server/src/shared"
 import { ds_Tree } from '../../services/tree.service'
 import memoize from 'memoizee'
 import { TabulatedFrequencyDocument } from './tabulated-frequency-document'

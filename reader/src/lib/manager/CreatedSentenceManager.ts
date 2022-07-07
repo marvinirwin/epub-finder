@@ -1,6 +1,6 @@
 import { DatabaseService } from '../Storage/database.service'
 import { Observable, Subject } from 'rxjs'
-import { CreatedSentence } from "@shared/"
+import { CreatedSentence } from "languagetrainer-server/src/shared"
 import { scan, shareReplay } from 'rxjs/operators'
 import { Dictionary } from 'lodash'
 

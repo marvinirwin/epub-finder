@@ -1,4 +1,4 @@
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 import { fromEvent, merge, Observable, ReplaySubject } from 'rxjs'
 import { mapTo, shareReplay, switchMap, tap } from 'rxjs/operators'
 // @ts-ignore

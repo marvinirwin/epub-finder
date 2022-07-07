@@ -1,6 +1,6 @@
 import { combineLatest, Observable } from 'rxjs'
 import { Dictionary } from 'lodash'
-import { ICard } from "@shared/"
+import { ICard } from "languagetrainer-server/src/shared"
 import { map, shareReplay, withLatestFrom } from 'rxjs/operators'
 import { cardForWord } from '../util/Util'
 

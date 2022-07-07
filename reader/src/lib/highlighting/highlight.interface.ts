@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs'
 import { Dictionary } from 'lodash'
-import { Segment } from "@shared/"
+import { Segment } from "languagetrainer-server/src/shared"
 import { RGBA } from './color.service'
 
 export interface HighlighterConfig {

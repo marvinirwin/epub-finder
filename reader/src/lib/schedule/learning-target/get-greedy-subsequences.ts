@@ -1,5 +1,5 @@
-import {SegmentSubsequences} from "@shared/*";
-import {IPositionedWord} from "@shared/";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
+import {IPositionedWord} from "languagetrainer-server/src/shared";
 import {groupBy} from "lodash";
 
 export const getGreedySubSequences = (subSequences: SegmentSubsequences): SegmentSubsequences => {

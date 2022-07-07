@@ -1,4 +1,4 @@
-import { VideoMetadata } from "@shared/"
+import { VideoMetadata } from "languagetrainer-server/src/shared"
 
 async function digestMessage(message: string): Promise<string> {
     const msgUint8 = new TextEncoder().encode(message.normalize('NFC'))

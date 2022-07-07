@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { VideoMetadata, VideoCharacter } from '@shared/'
+import { VideoMetadata, VideoCharacter } from 'languagetrainer-server/src/shared'
 
 export const useChunkedCharacterTimings = (
     videoMetaData: VideoMetadata | undefined,

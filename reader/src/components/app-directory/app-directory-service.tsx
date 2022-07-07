@@ -13,7 +13,7 @@ import {LibraryNode} from './nodes/library.node'
 import {SignInWithNode} from './nodes/sign-in-with.node'
 import {DEV} from '../../lib/util/url-params'
 import {ReadingProgressNode} from './nodes/reading-progress.node'
-import {CSV} from '@shared/'
+import {CSV} from 'languagetrainer-server/src/shared'
 import {LeaderBoardNode} from "./nodes/leader-board.node";
 import {ReadingNode} from "./reading.node";
 

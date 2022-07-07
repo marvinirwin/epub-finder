@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ManagerContext } from '../../App'
 import { TextField } from '@material-ui/core'
-import {newWordLimitInput, quizWordLimitInput} from '@shared/'
+import {newWordLimitInput, quizWordLimitInput} from 'languagetrainer-server/src/shared'
 import { observableLastValue } from '../../services/settings.service'
 import { Manager } from '../../lib/manager/Manager'
 import * as _ from 'lodash'

@@ -5,7 +5,7 @@ import { WordCard } from './word-card.interface'
 import { ManagerContext } from '../../App'
 import { observableLastValue } from '../../services/settings.service'
 import { Button, Typography } from '@material-ui/core'
-import { quizCardImage, selectQuizCardImageButton } from '@shared/'
+import { quizCardImage, selectQuizCardImageButton } from 'languagetrainer-server/src/shared'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
 import Image from 'material-ui-image';
 

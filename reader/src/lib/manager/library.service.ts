@@ -1,7 +1,7 @@
 import { DatabaseService } from '../Storage/database.service'
 import { SettingsService } from '../../services/settings.service'
 import { DocumentRepository } from '../documents/document.repository'
-import { LtDocument } from '@shared/'
+import { LtDocument } from 'languagetrainer-server/src/shared'
 
 export class LibraryService {
     db: DatabaseService

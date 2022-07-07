@@ -1,7 +1,7 @@
 import CardsRepository from '../manager/cards.repository'
 import { AllWordsRepository } from './all-words.repository'
 import { combineLatest, Observable } from 'rxjs'
-import { SetWithUniqueLengths } from "@shared/"
+import { SetWithUniqueLengths } from "languagetrainer-server/src/shared"
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
 import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
 

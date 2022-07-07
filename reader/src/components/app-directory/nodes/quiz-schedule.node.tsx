@@ -1,7 +1,7 @@
 import { TreeMenuNode } from '../tree-menu-node.interface'
 import React from 'react'
 import { CalendarToday } from '@material-ui/icons'
-import { QUIZ_SCHEDULE } from '@shared/'
+import { QUIZ_SCHEDULE } from 'languagetrainer-server/src/shared'
 import { Manager } from '../../../lib/manager/Manager'
 
 export function QuizScheduleNode(m: Manager): TreeMenuNode {

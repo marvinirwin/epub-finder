@@ -1,9 +1,9 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import { AtomizedDocument } from '@shared/'
+import { AtomizedDocument } from 'languagetrainer-server/src/shared'
 import { WorkerError } from './worker.helpers'
-import {AtomizedDocumentFromUrlParams} from "@shared/*";
+import {AtomizedDocumentFromUrlParams} from "languagetrainer-server/src/shared";
 
 // @ts-ignore
 self.window = self

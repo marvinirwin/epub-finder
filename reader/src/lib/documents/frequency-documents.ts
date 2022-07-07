@@ -1,6 +1,6 @@
 import { combineLatest, from, Observable } from 'rxjs'
 import { DocumentReadabilityProgress } from './document-readability-progress'
-import { LtDocument, SerializedTabulation } from '@shared/'
+import { LtDocument, SerializedTabulation } from 'languagetrainer-server/src/shared'
 import {
     SortQuizData,
     ScheduleRow,

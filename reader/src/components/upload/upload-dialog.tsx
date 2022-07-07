@@ -3,9 +3,9 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { UploadText } from './upload-text.component'
 import { Box, Button, Typography } from '@material-ui/core'
-import { fileChooser, uploadProgressBar } from '@shared/'
+import { fileChooser, uploadProgressBar } from 'languagetrainer-server/src/shared'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
-import { languageCodesMappedToLabels } from "@shared/"
+import { languageCodesMappedToLabels } from "languagetrainer-server/src/shared"
 import { useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
 import { EmittedValues } from "../UseVisilbleObservableState/EmittedValues.component";
 

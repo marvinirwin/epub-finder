@@ -4,7 +4,7 @@ import { LanguageConfigsService } from './language-configs.service'
 import { map, shareReplay } from 'rxjs/operators'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import memoize from "memoizee";
-import {cEdictRegex} from "@shared/";
+import {cEdictRegex} from "languagetrainer-server/src/shared";
 
 export const getCedict = memoize(() => axios.get(`${process.env.PUBLIC_URL}/cedict_ts.u8`))
 

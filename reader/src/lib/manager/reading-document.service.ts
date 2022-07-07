@@ -1,5 +1,5 @@
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { AtomizedDocument } from '@shared/'
+import { AtomizedDocument } from 'languagetrainer-server/src/shared'
 import { shareReplay, switchMap, tap } from 'rxjs/operators'
 import { filterMap, findMap, firstMap } from '../util/map.module'
 import { SettingsService } from '../../services/settings.service'

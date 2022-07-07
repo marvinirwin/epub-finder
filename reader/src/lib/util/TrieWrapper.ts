@@ -1,5 +1,5 @@
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs'
-import { SetWithUniqueLengths } from "@shared/"
+import { SetWithUniqueLengths } from "languagetrainer-server/src/shared"
 
 export class TrieWrapper {
     public changeSignal$ = new ReplaySubject<TrieWrapper>(1)

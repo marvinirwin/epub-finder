@@ -1,4 +1,4 @@
-import { manualQuizHiddenFieldConfigId } from '@shared/'
+import { manualQuizHiddenFieldConfigId } from 'languagetrainer-server/src/shared'
 import React, { useContext } from 'react'
 import { ManagerContext } from '../../../App'
 

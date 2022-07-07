@@ -6,7 +6,7 @@ import {SettingsService} from '../../services/settings.service'
 import {TabulatedFrequencyDocument} from '../learning-tree/tabulated-frequency-document'
 import {DocumentRepository} from './document.repository'
 import {TabulationConfigurationService} from '../language/language-maps/tabulation-configuration.service'
-import {LtDocument} from "@shared/*";
+import {LtDocument} from "languagetrainer-server/src/shared";
 
 export const tabulateFrequencyDocuments = (
     frequencyDocuments$: Observable<FrequencyDocument[]>,

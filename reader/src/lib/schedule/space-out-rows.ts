@@ -1,4 +1,4 @@
-import { safePushMap } from '@shared/'
+import { safePushMap } from 'languagetrainer-server/src/shared'
 
 export const spaceOutRows = <T, U, V>(
     resolveTypes: (v: T) => {

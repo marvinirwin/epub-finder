@@ -10,7 +10,7 @@ import {
 } from 'rxjs/operators'
 import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
-import { safePush } from '@shared/'
+import { safePush } from 'languagetrainer-server/src/shared'
 import { SuperMemoGrade } from 'supermemo'
 
 

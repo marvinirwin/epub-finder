@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { VideoCharacter } from "@shared/"
+import { VideoCharacter } from "languagetrainer-server/src/shared"
 import { percentagePosition } from './math.module'
 import { ManagerContext } from '../../App'
 

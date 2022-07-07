@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { Box, Typography } from '@material-ui/core'
-import { cardLimitReached, outOfWords } from '@shared/'
+import { cardLimitReached, outOfWords } from 'languagetrainer-server/src/shared'
 import { groupBy } from 'lodash'
 import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 

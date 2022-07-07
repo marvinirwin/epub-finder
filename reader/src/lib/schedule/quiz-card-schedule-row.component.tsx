@@ -6,7 +6,7 @@ import {
     quizCardDescription,
     quizCardRomanization,
     quizCardTranslation,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { useLoadingObservableString } from '../util/create-loading-observable'
 import {DictionaryDefinition} from "../../components/quiz/card-types/dictionary-definition.component";
 import { useVisibleObservableState} from "../../components/UseVisilbleObservableState/UseVisibleObservableState";

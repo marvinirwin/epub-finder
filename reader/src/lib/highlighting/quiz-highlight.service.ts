@@ -3,7 +3,7 @@ import { QuizService } from '../../components/quiz/quiz.service'
 import {map, shareReplay} from 'rxjs/operators'
 import { SettingsService } from '../../services/settings.service'
 import { combineLatest } from 'rxjs'
-import { QUIZ_NODE } from '@shared/'
+import { QUIZ_NODE } from 'languagetrainer-server/src/shared'
 
 export class QuizHighlightService {
     constructor({

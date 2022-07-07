@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ImageObject } from '@shared/'
+import { ImageObject } from 'languagetrainer-server/src/shared'
 
 export type ImageSearchResult = ImageObject[];
 export const getImages = (term: string): Promise<ImageSearchResult> => {

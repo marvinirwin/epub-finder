@@ -14,7 +14,7 @@ import Ciseaux from '../../lib/ciseaux/browser'
 import { Tape } from 'ciseaux/browser'
 import { filterData } from '../../lib/audio/audio-graphing'
 import {audioContext} from "../../lib/audio/audio-context";
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export const ciseauxPromise = audioContext.then(ctx => {
     // @ts-ignore

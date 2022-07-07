@@ -1,6 +1,6 @@
 import React from 'react'
 import {Box, Container, Link, Paper, Typography} from '@material-ui/core'
-import { introLanguageSelect } from '@shared/'
+import { introLanguageSelect } from 'languagetrainer-server/src/shared'
 import { LanguageSelect } from '../app-directory/nodes/language-select.component'
 import { signInUrl } from '../app-directory/nodes/sign-in-with.node'
 

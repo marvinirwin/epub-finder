@@ -4,7 +4,7 @@ import {
 } from '../schedule/schedule-row'
 import {
     SerializedTabulation,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 
 export interface WordReadabilityRecord {
     word: string

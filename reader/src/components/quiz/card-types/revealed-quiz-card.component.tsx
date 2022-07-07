@@ -13,7 +13,7 @@ import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.co
 import {ExpandOnClick} from "../../app-container/expandable-container";
 import { ManagerContext } from '../../../App'
 import { useVisibleObservableState } from '../../../components/UseVisilbleObservableState/UseVisibleObservableState'
-import { SegmentSubsequences } from "@shared/*";
+import { SegmentSubsequences } from "languagetrainer-server/src/shared";
 
 export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)

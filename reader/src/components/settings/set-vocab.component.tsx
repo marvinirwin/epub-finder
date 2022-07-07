@@ -8,7 +8,7 @@ import {
     Select,
     Switch,
 } from '@material-ui/core'
-import { LtDocument } from '@shared/'
+import { LtDocument } from 'languagetrainer-server/src/shared'
 
 export const SetVocab = () => {
     const m = useContext(ManagerContext)

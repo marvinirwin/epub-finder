@@ -1,16 +1,16 @@
 import CardsRepository from './cards.repository'
 import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { ICard } from "@shared/"
+import { ICard } from "languagetrainer-server/src/shared"
 import { cardForWord } from '../util/Util'
 import { combineLatest, Observable } from 'rxjs'
 import { shareReplay, switchMap } from 'rxjs/operators'
 import { ExampleSegmentsService } from '../quiz/example-segments.service'
 import uniqueBy from '@popperjs/core/lib/utils/uniqueBy'
 import JSZip from 'jszip'
-import { SerializeCardForCsv } from '@shared/'
+import { SerializeCardForCsv } from 'languagetrainer-server/src/shared'
 import { fetchSynthesizedAudio } from '../audio/fetch-synthesized-audio'
-import { CsvCard } from "@shared/"
+import { CsvCard } from "languagetrainer-server/src/shared"
 
 export class CsvService {
     csvAndZip$: Observable<{ csvRows: CsvCard[], zip: JSZip }>

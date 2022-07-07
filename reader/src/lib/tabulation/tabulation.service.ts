@@ -9,10 +9,10 @@ import {TimeService} from '../time/time.service'
 import {LanguageConfigsService} from '../language/language-configs.service'
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay, startWith} from 'rxjs/operators'
-import {SerializedTabulationAggregate} from "@shared/"
+import {SerializedTabulationAggregate} from "languagetrainer-server/src/shared"
 import {sumNotableSubSequences,} from '../schedule/learning-target/flash-card-learning-targets.service'
-import {DocumentWordCount} from "@shared/"
-import {safePushMap} from '@shared/'
+import {DocumentWordCount} from "languagetrainer-server/src/shared"
+import {safePushMap} from 'languagetrainer-server/src/shared'
 import {pipeLog} from '../manager/pipe.log'
 import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";
 import {combineSegmentSubSequences} from "./combine-segment-subsequences";

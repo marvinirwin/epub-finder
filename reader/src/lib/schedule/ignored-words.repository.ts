@@ -1,6 +1,6 @@
 import {IndexedRowsRepository} from './indexed-rows.repository'
 import {DatabaseService, CachedEntity} from '../Storage/database.service'
-import {IgnoredWord} from '@shared/'
+import {IgnoredWord} from 'languagetrainer-server/src/shared'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {observableLastValue} from "../../services/settings.service";
 import {LoggedInUserService} from "../auth/logged-in-user.service";

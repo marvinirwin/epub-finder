@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject } from 'rxjs'
 import { Dictionary } from 'lodash'
-import { Segment } from '@shared/'
+import { Segment } from 'languagetrainer-server/src/shared'
 import { filter, switchMap } from 'rxjs/operators'
 import { ds_Dict } from '../delta-scan/delta-scan.module'
 import { HotkeyModes } from './hotkey-modes'

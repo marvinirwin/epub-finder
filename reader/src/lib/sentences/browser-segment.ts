@@ -1,5 +1,5 @@
-import { Segment } from '@shared/'
-import { XMLDocumentNode } from "@shared/"
+import { Segment } from 'languagetrainer-server/src/shared'
+import { XMLDocumentNode } from "languagetrainer-server/src/shared"
 import { combineLatest, Observable, of } from 'rxjs'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { SettingsService } from '../../services/settings.service'

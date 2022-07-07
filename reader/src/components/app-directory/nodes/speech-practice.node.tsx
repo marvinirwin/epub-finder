@@ -2,7 +2,7 @@ import { TreeMenuNode } from '../tree-menu-node.interface'
 import { SpeechPractice } from '../../speech-practice/speech-practice.component'
 import React from 'react'
 import { Translate } from '@material-ui/icons'
-import { SPEECH_PRACTICE } from '@shared/'
+import { SPEECH_PRACTICE } from 'languagetrainer-server/src/shared'
 
 export const SpeechPracticeNode: TreeMenuNode = {
     name: SPEECH_PRACTICE,

@@ -13,7 +13,7 @@ import {
     InterpolateService,
     SerializedDocumentTabulation,
     SerializedTabulation,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { TabulateRemoteDocumentDto } from './tabulate-remote-document.dto'
 import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
 

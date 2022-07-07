@@ -3,7 +3,7 @@ import {QuizCard} from "../word-card.interface";
 import {ManagerContext} from "../../../App";
 import {useObservableState} from "observable-hooks";
 import {Paper, Table, TableBody, TableContainer} from "@material-ui/core";
-import {quizRowsNotInProgressTable} from "@shared/";
+import {quizRowsNotInProgressTable} from "languagetrainer-server/src/shared";
 import {QuizCardTableHead} from "../quiz-card-table-head.component";
 import {QuizCardTableRow} from "../quiz-card-table-row.component";
 import {quizCardKey} from "../../../lib/util/Util";

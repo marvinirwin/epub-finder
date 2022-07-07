@@ -1,6 +1,6 @@
 import { TreeMenuNode } from '../tree-menu-node.interface'
 import React from 'react'
-import {LEADER_BOARD} from '@shared/'
+import {LEADER_BOARD} from 'languagetrainer-server/src/shared'
 import { Manager } from '../../../lib/manager/Manager'
 import { FormatListNumbered } from '@material-ui/icons';
 

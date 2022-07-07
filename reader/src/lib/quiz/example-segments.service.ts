@@ -1,9 +1,9 @@
 import {Observable} from 'rxjs'
 import {map, shareReplay} from 'rxjs/operators'
 import {SelectedVirtualTabulationsService} from '../manager/selected-virtual-tabulations.service'
-import {SerializedTabulationAggregate} from "@shared/"
+import {SerializedTabulationAggregate} from "languagetrainer-server/src/shared"
 import {pipeLog} from '../manager/pipe.log'
-import {SegmentSubsequences, SerializedDocumentTabulation} from "@shared/*";
+import {SegmentSubsequences, SerializedDocumentTabulation} from "languagetrainer-server/src/shared";
 
 export class ExampleSegmentsService {
     exampleSegmentMap$: Observable<Map<string, SegmentSubsequences[]>>

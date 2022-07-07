@@ -2,7 +2,7 @@ import {
     observableLastValue,
     SettingsService,
 } from '../../services/settings.service'
-import { QUIZ_NODE } from '@shared/'
+import { QUIZ_NODE } from 'languagetrainer-server/src/shared'
 import { TimeService } from './time.service'
 import { QuizService } from '../../components/quiz/quiz.service'
 import { QuizResultService } from '../quiz/quiz-result.service'

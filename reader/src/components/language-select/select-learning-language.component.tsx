@@ -1,4 +1,4 @@
-import { SupportedSpeechToTextService } from "@shared/";
+import { SupportedSpeechToTextService } from "languagetrainer-server/src/shared";
 import { ManagerContext } from "../../App";
 import React, { useContext, useState } from "react";
 import { useObservableState } from "observable-hooks";

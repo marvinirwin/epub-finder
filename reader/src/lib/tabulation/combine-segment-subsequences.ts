@@ -1,4 +1,4 @@
-import {SegmentSubsequences} from "@shared/*";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
 import {flatten} from "lodash";
 
 export const combineSegmentSubSequences = (notableSubsequencesOfWords: SegmentSubsequences[]) => ({

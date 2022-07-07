@@ -1,4 +1,4 @@
-import { VideoMetadata } from '@shared/*'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 import {
     BehaviorSubject,
     combineLatest,

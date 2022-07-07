@@ -1,4 +1,4 @@
-import {SegmentSubsequences} from "@shared/*";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
 import {subSequenceRecordHasNothingAdjacent} from "../schedule/learning-target/flash-card-learning-targets.service";
 
 export const getNotableSubsequencesOfWords = (notableSubSequences: SegmentSubsequences, syntheticWords: Set<string>, strategy: 'noSeparator' | 'spaceSeparator', vocabulary: Set<string>): SegmentSubsequences => {

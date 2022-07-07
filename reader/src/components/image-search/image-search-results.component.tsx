@@ -1,6 +1,6 @@
 import { GridList, GridListTile } from '@material-ui/core'
 import React from 'react'
-import { ImageObject } from '@shared/'
+import { ImageObject } from 'languagetrainer-server/src/shared'
 import Image from 'material-ui-image';
 
 export const ImageSearchResults = ({

@@ -1,4 +1,4 @@
-import { InterpolateService } from '@shared/'
+import { InterpolateService } from 'languagetrainer-server/src/shared'
 
 export class InterpolateExampleSegmentsService {
     public static interpolate(sentences: string[]) {

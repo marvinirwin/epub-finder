@@ -22,7 +22,7 @@ import {
     averageKnownWords,
     AverageResult,
     wordsFromCountRecordList,
-} from "@shared/"
+} from "languagetrainer-server/src/shared"
 import { sum, round } from 'lodash'
 import { TranslationAttemptScheduleData } from '../../lib/schedule/translation-attempt-schedule.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'

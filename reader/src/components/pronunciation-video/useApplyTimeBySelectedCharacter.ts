@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { useSubscription } from 'observable-hooks'
 import { ManagerContext } from '../../App'
-import { VideoMetadata } from '@shared/'
+import { VideoMetadata } from 'languagetrainer-server/src/shared'
 
 export function useApplyTimeBySelectedCharacter(
     videoElementRef: HTMLVideoElement | null | undefined,

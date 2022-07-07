@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { usePlaceHighlightBar } from './usePlaceHighlightBar'
 import { TemporalPositionBarComponent } from './temporal-position-bar.component'
 import { HighlightBarComponent } from './highlight-bar.component'
-import { VideoCharacter, VideoMetadata } from "@shared/"
+import { VideoCharacter, VideoMetadata } from "languagetrainer-server/src/shared"
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { PronunciationTimingCharacterComponent } from './pronunciation-character.component'

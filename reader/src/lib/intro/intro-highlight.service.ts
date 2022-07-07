@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs'
-import { Segment } from "@shared/"
+import { Segment } from "languagetrainer-server/src/shared"
 import { filter, map, take } from 'rxjs/operators'
 import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
 

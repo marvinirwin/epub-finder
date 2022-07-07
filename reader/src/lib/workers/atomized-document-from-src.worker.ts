@@ -1,7 +1,7 @@
 /* eslint no-restricted-globals: 0 */
 // @ts-ignore
 // noinspection JSConstantReassignment
-import {AtomizedDocument, AtomizeSrcDocParams} from '@shared/'
+import {AtomizedDocument, AtomizeSrcDocParams} from 'languagetrainer-server/src/shared'
 // @ts-ignore
 import { XMLSerializer } from 'xmldom'
 

@@ -1,5 +1,5 @@
 {
-    "name": "express-typescript-starter",
+    "name": "languagetrainer-server",
     "version": "3.4.1",
     "description": "A starting point for Node.js express apps with TypeScript",
     "repository": {

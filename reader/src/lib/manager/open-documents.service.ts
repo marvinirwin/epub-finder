@@ -1,6 +1,6 @@
 import { combineLatest, merge, Observable, of } from 'rxjs'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
-import { SerializedDocumentTabulation, TabulatedSegments } from '@shared/'
+import { SerializedDocumentTabulation, TabulatedSegments } from 'languagetrainer-server/src/shared'
 import { flattenTree, NamedDeltaScanner } from '../delta-scan/delta-scan.module'
 import { DatabaseService } from '../Storage/database.service'
 import { SettingsService } from '../../services/settings.service'
@@ -12,7 +12,7 @@ import {
 } from '../document-frame/document-sources.service'
 import { DocumentRepository } from '../documents/document.repository'
 import { TrieWrapper } from '../util/TrieWrapper'
-import { SerializedTabulationAggregate } from "@shared/"
+import { SerializedTabulationAggregate } from "languagetrainer-server/src/shared"
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { BrowserSegment } from '../sentences/browser-segment'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'

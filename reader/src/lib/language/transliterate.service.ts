@@ -1,4 +1,4 @@
-import { TransliterateResponseDto, TransliterateRequestDto } from '@shared/'
+import { TransliterateResponseDto, TransliterateRequestDto } from 'languagetrainer-server/src/shared'
 import axios, { AxiosResponse } from 'axios'
 import memoize from 'memoizee'
 

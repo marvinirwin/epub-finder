@@ -1,7 +1,7 @@
 import { TreeMenuNode } from '../tree-menu-node.interface'
 import React, { useContext } from 'react'
 import { AccountCircle, DeviceHub, Settings } from '@material-ui/icons'
-import { AUTH, PROGRESS_TREE } from '@shared/'
+import { AUTH, PROGRESS_TREE } from 'languagetrainer-server/src/shared'
 import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
 import { FrequencyTreeNode } from '../../frequency-tree/frequency-tree-node.component'

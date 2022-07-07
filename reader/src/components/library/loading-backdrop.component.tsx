@@ -9,7 +9,7 @@ import {
     Typography,
 } from '@material-ui/core'
 import { useObservableState } from 'observable-hooks'
-import { loadingBackdropTypography } from '@shared/'
+import { loadingBackdropTypography } from 'languagetrainer-server/src/shared'
 import { ProgressItemComponent } from '../item-in-progress/progress-item.component'
 
 const useStyles = makeStyles((theme: Theme) =>

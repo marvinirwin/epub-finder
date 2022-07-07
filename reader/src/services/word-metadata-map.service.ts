@@ -1,12 +1,12 @@
 import { combineLatest, Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { Dictionary } from 'lodash'
-import { AtomMetadata } from "@shared/"
-import { XMLDocumentNode } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
+import { XMLDocumentNode } from "languagetrainer-server/src/shared"
 import { VisibleService } from '../lib/manager/visible.service'
 import { ElementAtomMetadataIndex } from './element-atom-metadata.index'
-import { Segment, safePushMapSet, safePushSet } from '@shared/'
-import { AbstractSegment } from "@shared/"
+import { Segment, safePushMapSet, safePushSet } from 'languagetrainer-server/src/shared'
+import { AbstractSegment } from "languagetrainer-server/src/shared"
 
 export type BrowserAtomMetadata = AtomMetadata<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>;
 

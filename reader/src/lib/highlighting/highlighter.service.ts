@@ -10,14 +10,14 @@ import { combineLatest, Observable, ReplaySubject } from 'rxjs'
 import { LtElement } from './Highlighter'
 import { Dictionary } from 'lodash'
 import { mixRGBA, RGBA } from './color.service'
-import { AtomMetadata } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
 import { map, shareReplay } from 'rxjs/operators'
 import debug from 'debug'
-import { safePushMap } from '@shared/'
+import { safePushMap } from 'languagetrainer-server/src/shared'
 import {RandomColorsService} from "../../services/random-colors.service";
 import {DEV} from "../util/url-params";
-import { XMLDocumentNode } from "@shared/"
-import { AbstractSegment } from "@shared/"
+import { XMLDocumentNode } from "languagetrainer-server/src/shared"
+import { AbstractSegment } from "languagetrainer-server/src/shared"
 
 // Priority, highlighterName
 export type HighlighterPath = [number, string]

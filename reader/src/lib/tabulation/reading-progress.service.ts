@@ -1,6 +1,6 @@
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay, startWith} from 'rxjs/operators'
-import {SerializedTabulationAggregate} from "@shared/"
+import {SerializedTabulationAggregate} from "languagetrainer-server/src/shared"
 import {VideoMetadataRepository} from '../../services/video-metadata.repository'
 import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
 import {AllWordsRepository} from '../language/all-words.repository'
@@ -11,7 +11,7 @@ import {
     KnowablePositionedWord,
     ReadingProgress,
     wordCountForSubsequence,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import {sumBy, uniq} from 'lodash'
 import {getGreedySubSequences} from "../schedule/learning-target/get-greedy-subsequences";
 import {getNotableSubsequencesOfWords} from "./get-notable-subsequences-of-words";

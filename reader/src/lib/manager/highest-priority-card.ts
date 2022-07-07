@@ -1,4 +1,4 @@
-import { ICard } from "@shared/"
+import { ICard } from "languagetrainer-server/src/shared"
 
 export const highestPriorityCard = (c1: ICard, c2: ICard) => {
     /*

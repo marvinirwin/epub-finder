@@ -2,7 +2,7 @@ import {
     observableLastValue,
     SettingsService,
 } from '../../services/settings.service'
-import { LtDocument } from '@shared/'
+import { LtDocument } from 'languagetrainer-server/src/shared'
 import { Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { DocumentRepository } from '../documents/document.repository'

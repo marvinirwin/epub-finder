@@ -8,7 +8,7 @@ import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
-import {SegmentSubsequences} from "@shared/*";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
 
 export const OpenExampleSentencesFactory = ({

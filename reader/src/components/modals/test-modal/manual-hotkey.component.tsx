@@ -1,4 +1,4 @@
-import { manualHotkeyInput, submitManualHotkeyButton } from '@shared/'
+import { manualHotkeyInput, submitManualHotkeyButton } from 'languagetrainer-server/src/shared'
 import { useContext, useState } from 'react'
 import { ManagerContext } from '../../../App'
 import React from 'react'

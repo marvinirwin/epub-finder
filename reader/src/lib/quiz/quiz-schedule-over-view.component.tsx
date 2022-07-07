@@ -15,7 +15,7 @@ import {
     quizRowsInProgressTable,
     quizRowsNotInProgressTable,
     quizRowsToReviewTable,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { QuizCardTableHead } from '../../components/quiz/quiz-card-table-head.component'

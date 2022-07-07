@@ -6,19 +6,19 @@ import {
     SerializedDocumentTabulation,
     tabulate,
     TabulatedSegments,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { TabulateLocalDocument } from '../workers/worker.helpers'
-import { XMLDocumentNode } from "@shared/"
+import { XMLDocumentNode } from "languagetrainer-server/src/shared"
 import { BrowserSegment } from '../sentences/browser-segment'
 import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
 import { OnSelectService } from '../user-interface/on-select.service'
-import { resolvePartialTabulationConfig } from "@shared/"
+import { resolvePartialTabulationConfig } from "languagetrainer-server/src/shared"
 import { pipeLog } from '../manager/pipe.log'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
-import { AbstractSegment } from "@shared/"
+import { AbstractSegment } from "languagetrainer-server/src/shared"
 
 export class OpenDocument {
     public name: string

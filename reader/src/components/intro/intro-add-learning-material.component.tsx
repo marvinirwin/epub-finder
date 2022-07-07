@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Container, Paper, Typography } from '@material-ui/core'
-import { introAddLearningMaterial } from '@shared/'
+import { introAddLearningMaterial } from 'languagetrainer-server/src/shared'
 import { UploadText } from '../upload/upload-text.component'
 
 export const IntroAddLearningMaterial: React.FC<{children?: React.ReactNode}> = ({ children }) => {

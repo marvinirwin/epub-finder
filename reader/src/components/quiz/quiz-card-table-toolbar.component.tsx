@@ -6,7 +6,7 @@ import {
     Toolbar,
     Typography,
 } from '@material-ui/core'
-import { filterScheduleRows } from '@shared/'
+import { filterScheduleRows } from 'languagetrainer-server/src/shared'
 import React, { useContext } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { ManagerContext } from '../../App'

@@ -9,7 +9,7 @@ import {
     libraryRowDelete, libraryRowToggleExample,
     libraryRowToggleFrequency,
     libraryRowToggleReading,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 
 export const LibraryDocumentRowComponent: React.FC<{
     document: LibraryDocumentRow

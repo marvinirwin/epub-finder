@@ -7,8 +7,8 @@ import {
     spokenLanguageSelect,
     textToSpeechLanguageSelectLabel,
     textToSpeechSelect,
-} from '@shared/'
-import { SupportedTranslations } from "@shared/"
+} from 'languagetrainer-server/src/shared'
+import { SupportedTranslations } from "languagetrainer-server/src/shared"
 
 export const LanguageSelect = () => {
     const m = useContext(ManagerContext)

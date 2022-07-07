@@ -1,13 +1,13 @@
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay } from 'rxjs/operators'
-import { SupportedTranslations } from "@shared/"
+import { SupportedTranslations } from "languagetrainer-server/src/shared"
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { SpeechToTextConfig, SupportedSpeechToTextService } from "@shared/"
-import { resolveRomanizationConfig, SupportedTransliterations } from '@shared/'
+import { SpeechToTextConfig, SupportedSpeechToTextService } from "languagetrainer-server/src/shared"
+import { resolveRomanizationConfig, SupportedTransliterations } from 'languagetrainer-server/src/shared'
 import { TextSpeechMap } from './text-speech-map'
-import { WordIdentifyingStrategy } from "@shared/"
-import { resolvePartialTabulationConfig } from "@shared/"
-import { TextToSpeechConfig, TextToSpeechConfigs } from "@shared/"
+import { WordIdentifyingStrategy } from "languagetrainer-server/src/shared"
+import { resolvePartialTabulationConfig } from "languagetrainer-server/src/shared"
+import { TextToSpeechConfig, TextToSpeechConfigs } from "languagetrainer-server/src/shared"
 
 export type PossibleTranslationConfig = { from: string; to: string } | undefined
 export type PossibleTransliterationConfig =

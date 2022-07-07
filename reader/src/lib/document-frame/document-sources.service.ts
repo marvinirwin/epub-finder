@@ -1,5 +1,5 @@
 import { merge, Observable } from 'rxjs'
-import { AtomizedDocument } from "@shared/"
+import { AtomizedDocument } from "languagetrainer-server/src/shared"
 import { AtomizedStringsForRawHTML } from '../pipes/AtomizedStringsForRawHTML'
 import { map, shareReplay } from 'rxjs/operators'
 import { AtomizedStringsForURL } from '../pipes/AtomizedStringsForURL'

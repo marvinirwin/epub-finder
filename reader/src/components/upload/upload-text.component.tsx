@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { ManagerContext } from '../../App'
 import { Box, Button, TextField, Typography } from '@material-ui/core'
-import { uploadTextArea, uploadTextButton, uploadTextName } from '@shared/'
+import { uploadTextArea, uploadTextButton, uploadTextName } from 'languagetrainer-server/src/shared'
 import { useObservableState } from 'observable-hooks'
 
 export const UploadText = () => {

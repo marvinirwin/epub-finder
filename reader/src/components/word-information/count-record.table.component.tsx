@@ -1,5 +1,5 @@
 import React from 'react'
-import { DocumentWordCount } from "@shared/"
+import { DocumentWordCount } from "languagetrainer-server/src/shared"
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
 
 export const CountRecordTable: React.FC<{

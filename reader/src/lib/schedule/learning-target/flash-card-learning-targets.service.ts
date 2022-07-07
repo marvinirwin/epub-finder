@@ -7,11 +7,11 @@ import {TimeService} from '../../time/time.service'
 import {combineLatest, Observable} from 'rxjs'
 import {map, shareReplay} from 'rxjs/operators'
 import {mapIfThenDefault} from '../../util/map.module'
-import {IPositionedWord} from "@shared/"
+import {IPositionedWord} from "languagetrainer-server/src/shared"
 import {CustomWordsRepository} from './custom-words.repository'
 import {TabulationService} from '../../tabulation/tabulation.service'
 import {pipeLog} from '../../manager/pipe.log'
-import {SegmentSubsequences} from "@shared/*";
+import {SegmentSubsequences} from "languagetrainer-server/src/shared";
 
 export const sumNotableSubSequences = (iPositionedWords: SegmentSubsequences) => {
     const m = new Map<string, number>()

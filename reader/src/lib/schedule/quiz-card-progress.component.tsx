@@ -9,7 +9,7 @@ import {
     recognizedCount,
     somewhatRecognizedCount,
     unrecognizedCount,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { Paper } from '@material-ui/core'
 
 export const QuizCardProgress = ({ quizCard }: { quizCard: QuizCard }) => {

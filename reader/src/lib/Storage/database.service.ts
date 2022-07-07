@@ -1,11 +1,11 @@
 import Dexie, {Table} from 'dexie'
-import {ICard} from "@shared/"
-import {CreatedSentence} from "@shared/"
+import {ICard} from "languagetrainer-server/src/shared"
+import {CreatedSentence} from "languagetrainer-server/src/shared"
 import {PronunciationProgressRow} from '../schedule/pronunciation-progress-row.interface'
 import {WordRecognitionRow} from "../schedule/word-recognition-row";
 import {queryPersistableEntity} from "./queryPersistableEntity";
-import {IgnoredWordView} from "@shared/";
-import {KnownWordView} from "@shared/";
+import {IgnoredWordView} from "languagetrainer-server/src/shared";
+import {KnownWordView} from "languagetrainer-server/src/shared";
 
 export type PersistableEntity = 'userSettings' |
     'userSettingView' |

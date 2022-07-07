@@ -1,6 +1,6 @@
 import { PronunciationProgressRepository } from '../schedule/pronunciation-progress.repository'
 import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
-import { SetWithUniqueLengths } from "@shared/"
+import { SetWithUniqueLengths } from "languagetrainer-server/src/shared"
 import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, shareReplay, startWith } from 'rxjs/operators'
 import { TemporaryHighlightService } from '../highlighting/temporary-highlight.service'

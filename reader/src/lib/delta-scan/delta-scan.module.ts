@@ -5,7 +5,7 @@ import {
     ds_Tree,
     flattenTreeIntoDict,
 } from '../../services/tree.service'
-import { Named } from "@shared/"
+import { Named } from "languagetrainer-server/src/shared"
 
 export type ds_Dict<T, U extends string = string> = {
     [key in U]: T

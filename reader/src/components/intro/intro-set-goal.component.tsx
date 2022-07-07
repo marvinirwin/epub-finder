@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Container, Paper, Typography } from '@material-ui/core'
-import { introSetCardLimit } from '@shared/'
+import { introSetCardLimit } from 'languagetrainer-server/src/shared'
 import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 
 export const IntroSetGoal: React.FC<{ children?: React.ReactNode }> = ({ children }) => {

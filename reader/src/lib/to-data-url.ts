@@ -1,4 +1,4 @@
-import {resolveExtFromResponseHeaders} from "@shared/*";
+import {resolveExtFromResponseHeaders} from "languagetrainer-server/src/shared";
 
 export const toDataUrl = (url: string) => fetch(url)
     .then(response => ({blob: response.blob(), ext: resolveExtFromResponseHeaders(response)}))

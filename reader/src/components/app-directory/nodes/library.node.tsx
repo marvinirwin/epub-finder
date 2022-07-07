@@ -1,7 +1,7 @@
 import React from 'react'
 import { LibraryBooks } from '@material-ui/icons'
 import { Manager } from '../../../lib/manager/Manager'
-import { LIBRARY } from '@shared/'
+import { LIBRARY } from 'languagetrainer-server/src/shared'
 
 export const LibraryNode = (m: Manager) => ({
     name: LIBRARY,

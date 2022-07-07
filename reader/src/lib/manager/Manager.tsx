@@ -3,7 +3,7 @@ import { Dictionary } from 'lodash'
 import { map, shareReplay } from 'rxjs/operators'
 import { DatabaseService } from '../Storage/database.service'
 import React from 'react'
-import { AtomMetadata } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
 import { AudioManager } from './AudioManager'
 import CardsRepository from './cards.repository'
 import { OpenDocumentsService } from './open-documents.service'

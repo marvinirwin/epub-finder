@@ -1,6 +1,6 @@
 import {
     SerializableTabulationConfiguration,
-} from "@shared/"
+} from "languagetrainer-server/src/shared"
 import { combineLatest, Observable } from 'rxjs'
 import { WordsService } from '../words.service'
 import { NotableSubsequencesService } from '../../sentences/notable-subsequences.service'

@@ -8,7 +8,7 @@ import {
 } from 'rxjs/operators'
 import { HighlightDelta } from '../lib/highlighting/highlight.interface'
 import { WordMetadataMapService } from './word-metadata-map.service'
-import { VideoCharacter, VideoMetadata } from "@shared/";
+import { VideoCharacter, VideoMetadata } from "languagetrainer-server/src/shared";
 
 export class HighlightPronunciationVideoService {
     constructor({

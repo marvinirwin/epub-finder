@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { Box, Typography } from '@material-ui/core'
-import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWordsLeftForTodayNumber } from '@shared/'
+import { quizLearnedTodayNumber, quizLearningNumber, quizToReviewNumber, quizWordsLeftForTodayNumber } from 'languagetrainer-server/src/shared'
 import { WrapInContext } from './wrap-in-menu'
 import {LimitedScheduleRows} from "../../lib/manager/limit-schedule-rows.type";
 import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";

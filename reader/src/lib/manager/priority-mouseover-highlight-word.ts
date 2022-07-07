@@ -1,5 +1,5 @@
-import { AtomMetadata } from "@shared/"
-import { ICard } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
+import { ICard } from "languagetrainer-server/src/shared"
 import { flatten, maxBy } from 'lodash'
 import CardsRepository from './cards.repository'
 

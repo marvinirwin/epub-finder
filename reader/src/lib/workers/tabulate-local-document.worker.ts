@@ -5,10 +5,10 @@ import {
     AtomizedDocument,
     SerializedDocumentTabulation,
     tabulate,
-} from '@shared/'
+} from 'languagetrainer-server/src/shared'
 import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
-import { SetWithUniqueLengths } from '@shared/'
-import { resolvePartialTabulationConfig } from "@shared/"
+import { SetWithUniqueLengths } from 'languagetrainer-server/src/shared'
+import { resolvePartialTabulationConfig } from "languagetrainer-server/src/shared"
 
 // @ts-ignore
 self.window = self

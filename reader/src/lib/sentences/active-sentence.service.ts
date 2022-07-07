@@ -1,4 +1,4 @@
-import { Segment } from '@shared/'
+import { Segment } from 'languagetrainer-server/src/shared'
 import { combineLatest, ReplaySubject } from 'rxjs'
 import { SettingsService } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'

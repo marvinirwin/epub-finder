@@ -1,5 +1,5 @@
 import { ds_Tree } from '../../services/tree.service'
-import { Named } from '@shared/ '
+import { Named } from 'languagetrainer-server/src/shared '
 
 /**
  * Each one of these things is an observable which returns treeNdoes

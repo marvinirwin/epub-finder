@@ -1,6 +1,6 @@
 import { ds_Dict, flattenTree } from '../delta-scan/delta-scan.module'
 import { Dictionary, flatten } from 'lodash'
-import { AtomMetadata } from "@shared/"
+import { AtomMetadata } from "languagetrainer-server/src/shared"
 import { combineLatest, Observable } from 'rxjs'
 import {
     EXAMPLE_SENTENCE_DOCUMENT,
@@ -8,9 +8,9 @@ import {
     READING_DOCUMENT_NODE_LABEL,
 } from './open-documents.service'
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators'
-import { Segment } from "@shared/"
+import { Segment } from "languagetrainer-server/src/shared"
 import { OpenDocument } from '../document-frame/open-document.entity'
-import { QUIZ_NODE, READING_NODE } from '@shared/'
+import { QUIZ_NODE, READING_NODE } from 'languagetrainer-server/src/shared'
 
 export const renderedSegmentsElements = (o$: Observable<Segment[][]>) =>
     o$.pipe(

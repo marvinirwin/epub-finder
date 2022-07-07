@@ -1,5 +1,5 @@
 import {flatten} from 'lodash'
-import {ICard} from "@shared/"
+import {ICard} from "languagetrainer-server/src/shared"
 import {ScheduleRow, SpacedSortQuizData} from "../schedule/schedule-row";
 
 export const cardForWord = async (word: string, language_code: string): Promise<Partial<ICard>> => ({

@@ -1,7 +1,7 @@
 import { WavAudio } from './wav-audio'
 import axios from 'axios'
-import { TextToSpeechConfig } from "@shared/"
-import { SpeechSynthesisRequestDto } from '@shared/'
+import { TextToSpeechConfig } from "languagetrainer-server/src/shared"
+import { SpeechSynthesisRequestDto } from 'languagetrainer-server/src/shared'
 
 export async function fetchSynthesizedAudio(
     c: { text: string} & TextToSpeechConfig
