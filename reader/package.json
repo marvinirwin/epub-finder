@@ -47,7 +47,7 @@
     "material-ui-popup-state": "^1.6.1",
     "memoizee": "^0.4.15",
     "microsoft-cognitiveservices-speech-sdk": "^1.15.0",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "observable-hooks": "^3.0.0",
     "plotly.js": "^1.54.5",
     "prettier": "^2.2.1",
