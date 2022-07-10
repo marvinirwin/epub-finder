@@ -4,7 +4,8 @@
   "private": true,
   "dependencies": {
     "@babel/helper-validator-option": "^7.12.11",
-    "@craco/craco": "^6.4.3",
+    "@craco/craco": "^7.0.0-alpha.7",
+    "@dealmore/craco-plugin-babel-include": "^1.0.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@material-ui/core": "^4.10.0",
@@ -64,6 +65,7 @@
     "react-toastify": "^6.0.5",
     "react-tooltip": "^4.2.6",
     "react-use-promise": "^0.3.1",
+    "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.5",
     "sass": "^1.49.8",
     "socket.io-client": "^3.0.3",

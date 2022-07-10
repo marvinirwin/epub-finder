@@ -1,11 +1,18 @@
 const { CracoAliasPlugin } = require("react-app-alias-ex");
+const babelInclude = require('@dealmore/craco-plugin-babel-include');
 
 module.exports = {
   plugins: [
     {
       plugin: CracoAliasPlugin,
       options: {}
-    }
+    },
+    {
+      plugin: babelInclude,
+      options: {
+        include: ['../server/src'],
+      },
+    },
   ],
   webpack: {
     configure: webpackConfig => {

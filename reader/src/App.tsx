@@ -1,3 +1,4 @@
+import 'refect-metadata';
 import './declaration.d'
 import 'fontsource-noto-sans'
 import React from 'react'
