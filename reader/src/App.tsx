@@ -1,7 +1,6 @@
-import 'refect-metadata';
+import React from 'react'
 import './declaration.d'
 import 'fontsource-noto-sans'
-import React from 'react'
 import './App.scss'
 import 'react-toastify/dist/ReactToastify.css'
 import {getManager} from './AppSingleton'

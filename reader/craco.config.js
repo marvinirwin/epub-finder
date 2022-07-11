@@ -23,5 +23,10 @@ module.exports = {
       webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
       return webpackConfig;
     }
-  }
+  },
+  babel: {
+    plugins: [
+      "babel-plugin-transform-typescript-metadata"
+    ]
+  },
 };
