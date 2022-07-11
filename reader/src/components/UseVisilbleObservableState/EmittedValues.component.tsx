@@ -37,7 +37,7 @@ export const EmittedValues = ({
   }
   return showObservables ?
     <div>
-      <ol style={{ position: "absolute", backgroundColor: "lightgrey", borderRadius: 5, padding: 24, ...(style || {}) }} >
+      <ol style={{ position: "absolute", backgroundColor: "lightgrey", borderRadius: 5, padding: 24, ...(style || {}), zIndex: 100 }} >
       {emittedValues.slice(0, linesVisible ).map(({ id, value, formatFn }) => <li
         style={{ lineHeight: "20px" }}
         key={id}>{formatFn ? formatFn(value) : value ? `${value}` : `${id}`}</li>)}
