@@ -16,7 +16,8 @@
         "test": "jest ",
         "lint-fix": "eslint --fix .  --ext .ts --ext .tsx",
         "nest-help": "nest --help",
-        "clone-libxml": "cd node_modules && git clone https://github.com/fishilico/libxmljs && cd libxmljs && npm run install"
+        "clone-libxml": "cd node_modules && git clone https://github.com/fishilico/libxmljs && cd libxmljs && npm run install",
+        "preinstall": "npm install -g npm-force-resolutions@0.0.3"
     },
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",
