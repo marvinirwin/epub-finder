@@ -17,6 +17,7 @@ export class ExampleSegmentsService {
     }) {
         this.exampleSegmentMap$ = selectedVirtualTabulationsService.selectedExampleVirtualTabulations$.pipe(
             map((tabulation) => {
+              debugger;
                 return new SerializedTabulationAggregate(
                     tabulation,
                 ).wordSegmentPositionedWordMap()

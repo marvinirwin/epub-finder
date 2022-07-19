@@ -35,9 +35,10 @@ export function Main({ m }: { m: Manager }) {
         useObservableState(m.browserInputsService.focusedElement$) || null
     const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {})
     const withDefaults = { ...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig }
+    const urlParams = new URLSearchParams(window.location.search)
 
     return (
-      <ShowObservableContext.Provider value={"true"}>
+      <ShowObservableContext.Provider value={urlParams.get('visible-observables') || ''}>
           <HotkeyContext.Provider value={withDefaults}>
               <FocusedElement.Provider value={hotkeyHandler}>
                   <PronunciationVideoResizedContext.Provider
