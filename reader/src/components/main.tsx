@@ -1,20 +1,19 @@
-import React, { useEffect } from 'react'
-import { Manager } from '../lib/manager/Manager'
-import { useObservableState } from 'observable-hooks'
-import { HotKeyEvents } from '../lib/hotkeys/HotKeyEvents'
-import { AppDirectory } from './app-directory/app-directory-service'
-import { Subject } from 'rxjs'
-import { Hotkeys } from '../lib/hotkeys/hotkeys.interface'
-import { MiniDrawer } from './app-container/drawer'
-import './mouseover-div/mouseover-div'
-import { useShowIntroModal } from '../lib/intro/use-show-intro-modal'
+import React, { useEffect } from "react";
+import { Manager } from "../lib/manager/Manager";
+import { useObservableState } from "observable-hooks";
+import { HotKeyEvents } from "../lib/hotkeys/HotKeyEvents";
+import { AppDirectory } from "./app-directory/app-directory-service";
+import { Subject } from "rxjs";
+import { Hotkeys } from "../lib/hotkeys/hotkeys.interface";
+import { MiniDrawer } from "./app-container/drawer";
+import "./mouseover-div/mouseover-div";
+import { useShowIntroModal } from "../lib/intro/use-show-intro-modal";
+import { ShowObservableContext } from "../ShowObservableContext";
 
 export const FocusedElement = React.createContext<
     HTMLElement | Document | null
 >(null)
 export const HotkeyContext = React.createContext<Partial<Hotkeys<string[]>>>({})
-// It's a string because I may want to filter observables to show, instead of showing/hiding all of them
-export const ShowObservableContext = React.createContext<string>("");
 const audioRecorderResized$ = new Subject<void>()
 const pronunciationVideoResized$ = new Subject<void>()
 export const AudioRecorderResizedContext = React.createContext<Subject<void>>(

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
-import { ShowObservableContext } from "../main";
 import { EmittedValuesProps } from "./EmittedValuesProps";
+import { ShowObservableContext } from "../../ShowObservableContext";
 
 const defaultLinesVisible = 8;
 
