@@ -257,7 +257,7 @@ export class SettingsService {
             'indexedDB',
         );
         this.onlyReviewPresentText$ = this.createSetting$<boolean>(
-            'textToSpeechConfiguration',
+            'onlyReviewPresentText',
             false,
             'indexedDB',
         );

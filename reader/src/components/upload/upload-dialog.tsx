@@ -58,12 +58,12 @@ export const UploadDialog = () => {
                             name="btn-upload"
                             style={{ display: 'none' }}
                             type="file"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                                 const droppedFiles = e.target.files
                                 if (droppedFiles && language_code) {
                                     for (let i = 0; i < droppedFiles.length; i++) {
                                         const file = droppedFiles[i]
-                                        m.uploadingDocumentsService.upload( {file, language_code})
+                                        await m.uploadingDocumentsService.upload( {file, language_code})
                                     }
                                 }
                             }}
