@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, DragEvent } from "react";
+import { SettingsPopup } from "../settings-popup/settings-popup.component";
 
-type Language = {
+export type Language = {
   value: string;
   name: string;
   variants?: Language[];
@@ -30,21 +31,21 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onL
     }
   }, [languages]);
 
-  const handleLanguageChange = (event: any) => {
-    const selectedLang = languages.find((lang) => lang.value === event.target.value);
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLang = languages.find((lang) => lang.value === e.target.value);
     setLanguage(selectedLang);
     onLanguageSelect(selectedLang);
   };
 
-  const handleVariantChange = (event: any) => {
+  const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (language?.variants) {
-      const selectedVariant = language.variants.find((lang) => lang.value === event.target.value);
+      const selectedVariant = language.variants.find((lang) => lang.value === e.target.value);
       setVariant(selectedVariant);
       onVariantSelect(selectedVariant);
     }
   };
 
-  const handleDrag = (e: any) => {
+  const handleDrag = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
@@ -54,7 +55,7 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onL
     }
   };
 
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -64,7 +65,7 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onL
     }
   };
 
-  const handleSubmit = (e: any) => {};
+  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {};
 
   const handleUploadClick = () => {
     inputRef.current?.click();
@@ -72,12 +73,12 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onL
 
   return (
     <div className="w-full h-full relative">
+      {showSettings && (
+        <div className="absolute top-0 left-0 w-full h-full z-10 bg-[rgba(0,0,0,0.5)]" onClick={() => setShowSettings(false)} />
+      )}
       <nav className="flex justify-end items-center relative w-full h-[70px]">
         {showSettings ? (
-          <div>
-            <input />
-            <select></select>
-          </div>
+          <SettingsPopup show={showSettings} languages={languages} onLanguageSelect={handleLanguageChange} onVariantSelect={handleVariantChange} />
         ) : (
           <div
             className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
