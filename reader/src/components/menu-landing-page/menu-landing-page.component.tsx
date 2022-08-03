@@ -14,7 +14,12 @@ export type MenuLandingPageProps = {
   onFileUpload: (files: any) => void;
 };
 
-export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onLanguageSelect, onVariantSelect, onFileUpload }) => {
+export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({
+  languages,
+  onLanguageSelect,
+  onVariantSelect,
+  onFileUpload,
+}) => {
   const [showSettings, setShowSettings] = useState(false);
   const [language, setLanguage] = useState<Language | undefined>(undefined);
   const [variant, setVariant] = useState<Language | undefined>(undefined);
@@ -74,11 +79,19 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({ languages, onL
   return (
     <div className="w-full h-full relative">
       {showSettings && (
-        <div className="absolute top-0 left-0 w-full h-full z-10 bg-[rgba(0,0,0,0.5)]" onClick={() => setShowSettings(false)} />
+        <div
+          className="absolute top-0 left-0 w-full h-full z-10 bg-[rgba(0,0,0,0.5)]"
+          onClick={() => setShowSettings(false)}
+        />
       )}
       <nav className="flex justify-end items-center relative w-full h-[70px]">
         {showSettings ? (
-          <SettingsPopup show={showSettings} languages={languages} onLanguageSelect={handleLanguageChange} onVariantSelect={handleVariantChange} />
+          <SettingsPopup
+            show={showSettings}
+            languages={languages}
+            onLanguageSelect={handleLanguageChange}
+            onVariantSelect={handleVariantChange}
+          />
         ) : (
           <div
             className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"

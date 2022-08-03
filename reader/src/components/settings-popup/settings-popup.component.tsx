@@ -39,38 +39,38 @@ export const SettingsPopup: React.FC<SettingsPopupProps> = ({ show, languages, o
   return (
     <>
       {show ? (
-          <div className="absolute top-1 right-1 z-20 p-3 w-80 h-[570px] flex flex-col items-center bg-white">
-            <input
-              className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
-              type="email"
-            />
+        <div className="absolute top-1 right-1 z-20 p-3 w-80 h-[570px] flex flex-col items-center bg-white">
+          <input
+            className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
+            type="email"
+          />
+          <select
+            className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
+            defaultValue={languages[0].value}
+            value={language?.value}
+            onChange={handleLanguageChange}
+          >
+            {languages.map((lang) => (
+              <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+          {variant && (
             <select
-              className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
-              defaultValue={languages[0].value}
-              value={language?.value}
-              onChange={handleLanguageChange}
+              className="w-[300px] h-11 p-2 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
+              defaultValue={variant.value}
+              value={variant.value}
+              onChange={handleVariantChange}
             >
-              {languages.map((lang) => (
+              {language?.variants?.map((lang) => (
                 <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
                   {lang.name}
                 </option>
               ))}
             </select>
-            {variant && (
-              <select
-                className="w-[300px] h-11 p-2 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
-                defaultValue={variant.value}
-                value={variant.value}
-                onChange={handleVariantChange}
-              >
-                {language?.variants?.map((lang) => (
-                  <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
-                    {lang.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          )}
+        </div>
       ) : (
         <></>
       )}
