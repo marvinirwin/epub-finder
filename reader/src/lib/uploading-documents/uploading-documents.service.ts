@@ -7,7 +7,7 @@ import { LanguageConfigsService } from "../language/language-configs.service";
 import { observableLastValue, SettingsService } from "../../services/settings.service";
 import { ModalService } from "../user-interface/modal.service";
 
-const supportedFileExtensions = new Set<string>([
+export const supportedDocumentFileExtensions = new Set<string>([
   "pdf",
   "docx",
   "txt",
@@ -55,7 +55,7 @@ export class UploadingDocumentsService {
   }
 
   async upload({ file, language_code }: { file: File, language_code: string }) {
-    if (!supportedFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name))) {
+    if (!supportedDocumentFileExtensions.has(DroppedFilesService.extensionFromFilename(file.name))) {
       throw new Error(`Unsupported file extension ${file.name}`);
     }
     return this.progressItemService.newProgressItem().exec(async () => {
