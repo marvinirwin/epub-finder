@@ -3,11 +3,12 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { UploadText } from './upload-text.component'
 import { Box, Button, Typography } from '@material-ui/core'
-import { fileChooser, uploadProgressBar } from '@shared/'
+import {fileChooser, SupportedSpeechToTextService, uploadProgressBar} from '@shared/'
 import { BorderLinearProgressComponent } from '../progress/border-linear-progress.component'
 import { languageCodesMappedToLabels } from "@shared/"
 import { useVisibleObservableState } from "../UseVisilbleObservableState/UseVisibleObservableState";
 import { EmittedValues } from "../UseVisilbleObservableState/EmittedValues.component";
+import {supportedDocumentFileExtensions} from "../../lib/uploading-documents/uploading-documents.service";
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
@@ -34,7 +35,7 @@ export const UploadDialog = () => {
                     Upload Learning Material
                 </Typography>
                 <Typography variant="subtitle1" style={{ margin: '24px' }}>
-                    Supported Extensions: docx, txt, pdf and html
+                    Supported Extensions: {}
                 </Typography>
                 <Typography variant="subtitle1" style={{ margin: '24px' }}>
                     Max Size: 1MB
@@ -58,12 +59,12 @@ export const UploadDialog = () => {
                             name="btn-upload"
                             style={{ display: 'none' }}
                             type="file"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                                 const droppedFiles = e.target.files
                                 if (droppedFiles && language_code) {
                                     for (let i = 0; i < droppedFiles.length; i++) {
                                         const file = droppedFiles[i]
-                                        m.uploadingDocumentsService.upload( {file, language_code})
+                                        await m.uploadingDocumentsService.upload( {file, language_code})
                                     }
                                 }
                             }}
@@ -73,7 +74,7 @@ export const UploadDialog = () => {
                             variant="outlined"
                             component="span"
                         >
-                            Upload a txt, pdf or html file
+                            Upload a {Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ')}
                         </Button>
                     </label>
                 </div>

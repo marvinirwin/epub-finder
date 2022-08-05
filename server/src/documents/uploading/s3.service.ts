@@ -39,14 +39,24 @@ const streamToString = (stream) => {
     });
 };
 
-export function s3ReadStream(filename: string): Promise<stream.Readable> {
-    return new Promise((resolve, reject) => {
-        const o = s3
-            .getObject({ Bucket: bucket, Key: filename })
-            .on("error", (e) => reject(e));
-        resolve(o.createReadStream());
-    });
+export function s3ReadStream(key: string): Promise<stream.Readable> {
+  return new Promise((resolve, reject) => {
+    const o = s3
+      .getObject({ Bucket: bucket, Key: key })
+      .on("error", (e) => reject(e));
+    resolve(o.createReadStream());
+  });
 }
+
+export const s3KeyToBuffer = async (key: string) => {
+  const chunks = [];
+  const stream = await s3ReadStream(key);
+  return new Promise<Buffer>((resolve, reject) => {
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+  });
+};
 
 export const getS3FileString = (filename: string) =>
     s3ReadStream(filename).then(streamToString);

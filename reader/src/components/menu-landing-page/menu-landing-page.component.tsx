@@ -20,7 +20,6 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({
   onVariantSelect,
   onFileUpload,
 }) => {
-  const [showSettings, setShowSettings] = useState(false);
   const [language, setLanguage] = useState<Language | undefined>(undefined);
   const [variant, setVariant] = useState<Language | undefined>(undefined);
   const [dragActive, setDragActive] = React.useState(false);
@@ -78,29 +77,11 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({
 
   return (
     <div className="w-full h-full relative">
-      {showSettings && (
-        <div
-          className="absolute top-0 left-0 w-full h-full z-10 bg-[rgba(0,0,0,0.5)]"
-          onClick={() => setShowSettings(false)}
-        />
-      )}
-      <nav className="flex justify-end items-center relative w-full h-[70px]">
-        {showSettings ? (
-          <SettingsPopup
-            show={showSettings}
-            languages={languages}
-            onLanguageSelect={handleLanguageChange}
-            onVariantSelect={handleVariantChange}
-          />
-        ) : (
-          <div
-            className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
-            onClick={() => setShowSettings(true)}
-          >
-            <span>M</span>
-          </div>
-        )}
-      </nav>
+      <SettingsPopup
+        languages={languages}
+        onLanguageSelect={handleLanguageChange}
+        onVariantSelect={handleVariantChange}
+      />
       <div className="w-full h-full flex flex-row">
         <div className="flex flex-col w-1/2">
           <h1 className="text-6xl">Learn all the words</h1>
@@ -165,39 +146,4 @@ export const MenuLandingPage: React.FC<MenuLandingPageProps> = ({
       </div>
     </div>
   );
-};
-
-MenuLandingPage.defaultProps = {
-  languages: [
-    {
-      value: "zh",
-      name: "Chinese",
-      variants: [
-        {
-          value: "zh-Hans",
-          name: "Chinese (Simplified)",
-        },
-        {
-          value: "zh-Hant",
-          name: "Chinese (Traditional)",
-        },
-      ],
-    },
-    {
-      value: "en",
-      name: "English",
-      variants: [
-        {
-          value: "en-CA",
-          name: "English (CA)",
-        },
-        {
-          value: "en-US",
-          name: "English (US)",
-        },
-      ],
-    },
-  ],
-  onLanguageSelect: () => {},
-  onVariantSelect: () => {},
 };
