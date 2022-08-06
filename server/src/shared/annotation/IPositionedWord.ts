@@ -1,7 +1,7 @@
 import { WordIdentifyingStrategy } from "../tabulation/tabulate-types";
 import { segmentBoundaryRegexp, wordBoundaryRegexp } from "../tabulation/word-separator";
 import {SegmentSubsequences} from "../index";
-import {breakThaiWords} from "../tabulate-documents/tabulate-segment/tabulate";
+import {breakThaiWords} from "../tabulate-documents/tabulate-segment/breakThaiWords";
 
 export interface IPositionedWord {
     word: string;

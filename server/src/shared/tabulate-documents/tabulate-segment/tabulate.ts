@@ -8,18 +8,7 @@ import {SegmentSubsequences, wordBoundaryRegexp} from "../../index";
 import {IWordInProgress} from "../../annotation/IWordInProgress";
 // @ts-ignore
 import memoize from "memoizee";
-
-export const breakThaiWords = memoize(async (text: string) => {
-  const result = await fetch(
-    `${process.env.PUBLIC_URL}/api/thai/separate`,
-    {
-      method: "POST",
-      body: JSON.stringify({text})
-    }
-  );
-  return result.json();
-}, {length: 1, primitive: true});
-
+import {breakThaiWords} from "./breakThaiWords";
 
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {

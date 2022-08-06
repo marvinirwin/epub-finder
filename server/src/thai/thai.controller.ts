@@ -6,7 +6,6 @@ wordcut.init();
 export class ThaiController {
   @Post("separate")
   findAll(@Body() body: {text: string}): string[] {
-    console.log(body)
-    return wordcut.cut(body.text);
+    return wordcut.cutIntoArray(body.text);
   }
 }
