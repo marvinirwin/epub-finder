@@ -299,7 +299,10 @@ export class AtomizedDocument {
 
     bodyInnerHTML() {
         const body = this.findBody();
-        return new XMLSerializer().serializeToString(body);
+        return new XMLSerializer().serializeToString(body)
+          .replace("<body xmlns=\"http://www.w3.org/1999/xhtml\">" , "")
+          .replace("</body>" , "")
+          ;
     }
 
     findBody(): Element {

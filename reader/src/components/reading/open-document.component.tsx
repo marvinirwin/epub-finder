@@ -16,6 +16,7 @@ export const OpenDocumentComponent = React.forwardRef<
             setMouseOverText('', '');
         }, 10)
     }, [bodyInnerHTML]);
+    console.log(bodyInnerHTML)
     return (
         <InnerHtmlFrameComponent
             {...props}

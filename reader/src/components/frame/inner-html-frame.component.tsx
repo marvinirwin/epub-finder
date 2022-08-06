@@ -15,17 +15,15 @@ export const InnerHtmlFrameComponent = React.forwardRef<
         title: string
     } & React.HTMLProps<HTMLIFrameElement>
 >(({ headText, bodyText, renderHandler, title, ...props }, ref) => {
-/*
-    const [headRef, setHeadRef] = useState<HTMLTitleElement | null>()
-*/
     const [bodyRef, setBodyRef] = useState<HTMLDivElement | null>()
     useEffect(() => {
-        if (/*headRef && */bodyRef) {
-            renderHandler(/*headRef,*/ bodyRef)
+        if (bodyRef) {
+            renderHandler(bodyRef)
         }
-    }, [headText, bodyText, /*headRef,*/ bodyRef])
+    }, [headText, bodyText, bodyRef])
     return (
-        <div ref={setBodyRef} {...props} dangerouslySetInnerHTML={{__html: bodyText}}/>
+        <div ref={setBodyRef} {...props} dangerouslySetInnerHTML={{__html: bodyText
+        }}/>
 /*
         <IframeComponent title={title} {...props} ref={ref}>
             <Fragment>

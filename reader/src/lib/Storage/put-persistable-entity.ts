@@ -10,7 +10,6 @@ export const putPersistableEntity = <T>(
     record: Partial<T>
   },
 ) => {
-  debugger;
   const url = new URL(`${window.location.origin}/api/entities/${entity}`)
   return fetch(
     url.toString(),

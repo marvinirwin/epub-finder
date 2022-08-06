@@ -50,10 +50,6 @@ export class SelectedVirtualTabulationsService {
       openDocumentList().pipe(pipeLog("selected-virtual-tabulations:open-document-list")),
       settingsService.selectedExampleSegmentDocuments$
     ]).pipe(
-      tap((...args) => {
-        console.log(args);
-        debugger;
-      }),
       selectedPipe<OpenDocument, string>(t => t.id),
       switchMap(openDocuments => {
         return combineLatest(openDocuments.map(openDocument => openDocument.virtualTabulation$)).pipe(startWith([]));
