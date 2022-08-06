@@ -125,6 +125,7 @@
     "web-vitals": "^2.1.4",
     "webpack": "^5.72.1",
     "websocket": "^1.0.32",
+    "wordcut": "^0.9.1",
     "worker-loader": "^2.0.0",
     "xmldom": "^0.3.0"
   },

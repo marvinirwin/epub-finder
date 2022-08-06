@@ -1,5 +1,5 @@
-import { flatten } from "lodash";
-import { WordIdentifyingStrategy } from "./tabulate";
+import {flatten} from "lodash";
+import {WordIdentifyingStrategy} from "./tabulate";
 
 export type LanguageCode = string
 
@@ -36,59 +36,97 @@ export const thaiRegexp = /\p{Script_Extensions=Thai}/u;
 export const wordBoundaryRegexp = /[\s.,"'–?:!;，！？；：（）［］【】。「」﹁﹂、‧《》〈〉]/;
 export const segmentBoundaryRegexp = /[.,“”"‘’'–?:!;，！？；：（）［］【】。「」﹁﹂、‧《》〈〉]/;
 export const LanguageSeparatorStrategy: {
-    languages: LanguageCode[];
-    strategy?: WordIdentifyingStrategy;
-    regexp: RegExp;
+  languages: LanguageCode[];
+  strategy?: WordIdentifyingStrategy;
+  regexp: RegExp;
 }[] = [
-    {
-        languages: ["zh-Hans", "zh-Hant", "yue"],
-        strategy: "noSeparator",
-        regexp: chineseCharacterRegexp,
-    },
-    {
-        languages: ["ar", "prs"],
-        strategy: "spaceSeparator",
-        regexp: arabicCharacterRegexp,
-    },
-    { languages: ["as", "bn"], regexp: assameseBengaliCharacterRegexp },
-    { languages: ["bg", "kk"], regexp: cyrillicRegexp },
-    { languages: ["el"], regexp: greekRegexp },
-    { languages: ["he"], regexp: hebrewRegexp },
-    { languages: ["gu"], regexp: gujaratiRegexp },
-    { languages: ["hi"], regexp: devangariRegexp },
-    { languages: ["ja"], regexp: japaneseRegexp },
-    { languages: ["kn"], regexp: kannadaRegexp },
-    { languages: ["ko"], regexp: koreanRegexp },
-    { languages: ['th'], regexp: thaiRegexp }
-    /**
-     * {languages: ['mww']},
-     * Hmong Daw has a few scripts, but they're all out of range I think
-     */
+  {
+    languages: ["zh-Hans", "zh-Hant", "yue"],
+    strategy: "noSeparator",
+    regexp: chineseCharacterRegexp,
+  },
+  {
+    languages: ["ar", "prs"],
+    strategy: "spaceSeparator",
+    regexp: arabicCharacterRegexp,
+  },
+  {
+    languages: ["as", "bn"],
+    regexp: assameseBengaliCharacterRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["bg", "kk"],
+    regexp: cyrillicRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["el"],
+    regexp: greekRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["he"],
+    regexp: hebrewRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["gu"],
+    regexp: gujaratiRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["hi"],
+    regexp: devangariRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["ja"],
+    regexp: japaneseRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["kn"],
+    regexp: kannadaRegexp,
+      strategy: "spaceSeparator"
+  },
+  {
+    languages: ["ko"],
+    regexp: koreanRegexp,
+    strategy: "spaceSeparator"
+  },
+  {
+    languages: ["th"],
+    regexp: thaiRegexp,
+    strategy: "spaceSeparator"
+  }
+  /**
+   * {languages: ['mww']},
+   * Hmong Daw has a few scripts, but they're all out of range I think
+   */
 ];
 
-export const languageRegexMap = new Map<
-    LanguageCode,
-    { strategy?: WordIdentifyingStrategy; regexp: RegExp }
->(
-    flatten(
-        LanguageSeparatorStrategy.map(({ languages, strategy, regexp }) =>
-            languages.map((language) => [language, { strategy, regexp }]),
-        ),
+export const languageRegexMap = new Map<LanguageCode,
+  { strategy?: WordIdentifyingStrategy; regexp: RegExp }>(
+  flatten(
+    LanguageSeparatorStrategy.map(({languages, strategy, regexp}) =>
+      languages.map((language) => [language, {strategy, regexp}]),
     ),
+  ),
 );
 
 export const resolvePartialTabulationConfig = (
-    language_code: string,
+  language_code: string,
 ): {
-    isWordBoundaryRegex: RegExp;
-    wordIdentifyingStrategy: WordIdentifyingStrategy;
-    isNotableCharacterRegex: RegExp;
+  isWordBoundaryRegex: RegExp;
+  wordIdentifyingStrategy: WordIdentifyingStrategy;
+  isNotableCharacterRegex: RegExp;
 } => {
-    const result = languageRegexMap.get(language_code);
-    return {
-        wordIdentifyingStrategy: result?.strategy || "spaceSeparator",
-        isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,
-        isWordBoundaryRegex: wordBoundaryRegexp,
-    };
+  const result = languageRegexMap.get(language_code);
+  return {
+    wordIdentifyingStrategy: result?.strategy || "spaceSeparator",
+    isNotableCharacterRegex: result?.regexp || latinCharacterRegexp,
+    isWordBoundaryRegex: wordBoundaryRegexp,
+  };
 };
 
