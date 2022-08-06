@@ -182,7 +182,6 @@ export class LanguageConfigsService {
       ) && firstPotentialTextToSpeechConfig;
 
       if (shouldSetDefaultTextToSpeechLanguage) {
-        debugger;
         settingsService.textToSpeechConfiguration$.next(firstPotentialTextToSpeechConfig);
         return;
       }

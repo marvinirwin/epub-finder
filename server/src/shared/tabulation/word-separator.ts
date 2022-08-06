@@ -24,6 +24,8 @@ export const greekRegexp = /\p{Script_Extensions=Greek}/u;
 export const japaneseRegexp = /[\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Han}]/u;
 export const kannadaRegexp = /\p{Script_Extensions=Kannada}/u;
 export const koreanRegexp = /\p{Script_Extensions=Hangul}/u;
+export const thaiRegexp = /\p{Script_Extensions=Thai}/u;
+
 // TODO, the rest, i stopped at ko
 
 /**
@@ -57,6 +59,7 @@ export const LanguageSeparatorStrategy: {
     { languages: ["ja"], regexp: japaneseRegexp },
     { languages: ["kn"], regexp: kannadaRegexp },
     { languages: ["ko"], regexp: koreanRegexp },
+    { languages: ['th'], regexp: thaiRegexp }
     /**
      * {languages: ['mww']},
      * Hmong Daw has a few scripts, but they're all out of range I think
