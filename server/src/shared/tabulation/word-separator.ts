@@ -1,5 +1,5 @@
 import {flatten} from "lodash";
-import {WordIdentifyingStrategy} from "./tabulate";
+import {WordIdentifyingStrategy} from "./tabulate-types";
 
 export type LanguageCode = string
 
@@ -98,7 +98,7 @@ export const LanguageSeparatorStrategy: {
   {
     languages: ["th"],
     regexp: thaiRegexp,
-    strategy: "spaceSeparator"
+    strategy: "thai"
   }
   /**
    * {languages: ['mww']},

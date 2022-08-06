@@ -1,5 +1,5 @@
 import {combineLatest, Observable} from 'rxjs'
-import {map, shareReplay, startWith} from 'rxjs/operators'
+import {map, shareReplay, startWith, switchMap} from 'rxjs/operators'
 import {SerializedTabulationAggregate} from "@shared/"
 import {VideoMetadataRepository} from '../../services/video-metadata.repository'
 import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
@@ -45,7 +45,7 @@ export class ReadingProgressService {
             languageConfigsService.wordSeparationStrategy$,
             weightedVocabService.weightedVocab$,
         ]).pipe(
-            map(([
+            switchMap(async ([
                      builtInWords,
                      selectedFrequencyVirtualTabulations,
                      videoMetadataIndex,
@@ -53,21 +53,20 @@ export class ReadingProgressService {
                      weightedVocab,
                  ]) => {
                 const syntheticWords = new Set<string>(Object.keys(videoMetadataIndex))
-                const vocabulary = new Set(builtInWords)
-                return new SerializedTabulationAggregate(
+                const vocabulary = new Set(builtInWords);
+                return Promise.all(new SerializedTabulationAggregate(
                     selectedFrequencyVirtualTabulations,
                 ).serializedTabulations.map(
-                    ({notableSubSequences, label}) => {
+                    async ({notableSubSequences, label}) => {
                         const notableSubsequencesOfWords = notableSubSequences.map(notableSubsequence => getNotableSubsequencesOfWords(notableSubsequence, syntheticWords, strategy, vocabulary))
-                        const knowableSubSequences: KnowablePositionedWord[] = getGreedySubSequences(combineSegmentSubSequences(notableSubsequencesOfWords)
-                        )
-                            .subsequences.map(positionedWord => ({
+                        const knowableSubSequences: KnowablePositionedWord[] = await Promise.all(getGreedySubSequences(combineSegmentSubSequences(notableSubsequencesOfWords)
+                        ).subsequences.map(async positionedWord => ({
                                         ...positionedWord,
                                         known: weightedVocab.get(positionedWord.word) === 1,
-                                        wordCount: wordCountForSubsequence(positionedWord.word, strategy)
+                                        wordCount: await wordCountForSubsequence(positionedWord.word, strategy)
                                     }
                                 ),
-                            );
+                            ));
                         const knownSubSequences = knowableSubSequences.filter(r => r.known)
                         const unknownSubSequences = knowableSubSequences.filter(r => !r.known)
                         const uniqueKnown = uniq(knownSubSequences.map(w => w.word));
@@ -89,7 +88,7 @@ export class ReadingProgressService {
                             uniqueUnknown,
                         };
                     },
-                )
+                ))
             }),
             shareReplay(1),
         )

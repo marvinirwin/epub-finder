@@ -8,22 +8,20 @@ import { Inject } from "@nestjs/common";
 import { SetWithUniqueLengths } from "../../shared/tabulate-documents/set-with-unique-lengths";
 import { resolvePartialTabulationConfig } from "../../shared/tabulation/word-separator";
 
-export function streamToString(stream): Promise<string> {
+export const streamToString = (stream): Promise<string> => {
     const chunks = [];
     return new Promise((resolve, reject) => {
         stream.on("data", (chunk) => chunks.push(chunk));
         stream.on("error", (err) => reject(err));
         stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
     });
-}
+};
 
-function segmentFromTextFactory(text: string[]) {
-    return text.map(text => ({
-        translatableText: text,
-        children: text.split("").map(character => ({textContent: character})),
-        textContent: text
-    }));
-}
+const segmentFromTextFactory = (text: string[]) => text.map(text => ({
+    translatableText: text,
+    children: text.split("").map(character => ({textContent: character})),
+    textContent: text
+}));
 
 export class TabulateService {
     constructor(
@@ -68,7 +66,7 @@ export class TabulateService {
         const text = await streamToString(
             await s3ReadStream(documentToTabulate.filename),
         );
-        return this.tabulate({text: [text], words, language_code});
+        return await this.tabulate({text: [text], words, language_code});
         /*
         return {
             wordCounts: tabulation.wordCounts,
@@ -79,9 +77,9 @@ export class TabulateService {
 */
     }
 
-    public  tabulate({text, words, language_code}: {text: string[]; words: string[]; language_code: string}) {
+    public  async tabulate({text, words, language_code}: {text: string[]; words: string[]; language_code: string}) {
         const setWithUniqueLengths = new SetWithUniqueLengths(words);
-        return tabulate({
+        return await tabulate({
             notableCharacterSequences: setWithUniqueLengths,
             segments: segmentFromTextFactory(text),
             greedyWordSet: setWithUniqueLengths,

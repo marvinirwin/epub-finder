@@ -1,7 +1,7 @@
 import { Dictionary } from "lodash";
 import { AtomMetadata } from "../atom-metadata/atom-metadata";
 import { Segment } from "./segment/segment";
-import { SerializedSegment, PositionedWord } from "../tabulation/tabulate";
+import { SerializedSegment, PositionedWord } from "../tabulation/tabulate-types";
 import {SegmentSubsequences} from "../index";
 import {AbstractNode, AbstractSegment} from "./tabulate-segment/tabulate";
 

@@ -1,11 +1,26 @@
-import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../tabulation/tabulate";
+import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../tabulation/tabulate-types";
 import {TabulatedSegments} from "../tabulated-documents.interface";
 import {flatten, uniq} from "lodash";
 import {safePush, safePushMap} from "../../safe-push";
 import {IPositionedWord} from "../../annotation/IPositionedWord";
 import {AtomMetadata} from "../../atom-metadata/atom-metadata";
-import {SegmentSubsequences} from "../../index";
+import {SegmentSubsequences, wordBoundaryRegexp} from "../../index";
 import {IWordInProgress} from "../../annotation/IWordInProgress";
+// @ts-ignore
+import memoize from "memoizee";
+
+export const breakThaiWords = memoize(async (text: string) => {
+  const result = await fetch(
+    `${process.env.PUBLIC_URL}/api/thai/separate`,
+    {
+      method: "POST",
+      body: JSON.stringify({text})
+    }
+  );
+  return result.json();
+}, {length: 1, primitive: true});
+
+
 
 export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
   const startPoint = Math.min(...positionedWords.map(({position}) => position));
@@ -23,14 +38,14 @@ export type AbstractSegment<T extends AbstractNode> = {
   translatableText: string;
 };
 
-export const tabulate = <NodeType extends AbstractNode, SegmentType extends AbstractSegment<NodeType>>(
+export const tabulate = async <NodeType extends AbstractNode, SegmentType extends AbstractSegment<NodeType>>(
   {
     notableCharacterSequences,
     segments,
     isNotableCharacterRegex,
     wordIdentifyingStrategy,
     isWordBoundaryRegex,
-  }: TabulationParameters<SegmentType>): TabulatedSegments<NodeType, SegmentType> => {
+  }: TabulationParameters<SegmentType>): Promise<TabulatedSegments<NodeType, SegmentType>> => {
   const tabulationObject = tabulationFactory<SegmentType, NodeType>();
   const elementSegmentMap = new Map<NodeType, SegmentType>();
   const isNotableCharacter = (character: string) =>
@@ -72,6 +87,8 @@ export const tabulate = <NodeType extends AbstractNode, SegmentType extends Abst
     text: string;
     index: number;
   } = {text: "", index: 0};
+
+
   for (let i = 0; i < allMarks.length; i++) {
     const currentMark: NodeType = allMarks[i];
     const currentCharacter = textContent[i];
@@ -118,34 +135,42 @@ export const tabulate = <NodeType extends AbstractNode, SegmentType extends Abst
 
     let wordStartingHereSplitBySeparator: string | undefined;
 
-    if (
-      notableSequencesWhichStartHere.length === 0 &&
-      notableSubsequencesInProgress.length === 0 &&
-      isNotableCharacter(currentCharacter)
-    ) {
-      switch (wordIdentifyingStrategy) {
-        case "noSeparator":
-          notableSequencesWhichStartHere.push(currentCharacter);
-          break;
-        case "spaceSeparator":
-          // Go until the next space or punctuation
-          const strings = textContent
-            .substr(i, textContent.length)
-            .split(isWordBoundaryRegex);
-          const wordStartingHere = strings[0]?.trim();
-          if (wordStartingHere) {
-            // Don't include if this word is part of multiple segments
-            const segmentsThisWordIsAPartOf = new Set(wordStartingHere
-              .split("")
-              .map((letter, index) => elementSegmentMap.get(allMarks[i + index])));
-            if (segmentsThisWordIsAPartOf.size > 1) {
-              break;
+    if (notableSequencesWhichStartHere.length === 0) {
+      if (notableSubsequencesInProgress.length === 0) {
+        if (isNotableCharacter(currentCharacter)) {
+          const textContentPastThisPoint = textContent
+            .substr(i, textContent.length);
+
+          const tryAndUseFirstSplitWord = <NodeType>(strings: string[]) => {
+            const wordStartingHere = strings[0]?.trim();
+            if (wordStartingHere) {
+              // Don't include if this word is part of multiple segments
+              const segmentsThisWordIsAPartOf = new Set(wordStartingHere
+                .split("")
+                .map((letter, index) => elementSegmentMap.get(allMarks[i + index])));
+              if (segmentsThisWordIsAPartOf.size > 1) {
+                return ""
+              }
+              safePush(wordSegmentMap, wordStartingHere, elementSegmentMap.get(currentMark));
+              notableSequencesWhichStartHere.push(wordStartingHere);
+              return wordStartingHere;
             }
-            safePush(wordSegmentMap, wordStartingHere, elementSegmentMap.get(currentMark));
-            wordStartingHereSplitBySeparator = wordStartingHere;
-            notableSequencesWhichStartHere.push(wordStartingHere);
+          };
+
+          switch (wordIdentifyingStrategy) {
+            case "noSeparator":
+              notableSequencesWhichStartHere.push(currentCharacter);
+              break;
+            case "spaceSeparator":
+              // Go until the next space or punctuation
+              wordStartingHereSplitBySeparator = tryAndUseFirstSplitWord(textContentPastThisPoint.split(wordBoundaryRegexp));
+              break;
+            case "thai":
+              wordStartingHereSplitBySeparator = tryAndUseFirstSplitWord(await breakThaiWords(textContentPastThisPoint));
+              break;
+
           }
-          break;
+        }
       }
     }
 

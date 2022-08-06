@@ -26,6 +26,7 @@ import { CardView } from "./entities/card-view.entity";
 import {TabulateService} from "./documents/similarity/tabulate.service";
 import { CacheService } from "./util/cache.service";
 import { DocumentView } from "./entities/document-view.entity";
+import { ThaiController } from './thai/thai.controller';
 
 
 @Module({
@@ -56,6 +57,6 @@ import { DocumentView } from "./entities/document-view.entity";
     providers: [
       CacheService, ChineseVocabService, SessionService, UsersService, CliService, TabulateService
     ],
-    controllers: [],
+    controllers: [ThaiController],
 })
 export class AppModule {}

@@ -32,7 +32,7 @@ ctx.onmessage = async (ev) => {
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
     const doc = AtomizedDocument.atomizeDocument({documentId: ltDoc.id(), documentSrc})
     const segments = doc.segments();
-    const tabulated = tabulate({
+    const tabulated = await tabulate({
         greedyWordSet: new SetWithUniqueLengths(words),
         notableCharacterSequences: new SetWithUniqueLengths(
             notableSubsequences,

@@ -58,7 +58,7 @@ export * from "./supported-text-to-speech";
 export type {SpeechSynthesisRequestDto} from "../speech/speech-synthesis-request-dto";
 export * from "./XMLDocumentNode";
 export type {AbstractSegment} from "./tabulate-documents/tabulate-segment/tabulate";
-export type {PositionedWord, WordIdentifyingStrategy, SerializableTabulationConfiguration} from "./tabulation/tabulate";
+export type {PositionedWord, WordIdentifyingStrategy, SerializableTabulationConfiguration} from "./tabulation/tabulate-types";
 export * from "./supported-transliteration.service";
 export type {SimilarityResults} from "./compre-similarity-result";
 export * from "./similarity-result.interface";
