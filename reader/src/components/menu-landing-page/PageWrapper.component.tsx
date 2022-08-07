@@ -64,26 +64,13 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     SettingsNode(m),
     TestingUtilsNode(m),
   ];
-  const language = languages.find(language => language.value === readingLanguageCode) as ParentLanguageOption;
+  const language = languages.find(language => language.value === readingLanguageCode);
   const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
   const variant = flatten(languages.map(l => l.variants)).find(v => v.value === spokenLanguageCode) as VariantLanguageOption;
   const setVariant = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.next(v.value)
   const [dragActive, setDragActive] = React.useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const currentComponent = useObservableState(m.settingsService.componentPath$)
-
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLang = languages.find((lang) => lang.value === e.target.value) as ParentLanguageOption;
-    setLanguage(selectedLang);
-  };
-
-  const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (language?.variants) {
-      const selectedVariant = language.variants.find((lang) => lang.value === e.target.value) as VariantLanguageOption;
-      setVariant(selectedVariant);
-      onVariantSelect(selectedVariant);
-    }
-  };
 
   const handleDrag = (e: DragEvent) => {
     e.preventDefault();
@@ -109,7 +96,39 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
   };
 
   const handleUploadClick = () => {
-    inputRef.current?.click();
+    // @ts-ignore
+    var el = window._protected_reference = document.createElement("INPUT");
+    // @ts-ignore
+    el.type = "file";
+    // @ts-ignore
+    el.accept = "image/*";
+    // @ts-ignore
+    el.multiple = "multiple"; // remove to have a single file selection
+
+    // (cancel will not trigger 'change')
+    el.addEventListener('change', function (ev2) {
+      //@ts-ignore
+      onFileUpload(el.files)
+      // access el.files[] to do something with it (test its length!)
+      // test some async handling
+      new Promise<void>(function (resolve) {
+          // @ts-ignore
+          setTimeout(function () {
+              resolve();
+            },
+            1000
+          );
+        }
+      )
+        .then(function () {
+          // clear / free reference
+          // @ts-ignore
+          el = window._protected_reference = undefined;
+        });
+
+    });
+
+    el.click(); // open
   };
 
   const getSelectedPage = () => {
@@ -124,7 +143,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
           dragActive={dragActive}
           onDragEnter={handleDrag}
           onDrop={handleDrop}
-          onSubmit={handleSubmit}
           onClick={handleUploadClick}
           ref={inputRef}
         />

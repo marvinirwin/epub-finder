@@ -5,7 +5,7 @@ import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 export type NavBarAndSettingsProps = {
   languages: ParentLanguageOption[];
   navBarItems: TreeMenuNode[]
-  language: ParentLanguageOption,
+  language: ParentLanguageOption | undefined,
   setLanguage: (v: ParentLanguageOption) => unknown
   variant: VariantLanguageOption,
   setVariant: (v: VariantLanguageOption) => unknown
@@ -60,14 +60,14 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
                   </option>
                 ))}
               </select>
-              {language.variants.length && (
+              {language?.variants?.length && (
                 <select
                   className="w-[300px] h-11 p-2 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
                   defaultValue={variant.value}
                   value={variant.value}
                   onChange={handleVariantChange}
                 >
-                  {language.variants.map((lang) => (
+                  {language?.variants?.map((lang) => (
                     <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
                       {lang.label}
                     </option>
