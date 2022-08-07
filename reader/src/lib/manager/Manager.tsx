@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs'
 import { Dictionary } from 'lodash'
 import { map, shareReplay } from 'rxjs/operators'
 import { DatabaseService } from '../Storage/database.service'
@@ -239,9 +239,7 @@ export class Manager {
         this.openDocumentsService = new OpenDocumentsService(this)
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
-            componentInView$: this.treeMenuService.selectedComponentNode$.pipe(
-                map((component) => component?.name || ''),
-            ),
+            componentInView$: of("").pipe(shareReplay(1)),
             openDocumentsService: this.openDocumentsService,
         })
         this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)

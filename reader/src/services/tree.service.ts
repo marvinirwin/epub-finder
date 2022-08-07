@@ -17,20 +17,7 @@ export type ds_Tree<T, U extends string = string> = {
     newTree?: boolean
 }
 
-export const walkTree = <T>(
-    t: ds_Tree<T>,
-    ...path: string[]
-): ds_Tree<T> | undefined => {
-    if (!path.length) return t
-    if (!t.children?.[path[0]]) {
-        throw new Error(`No child under ${t.nodeLabel} with label ${path[0]}`)
-    }
-    return walkTree(t.children[path[0]], ...path.slice(1))
-}
 
-export const treeValue = <T>(t: ds_Tree<T>, ...path: string[]) => {
-    return walkTree(t, ...path)?.value
-}
 
 /**
  * Maybe I should return a tree of deltas once I apply

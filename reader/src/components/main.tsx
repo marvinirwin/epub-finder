@@ -5,7 +5,6 @@ import { HotKeyEvents } from "../lib/hotkeys/HotKeyEvents";
 import { AppDirectory } from "./app-directory/app-directory-service";
 import { Subject } from "rxjs";
 import { Hotkeys } from "../lib/hotkeys/hotkeys.interface";
-import { MiniDrawer } from "./app-container/drawer";
 import "./mouseover-div/mouseover-div";
 import { useShowIntroModal } from "../lib/intro/use-show-intro-modal";
 import { ShowObservableContext } from "../ShowObservableContext";
