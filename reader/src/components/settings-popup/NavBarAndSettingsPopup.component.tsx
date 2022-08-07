@@ -22,16 +22,6 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
   }) => {
   const [showSettings, setShowSettings] = useState(false);
 
-  useEffect(() => {
-    if (languages.length) {
-      const lang = languages[0];
-      setLanguage(lang);
-      if (lang.variants?.length) {
-        setVariant(lang.variants[0]);
-      }
-    }
-  }, [languages]);
-
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLang = languages.find((lang) => lang.value === event.target.value) as ParentLanguageOption;
     setLanguage(selectedLang);
@@ -46,7 +36,7 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
 
   return (
     <>
-      <nav className="flex justify-end items-center relative w-full h-[70px]">
+      <nav className="flex justify-between items-center relative w-full h-[70px] px-8">
         {showSettings ? (
           <>
             <div
@@ -87,16 +77,18 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
             </div>
           </>
         ) : (
-          <div
-            className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
-            onClick={() => setShowSettings(true)}
-          >
-            <span>M</span>
-          </div>
+          <>
+            {
+              navBarItems.map(item => <span key={item.name}>{item.label}</span>)
+            }
+            <div
+              className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-space-around items-center"
+              onClick={() => setShowSettings(true)}
+            >
+              <span>M</span>
+            </div>
+          </>
         )}
-        {
-          navBarItems.map(item => <span key={item.name}>{item.label}</span>)
-        }
       </nav>
     </>
   );

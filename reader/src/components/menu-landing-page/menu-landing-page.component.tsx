@@ -33,7 +33,7 @@ export const LandingPage = (
     setVariant,
     variant
   }: LandingPageProps) => <div className="w-full h-full flex flex-row">
-  <div className="flex flex-col w-1/2">
+  <div className="flex flex-col w-1/2 p-8">
     <h1 className="text-6xl">Learn all the words</h1>
     <h1 className="text-6xl">from a restaurant menu</h1>
     <img src="https://i.kfs.io/album/global/160289973,0v1/fit/500x500.jpg" className="w-full"/>
