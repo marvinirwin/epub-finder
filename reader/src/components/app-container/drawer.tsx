@@ -111,6 +111,8 @@ export const MiniDrawer: React.FC<{children?: React.ReactNode}> = ({ children })
 
     return (
         <div className={`app-container ${classes.root}`}>
+
+
             <AppBar
                 position='fixed'
                 className={clsx(classes.appBar, {
@@ -136,69 +138,6 @@ export const MiniDrawer: React.FC<{children?: React.ReactNode}> = ({ children })
                     <ChangeLog/>
                 </Toolbar>
             </AppBar>
-            <Drawer
-                variant='permanent'
-                className={clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open,
-                })}
-                classes={{
-                    paper: clsx({
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open,
-                    }),
-                }}
-            >
-                <div className={classes.toolbar}>
-                    <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'rtl' ? (
-                            <ChevronRightIcon />
-                        ) : (
-                            <ChevronLeftIcon />
-                        )}
-                    </IconButton>
-                </div>
-                <Divider />
-                <List>
-                    {menuItemTree?.sourced && (
-                        <TreeMenu
-                            title={() => (
-                                <Typography
-                                    ref={(ref) =>
-                                        m.introService.titleRef$.next(ref)
-                                    }
-                                    variant='h6'
-                                />
-                            )}
-                            tree={menuItemTree.sourced}
-                            directoryPath={directoryPath
-                                .split('.')
-                                .filter((v) => v)}
-                            directoryChanged={(directoryPath) =>
-                                m.settingsService.directoryPath$.next(
-                                    directoryPath.join('.'),
-                                )
-                            }
-                            componentChanged={(componentPath) => {
-                                m.settingsService.componentPath$.next(
-                                    componentPath.join('.'),
-                                )
-                            }}
-                            actionSelected={(actionPath) =>
-                                treeMenuService.actionSelected$.next(actionPath)
-                            }
-                        >
-                            {/*
-                        <ListItem button>
-                            <IconButton onClick={ () => setOpen(!open)}>
-                                {open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
-                            </IconButton>
-                        </ListItem>
-*/}
-                        </TreeMenu>
-                    )}
-                </List>
-            </Drawer>
             <div className={classes.content}>
                 <div className={classes.toolbar} />
                 <AllItemsContainer className={`all-items-container`} />

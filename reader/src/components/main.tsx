@@ -9,6 +9,7 @@ import { MiniDrawer } from "./app-container/drawer";
 import "./mouseover-div/mouseover-div";
 import { useShowIntroModal } from "../lib/intro/use-show-intro-modal";
 import { ShowObservableContext } from "../ShowObservableContext";
+import {PageWrapper} from "./menu-landing-page/PageWrapper.component";
 
 export const FocusedElement = React.createContext<
     HTMLElement | Document | null
@@ -46,7 +47,7 @@ export function Main({ m }: { m: Manager }) {
                       <AudioRecorderResizedContext.Provider
                         value={audioRecorderResized$}
                       >
-                          <MiniDrawer />
+                          <PageWrapper />
                       </AudioRecorderResizedContext.Provider>
                   </PronunciationVideoResizedContext.Provider>
               </FocusedElement.Provider>

@@ -1,13 +1,17 @@
-import { SettingsService } from "../../services/settings.service";
-import { map, shareReplay } from "rxjs/operators";
-import { SupportedTranslations } from "@shared/";
-import { combineLatest, Observable, ReplaySubject } from "rxjs";
-import { SpeechToTextConfig, SupportedSpeechToTextService } from "@shared/";
-import { resolveRomanizationConfig, SupportedTransliterations } from "@shared/";
-import { TextSpeechMap } from "./text-speech-map";
-import { WordIdentifyingStrategy } from "@shared/";
-import { resolvePartialTabulationConfig } from "@shared/";
-import { TextToSpeechConfig, TextToSpeechConfigs } from "@shared/";
+import {SettingsService} from "../../services/settings.service";
+import {map, shareReplay} from "rxjs/operators";
+import {
+  resolvePartialTabulationConfig,
+  resolveRomanizationConfig,
+  SpeechToTextConfig,
+  SupportedTranslations,
+  SupportedTransliterations,
+  TextToSpeechConfig,
+  TextToSpeechConfigs,
+  WordIdentifyingStrategy
+} from "@shared/";
+import {combineLatest, Observable, ReplaySubject} from "rxjs";
+import {mapTranslatableLanguagesToSpokenOnes} from "./mapTranslatableLanguagesToSpokenOnes";
 
 export type PossibleTranslationConfig = { from: string; to: string } | undefined
 export type PossibleTransliterationConfig =
@@ -96,13 +100,7 @@ export class LanguageConfigsService {
     );
 
     this.potentialLearningSpoken$ = getLanguageCodeObservable(
-      (knownLanguageCode, learningLanguageCode) => {
-        const lowerCode = learningLanguageCode.toLowerCase();
-        const textSpeechMapElement = TextSpeechMap[lowerCode];
-        return (textSpeechMapElement || []).map((code) =>
-          SupportedSpeechToTextService.ConfigMap.get(code)
-        ).filter(v => !!v) as SpeechToTextConfig[];
-      }
+      (_, learningLanguageCode) => mapTranslatableLanguagesToSpokenOnes(learningLanguageCode)
     );
     this.learningToLatinTransliterateFn$ = getLanguageCodeObservable(
       (knownLanguageCode, learningLanguageCode) => {

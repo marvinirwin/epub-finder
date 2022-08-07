@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { Language } from "../menu-landing-page/menu-landing-page.component";
+import React, {useEffect, useState} from "react";
+import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/menu-landing-page.component";
+import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 
-export type SettingsPopupProps = {
-  languages: Language[];
-  onLanguageSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onVariantSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+export type NavBarAndSettingsProps = {
+  languages: ParentLanguageOption[];
+  navBarItems: TreeMenuNode[]
+  language: ParentLanguageOption,
+  setLanguage: (v: ParentLanguageOption) => unknown
+  variant: VariantLanguageOption,
+  setVariant: (v: VariantLanguageOption) => unknown
 };
 
-export const SettingsPopup: React.FC<SettingsPopupProps> = ({ languages, onLanguageSelect, onVariantSelect }) => {
-  const [language, setLanguage] = useState<Language | undefined>(undefined);
-  const [variant, setVariant] = useState<Language | undefined>(undefined);
+export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
+  {
+    languages,
+    navBarItems,
+    language,
+    setLanguage,
+    variant,
+    setVariant
+  }) => {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
@@ -23,16 +33,14 @@ export const SettingsPopup: React.FC<SettingsPopupProps> = ({ languages, onLangu
   }, [languages]);
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLang = languages.find((lang) => lang.value === event.target.value);
+    const selectedLang = languages.find((lang) => lang.value === event.target.value) as ParentLanguageOption;
     setLanguage(selectedLang);
-    onLanguageSelect(event);
   };
 
   const handleVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     if (language?.variants) {
-      const selectedVariant = language.variants.find((lang) => lang.value === event.target.value);
+      const selectedVariant = language.variants.find((lang) => lang.value === event.target.value) as VariantLanguageOption;
       setVariant(selectedVariant);
-      onVariantSelect(event);
     }
   };
 
@@ -58,7 +66,7 @@ export const SettingsPopup: React.FC<SettingsPopupProps> = ({ languages, onLangu
               >
                 {languages.map((lang) => (
                   <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
-                    {lang.name}
+                    {lang.label}
                   </option>
                 ))}
               </select>
@@ -71,7 +79,7 @@ export const SettingsPopup: React.FC<SettingsPopupProps> = ({ languages, onLangu
                 >
                   {language?.variants?.map((lang) => (
                     <option className="text-1rem text-[#71717A]" key={lang.value} value={lang.value}>
-                      {lang.name}
+                      {lang.label}
                     </option>
                   ))}
                 </select>
@@ -86,6 +94,9 @@ export const SettingsPopup: React.FC<SettingsPopupProps> = ({ languages, onLangu
             <span>M</span>
           </div>
         )}
+        {
+          navBarItems.map(item => <span key={item.name}>{item.label}</span>)
+        }
       </nav>
     </>
   );

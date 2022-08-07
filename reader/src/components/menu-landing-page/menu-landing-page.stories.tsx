@@ -1,10 +1,10 @@
 import React from "react";
 import { Story } from "@storybook/react";
-import { MenuLandingPage, MenuLandingPageProps } from "./menu-landing-page.component";
+import {PageWrapper, PageWrapperProps} from "./PageWrapper.component";
 
 export default {
   title: "MenuLandingPage",
-  component: MenuLandingPage,
+  component: PageWrapper,
   parameters: {
     docs: {
       inlineStories: false,
@@ -13,7 +13,7 @@ export default {
   },
 };
 
-const Template: Story<MenuLandingPageProps> = (args: MenuLandingPageProps) => <MenuLandingPage {...args} />;
+const Template: Story<PageWrapperProps> = (args: PageWrapperProps) => <PageWrapper {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

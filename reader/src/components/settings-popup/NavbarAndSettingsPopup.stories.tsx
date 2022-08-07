@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {Story} from '@storybook/react';
-import { SettingsPopup, SettingsPopupProps } from "./settings-popup.component";
+import { NavBarAndSettingsPopup, NavBarAndSettingsProps } from "./NavBarAndSettingsPopup.component";
 
 export default {
   title: "SettingsPopup",
-  component: SettingsPopup,
+  component: NavBarAndSettingsPopup,
   parameters: {
     docs: {
       inlineStories: false,
@@ -13,11 +13,11 @@ export default {
   },
 };
 
-const Template: Story<SettingsPopupProps> = (args: SettingsPopupProps) => {
+const Template: Story<NavBarAndSettingsProps> = (args: NavBarAndSettingsProps) => {
   const [showSettings, setShowSettings] = useState(true);
   return (
     <div className="w-full h-full relative">
-      <SettingsPopup {...args} />
+      <NavBarAndSettingsPopup {...args} />
     </div>
   );
 };
@@ -27,33 +27,32 @@ Default.args = {
   languages: [
     {
       value: "zh",
-      name: "Chinese",
+      label: "Chinese",
       variants: [
         {
           value: "zh-Hans",
-          name: "Chinese (Simplified)",
+          label: "Chinese (Simplified)",
         },
         {
           value: "zh-Hant",
-          name: "Chinese (Traditional)",
+          label: "Chinese (Traditional)",
         },
       ],
     },
     {
       value: "en",
-      name: "English",
+      label: "English",
       variants: [
         {
           value: "en-CA",
-          name: "English (CA)",
+          label: "English (CA)",
         },
         {
           value: "en-US",
-          name: "English (US)",
+          label: "English (US)",
         },
       ],
     },
   ],
-  onLanguageSelect: () => {},
-  onVariantSelect: () => {},
+
 };
