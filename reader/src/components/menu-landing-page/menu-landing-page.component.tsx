@@ -48,17 +48,17 @@ export const LandingPage = (
       >
         {languages.map(language => <option value={language.value}>{language.label}</option>)}
       </select>
-      {variant && (
+      {language.variants.length && (
         <select
           className="w-[300px] h-11 text-1rem text-[#71717A]"
-          defaultValue={variant.value}
-          value={variant.value}
+          defaultValue={variant?.value}
+          value={variant?.value}
           onChange={(e) => {
             const allVariants = flatten(languages.map(language => language.variants));
             setVariant(allVariants.find(variant => variant.value === e.target.value) as VariantLanguageOption);
           }}
         >
-          {language?.variants?.map(variant => <option value={variant.value} className="text-1rem text-[#71717A]">
+          {language.variants.map(variant => <option value={variant.value} className="text-1rem text-[#71717A]">
             {variant.label}
           </option>)}
         </select>
