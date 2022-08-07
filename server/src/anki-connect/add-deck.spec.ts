@@ -7,6 +7,7 @@ const deckName = "jest-deck";
 
 export const getDeckNames = async () => {
   const response = await fetch("127.0.0.1:8765", {
+// @ts-ignore
     "action": "deckNames",
     "version": 6
   });
@@ -41,7 +42,9 @@ const importZipFileIntoAnki = async (filename: string) => {
 
 };
 export const getImageBytesAndExt = (url: string) => fetch(url)
-  .then(async response => ({arrayBuffer: await response.arrayBuffer(), ext: resolveExtFromResponseHeaders(response)}))
+  .then(async response => ({arrayBuffer: await response.arrayBuffer(),
+// @ts-ignore
+    ext: resolveExtFromResponseHeaders(response)}))
   .then(({
            arrayBuffer,
            ext

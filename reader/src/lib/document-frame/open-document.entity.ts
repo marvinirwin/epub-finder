@@ -1,5 +1,5 @@
 import { combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { map, shareReplay } from 'rxjs/operators'
+import {flatMap, map, shareReplay, switchMap} from 'rxjs/operators'
 import {
     annotatedAndTranslated,
     AtomizedDocument,
@@ -47,7 +47,7 @@ export class OpenDocument {
             tabulationConfigurationService.tabulationConfiguration$,
             services.languageConfigsService.readingLanguageCode$,
         ]).pipe(
-            map(([segments, tabulationConfiguration, language_code]) => {
+            switchMap(([segments, tabulationConfiguration, language_code]) => {
                 return tabulate<XMLDocumentNode, AbstractSegment<XMLDocumentNode>>({
                     segments,
                     ...tabulationConfiguration,

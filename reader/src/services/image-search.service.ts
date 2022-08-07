@@ -4,6 +4,6 @@ import { ImageObject } from '@shared/'
 export type ImageSearchResult = ImageObject[];
 export const getImages = (term: string): Promise<ImageSearchResult> => {
     return axios
-        .post(`${process.env.PUBLIC_URL}/image-search`, { term })
+        .post(`${process.env.PUBLIC_URL}/api/image-search`, { term })
         .then((response) => response?.data || [])
 }

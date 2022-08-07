@@ -5,7 +5,7 @@ import {Repository} from "typeorm";
 import {CardView} from "../entities/card-view.entity";
 import {TabulateService} from "../documents/similarity/tabulate.service";
 
-import doGoogleOcr from "./ocr";
+import doGoogleOcr from "../text-extraction/oct";
 
 export class CliService {
     constructor(
@@ -20,7 +20,7 @@ export class CliService {
     }
 
     async exec() {
-        const sentences = [(await doGoogleOcr({fileName: "C:\\Users\\marvi\\Downloads\\chinese.jpg"})).join("\n")];
+        const sentences = [(await doGoogleOcr( "C:\\Users\\marvi\\Downloads\\chinese.jpg")).join("\n")];
 
         const flashcardDictionary = {};
         const allFlashCards = await this.cardViewRepository.find({});

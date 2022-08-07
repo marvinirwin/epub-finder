@@ -1,4 +1,4 @@
-import { PositionedWord } from "./tabulate";
+import { PositionedWord } from "./tabulate-types";
 import { maxBy, sum } from "lodash";
 
 export const wordsFromCountRecordList = (records: PositionedWord[]) => {

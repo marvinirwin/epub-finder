@@ -44,7 +44,7 @@
     "@types/jest": "^27.5.1",
     "@types/jquery": "^3.3.38",
     "@types/lodash": "^4.14.152",
-    "@types/memoizee": "^0.4.5",
+    "@types/memoizee": "^0.4.8",
     "@types/node": "^16.11.36",
     "@types/node-sass-middleware": "0.0.31",
     "@types/plotly.js": "^1.50.13",
@@ -127,6 +127,7 @@
     "web-vitals": "^2.1.4",
     "webpack": "^5.72.1",
     "websocket": "^1.0.32",
+    "wordcut": "^0.9.1",
     "worker-loader": "^2.0.0",
     "xmldom": "^0.3.0"
   },

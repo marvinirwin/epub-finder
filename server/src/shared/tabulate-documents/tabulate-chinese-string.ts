@@ -10,7 +10,7 @@ export const TabulateChineseText = async ({text, documentId}: {text: string; doc
     const notableCharacterSequencesSegmentsGreedyWordSet = trie(
         await ChineseVocabService.vocab(),
     );
-    return tabulate({
+    return await tabulate({
         notableCharacterSequences: notableCharacterSequencesSegmentsGreedyWordSet,
         segments: AtomizedDocument.atomizeDocument(
             {documentSrc: InterpolateService.text(text), documentId},

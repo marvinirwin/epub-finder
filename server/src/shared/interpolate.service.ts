@@ -10,12 +10,13 @@ export class InterpolateService {
     ${head}
 </head>
 <body>
-<div>
 ${body}
-</div>
 </body>
 </html>
         `;
+    }
+    static withImage () {
+
     }
 
     static text(body: string): string {

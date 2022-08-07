@@ -49,7 +49,7 @@ async function tabulateChineseSentence(...chineseSegments: string[]) {
     const chineseVocabSet = new SetWithUniqueLengths(
         await ChineseVocabService.vocab(),
     );
-    return tabulate({
+    return await tabulate({
         notableCharacterSequences: chineseVocabSet,
         segments: AtomizedDocument.atomizeDocument(
             InterpolateService.sentences(chineseSegments),

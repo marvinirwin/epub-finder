@@ -9,7 +9,7 @@ export type TabulationParameters<T> = {
 } & TabulationConfiguration
 
 
-export type WordIdentifyingStrategy = "noSeparator" | "spaceSeparator"
+export type WordIdentifyingStrategy = "noSeparator" | "spaceSeparator" | "thai"
 
 export type SerializableTabulationConfiguration = {
     notableCharacterSequences: SetWithUniqueLengths;

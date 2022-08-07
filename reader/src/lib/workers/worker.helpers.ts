@@ -1,13 +1,5 @@
 /* eslint import/no-webpack-loader-syntax:0 */
 import { GetWorkerResults } from '../util/GetWorkerResults'
-// @ts-ignore
-import AtomizeSrcdocWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-src.worker'
-// @ts-ignore
-import TabulateRemoteDocumentWorker from 'Worker-loader?name=dist/[name].js!./tabulate-remote-document.worker'
-// @ts-ignore
-import TabulateLocalDocumentWorker from 'Worker-loader?name=dist/[name].js!./tabulate-local-document.worker'
-// @ts-ignore
-import AtomizeUrlWorker from 'Worker-loader?name=dist/[name].js!./atomized-document-from-url.worker'
 import {
     AtomizedDocumentFromUrlParams, AtomizeSrcDocParams,
     InterpolateService,
@@ -21,7 +13,7 @@ export type WorkerError = { errorMessage: string }
 
 export const AtomizeHtml = (HTMLString: AtomizeSrcDocParams) => {
     return GetWorkerResults<string | WorkerError>(
-      new Worker(new URL("atomized-document-from-url.worker.ts", import.meta.url)),
+      new Worker(new URL("atomized-document-from-src.worker.ts", import.meta.url)),
       HTMLString
     ).then(handleWorkerError);
 }
