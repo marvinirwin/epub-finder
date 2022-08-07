@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/menu-landing-page.component";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
+import {goToSignIn} from "../app-directory/nodes/sign-in-with.node";
 
 export type NavBarAndSettingsProps = {
   languages: ParentLanguageOption[];
@@ -9,7 +10,7 @@ export type NavBarAndSettingsProps = {
   setLanguage: (v: ParentLanguageOption) => unknown
   variant: VariantLanguageOption,
   setVariant: (v: VariantLanguageOption) => unknown
-  currentUserInitial: string | undefined;
+  currentUserEmail: string | undefined;
   onNavBarItemClicked: (t: TreeMenuNode) => unknown
 };
 
@@ -21,7 +22,7 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
     setLanguage,
     variant,
     setVariant,
-    currentUserInitial,
+    currentUserEmail,
     onNavBarItemClicked
   }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -51,7 +52,18 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
               <input
                 className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
                 type="email"
+                disabled={true}
+                placeholder={'email'}
+                onClick={() => {
+                }}
+                value={currentUserEmail}
               />
+              {
+                !currentUserEmail ? <button
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full mx-8 my-1"
+                  onClick={() => goToSignIn()}
+                >Login</button> : null
+              }
               <select
                 className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
                 defaultValue={languages[0].value}
@@ -67,8 +79,8 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
               {language?.variants?.length && (
                 <select
                   className="w-[300px] h-11 p-2 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"
-                  defaultValue={variant.value}
-                  value={variant.value}
+                  defaultValue={variant?.value}
+                  value={variant?.value}
                   onChange={handleVariantChange}
                 >
                   {language?.variants?.map((lang) => (
@@ -93,9 +105,11 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
             }
             <div
               className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
-              onClick={() => setShowSettings(true)}
+              onClick={() => {
+                setShowSettings(true);
+              }}
             >
-              <span>{currentUserInitial}</span>
+              <span>{currentUserEmail ? currentUserEmail[0] : '?'}</span>
             </div>
           </>
         )}

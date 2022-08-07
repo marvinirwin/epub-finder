@@ -7,21 +7,10 @@ import {useObservableState} from "observable-hooks";
 import {QUIZ_NODE, SupportedTranslations} from "@shared/";
 import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTranslatableLanguagesToSpokenOnes";
 import {flatten} from "lodash";
-import {ReadingNode} from "../app-directory/reading.node";
-import {SignInWithNode} from "../app-directory/nodes/sign-in-with.node";
-import {LanguageSelectNode} from "../app-directory/nodes/language-select.node";
-import {RecognizeSpeechNode} from "../app-directory/nodes/recognize-speech.node";
-import {WatchPronunciationNode} from "../app-directory/nodes/watch-pronunciation.node";
 import {LibraryNode} from "../app-directory/nodes/library.node";
-import {ReadingProgressNode} from "../app-directory/nodes/reading-progress.node";
-import {QuizScheduleNode} from "../app-directory/nodes/quiz-schedule.node";
-import {LeaderBoardNode} from "../app-directory/nodes/leader-board.node";
-import {SettingsNode} from "../app-directory/nodes/settings.node";
-import {TestingUtilsNode} from "../app-directory/nodes/testing-utils.node";
 import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 import {LibraryTable} from "../library/library-table.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
-import {AmpStories} from "@material-ui/icons";
 
 export type PageWrapperProps = {};
 
@@ -36,7 +25,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     []
   const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
   const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
-  const currentUser = useObservableState(m.loggedInUserService.profile$)?.email;
+  const currentUserEmail = useObservableState(m.loggedInUserService.profile$)?.email;
 
   const languages: ParentLanguageOption[] = SupportedTranslations.map(t => {
       const v = {
@@ -164,7 +153,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         setVariant={setVariant}
         variant={variant}
         onNavBarItemClicked={item => m.settingsService.componentPath$.next(item.name)}
-        currentUserInitial={currentUser?.[0]}
+        currentUserEmail={currentUserEmail}
       />
       {getSelectedPage()}
     </div>
