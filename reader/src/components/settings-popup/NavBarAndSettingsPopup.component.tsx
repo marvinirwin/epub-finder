@@ -9,6 +9,8 @@ export type NavBarAndSettingsProps = {
   setLanguage: (v: ParentLanguageOption) => unknown
   variant: VariantLanguageOption,
   setVariant: (v: VariantLanguageOption) => unknown
+  currentUserInitial: string | undefined;
+  onNavBarItemClicked: (t: TreeMenuNode) => unknown
 };
 
 export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
@@ -18,7 +20,9 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
     language,
     setLanguage,
     variant,
-    setVariant
+    setVariant,
+    currentUserInitial,
+    onNavBarItemClicked
   }) => {
   const [showSettings, setShowSettings] = useState(false);
 
@@ -79,13 +83,19 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
         ) : (
           <>
             {
-              navBarItems.map(item => <span key={item.name}>{item.label}</span>)
+              navBarItems.map(item => <button
+                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                key={item.name}
+                onClick={() => onNavBarItemClicked(item)}
+              >
+                {item.label}
+              </button>)
             }
             <div
-              className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-space-around items-center"
+              className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
               onClick={() => setShowSettings(true)}
             >
-              <span>M</span>
+              <span>{currentUserInitial}</span>
             </div>
           </>
         )}

@@ -4,7 +4,7 @@ import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./menu-l
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
-import {SupportedTranslations} from "@shared/";
+import {QUIZ_NODE, SupportedTranslations} from "@shared/";
 import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTranslatableLanguagesToSpokenOnes";
 import {flatten} from "lodash";
 import {ReadingNode} from "../app-directory/reading.node";
@@ -18,6 +18,10 @@ import {QuizScheduleNode} from "../app-directory/nodes/quiz-schedule.node";
 import {LeaderBoardNode} from "../app-directory/nodes/leader-board.node";
 import {SettingsNode} from "../app-directory/nodes/settings.node";
 import {TestingUtilsNode} from "../app-directory/nodes/testing-utils.node";
+import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
+import {LibraryTable} from "../library/library-table.component";
+import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
+import {AmpStories} from "@material-ui/icons";
 
 export type PageWrapperProps = {};
 
@@ -32,6 +36,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     []
   const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
   const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
+  const currentUser = useObservableState(m.loggedInUserService.profile$)?.email;
 
   const languages: ParentLanguageOption[] = SupportedTranslations.map(t => {
       const v = {
@@ -52,18 +57,13 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     }
   }
   const navBarItems: TreeMenuNode[] = [
-    ReadingNode(m),
-    SignInWithNode(),
-    LanguageSelectNode(m),
-    RecognizeSpeechNode(m),
-    WatchPronunciationNode(m),
     LibraryNode(m),
-    ReadingProgressNode(m),
-    QuizScheduleNode(m),
-    LeaderBoardNode(m),
-    SettingsNode(m),
-    TestingUtilsNode(m),
-  ];
+    QuizCarouselNode(),
+    {
+      name: "LandingPage",
+      label: 'Home',
+    }
+];
   const language = languages.find(language => language.value === readingLanguageCode);
   const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
   const variant = flatten(languages.map(l => l.variants)).find(v => v.value === spokenLanguageCode) as VariantLanguageOption;
@@ -111,20 +111,18 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
       onFileUpload(el.files)
       // access el.files[] to do something with it (test its length!)
       // test some async handling
-      new Promise<void>(function (resolve) {
-          // @ts-ignore
+      new Promise<void>(function (resolve) { // @ts-ignore
           setTimeout(function () {
               resolve();
             },
             1000
           );
         }
-      )
-        .then(function () {
-          // clear / free reference
-          // @ts-ignore
-          el = window._protected_reference = undefined;
-        });
+      ).then(function () {
+        // clear / free reference
+        // @ts-ignore
+        el = window._protected_reference = undefined;
+      });
 
     });
 
@@ -132,7 +130,14 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
   };
 
   const getSelectedPage = () => {
+    const foundTreeNode = navBarItems.find(item => item.name === currentComponent);
+
     switch (currentComponent) {
+      case "quiz-carousel":
+        return <QuizCardCarousel/>
+      case "library":
+        return <LibraryTable/>
+      case "LandingPage":
       default:
         return <LandingPage
           languages={languages}
@@ -158,6 +163,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         setLanguage={setLanguage}
         setVariant={setVariant}
         variant={variant}
+        onNavBarItemClicked={item => m.settingsService.componentPath$.next(item.name)}
+        currentUserInitial={currentUser?.[0]}
       />
       {getSelectedPage()}
     </div>

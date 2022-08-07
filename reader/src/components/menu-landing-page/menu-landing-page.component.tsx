@@ -31,7 +31,7 @@ export const LandingPage = (
     setVariant,
     variant
   }: LandingPageProps) => {
-  return <div className="w-full h-full flex flex-row">
+  return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
       <h1 className="text-6xl">Learn all the words</h1>
       <h1 className="text-6xl">from a restaurant menu</h1>
@@ -63,7 +63,7 @@ export const LandingPage = (
           </select>
         )}
       </div>
-      <form
+      <div
         className={`relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center flex-1 ${
           dragActive && "border-[#0F91D2] bg-slate-100"
         }`}
@@ -86,7 +86,7 @@ export const LandingPage = (
             </button>
           </div>
         </label>
-      </form>
+      </div>
     </div>
   </div>;
 };
