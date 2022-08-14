@@ -30,6 +30,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
       flex: 1,
       alignItems: 'center',
       justifyContent: 'space-around',
+      marginBottom: '16px'
     }}>
       <DifficultyButtons quizCard={quizCard} previousScheduleItems={recognitionRecordsForThisCard}/>
     </Box>
