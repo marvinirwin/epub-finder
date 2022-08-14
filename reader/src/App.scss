@@ -461,8 +461,8 @@ background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
-  height: 100%;
   align-items: center;
+  flex: 1;
 
   & > #quiz-card-image-placeholder {
     /*

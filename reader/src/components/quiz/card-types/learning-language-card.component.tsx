@@ -6,7 +6,7 @@ import { CardLearningLanguageText } from '../../word-information/card-learning-l
 
 export const LearningLanguageCard = ({quizCard}: {quizCard: QuizCard}) => {
     const word = useObservableState(quizCard.word$)
-    return <Paper style={{display: 'flex', flexFlow: 'column nowrap', width: '100%', height: '100%', alignItems: 'center'}}>
+    return <Paper style={{display: 'flex', flexFlow: 'column nowrap', width: '100%', flex: 1, alignItems: 'center'}}>
         <Box m={2} p={1}><CardLearningLanguageText word={word || ''} /></Box>
     </Paper>
 }

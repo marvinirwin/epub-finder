@@ -8,7 +8,7 @@ const classNames = (...a: (string | undefined)[]) => a.filter(Boolean).join(' ')
 
 const getUrlWithAddedQueryParams = (entriesToAdd: Record<string, string | number>) => {
   const url = new URL(window.location.href);
-  Object.entries(entriesToAdd).map(([key, value]) => url.searchParams.set(key, value.toString()))
+  Object.entries(entriesToAdd).map(([key, value]) => url.searchParams.set(key, JSON.stringify(value.toString())))
   return url;
 };
 

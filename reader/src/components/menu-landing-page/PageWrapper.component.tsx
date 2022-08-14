@@ -4,7 +4,7 @@ import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./menu-l
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
-import {SupportedTranslations} from "@shared/";
+import {HOME_NODE, LIBRARY_NODE, QUIZ_NODE, SupportedTranslations} from "@shared/";
 import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTranslatableLanguagesToSpokenOnes";
 import {flatten} from "lodash";
 import {LibraryNode} from "../app-directory/nodes/library.node";
@@ -115,18 +115,18 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
 
   const getSelectedPage = (): [TreeMenuNode, React.ReactNode] => {
     switch (currentComponent) {
-      case "quiz-carousel":
+      case QUIZ_NODE:
         return [
           QuizCarouselNode,
           <QuizCardCarousel/>
         ]
-      case "library":
+      case LIBRARY_NODE:
         return [
           LibraryNode,
           <LibraryTable/>,
 
         ]
-      case "LandingPage":
+      case HOME_NODE:
       default:
         return [
           HomeNode,

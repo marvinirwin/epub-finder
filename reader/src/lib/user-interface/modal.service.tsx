@@ -15,7 +15,6 @@ import {SetQuizWordLimit} from '../../components/settings/set-new-quiz-word-limi
 import {WordCardDisplay} from '../word-card/word-card.modal.component'
 import {HotkeyConfig} from '../../components/hotkeys/HotkeyConfig'
 import {QuizScheduleOverView} from '../quiz/quiz-schedule-over-view.component'
-import {Intro} from '../../components/intro/intro.component'
 import {UploadDialog} from '../../components/upload/upload-dialog'
 import {Box} from '@material-ui/core'
 import {ImageSearchComponent} from '../../components/image-search/image-search.component'
@@ -33,14 +32,12 @@ export class ModalService {
     public testingUtils: NavModal
     public wordPaperDisplay: NavModal
     public quizScheduleOverView: NavModal
-    public intro: NavModal
     readingProgress: NavModal
     imageSearch: NavModal
     csv: NavModal
     leaderBoard: NavModal;
 
     constructor() {
-        this.intro = new NavModal('intro', () => <Intro />)
         this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
 
         this.languageSelect = new NavModal('spokenLanguage', () => (
@@ -106,7 +103,6 @@ export class ModalService {
             this.testingUtils,
             this.wordPaperDisplay,
             this.quizScheduleOverView,
-            this.intro,
             this.readingProgress,
             this.imageSearch,
             this.csv,

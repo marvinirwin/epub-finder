@@ -71,12 +71,6 @@ export class DocumentRepository {
             }, new Map()),
         )
         this.isFetching$ = isLoading$;
-        this.collection$.subscribe(collection => {
-            const noDocuments = !collection.size;
-            if (noDocuments) {
-                modalService.intro.open$.next(true);
-            }
-        })
     }
 
     private static async uploadFile(

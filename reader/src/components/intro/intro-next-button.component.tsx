@@ -11,7 +11,7 @@ export const NextButton: React.FC<{ currentTab: number; steps: unknown[] }> = ({
     const isLastTab = currentTab >= steps.length - 1
     const onClick = useCallback(isLastTab
         ? () => {
-            m.modalService.intro.open$.next(false)
+            // m.modalService.intro.open$.next(false)
         }
         : () => {
             m.settingsService.currentIntroTab$.next(currentTab + 1)

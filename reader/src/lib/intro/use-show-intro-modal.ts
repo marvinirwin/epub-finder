@@ -6,6 +6,6 @@ export const useShowIntroModal = () => {
     const m = useContext(ManagerContext)
     if (!localStorage.getItem('visitedBefore') || SHOW_INTRO) {
         localStorage.setItem('visitedBefore', '1')
-        m.modalService.intro.open$.next(true)
+        // m.modalService.intro.open$.next(true)
     }
 }

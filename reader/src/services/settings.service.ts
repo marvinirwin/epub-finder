@@ -117,6 +117,9 @@ export class SettingsService {
         this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
 
         this.componentPath$ = this.createSetting$<string>('page', '', 'url')
+        this.componentPath$.subscribe(v => {
+            // debugger;console.log(v)
+        })
 
         this.readingLanguage$ = this.createSetting$<string>(
             'reading',
