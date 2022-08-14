@@ -18,13 +18,13 @@ import {LeaderBoardNode} from "./nodes/leader-board.node";
 import {ReadingNode} from "./reading.node";
 
 export function AppDirectory(m: Manager) {
-    return arrayToTreeRoot<TreeMenuNode>(QuizCarouselNode(), [
+    return arrayToTreeRoot<TreeMenuNode>(QuizCarouselNode, [
         ReadingNode(m),
         SignInWithNode(),
         LanguageSelectNode(m),
         RecognizeSpeechNode(m),
         WatchPronunciationNode(m),
-        LibraryNode(m),
+        LibraryNode,
         ReadingProgressNode(m),
         QuizScheduleNode(m),
         LeaderBoardNode(m),

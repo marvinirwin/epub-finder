@@ -3,7 +3,7 @@ import {
     documentSelectionRow,
     frequencyDocumentList,
     PROGRESS_TREE,
-    LIBRARY,
+    LIBRARY_NODE,
     PAGES,
     QUIZ_NODE,
     UPLOAD_LEARNING_MATERIAL,
@@ -43,7 +43,7 @@ export class DirectoryPom {
     public static OpenLibraryDialog() {
         DirectoryPom.CloseAllDialogs()
         cy.wait(1000)
-        cy.get(`#${LIBRARY}`).click()
+        cy.get(`#${LIBRARY_NODE}`).click()
     }
 
     public static Back() {

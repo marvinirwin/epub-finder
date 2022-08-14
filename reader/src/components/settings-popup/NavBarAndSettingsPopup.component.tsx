@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/menu-landing-page.component";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {goToSignIn} from "../app-directory/nodes/sign-in-with.node";
+import {NavBar} from "../NavBar.component";
 
 export type NavBarAndSettingsProps = {
   languages: ParentLanguageOption[];
@@ -11,7 +12,7 @@ export type NavBarAndSettingsProps = {
   variant: VariantLanguageOption,
   setVariant: (v: VariantLanguageOption) => unknown
   currentUserEmail: string | undefined;
-  onNavBarItemClicked: (t: TreeMenuNode) => unknown
+  selectedNavItem: TreeMenuNode
 };
 
 export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
@@ -23,7 +24,7 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
     variant,
     setVariant,
     currentUserEmail,
-    onNavBarItemClicked
+    selectedNavItem
   }) => {
   const [showSettings, setShowSettings] = useState(false);
 
@@ -94,15 +95,7 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
           </>
         ) : (
           <>
-            {
-              navBarItems.map(item => <button
-                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                key={item.name}
-                onClick={() => onNavBarItemClicked(item)}
-              >
-                {item.label}
-              </button>)
-            }
+            <NavBar navItems={navBarItems} selectedNavItem={selectedNavItem}/>
             <div
               className="mx-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"
               onClick={() => {
@@ -116,4 +109,5 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
       </nav>
     </>
   );
-};
+}
+;

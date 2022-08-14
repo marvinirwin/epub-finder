@@ -4,13 +4,14 @@ import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./menu-l
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";
-import {QUIZ_NODE, SupportedTranslations} from "@shared/";
+import {SupportedTranslations} from "@shared/";
 import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTranslatableLanguagesToSpokenOnes";
 import {flatten} from "lodash";
 import {LibraryNode} from "../app-directory/nodes/library.node";
 import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 import {LibraryTable} from "../library/library-table.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
+import {HomeNode} from "../app-directory/nodes/Home.node";
 
 export type PageWrapperProps = {};
 
@@ -46,13 +47,13 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     }
   }
   const navBarItems: TreeMenuNode[] = [
-    LibraryNode(m),
-    QuizCarouselNode(),
+    LibraryNode,
+    QuizCarouselNode,
     {
       name: "LandingPage",
       label: 'Home',
     }
-];
+  ];
   const language = languages.find(language => language.value === readingLanguageCode);
   const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
   const variant = flatten(languages.map(l => l.variants)).find(v => v.value === spokenLanguageCode) as VariantLanguageOption;
@@ -79,9 +80,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     if (uploadedFiles.length) {
       onFileUpload(uploadedFiles);
     }
-  };
-
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
   };
 
   const handleUploadClick = () => {
@@ -118,33 +116,42 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     el.click(); // open
   };
 
-  const getSelectedPage = () => {
-    const foundTreeNode = navBarItems.find(item => item.name === currentComponent);
-
+  const getSelectedPage = (): [TreeMenuNode, React.ReactNode] => {
     switch (currentComponent) {
       case "quiz-carousel":
-        return <QuizCardCarousel/>
+        return [
+          QuizCarouselNode,
+          <QuizCardCarousel/>
+        ]
       case "library":
-        return <LibraryTable/>
+        return [
+          LibraryNode,
+          <LibraryTable/>,
+
+        ]
       case "LandingPage":
       default:
-        return <LandingPage
-          languages={languages}
-          language={language}
-          setLanguage={setLanguage}
-          variant={variant}
-          setVariant={setVariant}
-          dragActive={dragActive}
-          onDragEnter={handleDrag}
-          onDrop={handleDrop}
-          onClick={handleUploadClick}
-          ref={inputRef}
-        />
+        return [
+          HomeNode,
+          <LandingPage
+            languages={languages}
+            language={language}
+            setLanguage={setLanguage}
+            variant={variant}
+            setVariant={setVariant}
+            dragActive={dragActive}
+            onDragEnter={handleDrag}
+            onDrop={handleDrop}
+            onClick={handleUploadClick}
+            ref={inputRef}
+          />,
+
+        ]
     }
   }
+  const [currentNode, currentPage] = getSelectedPage();
 
-  return (
-    <div className="w-full h-full relative">
+  return <div className="w-full h-full relative">
       <NavBarAndSettingsPopup
         languages={languages}
         navBarItems={navBarItems}
@@ -152,10 +159,9 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         setLanguage={setLanguage}
         setVariant={setVariant}
         variant={variant}
-        onNavBarItemClicked={item => m.settingsService.componentPath$.next(item.name)}
         currentUserEmail={currentUserEmail}
+        selectedNavItem={currentNode}
       />
-      {getSelectedPage()}
+      {currentPage}
     </div>
-  );
 };
