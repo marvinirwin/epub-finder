@@ -1,20 +1,28 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
-import React from 'react'
+import React, {Fragment} from 'react'
+import {Disclosure, Menu, Transition} from '@headlessui/react'
+import {BellIcon, MenuIcon, XIcon} from '@heroicons/react/outline'
 import {TreeMenuNode} from "./app-directory/tree-menu-node.interface";
 
 const classNames = (...a: (string | undefined)[]) => a.filter(Boolean).join(' ')
 
 const getUrlWithAddedQueryParams = (entriesToAdd: Record<string, string | number>) => {
   const url = new URL(window.location.href);
-  Object.entries(entriesToAdd).map(([key, value]) => url.searchParams.append(key, value.toString()))
+  Object.entries(entriesToAdd).map(([key, value]) => url.searchParams.set(key, value.toString()))
   return url;
 };
 
-export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], selectedNavItem: TreeMenuNode}) => (
-  <Disclosure as="nav" className="bg-gray-800">
+export const NavBar = (
+  {
+    navItems,
+    selectedNavItem,
+    userProfileButton
+  }: {
+    navItems: TreeMenuNode[],
+    selectedNavItem: TreeMenuNode
+    userProfileButton: React.ReactNode
+  }) => (
+  <Disclosure as="nav" className="bg-gray-800 w-full">
     {({open}) => (
       <>
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -32,33 +40,21 @@ export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], s
               </Disclosure.Button>
             </div>
             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-              <div className="flex-shrink-0 flex items-center">
-                <img
-                  className="block lg:hidden h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=500"
-                  alt="Workflow"
-                />
-                <img
-                  className="hidden lg:block h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=500"
-                  alt="Workflow"
-                />
-              </div>
               <div className="hidden sm:block sm:ml-6">
                 <div className="flex space-x-4">
                   {navItems.map((item) => {
                     const isSelectedNavItem = item === selectedNavItem;
                     return (
                       <a
-                        key={item.name}
-
+                        key={item.label}
+                        href={getUrlWithAddedQueryParams({page: item.name}).href}
                         className={classNames(
                           isSelectedNavItem ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'px-3 py-2 rounded-md text-sm font-medium'
                         )}
                         aria-current={isSelectedNavItem ? 'page' : undefined}
                       >
-                        {item.name}
+                        {item.label}
                       </a>
                     );
                   })}
@@ -66,6 +62,7 @@ export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], s
               </div>
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+{/*
               <button
                 type="button"
                 className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
@@ -73,6 +70,7 @@ export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], s
                 <span className="sr-only">View notifications</span>
                 <BellIcon className="h-6 w-6" aria-hidden="true"/>
               </button>
+*/}
 
               {/* Profile dropdown */}
               <Menu as="div" className="ml-3 relative">
@@ -80,11 +78,7 @@ export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], s
                   <Menu.Button
                     className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                     <span className="sr-only">Open user menu</span>
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
+                    {userProfileButton}
                   </Menu.Button>
                 </div>
                 <Transition
@@ -145,12 +139,12 @@ export const NavBar = ({navItems, selectedNavItem}: {navItems: TreeMenuNode[], s
                   as="a"
                   href={getUrlWithAddedQueryParams({page: item.name}).href}
                   className={classNames(
-                      isSelected ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    isSelected ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block px-3 py-2 rounded-md text-base font-medium'
                   )}
                   aria-current={isSelected ? 'page' : undefined}
                 >
-                  {item.name}
+                  {item.label}
                 </Disclosure.Button>
               );
             })}

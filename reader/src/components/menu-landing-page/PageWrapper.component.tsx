@@ -47,12 +47,9 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     }
   }
   const navBarItems: TreeMenuNode[] = [
+    HomeNode,
     LibraryNode,
     QuizCarouselNode,
-    {
-      name: "LandingPage",
-      label: 'Home',
-    }
   ];
   const language = languages.find(language => language.value === readingLanguageCode);
   const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);

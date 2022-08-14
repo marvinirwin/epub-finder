@@ -5,6 +5,6 @@ import { LIBRARY_NODE } from '@shared/'
 
 export const LibraryNode = {
     name: LIBRARY_NODE,
-    label: 'Library',
+    label: 'My Library',
     LeftIcon: () => <LibraryBooks />,
 }
