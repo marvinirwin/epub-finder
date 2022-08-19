@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { QuizProgressBar } from "src/components/progress/quiz-progress-bar.component";
+import { QuizProgressBar } from "../../quiz-progress-bar.component";
 const playButton: string = require("./play-button.svg").default;
 const pauseButton: string = require("./pause-button.svg").default;
 

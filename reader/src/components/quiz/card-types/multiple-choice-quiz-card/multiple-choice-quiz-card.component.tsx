@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuizProgressBar } from 'src/components/progress/quiz-progress-bar.component';
+import { QuizProgressBar } from '../../quiz-progress-bar.component';
 
 type AnswerOption = {
     id: number,
