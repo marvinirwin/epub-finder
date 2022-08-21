@@ -129,7 +129,7 @@ export class DocumentsController {
         @Param("filename") filename: string,
         @Res() response: Response,
     ) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             const doc = await this.documentsService.byFilename({
                 filename,
                 user,

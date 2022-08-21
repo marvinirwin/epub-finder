@@ -21,6 +21,8 @@ export const LibraryDocumentRowComponent: React.FC<{
     const exampleSentences = useObservableState(
         m.settingsService.selectedExampleSegmentDocuments$,
     )
+    let checked = !!frequencyDocuments?.includes(document.ltDocument.id());
+    let checked1 = !!exampleSentences?.includes(document.ltDocument.id());
     return (
         <TableRow
             id={document.ltDocument.name}
@@ -38,7 +40,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                 <Checkbox
                     className={libraryRowToggleFrequency}
                     checked={
-                        !!frequencyDocuments?.includes(document.ltDocument.id())
+                        checked
                     }
                     onChange={() => document.toggleUseForFrequency()}
                 />
@@ -47,7 +49,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                 <Checkbox
                     className={libraryRowToggleExample}
                     checked={
-                        !!exampleSentences?.includes(document.ltDocument.id())
+                        checked1
                     }
                     onChange={() => document.toggleUseForExamples()}
                 />

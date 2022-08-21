@@ -79,6 +79,4 @@ ln -s /video public/video;
 npm install;
 ln -s /.language-trainer.env .env;
 node main.js
-ainer.env .env;
-node main.js
 ";

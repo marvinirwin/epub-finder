@@ -12,6 +12,7 @@ import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 import {LibraryTable} from "../library/library-table.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
 import {HomeNode} from "../app-directory/nodes/Home.node";
+import { Library } from "../library/library.component";
 
 export type PageWrapperProps = {};
 
@@ -123,7 +124,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
       case LIBRARY_NODE:
         return [
           LibraryNode,
-          <LibraryTable/>,
+          <Library />,
 
         ]
       case HOME_NODE:
