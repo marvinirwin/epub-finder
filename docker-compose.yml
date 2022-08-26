@@ -1,0 +1,25 @@
+version: '3'
+services:
+    mongo:
+        image: mongo:3.6
+    web:
+        build: ./reader
+        container_name: reader
+        ports:
+            - '3000:3000'
+        environment:
+            - MONGODB_URI=mongodb://mongo:27017/test
+        links:
+            - mongo
+        depends_on:
+            - mongo
+        volumes:
+            - .:/starter
+            - /starter/node_modules
+    api:
+        build: ./server
+        container_name: server
+        ports:
+            - '3001:3001'
+        stdin_open: true
+        tty: true
