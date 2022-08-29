@@ -3,9 +3,10 @@ services:
     mongo:
         image: mongo:3.6
     web:
-        build: .
+        build: ./reader
+        container_name: reader
         ports:
-            - '8080:8080'
+            - '3000:3000'
         environment:
             - MONGODB_URI=mongodb://mongo:27017/test
         links:
@@ -15,3 +16,10 @@ services:
         volumes:
             - .:/starter
             - /starter/node_modules
+    api:
+        build: ./server
+        container_name: server
+        ports:
+            - '3001:3001'
+        stdin_open: true
+        tty: true

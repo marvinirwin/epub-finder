@@ -1,0 +1,12 @@
+dev_wav_cache
+public
+*.md
+
+# Dependency directory
+node_modules
+
+# Ignore built ts files
+dist
+
+# ignore yarn.lock
+yarn.lock
