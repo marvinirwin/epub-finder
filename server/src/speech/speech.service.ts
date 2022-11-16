@@ -88,9 +88,9 @@ export class SpeechService {
             synthesizer.speakSsmlAsync(
                 ssml1,
                 async (result) => {
-                    await new Promise((resolve, reject) => synthesizer.close(resolve, reject));
+                    await new Promise((resolve, reject) => synthesizer.close(() => resolve(""), reject));
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    resolve();
+                    resolve("");
                 },
                 (error) => {
                     console.log(error);

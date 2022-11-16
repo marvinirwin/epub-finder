@@ -3,3 +3,4 @@ public/video
 .storybook
 __tests__
 node_modules
+src

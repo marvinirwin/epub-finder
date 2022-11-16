@@ -46,7 +46,7 @@ export class AuthController {
     public logout(@Req() req: Request, @Res() res: Response): void {
         // @ts-ignore
         req.session.destroy();
-        req.logout();
+        req.logout(() => {});
         res.clearCookie("nest");
         res.send("");
     }

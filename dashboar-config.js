@@ -1,5 +1,4 @@
 module.exports = {
-	pullRequestConfigs: [],
 	sshTunnels: [
 		// Tell dashboar that it’s needs to be use whatever widget is used for ssh tunnels
 		{

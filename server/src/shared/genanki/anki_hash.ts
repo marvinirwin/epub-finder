@@ -14,7 +14,7 @@ export function ankiHash(fields) {
   h.update(str);
   const hex = h.digest();
 
-  let hash_int = BigInt();
+  let hash_int = BigInt(0);
   for (let i = 0; i < 8; i++) {
     hash_int *= BigInt(256);
     hash_int += BigInt(hex[i]);

@@ -18,6 +18,7 @@ const compareDocuments = async (customArgv: string[]) => {
     );
     const [doc1Name, doc2Name] = args.documents;
     console.log(
+      //@ts-ignore
         await this.documentSimilarityService.compareDocumentsByName(
             doc1Name,
             doc2Name,
