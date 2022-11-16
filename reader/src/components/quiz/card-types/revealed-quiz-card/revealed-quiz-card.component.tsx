@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { QuizProgressBar } from "../../quiz-progress-bar.component";
 const playButton: string = require("./play-button.svg").default;
 const pauseButton: string = require("./pause-button.svg").default;
 
@@ -37,20 +38,13 @@ export const RevealedQuizCard: React.FC<RevealedQuizCardProps> = ({
     };
   }, []);
 
-  // had to put this in a function because the style was rendering before getting the progressBarPercentage prop value
-  const renderProgressBar = () => {
-    return `w-[${progressBarPercentage}%]`;
-  }
-
   const handlePlayClick = () => {
     setPlaying(!playing);
   };
 
   return (
-    <div className="w-full h-full relative">
-      <div className="w-full bg-[#9CA3AF] relative rounded-md my-5">
-        <div className={`${renderProgressBar()} h-8 bg-[#059669] rounded-md`} />
-      </div>
+    <div className="w-full h-full relative bg-white">
+      <QuizProgressBar progressBarPercentage={progressBarPercentage} />
       <div className="w-full flex flex-row">
         <div className="w-1/3">
           <img className="rounded-md" src="https://cdn.pixabay.com/photo/2015/05/18/23/19/gesture-772977_960_720.jpg" />
