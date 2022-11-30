@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: ./server.dev.Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./reader/src:/app/reader/src
+      - ./server/src:/app/server/src
+    env_file:
+      - ./server/.env
+    network_mode: bridge
+    init: true
+    tty: true
+
+  client:
+    build:
+      context: ./
+      dockerfile: ./client.dev.Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./reader/src:/app/reader/src
+      - ./server/src:/app/server/src
+    env_file:
+      - ./reader/.env
+    network_mode: bridge
+    init: true
+    tty: true

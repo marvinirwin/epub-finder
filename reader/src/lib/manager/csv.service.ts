@@ -56,6 +56,7 @@ export class CsvService {
                             c,
                             exampleSegments,
                             wavAudio,
+                          //@ts-ignore
                             zip,
                         });
                     })),

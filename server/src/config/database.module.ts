@@ -13,7 +13,6 @@ const username = process.env.TYPEORM_USERNAME;
 const password = process.env.TYPEORM_PASSWORD;
 const database = process.env.TYPEORM_DATABASE;
 const port = process.env.TYPEORM_PORT;
-console.log({host, username, password, database, port});
 export const DatabaseModule = TypeOrmModule.forRoot({
     // @ts-ignore
     type: "postgres",

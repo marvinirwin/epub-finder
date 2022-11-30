@@ -15,9 +15,12 @@ config({ path: ".env" });
 const args = process.argv.slice(1);
 const isCli = Boolean(process.env.CLI);
 
+const port = process.env.HTTP_PORT;
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: true });
     const { httpAdapter } = app.get(HttpAdapterHost);
+/*
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
     const options = new DocumentBuilder()
@@ -49,6 +52,8 @@ async function bootstrap() {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    await app.listen(process.env.HTTP_PORT);
+*/
+    await app.listen(port, '0.0.0.0');
+    console.log(`Listing on ${port}`);
 }
 bootstrap();
