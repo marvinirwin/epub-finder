@@ -1,4 +1,3 @@
-import { BucketConfig } from "../../bucket-config.interface";
 import { v4 as uuidv4 } from "uuid";
 import { getJobOutputFiles } from "./job-output.service";
 import {
