@@ -3,6 +3,7 @@ import { fromEvent, merge, Observable, ReplaySubject } from 'rxjs'
 import { mapTo, shareReplay, switchMap, tap } from 'rxjs/operators'
 // @ts-ignore
 import { io } from 'socket.io-client'
+import { getApiUrl } from '../lib/util/getApiUrl'
 
 export class ObservableService {
     public videoMetadata$: Observable<VideoMetadata>
@@ -31,6 +32,6 @@ export class ObservableService {
         )
     }
     attemptConnection() {
-        this.connection$.next(new io(`http://${process.env.PUBLIC_URL}/socket`))
+        this.connection$.next(new io(getApiUrl("/socket")))
     }
 }

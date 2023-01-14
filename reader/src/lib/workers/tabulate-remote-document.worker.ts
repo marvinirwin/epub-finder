@@ -12,6 +12,7 @@ import {
 import trie from 'trie-prefix-tree'
 import { SetWithUniqueLengths } from "@shared/"
 import { resolvePartialTabulationConfig } from "@shared/"
+import { getApiUrl } from '../util/getApiUrl'
 
 // @ts-ignore
 self.window = self
@@ -27,7 +28,7 @@ ctx.onmessage = async (ev) => {
     }: TabulateRemoteDocumentDto = ev.data
     const ltDoc = new LtDocument(d)
     const response = await fetch(
-        `${process.env.PUBLIC_URL}/api/documents/${ltDoc.filename}`,
+        getApiUrl("/api/documents/${ltDoc.filename}"),
     )
     const documentSrc = new TextDecoder().decode(await response.arrayBuffer())
     const doc = AtomizedDocument.atomizeDocument({documentId: ltDoc.id(), documentSrc})

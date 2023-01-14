@@ -7,6 +7,7 @@ import { useApplyBoundedTime } from './useApplyBoundedTime'
 import { useApplyPlaybackSpeed } from './useApplyPlaybackRate'
 import { useApplyPlaybackTime } from './useApplyPlaybackTime'
 import { useObservableState } from 'observable-hooks'
+import { getApiUrl } from '../..//lib/util/getApiUrl'
 
 export const PronunciationVideo = ({
     highlightBarPosition1Ms,
@@ -40,7 +41,7 @@ export const PronunciationVideo = ({
     useObserveVideoState(videoElementRef, m.pronunciationVideoService)
 
     const videoSource = videoMetadata
-        ? `${process.env.PUBLIC_URL}/video/${videoMetadata.filename}`
+        ? getApiUrl("/video/${videoMetadata.filename}")
         : undefined
 
     return (

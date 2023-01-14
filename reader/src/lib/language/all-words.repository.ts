@@ -5,8 +5,9 @@ import { map, shareReplay } from 'rxjs/operators'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import memoize from "memoizee";
 import {cEdictRegex} from "@shared/";
+import {getApiUrl} from '../util/getApiUrl'
 
-export const getCedict = memoize(() => axios.get(`${process.env.PUBLIC_URL}/cedict_ts.u8`))
+export const getCedict = memoize(() => axios.get(getApiUrl("/cedict_ts.u8")))
 
 export class AllWordsRepository {
     all$: Observable<Set<string>>

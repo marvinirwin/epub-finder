@@ -2,6 +2,7 @@ import { SpeechConfig } from 'microsoft-cognitiveservices-speech-sdk'
 import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import { RefreshableService } from './refreshable.service'
+import { getApiUrl } from '../util/getApiUrl'
 
 // Load when no token found
 
@@ -32,7 +33,7 @@ export class SpeechRecognitionConfigService {
 
     private static async loadToken() {
         return axios
-            .post(`${process.env.PUBLIC_URL}/api/speech-recognition-token`)
+            .post(getApiUrl("/api/speech-recognition-token"))
             .then((result) => result.data)
     }
 }

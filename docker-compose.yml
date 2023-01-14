@@ -10,7 +10,7 @@ services:
       - ./reader/src:/app/reader/src
       - ./server/src:/app/server/src
     env_file:
-      - ./server/.env
+      - ./.env
     network_mode: bridge
     init: true
     tty: true
@@ -25,7 +25,7 @@ services:
       - ./reader/src:/app/reader/src
       - ./server/src:/app/server/src
     env_file:
-      - ./reader/.env
+      - ./.env
     network_mode: bridge
     init: true
     tty: true

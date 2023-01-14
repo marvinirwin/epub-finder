@@ -5,6 +5,7 @@ import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
 import { UploadText } from '../upload/upload-text.component'
 import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
+import { getApiUrl } from '../../lib/util/getApiUrl'
 
 
 export const AddNewOrSelectLearningMaterial = () => {
@@ -20,7 +21,7 @@ export const AddLearningMaterial = () => {
 export const LogInToSeeLearningMaterial = () => {
     return <Typography variant={'h4'}>
         Out of learning material. Add more text or <Link
-        href={`${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`}>Sign In</Link> to see previously saved text
+        href={getApiUrl("/languagetrainer-auth/keycloak")}>Sign In</Link> to see previously saved text
     </Typography>
 }
 

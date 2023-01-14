@@ -2,13 +2,14 @@ import { BehaviorSubject } from 'rxjs'
 import axios from 'axios'
 import { mapFromId } from '../lib/util/map.module'
 import { VideoMetadata } from '@shared/'
+import { getApiUrl } from '../lib/util/getApiUrl'
 
 export class VideoMetadataRepository {
     all$ = new BehaviorSubject<Map<string, VideoMetadata>>(new Map())
 
     constructor() {
         axios
-            .get(`${process.env.PUBLIC_URL}/api/video_metadata`)
+            .get(getApiUrl("/api/video_metadata"))
             .then((response) => {
                 if (response.status === 200) {
                     const allMetadata = (response.data as unknown) as VideoMetadata[]

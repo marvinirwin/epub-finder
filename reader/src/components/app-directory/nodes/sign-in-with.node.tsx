@@ -7,8 +7,9 @@ import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
 import { ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core'
 import { TutorialPopper } from '../../tutorial-popover/tutorial-popper.component'
+import { getApiUrl } from '../../../lib/util/getApiUrl'
 
-export const signInUrl = `${process.env.PUBLIC_URL}/languagetrainer-auth/keycloak`;
+export const signInUrl = getApiUrl("/languagetrainer-auth/keycloak");
 export const goToSignIn = () => {
     window.location.href = signInUrl
 }

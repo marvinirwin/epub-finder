@@ -1,5 +1,6 @@
 import axios from 'axios'
 import memoize from 'memoizee'
+import { getApiUrl } from '../lib/util/getApiUrl'
 
 export interface TranslateRequest extends TranslateConfig {
     text: string
@@ -12,7 +13,7 @@ export interface TranslateConfig {
 
 export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
-            .post(`${process.env.PUBLIC_URL}/api/translate`, t)
+            .post(getApiUrl("/api/translate"), t)
             .then((response) => (response?.data?.translation as string) || ''),
     {
         promise: true,

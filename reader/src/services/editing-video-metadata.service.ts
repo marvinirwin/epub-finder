@@ -5,6 +5,7 @@ import axios from 'axios'
 import { debounce } from 'lodash'
 import { VideoMetadataDto } from '@shared/'
 import { VideoMetadata } from '@shared/'
+import { getApiUrl } from '../lib/util/getApiUrl'
 
 export class EditingVideoMetadataService {
     public editingCharacterIndex$ = new ReplaySubject<number | undefined>(1)
@@ -56,6 +57,6 @@ export class EditingVideoMetadataService {
     }
 
     private static async saveMetadata(metadata: VideoMetadataDto) {
-        await axios.put(`${process.env.PUBLIC_URL}/api/video_metadata`, metadata)
+        await axios.put(getApiUrl("/api/video_metadata"), metadata)
     }
 }

@@ -1,9 +1,10 @@
 import { ReadingDocumentService } from '../../lib/manager/reading-document.service'
-import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs'
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators'
+import { Observable, ReplaySubject } from 'rxjs'
+import { map, shareReplay } from 'rxjs/operators'
 import { observableLastValue } from '../../services/settings.service'
 import axios from 'axios'
 import { LoggedInUserService } from '../../lib/auth/logged-in-user.service'
+import { getApiUrl } from '../../lib/util/getApiUrl'
 
 export class RequestRecordingService {
     recordRequestSentences$ = new ReplaySubject<Map<string, boolean>>(1)
@@ -44,7 +45,7 @@ export class RequestRecordingService {
         )
         await axios
             .post(
-                `${process.env.PUBLIC_URL}/api/record-request`,
+                getApiUrl("/api/record-request"),
                 submittingSentences,
             )
             .then((response) =>
@@ -61,7 +62,7 @@ export class RequestRecordingService {
 
     async fetchAllRecordRequests() {
         return axios
-            .get(`${process.env.PUBLIC_URL}/api/record-request`)
+            .get(getApiUrl("/api/record-request"))
             .then(
                 (response) =>
                     response?.data &&

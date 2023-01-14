@@ -3,6 +3,7 @@ import {ReplaySubject} from "rxjs";
 import axios from "axios";
 import {LeaderBoardDto} from "@shared/";
 import {LoadingObservable} from "./quiz/word-card.interface";
+import { getApiUrl } from "../lib/util/getApiUrl";
 
 export class LeaderBoardService {
     fetchLoaderBoardSignal$ = new ReplaySubject<void>(1);
@@ -11,7 +12,7 @@ export class LeaderBoardService {
         this.leaderBoard = createLoadingObservable(
             this.fetchLoaderBoardSignal$,
             () => axios
-                .get(`${process.env.PUBLIC_URL}/api/leader-board`)
+                .get(getApiUrl("/api/leader-board"))
                 .then((response) => (response?.data as LeaderBoardDto) )
             ,
         );

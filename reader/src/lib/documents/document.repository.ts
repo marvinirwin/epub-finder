@@ -9,6 +9,7 @@ import { TESTING } from '../util/url-params'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { map, scan } from 'rxjs/operators'
 import {ModalService} from "../user-interface/modal.service";
+import { getApiUrl } from '../util/getApiUrl'
 
 export class DocumentRepository {
     collection$: Observable<Map<string, LtDocument>>
@@ -32,7 +33,7 @@ export class DocumentRepository {
             isLoading$,
         } = createLoadingObservable(languageConfigsService.readingLanguageCode$, async (language_code) => {
             const response = await axios.get(
-                `${process.env.PUBLIC_URL}/api/documents`,
+                getApiUrl("/api/documents"),
                 {
                     params: { language_code },
                 },
@@ -95,7 +96,7 @@ export class DocumentRepository {
             headers.sandbox_file = '1'
         }
         const result = await axios.put(
-            `${process.env.PUBLIC_URL}/api/documents/`,
+            getApiUrl("/api/documents/"),
             formData,
             {
                 headers,
@@ -107,7 +108,7 @@ export class DocumentRepository {
 
     public delete(ltDocument: LtDocument) {
         return axios
-            .post(`${process.env.PUBLIC_URL}/api/documents/update`, {
+            .post(getApiUrl("/api/documents/update"), {
                 ...ltDocument.d,
                 deleted: true,
             })

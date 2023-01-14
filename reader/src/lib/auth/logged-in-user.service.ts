@@ -1,6 +1,7 @@
 import { Observable, ReplaySubject } from 'rxjs'
 import axios from 'axios'
 import { map, shareReplay } from 'rxjs/operators'
+import { getApiUrl } from '../util/getApiUrl'
 
 export interface Profile {
     email: string
@@ -12,7 +13,7 @@ export class LoggedInUserService {
 
     public static async fetchLoggedInProfile(): Promise<Profile | undefined> {
         const response = await axios.get(
-            `${process.env.PUBLIC_URL}/api/users/profile`,
+            getApiUrl("/api/users/profile"),
         )
         return response?.data as Profile
     }
@@ -38,7 +39,7 @@ export class LoggedInUserService {
     }
 
     public async signOut() {
-        await axios.get(`${process.env.PUBLIC_URL}/languagetrainer-auth/logout`)
+        await axios.get(getApiUrl("/languagetrainer-auth/logout"))
         this.profile$.next(undefined)
     }
 }
