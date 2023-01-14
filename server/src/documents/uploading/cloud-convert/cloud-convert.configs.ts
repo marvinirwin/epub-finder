@@ -14,7 +14,7 @@ export const cloudConvertRegular = wrapService({
     process.env.CLOUD_CONVERT_API_KEY,
     false
   ),
-  mockService: cloudConvertMockService
+  mockService: entirelyDisabledService<CloudConvert>(ENABLE_CLOUD_CONVERT_NORMAL)
 });
 
 const ENABLE_CLOUD_CONVERT_SANDBOX = "ENABLE_CLOUD_CONVERT_SANDBOX";
@@ -25,6 +25,6 @@ export const cloudConvertSandbox = wrapService(
       process.env.SANDBOX_CLOUD_CONVERT_API_KEY,
       true
     ),
-    mockService: entirelyDisabledService<typeof >(ENABLE_CLOUD_CONVERT_SANDBOX)
+    mockService: entirelyDisabledService<CloudConvert>(ENABLE_CLOUD_CONVERT_SANDBOX)
   }
 );

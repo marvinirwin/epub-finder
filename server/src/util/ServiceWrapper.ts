@@ -21,7 +21,7 @@ export const disabledService = <P, R>(key: string): ((p: P) => R) => () => {
   throw Error(`This service is currently disabled Set the environment variable ${key}=true to enable it`);
 };
 export const entirelyDisabledService  = <T extends object>(key: string): (() => T) => () => {
-  return new Proxy<T>({},
+  return new Proxy<T>({} as T,
     {
       get() {
         throw new Error(`This service is currently disabled Set the environment variable ${key}=true to enable it`);
