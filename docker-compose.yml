@@ -9,6 +9,8 @@ services:
     volumes:
       - ./reader/src:/app/reader/src
       - ./server/src:/app/server/src
+      - ${PWD}/.env:/app/server/.env
+      - ${PWD}/.env:/app/reader/.env
     env_file:
       - ./.env
     network_mode: bridge
