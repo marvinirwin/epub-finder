@@ -3,7 +3,7 @@ module.exports = function(app) {
   app.use(
     "/login",
     createProxyMiddleware({
-      target: "http://localhost:3001",
+      target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "debug"
     })
@@ -11,7 +11,7 @@ module.exports = function(app) {
   app.use(
     "/languagetrainer-auth/*",
     createProxyMiddleware({
-      target: "http://localhost:3001",
+      target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "debug"
     })
@@ -19,7 +19,7 @@ module.exports = function(app) {
   app.use(
     "/keycloak/*",
     createProxyMiddleware({
-      target: "https://languagetrainer.app",
+      target: `${process.env.KEYCLOAK_URL}`,
       changeOrigin: true,
       logLevel: "debug"
     })
@@ -27,7 +27,7 @@ module.exports = function(app) {
   app.use(
     "/documents/*",
     createProxyMiddleware({
-      target: "http://localhost:3001",
+      target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "debug"
     })
@@ -35,7 +35,7 @@ module.exports = function(app) {
   app.use(
     "/translate/*",
     createProxyMiddleware({
-      target: "http://localhost:3001",
+      target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "info"
     })
@@ -43,7 +43,7 @@ module.exports = function(app) {
   app.use(
     "/api/",
     createProxyMiddleware({
-      target: "http://localhost:3001",
+      target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "info",
       pathRewrite: {'^/api' : ''}

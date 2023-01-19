@@ -14,7 +14,7 @@ export class LoadMetadataService implements OnModuleInit {
     ) {}
 
     async onModuleInit() {
-        // TODO reimplement this with S3
+        // TODO reimplement this with S3 and the filesystem
         const files = /*await fs.promises.readdir(process.env.VIDEO_DIR);*/[];
         return Promise.all(
             files

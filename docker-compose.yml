@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   server:
     build:
@@ -7,13 +8,14 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./reader/src:/app/reader/src
-      - ./server/src:/app/server/src
+      - ./reader:/app/reader
+      - ./server:/app/server
       - ${PWD}/.env:/app/server/.env
       - ${PWD}/.env:/app/reader/.env
+      - /app/server/node_modules
+      - /app/reader/node_modules
     env_file:
       - ./.env
-    network_mode: bridge
     init: true
     tty: true
 
@@ -24,10 +26,33 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./reader/src:/app/reader/src
-      - ./server/src:/app/server/src
+      - ./reader:/app/reader
+      - ./server:/app/server
+      - /app/server/node_modules
+      - /app/reader/node_modules
     env_file:
       - ./.env
-    network_mode: bridge
     init: true
     tty: true
+    environment:
+      - "KEYCLOAK_URL=http://keycloak:8090"
+      - "SERVER_URL=http://server:3001"
+
+  keycloak:
+    env_file:
+      - ./.env
+    image: keycloak
+    environment:
+      - KC_HOSTNAME=0.0.0.0
+      - HOSTNAME=0.0.0.0
+      - PROXY_ADDRESS_FORWARDING=true
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    entrypoint:
+      - /opt/keycloak/bin/kc.sh
+      - start-dev
+
+networks:
+  default:
+    internal: false

@@ -27,7 +27,7 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, "keycloak") {
             realm: KEYCLOAK_REALM,
             clientID: KEYCLOAK_CLIENT_ID,
             clientSecret: KEYCLOAK_CLIENT_SECRET,
-            callbackURL: "/languagetrainer-auth/keycloak/callback",
+            callbackURL: "/languagetrainer/keycloak/callback",
             authorizationURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth`,
             tokenURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`,
             userInfoURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
