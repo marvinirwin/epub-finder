@@ -35,7 +35,7 @@ services:
     init: true
     tty: true
     environment:
-      - "KEYCLOAK_URL=http://keycloak:8090"
+      - "KEYCLOAK_URL=http://keycloak:8080"
       - "SERVER_URL=http://server:3001"
 
   keycloak:
@@ -51,7 +51,7 @@ services:
       - "9990:9990"
     entrypoint:
       - /opt/keycloak/bin/kc.sh
-      - start-dev
+      - "start-dev --hostname 0.0.0.0"
 
 networks:
   default:
