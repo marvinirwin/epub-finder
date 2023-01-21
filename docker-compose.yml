@@ -56,3 +56,4 @@ services:
 networks:
   default:
     internal: false
+    driver: bridge

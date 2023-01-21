@@ -33,8 +33,7 @@ export const LandingPage = (
   }: LandingPageProps) => {
   return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
-      <h1 className="text-6xl">Learn all the words</h1>
-      <h1 className="text-6xl">from a restaurant menu</h1>
+      <h1 className="text-6xl">Memorized words from any media</h1>
       <img src="https://i.kfs.io/album/global/160289973,0v1/fit/500x500.jpg" className="w-full"/>
     </div>
     <div className="flex flex-col w-1/2 p-5">
