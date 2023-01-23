@@ -6,5 +6,6 @@
 This app requires a PostGreSQL database
 
 
-TODO make a list of required configurations
+To run the project locally add the following line to your hosts file to point http://server:8080 to http://localhost:8080
 
+`127.0.0.1       server`

@@ -1,4 +1,5 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
+console.error(process.env)
 module.exports = function(app) {
   app.use(
     "/login",

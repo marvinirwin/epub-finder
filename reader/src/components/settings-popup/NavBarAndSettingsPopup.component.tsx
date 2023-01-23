@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/menu-landing-page.component";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
-import {goToSignIn} from "../app-directory/nodes/sign-in-with.node";
+import {goToSignIn, signInUrl} from "../app-directory/nodes/sign-in-with.node";
 import {NavBar} from "../NavBar.component";
 
 export type NavBarAndSettingsProps = {
@@ -60,10 +60,10 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
                   value={currentUserEmail}
                 />
                 {
-                  !currentUserEmail ? <button
+                  !currentUserEmail ? <a
                     className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full mx-8 my-1"
-                    onClick={() => goToSignIn()}
-                  >Login</button> : null
+                    href={signInUrl}
+                  >Login</a> : null
                 }
                 <select
                   className="w-[300px] h-11 p-2 mb-3 font-sans text-base border rounded-sm border-[#d4d4d8] text-[#71717A]"

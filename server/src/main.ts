@@ -39,7 +39,7 @@ async function bootstrap() {
                 signed: false,
             },
             name: "nest",
-            resave: false,
+            resave: true,
             secret: process.env.SESSION_SECRET_KEY,
             store: new TypeormStore({
                 repository: app.get(SessionService).sessionRepository,

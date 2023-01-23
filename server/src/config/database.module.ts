@@ -31,5 +31,4 @@ export const DatabaseModule = TypeOrmModule.forRoot({
     synchronize: false,
     // @ts-ignore I dunno what this is for, it might be removable
     timezone: "Z",
-    logging: ["query"]
 });

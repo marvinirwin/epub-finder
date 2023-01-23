@@ -54,15 +54,15 @@ export class AuthController {
     @Public()
     @Get("/keycloak")
     @UseGuards(KeycloakGuard)
-    public googleLogin(): void {
-        // initiates the Google OAuth2 login flow
+    public keycloakLogin(): void {
+        // initiates the Keycloak Login Flow
     }
 
     @Public()
     @Get("/keycloak/callback")
     @UseGuards(KeycloakGuard)
     @Redirect(process.env.APP_URL)
-    public googleLoginCallback(@UserFromReq() user: User): string {
+    public keycloakLoginCallback(@UserFromReq() user: User): string {
         // Redirect to index.html
         return "";
     }

@@ -22,7 +22,13 @@ export class SessionSerializer extends PassportSerializer {
     ): void {
         this.userService
             .findOne(`${id}`)
-            .then((user) => done(null, user))
-            .catch((error) => done(error));
+            .then((user) => {
+                console.log(user)
+                done(null, user);
+            })
+            .catch((error) => {
+                console.log(error)
+                done(error);
+            });
     }
 }
