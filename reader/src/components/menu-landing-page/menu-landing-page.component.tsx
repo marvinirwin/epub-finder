@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import {flatten} from "lodash";
+import { LibraryBooks } from "@material-ui/icons";
 
 
 export type VariantLanguageOption = { value: string, label: string };
@@ -32,8 +33,7 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>( (
   }, ref) => {
   return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
-      <h1 className="text-6xl">Memorized words from any media</h1>
-      <img src="https://i.kfs.io/album/global/160289973,0v1/fit/500x500.jpg" className="w-full"/>
+      <LibraryBooks/>
     </div>
     <div className="flex flex-col w-1/2 p-5">
       <div className="flex flex-col justify-center items-center m-8">
