@@ -10,8 +10,8 @@ export class AnonymousStrategy extends PassportStrategy(Strategy, "anonymous") {
     }
     async authenticate(request) {
         if (request.user) {
-            return this.success(request.user);
+            return await this.success(request.user);
         }
-        return this.success(await this.userService.createAnonymousUser());
+        return await this.success(await this.userService.createAnonymousUser());
     }
 }

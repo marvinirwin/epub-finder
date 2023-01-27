@@ -28,7 +28,7 @@ export const DatabaseModule = TypeOrmModule.forRoot({
         migrationsDir: "src/migrations",
         entitiesDir: "src/entities",
     },
-    synchronize: false,
+    synchronize: true,
     // @ts-ignore I dunno what this is for, it might be removable
     timezone: "Z",
 });

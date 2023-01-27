@@ -23,11 +23,9 @@ export class SessionSerializer extends PassportSerializer {
         this.userService
             .findOne(`${id}`)
             .then((user) => {
-                console.log(user)
                 done(null, user);
             })
             .catch((error) => {
-                console.log(error)
                 done(error);
             });
     }

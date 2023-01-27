@@ -9,11 +9,6 @@ export class KeycloakGuard
         const result = (await super.canActivate(context)) as boolean;
         const request = context.switchToHttp().getRequest();
         await super.logIn(request);
-        const user = request.user;
-        await new Promise<void>((resolve, reject) =>
-            request.logIn(user, (err) => (err ? reject(err) : resolve()))
-        );
-        console.log(request.user);
         return result;
     }
 

@@ -10,7 +10,7 @@ import {
 } from 'rxjs/operators'
 import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
-import { safePush } from '@shared/'
+import { safePush, UnPersistedEntity } from '@shared/'
 import { SuperMemoGrade } from 'supermemo'
 
 
@@ -29,7 +29,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         getIndexValue,
     }: {
         databaseService: DatabaseService
-        load: () => Promise<AsyncGenerator<T[]>> | AsyncGenerator<T[]>
+        load: () => Promise<AsyncGenerator<UnPersistedEntity<T>[]>> | AsyncGenerator<UnPersistedEntity<T>[]>
         add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
         getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string }
     }) {
@@ -79,6 +79,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
             map((recordObject) => flatten(Object.values(recordObject))),
             shareReplay(1),
         );
+        // @ts-ignore
         this.loadGenerator(load);
     }
 

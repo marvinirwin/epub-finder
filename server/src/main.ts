@@ -39,17 +39,30 @@ async function bootstrap() {
                 signed: false,
             },
             name: "nest",
-            resave: true,
             secret: process.env.SESSION_SECRET_KEY,
             store: new TypeormStore({
                 repository: app.get(SessionService).sessionRepository,
             }),
-            saveUninitialized: true,
+            resave: false,
+            saveUninitialized: false
         }),
     );
 
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(function(request, response, next) {
+        if (request.session && !request.session.regenerate) {
+            request.session.regenerate = (cb) => {
+                cb()
+            }
+        }
+        if (request.session && !request.session.save) {
+            request.session.save = (cb) => {
+                cb()
+            }
+        }
+        next()
+    })
     await app.listen(port, '0.0.0.0');
     console.log(`Listing on ${port}`);
 }

@@ -1,9 +1,10 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {UnPersistedEntity} from "../shared/UnPersistedEntity";
 
 @Entity()
 export class IgnoredWord {
-    @PrimaryGeneratedColumn("uuid")
-    id: string
+    @PrimaryGeneratedColumn()
+    id: number
     @Column()
     language_code: string
     @Column()
@@ -15,3 +16,4 @@ export class IgnoredWord {
     @Column()
     creator_id: number;
 }
+export type PersistedIgnoredWord = UnPersistedEntity<IgnoredWord>;

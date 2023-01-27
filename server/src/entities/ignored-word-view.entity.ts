@@ -13,7 +13,7 @@ import { GroupwiseMax } from "./user-setting-view.entity";
 })
 export class IgnoredWordView {
     @ViewColumn()
-    id: string
+    id: number
     @ViewColumn()
     language_code: string
     @ViewColumn()

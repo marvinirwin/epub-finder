@@ -74,13 +74,13 @@ export class EntitiesController {
     }
 
     @Post(":entity")
-    @UseGuards(AnonymousGuard)
     async post(
         @UserFromReq() user: User,
         @Param("entity") entity: string,
         @Body() body: Record<string, any>,
     ) {
         const foundEntity = this.resolveEntity(entity);
+        console.log(user);
         if (!user) {
             throw new Error("Authentication required in to persist entities, shouldn't you be an anonymous user though?");
         }

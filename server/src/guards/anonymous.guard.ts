@@ -12,10 +12,12 @@ export class AnonymousGuard
         return result;
     }
 
+/*
     public handleRequest<UserEntity>(err: Error, user: UserEntity): UserEntity {
         if (err) {
             throw err;
         }
         return user;
     }
+*/
 }

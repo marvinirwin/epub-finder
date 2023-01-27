@@ -1,12 +1,6 @@
-import {
-    Injectable,
-    NestInterceptor,
-    ExecutionContext,
-    CallHandler,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
-import { User } from "../entities/user.entity";
+import {CallHandler, ExecutionContext, Injectable, NestInterceptor,} from "@nestjs/common";
+import {Observable} from "rxjs";
+import {User} from "../entities/user.entity";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -14,7 +8,10 @@ export class LoggingInterceptor implements NestInterceptor {
         const request = context
             .switchToHttp()
             .getRequest<Request & { user?: User }>();
-        console.log(`${request.method} ${request.url} ${request?.user?.email}`);
+        const nestCookie = (request.headers['cookie'] || '').split(';')
+            .map(cookieKeyValue => cookieKeyValue.split('='))
+            .find(([key, value]) => key === 'nest')
+        console.log(`${request.method} ${request.url} ${request?.user?.email} ${nestCookie?.[1].slice(2,5)}`);
         return next
             .handle()
             .pipe

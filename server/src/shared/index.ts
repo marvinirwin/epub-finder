@@ -69,3 +69,5 @@ export type {IgnoredWord} from "../entities/ignored-word.entity";
 export type {IgnoredWordView} from "../entities/ignored-word-view.entity";
 export type {KnownWord} from "../entities/known-word.entity";
 export type {UserSetting} from "../entities/user-setting.entity";
+
+export * from './UnPersistedEntity'

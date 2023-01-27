@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import {flatten} from "lodash";
 
 
@@ -18,7 +18,7 @@ export type LandingPageProps = {
   onClick: () => void
 };
 
-export const LandingPage = (
+export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>( (
   {
     dragActive,
     language,
@@ -26,11 +26,10 @@ export const LandingPage = (
     onClick,
     onDragEnter,
     onDrop,
-    ref,
     setLanguage,
     setVariant,
     variant
-  }: LandingPageProps) => {
+  }, ref) => {
   return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
       <h1 className="text-6xl">Memorized words from any media</h1>
@@ -88,5 +87,5 @@ export const LandingPage = (
       </div>
     </div>
   </div>;
-};
+} );
 

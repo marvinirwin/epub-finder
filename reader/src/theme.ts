@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme } from '@material-ui/core/styles'
 import { green, indigo } from '@material-ui/core/colors'
 
 export const factorFunc = (factor: number): number => {
@@ -37,7 +37,7 @@ export const factorFunc = (factor: number): number => {
     }
 }
 
-export const theme = createMuiTheme({
+export const theme = createTheme({
     palette: {
         primary: indigo,
         secondary: green,
