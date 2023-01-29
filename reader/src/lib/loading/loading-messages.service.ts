@@ -13,7 +13,7 @@ export class LoadingMessagesService {
         openDocumentsService: OpenDocumentsService
     }) {
         this.loadingMessages$ = combineLatest([
-            documentRepository.isFetching$.pipe(
+            documentRepository.loadingSignal.isLoading$.pipe(
                 map((isFetching) => (isFetching ? 'Fetching library' : '')),
             ),
             openDocumentsService.aVirtualTabulationIsLoading$.pipe(

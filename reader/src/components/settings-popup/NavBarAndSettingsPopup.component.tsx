@@ -13,6 +13,8 @@ export type NavBarAndSettingsProps = {
   setVariant: (v: VariantLanguageOption) => unknown
   currentUserEmail: string | undefined;
   selectedNavItem: TreeMenuNode
+  isLoading: boolean
+  loadingMessage: string
 };
 
 export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
@@ -24,7 +26,9 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
     variant,
     setVariant,
     currentUserEmail,
-    selectedNavItem
+    selectedNavItem,
+    isLoading,
+    loadingMessage
   }) => {
     const [showSettings, setShowSettings] = useState(false);
 

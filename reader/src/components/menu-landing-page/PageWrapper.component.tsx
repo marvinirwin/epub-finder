@@ -28,6 +28,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
   const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
   const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
   const currentUserEmail = useObservableState(m.loggedInUserService.profile$)?.email;
+  const isLoading = useObservableState(m.loadingService.isLoading$) || false;
+  const loadingMessage = useObservableState(m.loadingService.latestLoadingMessage$) || "";
 
   const languages: ParentLanguageOption[] = SupportedTranslations.map(t => {
       const v = {
@@ -159,6 +161,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         variant={variant}
         currentUserEmail={currentUserEmail}
         selectedNavItem={currentNode}
+        isLoading={isLoading}
+        loadingMessage={loadingMessage}
       />
       {currentPage}
     </div>

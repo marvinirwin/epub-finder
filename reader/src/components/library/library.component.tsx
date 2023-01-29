@@ -44,27 +44,6 @@ const LibraryRow = (
             }
         </td>
     </tr>;
-    /*
-        return <tr className="w-[300px] h-6 mb-3 flex flex-row flex-nowrap justify-between">
-            <td className="w-16">{document.ltDocument.name}</td>
-            <td className="w-16 flex justify-center items-center">
-                <input
-                    className="rounded-sm"
-                    type="checkbox"
-                    checked={isUsedForFrequency}
-                    onChange={() => document.toggleUseForFrequency()}
-                />
-            </td>
-            <td className="w-16 flex justify-center items-center">
-                <input
-                    className="rounded-sm"
-                    type="checkbox"
-                    checked={isUsedForExamples}
-                    onChange={() => document.toggleUseForExamples()}
-                />
-            </td>
-        </tr>;
-    */
 };
 
 export const Library: React.FC<LibraryProps> = ({}) => {
@@ -132,19 +111,4 @@ export const Library: React.FC<LibraryProps> = ({}) => {
             </div>
         </div>
     )
-    /*
-            < table
-        className = "w-80 h-[570px] p-[10px] relative text-sm flex flex-col items-center bg-white" >
-            < tr
-        className = "w-[300px] h-6 mb-3 flex flex-row flex-nowrap justify-between" >
-            < th
-        className = "w-16 font-normal" > Document < /th>
-        <th className="w-16 font-normal">Examples</th>
-        <th className="w-16 font-normal">Frequency</th>
-    </tr>
-
-    </table>
-    )
-        ;
-    */
 };

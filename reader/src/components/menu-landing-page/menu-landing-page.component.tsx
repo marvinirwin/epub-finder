@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import {flatten} from "lodash";
 import { LibraryBooks } from "@material-ui/icons";
+import { supportedDocumentFileExtensions } from "../../lib/uploading-documents/uploading-documents.service";
 
 
 export type VariantLanguageOption = { value: string, label: string };
@@ -31,6 +32,7 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>( (
     setVariant,
     variant
   }, ref) => {
+  const validExtensionList = Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ');
   return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
       <LibraryBooks/>
@@ -70,12 +72,12 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>( (
         onDragLeave={onDragEnter}
         onDrop={onDrop}
       >
-        <input ref={ref} className="hidden" type="file" id="input-file-upload" multiple={true}/>
+        <input ref={ref} className="hidden" type="file" id="input-file-upload" multiple={true} accept={validExtensionList}/>
         <label id="label-file-upload" htmlFor="file-upload" className={dragActive ? "drag-active" : ""}>
           <div className="flex flex-col justify-center items-center">
             <img className="w-12 h-12 mb-8" src={require("./upload-cloud.svg").default}/>
             <p className="mx-5 mb-3">Select a file or drag and drop here</p>
-            <p className="mx-5 mb-5 text-gray-400">JPG, PNG, or PDF, file size no more than 10mb</p>
+            <p className="mx-5 mb-5 text-gray-400">{validExtensionList} file size no more than 10mb</p>
             <button
               className="px-3 py-2 text-sm text-[#0F91D2] rounded-lg border border-[#0f91d2]"
               onClick={onClick}

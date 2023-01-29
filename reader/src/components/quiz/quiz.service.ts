@@ -21,153 +21,154 @@ import {scheduleRowKey} from "../../lib/util/Util";
 import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 
 export class QuizService {
-  quizCard: QuizCard
-  currentScheduleRow$: Observable<SpacedScheduleRow | undefined>
-  manualHiddenFieldConfig$ = new ReplaySubject<string>()
+    quizCard: QuizCard
+    currentScheduleRow$: Observable<SpacedScheduleRow | undefined>
+    manualHiddenFieldConfig$ = new ReplaySubject<string>()
 
-  constructor({
-                cardsRepository,
-                sortedLimitedQuizScheduleRowsService,
-                exampleSegmentsService,
-                openDocumentsService,
-                languageConfigsService,
-                settingsService,
-                tabulationConfigurationService,
-                translationAttemptScheduleService,
-                onSelectService,
-                wordRecognitionProgressRepository,
-              }: {
-    cardsRepository: CardsRepository
-    sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
-    openDocumentsService: OpenDocumentsService
-    languageConfigsService: LanguageConfigsService
-    settingsService: SettingsService
-    tabulationConfigurationService: TabulationConfigurationService
-    translationAttemptScheduleService: TranslationAttemptScheduleService
-    onSelectService: OnSelectService,
-    wordRecognitionProgressRepository: WordRecognitionProgressRepository
-    exampleSegmentsService: ExampleSegmentsService
-  }) {
-    this.manualHiddenFieldConfig$.next('')
-    this.currentScheduleRow$ = combineLatest(
-      [
-        sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
-        wordRecognitionProgressRepository.recordList$.pipe(
-          map(recordList => orderBy(recordList, r => r.created_at, 'desc') as WordRecognitionRow[]),
-          shareReplay(1),
-        ),
-      ],
-    ).pipe(
-      map(([scheduleRows, previousRecords]) => {
-        const firstRow = scheduleRows.limitedScheduleRows[0];
-        const previousCardType = previousRecords[0]?.flash_card_type;
-        const resolveNoRepeat = () => {
-          /*
-           * TODO make this generic
-           */
-          for (let i = 5; i >= 1; i--) {
-            const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
-            const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
-            const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
-              itemsThatDontRepeat,
-              itemsWithADifferentFlashCardTypeAsLastTime
-            ].every(set => set.has(r)))
-            if (filteredWords.length) {
-              return filteredWords[0];
-            }
-          }
-          for (let i = 5; i >= 1; i--) {
-            const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
-            const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
-              itemsThatDontRepeat,
-            ].every(set => set.has(r)))
-            if (filteredWords.length) {
-              return filteredWords[0];
-            }
-          }
-          for (let i = 5; i >= 1; i--) {
-            const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
-            const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
-              itemsWithADifferentFlashCardTypeAsLastTime
-            ].every(set => set.has(r)))
-            if (filteredWords.length) {
-              return filteredWords[0];
-            }
-          }
+    constructor(
+        {
+            cardsRepository,
+            sortedLimitedQuizScheduleRowsService,
+            exampleSegmentsService,
+            openDocumentsService,
+            languageConfigsService,
+            settingsService,
+            tabulationConfigurationService,
+            translationAttemptScheduleService,
+            onSelectService,
+            wordRecognitionProgressRepository,
+        }: {
+            cardsRepository: CardsRepository
+            sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
+            openDocumentsService: OpenDocumentsService
+            languageConfigsService: LanguageConfigsService
+            settingsService: SettingsService
+            tabulationConfigurationService: TabulationConfigurationService
+            translationAttemptScheduleService: TranslationAttemptScheduleService
+            onSelectService: OnSelectService,
+            wordRecognitionProgressRepository: WordRecognitionProgressRepository
+            exampleSegmentsService: ExampleSegmentsService
+        }) {
+        this.manualHiddenFieldConfig$.next('')
+        this.currentScheduleRow$ = combineLatest(
+            [
+                sortedLimitedQuizScheduleRowsService.sortedLimitedScheduleRows$,
+                wordRecognitionProgressRepository.recordList$.pipe(
+                    map(recordList => orderBy(recordList, r => r.created_at, 'desc') as WordRecognitionRow[]),
+                    shareReplay(1),
+                ),
+            ],
+        ).pipe(
+            map(([scheduleRows, previousRecords]) => {
+                const firstRow = scheduleRows.limitedScheduleRows[0];
+                const previousCardType = previousRecords[0]?.flash_card_type;
+                const resolveNoRepeat = () => {
+                    /*
+                     * TODO make this generic
+                     */
+                    for (let i = 5; i >= 1; i--) {
+                        const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
+                        const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
+                            itemsThatDontRepeat,
+                            itemsWithADifferentFlashCardTypeAsLastTime
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
+                        }
+                    }
+                    for (let i = 5; i >= 1; i--) {
+                        const itemsThatDontRepeat = new Set(getItemsThatDontRepeat(scheduleRows, previousRecords, i, r => r.word));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
+                            itemsThatDontRepeat,
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
+                        }
+                    }
+                    for (let i = 5; i >= 1; i--) {
+                        const itemsWithADifferentFlashCardTypeAsLastTime = new Set(scheduleRows.limitedScheduleRows.filter(r => r.d.flash_card_type !== previousCardType));
+                        const filteredWords = scheduleRows.limitedScheduleRows.filter(r => [
+                            itemsWithADifferentFlashCardTypeAsLastTime
+                        ].every(set => set.has(r)))
+                        if (filteredWords.length) {
+                            return filteredWords[0];
+                        }
+                    }
+                }
+                const itemPreventedRepeat = resolveNoRepeat()
+                if (itemPreventedRepeat) {
+                    return itemPreventedRepeat
+                }
+                return firstRow
+            }),
+        )
+        const currentWord$ = this.currentScheduleRow$.pipe(
+            map((row) => row?.d.word),
+            distinctUntilChanged(),
+        )
+        const openExampleSentencesDocument = OpenExampleSentencesFactory({
+            tabulationConfigurationService,
+            settingsService,
+            languageConfigsService,
+            onSelectService,
+            exampleSegmentsService,
+            documentId: 'example-sentences',
+            sentences$: combineLatest([
+                exampleSegmentsService.exampleSegmentMap$,
+                currentWord$,
+            ]).pipe(
+                debounceTime(0),
+                map(
+                    ([
+                         exampleSegmentMap,
+                         currentWord,
+                     ]) => {
+                        if (!currentWord) return []
+                        const subSequences = exampleSegmentMap.get(currentWord) || [];
+                        return uniqBy(
+                            subSequences,
+                            subSequence => subSequence.segmentText,
+                        ).slice(0, 10)
+                    },
+                ),
+                shareReplay(1),
+            ),
+        })
+        openDocumentsService.openDocumentTree.appendDelta$.next({
+            nodeLabel: 'root',
+            children: {
+                [EXAMPLE_SENTENCE_DOCUMENT]: {
+                    nodeLabel: EXAMPLE_SENTENCE_DOCUMENT,
+                    value: openExampleSentencesDocument,
+                },
+            },
+        })
+
+        const wordCard = wordCardFactory(
+            currentWord$,
+            cardsRepository,
+            languageConfigsService,
+        )
+
+        this.quizCard = {
+            ...wordCard,
+            flashCardType$: this.currentScheduleRow$.pipe(
+                map(scheduleRow => scheduleRow?.d?.flash_card_type || FlashCardType.WordExamplesAndPicture),
+                shareReplay(1),
+            ),
+            answerIsRevealed$: new BehaviorSubject<boolean>(false),
+            exampleSentenceOpenDocument: openExampleSentencesDocument,
         }
-        const itemPreventedRepeat = resolveNoRepeat()
-        if (itemPreventedRepeat) {
-          return itemPreventedRepeat
-        }
-        return firstRow
-      }),
-    )
-    const currentWord$ = this.currentScheduleRow$.pipe(
-      map((row) => row?.d.word),
-      distinctUntilChanged(),
-    )
-    const openExampleSentencesDocument = OpenExampleSentencesFactory({
-      tabulationConfigurationService,
-      settingsService,
-      languageConfigsService,
-      onSelectService,
-      exampleSegmentsService,
-      documentId: 'example-sentences',
-      sentences$: combineLatest([
-        exampleSegmentsService.exampleSegmentMap$,
-        currentWord$,
-      ]).pipe(
-        debounceTime(0),
-        map(
-          ([
-             exampleSegmentMap,
-             currentWord,
-           ]) => {
-            if (!currentWord) return []
-            const subSequences = exampleSegmentMap.get(currentWord) || [];
-            return uniqBy(
-              subSequences,
-              subSequence => subSequence.segmentText,
-            ).slice(0, 10)
-          },
-        ),
-        shareReplay(1),
-      ),
-    })
-    openDocumentsService.openDocumentTree.appendDelta$.next({
-      nodeLabel: 'root',
-      children: {
-        [EXAMPLE_SENTENCE_DOCUMENT]: {
-          nodeLabel: EXAMPLE_SENTENCE_DOCUMENT,
-          value: openExampleSentencesDocument,
-        },
-      },
-    })
 
-    const wordCard = wordCardFactory(
-      currentWord$,
-      cardsRepository,
-      languageConfigsService,
-    )
-
-    this.quizCard = {
-      ...wordCard,
-      flashCardType$: this.currentScheduleRow$.pipe(
-        map(scheduleRow => scheduleRow?.d?.flash_card_type || FlashCardType.WordExamplesAndPicture),
-        shareReplay(1),
-      ),
-      answerIsRevealed$: new BehaviorSubject<boolean>(false),
-      exampleSentenceOpenDocument: openExampleSentencesDocument,
+        this.currentScheduleRow$
+            .pipe(distinctUntilChanged(
+                    (r1, r2) => {
+                        if (!r1 || !r2) return false
+                        return scheduleRowKey(r1) === scheduleRowKey(r2)
+                    }),
+                mapTo(false),
+            )
+            .subscribe(this.quizCard.answerIsRevealed$)
     }
-
-    this.currentScheduleRow$
-      .pipe(distinctUntilChanged(
-        (r1, r2) => {
-          if (!r1 || !r2) return false
-          return scheduleRowKey(r1) === scheduleRowKey(r2)
-        }),
-        mapTo(false),
-      )
-      .subscribe(this.quizCard.answerIsRevealed$)
-  }
 }

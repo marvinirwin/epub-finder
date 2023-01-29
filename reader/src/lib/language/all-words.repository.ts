@@ -24,6 +24,7 @@ export class AllWordsRepository {
             languageConfigsService.readingLanguageCode$,
             async code => {
                 switch(code) {
+                    case 'zh-Hant':
                     case 'zh-Hans':
                         const response = await getCedict();
                         const data = response.data;

@@ -8,7 +8,9 @@ import { observableLastValue } from '../../services/settings.service'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { highestPriorityCard } from './highest-priority-card'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
+import { LoadingSignal } from '../loading/loadingSignal'
 
+const loadingChunkSize = 500;
 export default class CardsRepository {
     private languageConfigsService: LanguageConfigsService
     public static mergeCardIntoCardDict(
@@ -37,7 +39,7 @@ export default class CardsRepository {
     addCardsWhichDoNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>()
     upsertCards$ = new Subject<ICard[]>()
     cardIndex$!: Observable<Dictionary<ICard[]>>
-    cardProcessingSignal$ = new ReplaySubject<boolean>(1)
+    loadingSignal = new LoadingSignal()
     newWords$: Observable<string[]>
     all$ = new BehaviorSubject<Dictionary<ICard[]>>({})
     /**
@@ -55,7 +57,6 @@ export default class CardsRepository {
     ) {
         this.db = databaseService
         this.languageConfigsService = languageConfigsService;
-        this.cardProcessingSignal$.next(true)
 
         this.newWords$ = this.addCardsWhichDoNotHaveToBePersisted$.pipe(
             map((cards) => cards.map((card) => card.learning_language)),
@@ -150,13 +151,21 @@ export default class CardsRepository {
     }
 
     async load() {
-        this.cardProcessingSignal$.next(true)
+        this.loadingSignal.isLoading$.next(true)
         await this.getCardsFromDB()
-        this.cardProcessingSignal$.next(false)
+        this.loadingSignal.isLoading$.next(false)
     }
 
     private async getCardsFromDB() {
-        for await (const cards of this.db.getCardsFromDB({}, 500)) {
+        let count = 0;
+
+        const sendLoadingMessage =  () => {
+            this.loadingSignal.latestMessage$.next(`fetching cards.  ${count} fetched so far.`);
+        }
+        sendLoadingMessage();
+        for await (const cards of this.db.getCardsFromDB({}, loadingChunkSize)) {
+            sendLoadingMessage();
+            count += cards.length;
             this.addCardsWhichDoNotHaveToBePersisted$.next(cards)
         }
     }

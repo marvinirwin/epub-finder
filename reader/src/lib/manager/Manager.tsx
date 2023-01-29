@@ -8,8 +8,6 @@ import { AudioManager } from './AudioManager'
 import CardsRepository from './cards.repository'
 import { OpenDocumentsService } from './open-documents.service'
 import { BrowserInputsService } from '../hotkeys/browser-inputs-service'
-import { InputPage } from './manager-connections/Input-Page'
-import { CardPage } from './manager-connections/Card-Page'
 import { CreatedSentenceManager } from './CreatedSentenceManager'
 import { AppContext } from '../app-context/AppContext'
 import { RecordRequest } from '../util/RecordRequest'
@@ -100,6 +98,7 @@ import { CsvService } from './csv.service'
 import { KnownWordsRepository } from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
+import {LoadingService} from "../loading/loadingService";
 
 
 /*
@@ -199,6 +198,8 @@ export class Manager {
     knownWordsRepository: KnownWordsRepository
     leaderBoardService: LeaderBoardService;
     dictionaryService: DictionaryService;
+    loadingService: LoadingService;
+
 
     constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
@@ -316,8 +317,6 @@ export class Manager {
         this.observableService.videoMetadata$.subscribe((metadata) => {
             this.pronunciationVideoService.videoMetadata$.next(metadata)
         })
-        InputPage(this.browserInputsService, this.openDocumentsService)
-        CardPage(this.cardsRepository, this.openDocumentsService)
 
         this.openDocumentsService.renderedSegments$.subscribe((segments) => {
             this.browserInputsService.applySegmentListeners(segments)
@@ -325,7 +324,6 @@ export class Manager {
         this.readingDocumentService = new ReadingDocumentService(this)
 
         this.highlighter = new Highlighter(this)
-
 
         this.browserInputsService.selectedText$.subscribe((word) => {
             this.audioRecordingService.audioRecorder.recordRequest$.next(
@@ -445,6 +443,9 @@ export class Manager {
         this.readingProgressService = new ReadingProgressService(this)
         this.csvService = new CsvService(this)
         this.dictionaryService = new DictionaryService(this);
+        this.loadingService = new LoadingService({
+            loadingSignals: [ this.cardsRepository.loadingSignal, this.documentRepository.loadingSignal ]
+        });
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()

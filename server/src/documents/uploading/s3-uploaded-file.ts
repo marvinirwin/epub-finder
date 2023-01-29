@@ -94,7 +94,9 @@ export class S3UploadedFile {
                     <img style="position: absolute; z-index: 1;" src="${this.file.location}"></img>
                     <div
                       style="position: absolute; z-index: 2;"
-                    ></div>
+                    >
+                    {text}
+</div>
                     `
           ))
         );

@@ -7,13 +7,14 @@ import { LtDocument } from '@shared/'
 import { createLoadingObservable } from '../util/create-loading-observable'
 import { TESTING } from '../util/url-params'
 import { LanguageConfigsService } from '../language/language-configs.service'
-import { map, scan } from 'rxjs/operators'
+import {filter, map, scan } from 'rxjs/operators'
 import {ModalService} from "../user-interface/modal.service";
 import { getApiUrl } from '../util/getApiUrl'
+import {LoadingSignal} from "../loading/loadingSignal";
 
 export class DocumentRepository {
     collection$: Observable<Map<string, LtDocument>>
-    isFetching$: Observable<boolean>
+    loadingSignal = new LoadingSignal()
     newDocument$ = new ReplaySubject<LtDocument>(1)
     deleteDocument$ = new ReplaySubject<LtDocument>(1)
     private databaseService: DatabaseService
@@ -44,7 +45,7 @@ export class DocumentRepository {
                 responseDocuments,
                 (d) => d.id(),
             )
-        })
+        });
 
         this.collection$ = merge(
             obs$.pipe(map(fetchedDocumentMap => ({ fetchedDocumentMap }))),
@@ -70,8 +71,10 @@ export class DocumentRepository {
                 }
                 return acc
             }, new Map()),
-        )
-        this.isFetching$ = isLoading$;
+        );
+        isLoading$.pipe(
+            filter(isLoading => isLoading)
+        ).subscribe(() => this.loadingSignal.latestMessage$.next(`Loading all documents`))
     }
 
     private static async uploadFile(
