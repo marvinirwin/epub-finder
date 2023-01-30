@@ -151,7 +151,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
   }
   const [currentNode, currentPage] = getSelectedPage();
 
-  return <div className="w-full h-full relative">
+  return <div className="w-full h-full relative flex flex-col">
       <NavBarAndSettingsPopup
         languages={languages}
         navBarItems={navBarItems}

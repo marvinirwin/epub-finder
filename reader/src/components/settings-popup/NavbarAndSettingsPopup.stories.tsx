@@ -16,7 +16,7 @@ export default {
 const Template: Story<NavBarAndSettingsProps> = (args: NavBarAndSettingsProps) => {
   const [showSettings, setShowSettings] = useState(true);
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative flex flex-col">
       <NavBarAndSettingsPopup {...args} />
     </div>
   );
