@@ -3,12 +3,11 @@ import { TranslateRequestDto } from "./translate-request-dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { JsonCache } from "../entities/json-cache.entity";
-import { TranslateResponseDto } from "./translate-response-dto";
 import { sha1 } from "../util/sha1";
 
 const { Translate } = require("@google-cloud/translate").v2;
 export const projectId = "mandarin-trainer";
-export const translate = new Translate({ projectId });
+export const translate = new Translate({ projectId, key: process.env.GOOGLE_API_KEY });
 
 import debug from "debug";
 import { MAX_TRANSLATE_LENGTH } from "./transliterate.service";
