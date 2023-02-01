@@ -35,7 +35,7 @@ export const QuizCardScheduleRowDisplay = ({
                 </Typography>
                 <br />
                 <DictionaryDefinition word={word}/>
-                <Typography variant="h4" className={quizCardTranslation}>
+                <Typography variant="subtitle1" className={quizCardTranslation}>
                     {translation}
                 </Typography>
             </div>

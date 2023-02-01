@@ -216,6 +216,7 @@ export class Manager {
         this.historyService = new HistoryService()
         this.settingsService = new SettingsService(this)
         this.languageConfigsService = new LanguageConfigsService(this)
+        this.dictionaryService = new DictionaryService(this);
         this.allWordsRepository = new AllWordsRepository(this);
         this.knownWordsRepository = new KnownWordsRepository(this);
         this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this)
@@ -442,7 +443,6 @@ export class Manager {
         this.advanceTimeService = new AdvanceTimeService(this)
         this.readingProgressService = new ReadingProgressService(this)
         this.csvService = new CsvService(this)
-        this.dictionaryService = new DictionaryService(this);
         this.loadingService = new LoadingService({
             loadingSignals: [ this.cardsRepository.loadingSignal, this.documentRepository.loadingSignal ]
         });

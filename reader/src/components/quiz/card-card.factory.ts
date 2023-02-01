@@ -1,20 +1,22 @@
-import { combineLatest, Observable, of } from 'rxjs'
+import {combineLatest, Observable, of} from 'rxjs'
 import CardsRepository from '../../lib/manager/cards.repository'
-import { ICard } from "@shared/"
-import { LanguageConfigsService } from '../../lib/language/language-configs.service'
-import { EditableValue } from './editing-value'
-import { resolveICardForWordLatest } from '../../lib/pipes/ResolveICardForWord'
-import { debounceTime, distinctUntilChanged, map, shareReplay, withLatestFrom } from 'rxjs/operators'
-import { fetchTransliteration } from '../../lib/language/transliterate.service'
-import { fetchTranslation } from '../../services/translate.service'
-import { fetchSynthesizedAudio } from '../../lib/audio/fetch-synthesized-audio'
-import { WordCard } from './word-card.interface'
-import { createLoadingObservable } from '../../lib/util/create-loading-observable'
+import {ICard} from "@shared/"
+import {LanguageConfigsService} from '../../lib/language/language-configs.service'
+import {EditableValue} from './editing-value'
+import {resolveICardForWordLatest} from '../../lib/pipes/ResolveICardForWord'
+import {debounceTime, distinctUntilChanged, map, shareReplay, withLatestFrom} from 'rxjs/operators'
+import {fetchTransliteration} from '../../lib/language/transliterate.service'
+import {fetchTranslation} from '../../services/translate.service'
+import {fetchSynthesizedAudio} from '../../lib/audio/fetch-synthesized-audio'
+import {WordCard} from './word-card.interface'
+import {createLoadingObservable} from '../../lib/util/create-loading-observable'
+import {DictionaryService} from "../../lib/dictionary/dictionary.service";
 
 export const wordCardFactory = (
     currentWord$: Observable<string | undefined>,
     cardService: CardsRepository,
     languageConfigsService: LanguageConfigsService,
+    dictionaryService: DictionaryService
 ): WordCard => {
     const update = (propsToUpdate: Partial<ICard>, word: string) => {
         cardService.updateICard(word, propsToUpdate)
@@ -38,11 +40,11 @@ export const wordCardFactory = (
                 imageSrc$
                     .pipe(withLatestFrom(currentWord$), debounceTime(1000))
                     .subscribe(([imageSrc, word]) => {
-                        const newPhotos = [];
-                        if (imageSrc) {
-                            newPhotos.push(imageSrc);
-                        }
-                        update({ photos: newPhotos }, word || '')
+                            const newPhotos = [];
+                            if (imageSrc) {
+                                newPhotos.push(imageSrc);
+                            }
+                            update({photos: newPhotos}, word || '')
                         },
                     )
             },
@@ -61,7 +63,7 @@ export const wordCardFactory = (
                     .pipe(withLatestFrom(currentWord$), debounceTime(1000))
                     .subscribe(([description, word]) => {
                         update(
-                            { known_language: [description || ''] },
+                            {known_language: [description || '']},
                             word || '',
                         )
                     }),
@@ -76,24 +78,30 @@ export const wordCardFactory = (
                         ...transliterateConfig,
                         text: currentWord || '',
                     })
-                    : of(undefined))
-        ,
+                    : of(undefined)),
         translation$: createLoadingObservable(combineLatest([
                 languageConfigsService.learningToKnownTranslateConfig$,
+                dictionaryService.dictionary.obs$,
                 currentWord$,
-            ]), ([translateConfig, currentWord]) => {
-                return translateConfig
-                    ? fetchTranslation({
-                        text: currentWord || '',
-                        ...translateConfig,
-                    })
-                    : of(undefined)
+            ]),  ([translateConfig, dictionary, currentWord]) => {
+                return dictionary.getDefinition(currentWord || "")
+                    .then(result => {
+                        if (result) {
+                            return result;
+                        }
+                        return translateConfig
+                            ? fetchTranslation({
+                                text: currentWord || '',
+                                ...translateConfig,
+                            })
+                            : ""
+                    });
             },
         ),
         audio$: createLoadingObservable(combineLatest([currentWord$, languageConfigsService.learningLanguageTextToSpeechConfig$]),
             async ([currentWord, learningLanguageToTextConfig]) => {
                 if (currentWord && learningLanguageToTextConfig) {
-                    return fetchSynthesizedAudio({ ...learningLanguageToTextConfig, text: currentWord })
+                    return fetchSynthesizedAudio({...learningLanguageToTextConfig, text: currentWord})
                 }
             },
         ),

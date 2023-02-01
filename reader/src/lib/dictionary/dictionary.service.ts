@@ -28,7 +28,7 @@ export class DictionaryService {
                         const dictionary = parseCedictDictionary(response.data);
                         return {
                             getDefinition: async (term: string) => {
-                                return dictionary.get(term) || ''
+                                return (dictionary.get(term) || '').replace(/\[.*?\]/, "")
                             },
                             name: 'cedict_ts chinese dictionary'
                         }

@@ -96,7 +96,6 @@ export class FlashCardLearningTargetsService {
                 ignoredWords.forEach(
                     ({word}) => learningTargetIndex.delete(word),
                 )
-                debugger;
                 return learningTargetIndex
             }),
             shareReplay(1),

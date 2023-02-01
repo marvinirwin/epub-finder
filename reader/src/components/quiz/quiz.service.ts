@@ -19,6 +19,7 @@ import {WordRecognitionRow} from '../../lib/schedule/word-recognition-row'
 import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
 import {scheduleRowKey} from "../../lib/util/Util";
 import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
+import {DictionaryService} from "../../lib/dictionary/dictionary.service";
 
 export class QuizService {
     quizCard: QuizCard
@@ -37,6 +38,7 @@ export class QuizService {
             translationAttemptScheduleService,
             onSelectService,
             wordRecognitionProgressRepository,
+            dictionaryService
         }: {
             cardsRepository: CardsRepository
             sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
@@ -48,6 +50,7 @@ export class QuizService {
             onSelectService: OnSelectService,
             wordRecognitionProgressRepository: WordRecognitionProgressRepository
             exampleSegmentsService: ExampleSegmentsService
+            dictionaryService: DictionaryService
         }) {
         this.manualHiddenFieldConfig$.next('')
         this.currentScheduleRow$ = combineLatest(
@@ -149,6 +152,7 @@ export class QuizService {
             currentWord$,
             cardsRepository,
             languageConfigsService,
+            dictionaryService
         )
 
         this.quizCard = {
