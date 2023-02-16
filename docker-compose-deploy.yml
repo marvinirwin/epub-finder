@@ -15,7 +15,6 @@ services:
       - /app/server/node_modules
       - /app/reader/node_modules
     env_file:
-      - ./docker.env
       - ./.env
     init: true
     tty: true
@@ -51,7 +50,7 @@ services:
       - "8080:8080"
       - "9990:9990"
     entrypoint:
-      - "/opt/keycloak/bin/kc.sh"
+      - /opt/keycloak/bin/kc.sh
       - "start-dev --hostname 0.0.0.0"
 
 networks:

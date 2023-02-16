@@ -86,7 +86,7 @@
     "material-ui-image": "^3.3.2",
     "material-ui-popup-state": "^1.6.1",
     "memoizee": "^0.4.15",
-    "microsoft-cognitiveservices-speech-sdk": "^1.15.0",
+    "microsoft-cognitiveservices-speech-sdk": "1.25.1",
     "moment": "^2.27.0",
     "nodemon": "^2.0.4",
     "observable-hooks": "^3.0.0",

@@ -20,8 +20,6 @@ const port = process.env.HTTP_PORT;
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: true });
     const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalInterceptors(new LoggingInterceptor());
-    app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
     const options = new DocumentBuilder()
         .setTitle("LanguageTrainer backend")
         .setVersion("1.0")
@@ -63,6 +61,8 @@ async function bootstrap() {
         }
         next()
     })
+    app.useGlobalInterceptors(new LoggingInterceptor());
+    app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
     await app.listen(port, '0.0.0.0');
     console.log(`Listing on ${port}`);
 }
