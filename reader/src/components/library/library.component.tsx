@@ -2,6 +2,9 @@ import React, {useContext, useState} from "react";
 import {LibraryDocumentRow} from "../../lib/manager/library-document-row";
 import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../../App";
+import {dateFormat} from "../../lib/util/dateFormat";
+import {format} from "date-fns";
+import { orderBy } from "lodash";
 
 export type LibraryProps = {}
 
@@ -43,12 +46,33 @@ const LibraryRow = (
                 />
             }
         </td>
+        <td>
+            {
+                format(new Date(document.ltDocument.createdAt), dateFormat)
+            }
+        </td>
+        <td>
+            <button type="button"
+                    className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
+                    onClick={async () => {
+                        const responseText = await (await fetch(document.ltDocument.url())).text();
+                        const text = new DOMParser().parseFromString(responseText, "text/html").body.innerText;
+                        if (!text) {
+                            throw new Error(`Could not get text to copy for document ${document.ltDocument.name}`);
+                        }
+                        console.log(text);
+                        await navigator.clipboard.writeText(text);
+                    }}
+            >Copy
+            </button>
+        </td>
     </tr>;
 };
 
 export const Library: React.FC<LibraryProps> = ({}) => {
     const m = useContext(ManagerContext);
-    const documents = Array.from(useObservableState(m.documentRepository.collection$)?.values() || []);
+    const documents = orderBy(
+        Array.from(useObservableState(m.documentRepository.collection$)?.values() || []), r => new Date(r.createdAt).getTime(), 'desc');
     return (
         <div className="px-4 sm:px-6 lg:px-8 mt-8">
             <div className="sm:flex sm:items-center">
@@ -89,6 +113,14 @@ export const Library: React.FC<LibraryProps> = ({}) => {
                                     <th scope="col"
                                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Frequency Source
+                                    </th>
+                                    <th scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Time Added
+                                    </th>
+                                    <th scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Copy
                                     </th>
                                 </tr>
                                 </thead>

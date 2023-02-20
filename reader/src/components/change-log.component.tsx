@@ -4,6 +4,7 @@ import {Accordion, AccordionDetails, AccordionSummary, Divider, Typography} from
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {format} from "date-fns";
 import {changeLog} from "./change-log";
+import {dateFormat} from "../lib/util/dateFormat";
 
 
 const [firstChange, ...otherChanges] = changeLog;
@@ -18,7 +19,7 @@ const ChangeLogEntry: React.FC<{ date: Date, message: string }> = ({date, messag
                 minWidth: '20ch'
             }}
         >
-            {format(date, 'MMM dd, yyyy h:mmaaa')}
+            {format(date, dateFormat)}
         </Typography>
         <Typography variant='caption'>
             {message}
