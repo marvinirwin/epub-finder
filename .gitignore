@@ -4,7 +4,7 @@ server/.env
 env
 **/*/.idea
 .DS_Store
-.env
+.env*
 .idea/
 package-lock.json
 server/package-lock.json
@@ -12,4 +12,3 @@ server/public/video/
 server/src/subtitles/
 dashboar-store*
 server/.dev_wav_cache
-

@@ -44,15 +44,14 @@ services:
       - ./.env
     image: keycloak
     environment:
-      - KC_HOSTNAME=0.0.0.0
-      - HOSTNAME=0.0.0.0
+      - KC_HOSTNAME=localhost
       - PROXY_ADDRESS_FORWARDING=true
     ports:
       - "8080:8080"
       - "9990:9990"
     entrypoint:
       - "/opt/keycloak/bin/kc.sh"
-      - "start-dev --hostname 0.0.0.0"
+      - "start-dev"
 
 networks:
   default:
