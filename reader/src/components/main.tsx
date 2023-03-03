@@ -26,7 +26,6 @@ export const PronunciationVideoResizedContext = React.createContext<
 export function Main({ m }: { m: Manager }) {
     useEffect(() => {
         m.browserInputsService.applyDocumentListeners(document)
-        m.treeMenuService.tree.appendDelta$.next(AppDirectory(m))
     }, [m])
     useShowIntroModal()
 

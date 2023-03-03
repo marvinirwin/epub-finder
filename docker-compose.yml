@@ -36,7 +36,7 @@ services:
     init: true
     tty: true
     environment:
-      - "KEYCLOAK_URL=http://keycloak:8080"
+      - "KEYCLOAK_URL=http://localhost:8080"
       - "SERVER_URL=http://server:3001"
 
   keycloak:

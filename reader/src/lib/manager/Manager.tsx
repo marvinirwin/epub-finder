@@ -1,101 +1,100 @@
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs'
-import { Dictionary } from 'lodash'
-import { map, shareReplay } from 'rxjs/operators'
-import { DatabaseService } from '../Storage/database.service'
+import {Dictionary} from 'lodash'
+import {map, shareReplay} from 'rxjs/operators'
+import {DatabaseService} from '../Storage/database.service'
 import React from 'react'
-import { AtomMetadata } from "@shared/"
-import { AudioManager } from './AudioManager'
+import {AtomMetadata} from "@shared/"
+import {AudioManager} from './AudioManager'
 import CardsRepository from './cards.repository'
-import { OpenDocumentsService } from './open-documents.service'
-import { BrowserInputsService } from '../hotkeys/browser-inputs-service'
-import { CreatedSentenceManager } from './CreatedSentenceManager'
-import { AppContext } from '../app-context/AppContext'
-import { RecordRequest } from '../util/RecordRequest'
-import { Highlighter } from '../highlighting/Highlighter'
-import { HotKeyEvents } from '../hotkeys/HotKeyEvents'
-import { ModesService } from '../modes/modes.service'
-import { PronunciationVideoService } from '../../components/pronunciation-video/pronunciation-video.service'
-import { ObservableService } from '../../services/observable.service'
-import { HighlighterService } from '../highlighting/highlighter.service'
-import { removePunctuation, TemporaryHighlightService } from '../highlighting/temporary-highlight.service'
-import { RGBA } from '../highlighting/color.service'
-import { EditingVideoMetadataService } from '../../services/editing-video-metadata.service'
-import { SettingsService } from '../../services/settings.service'
-import { HotkeysService } from '../../services/hotkeys.service'
-import { HighlightPronunciationVideoService } from '../../services/highlight-pronunciation-video.service'
-import { WordRecognitionProgressRepository } from '../schedule/word-recognition-progress.repository'
-import { PronunciationProgressRepository } from '../schedule/pronunciation-progress.repository'
-import { QuizResultService } from '../quiz/quiz-result.service'
-import { HighlightPronunciationProgressService } from '../highlighting/highlight-pronunciation-progress.service'
-import { HighlightRecollectionDifficultyService } from '../highlighting/highlight-recollection-difficulty.service'
-import { TestHotkeysService } from '../hotkeys/test-hotkeys.service'
-import { IntroService } from '../intro/intro.service'
-import { IntroSeriesService } from '../intro/intro-series.service'
-import { IntroHighlightService } from '../intro/intro-highlight.service'
-import { LoggedInUserService } from '../auth/logged-in-user.service'
-import { DocumentCheckingOutService } from '../../components/library/document-checking-out.service'
-import { DocumentRepository } from '../documents/document.repository'
-import { LibraryService } from './library.service'
-import { DroppedFilesService } from '../uploading-documents/dropped-files.service'
-import { UploadingDocumentsService } from '../uploading-documents/uploading-documents.service'
-import { DocumentSelectionService } from '../document-selection/document-selection.service'
-import { AlertMessage, AlertsService } from '../../services/alerts.service'
-import { ReadingDocumentService } from './reading-document.service'
-import { RequestRecordingService } from '../../components/pronunciation-video/request-recording.service'
-import { TreeMenuService } from '../../services/tree-menu.service'
-import { ScheduleService } from '../schedule/schedule.service'
-import { QuizService } from '../../components/quiz/quiz.service'
-import { ExampleSegmentsService } from '../quiz/example-segments.service'
-import { ImageSearchService } from '../image-search/image-search.service'
-import { QuizCardScheduleRowsService } from '../schedule/quiz-card-schedule-rows.service'
-import { GoalsService } from '../quiz/goals.service'
-import { ActiveSentenceService } from '../sentences/active-sentence.service'
-import { VisibleService } from './visible.service'
-import { ElementAtomMetadataIndex } from '../../services/element-atom-metadata.index'
-import { WordMetadataMapService } from '../../services/word-metadata-map.service'
-import { AtomElementEventsService } from '../user-interface/atom-element-events.service'
-import { ToastMessage, ToastMessageService } from '../user-interface/toast-message.service'
-import { ProgressItemService } from '../../components/item-in-progress/progress-item.service'
-import { IsRecordingService } from '../audio/is-recording.service'
-import { HistoryService } from '../app-context/history.service'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { SpeechPracticeService } from '../audio/speech-practice.service'
-import { MicFeedbackService } from '../audio/mic-feedback.service'
-import { ModalService } from '../user-interface/modal.service'
-import { VideoMetadataRepository } from '../../services/video-metadata.repository'
-import { VideoMetadataHighlight } from '../highlighting/video-metadata.highlight'
-import { MousedOverWordHighlightService } from '../highlighting/moused-over-word-highlight.service'
-import { IgnoredWordsRepository } from '../schedule/ignored-words.repository'
-import { FrequencyDocumentsRepository } from '../documents/frequency-documents.repository'
-import { AllWordsRepository } from '../language/all-words.repository'
-import { QuizHighlightService } from '../highlighting/quiz-highlight.service'
-import { FrequencyTreeService } from '../learning-tree/frequency-tree.service'
-import { VocabService } from '../language/vocab.service'
-import { FilterScheduleTableRowsService } from '../schedule/filter-schedule-table-rows.service'
-import { SortedLimitScheduleRowsService } from './sorted-limit-schedule-rows.service'
-import { WordCardModalService } from '../word-card/word-card-modal.service'
-import { LoadingMessagesService } from '../loading/loading-messages.service'
-import { NotableSubsequencesService } from '../sentences/notable-subsequences.service'
-import { WordsService } from '../language/words.service'
-import { TabulationConfigurationService } from '../language/language-maps/tabulation-configuration.service'
-import { TranslationAttemptScheduleService } from '../schedule/translation-attempt-schedule.service'
-import { TranslationAttemptRepository } from '../schedule/translation-attempt.repository'
-import { QuizScheduleRowData } from '../schedule/schedule-row'
-import { TranslationAttemptService } from '../../components/translation-attempt/translation-attempt.service'
-import { WeightedVocabService } from '../language/weighted-vocab.service'
-import { GeneralToastMessageService } from '../user-interface/general-toast-message.service'
-import { SelectedVirtualTabulationsService } from './selected-virtual-tabulations.service'
-import { HotkeyModeService } from '../hotkeys/hotkey-mode.service'
-import { OnSelectService } from '../user-interface/on-select.service'
-import { TimeService } from '../time/time.service'
-import { AdvanceTimeService } from '../time/advance-time.service'
-import { FlashCardLearningTargetsService } from '../schedule/learning-target/flash-card-learning-targets.service'
-import { CustomWordsRepository } from '../schedule/learning-target/custom-words.repository'
-import { TabulationService } from '../tabulation/tabulation.service'
-import { FlashCardTypesRequiredToProgressService } from '../schedule/required-to-progress.service'
-import { ReadingProgressService } from '../tabulation/reading-progress.service'
-import { CsvService } from './csv.service'
-import { KnownWordsRepository } from '../schedule/known-words.repository'
+import {OpenDocumentsService} from './open-documents.service'
+import {BrowserInputsService} from '../hotkeys/browser-inputs-service'
+import {CreatedSentenceManager} from './CreatedSentenceManager'
+import {AppContext} from '../app-context/AppContext'
+import {RecordRequest} from '../util/RecordRequest'
+import {Highlighter} from '../highlighting/Highlighter'
+import {HotKeyEvents} from '../hotkeys/HotKeyEvents'
+import {ModesService} from '../modes/modes.service'
+import {PronunciationVideoService} from '../../components/pronunciation-video/pronunciation-video.service'
+import {ObservableService} from '../../services/observable.service'
+import {HighlighterService} from '../highlighting/highlighter.service'
+import {removePunctuation, TemporaryHighlightService} from '../highlighting/temporary-highlight.service'
+import {RGBA} from '../highlighting/color.service'
+import {EditingVideoMetadataService} from '../../services/editing-video-metadata.service'
+import {SettingsService} from '../../services/settings.service'
+import {HotkeysService} from '../../services/hotkeys.service'
+import {HighlightPronunciationVideoService} from '../../services/highlight-pronunciation-video.service'
+import {WordRecognitionProgressRepository} from '../schedule/word-recognition-progress.repository'
+import {PronunciationProgressRepository} from '../schedule/pronunciation-progress.repository'
+import {QuizResultService} from '../quiz/quiz-result.service'
+import {HighlightPronunciationProgressService} from '../highlighting/highlight-pronunciation-progress.service'
+import {HighlightRecollectionDifficultyService} from '../highlighting/highlight-recollection-difficulty.service'
+import {TestHotkeysService} from '../hotkeys/test-hotkeys.service'
+import {IntroService} from '../intro/intro.service'
+import {IntroSeriesService} from '../intro/intro-series.service'
+import {IntroHighlightService} from '../intro/intro-highlight.service'
+import {LoggedInUserService} from '../auth/logged-in-user.service'
+import {DocumentCheckingOutService} from '../../components/library/document-checking-out.service'
+import {DocumentRepository} from '../documents/document.repository'
+import {LibraryService} from './library.service'
+import {DroppedFilesService} from '../uploading-documents/dropped-files.service'
+import {UploadingDocumentsService} from '../uploading-documents/uploading-documents.service'
+import {DocumentSelectionService} from '../document-selection/document-selection.service'
+import {AlertMessage, AlertsService} from '../../services/alerts.service'
+import {ReadingDocumentService} from './reading-document.service'
+import {RequestRecordingService} from '../../components/pronunciation-video/request-recording.service'
+import {ScheduleService} from '../schedule/schedule.service'
+import {QuizService} from '../../components/quiz/quiz.service'
+import {ExampleSegmentsService} from '../quiz/example-segments.service'
+import {ImageSearchService} from '../image-search/image-search.service'
+import {QuizCardScheduleRowsService} from '../schedule/quiz-card-schedule-rows.service'
+import {GoalsService} from '../quiz/goals.service'
+import {ActiveSentenceService} from '../sentences/active-sentence.service'
+import {VisibleService} from './visible.service'
+import {ElementAtomMetadataIndex} from '../../services/element-atom-metadata.index'
+import {WordMetadataMapService} from '../../services/word-metadata-map.service'
+import {AtomElementEventsService} from '../user-interface/atom-element-events.service'
+import {ToastMessage, ToastMessageService} from '../user-interface/toast-message.service'
+import {ProgressItemService} from '../../components/item-in-progress/progress-item.service'
+import {IsRecordingService} from '../audio/is-recording.service'
+import {HistoryService} from '../app-context/history.service'
+import {LanguageConfigsService} from '../language/language-configs.service'
+import {SpeechPracticeService} from '../audio/speech-practice.service'
+import {MicFeedbackService} from '../audio/mic-feedback.service'
+import {ModalService} from '../user-interface/modal.service'
+import {VideoMetadataRepository} from '../../services/video-metadata.repository'
+import {VideoMetadataHighlight} from '../highlighting/video-metadata.highlight'
+import {MousedOverWordHighlightService} from '../highlighting/moused-over-word-highlight.service'
+import {IgnoredWordsRepository} from '../schedule/ignored-words.repository'
+import {FrequencyDocumentsRepository} from '../documents/frequency-documents.repository'
+import {AllWordsRepository} from '../language/all-words.repository'
+import {QuizHighlightService} from '../highlighting/quiz-highlight.service'
+import {FrequencyTreeService} from '../learning-tree/frequency-tree.service'
+import {VocabService} from '../language/vocab.service'
+import {FilterScheduleTableRowsService} from '../schedule/filter-schedule-table-rows.service'
+import {SortedLimitScheduleRowsService} from './sorted-limit-schedule-rows.service'
+import {WordCardModalService} from '../word-card/word-card-modal.service'
+import {LoadingMessagesService} from '../loading/loading-messages.service'
+import {NotableSubsequencesService} from '../sentences/notable-subsequences.service'
+import {WordsService} from '../language/words.service'
+import {TabulationConfigurationService} from '../language/language-maps/tabulation-configuration.service'
+import {TranslationAttemptScheduleService} from '../schedule/translation-attempt-schedule.service'
+import {TranslationAttemptRepository} from '../schedule/translation-attempt.repository'
+import {QuizScheduleRowData} from '../schedule/schedule-row'
+import {TranslationAttemptService} from '../../components/translation-attempt/translation-attempt.service'
+import {WeightedVocabService} from '../language/weighted-vocab.service'
+import {GeneralToastMessageService} from '../user-interface/general-toast-message.service'
+import {SelectedVirtualTabulationsService} from './selected-virtual-tabulations.service'
+import {HotkeyModeService} from '../hotkeys/hotkey-mode.service'
+import {OnSelectService} from '../user-interface/on-select.service'
+import {TimeService} from '../time/time.service'
+import {AdvanceTimeService} from '../time/advance-time.service'
+import {FlashCardLearningTargetsService} from '../schedule/learning-target/flash-card-learning-targets.service'
+import {CustomWordsRepository} from '../schedule/learning-target/custom-words.repository'
+import {TabulationService} from '../tabulation/tabulation.service'
+import {FlashCardTypesRequiredToProgressService} from '../schedule/required-to-progress.service'
+import {ReadingProgressService} from '../tabulation/reading-progress.service'
+import {CsvService} from './csv.service'
+import {KnownWordsRepository} from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
 import {LoadingService} from "../loading/loadingService";
@@ -123,7 +122,6 @@ export class Manager {
     public introService: IntroService
     public alertsService = new AlertsService()
     public requestRecordingService: RequestRecordingService
-    public treeMenuService: TreeMenuService<any, { value: any }>
     public quizCardScheduleRowsService: QuizCardScheduleRowsService
 
     public observableService = new ObservableService()
@@ -201,7 +199,7 @@ export class Manager {
     loadingService: LoadingService;
 
 
-    constructor(public databaseService: DatabaseService, { audioSource }: AppContext) {
+    constructor(public databaseService: DatabaseService, {audioSource}: AppContext) {
         this.customWordsRepository = new CustomWordsRepository(this)
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)
@@ -221,7 +219,6 @@ export class Manager {
         this.knownWordsRepository = new KnownWordsRepository(this);
         this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this)
         this.settingsService.spokenLanguage$.subscribe(audioSource.learningToKnownSpeech$)
-        this.treeMenuService = new TreeMenuService<any, { value: any }>(this)
         this.hotkeysService = new HotkeysService(this)
         this.hotkeyEvents = new HotKeyEvents(this)
         this.activeSentenceService = new ActiveSentenceService(this)
@@ -241,7 +238,11 @@ export class Manager {
         this.openDocumentsService = new OpenDocumentsService(this)
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
-            componentInView$: of("").pipe(shareReplay(1)),
+            componentInView$: this.settingsService
+                .componentPath$
+                .pipe(
+                    shareReplay(1)
+                ),
             openDocumentsService: this.openDocumentsService,
         })
         this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)
@@ -444,7 +445,7 @@ export class Manager {
         this.readingProgressService = new ReadingProgressService(this)
         this.csvService = new CsvService(this)
         this.loadingService = new LoadingService({
-            loadingSignals: [ this.cardsRepository.loadingSignal, this.documentRepository.loadingSignal ]
+            loadingSignals: [this.cardsRepository.loadingSignal, this.documentRepository.loadingSignal]
         });
 
         this.hotkeyEvents.startListeners()

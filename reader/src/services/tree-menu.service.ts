@@ -9,9 +9,7 @@ import { DeltaScanner, ds_Dict } from '../lib/delta-scan/delta-scan.module'
 export type TreeMenuProps<T> = { value: T }
 
 export class TreeMenuService<T, U extends TreeMenuProps<any>> {
-    tree = new DeltaScanner<TreeMenuNode>()
 
-    allItems$: Observable<ds_Dict<TreeMenuNode>>
 
     /*
         menuItems: DeltaScanner<T>;
@@ -19,7 +17,6 @@ export class TreeMenuService<T, U extends TreeMenuProps<any>> {
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
 
-        this.allItems$ = this.tree.updates$.pipe(flattenTreeIntoDict())
         /*
                 this.menuItems = this.tree.mapWith(v => v.value);
         */
