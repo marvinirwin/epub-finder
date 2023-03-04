@@ -1,14 +1,10 @@
 **/node_modules
 **/.idea
 **/.env
-**/package-lock.json
 **/dashboar-store.json
 **/dist
 reader/build
 reader/public/video
-reader/src
 server/cache
 server/dist
 server/documents
-server/public
-server/src

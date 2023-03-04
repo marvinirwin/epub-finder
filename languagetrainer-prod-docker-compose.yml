@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  prod:
+    image: 'languagetrainer-prod'
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./.prod.env
+    init: true
+    tty: true
+

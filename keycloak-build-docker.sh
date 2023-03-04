@@ -8,3 +8,6 @@ cd keycloak-containers/server
 git checkout $VERSION
 docker build -t "jboss/keycloak:${VERSION}" .
 docker build -t "quay.io/keycloak/keycloak:${VERSION}" .
+
+docker tag keycloak:latest marvinirwin/keycloak:latest
+docker push marvinirwin/keycloak:latest
