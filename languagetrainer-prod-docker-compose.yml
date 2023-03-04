@@ -5,6 +5,7 @@ services:
     image: 'languagetrainer-prod'
     ports:
       - "3001:3001"
+      - "8080:8080"
     env_file:
       - ./.prod.env
     init: true

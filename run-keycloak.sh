@@ -1,1 +1,1 @@
-/opt/keycloak/bin/kc.sh start
+/opt/keycloak/bin/kc.sh start-dev
