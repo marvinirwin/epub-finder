@@ -1,4 +1,4 @@
-FROM marvinirwin/keycloak
+FROM marvinirwin/keycloak:latest
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
