@@ -14,7 +14,7 @@ import { VideoMetadataDto } from "./video-metadata.dto";
 import { sha1 } from "../util/sha1";
 import { zip, zipObject } from "lodash";
 
-@Controller("video_metadata")
+@Controller("/api/video_metadata")
 export class VideoMetadataController {
     constructor(private videoMetadataService: VideoMetadataService) {}
 

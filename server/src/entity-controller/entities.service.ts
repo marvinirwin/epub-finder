@@ -13,7 +13,7 @@ import { IgnoredWordView } from "../entities/ignored-word-view.entity";
 import { KnownWordView } from "../entities/known-word-view.entity";
 import { KnownWord } from "../entities/known-word.entity";
 
-@Controller("repositories")
+@Controller("/api/repositories")
 export class EntitiesService {
     public entityMap: {
         [key: string]: Repository<any> | RepositoryType;

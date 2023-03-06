@@ -3,7 +3,7 @@ import { SpeechService, wavRoot } from "./speech.service";
 import { SpeechSynthesisRequestDto } from "./speech-synthesis-request-dto";
 import fs from "fs-extra";
 
-@Controller("speech-synthesis")
+@Controller("/api/speech-synthesis")
 export class SpeechSynthesisController {
     constructor(private speechService: SpeechService) {}
 

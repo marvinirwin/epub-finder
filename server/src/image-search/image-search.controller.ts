@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body } from "@nestjs/common";
 import { ImageSearchService } from "./image-search.service";
 import { ImageSearchRequestDto } from "./image-search-request-dto";
 
-@Controller("image-search")
+@Controller("/api/image-search")
 export class ImageSearchController {
     constructor(private imageSearchService: ImageSearchService) {}
 

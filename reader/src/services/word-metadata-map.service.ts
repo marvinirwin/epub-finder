@@ -26,7 +26,6 @@ export class WordMetadataMapService {
             aggregateElementIndexService.index$,
         ]).pipe(
             map(([elementsInView, elementIndex]) => {
-                debugger;
                 const map = {} as Dictionary<Set<BrowserAtomMetadata>>
                 elementsInView.forEach((elementInView) => {
                     const metadata = elementIndex.get(

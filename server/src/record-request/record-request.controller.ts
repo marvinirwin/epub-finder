@@ -7,7 +7,7 @@ import { RecordRequestService } from "./record-request.service";
 
 export type RecordRequestDto = string[]
 
-@Controller("record-request")
+@Controller("/api/record-request")
 export class RecordRequestController {
     constructor(private recordRequestService: RecordRequestService) {}
 

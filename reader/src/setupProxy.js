@@ -47,7 +47,6 @@ module.exports = function(app) {
       target: `${process.env.SERVER_URL}`,
       changeOrigin: true,
       logLevel: "info",
-      pathRewrite: {'^/api' : ''}
     })
   );
 };

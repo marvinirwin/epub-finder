@@ -33,7 +33,7 @@ import { RevisionUpdater } from "../revision-updater";
 import { DocumentUpdateDto } from "./document-update.dto";
 import { ltDocId } from "../shared/lt-document";
 
-@Controller("documents")
+@Controller("/api/documents")
 export class DocumentsController {
     constructor(
         private documentsService: DocumentsService,

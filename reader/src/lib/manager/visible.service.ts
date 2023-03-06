@@ -67,7 +67,6 @@ export class VisibleService {
 
         this.elementsInView$ = this.openDocumentsInView$.pipe(
             switchMap((documents: OpenDocument[]) => {
-                debugger;
                 return combineLatest(
                     documents.map((document) => document.renderedSegments$),
                 )

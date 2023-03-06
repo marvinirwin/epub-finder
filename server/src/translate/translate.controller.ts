@@ -6,7 +6,7 @@ import { transliterate } from "./transliterate.service";
 import { TransliterateRequestDto } from "./transliterate-request.dto";
 import { Public } from "../decorators/public";
 
-@Controller("translate")
+@Controller("/api/translate")
 export class TranslateController {
     constructor(private translateService: TranslateService) {}
 

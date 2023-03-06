@@ -6,7 +6,7 @@ import { User } from "../entities/user.entity";
 import { LoggedInGuard } from "../guards/logged-in.guard";
 import {LoggingInterceptor} from "../interceptors/logging.interceptor";
 
-@Controller("users")
+@Controller("/api/users")
 export class UsersController {
     constructor(private usersService: UsersService) {}
 

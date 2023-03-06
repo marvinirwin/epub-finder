@@ -34,7 +34,7 @@ const processGteLte = (where: Record<string, any>) => {
     });
 };
 
-@Controller("entities")
+@Controller("/api/entities")
 export class EntitiesController {
     constructor(
         private repositoryControllerService: EntitiesService,
