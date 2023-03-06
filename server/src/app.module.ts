@@ -29,6 +29,7 @@ import {DocumentView} from "./entities/document-view.entity";
 import {ThaiController} from './thai/thai.controller';
 import { APP_FILTER } from "@nestjs/core";
 import {HttpErrorFilter} from "./filters/HttpErrorFilter";
+import {resolve} from "path";
 
 
 @Module({
@@ -42,7 +43,7 @@ import {HttpErrorFilter} from "./filters/HttpErrorFilter";
         UsersModule,
         UsersHttpModule,
         ServeStaticModule.forRoot({
-            rootPath: "public",
+            rootPath: resolve("public"),
             serveRoot: "/",
         }),
         AuthModule,
