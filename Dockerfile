@@ -1,4 +1,4 @@
-FROM marvinirwin/keycloak2:latest
+FROM quay.io/keycloak/keycloak:latest
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
