@@ -2,6 +2,7 @@ import React, { forwardRef } from "react";
 import {flatten} from "lodash";
 import { LibraryBooks } from "@material-ui/icons";
 import { supportedDocumentFileExtensions } from "../../lib/uploading-documents/uploading-documents.service";
+import CameraComponent from "../camera/take-picture";
 
 
 export type VariantLanguageOption = { value: string, label: string };
@@ -35,7 +36,9 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>( (
   const validExtensionList = Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ');
   return <div className="w-full flex flex-row grow">
     <div className="flex flex-col w-1/2 p-8">
-      <LibraryBooks/>
+      <CameraComponent onPictureTaken={(image: string) => {
+        console.log(image)
+      }}/>
     </div>
     <div className="flex flex-col w-1/2 p-5">
       <div className="flex flex-col justify-center items-center m-8">

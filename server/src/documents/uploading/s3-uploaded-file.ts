@@ -83,9 +83,6 @@ export class S3UploadedFile {
       case "bmp":
         const buffer = await s3KeyToBuffer(key);
         const text = await doGoogleOcr(buffer);
-        // TODO how to get S3 URL
-        // TODO see what this.file.location is
-        console.log(this.file)
         const r = await uploadToS3(
           Buffer.from(InterpolateService.html(
             `
