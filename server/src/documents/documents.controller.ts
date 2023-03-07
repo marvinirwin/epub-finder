@@ -32,6 +32,7 @@ import { S3UploadedFile, UploadOutput } from "./uploading/s3-uploaded-file";
 import { RevisionUpdater } from "../revision-updater";
 import { DocumentUpdateDto } from "./document-update.dto";
 import { ltDocId } from "../shared/lt-document";
+import { LoggedInGuard } from "../guards/logged-in.guard";
 
 @Controller("/api/documents")
 export class DocumentsController {
@@ -57,7 +58,7 @@ export class DocumentsController {
     }
 
     @Put("")
-    @UseGuards(AnonymousGuard)
+    @UseGuards(LoggedInGuard)
     @UseInterceptors(
         FileInterceptor("file", {
             storage: multerS3({
@@ -148,7 +149,6 @@ export class DocumentsController {
     }
 
     @Post("update")
-    @UseGuards(AnonymousGuard)
     async update(
         @Body() documentUpdateDto: DocumentUpdateDto,
         @UserFromReq() user: User | undefined,

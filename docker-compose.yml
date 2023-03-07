@@ -15,7 +15,7 @@ services:
       - /app/server/node_modules
       - /app/reader/node_modules
     env_file:
-      - ./docker.env
+      - ./.env-docker
       - ./.env
     init: true
     tty: true
@@ -42,7 +42,7 @@ services:
   keycloak:
     env_file:
       - ./.env
-    image: keycloak
+    image: quay.io/keycloak/keycloak:19.0
     environment:
       - KC_HOSTNAME=localhost
       - PROXY_ADDRESS_FORWARDING=true
