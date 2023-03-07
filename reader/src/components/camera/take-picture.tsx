@@ -157,7 +157,7 @@ async function convertHeicToJpeg(file: File): Promise<File> {
 
 
 interface CameraComponentProps {
-    onPictureTaken: (image: string) => void;
+    onPictureTaken: (image: File) => void;
 }
 
 const CameraComponent: React.FC<CameraComponentProps> = ({ onPictureTaken }) => {
@@ -170,7 +170,7 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onPictureTaken }) => 
             reader.onload = () => {
                 const imageString = reader.result as string;
                 setImage(imageString);
-                onPictureTaken(imageString);
+                onPictureTaken(file);
             };
             reader.readAsDataURL(file);
         }
