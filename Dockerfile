@@ -1,5 +1,7 @@
 FROM quay.io/keycloak/keycloak:latest
 
+FROM registry.access.redhat.com/ubi9-minimal
+
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
 USER root
@@ -14,7 +16,7 @@ RUN microdnf clean all
 
 
 
-# NodeJS START
+#NodeJS START
 WORKDIR /app
 
 COPY ./reader/package.json ./reader/package.json
@@ -47,10 +49,10 @@ WORKDIR /app/server
 
 RUN npm run build
 
-# NodeJS END
+#NodeJS END
 WORKDIR /app
 
 RUN chmod +x *.sh
 
 ENTRYPOINT ["bash", "./docker-entrypoint.sh" ]
-# ENTRYPOINT ["node", "--version" ]
+## ENTRYPOINT ["node", "--version" ]
