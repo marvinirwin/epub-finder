@@ -3,7 +3,7 @@ import {getS3FileString, inputConfig, s3KeyToBuffer, uploadToS3,} from "./s3.ser
 import {S3File} from "./cloud-convert/job-output.service";
 import {ConversionProcess} from "./cloud-convert/conversion-process";
 import {InterpolateService} from "../../shared";
-import doGoogleOcr from "../../text-extraction/oct";
+import doGoogleOcr from "../../text-extraction/ocr";
 import {ManagedUpload} from "aws-sdk/clients/s3";
 
 export class UploadOutput {
@@ -95,7 +95,7 @@ export class S3UploadedFile {
                     <div
                       style="position: absolute; z-index: 2;"
                     >
-                    {text}
+                    ${text.join('\n')}
 </div>
                     `
           ))
