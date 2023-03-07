@@ -6,15 +6,29 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
 USER root
 
+
+
 RUN microdnf update -y
-RUN microdnf install -y yum
+#RUN curl -O https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+#RUN tar xvzf Python-2.7.18.tgz
+#
+#
+#RUN microdnf install -y gcc zlib-devel openssl-devel curl
+#RUN ./configure --prefix=/opt/python2 --with-optimizations
+#RUN make
+#RUN make install
+#RUN export PATH=/opt/python2/bin:$PATH
+RUN microdnf install -y wget
+RUN wget https://github.com/niess/python-appimage/releases/download/python2.7/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage
+RUN install -m 755 python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/
+RUN ln -sr /usr/local/bin/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/python2
+
+
 RUN curl -fsSL https://rpm.nodesource.com/setup_16.x | bash -
 RUN microdnf install -y nodejs
-RUN microdnf install git
-RUN microdnf install python2 gcc-c++ gcc make
+RUN microdnf install -y git
+RUN microdnf install -y gcc-c++ gcc make
 RUN microdnf clean all
-
-
 
 #NodeJS START
 WORKDIR /app
