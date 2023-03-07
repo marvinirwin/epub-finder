@@ -20,8 +20,12 @@ RUN microdnf update -y
 # RUN ln -sr /usr/local/bin/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/python2
 
 
+RUN microdnf install -y yum
 RUN curl -fsSL https://rpm.nodesource.com/setup_16.x | bash -
+RUN yum install -y nodejs
 RUN microdnf install -y python2
+# RUN microdnf install -y nodejs
+RUN node --version
 RUN microdnf install -y git
 RUN microdnf install -y gcc-c++ gcc make
 RUN microdnf clean all
