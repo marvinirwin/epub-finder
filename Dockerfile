@@ -1,12 +1,8 @@
-FROM quay.io/keycloak/keycloak:latest
-
-FROM registry.access.redhat.com/ubi9-minimal
+FROM quay.io/keycloak/keycloak:19.0
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
 USER root
-
-
 
 RUN microdnf update -y
 #RUN curl -O https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
@@ -18,14 +14,14 @@ RUN microdnf update -y
 #RUN make
 #RUN make install
 #RUN export PATH=/opt/python2/bin:$PATH
-RUN microdnf install -y wget
-RUN wget https://github.com/niess/python-appimage/releases/download/python2.7/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage
-RUN install -m 755 python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/
-RUN ln -sr /usr/local/bin/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/python2
+# RUN microdnf install -y wget
+# RUN wget https://github.com/niess/python-appimage/releases/download/python2.7/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage
+# RUN install -m 755 python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/
+# RUN ln -sr /usr/local/bin/python2.7.18-cp27-cp27m-manylinux1_x86_64.AppImage /usr/local/bin/python2
 
 
 RUN curl -fsSL https://rpm.nodesource.com/setup_16.x | bash -
-RUN microdnf install -y nodejs
+RUN microdnf install -y python2
 RUN microdnf install -y git
 RUN microdnf install -y gcc-c++ gcc make
 RUN microdnf clean all

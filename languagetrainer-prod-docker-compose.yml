@@ -11,4 +11,5 @@ services:
       - ./.prod.env
     init: true
     tty: true
+    
 
