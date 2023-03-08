@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import {he} from "date-fns/locale";
 
 
 export enum VideoFacingMode {
@@ -163,14 +164,15 @@ interface CameraComponentProps {
 const CameraComponent: React.FC<CameraComponentProps> = ({ onPictureTaken }) => {
     const [image, setImage] = useState<string>();
 
-    const handlePictureTaken = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePictureTaken = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            alert(`${file.name}, ${file.type}`);
             const reader = new FileReader();
             reader.onload = () => {
                 const imageString = reader.result as string;
                 setImage(imageString);
-                onPictureTaken(file);
+                onPictureTaken(file as File);
             };
             reader.readAsDataURL(file);
         }
