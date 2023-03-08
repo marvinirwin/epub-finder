@@ -1,8 +1,6 @@
 import React from "react";
 import { Story } from "@storybook/react";
 import { Library, LibraryProps } from "./library.component";
-//import { LtDocument } from "../../../../server/src/shared/lt-document";
-import { DocumentView } from "../../../../server/src/entities/document-view.entity";
 
 export default {
   title: "Library",

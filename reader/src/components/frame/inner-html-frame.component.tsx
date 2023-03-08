@@ -1,6 +1,4 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { IframeComponent } from './iframe.component'
-import { BodyStyle } from '../../lib/document-frame/atomized-document-style.service'
 
 export type IFrameRenderHandler = (
     body: HTMLDivElement,

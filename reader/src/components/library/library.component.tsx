@@ -54,7 +54,10 @@ const LibraryRow = (
         <td>
             <button type="button"
                     className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
-                    onClick={async () => {
+                    onClick={() => {
+                        m.modalService.quickPreviewDocument.open$.next(true);
+                        m.quickPreviewService.quickPreviewDocumentUrl$.next(document.ltDocument.url());
+/*
                         const responseText = await (await fetch(document.ltDocument.url())).text();
                         const text = new DOMParser().parseFromString(responseText, "text/html").body.innerText;
                         if (!text) {
@@ -62,8 +65,9 @@ const LibraryRow = (
                         }
                         console.log(text);
                         await navigator.clipboard.writeText(text);
+*/
                     }}
-            >Copy
+            >Preview
             </button>
         </td>
     </tr>;
@@ -82,6 +86,7 @@ export const Library: React.FC<LibraryProps> = ({}) => {
                     </p>
                 </div>
                 <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+{/*
                     <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
@@ -93,6 +98,7 @@ export const Library: React.FC<LibraryProps> = ({}) => {
                     >
                         Add Media Source
                     </button>
+*/}
                 </div>
             </div>
             <div className="mt-8 flex flex-col">
@@ -120,7 +126,7 @@ export const Library: React.FC<LibraryProps> = ({}) => {
                                     </th>
                                     <th scope="col"
                                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Copy
+                                        Preview
                                     </th>
                                 </tr>
                                 </thead>

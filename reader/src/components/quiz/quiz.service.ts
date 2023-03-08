@@ -3,7 +3,7 @@ import {OpenExampleSentencesFactory} from '../../lib/document-frame/open-example
 import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay} from 'rxjs/operators'
 import {QuizCard} from './word-card.interface'
 import {orderBy, uniqBy} from 'lodash'
-import CardsRepository from 'src/lib/manager/cards.repository'
+import CardsRepository from '../../lib/manager/cards.repository'
 import {ExampleSegmentsService} from '../../lib/quiz/example-segments.service'
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from '../../lib/manager/open-documents.service'
 import {LanguageConfigsService} from '../../lib/language/language-configs.service'

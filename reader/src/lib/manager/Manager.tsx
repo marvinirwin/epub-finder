@@ -98,6 +98,8 @@ import {KnownWordsRepository} from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
 import {LoadingService} from "../loading/loadingService";
+import {TakenPictureService} from "./TakenPictureService";
+import {QuickPreviewService} from "./QuickPreviewService";
 
 
 /*
@@ -197,6 +199,8 @@ export class Manager {
     leaderBoardService: LeaderBoardService;
     dictionaryService: DictionaryService;
     loadingService: LoadingService;
+    takenPictureService: TakenPictureService = new TakenPictureService();
+    quickPreviewService: QuickPreviewService = new QuickPreviewService();
 
 
     constructor(public databaseService: DatabaseService, {audioSource}: AppContext) {

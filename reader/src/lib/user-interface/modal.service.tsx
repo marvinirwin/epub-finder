@@ -23,21 +23,32 @@ import {CsvComponent} from "./csv.component";
 import {SetReviewCardLimit} from "../../components/settings/set-review-card-limit.component";
 import {ToggleOnlyPresentText} from "../../components/settings/toggle-only-present-text.component";
 import {LeaderBoard} from "./leader-board.component";
+import { ReadingDocumentPreview } from '../../components/document-preview/ReadingDocumentPreview'
+import { QuickPreviewDocument } from '../../components/document-preview/QuickPreviewDocument'
 
 export class ModalService {
-    public languageSelect: NavModal
-    public fileUpload: NavModal
-    public library: NavModal
-    public settings: NavModal
-    public testingUtils: NavModal
-    public wordPaperDisplay: NavModal
-    public quizScheduleOverView: NavModal
+    languageSelect: NavModal
+    fileUpload: NavModal
+    library: NavModal
+    settings: NavModal
+    testingUtils: NavModal
+    wordPaperDisplay: NavModal
+    quizScheduleOverView: NavModal
     readingProgress: NavModal
     imageSearch: NavModal
     csv: NavModal
     leaderBoard: NavModal;
+    previewReadingDocument: NavModal;
+    quickPreviewDocument: NavModal;
 
     constructor() {
+        this.previewReadingDocument = new NavModal('previewReadingDocument', () => {
+            return <ReadingDocumentPreview onClose={() => this.previewReadingDocument.open$.next(false)}/>;
+        })
+        this.quickPreviewDocument = new NavModal('quickPreviewDocument', () => {
+            debugger;
+            return <QuickPreviewDocument onClose={() => this.quickPreviewDocument.open$.next(false)}/>;
+        })
         this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
 
         this.languageSelect = new NavModal('spokenLanguage', () => (
@@ -106,7 +117,9 @@ export class ModalService {
             this.readingProgress,
             this.imageSearch,
             this.csv,
-            this.leaderBoard
+            this.leaderBoard,
+            this.quickPreviewDocument,
+            this.previewReadingDocument
         ]
     }
 }

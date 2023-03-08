@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {he} from "date-fns/locale";
 
 
+/**
+ * @deprecated
+ */
 export enum VideoFacingMode {
     'user' = 'user',
     'environment' = 'environment',
@@ -13,6 +15,10 @@ export enum VideoFacingMode {
 }
 
 
+/**
+ * @deprecated
+ * @constructor
+ */
 export const TakePictureComponent = () => {
     const [mediaStreamConstraints, setMediaStreamConstraints] = useState<MediaStreamConstraints>(() => ({
             audio: false,
@@ -128,6 +134,7 @@ export const TakePictureComponent = () => {
         </div>
     </div>;
 }
+
 async function convertHeicToJpeg(file: File): Promise<File> {
     // Load the HEIC image as an image element
     const image = new Image();

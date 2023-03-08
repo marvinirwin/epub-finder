@@ -5,7 +5,7 @@ import {DEV} from "../../lib/util/url-params";
 import React from "react";
 
 export const ReadingNode = (m: Manager): TreeMenuNode => ({
-    Component: () => <ReadingComponent m={m}/>,
+    Component: () => <ReadingComponent/>,
     label: 'Read',
     name: 'reading',
     hidden: !DEV,
