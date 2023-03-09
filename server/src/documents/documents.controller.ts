@@ -26,11 +26,11 @@ import { HashService } from "./uploading/hash.service";
 import multerS3 from "multer-s3";
 import { v4 as uuidv4 } from "uuid";
 import { s3, s3ReadStream } from "./uploading/s3.service";
-import { AnonymousGuard } from "../guards/anonymous.guard";
 import { DocumentViewDto } from "./document-view.dto";
 import { S3UploadedFile, UploadOutput } from "./uploading/s3-uploaded-file";
 import { RevisionUpdater } from "../revision-updater";
 import { DocumentUpdateDto } from "./document-update.dto";
+import { SegmentDto } from "./segment.dto";
 import { ltDocId } from "../shared/lt-document";
 import { LoggedInGuard } from "../guards/logged-in.guard";
 
@@ -174,6 +174,14 @@ export class DocumentsController {
 */
     }
 
+    @Post('splitWords')
+    @UseGuards(LoggedInGuard)
+    async segment(
+        @Body() SegmentDto: SegmentDto,
+    ) {
+
+    }
+
     private getRevisionUpdater(user: User, existingDocumentId: string) {
         return new RevisionUpdater<Document, DocumentUpdateDto>(
             (r) => {
@@ -201,4 +209,5 @@ export class DocumentsController {
             }),
         );
     }
+
 }

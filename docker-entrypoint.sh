@@ -1,5 +1,5 @@
 # Start the first process
-# ./run-keycloak.sh &
+./run-keycloak.sh &
 
 # Start the second process
 ./run-server.sh &

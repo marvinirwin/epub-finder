@@ -7,12 +7,36 @@ import { basename } from "path";
 import { HashService } from "./uploading/hash.service";
 import { HttpException } from "@nestjs/common";
 import { DocumentUpdateDto } from "./document-update.dto";
+import {Configuration, OpenAIApi} from "openai";
+import {encode} from 'gpt-3-encoder';
 
 function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
     return new Error(
         `Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`,
     );
 }
+
+const maxTokens = 4096;
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+export const getChatGPTResult = async (prompt: string) => {
+    const length = encode(prompt).length;
+    console.log(length)
+    return await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: maxTokens - length,
+        temperature: 0.5,
+    })
+        .then(response => response.data.choices[0].text)
+        .catch(e => {
+            console.log(prompt.length);
+            console.error(e.response.data);
+            throw e.response.data;
+        })
+};
 
 export class DocumentsService {
     constructor(
