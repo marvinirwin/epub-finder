@@ -19,7 +19,6 @@ proxy.on(
 
 // Set up the server to handle requests
 const server = http.createServer((req, res) => {
-    // Proxy requests to /test to localhost:8080
     if (req.url.startsWith('/realms') || req.url.startsWith('/resources')) {
         proxy.web(req, res, { target: 'http://localhost:8080' });
     } else {
