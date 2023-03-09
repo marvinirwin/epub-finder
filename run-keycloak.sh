@@ -1,1 +1,1 @@
-/opt/keycloak/bin/kc.sh start-dev
+/opt/keycloak/bin/kc.sh start-dev --verbose
