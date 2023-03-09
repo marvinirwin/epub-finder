@@ -4,6 +4,19 @@ const http = require('http');
 // Create the proxy server
 const proxy = httpProxy.createProxyServer();
 
+
+proxy.on(
+    'proxyReq',
+    (proxyReq, req, res, options) => {
+        // Add custom header to request
+        proxyReq.setHeader('Host', req.headers.host);
+        proxyReq.setHeader('X-Real-IP', req.socket.remoteAddress);
+        proxyReq.setHeader('X-Forwarded-For', req.headers['x-forwarded-for'] || '');
+        proxyReq.setHeader('X-Forwarded-Proto', req.headers['x-forwarded-proto'] || '');
+
+    }
+)
+
 // Set up the server to handle requests
 const server = http.createServer((req, res) => {
     // Proxy requests to /test to localhost:8080
