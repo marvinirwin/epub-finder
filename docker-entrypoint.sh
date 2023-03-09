@@ -1,13 +1,6 @@
-# Start the first process
-./run-keycloak.sh &
-
-# Start the second process
-./run-server.sh &
-
-# Start the reverse proxy to send requests between them
-node server/proxy.js &
-
-# Wait for any process to exit
+./run-keycloak.sh & \
+./run-server.sh & \
+node server/proxy.js & \
 wait -n
 
 # Exit with status of process that exited first
