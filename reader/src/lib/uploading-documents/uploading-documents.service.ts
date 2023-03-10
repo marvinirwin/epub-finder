@@ -16,7 +16,8 @@ export const supportedDocumentFileExtensions = new Set<string>([
   "jpeg",
   "jpg",
   "svg",
-  "bmp"
+  "bmp",
+  'heic'
 ]);
 
 /**

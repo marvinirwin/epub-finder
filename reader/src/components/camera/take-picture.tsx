@@ -135,33 +135,6 @@ export const TakePictureComponent = () => {
     </div>;
 }
 
-async function convertHeicToJpeg(file: File): Promise<File> {
-    // Load the HEIC image as an image element
-    const image = new Image();
-    const imageLoadPromise = new Promise<void>((resolve) => {
-        image.onload = () => resolve();
-        image.src = URL.createObjectURL(file);
-    });
-    await imageLoadPromise;
-
-    // Draw the image onto a canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx?.drawImage(image, 0, 0);
-
-    // Convert the canvas to a JPEG blob
-    const jpegBlob = await new Promise<Blob>((resolve) =>
-        canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.9)
-    );
-
-    // Create a new File object with the JPEG blob and the original filename
-    const jpegFile = new File([jpegBlob], file.name.replace(/\.heic$/, '.jpg'), {
-        type: 'image/jpeg',
-    });
-    return jpegFile;
-}
 
 
 interface CameraComponentProps {
@@ -174,7 +147,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onPictureTaken }) => 
     const handlePictureTaken = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            alert(`${file.name}, ${file.type}`);
             const reader = new FileReader();
             reader.onload = () => {
                 const imageString = reader.result as string;
