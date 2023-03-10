@@ -11,13 +11,15 @@ const {
     KEYCLOAK_REALM,
     KEYCLOAK_CLIENT_ID,
     KEYCLOAK_CLIENT_SECRET,
-    APP_URL
+    APP_URL,
+    REMOTE_KEYCLOAK_URL
 } = getRequiredEnvironmentVariables(
     "KEYCLOAK_URL",
     "KEYCLOAK_REALM",
     "KEYCLOAK_CLIENT_ID",
     "KEYCLOAK_CLIENT_SECRET",
-    "APP_URL"
+    "APP_URL",
+    "REMOTE_KEYCLOAK_URL"
 );
 
 @Injectable()
@@ -30,7 +32,7 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, "keycloak") {
             clientID: KEYCLOAK_CLIENT_ID,
             clientSecret: KEYCLOAK_CLIENT_SECRET,
             callbackURL: `${APP_URL}/languagetrainer-auth/keycloak/callback`,
-            authorizationURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth`,
+            authorizationURL: `${REMOTE_KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth`,
             tokenURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`,
             userInfoURL: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
             passReqToCallback: true,
