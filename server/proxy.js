@@ -14,6 +14,7 @@ proxy.on(
 */
 
 // Set up the server to handle requests
+const assumedProtocol = 'https';
 const server = http.createServer((req, res) => {
     if (req.url.startsWith('/realms') || req.url.startsWith('/resources')) {
         proxy.web(
@@ -27,9 +28,10 @@ const server = http.createServer((req, res) => {
                     'X-Forwarded-For': req.connection.remoteAddress,
                     'X-Forwarded-Host': req.headers.host,
                     'X-Forwarded-Port': '443',
-                    'X-Forwarded-Proto': req.protocol,
-                    'X-Forwarded-Scheme': req.protocol,
-                    'X-Scheme': req.protocol,
+                    // TODO change these to use the actual req.protocl
+                    'X-Forwarded-Proto': assumedProtocol,
+                    'X-Forwarded-Scheme': assumedProtocol,
+                    'X-Scheme': assumedProtocol,
                     'X-Original-Forwarded-For': req.headers['x-forwarded-for'] || '',
                     Proxy: ''
                 }
