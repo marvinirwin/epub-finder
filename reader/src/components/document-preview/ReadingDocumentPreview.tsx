@@ -8,11 +8,11 @@ type Props = {
 
 export const ReadingDocumentPreview: React.FC<Props> = ({ onClose}) => {
     return (
-        <div>
+        <>
             <ReadingComponent/>
             <button style={{position: 'absolute', top: '1rem', right: '1rem'}} onClick={onClose}>
                 Close
             </button>
-        </div>
+        </>
     );
 };

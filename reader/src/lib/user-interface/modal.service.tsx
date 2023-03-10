@@ -46,7 +46,6 @@ export class ModalService {
             return <ReadingDocumentPreview onClose={() => this.previewReadingDocument.open$.next(false)}/>;
         })
         this.quickPreviewDocument = new NavModal('quickPreviewDocument', () => {
-            debugger;
             return <QuickPreviewDocument onClose={() => this.quickPreviewDocument.open$.next(false)}/>;
         })
         this.fileUpload = new NavModal('fileUpload', () => <UploadDialog />)
