@@ -1,7 +1,7 @@
 import { SetWithUniqueLengths } from "../tabulate-documents/set-with-unique-lengths";
 import { TabulatedDocuments } from "../tabulate-documents/tabulated-documents.interface";
 import { AtomMetadata } from "../atom-metadata/atom-metadata";
-import {SegmentSubsequences} from "../index";
+import {SegmentSubsequences, SplitWordsDto, SplitWordsResponse} from "../index";
 import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
 
 export type TabulationParameters<T> = {
@@ -20,6 +20,7 @@ export type TabulationConfiguration = SerializableTabulationConfiguration & {
     isNotableCharacterRegex: RegExp;
     isWordBoundaryRegex: RegExp;
     wordIdentifyingStrategy: WordIdentifyingStrategy;
+    wordSplitFunction?: (dto: SplitWordsDto) => Promise<SplitWordsResponse>;
 }
 
 export interface PositionedWord {
@@ -31,6 +32,7 @@ export interface SerializedSegment {
     text: string;
     index: number;
 }
+
 
 export const tabulationFactory = <T extends AbstractSegment<U>, U extends AbstractNode>(): TabulatedDocuments<U, T> => ({
     wordElementsMap: {},

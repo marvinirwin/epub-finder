@@ -1,20 +1,20 @@
-import { User } from "../entities/user.entity";
-import { Document, documentRootId } from "../entities/document.entity";
-import { DocumentView } from "../entities/document-view.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { basename } from "path";
-import { HashService } from "./uploading/hash.service";
-import { HttpException } from "@nestjs/common";
-import { DocumentUpdateDto } from "./document-update.dto";
+import {User} from "../entities/user.entity";
+import {Document, documentRootId} from "../entities/document.entity";
+import {DocumentView} from "../entities/document-view.entity";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import {basename} from "path";
+import {HashService} from "./uploading/hash.service";
+import {HttpException} from "@nestjs/common";
+import {DocumentUpdateDto} from "./document-update.dto";
 import {Configuration, OpenAIApi} from "openai";
 import {encode} from 'gpt-3-encoder';
+import {TranslateWithGrammarExplanationDto} from "../shared";
+import {SplitWordsDto} from "../shared";
 
-function CannotFindDocumentForUser(documentIdToDelete: string, user: User) {
-    return new Error(
-        `Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`,
-    );
-}
+const CannotFindDocumentForUser = (documentIdToDelete: string, user: User) => new Error(
+    `Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`,
+);
 
 const maxTokens = 4096;
 const configuration = new Configuration({
@@ -30,7 +30,10 @@ export const getChatGPTResult = async (prompt: string) => {
         max_tokens: maxTokens - length,
         temperature: 0.5,
     })
-        .then(response => response.data.choices[0].text)
+        .then(response => {
+            console.log(response.data.choices);
+            return response.data.choices[0].text;
+        })
         .catch(e => {
             console.log(prompt.length);
             console.error(e.response.data);
@@ -46,19 +49,20 @@ export class DocumentsService {
         public documentRepository: Repository<Document>,
         @InjectRepository(User)
         public userRepository: Repository<User>,
-    ) {}
+    ) {
+    }
 
     async allDocuments({
-        user,
-        condition
-    }: {
+                           user,
+                           condition
+                       }: {
         user?: User | undefined;
         condition: Partial<DocumentView>;
     }): Promise<DocumentView[]> {
         return await this.documentViewRepository.find({
             where: [
-                { creator_id: user?.id, deleted: false, ...condition},
-                { global: true, deleted: false, ...condition },
+                {creator_id: user?.id, deleted: false, ...condition},
+                {global: true, deleted: false, ...condition},
             ],
         });
     }
@@ -142,9 +146,9 @@ export class DocumentsService {
     }
 
     public async byFilename({
-        filename,
-        user,
-    }: {
+                                filename,
+                                user,
+                            }: {
         filename: string;
         user?: User;
     }) {
@@ -195,6 +199,20 @@ export class DocumentsService {
         }
         // Will this be mad because the id property will also be spread in?
         // Don't I have to use the document_id prop?
-        return await this.documentRepository.insert({ ...currentEntry, ...d });
+        return await this.documentRepository.insert({...currentEntry, ...d});
+    }
+
+    async splitWords(dto: SplitWordsDto) {
+        return {
+            splitWords: getChatGPTResult(`Can you split the following text into words and return the results in a JSON array with every element looks like {word: "someWord" position: 0} where position is the position of the word in the original text? 
+        ${dto.text} `)
+        }
+    }
+
+    async translationWithGrammarHints(dto: TranslateWithGrammarExplanationDto) {
+        return {
+            translation: await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {sourceText: string, translatedText: string, grammarHints: string[]}.
+         ${dto.text}`)
+        }
     }
 }

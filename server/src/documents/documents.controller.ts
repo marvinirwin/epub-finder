@@ -30,9 +30,10 @@ import { DocumentViewDto } from "./document-view.dto";
 import { S3UploadedFile, UploadOutput } from "./uploading/s3-uploaded-file";
 import { RevisionUpdater } from "../revision-updater";
 import { DocumentUpdateDto } from "./document-update.dto";
-import { SegmentDto } from "./segment.dto";
 import { ltDocId } from "../shared/lt-document";
 import { LoggedInGuard } from "../guards/logged-in.guard";
+import {TranslateWithGrammarExplanationDto} from "../shared";
+import {SplitWordsDto} from "../shared";
 
 @Controller("/api/documents")
 export class DocumentsController {
@@ -176,10 +177,18 @@ export class DocumentsController {
 
     @Post('splitWords')
     @UseGuards(LoggedInGuard)
-    async segment(
-        @Body() SegmentDto: SegmentDto,
+    async splitWords(
+        @Body() segmentDto: SplitWordsDto,
     ) {
+        return this.documentsService.splitWords(segmentDto)
+    }
 
+    @Post('translationWithGrammarHints')
+    @UseGuards(LoggedInGuard)
+    async translationWithGrammarHints(
+        @Body() segmentDto: TranslateWithGrammarExplanationDto,
+    ) {
+        return this.documentsService.translationWithGrammarHints(segmentDto)
     }
 
     private getRevisionUpdater(user: User, existingDocumentId: string) {

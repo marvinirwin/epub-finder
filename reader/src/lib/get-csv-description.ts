@@ -1,6 +1,6 @@
 import {SupportedTranslation} from "@shared/";
 import {ICard} from "@shared/";
-import {fetchTranslation} from "../services/translate.service";
+import {fetchTranslation, fetchTranslationWithGrammarHints} from "../services/translate.service";
 import {SegmentSubsequences} from "@shared/";
 import {PositionedWord} from "@shared/";
 import {flatten} from "lodash";
@@ -35,7 +35,7 @@ export async function getCsvDescription(
         segments: SegmentSubsequences[]
     }) {
     const definition = knownLanguage || (learningToKnowTranslationConfig ?
-        await fetchTranslation({from: c.language_code, to: 'en', text: c.learning_language}) :
+        await fetchTranslationWithGrammarHints({from: c.language_code, to: 'en', text: c.learning_language}) :
         '');
     const segmentTextWithWordsHighlighted = getSegmentTextWithWordsHighlighted(
         segments, /* TODO Put the target subsequences here */

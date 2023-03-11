@@ -71,3 +71,5 @@ export type {KnownWord} from "../entities/known-word.entity";
 export type {UserSetting} from "../entities/user-setting.entity";
 
 export * from './UnPersistedEntity'
+export * from './SplitWordsDto'
+export * from './translateWithGrammarExplanationDto'

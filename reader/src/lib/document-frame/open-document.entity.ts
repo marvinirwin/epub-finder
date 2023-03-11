@@ -19,6 +19,7 @@ import { resolvePartialTabulationConfig } from "@shared/"
 import { pipeLog } from '../manager/pipe.log'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
 import { AbstractSegment } from "@shared/"
+import {fetchWordSplit} from "../../services/translate.service";
 
 export class OpenDocument {
     public name: string
@@ -52,6 +53,7 @@ export class OpenDocument {
                     segments,
                     ...tabulationConfiguration,
                     ...resolvePartialTabulationConfig(language_code),
+                    wordSplitFunction: fetchWordSplit
                 })
             }),
             shareReplay(1),

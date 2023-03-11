@@ -3,7 +3,7 @@ import { combineLatest, Observable } from 'rxjs'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
 import { fetchTransliteration } from '../language/transliterate.service'
-import { fetchTranslation } from '../../services/translate.service'
+import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
 
 export class SpeechPracticeService {
     public learningLanguage$: Observable<string | undefined>
@@ -39,7 +39,7 @@ export class SpeechPracticeService {
         ]).pipe(
             switchMap(async ([learningLanguageText, translateConfig]) => {
                 if (translateConfig && learningLanguageText) {
-                    return fetchTranslation({
+                    return fetchTranslationWithGrammarHints({
                         ...translateConfig,
                         text: learningLanguageText,
                     })

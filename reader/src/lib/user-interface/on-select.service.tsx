@@ -3,7 +3,7 @@ import {BrowserInputsService} from '../hotkeys/browser-inputs-service'
 import {GeneralToastMessageService} from './general-toast-message.service'
 import {distinctUntilChanged, withLatestFrom} from 'rxjs/operators'
 import {LanguageConfigsService} from '../language/language-configs.service'
-import {fetchTranslation} from '../../services/translate.service'
+import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import React from 'react'
 import {Box, Typography} from '@material-ui/core'
 
@@ -31,7 +31,7 @@ export class OnSelectService {
             )
             .subscribe(async ([str, translateConfig]) => {
                 if (str && translateConfig) {
-                    const translation = await fetchTranslation({
+                    const translation = await fetchTranslationWithGrammarHints({
                         ...translateConfig,
                         text: str,
                     })

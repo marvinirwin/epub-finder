@@ -9,6 +9,7 @@ import {
 import { TabulateLocalDocumentDto } from './tabulate-local-document.dto'
 import { SetWithUniqueLengths } from '@shared/'
 import { resolvePartialTabulationConfig } from "@shared/"
+import {fetchWordSplit} from "../../services/translate.service";
 
 // @ts-ignore
 self.window = self
@@ -34,6 +35,7 @@ ctx.onmessage = async (ev) => {
         segments,
         ...resolvePartialTabulationConfig(language_code),
         language_code,
+        wordSplitFunction: fetchWordSplit
     });
     try {
         ctx.postMessage({

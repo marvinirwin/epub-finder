@@ -13,6 +13,7 @@ import trie from 'trie-prefix-tree'
 import { SetWithUniqueLengths } from "@shared/"
 import { resolvePartialTabulationConfig } from "@shared/"
 import { getApiUrl } from '../util/getApiUrl'
+import {fetchWordSplit} from "../../services/translate.service";
 
 // @ts-ignore
 self.window = self
@@ -41,6 +42,7 @@ ctx.onmessage = async (ev) => {
         segments,
         ...resolvePartialTabulationConfig(language_code),
         language_code,
+        wordSplitFunction: fetchWordSplit
     })
     ctx.postMessage({
         wordSegmentSubSequencesMap: tabulated.wordSegmentSubSequencesMap,

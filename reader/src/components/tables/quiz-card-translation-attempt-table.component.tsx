@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core'
 import { format } from 'date-fns'
 import { useCancellablePromise } from '../../lib/manager/AudioManager'
-import { fetchTranslation } from '../../services/translate.service'
+import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import { TranslationAttemptScheduleData } from '../../lib/schedule/translation-attempt-schedule.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
 
@@ -26,7 +26,7 @@ export const useTranslation = (segmentText: string | undefined) => {
     useEffect(() => {
         if (languageConfig && segmentText) {
             cancellablePromise(
-                fetchTranslation({ ...languageConfig, text: segmentText }),
+                fetchTranslationWithGrammarHints({ ...languageConfig, text: segmentText }),
             ).then(setTranslation)
         }
     }, [segmentText, languageConfig])

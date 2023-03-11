@@ -6,7 +6,7 @@ import {EditableValue} from './editing-value'
 import {resolveICardForWordLatest} from '../../lib/pipes/ResolveICardForWord'
 import {debounceTime, distinctUntilChanged, map, shareReplay, withLatestFrom} from 'rxjs/operators'
 import {fetchTransliteration} from '../../lib/language/transliterate.service'
-import {fetchTranslation} from '../../services/translate.service'
+import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import {fetchSynthesizedAudio} from '../../lib/audio/fetch-synthesized-audio'
 import {WordCard} from './word-card.interface'
 import {createLoadingObservable} from '../../lib/util/create-loading-observable'
@@ -90,7 +90,7 @@ export const wordCardFactory = (
                             return result;
                         }
                         return translateConfig
-                            ? fetchTranslation({
+                            ? fetchTranslationWithGrammarHints({
                                 text: currentWord || '',
                                 ...translateConfig,
                             })
