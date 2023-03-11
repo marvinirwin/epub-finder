@@ -204,15 +204,15 @@ export class DocumentsService {
 
     async splitWords(dto: SplitWordsDto) {
         return {
-            splitWords: getChatGPTResult(`Can you split the following text into words and return the results in a JSON array with every element looks like {word: "someWord" position: 0} where position is the position of the word in the original text? 
-        ${dto.text} `)
+            splitWords: JSON.parse(await getChatGPTResult(`Can you split the following text into words and return the results in a JSON array where every element looks like {"word": "someWord" "position": 0} where position is the position of the start of the word in the original text? 
+        ${dto.text} `))
         }
     }
 
     async translationWithGrammarHints(dto: TranslateWithGrammarExplanationDto) {
         return {
-            translation: await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {sourceText: string, translatedText: string, grammarHints: string[]}.
-         ${dto.text}`)
+            translation: JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {sourceText: string, translatedText: string, grammarHints: string[]}.
+         ${dto.text}`))
         }
     }
 }
