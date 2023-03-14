@@ -78,57 +78,36 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
         text: string;
         index: number;
     } = {text: "", index: 0};
+    /**
+     * Every time a new segment is encountered, try to split it with the given function
+     * If the function does not exist, or returned something bad, then do manual word entering
+     */
+    let splitFunctionResults: IPositionedWord[] | undefined = undefined
 
-
-    function pushPositionedWord(mostRecentSegmentSubsequence: SegmentSubsequences, i: number, wordStartingHere: string) {
-        if (!wordSplitFunction) {
-
-            mostRecentSegmentSubsequence
-                .subsequences.push({position: i, word: wordStartingHere});
-        }
-        safePushMap(
-            segmentWordCountRecordsMap,
-            currentSerialzedSegment as SerializedSegment,
-            {
-                position: i - currentSegmentStart,
-                word: wordStartingHere,
-            },
-        );
-        safePushMap(
-            wordSegmentSubsequencesMap,
-            wordStartingHere,
-            mostRecentSegmentSubsequence
-        );
-    }
 
     for (let i = 0; i < allMarks.length; i++) {
         const currentMark: NodeType = allMarks[i];
         const currentCharacter = textContent[i];
         if (elementSegmentMap.get(currentMark) !== currentSegment) {
             currentSegment = elementSegmentMap.get(currentMark) as SegmentType;
-            // If we're at a new segment, run the splitter
-            const split = wordSplitFunction && await wordSplitFunction(
-                {
-                    language_code,
-                    text: currentSegment.translatableText
-                }
-            );
-
             segmentIndex++;
             currentSegmentStart = i;
             currentSerialzedSegment = {
                 text: currentSegment.translatableText,
                 index: segmentIndex,
             };
+            splitFunctionResults = (wordSplitFunction ? await wordSplitFunction(
+                {
+                    language_code,
+                    text: currentSegment.translatableText
+                }
+            ) : undefined)?.splitWords;
             const segmentSubSequences = {
                 segmentText: currentSegment.translatableText,
-                subsequences: split?.splitWords || []
+                subsequences: []
             };
             safePushMap(wordSegmentSubsequencesMap, segmentSubSequences.segmentText, segmentSubSequences);
             notableSubSequences.push(segmentSubSequences);
-            split?.splitWords?.forEach((positionedWord) => {
-                pushPositionedWord(segmentSubSequences, positionedWord.position, positionedWord.word);
-            })
 
         }
 
@@ -141,20 +120,22 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
         const potentialNotableSequences = uniq(
             uniqueLengths.map((size) => textContent.substr(i, size)),
         );
-        const notableSequencesWhichStartHere: string[] = potentialNotableSequences.reduce(
-            (acc: string[], potentialWord) => {
-                if (notableCharacterSequences.has(potentialWord)) {
-                    safePush(
-                        wordSegmentMap,
-                        potentialWord,
-                        elementSegmentMap.get(currentMark),
-                    );
-                    acc.push(potentialWord);
-                }
-                return acc;
-            },
-            [],
-        );
+        const notableSequencesWhichStartHere: string[] = splitFunctionResults ?
+            splitFunctionResults.filter(splitFunctionResult => splitFunctionResult.position === i).map(({word}) => word)  :
+            potentialNotableSequences.reduce(
+                (acc: string[], potentialWord) => {
+                    if (notableCharacterSequences.has(potentialWord)) {
+                        safePush(
+                            wordSegmentMap,
+                            potentialWord,
+                            elementSegmentMap.get(currentMark),
+                        );
+                        acc.push(potentialWord);
+                    }
+                    return acc;
+                },
+                [],
+            );
 
         let wordStartingHereSplitBySeparator: string | undefined;
 
@@ -197,12 +178,24 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
             }
         }
 
+
         notableSequencesWhichStartHere.forEach((wordStartingHere) => {
             const mostRecentSegmentSubsequence = notableSubSequences[notableSubSequences.length - 1];
-            // TODO see if we can do away with this and just use the openAI word splitter
-            if (!wordSplitFunction) {
-                pushPositionedWord(mostRecentSegmentSubsequence, i, wordStartingHere);
-            }
+            mostRecentSegmentSubsequence
+                .subsequences.push({position: i, word: wordStartingHere});
+            safePushMap(
+                segmentWordCountRecordsMap,
+                currentSerialzedSegment as SerializedSegment,
+                {
+                    position: i - currentSegmentStart,
+                    word: wordStartingHere,
+                },
+            );
+            safePushMap(
+                wordSegmentSubsequencesMap,
+                wordStartingHere,
+                mostRecentSegmentSubsequence
+            );
         });
 
         notableSubsequencesInProgress.push(
