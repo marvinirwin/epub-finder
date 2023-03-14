@@ -211,7 +211,7 @@ export class DocumentsService {
 
     async translationWithGrammarHints(dto: TranslateWithGrammarExplanationDto) {
         return {
-            translation: JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {sourceText: string, translatedText: string, grammarHints: string[]}.
+            translation: JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}.
          ${dto.text}`))
         }
     }

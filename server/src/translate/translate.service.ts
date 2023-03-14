@@ -27,6 +27,9 @@ export class TranslateService {
         const [translation] = await translate.translate(text, to);
         return { translation };
     }
+    async translateWithGrammarHint({ text, to }: TranslateRequestDto) {
+
+    }
     async transliterate({ text, to }: TranslateRequestDto) {
         const [translation] = await translate.translate(text, to);
         return { translation };

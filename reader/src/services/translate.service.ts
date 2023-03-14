@@ -14,8 +14,12 @@ export interface TranslateConfig {
 
 export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
-            .post(getApiUrl("/api/documents/translationsWithGrammarHints"), t)
-            .then((response) => (response?.data?.translation as string) || ''),
+            .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
+            .then((response) => {
+                const data = response.data as TranslateWithGrammarExplanationResponseDto;
+                return data.translatedText ? `${data.translatedText}\n${data.grammarHints.join(' ')}`
+                    : '';
+            }),
     {
         promise: true,
         normalizer(
@@ -29,7 +33,7 @@ export const fetchTranslation = memoize((t: TranslateRequest) =>
 
 export const fetchTranslationWithGrammarHints = memoize((t: TranslateRequest) =>
         axios
-            .post(getApiUrl("/api/documents/translationsWithGrammarHints"), t)
+            .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
             .then((response) => {
                 const translation = response?.data?.translation as TranslateWithGrammarExplanationResponseDto;
                 if (translation) {
