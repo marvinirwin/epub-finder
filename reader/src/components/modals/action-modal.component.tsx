@@ -1,6 +1,7 @@
 import React from 'react'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Backdrop from '@material-ui/core/Backdrop'
+import { Card, Dialog, Paper } from '@material-ui/core'
 import { useObservableState } from 'observable-hooks'
 import { NavModal } from '../../lib/user-interface/nav-modal'
 import {Modal} from 'flowbite-react';
@@ -34,13 +35,18 @@ export const ActionModal: React.FC<{
     }
 
     return (
-        <Modal
-            show={open}
+        <Dialog
             className={`action-modal ${classes.modal}`}
-            style={{width: '90vw', height: '90vh'}}
+            open={open}
             onClose={handleClose}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+                timeout: 500,
+            }}
+            fullScreen={true}
         >
             {children}
-        </Modal>
+        </Dialog>
     )
 }
