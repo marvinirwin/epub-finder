@@ -9,7 +9,6 @@ import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTransl
 import {flatten} from "lodash";
 import {LibraryNode} from "../app-directory/nodes/library.node";
 import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
-import {LibraryTable} from "../library/library-table.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
 import {HomeNode} from "../app-directory/nodes/Home.node";
 import {Library} from "../library/library.component";
@@ -33,7 +32,10 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
 
     const languages: ParentLanguageOption[] = SupportedTranslations.map(t => {
             const v = {
-                variants: mapTranslatableLanguagesToSpokenOnes(t.code).map(v => ({label: v.label, value: v.code})),
+                variants: mapTranslatableLanguagesToSpokenOnes(t.code).map(spokenLanguage => ({
+                    label: spokenLanguage.label,
+                    value: spokenLanguage.code
+                })),
                 label: t.label,
                 value: t.code
             }
@@ -44,6 +46,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     const onLanguageSelect = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
     const onVariantSelect = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.next(v.value);
     const onFileUpload = async (files: FileList) => {
+        // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             await m.uploadingDocumentsService.upload({file, language_code: readingLanguageCode});
@@ -54,7 +57,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         LibraryNode,
         QuizCarouselNode,
     ];
-    const language = languages.find(language => language.value === readingLanguageCode);
+    const language = languages.find(l => l.value === readingLanguageCode);
     const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
     const variant = flatten(languages.map(l => l.variants)).find(v => v.value === spokenLanguageCode) as VariantLanguageOption;
     const setVariant = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.next(v.value)
@@ -72,7 +75,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         }
     };
 
-    const handleDrop = (e: DragEvent) => {
+    const handleDrop = ({e, filename}: { e: DragEvent, filename: string }) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
@@ -84,7 +87,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
 
     const handleUploadClick = () => {
         // @ts-ignore
-        var el = window._protected_reference = document.createElement("INPUT");
+        let el = window._protected_reference = document.createElement("INPUT");
         // @ts-ignore
         el.type = "file";
         // @ts-ignore
@@ -93,19 +96,19 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         el.multiple = "multiple"; // remove to have a single file selection
 
         // (cancel will not trigger 'change')
-        el.addEventListener('change', function (ev2) {
-            //@ts-ignore
+        el.addEventListener('change', ev2 => {
+            // @ts-ignore
             onFileUpload(el.files)
             // access el.files[] to do something with it (test its length!)
             // test some async handling
-            new Promise<void>(function (resolve) { // @ts-ignore
-                    setTimeout(function () {
+            new Promise<void>(resolve => { // @ts-ignore
+                    setTimeout(() => {
                             resolve();
                         },
                         1000
                     );
                 }
-            ).then(function () {
+            ).then(() => {
                 // clear / free reference
                 // @ts-ignore
                 el = window._protected_reference = undefined;
@@ -134,10 +137,22 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
                 return [
                     HomeNode,
                     <LandingPage
-                        onFileSelected={file => m.uploadingDocumentsService.upload({
-                            file,
-                            language_code: readingLanguageCode
-                        })}
+                        onTextUpload={({text, name}) =>
+                            m.uploadingDocumentsService.upload(
+                                {
+                                    file: new File([text], name),
+                                    language_code: readingLanguageCode
+                                }
+                            )
+                        }
+                        onFileSelected={({file}) =>
+                            m.uploadingDocumentsService.upload(
+                                {
+                                    file,
+                                    language_code: readingLanguageCode
+                                }
+                            )
+                        }
                         languages={languages}
                         language={language}
                         setLanguage={setLanguage}

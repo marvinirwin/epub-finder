@@ -1,10 +1,9 @@
-import React, {forwardRef} from "react";
+import React, {forwardRef, useState} from "react";
 import {flatten} from "lodash";
-import {LibraryBooks} from "@material-ui/icons";
 import {supportedDocumentFileExtensions} from "../../lib/uploading-documents/uploading-documents.service";
 import CameraComponent from "../camera/take-picture";
 import {Library} from "../library/library.component";
-
+import {TextInput, Button} from "flowbite-react";
 
 export type VariantLanguageOption = { value: string, label: string };
 export type ParentLanguageOption = { value: string, label: string, variants: VariantLanguageOption[] };
@@ -17,10 +16,11 @@ export type LandingPageProps = {
     setVariant: (v: VariantLanguageOption) => unknown,
     dragActive: boolean,
     onDragEnter: (e: React.DragEvent) => void,
-    onDrop: (e: React.DragEvent) => void,
+    onDrop: (p: { e: React.DragEvent, filename: string }) => void,
     ref: React.RefObject<HTMLInputElement>,
     onClick: () => void
-    onFileSelected: (file: File) => void
+    onFileSelected: (p: { file: File, name: string }) => void
+    onTextUpload: (p: { text: string, name: string }) => void
 };
 
 export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
@@ -34,13 +34,16 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
         setLanguage,
         setVariant,
         variant,
-        onFileSelected
+        onFileSelected,
+        onTextUpload
     }, ref) => {
+    const [uploadedFileName, setUploadedFileName] = useState<string>("")
+    const [uploadedFileText, setUploadedFileText] = useState<string>("");
     const validExtensionList = Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ');
     return <div className="w-full flex flex-row grow">
         <div className="flex flex-col w-1/2 p-8">
             <CameraComponent onPictureTaken={(image) => {
-                onFileSelected(image)
+                onFileSelected({name: uploadedFileName, file: image})
             }}/>
             <Library/>
         </div>
@@ -50,9 +53,9 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                     className="w-[300px] h-11 mb-[30px] text-1rem text-[#71717A]"
                     defaultValue={language?.value}
                     value={language?.value}
-                    onChange={v => setLanguage(languages.find(language => language.value === v.target.value) as ParentLanguageOption)}
+                    onChange={v => setLanguage(languages.find(l => l.value === v.target.value) as ParentLanguageOption)}
                 >
-                    {languages.map(language => <option value={language.value}>{language.label}</option>)}
+                    {languages.map(l => <option value={l.value}>{l.label}</option>)}
                 </select>
                 {language?.variants?.length && (
                     <select
@@ -60,14 +63,17 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                         defaultValue={variant?.value}
                         value={variant?.value}
                         onChange={(e) => {
-                            const allVariants = flatten(languages.map(language => language.variants));
-                            setVariant(allVariants.find(variant => variant.value === e.target.value) as VariantLanguageOption);
+                            const allVariants = flatten(languages.map(l => l.variants));
+                            setVariant(allVariants.find(v => v.value === e.target.value) as VariantLanguageOption);
                         }}
                     >
-                        {language.variants.map(variant => <option value={variant.value}
-                                                                  className="text-1rem text-[#71717A]">
-                            {variant.label}
-                        </option>)}
+                        {
+                            language.variants.map(v => <option
+                                value={v.value}
+                                className="text-1rem text-[#71717A]">
+                                {v.label}
+                            </option>)
+                        }
                     </select>
                 )}
             </div>
@@ -78,8 +84,30 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                 onDragEnter={onDragEnter}
                 onDragOver={onDragEnter}
                 onDragLeave={onDragEnter}
-                onDrop={onDrop}
+                onDrop={e => onDrop(
+                    {
+                        e,
+                        filename: uploadedFileName
+                    }
+                )}
             >
+                <TextInput
+                    value={uploadedFileText}
+                    onChange={e => setUploadedFileText(e.target.value)}
+                />
+                <div>
+                    <TextInput
+                        value={uploadedFileName}
+                        onChange={e => setUploadedFileName(e.target.value)}
+                    />
+                    <Button
+                        onClick={() => {
+                            onTextUpload({text: uploadedFileText, name: uploadedFileName})
+                        }}
+                    >
+                        Upload Text
+                    </Button>
+                </div>
                 <input ref={ref} className="hidden" type="file" id="input-file-upload" multiple={true}
                        accept={validExtensionList}/>
                 <label id="label-file-upload" htmlFor="file-upload" className={dragActive ? "drag-active" : ""}>
