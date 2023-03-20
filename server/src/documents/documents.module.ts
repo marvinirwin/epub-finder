@@ -10,6 +10,7 @@ import { UploadOnStartupService } from "./built-in-documents/upload-on-startup.s
 import { TabulateService } from "./similarity/tabulate.service";
 import { CacheService } from "../util/cache.service";
 import { JsonCache } from "../entities/json-cache.entity";
+import {LanguageModelService} from "../translate/language-model.service";
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { JsonCache } from "../entities/json-cache.entity";
         UploadOnStartupService,
         TabulateService,
         CacheService,
+        LanguageModelService
     ],
 })
 export class DocumentsModule {}

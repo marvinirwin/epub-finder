@@ -30,6 +30,7 @@ export class TranslateService {
     async translateWithGrammarHint({ text, to }: TranslateRequestDto) {
 
     }
+
     async transliterate({ text, to }: TranslateRequestDto) {
         const [translation] = await translate.translate(text, to);
         return { translation };
@@ -64,4 +65,5 @@ export class TranslateService {
             Object.assign(new JsonCache(), cacheEntry),
         );
     }
+
 }

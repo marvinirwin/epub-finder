@@ -5,12 +5,13 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {basename} from "path";
 import {HashService} from "./uploading/hash.service";
-import {HttpException} from "@nestjs/common";
+import {HttpException, Inject} from "@nestjs/common";
 import {DocumentUpdateDto} from "./document-update.dto";
 import {Configuration, OpenAIApi} from "openai";
 import {encode} from 'gpt-3-encoder';
 import {TranslateWithGrammarExplanationDto} from "../shared";
 import {SplitWordsDto} from "../shared";
+import {LanguageModelService} from "../translate/language-model.service";
 
 const CannotFindDocumentForUser = (documentIdToDelete: string, user: User) => new Error(
     `Cannot find existing document with id ${documentIdToDelete} which belongs to user ${user.id}`,
@@ -49,6 +50,8 @@ export class DocumentsService {
         public documentRepository: Repository<Document>,
         @InjectRepository(User)
         public userRepository: Repository<User>,
+        @Inject(LanguageModelService)
+        public languageModelService: LanguageModelService,
     ) {
     }
 
@@ -203,16 +206,22 @@ export class DocumentsService {
     }
 
     async splitWords(dto: SplitWordsDto) {
+        return this.languageModelService.splitWords(dto);
+/*
         return {
             splitWords: JSON.parse(await getChatGPTResult(`Can you split the following text into words and return the results in a JSON array where every element looks like {"word": "someWord" "position": 0} where position is the position of the start of the word in the original text? 
         ${dto.text} `))
         }
+*/
     }
 
     async translationWithGrammarHints(dto: TranslateWithGrammarExplanationDto) {
+        return this.languageModelService.translationWithGrammarHints(dto);
+/*
         return {
             translation: JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}.
          ${dto.text}`))
         }
+*/
     }
 }
