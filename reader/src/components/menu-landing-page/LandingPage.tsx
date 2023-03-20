@@ -77,6 +77,12 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                     </select>
                 )}
             </div>
+            <TextInput
+                value={uploadedFileName}
+                onChange={e => setUploadedFileName(e.target.value)}
+                placeholder={'The label of your uploaded material.  Will use filename if left blank.'}
+            />
+            &nbsp;
             <div className='flex flex-col justify-center'>
                 <Textarea
                     value={uploadedFileText}
@@ -85,17 +91,16 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                 />
                 <Button
                     onClick={() => {
-                        onTextUpload({text: uploadedFileText, name: uploadedFileName})
+                        if (!uploadedFileText || !uploadedFileName) {
+                            alert(`Please enter a name and some text to upload`);
+                            return;
+                        }
+                        onTextUpload({text: uploadedFileText, name: `${uploadedFileName}.txt`})
                     }}
                 >
                     Upload Text
                 </Button>
             </div>
-            <TextInput
-                value={uploadedFileName}
-                onChange={e => setUploadedFileName(e.target.value)}
-                placeholder={'The label of your uploaded material.  Will use filename if left blank.'}
-            />
             <div
                 className={`relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center flex-1 ${
                     dragActive && "border-[#0F91D2] bg-slate-100"
