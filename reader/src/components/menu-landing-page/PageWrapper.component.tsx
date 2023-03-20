@@ -1,6 +1,6 @@
 import React, {DragEvent, useContext, useRef} from "react";
 import {NavBarAndSettingsPopup} from "../settings-popup/NavBarAndSettingsPopup.component";
-import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./menu-landing-page.component";
+import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./LandingPage";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {ManagerContext} from "../../App";
 import {useObservableState} from "observable-hooks";

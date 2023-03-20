@@ -14,6 +14,8 @@ import {theme} from './theme'
 import {ActionModal} from './components/modals/action-modal.component'
 import {isSafari} from "./components/quiz/is.safari";
 import {SafariNotSupported} from "./safari-not-supported.component";
+import {Flowbite, DarkThemeToggle, CustomFlowbiteTheme} from 'flowbite-react';
+
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -30,25 +32,27 @@ export const ManagerContext = React.createContext(manager);
 
 function App() {
     return (
-        <ThemeProvider theme={theme}>
-            <ManagerContext.Provider value={manager}>
-                <CssBaseline>
-                    {isSafari ? <SafariNotSupported/> : <>
-                        {manager.modalService.modals().map((Modal) => (
-                            <ActionModal key={Modal.id} navModal={Modal}>
-                                <Modal.CardContents />
-                            </ActionModal>
-                        ))}
-                        <LoadingBackdrop />
-                        <AlertSnackbar />
-                        <GeneralMessageSnackbar />
-                        {/* <SpeechRecognitionSnackbar/> */}
-                        <GlobalDragOver />
-                        <Main m={manager} />
-                    </>}
-                </CssBaseline>
-            </ManagerContext.Provider>
-        </ThemeProvider>
+        <Flowbite>
+            <ThemeProvider theme={theme}>
+                <ManagerContext.Provider value={manager}>
+                    <CssBaseline>
+                        {isSafari ? <SafariNotSupported/> : <>
+                            {manager.modalService.modals().map((Modal) => (
+                                <ActionModal key={Modal.id} navModal={Modal}>
+                                    <Modal.CardContents/>
+                                </ActionModal>
+                            ))}
+                            <LoadingBackdrop/>
+                            <AlertSnackbar/>
+                            <GeneralMessageSnackbar/>
+                            {/* <SpeechRecognitionSnackbar/> */}
+                            <GlobalDragOver/>
+                            <Main m={manager}/>
+                        </>}
+                    </CssBaseline>
+                </ManagerContext.Provider>
+            </ThemeProvider>
+        </Flowbite>
     )
 }
 

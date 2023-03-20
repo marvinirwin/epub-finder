@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/menu-landing-page.component";
+import {ParentLanguageOption, VariantLanguageOption} from "../menu-landing-page/LandingPage";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
 import {goToSignIn, signInUrl} from "../app-directory/nodes/sign-in-with.node";
 import {NavBar} from "../NavBar.component";

@@ -3,7 +3,7 @@ import {flatten} from "lodash";
 import {supportedDocumentFileExtensions} from "../../lib/uploading-documents/uploading-documents.service";
 import CameraComponent from "../camera/take-picture";
 import {Library} from "../library/library.component";
-import {TextInput, Button} from "flowbite-react";
+import {TextInput, Button, Textarea} from "flowbite-react";
 
 export type VariantLanguageOption = { value: string, label: string };
 export type ParentLanguageOption = { value: string, label: string, variants: VariantLanguageOption[] };
@@ -77,6 +77,25 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                     </select>
                 )}
             </div>
+            <div className='flex flex-col justify-center'>
+                <Textarea
+                    value={uploadedFileText}
+                    placeholder={'Use this when you want to upload some text and not a file'}
+                    onChange={e => setUploadedFileText(e.target.value)}
+                />
+                <Button
+                    onClick={() => {
+                        onTextUpload({text: uploadedFileText, name: uploadedFileName})
+                    }}
+                >
+                    Upload Text
+                </Button>
+            </div>
+            <TextInput
+                value={uploadedFileName}
+                onChange={e => setUploadedFileName(e.target.value)}
+                placeholder={'The label of your uploaded material.  Will use filename if left blank.'}
+            />
             <div
                 className={`relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center flex-1 ${
                     dragActive && "border-[#0F91D2] bg-slate-100"
@@ -91,23 +110,6 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                     }
                 )}
             >
-                <TextInput
-                    value={uploadedFileText}
-                    onChange={e => setUploadedFileText(e.target.value)}
-                />
-                <div>
-                    <TextInput
-                        value={uploadedFileName}
-                        onChange={e => setUploadedFileName(e.target.value)}
-                    />
-                    <Button
-                        onClick={() => {
-                            onTextUpload({text: uploadedFileText, name: uploadedFileName})
-                        }}
-                    >
-                        Upload Text
-                    </Button>
-                </div>
                 <input ref={ref} className="hidden" type="file" id="input-file-upload" multiple={true}
                        accept={validExtensionList}/>
                 <label id="label-file-upload" htmlFor="file-upload" className={dragActive ? "drag-active" : ""}>
