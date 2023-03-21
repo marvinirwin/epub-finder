@@ -1,6 +1,11 @@
-import {SerializedSegment, tabulationFactory, TabulationParameters} from "../../tabulation/tabulate-types";
+import {
+    SerializedSegment,
+    tabulationFactory,
+    TabulationParameters,
+    WordSplitFunction
+} from "../../tabulation/tabulate-types";
 import {TabulatedSegments} from "../tabulated-documents.interface";
-import {flatten, uniq} from "lodash";
+import {uniq} from "lodash";
 import {safePush, safePushMap} from "../../safe-push";
 import {IPositionedWord} from "../../annotation/IPositionedWord";
 import {AtomMetadata} from "../../atom-metadata/atom-metadata";
@@ -9,22 +14,21 @@ import {IWordInProgress} from "../../annotation/IWordInProgress";
 // @ts-ignore
 import memoize from "memoizee";
 import {breakThaiWords} from "./breakThaiWords";
+import {AbstractSegment} from "./abstractSegment";
+import {AbstractNode} from "./abstractNode";
+import {textFromPositionedWordsAndAllText} from "./textFromPositionedWordsAndAllText";
+import {getTryAndUseFirstSplitWordFunction} from "./getTryAndUseFirstSplitWordFunction";
+import {getWordSegmentSubsequencesMap} from "./getWordSegmentSubsequencesMap";
+import {getWordSegmentMap} from "./getWordSegmentMap";
+import {getAllMarks} from "./getAllMarks";
 
+const processSegment = async <T extends AbstractSegment<any>>(segment: T, language_code: string, wordSplitFunction: WordSplitFunction) => {
+    const result = await wordSplitFunction({
+        language_code,
+        text: segment.translatableText
+    });
 
-export const textFromPositionedWordsAndAllText = (allText: string, positionedWords: IPositionedWord[]): string => {
-    const startPoint = Math.min(...positionedWords.map(({position}) => position));
-    const endPoint = Math.min(...positionedWords.map(({position, word}) => position + word.length));
-    return allText.substr(startPoint, endPoint);
-};
-
-export type AbstractNode = {
-    textContent: string | null;
-}
-
-export type AbstractSegment<T extends AbstractNode> = {
-    children: T[];
-    textContent: string | null;
-    translatableText: string;
+    return result?.splitWords;
 };
 
 export const tabulate = async <NodeType extends AbstractNode, SegmentType extends AbstractSegment<NodeType>>(
@@ -50,20 +54,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
     } = tabulationObject;
 
 
-    const allMarks: NodeType[] = flatten(
-        segments.map((segment) => {
-            segment.children.forEach((node) =>
-                elementSegmentMap.set(node, segment),
-            );
-            return segment.children;
-        }),
-    ).filter((n) => {
-        const text = n.textContent as string;
-        if (wordIdentifyingStrategy === "noSeparator") {
-            return text.trim();
-        }
-        return text;
-    });
+    const allMarks: NodeType[] = getAllMarks(segments, elementSegmentMap, wordIdentifyingStrategy);
     const uniqueLengths = uniq(
         Array.from(notableCharacterSequences.uniqueLengths).concat(1),
     );
@@ -74,7 +65,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
     let currentSegment: SegmentType | undefined;
     let segmentIndex = -1;
     let currentSegmentStart: number;
-    let currentSerialzedSegment: {
+    let currentSerializedSegment: {
         text: string;
         index: number;
     } = {text: "", index: 0};
@@ -84,6 +75,13 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
      */
     let splitFunctionResults: IPositionedWord[] | undefined = undefined
 
+    const segmentPromises = await Promise.all(
+
+        wordSplitFunction ? segments.map(segment => {
+                return processSegment(segment, language_code, wordSplitFunction);
+            }
+        ) : []
+    );
 
     for (let i = 0; i < allMarks.length; i++) {
         const currentMark: NodeType = allMarks[i];
@@ -92,16 +90,16 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
             currentSegment = elementSegmentMap.get(currentMark) as SegmentType;
             segmentIndex++;
             currentSegmentStart = i;
-            currentSerialzedSegment = {
+            currentSerializedSegment = {
                 text: currentSegment.translatableText,
                 index: segmentIndex,
             };
-            splitFunctionResults = (wordSplitFunction ? await wordSplitFunction(
+            splitFunctionResults = segmentPromises[segmentIndex];/*(wordSplitFunction ? await wordSplitFunction(
                 {
                     language_code,
                     text: currentSegment.translatableText
                 }
-            ) : undefined)?.splitWords;
+            ) : undefined)?.splitWords;*/
             const segmentSubSequences = {
                 segmentText: currentSegment.translatableText,
                 subsequences: []
@@ -121,7 +119,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
             uniqueLengths.map((size) => textContent.substr(i, size)),
         );
         const notableSequencesWhichStartHere: string[] = splitFunctionResults ?
-            splitFunctionResults.filter(splitFunctionResult => splitFunctionResult.position === i).map(({word}) => word)  :
+            splitFunctionResults.filter(splitFunctionResult => splitFunctionResult.position === i).map(({word}) => word) :
             potentialNotableSequences.reduce(
                 (acc: string[], potentialWord) => {
                     if (notableCharacterSequences.has(potentialWord)) {
@@ -144,23 +142,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
                 if (isNotableCharacter(currentCharacter)) {
                     const textContentPastThisPoint = textContent
                         .substr(i, textContent.length);
-
-                    const tryAndUseFirstSplitWord = <NodeType>(strings: string[]) => {
-                        const wordStartingHere = strings[0]?.trim();
-                        if (wordStartingHere) {
-                            // Don't include if this word is part of multiple segments
-                            const segmentsThisWordIsAPartOf = new Set(wordStartingHere
-                                .split("")
-                                .map((letter, index) => elementSegmentMap.get(allMarks[i + index])));
-                            if (segmentsThisWordIsAPartOf.size > 1) {
-                                return ""
-                            }
-                            safePush(wordSegmentMap, wordStartingHere, elementSegmentMap.get(currentMark));
-                            notableSequencesWhichStartHere.push(wordStartingHere);
-                            return wordStartingHere;
-                        }
-                    };
-
+                    const tryAndUseFirstSplitWord = getTryAndUseFirstSplitWordFunction(elementSegmentMap, allMarks, i, wordSegmentMap, currentMark, notableSequencesWhichStartHere);
                     switch (wordIdentifyingStrategy) {
                         case "noSeparator":
                             notableSequencesWhichStartHere.push(currentCharacter);
@@ -185,7 +167,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
                 .subsequences.push({position: i, word: wordStartingHere});
             safePushMap(
                 segmentWordCountRecordsMap,
-                currentSerialzedSegment as SerializedSegment,
+                currentSerializedSegment as SerializedSegment,
                 {
                     position: i - currentSegmentStart,
                     word: wordStartingHere,
@@ -213,7 +195,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
             },
         );
         const segmentSubsequences: SegmentSubsequences = {
-            segmentText: textFromPositionedWordsAndAllText(currentSerialzedSegment.text, positionedWordsInProgress),
+            segmentText: textFromPositionedWordsAndAllText(currentSerializedSegment.text, positionedWordsInProgress),
             subsequences: positionedWordsInProgress
         };
 
@@ -233,21 +215,7 @@ export const tabulate = async <NodeType extends AbstractNode, SegmentType extend
             }
         });
     }
-    tabulationObject.wordSegmentMap = Object.fromEntries(
-        Object.entries(wordSegmentMap).map(([word, segmentSet]) => [
-            word,
-            Array.from(segmentSet),
-        ]),
-    );
-    tabulationObject.wordSegmentSubSequencesMap = new Map(
-        Object.entries(
-            tabulationObject.wordSegmentMap,
-        ).map(([word]) => {
-            return [
-                word,
-                new Set(wordSegmentSubsequencesMap.get(word) as SegmentSubsequences[]),
-            ];
-        }),
-    );
+    tabulationObject.wordSegmentMap = getWordSegmentMap(wordSegmentMap);
+    tabulationObject.wordSegmentSubSequencesMap = getWordSegmentSubsequencesMap(tabulationObject, wordSegmentSubsequencesMap);
     return tabulationObject;
 };

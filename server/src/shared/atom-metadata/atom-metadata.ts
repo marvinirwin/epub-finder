@@ -1,5 +1,6 @@
 import {SegmentSubsequences} from "../index";
-import {AbstractNode, AbstractSegment} from "../tabulate-documents/tabulate-segment/tabulate";
+import {AbstractSegment} from "../tabulate-documents/tabulate-segment/abstractSegment";
+import {AbstractNode} from "../tabulate-documents/tabulate-segment/abstractNode";
 
 export class AtomMetadata<U extends AbstractNode = AbstractNode, T extends AbstractSegment<U> = AbstractSegment<U>, > {
     m: {
