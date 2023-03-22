@@ -1,7 +1,7 @@
 import axios from 'axios'
 import memoize from 'memoizee'
-import { getApiUrl } from '../lib/util/getApiUrl'
-import {SplitWordsDto, SplitWordsResponse, TranslateWithGrammarExplanationResponseDto} from '@shared/*';
+import {getApiUrl} from '../lib/util/getApiUrl'
+import {SplitWordsDto, SplitWordsResponseDto, TranslateWithGrammarExplanationResponseDto} from '@shared/*';
 
 export interface TranslateRequest extends TranslateConfig {
     text: string
@@ -16,8 +16,10 @@ export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
             .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
             .then((response) => {
-                const data = response.data as TranslateWithGrammarExplanationResponseDto;
-                return data.translatedText ? `${data.translatedText}\n${data.grammarHints.join(' ')}`
+                const data = response.data.translation as TranslateWithGrammarExplanationResponseDto;
+                return data.translatedText ? `${data.translatedText}
+
+                ${data.grammarHints.join('\n')}`
                     : '';
             }),
     {
@@ -36,13 +38,19 @@ export const fetchTranslationWithGrammarHints = memoize((t: TranslateRequest) =>
             .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
             .then((response) => {
                 const translation = response?.data?.translation as TranslateWithGrammarExplanationResponseDto;
-                if (translation) {
-                    return `
+
+                function extractTranslation() {
+                    if (translation) {
+                        return `
                     ${translation.translatedText}
-                    ${translation.grammarHints}
+
+                    ${translation.grammarHints.join('\n')}
                     `
+                    }
+                    return translation || '';
                 }
-                return translation || '';
+
+                return extractTranslation();
             }),
     {
         promise: true,
@@ -57,11 +65,11 @@ export const fetchTranslationWithGrammarHints = memoize((t: TranslateRequest) =>
 export const fetchWordSplit = memoize((t: SplitWordsDto) =>
         axios
             .post(getApiUrl("/api/documents/splitWords"), t)
-            .then((response) => (response?.data?.splitWords as SplitWordsResponse)),
+            .then((response) => (response?.data?.splitWords as SplitWordsResponseDto)),
     {
         promise: true,
         normalizer(
-            args: Parameters<(d: SplitWordsDto) => Promise<SplitWordsResponse>>,
+            args: Parameters<(d: SplitWordsDto) => Promise<SplitWordsResponseDto>>,
         ): string {
             return JSON.stringify(args)
         },

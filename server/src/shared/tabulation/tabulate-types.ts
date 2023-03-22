@@ -1,7 +1,7 @@
 import { SetWithUniqueLengths } from "../tabulate-documents/set-with-unique-lengths";
 import { TabulatedDocuments } from "../tabulate-documents/tabulated-documents.interface";
 import { AtomMetadata } from "../atom-metadata/atom-metadata";
-import {SegmentSubsequences, SplitWordsDto, SplitWordsResponse} from "../index";
+import {SegmentSubsequences, SplitWordsDto, SplitWordsResponseDto} from "../index";
 import {AbstractSegment} from "../tabulate-documents/tabulate-segment/abstractSegment";
 import {AbstractNode} from "../tabulate-documents/tabulate-segment/abstractNode";
 
@@ -17,7 +17,7 @@ export type SerializableTabulationConfiguration = {
     greedyWordSet: SetWithUniqueLengths;
     language_code: string;
 }
-export type WordSplitFunction = (dto: SplitWordsDto) => Promise<SplitWordsResponse>;
+export type WordSplitFunction = (dto: SplitWordsDto) => Promise<SplitWordsResponseDto>;
 export type TabulationConfiguration = SerializableTabulationConfiguration & {
     isNotableCharacterRegex: RegExp;
     isWordBoundaryRegex: RegExp;
