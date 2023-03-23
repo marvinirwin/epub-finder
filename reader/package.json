@@ -52,6 +52,7 @@
     "@types/react-custom-scrollbars": "^4.0.7",
     "@types/react-facebook-login": "^4.1.2",
     "@types/react-plotly.js": "^2.2.4",
+    "@types/react-router-dom": "^5.3.3",
     "@types/socket.io-client": "^1.4.34",
     "@types/sql.js": "^1.0.3",
     "@types/trie-prefix-tree": "^1.5.0",
@@ -108,6 +109,7 @@
     "react-plotly.js": "^2.4.0",
     "react-popper": "^2.2.3",
     "react-reader": "^0.18.3",
+    "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "react-toastify": "^6.0.5",
     "react-tooltip": "^4.2.6",
@@ -169,7 +171,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": ".",
+  "homepage": "https://languagetrainer.ai",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9"
   }
