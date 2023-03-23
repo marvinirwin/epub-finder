@@ -35,7 +35,7 @@ export class LanguageModelService {
             splitWords: JSON.parse(await getChatGPTResult(`Can you split the following text into words and return the results in a JSON array where every element looks like {"word": "someWord" "position": 0} where position is the position of the start of the word in the original text? ${dto.text} `)),
         } as SplitWordsResponseDto;
 
-        this.insertCacheEntry(dto, result);
+        this.insertCacheEntry(dto, result, this._languageModelSplitWords);
         return result;
     }
 
@@ -48,11 +48,11 @@ export class LanguageModelService {
 
         const result = JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}. ${dto.text}`));
 
-        this.insertCacheEntry(dto, result);
+        this.insertCacheEntry(dto, result, this._translationWithGrammarHints);
         return result;
     }
 
-    insertCacheEntry(translateRequestDto: any, translateResponseDto: any, service?: string) {
+    insertCacheEntry(translateRequestDto: any, translateResponseDto: any, service: string) {
         const cacheEntry: Partial<JsonCache> = {
             service: service,
             key_hash: sha1([translateRequestDto]),
