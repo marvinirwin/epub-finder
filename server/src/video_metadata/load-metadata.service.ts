@@ -2,13 +2,13 @@ import { Inject, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import fs from "fs-extra";
-import { VideoMetadata } from "../entities/video.metadata";
+import { VideoMetadataEntity } from "../entities/video.metadata.entity";
 import { VideoMetadataService } from "./video-metadata.service";
 
 export class LoadMetadataService implements OnModuleInit {
     constructor(
-        @InjectRepository(VideoMetadata)
-        private videoMetadataRepository: Repository<VideoMetadata>,
+        @InjectRepository(VideoMetadataEntity)
+        private videoMetadataRepository: Repository<VideoMetadataEntity>,
         @Inject(VideoMetadataService)
         private videoMetadataService: VideoMetadataService,
     ) {}

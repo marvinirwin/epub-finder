@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 
 @Entity({ name: "video_metadata" })
-export class VideoMetadata {
+export class VideoMetadataEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
@@ -28,4 +28,7 @@ export class VideoMetadata {
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     created_at: Date
+
+    @Column("text")
+    s3_url: string
 }

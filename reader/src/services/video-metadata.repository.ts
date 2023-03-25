@@ -14,7 +14,7 @@ export class VideoMetadataRepository {
                 if (response.status === 200) {
                     const allMetadata = (response.data as unknown) as VideoMetadata[]
                     // I'm totally going to regret this,
-                    // I need to make a class VideoMetadata which removes its punctuation
+                    // I need to make a class VideoMetadataEntity which removes its punctuation
                     /*
                     allMetadata
                         .forEach(metadata =>
