@@ -16,7 +16,7 @@ export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
             .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
             .then((response) => {
-                const data = response.data.translation as TranslateWithGrammarExplanationResponseDto;
+                const data = response.data as TranslateWithGrammarExplanationResponseDto;
                 return data.translatedText ? `${data.translatedText}
 
                 ${data.grammarHints.join('\n')}`
@@ -37,7 +37,7 @@ export const fetchTranslationWithGrammarHints = memoize((t: TranslateRequest) =>
         axios
             .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
             .then((response) => {
-                const translation = response?.data?.translation as TranslateWithGrammarExplanationResponseDto;
+                const translation = response?.data as TranslateWithGrammarExplanationResponseDto;
 
                 function extractTranslation() {
                     if (translation) {

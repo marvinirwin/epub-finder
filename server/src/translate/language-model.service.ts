@@ -31,12 +31,21 @@ export class LanguageModelService {
             return cacheResult;
         }
 
-        const result = {
-            splitWords: JSON.parse(await getChatGPTResult(`Can you split the following text into words and return the results in a JSON array where every element looks like {"word": "someWord" "position": 0} where position is the position of the start of the word in the original text? ${dto.text} `)),
-        } as SplitWordsResponseDto;
-
+        const splitWords = await getChatGPTResult(`Can you split the following text into words and return the results in a JSON array where every element looks like {"word": "someWord" "position": 0} where position is the position of the start of the word in the original text? ${dto.text} `);
+        let result;
+        try {
+            result = {
+                splitWords: JSON.parse(splitWords),
+            } as SplitWordsResponseDto;
+        } catch(e) {
+            console.error(`Failed to parse splitWords response for ${splitWords}`)
+            result = {
+                splitWords: []
+            }
+        }
         this.insertCacheEntry(dto, result, this._languageModelSplitWords);
         return result;
+
     }
 
     async translationWithGrammarHints(dto: TranslateWithGrammarExplanationDto): Promise<TranslateWithGrammarExplanationResponseDto>  {
@@ -45,8 +54,18 @@ export class LanguageModelService {
         if (cacheResult) {
             return cacheResult;
         }
-
-        const result = JSON.parse(await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}. ${dto.text}`));
+        let response = await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}. ${dto.text}`);
+        let result;
+        try {
+            result = JSON.parse(response)
+        } catch(e) {
+            console.error(`Failed to parse translationWithGrammarHints response for ${dto.text}, ${response}`)
+            result = {
+                sourceText: dto.text,
+                translatedText: "",
+                grammarHints: []
+            }
+        }
 
         this.insertCacheEntry(dto, result, this._translationWithGrammarHints);
         return result;
