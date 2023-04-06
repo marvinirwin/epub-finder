@@ -22,21 +22,10 @@ export class VideoController {
         }
 
         const stream = new Readable();
-        stream._read = () => {}; // override the method to implement it later
+        stream._read = () => {};
 
-        const chunkSize = 10 ** 6; // 1MB
-        let offset = 0;
-
-        stream._read = () => {
-            const chunk = s3Object.Body.slice(offset, offset + chunkSize);
-            offset += chunkSize;
-
-            if (chunk.length === 0) {
-                stream.push(null);
-            } else {
-                stream.push(chunk);
-            }
-        };
+        stream.push(s3Object.Body);
+        stream.push(null);
 
         res.setHeader('Content-Type', s3Object.ContentType);
         res.setHeader('Content-Length', s3Object.ContentLength);
