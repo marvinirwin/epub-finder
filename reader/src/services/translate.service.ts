@@ -12,6 +12,7 @@ export interface TranslateConfig {
     to: string
 }
 
+/*
 export const fetchTranslation = memoize((t: TranslateRequest) =>
         axios
             .post(getApiUrl("/api/documents/translationWithGrammarHints"), t)
@@ -31,6 +32,7 @@ export const fetchTranslation = memoize((t: TranslateRequest) =>
         },
     },
 )
+*/
 
 
 export const fetchTranslationWithGrammarHints = memoize((t: TranslateRequest) =>

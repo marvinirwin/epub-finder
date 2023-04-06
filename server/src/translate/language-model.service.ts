@@ -13,6 +13,14 @@ import debug from "debug";
 import {getChatGPTResult} from "../documents/documents.service";
 const d = debug("service:language-model");
 
+export const JsonTypescriptPromptStart = `You will function as a JSON api. The user will feed you valid JSON and you will return valid JSON, do not add any extra characters to the output that would make your output invalid JSON.
+
+The end of this system message will contain typescript types named Input and Output. 
+`;
+export const JsonTypescriptPromptInputTypeStart = `The input to this is defined as follows`;
+export const JsonTypescriptPromptOutputTypeStart = `Your output, which should be `;
+export const JsonTypescriptPromptEnd = `Please only reply the following prompt with the JSON representation of the APIResult interface, parsable with JSON.parse`;
+
 @Injectable()
 export class LanguageModelService {
     private readonly _languageModelSplitWords = 'languageModelSplitWords';
@@ -54,7 +62,33 @@ export class LanguageModelService {
         if (cacheResult) {
             return cacheResult;
         }
-        let response = await getChatGPTResult(`Can you translate the following text into ${dto.destLanguageCode} and explain all grammatical devices in it?  Return the results as JSON structure {"sourceText": string, "translatedText": string, "grammarHints": string[]}. ${dto.text}`);
+        let response = await getChatGPTResult(`
+        
+${JsonTypescriptPromptStart}
+
+If all inputs are valid then you should perform the action described in the "command" value of the input and return the result in the format described by the Output type.  All new files should be created relative to the baseDir
+
+${JsonTypescriptPromptInputTypeStart}
+export interface Input {
+    text: string;
+    command: string
+}
+
+${JsonTypescriptPromptOutputTypeStart}
+
+interface Output {
+    sourceText: string
+    translatedText: string;
+    grammarHints: string[]
+}
+
+${JsonTypescriptPromptEnd}
+
+${JSON.stringify({
+            command: `Translate the following text into ${dto.destLanguageCode} and explain all grammatical clauses and concepts`, 
+            text: dto.text,
+})}
+          `);
         let result;
         try {
             result = JSON.parse(response)

@@ -17,7 +17,7 @@ import {
 } from 'rxjs/operators'
 import { LanguageConfigsService } from '../../lib/language/language-configs.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
-import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
+import { fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import { fetchTransliteration } from '../../lib/language/transliterate.service'
 
 export class TranslationAttemptService {

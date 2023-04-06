@@ -1,9 +1,9 @@
 import {ReplaySubject} from 'rxjs'
 import {BrowserInputsService} from '../hotkeys/browser-inputs-service'
 import {GeneralToastMessageService} from './general-toast-message.service'
-import {distinctUntilChanged, withLatestFrom} from 'rxjs/operators'
+import { withLatestFrom} from 'rxjs/operators'
 import {LanguageConfigsService} from '../language/language-configs.service'
-import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
+import {fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import React from 'react'
 import {Box, Typography} from '@material-ui/core'
 

@@ -41,3 +41,5 @@ dist/**/*
 yarn.lock
 /mandarin-trainer*.json
 /public/books/
+/dev_wav_cache/
+/public/

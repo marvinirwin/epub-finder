@@ -10,9 +10,8 @@ import {
     TableHead,
     TableRow,
 } from '@material-ui/core'
-import { format } from 'date-fns'
 import { useCancellablePromise } from '../../lib/manager/AudioManager'
-import {fetchTranslation, fetchTranslationWithGrammarHints} from '../../services/translate.service'
+import { fetchTranslationWithGrammarHints} from '../../services/translate.service'
 import { TranslationAttemptScheduleData } from '../../lib/schedule/translation-attempt-schedule.service'
 import { ScheduleRow } from '../../lib/schedule/schedule-row'
 

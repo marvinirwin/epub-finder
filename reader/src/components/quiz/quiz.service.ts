@@ -1,12 +1,12 @@
 import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from 'rxjs'
 import {OpenExampleSentencesFactory} from '../../lib/document-frame/open-example-sentences-document.factory'
-import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay} from 'rxjs/operators'
+import {debounceTime, distinctUntilChanged, map, mapTo, shareReplay, tap} from 'rxjs/operators'
 import {QuizCard} from './word-card.interface'
 import {orderBy, uniqBy} from 'lodash'
 import CardsRepository from '../../lib/manager/cards.repository'
 import {ExampleSegmentsService} from '../../lib/quiz/example-segments.service'
 import {EXAMPLE_SENTENCE_DOCUMENT, OpenDocumentsService} from '../../lib/manager/open-documents.service'
-import {LanguageConfigsService} from '../../lib/language/language-configs.service'
+import {LanguageConfigsService, PossibleTranslationConfig} from '../../lib/language/language-configs.service'
 import {FlashCardType} from '../../lib/quiz/hidden-quiz-fields'
 import {SettingsService} from '../../services/settings.service'
 import {SortedLimitScheduleRowsService,} from '../../lib/manager/sorted-limit-schedule-rows.service'
@@ -20,6 +20,13 @@ import {getItemsThatDontRepeat} from "./get-items-that-dont-repeat";
 import {scheduleRowKey} from "../../lib/util/Util";
 import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 import {DictionaryService} from "../../lib/dictionary/dictionary.service";
+import {fetchTranslationWithGrammarHints} from "../../services/translate.service";
+import {SegmentSubsequences} from "@shared/*";
+
+type SegmentMapReturnType = {
+    segments: SegmentSubsequences[],
+    translationConfig: PossibleTranslationConfig
+};
 
 export class QuizService {
     quizCard: QuizCard
@@ -120,21 +127,45 @@ export class QuizService {
             sentences$: combineLatest([
                 exampleSegmentsService.exampleSegmentMap$,
                 currentWord$,
+                languageConfigsService.learningToKnownTranslateConfig$
             ]).pipe(
                 debounceTime(0),
                 map(
                     ([
                          exampleSegmentMap,
                          currentWord,
-                     ]) => {
-                        if (!currentWord) return []
+                         translationConfig
+                     ]): SegmentMapReturnType => {
+                        if (!currentWord) return {
+                            segments: [],
+                            translationConfig
+                        } as SegmentMapReturnType;
+
                         const subSequences = exampleSegmentMap.get(currentWord) || [];
-                        return uniqBy(
-                            subSequences,
-                            subSequence => subSequence.segmentText,
-                        ).slice(0, 10)
+                        return {
+                            segments: uniqBy(
+                                subSequences,
+                                subSequence => subSequence.segmentText,
+                            ).slice(0, 10),
+                            translationConfig
+                        } as SegmentMapReturnType
                     },
                 ),
+                tap(({segments, translationConfig}) => {
+                    // pre fetch translations so the user doesnt have to wait on mouseover
+                    if (translationConfig){
+                        segments.forEach(exampleSegment => {
+                            fetchTranslationWithGrammarHints({
+                                to: translationConfig.to as string,
+                                from: translationConfig.from as string,
+                                text: exampleSegment.segmentText as string,
+                            })
+                        })
+                    }
+                }),
+                map(( {segments} ) => {
+                    return segments
+                }),
                 shareReplay(1),
             ),
         })

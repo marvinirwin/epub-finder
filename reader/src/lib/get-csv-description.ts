@@ -1,6 +1,6 @@
 import {SupportedTranslation} from "@shared/";
 import {ICard} from "@shared/";
-import {fetchTranslation, fetchTranslationWithGrammarHints} from "../services/translate.service";
+import {fetchTranslationWithGrammarHints} from "../services/translate.service";
 import {SegmentSubsequences} from "@shared/";
 import {PositionedWord} from "@shared/";
 import {flatten} from "lodash";

@@ -4,7 +4,7 @@ import { combineLatest, Observable, of } from 'rxjs'
 import { LanguageConfigsService } from '../language/language-configs.service'
 import { SettingsService } from '../../services/settings.service'
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
-import { fetchTranslation } from '../../services/translate.service'
+import { fetchTranslationWithGrammarHints } from '../../services/translate.service'
 import { fetchTransliteration } from '../language/transliterate.service'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
 import { uniq } from 'lodash'
@@ -28,7 +28,7 @@ export class BrowserSegment extends Segment {
         this.translation$ = languageConfigsService.learningToKnownTranslateConfig$.pipe(
             switchMap((translateConfig) =>
                 translateConfig
-                    ? fetchTranslation({
+                    ? fetchTranslationWithGrammarHints({
                           ...translateConfig,
                           text: this.translatableText,
                       })
