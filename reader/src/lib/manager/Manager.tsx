@@ -97,7 +97,7 @@ import {CsvService} from './csv.service'
 import {KnownWordsRepository} from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
-import {LoadingService} from "../loading/loadingService";
+import {LoadingService, LoadingWrapperService} from "../loading/loadingService";
 import {TakenPictureService} from "./TakenPictureService";
 import {QuickPreviewService} from "./QuickPreviewService";
 
@@ -108,6 +108,7 @@ const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number
 */
 
 export class Manager {
+    public loadingWrapperService: LoadingWrapperService;
     public hotkeyEvents: HotKeyEvents
     public audioRecordingService: AudioManager
     public cardsRepository: CardsRepository
@@ -237,6 +238,12 @@ export class Manager {
         this.onSelectService = new OnSelectService(this)
         this.documentRepository = new DocumentRepository(this)
         this.cardsRepository = new CardsRepository(this)
+        this.loadingService = new LoadingService({
+            loadingSignals: [
+                this.cardsRepository.loadingSignal,
+                this.documentRepository.loadingSignal
+            ]
+        });
         this.pronunciationProgressService = new PronunciationProgressRepository(this)
         this.wordRecognitionProgressRepository = new WordRecognitionProgressRepository(this)
         this.openDocumentsService = new OpenDocumentsService(this)
@@ -448,9 +455,6 @@ export class Manager {
         this.advanceTimeService = new AdvanceTimeService(this)
         this.readingProgressService = new ReadingProgressService(this)
         this.csvService = new CsvService(this)
-        this.loadingService = new LoadingService({
-            loadingSignals: [this.cardsRepository.loadingSignal, this.documentRepository.loadingSignal]
-        });
 
         this.hotkeyEvents.startListeners()
         this.cardsRepository.load()

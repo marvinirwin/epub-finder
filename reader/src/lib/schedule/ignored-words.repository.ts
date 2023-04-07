@@ -4,11 +4,22 @@ import {IgnoredWord} from '@shared/'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {observableLastValue} from "../../services/settings.service";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
+import {LoadingWrapperService} from "../loading/loadingService";
 
 // @ts-ignore
 export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
-    constructor({ databaseService, loggedInUserService }: { databaseService: DatabaseService, loggedInUserService: LoggedInUserService }) {
+    constructor(
+        {
+            databaseService,
+            loggedInUserService,
+            loadingWrapperService
+        }: {
+            databaseService: DatabaseService,
+            loggedInUserService: LoggedInUserService,
+            loadingWrapperService: LoadingWrapperService
+        }) {
         super({
+            loadingWrapperService,
             databaseService,
             load: async () => {
                 const profile = await observableLastValue(loggedInUserService.profile$);
@@ -23,7 +34,7 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
                 );
             },
             add: (r) => putPersistableEntity({entity: 'ignoredWords', record: r}),
-            getIndexValue: (r) => ({ indexValue: r.word }),
+            getIndexValue: (r) => ({indexValue: r.word}),
         })
     }
 }

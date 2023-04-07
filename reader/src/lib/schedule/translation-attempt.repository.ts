@@ -1,7 +1,8 @@
-import { IndexedRowsRepository } from './indexed-rows.repository'
-import { DatabaseService } from '../Storage/database.service'
-import { SuperMemoGrade } from 'supermemo'
-import { emptyGenerator } from './pronunciation-progress.repository'
+import {IndexedRowsRepository} from './indexed-rows.repository'
+import {DatabaseService} from '../Storage/database.service'
+import {SuperMemoGrade} from 'supermemo'
+import {emptyGenerator} from './pronunciation-progress.repository'
+import {LoadingWrapperService} from "../loading/loadingService";
 
 export interface TranslationAttemptRecord {
     id: number
@@ -18,12 +19,20 @@ export interface TranslationAttemptRecord {
 }
 
 export class TranslationAttemptRepository extends IndexedRowsRepository<TranslationAttemptRecord> {
-    constructor({ databaseService }: { databaseService: DatabaseService }) {
+    constructor(
+        {
+            databaseService,
+            loadingWrapperService
+        }: {
+            databaseService: DatabaseService,
+            loadingWrapperService: LoadingWrapperService
+        }) {
         super({
             databaseService,
             load: emptyGenerator,
             add: (r) => Promise.resolve(r as TranslationAttemptRecord),
-            getIndexValue: (r) => ({ indexValue: r.learningLanguage }),
+            getIndexValue: (r) => ({indexValue: r.learningLanguage}),
+            loadingWrapperService
         })
     }
 }

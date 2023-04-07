@@ -12,6 +12,8 @@ import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
 import { safePush, UnPersistedEntity } from '@shared/'
 import { SuperMemoGrade } from 'supermemo'
+import {LoadingWrapperService} from "../loading/loadingService";
+import {LoadingSignal} from "../loading/loadingSignal";
 
 
 export type PotentialExcludedDbColumns<T> = Omit<T, 'creator_id' | 'id'> | T;
@@ -22,7 +24,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
     latestRecords$ = new BehaviorSubject<Map<string, PotentialExcludedDbColumns<T>>>(new Map())
     addRecords$: ReplaySubject<PotentialExcludedDbColumns<T>[]> = new ReplaySubject<PotentialExcludedDbColumns<T>[]>(1)
     clearRecords$ = new ReplaySubject<void>(1)
-
+    loadingSignal$ = new LoadingSignal();
     constructor({
         load,
         add,
@@ -31,7 +33,8 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         databaseService: DatabaseService
         load: () => Promise<AsyncGenerator<UnPersistedEntity<T>[]>> | AsyncGenerator<UnPersistedEntity<T>[]>
         add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
-        getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string }
+        getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string },
+        loadingWrapperService: LoadingWrapperService
     }) {
         this.indexOfOrderedRecords$.next({})
         this.addRecords$

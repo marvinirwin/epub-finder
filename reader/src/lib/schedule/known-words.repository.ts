@@ -4,9 +4,19 @@ import {KnownWord} from '@shared/'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {observableLastValue} from "../../services/settings.service";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
+import {LoadingWrapperService} from "../loading/loadingService";
 
 export class KnownWordsRepository extends IndexedRowsRepository<KnownWord> {
-    constructor({ databaseService, loggedInUserService }: { databaseService: DatabaseService, loggedInUserService: LoggedInUserService }) {
+    constructor(
+        {
+            databaseService,
+            loggedInUserService,
+            loadingWrapperService
+        }: {
+            databaseService: DatabaseService,
+            loggedInUserService: LoggedInUserService,
+            loadingWrapperService: LoadingWrapperService
+        }) {
         super({
             databaseService,
             load: async () => {
@@ -23,6 +33,7 @@ export class KnownWordsRepository extends IndexedRowsRepository<KnownWord> {
             },
             add: (r) => putPersistableEntity({entity: 'knownWords', record: r}),
             getIndexValue: (r) => ({ indexValue: r.word }),
+            loadingWrapperService
         })
     }
 }

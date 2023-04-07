@@ -1,18 +1,20 @@
-import { BehaviorSubject, merge, Observable, ReplaySubject, Subject } from 'rxjs'
-import { getIsMeFunction, ICard } from "@shared/"
-import { Dictionary } from 'lodash'
-import { map, scan, shareReplay, startWith } from 'rxjs/operators'
-import { DatabaseService} from '../Storage/database.service'
-import { cardForWord } from '../util/Util'
-import { observableLastValue } from '../../services/settings.service'
-import { LanguageConfigsService } from '../language/language-configs.service'
-import { highestPriorityCard } from './highest-priority-card'
+import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from 'rxjs'
+import {getIsMeFunction, ICard} from "@shared/"
+import {Dictionary} from 'lodash'
+import {map, scan, shareReplay, startWith} from 'rxjs/operators'
+import {DatabaseService} from '../Storage/database.service'
+import {cardForWord} from '../util/Util'
+import {observableLastValue} from '../../services/settings.service'
+import {LanguageConfigsService} from '../language/language-configs.service'
+import {highestPriorityCard} from './highest-priority-card'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
-import { LoadingSignal } from '../loading/loadingSignal'
+import {LoadingSignal} from '../loading/loadingSignal'
+import {LoadingService} from "../loading/loadingService";
 
 const loadingChunkSize = 500;
 export default class CardsRepository {
     private languageConfigsService: LanguageConfigsService
+
     public static mergeCardIntoCardDict(
         newICard: ICard,
         o: { [p: string]: ICard[] },
@@ -36,6 +38,7 @@ export default class CardsRepository {
             o[newICard.learning_language] = [newICard]
         }
     }
+
     addCardsWhichDoNotHaveToBePersisted$: Subject<ICard[]> = new Subject<ICard[]>()
     upsertCards$ = new Subject<ICard[]>()
     cardIndex$!: Observable<Dictionary<ICard[]>>
@@ -50,10 +53,16 @@ export default class CardsRepository {
     private deleteWords: Subject<string[]> = new Subject<string[]>()
     private db: DatabaseService
 
-    constructor({ databaseService, languageConfigsService }: {
-                    databaseService: DatabaseService,
-                    languageConfigsService: LanguageConfigsService
-                },
+    constructor(
+        {
+            databaseService,
+            languageConfigsService,
+            loadingService
+        }: {
+            databaseService: DatabaseService,
+            languageConfigsService: LanguageConfigsService,
+            loadingService: LoadingService
+        },
     ) {
         this.db = databaseService
         this.languageConfigsService = languageConfigsService;
@@ -82,7 +91,7 @@ export default class CardsRepository {
                             (cardToDelete) => delete cardIndex[cardToDelete],
                         )
                         // TODO I dont think we need to shallow clone here
-                        const newCardIndex = { ...cardIndex }
+                        const newCardIndex = {...cardIndex}
                         newCards.forEach((newICard) => {
                             CardsRepository.mergeCardIntoCardDict(
                                 newICard,
@@ -110,7 +119,7 @@ export default class CardsRepository {
                                 entity: 'cards',
                                 record: card,
                             },
-                        ).then(({ id }) => {
+                        ).then(({id}) => {
                             return card.id = id
                         })
                     }
@@ -159,7 +168,7 @@ export default class CardsRepository {
     private async getCardsFromDB() {
         let count = 0;
 
-        const sendLoadingMessage =  () => {
+        const sendLoadingMessage = () => {
             this.loadingSignal.latestMessage$.next(`fetching cards.  ${count} fetched so far.`);
         }
         sendLoadingMessage();
