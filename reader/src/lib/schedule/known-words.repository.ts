@@ -14,10 +14,10 @@ export class KnownWordsRepository extends IndexedRowsRepository<KnownWord> {
             loadingWrapperService
         }: {
             databaseService: DatabaseService,
-            loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService
+            loadingWrapperService: LoadingWrapperService, loggedInUserService: LoggedInUserService
         }) {
         super({
+            loggedInUserService,
             databaseService,
             load: async () => {
                 const email = (await observableLastValue(loggedInUserService.profile$))?.email;

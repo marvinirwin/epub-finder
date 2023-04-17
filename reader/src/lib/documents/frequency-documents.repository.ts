@@ -83,7 +83,7 @@ export class FrequencyDocumentsRepository {
     }) {
         this.selected$ = combineLatest([
             documentRepository.collection$,
-            settingsService.selectedFrequencyDocuments$,
+            settingsService.selectedFrequencyDocuments$.obs$,
         ]).pipe(
             map(([allDocumentsMap, selectedFrequencyDocumentIds]) => {
                 const shouldSelectDefaultFrequencyDocument = !selectedFrequencyDocumentIds.length;

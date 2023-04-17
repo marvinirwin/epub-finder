@@ -3,25 +3,12 @@ import {flatten} from "lodash";
 import {supportedDocumentFileExtensions} from "../../lib/uploading-documents/uploading-documents.service";
 import CameraComponent from "../camera/take-picture";
 import {Library} from "../library/library.component";
-import {TextInput, Button, Textarea} from "flowbite-react";
+import {Button, Textarea, TextInput} from "flowbite-react";
+import {LandingPageProps} from "./LandingPageProps";
+import {VideoMetdataList} from "./VideoMetdataList";
 
 export type VariantLanguageOption = { value: string, label: string };
 export type ParentLanguageOption = { value: string, label: string, variants: VariantLanguageOption[] };
-
-export type LandingPageProps = {
-    languages: ParentLanguageOption[],
-    language: ParentLanguageOption | undefined,
-    setLanguage: (l: ParentLanguageOption) => unknown,
-    variant: VariantLanguageOption | undefined,
-    setVariant: (v: VariantLanguageOption) => unknown,
-    dragActive: boolean,
-    onDragEnter: (e: React.DragEvent) => void,
-    onDrop: (p: { e: React.DragEvent, filename: string }) => void,
-    ref: React.RefObject<HTMLInputElement>,
-    onClick: () => void
-    onFileSelected: (p: { file: File, name: string }) => void
-    onTextUpload: (p: { text: string, name: string }) => void
-};
 
 export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
     {
@@ -132,6 +119,7 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                 </label>
             </div>
         </div>
+        <VideoMetdataList/>
     </div>;
 });
 

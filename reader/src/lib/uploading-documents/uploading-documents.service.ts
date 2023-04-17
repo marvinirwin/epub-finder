@@ -71,15 +71,15 @@ export class UploadingDocumentsService {
       this.uploadingMessages$.next(
         `Uploading ${file.name} success!`
       );
-      this.settingsService.selectedFrequencyDocuments$.next(
-        (await observableLastValue(this.settingsService.selectedFrequencyDocuments$))
+      this.settingsService.selectedFrequencyDocuments$.user$.next(
+        (await observableLastValue(this.settingsService.selectedFrequencyDocuments$.user$))
           .concat(uploadedDocuments.id())
       );
-      this.settingsService.selectedExampleSegmentDocuments$.next(
-        (await observableLastValue(this.settingsService.selectedExampleSegmentDocuments$))
+      this.settingsService.selectedExampleSegmentDocuments$.user$.next(
+        (await observableLastValue(this.settingsService.selectedExampleSegmentDocuments$.user$))
           .concat(uploadedDocuments.id())
       );
-      this.settingsService.readingDocument$.next(uploadedDocuments.id());
+      this.settingsService.readingDocument$.user$.next(uploadedDocuments.id());
     });
   }
 }

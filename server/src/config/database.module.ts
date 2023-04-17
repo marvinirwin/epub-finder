@@ -13,6 +13,8 @@ const username = process.env.TYPEORM_USERNAME;
 const password = process.env.TYPEORM_PASSWORD;
 const database = process.env.TYPEORM_DATABASE;
 const port = process.env.TYPEORM_PORT;
+console.log(password)
+
 export const DatabaseModule = TypeOrmModule.forRoot({
     // @ts-ignore
     type: "postgres",
@@ -28,7 +30,10 @@ export const DatabaseModule = TypeOrmModule.forRoot({
         migrationsDir: "src/migrations",
         entitiesDir: "src/entities",
     },
-    synchronize: true,
     // @ts-ignore I dunno what this is for, it might be removable
     timezone: "Z",
+    ssl: {
+        rejectUnauthorized: false, // Disable verification of the server's SSL/TLS certificate
+    },
+    sslmode: 'require',
 });

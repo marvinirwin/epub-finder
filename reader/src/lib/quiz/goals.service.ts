@@ -52,7 +52,7 @@ export class GoalsService {
         )
         this.dailyGoalFraction$ = combineLatest([
             this.dailyProgress$,
-            settingsService.dailyGoal$,
+            settingsService.dailyGoal$.obs$,
         ]).pipe(
             map(([currentProgress, dailyGoal]): [number, number] => [
                 currentProgress,

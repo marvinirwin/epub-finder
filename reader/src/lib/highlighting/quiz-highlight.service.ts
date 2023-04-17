@@ -18,7 +18,7 @@ export class QuizHighlightService {
         highlighterService.singleHighlight(
             combineLatest([
                 quizService.quizCard.word$,
-                settingsService.componentPath$,
+                settingsService.componentPath$.obs$,
             ]).pipe(
                 map(([word, componentPath]) => {
                         return (componentPath === QUIZ_NODE || !componentPath)

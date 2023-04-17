@@ -34,9 +34,9 @@ export class SortedLimitScheduleRowsService {
     }) {
         this.sortedLimitedScheduleRows$ = combineLatest([
             quizCardScheduleRowsService.scheduleRows$.pipe(pipeLog('sorted-limited:scheduleRows')),
-            settingsService.newQuizWordLimit$.pipe(pipeLog('sorted-limited:newQuizWordLimit')),
-            settingsService.maxReviewsPerDay$.pipe(pipeLog('sorted-limited:maxReviewsPerDay')),
-            settingsService.onlyReviewPresentText$.pipe(pipeLog('sorted-limited:onlyReviewPresentText')),
+            settingsService.newQuizWordLimit$.obs$.pipe(pipeLog('sorted-limited:newQuizWordLimit')),
+            settingsService.maxReviewsPerDay$.obs$.pipe(pipeLog('sorted-limited:maxReviewsPerDay')),
+            settingsService.onlyReviewPresentText$.obs$.pipe(pipeLog('sorted-limited:onlyReviewPresentText')),
             timeService.quizNow$.pipe(pipeLog('sorted-limited:quizNow')),
             knownWordsRepository.indexOfOrderedRecords$.pipe(pipeLog('sorted-limited:knownWords')),
         ]).pipe(

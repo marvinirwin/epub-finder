@@ -63,14 +63,15 @@ export class EntitiesController {
         processGteLte(where);
         where.creator_id = user.id;
         // @ts-ignore
-        return await foundEntity.view.find({
-            where: [
-                where
-            ],
+        const start = new Date().getTime();
+        const newVar = await foundEntity.view.find({
+            where,
             skip,
             take,
-            order
+            order,
         });
+        console.log(`${entity} query Execution time:`, new Date().getTime() - start, "ms");
+        return newVar;
     }
 
     @Post(":entity")

@@ -16,7 +16,7 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
         }: {
             databaseService: DatabaseService,
             loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService
+            loadingWrapperService: LoadingWrapperService,
         }) {
         super({
             loadingWrapperService,
@@ -35,6 +35,7 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
             },
             add: (r) => putPersistableEntity({entity: 'ignoredWords', record: r}),
             getIndexValue: (r) => ({indexValue: r.word}),
+            loggedInUserService
         })
     }
 }

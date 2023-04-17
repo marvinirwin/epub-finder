@@ -43,20 +43,20 @@ export class IntroSeriesService {
     }
 
     private async markStepCompleted(...steps: introJs.Step[]) {
-        const currentSteps = await this.settingsService.completedSteps$
+        const currentSteps = await this.settingsService.completedSteps$.obs$
             .pipe(take(1))
             .toPromise()
         const uniqueSteps = new Set([
             ...(currentSteps || []),
             ...steps.map((step) => step.intro),
         ])
-        this.settingsService.completedSteps$.next(Array.from(uniqueSteps))
+        this.settingsService.completedSteps$.user$.next(Array.from(uniqueSteps))
     }
 
     addSteps(steps: introJs.Step[], startSignal$: Observable<void>) {
         combineLatest([
             startSignal$,
-            this.settingsService.completedSteps$,
+            this.settingsService.completedSteps$.obs$,
         ]).subscribe(([, completedSteps]) => {
             if (completedSteps) {
                 const filteredSteps = steps.filter(

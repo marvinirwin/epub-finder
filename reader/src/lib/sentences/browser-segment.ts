@@ -50,8 +50,8 @@ export class BrowserSegment extends Segment {
         this.mouseoverText$ = combineLatest([
             this.translation$.pipe(startWith('')),
             this.romanization$.pipe(startWith('')),
-            settingsService.showRomanization$,
-            settingsService.showTranslation$,
+            settingsService.showRomanization$.obs$,
+            settingsService.showTranslation$.obs$,
             exampleSegmentsService.exampleSegmentTabulationMap$
         ]).pipe(
             map(

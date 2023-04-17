@@ -17,8 +17,8 @@ export class DocumentSelectionService {
     }) {
         this.documentSelectionRows$ = combineLatest([
             documentRepository.collection$,
-            settingsService.checkedOutDocuments$,
-            settingsService.readingDocument$,
+            settingsService.checkedOutDocuments$.obs$,
+            settingsService.readingDocument$.obs$,
         ]).pipe(
             map(([available, checkedOutDocumentNames, readingDocumentId]) => {
                 const all: DocumentSelectionRowInterface[] = [

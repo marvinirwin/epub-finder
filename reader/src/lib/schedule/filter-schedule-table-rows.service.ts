@@ -18,9 +18,9 @@ export class FilterScheduleTableRowsService {
         settingsService: SettingsService
     }) {
         this.filteredScheduleRows$ = combineLatest([
-            settingsService.scheduleTableWordFilterValue$,
-            settingsService.scheduleTableShowUnderDue$,
-            settingsService.scheduleTableShowUncounted$,
+            settingsService.scheduleTableWordFilterValue$.obs$,
+            settingsService.scheduleTableShowUnderDue$.obs$,
+            settingsService.scheduleTableShowUncounted$.obs$,
             scheduleService.sortedLimitedScheduleRows$.pipe(
                 map(({
                          wordsToReview,

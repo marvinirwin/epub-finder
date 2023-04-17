@@ -21,7 +21,7 @@ export class AdvanceTimeService {
     }) {
         setInterval(async () => {
             const currentComponent = await observableLastValue(
-                settingsService.componentPath$,
+                settingsService.componentPath$.obs$,
             )
             // TODO this is a hack, QUIZ_NODE is the default component
             if (currentComponent !== QUIZ_NODE && currentComponent !== '') {

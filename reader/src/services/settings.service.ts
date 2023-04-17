@@ -1,22 +1,39 @@
-import { DatabaseService } from '../lib/Storage/database.service'
-import { Observable, ReplaySubject } from 'rxjs'
-import { ds_Dict } from '../lib/delta-scan/delta-scan.module'
-import { Hotkeys } from '../lib/hotkeys/hotkeys.interface'
-import { distinct, distinctUntilChanged, skip, take } from 'rxjs/operators'
-import { HistoryService } from '../lib/app-context/history.service'
-import { SettingGetSet, SettingType } from './setting-get-set'
-import { MapSubject } from './map-subject'
-import { FlashCardType } from '../lib/quiz/hidden-quiz-fields'
-import { TextToSpeechConfig } from "@shared/"
+import {DatabaseService} from '../lib/Storage/database.service'
+import {Observable, ReplaySubject} from 'rxjs'
+import {ds_Dict} from '../lib/delta-scan/delta-scan.module'
+import {Hotkeys} from '../lib/hotkeys/hotkeys.interface'
+import {distinctUntilChanged, shareReplay, skip, switchMap, take} from 'rxjs/operators'
+import {HistoryService} from '../lib/app-context/history.service'
+import {SettingGetSet, SettingType} from './setting-get-set'
+import {MapSubject} from './map-subject'
+import {FlashCardType} from '../lib/quiz/hidden-quiz-fields'
+import {TextToSpeechConfig, UserSetting} from "@shared/"
+import {LoggedInUserService} from "../lib/auth/logged-in-user.service";
+import {queryPersistableEntity} from "../lib/Storage/queryPersistableEntity";
+import {merge} from 'rxjs';
 
-const settingSubject = <T>(getSet: SettingGetSet<T>): ReplaySubject<T> => {
-    const settingReplaySubject = new ReplaySubject<T>(1)
+export type SettingObject<T> = {
+    default$: ReplaySubject<T>,
+    user$: ReplaySubject<T>,
+    obs$: Observable<T>
+}
+export const GetSettingObject = <T>() => {
+    const default$ = new ReplaySubject<T>(1);
+    const user$ = new ReplaySubject<T>(1);
+    return {
+        user$,
+        default$,
+        obs$: merge(default$, user$).pipe(shareReplay(1))
+    }
+}
+
+const settingSubject = <T>(getSet: SettingGetSet<T>): SettingObject<T> => {
+    const settingReplaySubject = GetSettingObject<T>()
     Promise.resolve(getSet.get()).then((value) => {
-        settingReplaySubject.next(value)
+        settingReplaySubject.default$.next(value)
     })
-    settingReplaySubject
-        .pipe(skip(1), distinctUntilChanged())
-        .pipe()
+    settingReplaySubject.user$
+        .pipe(distinctUntilChanged())
         .subscribe((value) => {
             getSet.set(value)
         })
@@ -31,62 +48,77 @@ export class SettingsService {
     private db: DatabaseService
 
     public historyService: HistoryService
-    public drawerClosed$: ReplaySubject<boolean>
-    public checkedOutDocuments$: ReplaySubject<ds_Dict<boolean>>
-    public readingDocument$: ReplaySubject<string>
-    public hotkeys$: ReplaySubject<Partial<Hotkeys<string[]>>>
+    public drawerClosed$: SettingObject<boolean>
+    public checkedOutDocuments$: SettingObject<ds_Dict<boolean>>
+    public readingDocument$: SettingObject<string>
+    public hotkeys$: SettingObject<Partial<Hotkeys<string[]>>>
     public playbackEndPercent$: MapSubject<number, string>
     public playbackStartPercent$: MapSubject<number, string>
     public playbackSpeed$: MapSubject<number, string>
-    public completedSteps$: ReplaySubject<string[]>
-    public pronunciationVideoSentenceHash$: ReplaySubject<string>
-    public showTranslation$: ReplaySubject<boolean>
-    public dailyGoal$: ReplaySubject<number>
-    public showRomanization$: ReplaySubject<boolean>
-    public frequencyWeight$: ReplaySubject<number>
-    public directoryPath$: ReplaySubject<string>
-    public readingLanguage$: ReplaySubject<string>
-    public componentPath$: ReplaySubject<string>
-    public manualIsRecording$: ReplaySubject<boolean>
-    public spokenLanguage$: ReplaySubject<string>
-    public selectedFrequencyDocuments$: ReplaySubject<string[]>
-    public progressTreeRootId$: ReplaySubject<string>
+    public completedSteps$: SettingObject<string[]>
+    public pronunciationVideoSentenceHash$: SettingObject<string>
+    public showTranslation$: SettingObject<boolean>
+    public dailyGoal$: SettingObject<number>
+    public showRomanization$: SettingObject<boolean>
+    public frequencyWeight$: SettingObject<number>
+    public directoryPath$: SettingObject<string>
+    public readingLanguage$: SettingObject<string>
+    public componentPath$: SettingObject<string>
+    public manualIsRecording$: SettingObject<boolean>
+    public spokenLanguage$: SettingObject<string>
+    public selectedFrequencyDocuments$: SettingObject<string[]>
+    public progressTreeRootId$: SettingObject<string>
     /**
      * Either the Id of a frequency document, or blank to use recognition progress
      */
-    public selectedVocabulary$: ReplaySubject<string>
-    public dateWeight$: ReplaySubject<number>
-    public wordLengthWeight$: ReplaySubject<number>
-    public scheduleTableWordFilterValue$: ReplaySubject<string>
-    public scheduleTableShowUncounted$: ReplaySubject<boolean>
-    public scheduleTableShowUnderDue$: ReplaySubject<boolean>
-    public newQuizWordLimit$: ReplaySubject<number>
-    public translationAttemptSentenceWeight$: ReplaySubject<number>
-    public flashCardTypesRequiredToProgress$: ReplaySubject<FlashCardType[]>
-    public currentIntroTab$: ReplaySubject<number>
-    selectedExampleSegmentDocuments$: ReplaySubject<string[]>
-    textToSpeechConfiguration$: ReplaySubject<TextToSpeechConfig | undefined>
-    onlyReviewPresentText$: ReplaySubject<boolean>;
-    maxReviewsPerDay$: ReplaySubject<number>;
-    showSoundQuizCard$: ReplaySubject<boolean>;
+    public selectedVocabulary$: SettingObject<string>
+    public dateWeight$: SettingObject<number>
+    public wordLengthWeight$: SettingObject<number>
+    public scheduleTableWordFilterValue$: SettingObject<string>
+    public scheduleTableShowUncounted$: SettingObject<boolean>
+    public scheduleTableShowUnderDue$: SettingObject<boolean>
+    public newQuizWordLimit$: SettingObject<number>
+    public translationAttemptSentenceWeight$: SettingObject<number>
+    public flashCardTypesRequiredToProgress$: SettingObject<FlashCardType[]>
+    public currentIntroTab$: SettingObject<number>
+    selectedExampleSegmentDocuments$: SettingObject<string[]>
+    textToSpeechConfiguration$: SettingObject<TextToSpeechConfig | undefined>
+    onlyReviewPresentText$: SettingObject<boolean>;
+    maxReviewsPerDay$: SettingObject<number>;
+    showSoundQuizCard$: SettingObject<boolean>;
+    fetchedSettingsPromise$: Observable<Map<string, UserSetting>>;
 
     constructor({
-        databaseService,
-        historyService,
-    }: {
+                    databaseService,
+                    historyService,
+                    loggedInUserService
+                }: {
         databaseService: DatabaseService
         historyService: HistoryService
+        loggedInUserService: LoggedInUserService
     }) {
+        this.fetchedSettingsPromise$ = loggedInUserService.isLoggedIn$.pipe(
+            switchMap(() =>
+                queryPersistableEntity<UserSetting>({
+                        entity: 'userSettings',
+                        skip: 0,
+                        take: 100,
+                    }
+                ).then(records => new Map(records.map(userSettingRecord => [userSettingRecord.name, userSettingRecord])))
+            ),
+            shareReplay(1)
+        )
         this.db = databaseService
         this.historyService = historyService
         this.drawerClosed$ = this.createSetting$<boolean>(
             'drawerClosed',
             false,
             'indexedDB',
-        )
+        );
+
         this.checkedOutDocuments$ = this.createSetting$<ds_Dict<boolean>>(
             'checkedOutDocuments',
-            { 'cat-likes-tea': true },
+            {'cat-likes-tea': true},
             'indexedDB',
         )
 
@@ -117,9 +149,6 @@ export class SettingsService {
         this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
 
         this.componentPath$ = this.createSetting$<string>('page', '', 'url')
-        this.componentPath$.subscribe(v => {
-            // debugger;console.log(v)
-        })
 
         this.readingLanguage$ = this.createSetting$<string>(
             'reading',
@@ -281,7 +310,7 @@ export class SettingsService {
         settingName: string,
         defaultVal: T,
         type: SettingType,
-    ): ReplaySubject<T> {
+    ): SettingObject<T> {
         return settingSubject<T>(
             SettingGetSet.FromSettingName(
                 this.historyService,
@@ -289,6 +318,7 @@ export class SettingsService {
                 type,
                 settingName,
                 defaultVal,
+                this.fetchedSettingsPromise$
             ),
         )
     }

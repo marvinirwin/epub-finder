@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {MiddlewareConsumer, Module, NestModule} from "@nestjs/common";
 import {DatabaseModule} from "./config/database.module";
 import {ImageSearchHttpModule} from "./image-search/image-search-http.module";
 import {SpeechHttpModule} from "./speech/speech-http.module";
@@ -30,6 +30,7 @@ import {ThaiController} from './thai/thai.controller';
 import { APP_FILTER } from "@nestjs/core";
 import {HttpErrorFilter} from "./filters/HttpErrorFilter";
 import {resolve} from "path";
+import {TimingMiddleware} from "./timing.middleware";
 
 
 @Module({
@@ -71,5 +72,8 @@ import {resolve} from "path";
     ],
     controllers: [ThaiController],
 })
-export class AppModule {
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(TimingMiddleware).forRoutes('*');
+    }
 }

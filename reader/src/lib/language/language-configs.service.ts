@@ -41,13 +41,13 @@ export class LanguageConfigsService {
   constructor({ settingsService }: { settingsService: SettingsService }) {
     const knownLanguage$ = new ReplaySubject<string>(1);
     knownLanguage$.next("en");
-    this.learningLanguageTextToSpeechConfig$ = settingsService.textToSpeechConfiguration$;
+    this.learningLanguageTextToSpeechConfig$ = settingsService.textToSpeechConfiguration$.obs$;
     const getLanguageCodeObservable = <T>(
       f: (knownLanguageCode: string, learningLanguageCode: string) => T
     ) =>
       combineLatest([
         knownLanguage$,
-        settingsService.readingLanguage$
+        settingsService.readingLanguage$.obs$
       ]).pipe(
         map(([knownLanguage, learningLanguage]) =>
           f(knownLanguage, learningLanguage)
@@ -86,7 +86,7 @@ export class LanguageConfigsService {
     );
 
 
-    this.potentialLearningLanguageTextToSpeechConfigs$ = settingsService.readingLanguage$
+    this.potentialLearningLanguageTextToSpeechConfigs$ = settingsService.readingLanguage$.obs$
       .pipe(
         map(readingLanguage => {
           return resolveTextToSpeechConfig(readingLanguage);
@@ -141,7 +141,7 @@ export class LanguageConfigsService {
 
     combineLatest([
       this.potentialLearningSpoken$,
-      settingsService.spokenLanguage$
+      settingsService.spokenLanguage$.obs$
     ]).subscribe(
       ([potentialSpokenLanguageConfigs, currentSpokenLanguageCode]) => {
         const firstPotentialSpokenLanguageConfig = potentialSpokenLanguageConfigs[0];
@@ -163,14 +163,14 @@ export class LanguageConfigsService {
             .map((c) => c.code)
             .includes(currentSpokenLanguageCode);
         if (shouldClearSpokenLanguage) {
-          settingsService.spokenLanguage$.next("");
+          settingsService.spokenLanguage$.user$.next("");
         }
       }
     );
 
     combineLatest([
       this.potentialLearningLanguageTextToSpeechConfigs$,
-      settingsService.textToSpeechConfiguration$
+      settingsService.textToSpeechConfiguration$.obs$
     ]).subscribe(([potentialTextToSpeechConfigs, currentTextToSpeechConfig]) => {
       const firstPotentialTextToSpeechConfig = potentialTextToSpeechConfigs[0];
       const isCurrentConfigViable = potentialTextToSpeechConfigs.find(speechConfig => speechConfig.voice === currentTextToSpeechConfig?.voice);
@@ -180,11 +180,11 @@ export class LanguageConfigsService {
       ) && firstPotentialTextToSpeechConfig;
 
       if (shouldSetDefaultTextToSpeechLanguage) {
-        settingsService.textToSpeechConfiguration$.next(firstPotentialTextToSpeechConfig);
+        settingsService.textToSpeechConfiguration$.user$.next(firstPotentialTextToSpeechConfig);
         return;
       }
       if (!isCurrentConfigViable && currentTextToSpeechConfig) {
-        settingsService.textToSpeechConfiguration$.next(undefined);
+        settingsService.textToSpeechConfiguration$.user$.next(undefined);
       }
     });
   }

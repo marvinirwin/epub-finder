@@ -83,10 +83,10 @@ export class QuizCardScheduleRowsService implements ScheduleRowsService<SortQuiz
   ) {
     this.scheduleRows$ = combineLatest([
       combineLatest([
-        settingsService.frequencyWeight$,
-        settingsService.dateWeight$,
-        settingsService.wordLengthWeight$,
-        settingsService.translationAttemptSentenceWeight$,
+        settingsService.frequencyWeight$.obs$,
+        settingsService.dateWeight$.obs$,
+        settingsService.wordLengthWeight$.obs$,
+        settingsService.translationAttemptSentenceWeight$.obs$,
         flashCardTypesRequiredToProgressService.activeFlashCardTypes$.pipe(pipeLog("quiz-schedule-rows:activeFlashCardTypes"))
       ]),
       combineLatest([

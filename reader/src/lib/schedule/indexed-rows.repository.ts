@@ -14,6 +14,7 @@ import { safePush, UnPersistedEntity } from '@shared/'
 import { SuperMemoGrade } from 'supermemo'
 import {LoadingWrapperService} from "../loading/loadingService";
 import {LoadingSignal} from "../loading/loadingSignal";
+import {LoggedInUserService} from "../auth/logged-in-user.service";
 
 
 export type PotentialExcludedDbColumns<T> = Omit<T, 'creator_id' | 'id'> | T;
@@ -29,12 +30,14 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         load,
         add,
         getIndexValue,
+        loggedInUserService
     }: {
         databaseService: DatabaseService
         load: () => Promise<AsyncGenerator<UnPersistedEntity<T>[]>> | AsyncGenerator<UnPersistedEntity<T>[]>
         add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
         getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string },
-        loadingWrapperService: LoadingWrapperService
+        loadingWrapperService: LoadingWrapperService,
+        loggedInUserService: LoggedInUserService,
     }) {
         this.indexOfOrderedRecords$.next({})
         this.addRecords$

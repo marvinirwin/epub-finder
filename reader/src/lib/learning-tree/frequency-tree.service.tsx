@@ -31,7 +31,7 @@ export class FrequencyTreeService {
         */
         this.tree$ = combineLatest([
             frequencyDocumentsRepository.selectedTabulated$,
-            settingsService.progressTreeRootId$,
+            settingsService.progressTreeRootId$.obs$,
         ]).pipe(
             map(([allFrequencyDocuments, rootId]) => {
                 const rootNode =

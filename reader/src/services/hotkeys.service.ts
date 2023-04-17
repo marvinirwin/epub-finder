@@ -9,7 +9,7 @@ export class HotkeysService {
     private settingsService: SettingsService
 
     constructor({ settingsService }: { settingsService: SettingsService }) {
-        this.hotkeyConfiguration$ = settingsService.hotkeys$.pipe(
+        this.hotkeyConfiguration$ = settingsService.hotkeys$.obs$.pipe(
             map((hotkeys) => ({
                 ...HotKeyEvents.defaultHotkeys(),
                 ...hotkeys,
@@ -23,7 +23,7 @@ export class HotkeysService {
         defaultHotkeys: Hotkeys<string[]>,
         hotkeyActions: Hotkeys<Subject<void>>,
     ): Observable<Map<string[], Subject<void>>> {
-        return this.settingsService.hotkeys$.pipe(
+        return this.settingsService.hotkeys$.obs$.pipe(
             map((hotkeyConfig) => {
                 const keyMap = new Map<string[], Subject<void>>()
                 let action: keyof Hotkeys<any>

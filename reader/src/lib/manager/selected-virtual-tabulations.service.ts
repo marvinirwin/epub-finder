@@ -39,7 +39,7 @@ export class SelectedVirtualTabulationsService {
 
     this.selectedFrequencyVirtualTabulations$ = combineLatest([
       openDocumentList().pipe(pipeLog("selected-virtual-tabulations:open-document-list")),
-      settingsService.selectedFrequencyDocuments$.pipe(pipeLog("selected-virtual-tabulations:selected-frequency-documents"))
+      settingsService.selectedFrequencyDocuments$.obs$.pipe(pipeLog("selected-virtual-tabulations:selected-frequency-documents"))
     ]).pipe(
       selectedPipe<OpenDocument, string>(t => t.id),
       switchMap(openDocuments => combineLatest(openDocuments.map(openDocument => openDocument.virtualTabulation$)).pipe(startWith([]))),
@@ -48,7 +48,7 @@ export class SelectedVirtualTabulationsService {
     );
     this.selectedExampleVirtualTabulations$ = combineLatest([
       openDocumentList().pipe(pipeLog("selected-virtual-tabulations:open-document-list")),
-      settingsService.selectedExampleSegmentDocuments$
+      settingsService.selectedExampleSegmentDocuments$.obs$
     ]).pipe(
       selectedPipe<OpenDocument, string>(t => t.id),
       switchMap(openDocuments => {

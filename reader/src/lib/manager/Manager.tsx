@@ -223,7 +223,7 @@ export class Manager {
         this.allWordsRepository = new AllWordsRepository(this);
         this.knownWordsRepository = new KnownWordsRepository(this);
         this.flashCardTypesRequiredToProgressService = new FlashCardTypesRequiredToProgressService(this)
-        this.settingsService.spokenLanguage$.subscribe(audioSource.learningToKnownSpeech$)
+        this.settingsService.spokenLanguage$.obs$.subscribe(audioSource.learningToKnownSpeech$)
         this.hotkeysService = new HotkeysService(this)
         this.hotkeyEvents = new HotKeyEvents(this)
         this.activeSentenceService = new ActiveSentenceService(this)
@@ -250,7 +250,7 @@ export class Manager {
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
             componentInView$: this.settingsService
-                .componentPath$
+                .componentPath$.obs$
                 .pipe(
                     shareReplay(1)
                 ),

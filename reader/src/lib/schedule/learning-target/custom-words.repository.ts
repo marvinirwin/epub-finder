@@ -13,8 +13,7 @@ export class CustomWordsRepository extends IndexedRowsRepository<CustomWord> {
             loggedInUserService
         }: {
             databaseService: DatabaseService,
-            loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService
+            loadingWrapperService: LoadingWrapperService, loggedInUserService: LoggedInUserService
         }) {
         super({
             databaseService,
@@ -29,6 +28,7 @@ export class CustomWordsRepository extends IndexedRowsRepository<CustomWord> {
             add: (r) => putPersistableEntity({entity: 'customWords', record: r}),
             getIndexValue: (r) => ({indexValue: r.word}),
             loadingWrapperService,
+            loggedInUserService
         })
     }
 }

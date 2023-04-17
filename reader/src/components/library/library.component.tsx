@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {LibraryDocumentRow} from "../../lib/manager/library-document-row";
 import {useObservableState} from "observable-hooks";
 import {ManagerContext} from "../../App";
@@ -19,6 +19,15 @@ const LibraryRow = (
     const exampleSentences = useObservableState(
         m.settingsService.selectedExampleSegmentDocuments$
     );
+
+    useEffect(() => {
+        console.log(m.settingsService.selectedExampleSegmentDocuments$);
+        m.settingsService.selectedExampleSegmentDocuments$.subscribe(v => {
+            debugger;
+            console.log(v);
+        })
+    }, []);
+
     const isUsedForFrequency = !!frequencyDocuments?.includes(document.ltDocument.id());
 
     const isUsedForExamples = !!exampleSentences?.includes(document.ltDocument.id());

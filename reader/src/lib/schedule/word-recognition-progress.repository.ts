@@ -15,7 +15,7 @@ export class WordRecognitionProgressRepository extends IndexedRowsRepository<Wor
         }: {
             databaseService: DatabaseService,
             loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService
+            loadingWrapperService: LoadingWrapperService,
         }) {
         super({
             databaseService,
@@ -30,7 +30,8 @@ export class WordRecognitionProgressRepository extends IndexedRowsRepository<Wor
             },
             add: (r) => putPersistableEntity({entity: 'spacedRepitionEntities', record: r}),
             getIndexValue: (r) => ({indexValue: r.word}),
-            loadingWrapperService
+            loadingWrapperService,
+            loggedInUserService
         })
     }
 }

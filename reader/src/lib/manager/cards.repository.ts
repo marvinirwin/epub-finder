@@ -1,7 +1,7 @@
 import {BehaviorSubject, merge, Observable, ReplaySubject, Subject} from 'rxjs'
 import {getIsMeFunction, ICard} from "@shared/"
 import {Dictionary} from 'lodash'
-import {map, scan, shareReplay, startWith} from 'rxjs/operators'
+import {map, scan, shareReplay, startWith, take} from 'rxjs/operators'
 import {DatabaseService} from '../Storage/database.service'
 import {cardForWord} from '../util/Util'
 import {observableLastValue} from '../../services/settings.service'
@@ -10,6 +10,7 @@ import {highestPriorityCard} from './highest-priority-card'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {LoadingSignal} from '../loading/loadingSignal'
 import {LoadingService} from "../loading/loadingService";
+import {LoggedInUserService} from "../auth/logged-in-user.service";
 
 const loadingChunkSize = 500;
 export default class CardsRepository {
@@ -52,16 +53,19 @@ export default class CardsRepository {
      */
     private deleteWords: Subject<string[]> = new Subject<string[]>()
     private db: DatabaseService
+    private loggedInUserService: LoggedInUserService;
 
     constructor(
         {
             databaseService,
             languageConfigsService,
-            loadingService
+            loadingService,
+            loggedInUserService
         }: {
             databaseService: DatabaseService,
             languageConfigsService: LanguageConfigsService,
-            loadingService: LoadingService
+            loadingService: LoadingService,
+            loggedInUserService: LoggedInUserService
         },
     ) {
         this.db = databaseService
@@ -135,6 +139,7 @@ export default class CardsRepository {
                     }
                 })
         */
+        this.loggedInUserService=loggedInUserService;
     }
 
 
@@ -161,6 +166,7 @@ export default class CardsRepository {
 
     async load() {
         this.loadingSignal.isLoading$.next(true)
+        await this.loggedInUserService.profile$.pipe(take(1)).toPromise();
         await this.getCardsFromDB()
         this.loadingSignal.isLoading$.next(false)
     }

@@ -1,19 +1,14 @@
 import {DatabaseService} from '../lib/Storage/database.service'
 import {HistoryService} from '../lib/app-context/history.service'
 import {Observable, of} from 'rxjs'
-import {distinctUntilChanged, skip} from 'rxjs/operators'
+import {distinctUntilChanged, skip, take} from 'rxjs/operators'
 import {UserSetting} from '@shared/'
-import {queryPersistableEntity} from "../lib/Storage/queryPersistableEntity";
 import {putPersistableEntity} from "../lib/Storage/put-persistable-entity";
+
 
 export type SettingType = 'url' | 'indexedDB' | 'REST';
 
 
-const settings = queryPersistableEntity<UserSetting>({
-    entity: 'userSettings',
-    skip: 0,
-    take: 100,
-}).then(records => new Map(records.map(userSettingRecord => [userSettingRecord.name, userSettingRecord])))
 
 export class SettingGetSet<T> {
     constructor(
@@ -21,7 +16,9 @@ export class SettingGetSet<T> {
         public get: () => Promise<T> | T,
         public set: (v: T) => Promise<void> | void,
         private changed$: Observable<any>,
+        private fetchedSettings$: Observable<Map<string, UserSetting>>
     ) {
+        const settingsPromise =
         changed$
             .pipe(
                 skip(1),
@@ -40,14 +37,16 @@ export class SettingGetSet<T> {
         type: SettingRepository,
         name: string,
         defaultWhenNotAvailable: Value,
+        fetchedSettings$: Observable<Map<string, UserSetting>>
     ) {
+        const settingsPromise = fetchedSettings$.pipe(take(1)).toPromise()
         switch (type) {
             case 'indexedDB':
                 return new SettingGetSet<Value>(
                     name,
                     () =>
                         new Promise((resolve, reject) =>
-                            settings
+                            settingsPromise
                                 .then(map => [map.get(name)])
                                 .then((rows) => {
                                         const row = rows[0]
@@ -70,6 +69,7 @@ export class SettingGetSet<T> {
                         })
                     },
                     of(),
+                    fetchedSettings$
                 )
             case 'REST':
                 throw new Error('Not implemented')
@@ -91,6 +91,7 @@ export class SettingGetSet<T> {
                         historyService.set(name, JSON.stringify(v))
                     },
                     historyService.url$,
+                    fetchedSettings$
                 )
             default:
                 throw new Error(`Unknown setting get/set type ${type}`)

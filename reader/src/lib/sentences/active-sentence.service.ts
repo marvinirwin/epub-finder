@@ -15,8 +15,8 @@ export class ActiveSentenceService {
     }) {
         combineLatest([
             this.activeSentence$,
-            settingsService.showTranslation$,
-            settingsService.showRomanization$,
+            settingsService.showTranslation$.obs$,
+            settingsService.showRomanization$.obs$,
             languageConfigsService.learningToKnownTranslateConfig$,
             languageConfigsService.learningToLatinTransliterateFn$,
         ]).subscribe(

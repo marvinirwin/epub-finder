@@ -19,8 +19,8 @@ export class FlashCardTypesRequiredToProgressService {
     ) {
         this.activeFlashCardTypes$ = combineLatest([
             languageConfigsService.learningLanguageTextToSpeechConfig$,
-            settingsService.flashCardTypesRequiredToProgress$,
-            settingsService.showSoundQuizCard$
+            settingsService.flashCardTypesRequiredToProgress$.obs$,
+            settingsService.showSoundQuizCard$.obs$
         ]).pipe(
             map(([textToSpeechConfig, flashCardTypes, showSoundQuizCard]) => {
                 const shouldRemovedSoundQuiz = !textToSpeechConfig || !showSoundQuizCard;

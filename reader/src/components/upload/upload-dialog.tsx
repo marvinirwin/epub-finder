@@ -18,7 +18,7 @@ export const UploadDialog = () => {
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     const currentLanguageLabel = languageCodesMappedToLabels.get(language_code || '') || '';
 
-    const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
+    const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$.obs$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
     const emittedCurrentUploadingFiles = useVisibleObservableState(m.uploadingDocumentsService.currentUploadingFile$, (file: File | undefined) => `m.uploadingDocumentsService.currentUploadingFile$: ${file?.name}`);
 
     const allEmittedValues = useMemo(() => [...emittedSelectedReadingLanguages, ...emittedCurrentUploadingFiles], [emittedSelectedReadingLanguages, emittedCurrentUploadingFiles]);

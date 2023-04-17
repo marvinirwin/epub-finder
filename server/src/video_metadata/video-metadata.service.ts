@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import {  Repository } from "typeorm";
 import { VideoMetadataView } from "../entities/video-metadata-view.entity";
-import { VideoMetadataEntity } from "../entities/video.metadata.entity";
+import { VideoMetadataEntity } from "../entities/video-metadata.entity";
 import { VideoMetadataDto } from "./video-metadata.dto";
 import { sha1 } from "../util/sha1";
 import fs from "fs-extra";

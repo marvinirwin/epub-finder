@@ -70,7 +70,7 @@ export class ReadingDocumentService {
 
         combineLatest([
             openDocumentsService.sourceDocuments$,
-            settingsService.readingDocument$,
+            settingsService.readingDocument$.obs$,
         ]).subscribe(([selectableDocuments, selectedDocument]) => {
             const foundDocument = findMap(
                 selectableDocuments,
@@ -82,7 +82,7 @@ export class ReadingDocumentService {
             ) {
                 const firstCheckedOutDocument = firstMap(selectableDocuments)
                 // Will this id
-                settingsService.readingDocument$.next(
+                settingsService.readingDocument$.user$.next(
                     firstCheckedOutDocument.id,
                 )
                 this.displayDocument$.next(

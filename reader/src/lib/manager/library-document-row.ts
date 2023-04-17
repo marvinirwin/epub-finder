@@ -28,14 +28,14 @@ export class LibraryDocumentRow {
         this.readingDocumentRepository = readingDocumentRepository
         this.settingsService = settingsService
         this.ltDocument = ltDocument
-        this.selectedForReading$ = settingsService.readingDocument$.pipe(
+        this.selectedForReading$ = settingsService.readingDocument$.obs$.pipe(
             // Is the use of id() here not correct?
             // No I think we always use id()
             map((readingDocumentId) => ltDocument.id() === readingDocumentId),
             shareReplay(1),
         )
 
-        this.selectedForFrequency$ = settingsService.selectedFrequencyDocuments$.pipe(
+        this.selectedForFrequency$ = settingsService.selectedFrequencyDocuments$.obs$.pipe(
             map((selectedFrequencyDocumentIds) =>
                 selectedFrequencyDocumentIds.includes(ltDocument.id()),
             ),
@@ -45,12 +45,12 @@ export class LibraryDocumentRow {
 
     async toggleReading() {
         const mostRecent = await observableLastValue(
-            this.settingsService.readingDocument$,
+            this.settingsService.readingDocument$.obs$,
         )
         if (mostRecent !== this.ltDocument.id()) {
-            this.settingsService.readingDocument$.next('')
+            this.settingsService.readingDocument$.user$.next('')
         } else {
-            this.settingsService.readingDocument$.next(this.ltDocument.id())
+            this.settingsService.readingDocument$.user$.next(this.ltDocument.id())
         }
     }
 
@@ -60,29 +60,29 @@ export class LibraryDocumentRow {
 
     async toggleUseForFrequency() {
         const mostRecent = await observableLastValue(
-            this.settingsService.selectedFrequencyDocuments$,
+            this.settingsService.selectedFrequencyDocuments$.obs$,
         )
         if (mostRecent.includes(this.ltDocument.id())) {
-            this.settingsService.selectedFrequencyDocuments$.next(
+            this.settingsService.selectedFrequencyDocuments$.user$.next(
                 mostRecent.filter((id) => id !== this.ltDocument.id()),
             )
         } else {
-            this.settingsService.selectedFrequencyDocuments$.next(
+            this.settingsService.selectedFrequencyDocuments$.user$.next(
                 mostRecent.concat(this.ltDocument.id()),
             )
         }
     }
     async toggleUseForExamples() {
         const mostRecent = await observableLastValue(
-            this.settingsService.selectedExampleSegmentDocuments$,
+            this.settingsService.selectedExampleSegmentDocuments$.obs$,
         )
         const documentIsAlreadySelected = mostRecent.includes(this.ltDocument.id())
         if (documentIsAlreadySelected) {
-            this.settingsService.selectedExampleSegmentDocuments$.next(
+            this.settingsService.selectedExampleSegmentDocuments$.user$.next(
                 mostRecent.filter((id) => id !== this.ltDocument.id()),
             )
         } else {
-            this.settingsService.selectedExampleSegmentDocuments$.next(
+            this.settingsService.selectedExampleSegmentDocuments$.user$.next(
                 mostRecent.concat(this.ltDocument.id()),
             )
         }
