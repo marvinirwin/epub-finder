@@ -1,5 +1,4 @@
 import {
-    observableLastValue,
     SettingsService,
 } from '../../services/settings.service'
 import { LtDocument } from '@shared/'
@@ -7,6 +6,7 @@ import { Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 import { DocumentRepository } from '../documents/document.repository'
 import { FrequencyDocumentsRepository } from '../documents/frequency-documents.repository'
+import {observableLastValue} from "../../services/observableLastValue";
 
 export class LibraryDocumentRow {
     selectedForFrequency$: Observable<boolean>

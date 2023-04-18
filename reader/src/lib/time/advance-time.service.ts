@@ -1,11 +1,11 @@
 import {
-    observableLastValue,
     SettingsService,
 } from '../../services/settings.service'
 import { QUIZ_NODE } from '@shared/'
 import { TimeService } from './time.service'
 import { QuizService } from '../../components/quiz/quiz.service'
 import { QuizResultService } from '../quiz/quiz-result.service'
+import {observableLastValue} from "../../services/observableLastValue";
 
 export class AdvanceTimeService {
     constructor({
@@ -21,7 +21,7 @@ export class AdvanceTimeService {
     }) {
         setInterval(async () => {
             const currentComponent = await observableLastValue(
-                settingsService.componentPath$.obs$,
+                settingsService.componentPath$,
             )
             // TODO this is a hack, QUIZ_NODE is the default component
             if (currentComponent !== QUIZ_NODE && currentComponent !== '') {

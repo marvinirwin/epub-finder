@@ -4,13 +4,13 @@ import {Dictionary} from 'lodash'
 import {map, scan, shareReplay, startWith, take} from 'rxjs/operators'
 import {DatabaseService} from '../Storage/database.service'
 import {cardForWord} from '../util/Util'
-import {observableLastValue} from '../../services/settings.service'
 import {LanguageConfigsService} from '../language/language-configs.service'
 import {highestPriorityCard} from './highest-priority-card'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {LoadingSignal} from '../loading/loadingSignal'
 import {LoadingService} from "../loading/loadingService";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
+import {observableLastValue} from "../../services/observableLastValue";
 
 const loadingChunkSize = 500;
 export default class CardsRepository {

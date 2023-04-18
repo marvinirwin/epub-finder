@@ -3,11 +3,11 @@ import React, { useContext } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { WordCard } from './word-card.interface'
 import { ManagerContext } from '../../App'
-import { observableLastValue } from '../../services/settings.service'
 import { Button, Typography } from '@material-ui/core'
 import { quizCardImage, selectQuizCardImageButton } from '@shared/'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
 import Image from 'material-ui-image';
+import {observableLastValue} from "../../services/observableLastValue";
 
 export function CardImage({ wordInfo }: { wordInfo: WordCard }) {
     const quizCardImageSource = useObservableState(wordInfo.image$.value$)

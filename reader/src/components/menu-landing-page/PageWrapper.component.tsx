@@ -14,6 +14,7 @@ import {HomeNode} from "../app-directory/nodes/Home.node";
 import {
     createBrowserRouter,
     RouterProvider,
+    useLocation,
     useRoutes,
 } from "react-router-dom";
 
@@ -56,7 +57,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     }
     const navBarItems: TreeMenuNode[] = [
         HomeNode,
-        LibraryNode,
         QuizCarouselNode,
     ];
     const language = languages.find(l => l.value === readingLanguageCode);
@@ -65,7 +65,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     const setVariant = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.user$.next(v.value)
     const [dragActive, setDragActive] = React.useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-    const currentComponent = useObservableState(m.settingsService.componentPath$.obs$)
+    const {pathname: currentComponent} = useLocation();
 
     const handleDrag = (e: DragEvent) => {
         e.preventDefault();
@@ -123,7 +123,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
 
     const router = useRoutes([
         {
-            path: QuizCarouselNode.name,
+            path: QuizCarouselNode.pathname,
             element: <QuizCardCarousel/>
         },
         {

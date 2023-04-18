@@ -1,8 +1,8 @@
 import {DatabaseService} from '../lib/Storage/database.service'
-import {Observable, ReplaySubject} from 'rxjs'
+import {merge, Observable, ReplaySubject} from 'rxjs'
 import {ds_Dict} from '../lib/delta-scan/delta-scan.module'
 import {Hotkeys} from '../lib/hotkeys/hotkeys.interface'
-import {distinctUntilChanged, shareReplay, skip, switchMap, take} from 'rxjs/operators'
+import {distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators'
 import {HistoryService} from '../lib/app-context/history.service'
 import {SettingGetSet, SettingType} from './setting-get-set'
 import {MapSubject} from './map-subject'
@@ -10,7 +10,6 @@ import {FlashCardType} from '../lib/quiz/hidden-quiz-fields'
 import {TextToSpeechConfig, UserSetting} from "@shared/"
 import {LoggedInUserService} from "../lib/auth/logged-in-user.service";
 import {queryPersistableEntity} from "../lib/Storage/queryPersistableEntity";
-import {merge} from 'rxjs';
 
 export type SettingObject<T> = {
     default$: ReplaySubject<T>,
@@ -40,9 +39,24 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): SettingObject<T> => {
     return settingReplaySubject
 }
 
-export interface QuizCardConfiguration {
-    flash_card_type: FlashCardType
+function listenToPathnameChanges() {
+    return new Observable<string>((observer) => {
+        const onPopState = (event: any) => {
+            observer.next(window.location.pathname);
+        };
+
+        window.addEventListener('popstate', onPopState);
+
+        // Emit the initial value
+        observer.next(window.location.pathname);
+
+        // Clean up function
+        return () => {
+            window.removeEventListener('popstate', onPopState);
+        };
+    });
 }
+
 
 export class SettingsService {
     private db: DatabaseService
@@ -61,9 +75,8 @@ export class SettingsService {
     public dailyGoal$: SettingObject<number>
     public showRomanization$: SettingObject<boolean>
     public frequencyWeight$: SettingObject<number>
-    public directoryPath$: SettingObject<string>
     public readingLanguage$: SettingObject<string>
-    public componentPath$: SettingObject<string>
+    public componentPath$: Observable<string>
     public manualIsRecording$: SettingObject<boolean>
     public spokenLanguage$: SettingObject<string>
     public selectedFrequencyDocuments$: SettingObject<string[]>
@@ -145,10 +158,6 @@ export class SettingsService {
             '',
             'indexedDB',
         )
-
-        this.directoryPath$ = this.createSetting$<string>('dir', '', 'url')
-
-        this.componentPath$ = this.createSetting$<string>('page', '', 'url')
 
         this.readingLanguage$ = this.createSetting$<string>(
             'reading',
@@ -304,6 +313,11 @@ export class SettingsService {
             true,
             'indexedDB',
         );
+        this.componentPath$ = listenToPathnameChanges()
+            .pipe(
+                map(v => v.replace('/', '')),
+                shareReplay(1)
+            )
     }
 
     public createSetting$<T>(
@@ -324,6 +338,3 @@ export class SettingsService {
     }
 }
 
-export const observableLastValue = <T>(r: Observable<T>): Promise<T> => {
-    return r.pipe(take(1)).toPromise()
-}

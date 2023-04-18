@@ -1,10 +1,10 @@
 import { ReadingDocumentService } from '../../lib/manager/reading-document.service'
 import { Observable, ReplaySubject } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
-import { observableLastValue } from '../../services/settings.service'
 import axios from 'axios'
 import { LoggedInUserService } from '../../lib/auth/logged-in-user.service'
 import { getApiUrl } from '../../lib/util/getApiUrl'
+import {observableLastValue} from "../../services/observableLastValue";
 
 export class RequestRecordingService {
     recordRequestSentences$ = new ReplaySubject<Map<string, boolean>>(1)

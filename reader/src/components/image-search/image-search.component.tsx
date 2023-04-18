@@ -6,8 +6,8 @@ import {ImageResult} from './image-search-result.interface'
 import {ImageSearchResults} from './image-search-results.component'
 import {ManagerContext} from '../../App'
 import CloseIcon from '@material-ui/icons/Close'
-import {observableLastValue} from '../../services/settings.service'
 import {useTutorialPopOver} from "../tutorial-popover/tutorial-popper.component";
+import {observableLastValue} from "../../services/observableLastValue";
 
 export interface ImageSearchResponse {
     images: ImageResult[]

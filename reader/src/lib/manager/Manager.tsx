@@ -249,11 +249,7 @@ export class Manager {
         this.openDocumentsService = new OpenDocumentsService(this)
         this.selectedVirtualTabulationsService = new SelectedVirtualTabulationsService(this)
         this.visibleElementsService = new VisibleService({
-            componentInView$: this.settingsService
-                .componentPath$.obs$
-                .pipe(
-                    shareReplay(1)
-                ),
+            componentInView$: this.settingsService.componentPath$,
             openDocumentsService: this.openDocumentsService,
         })
         this.elementAtomMetadataIndex = new ElementAtomMetadataIndex(this)

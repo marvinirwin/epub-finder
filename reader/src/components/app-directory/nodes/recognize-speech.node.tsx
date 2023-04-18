@@ -7,9 +7,9 @@ import { ManagerContext } from '../../../App'
 import { useObservableState } from 'observable-hooks'
 import { RecordVoiceOver } from '@material-ui/icons'
 import { RECOGNIZE_SPEECH } from '@shared/'
-import { observableLastValue } from '../../../services/settings.service'
 import { TutorialPopper } from '../../tutorial-popover/tutorial-popper.component'
 import { Typography } from '@material-ui/core'
+import {observableLastValue} from "../../../services/observableLastValue";
 
 export function RecognizeSpeechNode(m: Manager): TreeMenuNode {
     return {

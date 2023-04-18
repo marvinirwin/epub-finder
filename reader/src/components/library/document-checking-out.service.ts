@@ -1,8 +1,8 @@
 import { Manager } from '../../lib/manager/Manager'
 import {
-    observableLastValue,
     SettingsService,
 } from '../../services/settings.service'
+import {observableLastValue} from "../../services/observableLastValue";
 
 export class DocumentCheckingOutService {
     private settingsService: SettingsService

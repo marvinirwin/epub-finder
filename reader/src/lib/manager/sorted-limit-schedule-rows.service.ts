@@ -1,4 +1,4 @@
-import {observableLastValue, SettingsService} from '../../services/settings.service'
+import {SettingsService} from '../../services/settings.service'
 import {combineLatest, Observable} from 'rxjs'
 import {debounceTime, distinctUntilChanged, map, shareReplay} from 'rxjs/operators'
 import {ScheduleRow, SpacedSortQuizData} from '../schedule/schedule-row'
@@ -13,6 +13,7 @@ import {quizCardKey, scheduleRowKey} from "../util/Util";
 import {getSiblingRecords} from "./group-schedule-rows";
 import {LimitedScheduleRows} from "./limit-schedule-rows.type";
 import {SpacedScheduleRow} from "./space-schedule-row.type";
+import {observableLastValue} from "../../services/observableLastValue";
 
 
 export class SortedLimitScheduleRowsService {

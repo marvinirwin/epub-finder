@@ -4,8 +4,9 @@ import { DocumentCheckingOutService } from "../../components/library/document-ch
 import { LibraryService } from "../manager/library.service";
 import { ProgressItemService } from "../../components/item-in-progress/progress-item.service";
 import { LanguageConfigsService } from "../language/language-configs.service";
-import { observableLastValue, SettingsService } from "../../services/settings.service";
+import { SettingsService } from "../../services/settings.service";
 import { ModalService } from "../user-interface/modal.service";
+import {observableLastValue} from "../../services/observableLastValue";
 
 export const supportedDocumentFileExtensions = new Set<string>([
   "pdf",

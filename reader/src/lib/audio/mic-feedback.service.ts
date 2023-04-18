@@ -2,8 +2,8 @@ import { Observable, ReplaySubject } from 'rxjs'
 import { AudioSource } from './audio-source'
 import { map, shareReplay, switchMap } from 'rxjs/operators'
 import { audioContext } from './audio-context'
-import { observableLastValue } from '../../services/settings.service'
 import {IAudioContext, AnalyserNode} from "standardized-audio-context";
+import {observableLastValue} from "../../services/observableLastValue";
 
 export class MicFeedbackService {
     micRef$ = new ReplaySubject<SVGSVGElement | null>(1)

@@ -6,6 +6,7 @@ import {QUIZ_NODE} from '@shared/'
 
 export const QuizCarouselNode: TreeMenuNode = {
   name: QUIZ_NODE,
+  pathname: QUIZ_NODE,
   label: 'Review Flash Cards',
   LeftIcon: () => <AmpStories/>,
 }

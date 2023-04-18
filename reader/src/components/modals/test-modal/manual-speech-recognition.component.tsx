@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { ManagerContext } from '../../../App'
-import { observableLastValue } from '../../../services/settings.service'
+import {observableLastValue} from "../../../services/observableLastValue";
 
 export const ManualSpeechRecognition = () => {
     const m = useContext(ManagerContext)
