@@ -11,7 +11,11 @@ import {LibraryNode} from "../app-directory/nodes/library.node";
 import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
 import {HomeNode} from "../app-directory/nodes/Home.node";
-import {Library} from "../library/library.component";
+import {
+    createBrowserRouter,
+    RouterProvider,
+    useRoutes,
+} from "react-router-dom";
 
 export type PageWrapperProps = {};
 
@@ -43,8 +47,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         }
     );
 
-    const onLanguageSelect = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.user$.next(v.value);
-    const onVariantSelect = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.user$.next(v.value);
     const onFileUpload = async (files: FileList) => {
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < files.length; i++) {
@@ -119,56 +121,44 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         el.click(); // open
     };
 
-    const getSelectedPage = (): [TreeMenuNode, React.ReactNode] => {
-        switch (currentComponent) {
-            case QUIZ_NODE:
-                return [
-                    QuizCarouselNode,
-                    <QuizCardCarousel/>
-                ]
-            case LIBRARY_NODE:
-                return [
-                    LibraryNode,
-                    <Library/>,
+    const router = useRoutes([
+        {
+            path: QuizCarouselNode.name,
+            element: <QuizCardCarousel/>
+        },
+        {
+            path: HomeNode.pathname,
+            element: <LandingPage
+                    onTextUpload={({text, name}) =>
+                        m.uploadingDocumentsService.upload(
+                            {
+                                file: new File([text], name),
+                                language_code: readingLanguageCode
+                            }
+                        )
+                    }
+                    onFileSelected={({file}) =>
+                        m.uploadingDocumentsService.upload(
+                            {
+                                file,
+                                language_code: readingLanguageCode
+                            }
+                        )
+                    }
+                    languages={languages}
+                    language={language}
+                    setLanguage={setLanguage}
+                    variant={variant}
+                    setVariant={setVariant}
+                    dragActive={dragActive}
+                    onDragEnter={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={handleUploadClick}
+                    ref={inputRef}
+                />,
 
-                ]
-            case HOME_NODE:
-            default:
-                return [
-                    HomeNode,
-                    <LandingPage
-                        onTextUpload={({text, name}) =>
-                            m.uploadingDocumentsService.upload(
-                                {
-                                    file: new File([text], name),
-                                    language_code: readingLanguageCode
-                                }
-                            )
-                        }
-                        onFileSelected={({file}) =>
-                            m.uploadingDocumentsService.upload(
-                                {
-                                    file,
-                                    language_code: readingLanguageCode
-                                }
-                            )
-                        }
-                        languages={languages}
-                        language={language}
-                        setLanguage={setLanguage}
-                        variant={variant}
-                        setVariant={setVariant}
-                        dragActive={dragActive}
-                        onDragEnter={handleDrag}
-                        onDrop={handleDrop}
-                        onClick={handleUploadClick}
-                        ref={inputRef}
-                    />,
-
-                ]
-        }
-    }
-    const [currentNode, currentPage] = getSelectedPage();
+        },
+    ]);
 
     return <div className="w-full h-full relative flex flex-col">
         <NavBarAndSettingsPopup
@@ -179,10 +169,9 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
             setVariant={setVariant}
             variant={variant}
             currentUserEmail={currentUserEmail}
-            selectedNavItem={currentNode}
             isLoading={isLoading}
             loadingMessage={loadingMessage}
         />
-        {currentPage}
+        {router}
     </div>
 };

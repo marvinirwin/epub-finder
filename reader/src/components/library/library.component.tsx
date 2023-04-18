@@ -20,14 +20,6 @@ const LibraryRow = (
         m.settingsService.selectedExampleSegmentDocuments$.obs$
     );
 
-    useEffect(() => {
-        console.log(m.settingsService.selectedExampleSegmentDocuments$);
-        m.settingsService.selectedExampleSegmentDocuments$.obs$.subscribe(v => {
-            debugger;
-            console.log(v);
-        })
-    }, []);
-
     const isUsedForFrequency = !!frequencyDocuments?.includes(document.ltDocument.id());
 
     const isUsedForExamples = !!exampleSentences?.includes(document.ltDocument.id());

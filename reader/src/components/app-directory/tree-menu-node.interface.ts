@@ -10,4 +10,6 @@ export interface TreeMenuNode {
     hidden?: boolean
     props?: React.HTMLProps<HTMLDivElement>
     ReplaceComponent?: React.FunctionComponent
+
+    pathname?: string
 }

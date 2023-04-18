@@ -3,5 +3,6 @@ import {HOME_NODE} from "@shared/";
 
 export const HomeNode: TreeMenuNode = {
   name: HOME_NODE,
+  pathname: "/",
   label: "Home"
 }

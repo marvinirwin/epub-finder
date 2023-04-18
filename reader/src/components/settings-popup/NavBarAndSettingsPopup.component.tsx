@@ -12,7 +12,6 @@ export type NavBarAndSettingsProps = {
   variant: VariantLanguageOption,
   setVariant: (v: VariantLanguageOption) => unknown
   currentUserEmail: string | undefined;
-  selectedNavItem: TreeMenuNode
   isLoading: boolean
   loadingMessage: string
 };
@@ -26,7 +25,6 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
     variant,
     setVariant,
     currentUserEmail,
-    selectedNavItem,
     isLoading,
     loadingMessage
   }) => {
@@ -101,7 +99,6 @@ export const NavBarAndSettingsPopup: React.FC<NavBarAndSettingsProps> = (
             <>
               <NavBar
                 navItems={navBarItems}
-                selectedNavItem={selectedNavItem}
                 userProfileButton={
                   <div
                     className="ml-5 w-10 h-10 rounded-full bg-[#D9D9D9] flex justify-center items-center"

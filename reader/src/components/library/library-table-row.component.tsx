@@ -1,15 +1,10 @@
-import React, { useContext } from 'react'
-import { LibraryDocumentRow } from '../../lib/manager/library-document-row'
-import { TableCell, TableRow, Button, Typography } from '@material-ui/core'
+import React, {useContext} from 'react'
+import {LibraryDocumentRow} from '../../lib/manager/library-document-row'
+import {Button, TableCell, TableRow, Typography} from '@material-ui/core'
 import Checkbox from '@material-ui/core/Checkbox'
-import { ManagerContext } from '../../App'
-import { useObservableState } from 'observable-hooks'
-import {
-    libraryRow,
-    libraryRowDelete, libraryRowToggleExample,
-    libraryRowToggleFrequency,
-    libraryRowToggleReading,
-} from '@shared/'
+import {ManagerContext} from '../../App'
+import {useObservableState} from 'observable-hooks'
+import {libraryRow, libraryRowDelete, libraryRowToggleExample, libraryRowToggleFrequency,} from '@shared/'
 
 export const LibraryDocumentRowComponent: React.FC<{
     document: LibraryDocumentRow
@@ -21,8 +16,6 @@ export const LibraryDocumentRowComponent: React.FC<{
     const exampleSentences = useObservableState(
         m.settingsService.selectedExampleSegmentDocuments$.obs$,
     )
-    let checked = !!frequencyDocuments?.includes(document.ltDocument.id());
-    let checked1 = !!exampleSentences?.includes(document.ltDocument.id());
     return (
         <TableRow
             id={document.ltDocument.name}
@@ -40,7 +33,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                 <Checkbox
                     className={libraryRowToggleFrequency}
                     checked={
-                        checked
+                        !!frequencyDocuments?.includes(document.ltDocument.id())
                     }
                     onChange={() => document.toggleUseForFrequency()}
                 />
@@ -49,7 +42,7 @@ export const LibraryDocumentRowComponent: React.FC<{
                 <Checkbox
                     className={libraryRowToggleExample}
                     checked={
-                        checked1
+                        !!exampleSentences?.includes(document.ltDocument.id())
                     }
                     onChange={() => document.toggleUseForExamples()}
                 />
