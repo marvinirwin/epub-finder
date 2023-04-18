@@ -12,7 +12,7 @@ import {
 export const AdjustFrequencyWeight = () => {
     const m = useContext(ManagerContext)
     const frequencyWeight =
-        useObservableState(m.settingsService.frequencyWeight$) || 0
+        useObservableState(m.settingsService.frequencyWeight$.obs$) || 0
     return (
         <ListItem>
             <Typography gutterBottom>
@@ -21,7 +21,7 @@ export const AdjustFrequencyWeight = () => {
             <Slider
                 value={frequencyWeight}
                 onChange={(_, value) => {
-                    m.settingsService.frequencyWeight$.next(value as number)
+                    m.settingsService.frequencyWeight$.user$.next(value as number)
                 }}
                 step={0.1}
                 marks

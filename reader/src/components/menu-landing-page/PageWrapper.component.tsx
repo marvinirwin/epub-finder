@@ -18,14 +18,14 @@ export type PageWrapperProps = {};
 export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     const m = useContext(ManagerContext);
     const readingLanguageCode =
-        useObservableState(m.settingsService.readingLanguage$) || ''
+        useObservableState(m.settingsService.readingLanguage$.obs$) || ''
     const spokenLanguageCode =
-        useObservableState(m.settingsService.spokenLanguage$) || ''
+        useObservableState(m.settingsService.spokenLanguage$.obs$) || ''
     const potentialSpokenLanguageCode =
         useObservableState(m.languageConfigsService.potentialLearningSpoken$) ||
         []
     const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
-    const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
+    const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$.obs$);
     const currentUserEmail = useObservableState(m.loggedInUserService.profile$)?.email;
     const isLoading = useObservableState(m.loadingService.isLoading$) || false;
     const loadingMessage = useObservableState(m.loadingService.latestLoadingMessage$) || "";
@@ -43,8 +43,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         }
     );
 
-    const onLanguageSelect = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
-    const onVariantSelect = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.next(v.value);
+    const onLanguageSelect = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.user$.next(v.value);
+    const onVariantSelect = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.user$.next(v.value);
     const onFileUpload = async (files: FileList) => {
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < files.length; i++) {
@@ -58,12 +58,12 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         QuizCarouselNode,
     ];
     const language = languages.find(l => l.value === readingLanguageCode);
-    const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.next(v.value);
+    const setLanguage = (v: ParentLanguageOption) => m.settingsService.readingLanguage$.user$.next(v.value);
     const variant = flatten(languages.map(l => l.variants)).find(v => v.value === spokenLanguageCode) as VariantLanguageOption;
-    const setVariant = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.next(v.value)
+    const setVariant = (v: VariantLanguageOption) => m.settingsService.spokenLanguage$.user$.next(v.value)
     const [dragActive, setDragActive] = React.useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-    const currentComponent = useObservableState(m.settingsService.componentPath$)
+    const currentComponent = useObservableState(m.settingsService.componentPath$.obs$)
 
     const handleDrag = (e: DragEvent) => {
         e.preventDefault();
@@ -96,7 +96,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         el.multiple = "multiple"; // remove to have a single file selection
 
         // (cancel will not trigger 'change')
-        el.addEventListener('change', ev2 => {
+        el.addEventListener('change', v2 => {
             // @ts-ignore
             onFileUpload(el.files)
             // access el.files[] to do something with it (test its length!)

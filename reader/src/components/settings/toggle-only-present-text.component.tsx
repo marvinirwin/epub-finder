@@ -5,7 +5,7 @@ import { FormControlLabel, ListItem, Switch } from '@material-ui/core'
 
 export const ToggleOnlyPresentText = () => {
     const m = useContext(ManagerContext)
-    const onlyShowPresentText = useObservableState(m.settingsService.onlyReviewPresentText$)
+    const onlyShowPresentText = useObservableState(m.settingsService.onlyReviewPresentText$.obs$)
     return (
         <ListItem>
             <FormControlLabel
@@ -13,7 +13,7 @@ export const ToggleOnlyPresentText = () => {
                     <Switch
                         checked={!!onlyShowPresentText}
                         onChange={() =>
-                            m.settingsService.onlyReviewPresentText$.next(!onlyShowPresentText)
+                            m.settingsService.onlyReviewPresentText$.user$.next(!onlyShowPresentText)
                         }
                     />
                 }

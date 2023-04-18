@@ -11,7 +11,7 @@ import {
 
 export const AdjustDateWeight = () => {
     const m = useContext(ManagerContext)
-    const dateWeight = useObservableState(m.settingsService.dateWeight$) || 0
+    const dateWeight = useObservableState(m.settingsService.dateWeight$.obs$) || 0
     return (
         <ListItem>
             <Typography gutterBottom>
@@ -20,7 +20,7 @@ export const AdjustDateWeight = () => {
             <Slider
                 value={dateWeight}
                 onChange={(_, value) => {
-                    m.settingsService.dateWeight$.next(value as number)
+                    m.settingsService.dateWeight$.user$.next(value as number)
                 }}
                 step={0.1}
                 marks
@@ -34,7 +34,7 @@ export const AdjustTranslationAttemptSentenceWeight = () => {
     const m = useContext(ManagerContext)
     const dateWeight =
         useObservableState(
-            m.settingsService.translationAttemptSentenceWeight$,
+            m.settingsService.translationAttemptSentenceWeight$.obs$,
         ) || 0
     return (
         <ListItem>
@@ -45,7 +45,7 @@ export const AdjustTranslationAttemptSentenceWeight = () => {
             <Slider
                 value={dateWeight}
                 onChange={(_, value) => {
-                    m.settingsService.translationAttemptSentenceWeight$.next(
+                    m.settingsService.translationAttemptSentenceWeight$.user$.next(
                         value as number,
                     )
                 }}

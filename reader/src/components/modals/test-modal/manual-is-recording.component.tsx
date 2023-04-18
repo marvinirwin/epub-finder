@@ -5,7 +5,7 @@ import { ManagerContext } from '../../../App'
 export const ManualIsRecording = () => {
     const m = useContext(ManagerContext)
     const manualIsRecording =
-        useObservableState(m.settingsService.manualIsRecording$) || false
+        useObservableState(m.settingsService.manualIsRecording$.obs$) || false
     return (
         <input
             id="manual-is-recording"

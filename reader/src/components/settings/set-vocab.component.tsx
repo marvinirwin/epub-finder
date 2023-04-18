@@ -13,7 +13,7 @@ import { LtDocument } from '@shared/'
 export const SetVocab = () => {
     const m = useContext(ManagerContext)
     const selectedVocab =
-        useObservableState(m.settingsService.selectedVocabulary$) ||
+        useObservableState(m.settingsService.selectedVocabulary$.obs$) ||
         'USE_QUIZ_RESULTS'
     const allDocuments: Map<string, LtDocument> =
         useObservableState(m.documentRepository.collection$) || new Map()
@@ -25,7 +25,7 @@ export const SetVocab = () => {
                         labelId="reading-language-select-label"
                         value={selectedVocab}
                         onChange={(e) =>
-                            m.settingsService.selectedVocabulary$.next(
+                            m.settingsService.selectedVocabulary$.user$.next(
                                 e.target.value as string,
                             )
                         }

@@ -14,15 +14,15 @@ const LibraryRow = (
     }: { document: LibraryDocumentRow }) => {
     const m = useContext(ManagerContext);
     const frequencyDocuments = useObservableState(
-        m.settingsService.selectedFrequencyDocuments$
+        m.settingsService.selectedFrequencyDocuments$.obs$
     );
     const exampleSentences = useObservableState(
-        m.settingsService.selectedExampleSegmentDocuments$
+        m.settingsService.selectedExampleSegmentDocuments$.obs$
     );
 
     useEffect(() => {
         console.log(m.settingsService.selectedExampleSegmentDocuments$);
-        m.settingsService.selectedExampleSegmentDocuments$.subscribe(v => {
+        m.settingsService.selectedExampleSegmentDocuments$.obs$.subscribe(v => {
             debugger;
             console.log(v);
         })

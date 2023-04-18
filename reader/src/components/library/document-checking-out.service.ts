@@ -15,16 +15,16 @@ export class DocumentCheckingOutService {
         const checkedOutDocuments = {...await observableLastValue(this.settingsService.checkedOutDocuments$)};
         checkedOutDocuments[titleBeingCheckedOut] = true;
 */
-        this.settingsService.readingDocument$.next(titleBeingCheckedOut)
+        this.settingsService.readingDocument$.user$.next(titleBeingCheckedOut)
     }
 
     async returnDocument(titleBeingReturned: string) {
         const checkedOutDocuments = {
             ...(await observableLastValue(
-                this.settingsService.checkedOutDocuments$,
+                this.settingsService.checkedOutDocuments$.obs$,
             )),
         }
         delete checkedOutDocuments[titleBeingReturned]
-        this.settingsService.checkedOutDocuments$.next(checkedOutDocuments)
+        this.settingsService.checkedOutDocuments$.user$.next(checkedOutDocuments)
     }
 }

@@ -8,7 +8,7 @@ import { SetQuizWordLimit } from '../settings/set-new-quiz-word-limit.component'
 
 export const QuizCardLimitReached = () => {
     const m = useContext(ManagerContext)
-    const limit = useObservableState(m.settingsService.newQuizWordLimit$) || 0
+    const limit = useObservableState(m.settingsService.newQuizWordLimit$.obs$) || 0
     const completedScheduleRows = useObservableState(m.quizCardScheduleService.cardsLearnedToday$) || [];
     const wordsDoneToday = Object.values(groupBy(completedScheduleRows, r => r.d.word))
             ?.length || 0

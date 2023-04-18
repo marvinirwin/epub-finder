@@ -31,7 +31,7 @@ export function Main({ m }: { m: Manager }) {
 
     const hotkeyHandler =
         useObservableState(m.browserInputsService.focusedElement$) || null
-    const hotkeyConfig = useObservableState(m.settingsService.hotkeys$, {})
+    const hotkeyConfig = useObservableState(m.settingsService.hotkeys$.obs$, {})
     const withDefaults = { ...HotKeyEvents.defaultHotkeys(), ...hotkeyConfig }
     const urlParams = new URLSearchParams(window.location.search)
 

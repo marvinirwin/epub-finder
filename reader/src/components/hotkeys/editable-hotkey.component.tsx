@@ -19,9 +19,9 @@ export function EditableHotkeyComponent({
                 placeholder={action}
                 value={(keyCombo || []).join('+')}
                 onChange={async (e) => {
-                    m.settingsService.hotkeys$.next({
+                    m.settingsService.hotkeys$.user$.next({
                         ...(await observableLastValue(
-                            m.settingsService.hotkeys$,
+                            m.settingsService.hotkeys$.obs$,
                         )),
                         [action]: (e?.target?.value || '').split('+'),
                     })

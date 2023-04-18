@@ -14,13 +14,13 @@ import { ManagerContext } from '../../App'
 export const QuizCardTableToolbar = () => {
     const m = useContext(ManagerContext)
     const filterValue =
-        useObservableState(m.settingsService.scheduleTableWordFilterValue$) ||
+        useObservableState(m.settingsService.scheduleTableWordFilterValue$.obs$) ||
         ''
     const showUncounted =
-        useObservableState(m.settingsService.scheduleTableShowUncounted$) ||
+        useObservableState(m.settingsService.scheduleTableShowUncounted$.obs$) ||
         false
     const showUnderDue =
-        useObservableState(m.settingsService.scheduleTableShowUnderDue$) ||
+        useObservableState(m.settingsService.scheduleTableShowUnderDue$.obs$) ||
         false
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -32,7 +32,7 @@ export const QuizCardTableToolbar = () => {
                     <Switch
                         checked={showUncounted}
                         onChange={() =>
-                            m.settingsService.scheduleTableShowUncounted$.next(
+                            m.settingsService.scheduleTableShowUncounted$.user$.next(
                                 !showUncounted,
                             )
                         }
@@ -45,7 +45,7 @@ export const QuizCardTableToolbar = () => {
                     <Switch
                         checked={showUnderDue}
                         onChange={() =>
-                            m.settingsService.scheduleTableShowUnderDue$.next(
+                            m.settingsService.scheduleTableShowUnderDue$.user$.next(
                                 !showUnderDue,
                             )
                         }
@@ -56,7 +56,7 @@ export const QuizCardTableToolbar = () => {
             <TextField
                 value={filterValue}
                 onChange={(v) =>
-                    m.settingsService.scheduleTableWordFilterValue$.next(
+                    m.settingsService.scheduleTableWordFilterValue$.user$.next(
                         v.target.value,
                     )
                 }

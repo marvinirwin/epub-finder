@@ -6,14 +6,14 @@ import { observableLastValue } from '../../services/settings.service'
 import { Manager } from '../../lib/manager/Manager'
 import * as _ from 'lodash'
 
-const setReviewCardLimitDebounced = _.debounce((m: Manager, newLimit: number) => m.settingsService.newQuizWordLimit$.next(newLimit), 1000)
+const setReviewCardLimitDebounced = _.debounce((m: Manager, newLimit: number) => m.settingsService.newQuizWordLimit$.user$.next(newLimit), 1000)
 
 export const SetReviewCardLimit = () => {
     const m = useContext(ManagerContext)
     const [reviewCardLimitString, setReviewCardLimit] = useState<string>('')
     const setReviewLimitSetting = (str: string) => setReviewCardLimitDebounced(m, parseInt(str, 10) || 0)
     useEffect(() => {
-        observableLastValue(m.settingsService.maxReviewsPerDay$)
+        observableLastValue(m.settingsService.maxReviewsPerDay$.obs$)
             .then(r => setReviewCardLimit(`${r}`))
     }, [])
 

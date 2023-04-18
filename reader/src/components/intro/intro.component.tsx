@@ -10,7 +10,7 @@ import { IntroSetGoal } from './intro-set-goal.component'
 export const Intro = () => {
     const m = useContext(ManagerContext)
     const currentIntroTab =
-        useObservableState(m.settingsService.currentIntroTab$) || 0
+        useObservableState(m.settingsService.currentIntroTab$.obs$) || 0
     const steps = [
         {
             Component: IntroLanguageSelect,
@@ -36,7 +36,7 @@ export const Intro = () => {
             <Tabs
                 value={currentIntroTab}
                 onChange={(_, newValue) => {
-                    m.settingsService.currentIntroTab$.next(newValue)
+                    m.settingsService.currentIntroTab$.user$.next(newValue)
                 }}
                 indicatorColor="primary"
                 textColor="primary"

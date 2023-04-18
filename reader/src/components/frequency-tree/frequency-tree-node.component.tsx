@@ -22,7 +22,7 @@ export const FrequencyTreeNode: React.FC<FrequencyDocumentNodeArgs> = ({
             <Button
                 style={{ margin: '24px' }}
                 onClick={() =>
-                    m.settingsService.progressTreeRootId$.next(
+                    m.settingsService.progressTreeRootId$.user$.next(
                         value.frequencyDocument.id(),
                     )
                 }

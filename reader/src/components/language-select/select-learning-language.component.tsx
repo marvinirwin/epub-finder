@@ -9,12 +9,12 @@ import { EmittedValuesWithRef } from "../UseVisilbleObservableState/EmittedValue
 export const SelectLearningLanguage = () => {
     const m = useContext(ManagerContext)
     const allLanguages = SupportedSpeechToTextService.Configs;
-    const lang = useObservableState(m.settingsService.readingLanguage$) || '';
-    const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
+    const lang = useObservableState(m.settingsService.readingLanguage$.obs$) || '';
+    const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$.obs$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
     const [ref, setRef] = useState<HTMLSelectElement | null>(null);
     return <>
         <EmittedValuesWithRef ref={ref} emittedValues={emittedSelectedReadingLanguages} id={'select-learning-language'}/>
-        <SelectLearningLanguageBase options={allLanguages} value={lang} onChange={languageCode => m.settingsService.readingLanguage$.next(languageCode) } ref={setRef}/>
+        <SelectLearningLanguageBase options={allLanguages} value={lang} onChange={languageCode => m.settingsService.readingLanguage$.user$.next(languageCode) } ref={setRef}/>
     </>
 }
 

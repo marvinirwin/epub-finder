@@ -12,7 +12,7 @@ import {
 export const AdjustLengthWeight = () => {
     const m = useContext(ManagerContext)
     const wordLengthWeight =
-        useObservableState(m.settingsService.wordLengthWeight$) || 0
+        useObservableState(m.settingsService.wordLengthWeight$.obs$) || 0
     return (
         <ListItem>
             <Typography gutterBottom>
@@ -21,7 +21,7 @@ export const AdjustLengthWeight = () => {
             <Slider
                 value={wordLengthWeight}
                 onChange={(_, value) => {
-                    m.settingsService.wordLengthWeight$.next(value as number)
+                    m.settingsService.wordLengthWeight$.user$.next(value as number)
                 }}
                 step={0.1}
                 marks

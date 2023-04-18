@@ -13,14 +13,14 @@ import { SupportedTranslations } from "@shared/"
 export const LanguageSelect = () => {
     const m = useContext(ManagerContext)
     const readingLanguageCode =
-        useObservableState(m.settingsService.readingLanguage$) || ''
+        useObservableState(m.settingsService.readingLanguage$.obs$) || ''
     const spokenLanguageCode =
-        useObservableState(m.settingsService.spokenLanguage$) || ''
+        useObservableState(m.settingsService.spokenLanguage$.obs$) || ''
     const potentialSpokenLanguageCode =
         useObservableState(m.languageConfigsService.potentialLearningSpoken$) ||
         []
     const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
-    const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$);
+    const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$.obs$);
     return (
         <Fragment>
             <Box m={2} p={1}>
@@ -32,7 +32,7 @@ export const LanguageSelect = () => {
                     labelId='reading-language-select-label'
                     value={readingLanguageCode}
                     onChange={(e) =>
-                        m.settingsService.readingLanguage$.next(
+                        m.settingsService.readingLanguage$.user$.next(
                             e.target.value as string,
                         )
                     }
@@ -56,7 +56,7 @@ export const LanguageSelect = () => {
                     labelId='spoken-language-select-label'
                     value={spokenLanguageCode}
                     onChange={(e) =>
-                        m.settingsService.spokenLanguage$.next(
+                        m.settingsService.spokenLanguage$.user$.next(
                             e.target.value as string,
                         )
                     }
@@ -78,7 +78,7 @@ export const LanguageSelect = () => {
                     labelId={textToSpeechLanguageSelectLabel}
                     value={chosenTextToSpeechConfig?.voice || ''}
                     onChange={(e) =>
-                        m.settingsService.textToSpeechConfiguration$.next(
+                        m.settingsService.textToSpeechConfiguration$.user$.next(
                             potentialTextToSpeech.find(potentialConfig => potentialConfig.voice === e.target.value)
                         )
                     }

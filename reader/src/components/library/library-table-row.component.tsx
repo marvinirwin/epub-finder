@@ -16,10 +16,10 @@ export const LibraryDocumentRowComponent: React.FC<{
 }> = ({ document }) => {
     const m = useContext(ManagerContext)
     const frequencyDocuments = useObservableState(
-        m.settingsService.selectedFrequencyDocuments$,
+        m.settingsService.selectedFrequencyDocuments$.obs$,
     )
     const exampleSentences = useObservableState(
-        m.settingsService.selectedExampleSegmentDocuments$,
+        m.settingsService.selectedExampleSegmentDocuments$.obs$,
     )
     let checked = !!frequencyDocuments?.includes(document.ltDocument.id());
     let checked1 = !!exampleSentences?.includes(document.ltDocument.id());
@@ -29,7 +29,7 @@ export const LibraryDocumentRowComponent: React.FC<{
             className={libraryRow}
             onClick={(e) => {
                 if (e.metaKey) {
-                    m.settingsService.readingDocument$.next(
+                    m.settingsService.readingDocument$.user$.next(
                         document.ltDocument.id(),
                     )
                 }

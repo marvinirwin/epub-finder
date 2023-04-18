@@ -14,7 +14,7 @@ export const NextButton: React.FC<{ currentTab: number; steps: unknown[] }> = ({
             // m.modalService.intro.open$.next(false)
         }
         : () => {
-            m.settingsService.currentIntroTab$.next(currentTab + 1)
+            m.settingsService.currentIntroTab$.user$.next(currentTab + 1)
         }, [isLastTab])
     return (
         <Box m={2} p={1}>

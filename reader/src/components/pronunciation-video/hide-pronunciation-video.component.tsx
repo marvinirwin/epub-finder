@@ -11,7 +11,7 @@ export const HidePronunciationVideo = () => {
             aria-label="edit"
             style={{ position: 'absolute', float: 'right', margin: '24px' }}
             onClick={() =>
-                m.settingsService.pronunciationVideoSentenceHash$.next('')
+                m.settingsService.pronunciationVideoSentenceHash$.user$.next('')
             }
         >
             <Close />
