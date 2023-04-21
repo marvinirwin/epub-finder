@@ -1,6 +1,8 @@
 export const AUDIO_GRAPH_SAMPLE_SIZE = 50
 export const filterData = (audioBuffer: AudioBuffer, samples: number) => {
-    const rawData = audioBuffer.getChannelData(0) // We only need to work with one channel of data
+    const rawData2 = audioBuffer.getChannelData(0) // We only need to work with one channel of data
+    const rawData = audioBuffer.getChannelData(1) // We only need to work with one channel of data
+
     const blockSize = Math.floor(rawData.length / samples) // the number of samples in each subdivision
     const filteredData = []
     for (let i = 0; i < samples; i++) {

@@ -27,6 +27,7 @@ var Fragment = (function () {
     function Fragment(data, beginTime, endTime) {
         _classCallCheck(this, Fragment)
 
+        console.log(data)
         this.content = data
         this.beginTime = beginTime
         this.endTime = endTime

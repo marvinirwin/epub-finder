@@ -104,6 +104,7 @@ self.renderTrack = function (trackNum, fragments, destination, sampleRate) {
                 reverse: !!fragment.reverse,
             })
         }
+        console.log(srcSub)
 
         pos += length
     }

@@ -102,11 +102,13 @@ export const CharacterTimingSectionComponent: React.FunctionComponent<{
     const debouncedOnDropOver = useDebouncedFn(onDropOver, 250)
 
     useEffect(() => {
-        if (canvas && audioBuffer && normalMax) {
+        if (canvas) {
             const sectionPadding = 24 * 2
             canvas.width =
                 (canvas.parentElement?.clientWidth || 240) - sectionPadding
             canvas.height = 50
+        }
+        if (canvas && audioBuffer && normalMax) {
             draw(
                 normalizeData(filterData(audioBuffer, 1000), normalMax),
                 canvas,

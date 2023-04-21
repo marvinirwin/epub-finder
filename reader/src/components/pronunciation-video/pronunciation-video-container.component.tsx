@@ -1,20 +1,20 @@
-import { Manager } from '../../lib/manager/Manager'
-import React, { useEffect, useRef, useState } from 'react'
-import { useObservableState, useSubscription } from 'observable-hooks'
-import { Card } from '@material-ui/core'
-import { CharacterTimingSectionComponent } from './character-timing-section.component'
-import { useChunkedCharacterTimings } from './useChunkedCharacterTimings'
-import { PronunciationVideo } from './pronunciation-video.component'
-import { useResizeObserver } from 'beautiful-react-hooks'
-import { PronunciationSection } from './pronunciation-section'
-import { PlaybackSpeedComponent } from '../app-directory/playback-speed.component'
-import { useHighlightBarPositionPercentage } from './useSetHighlightBarPositionPercentage'
+import {Manager} from '../../lib/manager/Manager'
+import React, {useEffect, useRef, useState} from 'react'
+import {useObservableState, useSubscription} from 'observable-hooks'
+import {Card} from '@material-ui/core'
+import {CharacterTimingSectionComponent} from './character-timing-section.component'
+import {useChunkedCharacterTimings} from './useChunkedCharacterTimings'
+import {PronunciationVideo} from './pronunciation-video.component'
+import {useResizeObserver} from 'beautiful-react-hooks'
+import {PronunciationSection} from './pronunciation-section'
+import {PlaybackSpeedComponent} from '../app-directory/playback-speed.component'
+import {useHighlightBarPositionPercentage} from './useSetHighlightBarPositionPercentage'
 
 const DRAG_TIMEOUT = 500
 
 export const PronunciationVideoContainer: React.FunctionComponent<{
     m: Manager
-}> = ({ m }) => {
+}> = ({m}) => {
     const [highlightBarPosition1Ms, setHighlightBarMsP1] = useState(
         useObservableState(m.settingsService.playbackStartPercent$.obs$),
     )
@@ -36,9 +36,9 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
         m.pronunciationVideoService.videoMetadata$,
     )
 
-    const { chunkedAudioBuffers, max } = useObservableState(
+    const {chunkedAudioBuffers, max} = useObservableState(
         m.pronunciationVideoService.chunkedAudioBuffers$,
-        { chunkedAudioBuffers: [], max: 0 },
+        {chunkedAudioBuffers: [], max: 0},
     )
     const currentSentenceCharacterIndex = useObservableState(
         m.browserInputsService.videoCharacterIndex$,
@@ -99,7 +99,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
 
     return (
         <Card className={'pronunciation-video-container-card'}>
-            <div style={{}}>
+            <div>
                 <PronunciationVideo
                     highlightBarPosition1Ms={highlightBarPosition1Ms}
                     highlightBarPosition2Ms={highlightBarPosition2Ms}
@@ -107,15 +107,15 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
                         currentSentenceCharacterIndex
                     }
                 />
-                <PlaybackSpeedComponent />
+                <PlaybackSpeedComponent/>
             </div>
-
             {/* @ts-ignore */}
             <div
                 className={`pronunciation-sections-container`}
                 ref={v => pronunciationSectionsContainer.current = v}
             >
-                {chunkedCharacterTimings &&
+                {
+                    chunkedCharacterTimings &&
                     videoMetadata &&
                     sectionLengthMs &&
                     chunkedCharacterTimings.map(
@@ -162,7 +162,7 @@ export const PronunciationVideoContainer: React.FunctionComponent<{
                                             // If the click was fast enough then clear the range
                                             if (
                                                 new Date().getTime() -
-                                                    mouseDownTime.getTime() <
+                                                mouseDownTime.getTime() <
                                                 DRAG_TIMEOUT
                                             ) {
                                                 setHighlightBarMsP1(0)

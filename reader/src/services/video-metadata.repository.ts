@@ -12,7 +12,8 @@ export class VideoMetadataRepository {
             .get(getApiUrl("/api/video_metadata"))
             .then((response) => {
                 if (response.status === 200) {
-                    const allMetadata = (response.data as unknown) as VideoMetadata[]
+                    // @ts-ignore
+                    const allMetadata = ((response.data as unknown) as VideoMetadata[]).map(v => JSON.parse(v.metadata))
                     // I'm totally going to regret this,
                     // I need to make a class VideoMetadataEntity which removes its punctuation
                     /*

@@ -52,9 +52,8 @@ export class PronunciationVideoService {
             if (v) {
                 const hash = await sha1(v.sentence)
                 this.audioUrl$.next(
-                    `${process.env.PUBLIC_URL}/video/${
-                        v.audioFilename || `${hash}.wav`
-                    } `,
+                    `https://languagetrainer-documents.s3.amazonaws.com/${hash}-audio`,
+                    // `${process.env.PUBLIC_URL}/video/${hash}-audio`,
                 )
             }
         })

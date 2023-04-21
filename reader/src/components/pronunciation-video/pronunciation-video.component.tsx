@@ -41,7 +41,8 @@ export const PronunciationVideo = ({
     useObserveVideoState(videoElementRef, m.pronunciationVideoService)
 
     const videoSource = videoMetadata
-        ? getApiUrl("/video/${videoMetadata.filename}")
+        ? // getApiUrl(`/video/${videoMetadata.filename}`)
+                `https://languagetrainer-documents.s3.amazonaws.com/${videoMetadata.filename}`
         : undefined
 
     return (
