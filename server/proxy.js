@@ -1,17 +1,9 @@
 const httpProxy = require('http-proxy');
 const http = require('http');
+const net = require('net');
 
 // Create the proxy server
 const proxy = httpProxy.createProxyServer();
-
-
-/*
-proxy.on(
-    'proxyReq',
-    (proxyReq, req, res, options) => {
-    }
-)
-*/
 
 // Set up the server to handle requests
 const assumedProtocol = 'https';
@@ -28,7 +20,6 @@ const server = http.createServer((req, res) => {
                     'X-Forwarded-For': req.connection.remoteAddress,
                     'X-Forwarded-Host': req.headers.host,
                     'X-Forwarded-Port': '443',
-                    // TODO change these to use the actual req.protocl
                     'X-Forwarded-Proto': assumedProtocol,
                     'X-Forwarded-Scheme': assumedProtocol,
                     'X-Scheme': assumedProtocol,
@@ -38,10 +29,38 @@ const server = http.createServer((req, res) => {
             }
         );
     } else {
-        // Otherwise, proxy requests to localhost:3001
-        proxy.web(req, res, {target: 'http://localhost:3001'});
+        proxy.web(req, res, { target: 'http://localhost:3001' });
     }
 });
 
-// Start the server
-server.listen(process.env.PORT || 8000);
+function checkIfListening(host, port) {
+    return new Promise((resolve, reject) => {
+        const socket = new net.Socket();
+        socket.setTimeout(60000);
+        socket.on('connect', () => {
+            socket.end();
+            resolve(true);
+        }).on('timeout', () => {
+            socket.destroy();
+            resolve(false);
+        }).on('error', (err) => {
+            socket.destroy();
+            resolve(false);
+        }).connect(port, host);
+    });
+}
+
+async function startServer() {
+    const target1 = await checkIfListening('localhost', 8080);
+    const target2 = await checkIfListening('localhost', 3001);
+
+    if (target1 && target2) {
+        server.listen(process.env.PORT || 8000, () => {
+            console.log('Server started on port', process.env.PORT || 8000);
+        });
+    } else {
+        console.error('One or both of the targets are not listening. Server not started.');
+    }
+}
+
+startServer();
