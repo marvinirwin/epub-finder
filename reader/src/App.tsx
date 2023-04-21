@@ -16,6 +16,7 @@ import {isSafari} from "./components/quiz/is.safari";
 import {SafariNotSupported} from "./safari-not-supported.component";
 import {Flowbite, DarkThemeToggle, CustomFlowbiteTheme} from 'flowbite-react';
 import {PronunciationVideoContainer} from "./components/pronunciation-video/pronunciation-video-container.component";
+import {useObservableState} from "observable-hooks";
 
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -33,6 +34,7 @@ export const ManagerContext = React.createContext(manager);
 
 function App() {
     const m = manager;
+    const selectedVideo = useObservableState(m.pronunciationVideoService.videoMetadata$);
     return (
         <Flowbite>
             <ThemeProvider theme={theme}>
@@ -50,9 +52,12 @@ function App() {
                             {/* <SpeechRecognitionSnackbar/> */}
                             <GlobalDragOver/>
                             <Main m={manager}/>
-                            <div style={{position: 'fixed', zIndex: 2, top: 0, width: '100%'}}>
-                                <PronunciationVideoContainer m={m} />
-                            </div>
+                            {
+                                selectedVideo &&
+                                <div style={{position: 'fixed', zIndex: 2, top: 0, width: '100%'}}>
+                                    <PronunciationVideoContainer m={m}/>
+                                </div>
+                            }
                         </>}
                     </CssBaseline>
                 </ManagerContext.Provider>
