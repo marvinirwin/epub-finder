@@ -1,4 +1,4 @@
-import React, {DragEvent, useContext, useRef} from "react";
+import React, {DragEvent, useContext, useRef, useState} from "react";
 import {NavBarAndSettingsPopup} from "../settings-popup/NavBarAndSettingsPopup.component";
 import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./LandingPage";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
@@ -7,16 +7,14 @@ import {useObservableState} from "observable-hooks";
 import {HOME_NODE, LIBRARY_NODE, QUIZ_NODE, SupportedTranslations} from "@shared/";
 import {mapTranslatableLanguagesToSpokenOnes} from "../../lib/language/mapTranslatableLanguagesToSpokenOnes";
 import {flatten} from "lodash";
-import {LibraryNode} from "../app-directory/nodes/library.node";
 import {QuizCardCarousel} from "../quiz/quiz-card-carousel.component";
 import {QuizCarouselNode} from "../app-directory/nodes/quiz-carousel.node";
 import {HomeNode} from "../app-directory/nodes/Home.node";
 import {
-    createBrowserRouter,
-    RouterProvider,
     useLocation,
     useRoutes,
 } from "react-router-dom";
+import UploadingModal from "../../UploadingModal";
 
 export type PageWrapperProps = {};
 
@@ -28,7 +26,9 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         useObservableState(m.settingsService.spokenLanguage$.obs$) || ''
     const potentialSpokenLanguageCode =
         useObservableState(m.languageConfigsService.potentialLearningSpoken$) ||
-        []
+        [];
+
+    const [uploadingDocument, setUploadingDocument] = useState<File | undefined>(undefined);
     const potentialTextToSpeech = useObservableState(m.languageConfigsService.potentialLearningLanguageTextToSpeechConfigs$) || []
     const chosenTextToSpeechConfig = useObservableState(m.settingsService.textToSpeechConfiguration$.obs$);
     const currentUserEmail = useObservableState(m.loggedInUserService.profile$)?.email;
@@ -67,6 +67,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const {pathname: currentComponent} = useLocation();
 
+
     const handleDrag = (e: DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -77,13 +78,17 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         }
     };
 
-    const handleDrop = ({e, filename}: { e: DragEvent, filename: string }) => {
+    const handleDrop = ({e}: { e: DragEvent }) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
         const uploadedFiles = e.dataTransfer.files;
         if (uploadedFiles.length) {
-            onFileUpload(uploadedFiles);
+            if (uploadedFiles.length > 1) {
+                onFileUpload(uploadedFiles);
+            } else {
+                setUploadingDocument(uploadedFiles[0] as File)
+            }
         }
     };
 
@@ -99,6 +104,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
 
         // (cancel will not trigger 'change')
         el.addEventListener('change', v2 => {
+
             // @ts-ignore
             onFileUpload(el.files)
             // access el.files[] to do something with it (test its length!)
@@ -129,33 +135,37 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         {
             path: HomeNode.pathname,
             element: <LandingPage
-                    onTextUpload={({text, name}) =>
-                        m.uploadingDocumentsService.upload(
-                            {
-                                file: new File([text], name),
-                                language_code: readingLanguageCode
-                            }
-                        )
-                    }
-                    onFileSelected={({file}) =>
-                        m.uploadingDocumentsService.upload(
-                            {
-                                file,
-                                language_code: readingLanguageCode
-                            }
-                        )
-                    }
-                    languages={languages}
-                    language={language}
-                    setLanguage={setLanguage}
-                    variant={variant}
-                    setVariant={setVariant}
-                    dragActive={dragActive}
-                    onDragEnter={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={handleUploadClick}
-                    ref={inputRef}
-                />,
+                onTextUpload={(file) => {
+                    setUploadingDocument(file)
+                    /*
+                                            m.uploadingDocumentsService.upload(
+                                                {
+                                                    file: ,
+                                                    language_code: readingLanguageCode
+                                                }
+                                            );
+                    */
+                }
+                }
+                onFileSelected={({file}) =>
+                    m.uploadingDocumentsService.upload(
+                        {
+                            file,
+                            language_code: readingLanguageCode
+                        }
+                    )
+                }
+                languages={languages}
+                language={language}
+                setLanguage={setLanguage}
+                variant={variant}
+                setVariant={setVariant}
+                dragActive={dragActive}
+                onDragEnter={handleDrag}
+                onDrop={handleDrop}
+                onClick={handleUploadClick}
+                ref={inputRef}
+            />,
 
         },
     ]);
@@ -172,6 +182,19 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
             isLoading={isLoading}
             loadingMessage={loadingMessage}
         />
+        {
+            uploadingDocument &&
+            <UploadingModal
+                uploadingDocument={uploadingDocument}
+                onSubmit={(file: File,) => {
+                    const fileList = new DataTransfer();
+                    fileList.items.add(file)
+                    debugger;
+                    onFileUpload(fileList.files)
+                }
+                }
+            ></UploadingModal>
+        }
         {router}
     </div>
 };

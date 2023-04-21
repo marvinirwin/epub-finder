@@ -9,9 +9,9 @@ export type LandingPageProps = {
     setVariant: (v: VariantLanguageOption) => unknown,
     dragActive: boolean,
     onDragEnter: (e: React.DragEvent) => void,
-    onDrop: (p: { e: React.DragEvent, filename: string }) => void,
+    onDrop: (p: { e: React.DragEvent }) => void,
     ref: React.RefObject<HTMLInputElement>,
     onClick: () => void
-    onFileSelected: (p: { file: File, name: string }) => void
-    onTextUpload: (p: { text: string, name: string }) => void
+    onFileSelected: (p: { file: File }) => void
+    onTextUpload: (p: File) => void
 };

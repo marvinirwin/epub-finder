@@ -24,13 +24,12 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
         onFileSelected,
         onTextUpload
     }, ref) => {
-    const [uploadedFileName, setUploadedFileName] = useState<string>("")
     const [uploadedFileText, setUploadedFileText] = useState<string>("");
     const validExtensionList = Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ');
     return <div className="w-full flex flex-row grow">
         <div className="flex flex-col w-1/2 p-8">
             <CameraComponent onPictureTaken={(image) => {
-                onFileSelected({name: uploadedFileName, file: image})
+                onFileSelected({file: image})
             }}/>
             <Library/>
         </div>
@@ -64,12 +63,6 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                     </select>
                 )}
             </div>
-            <TextInput
-                value={uploadedFileName}
-                onChange={e => setUploadedFileName(e.target.value)}
-                placeholder={'The label of your uploaded material.  Will use filename if left blank.'}
-            />
-            &nbsp;
             <div className='flex flex-col justify-center'>
                 <Textarea
                     value={uploadedFileText}
@@ -78,11 +71,11 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                 />
                 <Button
                     onClick={() => {
-                        if (!uploadedFileText || !uploadedFileName) {
+                        if (!uploadedFileText ) {
                             alert(`Please enter a name and some text to upload`);
                             return;
                         }
-                        onTextUpload({text: uploadedFileText, name: `${uploadedFileName}.txt`})
+                        onTextUpload(new File([uploadedFileText], 'inputText.txt'))
                     }}
                 >
                     Upload Text
@@ -98,7 +91,6 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
                 onDrop={e => onDrop(
                     {
                         e,
-                        filename: uploadedFileName
                     }
                 )}
             >
