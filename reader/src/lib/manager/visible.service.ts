@@ -49,6 +49,7 @@ export class VisibleService {
         ]).pipe(
             map(([componentInView, { sourced }]) => {
                 if (!sourced || !sourced.children) return []
+                console.log(componentInView)
                 switch (componentInView) {
                     case READING_NODE:
                         return flattenTree(

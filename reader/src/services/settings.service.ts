@@ -46,6 +46,7 @@ function listenToPathnameChanges() {
         };
 
         window.addEventListener('popstate', onPopState);
+        window.addEventListener('pushstate', onPopState);
 
         // Emit the initial value
         observer.next(window.location.pathname);

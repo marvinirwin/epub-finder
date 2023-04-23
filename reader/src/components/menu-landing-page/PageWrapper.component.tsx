@@ -147,13 +147,17 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
                     */
                 }
                 }
-                onFileSelected={({file}) =>
-                    m.uploadingDocumentsService.upload(
-                        {
-                            file,
-                            language_code: readingLanguageCode
-                        }
-                    )
+                onFileSelected={({file}) => {
+                    setUploadingDocument(file);
+                    /*
+                                        m.uploadingDocumentsService.upload(
+                                            {
+                                                file,
+                                                language_code: readingLanguageCode
+                                            }
+                                        );
+                    */
+                }
                 }
                 languages={languages}
                 language={language}
@@ -189,8 +193,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
                 onSubmit={(file: File,) => {
                     const fileList = new DataTransfer();
                     fileList.items.add(file)
-                    debugger;
                     onFileUpload(fileList.files)
+                    setUploadingDocument(undefined);
                 }
                 }
             ></UploadingModal>
