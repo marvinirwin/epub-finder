@@ -11,15 +11,15 @@ import {CardLearningLanguageText} from '../../word-information/card-learning-lan
 import {CardOrderMetadata} from "./card-order-metadata.component";
 import {ScheduleRowsTables} from "../../word-information/schedule-rows-tables.component";
 import {ExpandOnClick} from "../../app-container/expandable-container";
-import { ManagerContext } from '../../../App'
-import { useVisibleObservableState } from '../../UseVisilbleObservableState/UseVisibleObservableState'
-import { SegmentSubsequences } from "@shared/*";
+import {ManagerContext} from '../../../App'
+import {useVisibleObservableState} from '../../UseVisilbleObservableState/UseVisibleObservableState'
+import {SegmentSubsequences} from "@shared/*";
 
 export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const word = useObservableState(quizCard.word$)
     const exampleSegmentsHidden = useIsFieldHidden({quizCard, label: QuizCardField.ExampleSegments})
     const {exampleSegmentsService} = useContext(ManagerContext);
-    const emittedValues = useVisibleObservableState(exampleSegmentsService.exampleSegmentMap$, (v:Map<string, SegmentSubsequences[]>)  => `${Array.from(v.keys()).slice(0, 3).join(', ')} ${Array.from(v.keys()).length}`);
+    const emittedValues = useVisibleObservableState(exampleSegmentsService.exampleSegmentMap$, (v: Map<string, SegmentSubsequences[]>) => `${Array.from(v.keys()).slice(0, 3).join(', ')} ${Array.from(v.keys()).length}`);
     return <Fragment>
         <div className={'quiz-card-data-sheet'}>
             <div>
@@ -39,11 +39,14 @@ export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
                 {<CardInfo quizCard={quizCard}/>}
             </div>
         </div>
+{/*
         <div style={{display: 'flex', justifyContent: 'space-around', width: '100%'}}>
             <ExpandOnClick label={"Quiz Ordering"}>
-                <CardOrderMetadata quizCard={quizCard}/></ExpandOnClick>
+                <CardOrderMetadata quizCard={quizCard}/>
+            </ExpandOnClick>
             <ScheduleRowsTables word={word || ''}/>
         </div>
+*/}
         {
             !exampleSegmentsHidden && <OpenDocumentComponent
                 style={{margin: '24px', flex: 1, overflow: 'auto', width: '100%'}}
