@@ -31,6 +31,7 @@ export class ProgressItem {
         try {
             this.start()
             await cb()
+            debugger;
             this.stop()
         } catch (e) {
             this.stop()

@@ -29,7 +29,6 @@ export const supportedDocumentFileExtensions = new Set<string>([
  */
 export class UploadingDocumentsService {
   uploadingMessages$ = new ReplaySubject<string>(1);
-  currentUploadingFile$ = new ReplaySubject<File | undefined>(1);
   private libraryService: LibraryService;
   private progressItemService: ProgressItemService;
   private settingsService: SettingsService;
@@ -53,7 +52,6 @@ export class UploadingDocumentsService {
     this.libraryService = libraryService;
     this.progressItemService = progressItemService;
     this.modalService = modalService;
-    this.currentUploadingFile$.next();
   }
 
   async upload({ file, language_code }: { file: File, language_code: string }) {
@@ -63,15 +61,7 @@ export class UploadingDocumentsService {
     return this.progressItemService.newProgressItem().exec(async () => {
       let lastDocument: string | undefined;
       lastDocument = file.name;
-      this.uploadingMessages$.next(
-        `Uploading ${file.name}...`
-      );
-      this.currentUploadingFile$.next(file);
       const uploadedDocuments = await this.libraryService.upsertDocument(file, language_code);
-      this.currentUploadingFile$.next(undefined);
-      this.uploadingMessages$.next(
-        `Uploading ${file.name} success!`
-      );
       this.settingsService.selectedFrequencyDocuments$.user$.next(
         (await observableLastValue(this.settingsService.selectedFrequencyDocuments$.user$))
           .concat(uploadedDocuments.id())

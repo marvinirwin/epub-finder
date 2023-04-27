@@ -12,20 +12,19 @@ import {supportedDocumentFileExtensions} from "../../lib/uploading-documents/upl
 
 export const UploadDialog = () => {
     const m = useContext(ManagerContext)
-    const currentFile = useObservableState(
-        m.uploadingDocumentsService.currentUploadingFile$,
-    );
     const language_code = useObservableState(m.languageConfigsService.readingLanguageCode$);
     const currentLanguageLabel = languageCodesMappedToLabels.get(language_code || '') || '';
 
     const emittedSelectedReadingLanguages = useVisibleObservableState(m.settingsService.readingLanguage$.obs$, (str: string) => `m.settingsService.readingLanguage$: ${str}`);
-    const emittedCurrentUploadingFiles = useVisibleObservableState(m.uploadingDocumentsService.currentUploadingFile$, (file: File | undefined) => `m.uploadingDocumentsService.currentUploadingFile$: ${file?.name}`);
+    // const emittedCurrentUploadingFiles = useVisibleObservableState(m.uploadingDocumentsService.currentUploadingFile$, (file: File | undefined) => `m.uploadingDocumentsService.currentUploadingFile$: ${file?.name}`);
 
-    const allEmittedValues = useMemo(() => [...emittedSelectedReadingLanguages, ...emittedCurrentUploadingFiles], [emittedSelectedReadingLanguages, emittedCurrentUploadingFiles]);
+    // const allEmittedValues = useMemo(() => [...emittedSelectedReadingLanguages, ...emittedCurrentUploadingFiles], [emittedSelectedReadingLanguages, emittedCurrentUploadingFiles]);
 
     return (
         <Box m={2} p={1} style={{width: '90vw', height: '90vh'}}>
+{/*
             <EmittedValues emittedValues={allEmittedValues} id={'upload-dialog'} />
+*/}
             <Typography variant={'h5'} color="textSecondary" gutterBottom>
                 Copy and paste some text you'd like to read in <Button onClick={() => m.modalService.languageSelect.open$.next(true)}><Typography variant={'h5'} color="textSecondary">{currentLanguageLabel}</Typography></Button>
             </Typography>
@@ -41,6 +40,7 @@ export const UploadDialog = () => {
                     Max Size: 1MB
                 </Typography>
                 <div className="mg20">
+{/*
                     {currentFile && (
                         <Box
                             className={`mb25 ${uploadProgressBar}`}
@@ -52,6 +52,7 @@ export const UploadDialog = () => {
                             </Box>
                         </Box>
                     )}
+*/}
 
                     <label htmlFor="btn-upload">
                         <input

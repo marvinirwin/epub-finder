@@ -205,6 +205,7 @@ export class Manager {
 
 
     constructor(public databaseService: DatabaseService, {audioSource}: AppContext) {
+        this.loadingWrapperService = new LoadingWrapperService()
         this.customWordsRepository = new CustomWordsRepository(this)
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)
