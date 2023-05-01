@@ -27,7 +27,7 @@ export const QuizCardScheduleRowDisplay = ({
 
     const word = useObservableState(quizCard.word$) || '';
     return (
-        <div style={{position: 'absolute'}}>
+        <div>
             <EmittedValues emittedValues={useConcatArray(emittedTranslations, emittedRomanizations, emittedDescriptions)} id={'quiz-card-schedule-row'}/>
             <div style={{ marginTop: '24px' }}>
                 <Typography variant="h4" className={quizCardRomanization}>

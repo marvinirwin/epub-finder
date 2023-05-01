@@ -678,15 +678,6 @@ mark {
 .expand-on-click {
   overflow: hidden;
   height: 5em;
-  /*
-  position: relative;
-  transition: height, width 0.5s;
-  width: fit-content;
-  &:hover {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  }
-  overflow: hidden;
-  */
 }
 
 .expand-on-click.open {

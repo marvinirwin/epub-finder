@@ -23,9 +23,7 @@ export const QuizCardButtons: React.FC<{ quizCard: QuizCard }> = ({
     quizCard.answerIsRevealed$.next(true),
   )
   return answerIsRevealed ? (
-    <Box m={2} p={1} style={{
-      display: 'flex',
-      flexFlow: 'row nowrap',
+    <Box m={2} p={1} className="flex md:flex-row flex-col" style={{
       width: '100%',
       flex: 1,
       alignItems: 'center',

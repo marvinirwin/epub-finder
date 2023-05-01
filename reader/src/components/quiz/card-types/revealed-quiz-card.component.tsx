@@ -21,18 +21,17 @@ export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
     const {exampleSegmentsService} = useContext(ManagerContext);
     const emittedValues = useVisibleObservableState(exampleSegmentsService.exampleSegmentMap$, (v: Map<string, SegmentSubsequences[]>) => `${Array.from(v.keys()).slice(0, 3).join(', ')} ${Array.from(v.keys()).length}`);
     return <Fragment>
-        <div className={'quiz-card-data-sheet'}>
-            <div>
+        <div className="flex flex-wrap">
+{/*
+            <div className="w-full sm:w-1/3">
                 <CardImage wordInfo={quizCard}/>
-                {/*
-                <Typography variant={'subtitle2'}>Card Type: {quizCardType || ''}</Typography>
-*/}
             </div>
-            <div className={'quiz-card-data-sheet-middle'}>
+*/}
+            <div className="w-full sm:w-1/3">
                 <QuizCardSound quizCard={quizCard}/>
                 <CardLearningLanguageText word={word || ''}/>
             </div>
-            <div className={`revealed-quiz-card-info-tab`}>
+            <div className="flex flex-column">
                 {/*
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}

@@ -26,12 +26,12 @@ export const LandingPage = forwardRef<HTMLInputElement, LandingPageProps>((
     }, ref) => {
     const [uploadedFileText, setUploadedFileText] = useState<string>("");
     const validExtensionList = Array.from(supportedDocumentFileExtensions).map(ext => `.${ext}`).join(', ');
-    const className = "shadow-md p-1 sm:w-1/2 w-full";
+    const className = "shadow-md p-1 md:w-1/2 w-full";
     const className2= "bg-white p-6 shadow-md"
     return <div className="min-h-screen bg-gray-100 flex sm:flex-row flex-wrap w-screen">
         <div className={className}>
             <div className={className2}>
-                <div className="flex flex-col w-1/2 p-5">
+                <div className="flex flex-col p-5">
                     <CameraComponent onPictureTaken={(image) => {
                         onFileSelected({file: image})
                     }}/>

@@ -12,6 +12,7 @@ import { SuperMemoGrade } from 'supermemo'
 import { QuizCard } from '../quiz/word-card.interface'
 import { useTutorialPopOver } from '../tutorial-popover/tutorial-popper.component'
 import debug from 'debug'
+import { classNames } from '../ClassNames'
 
 const d = debug('difficulty-buttons')
 
@@ -90,7 +91,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
     })
     return (
         <Fragment>
-            <HotkeyWrapper action={'QUIZ_RESULT_HARD'}>
+            <HotkeyWrapper action={'QUIZ_RESULT_HARD'} className={'py-2'}>
                 <Button
                     ref={hardRef}
                     className={QUIZ_BUTTON_HARD}
@@ -100,7 +101,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 </Button>
                 <HardTutorialPopOver />
             </HotkeyWrapper>
-            <HotkeyWrapper action={'QUIZ_RESULT_MEDIUM'}>
+            <HotkeyWrapper action={'QUIZ_RESULT_MEDIUM'} className={'py-2'}>
                 <Button
                     className={QUIZ_BUTTON_MEDIUM}
                     onClick={() => m.hotkeyEvents.quizResultMedium$.next()}
@@ -110,7 +111,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 </Button>
                 <MediumTutorialPopOver />
             </HotkeyWrapper>
-            <HotkeyWrapper action={'QUIZ_RESULT_EASY'}>
+            <HotkeyWrapper action={'QUIZ_RESULT_EASY'} className={'py-2'}>
                 {' '}
                 <Button
                     className={QUIZ_BUTTON_EASY}
@@ -121,7 +122,7 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 </Button>
                 <EasyTutorialPopOver />
             </HotkeyWrapper>
-            <HotkeyWrapper action={'QUIZ_RESULT_IGNORE'}>
+            <HotkeyWrapper action={'QUIZ_RESULT_IGNORE'} className={'py-2'}>
                 <Button
                     ref={ignoreRef}
                     className={QUIZ_BUTTON_IGNORE}
@@ -133,10 +134,12 @@ export const DifficultyButtons: React.FC<{ previousScheduleItems: ScheduleItem[]
                 </Button>
                 <IgnoreTutorialPopOver />
             </HotkeyWrapper>
-            <HotkeyWrapper action={'MARK_WORD_AS_KNOWN'}>
+            <HotkeyWrapper action={'MARK_WORD_AS_KNOWN'} className={'py-2'}>
                 <Button
                     ref={markAsKnownRef}
                     className={MARK_AS_KNOWN}
+                    style={{
+                    }}
                     onClick={() => {
                         m.hotkeyEvents.markWordAsKnown$.next()
                     }}

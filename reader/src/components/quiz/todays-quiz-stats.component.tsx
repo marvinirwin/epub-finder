@@ -56,7 +56,7 @@ export const TodaysQuizStats = () => {
         const wordsReviewingOrLearning = anyScheduleRowsForWord(scheduleInfo.wordsReviewingOrLearning, flashCardTypes)
         const wordsLeft = allScheduleRowsForWordToday({scheduleRows: scheduleInfo.wordsLeftForToday, allScheduleRows})
     */
-    return <Box m={2} p={1} className={'quiz-button-row'}>
+    return <Box m={2} p={1} className="flex md:flex-row flex-column">
         <WordCountInButton
             scheduleRows={scheduleInfo.wordsLeftForToday}
             className={quizWordsLeftForTodayNumber}>

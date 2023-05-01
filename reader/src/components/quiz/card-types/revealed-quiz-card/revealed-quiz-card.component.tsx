@@ -45,8 +45,8 @@ export const RevealedQuizCard: React.FC<RevealedQuizCardProps> = ({
   return (
     <div className="w-full h-full relative bg-white">
       <QuizProgressBar progressBarPercentage={progressBarPercentage} />
-      <div className="w-full flex flex-row">
-        <div className="w-1/3">
+      <div className="w-full flex flex-row flex-wrap">
+        <div className="w-1/3 md:w-full">
           <img className="rounded-md" src="https://cdn.pixabay.com/photo/2015/05/18/23/19/gesture-772977_960_720.jpg" />
         </div>
         <div className="w-1/3 flex flex-row flex-wrap p-3 leading-none">

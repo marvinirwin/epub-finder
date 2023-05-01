@@ -4,14 +4,17 @@ import { FocusedElement, HotkeyContext } from '../main'
 import { Hotkeys } from '../../lib/hotkeys/hotkeys.interface'
 import { ManagerContext } from '../../App'
 import { useObservableState } from 'observable-hooks'
+import {classNames} from "../ClassNames";
 
 export interface HotkeyWrapperParams {
     action: keyof Hotkeys<any>
     children?: React.ReactNode
+    className?: string
 }
 export const HotkeyWrapper: React.FunctionComponent<HotkeyWrapperParams> = ({
     children,
     action,
+    className
 }) => {
     const handler = useContext(FocusedElement)
     const config = useContext(HotkeyContext)
@@ -26,6 +29,7 @@ export const HotkeyWrapper: React.FunctionComponent<HotkeyWrapperParams> = ({
                 <span className={`hotkey-mode-${mode}`}>{keysStr}</span>
             }
             color="primary"
+            className={classNames(className)}
         >
             {children}
         </Badge>
