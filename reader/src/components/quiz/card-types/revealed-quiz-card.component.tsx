@@ -27,7 +27,7 @@ export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
                 <CardImage wordInfo={quizCard}/>
             </div>
 */}
-            <div className="w-full sm:w-1/3">
+            <div className="w-full sm:w-1/2">
                 <QuizCardSound quizCard={quizCard}/>
                 <CardLearningLanguageText word={word || ''}/>
             </div>

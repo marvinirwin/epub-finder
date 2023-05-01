@@ -11,7 +11,7 @@ export const CardInfo = ({ quizCard }: { quizCard: QuizCard }) => {
         | ScheduleRow<SortQuizData>
         | undefined = useObservableState(m.quizService.currentScheduleRow$)
     return (
-        <div>
+        <div className="w-full sm:w-1/2">
             {scheduleRow && (
                 <QuizCardScheduleRowDisplay
                     quizCard={quizCard}
