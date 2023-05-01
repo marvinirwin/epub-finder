@@ -19,6 +19,7 @@ import { TabulationConfigurationService } from '../language/language-maps/tabula
 import { OnSelectService } from '../user-interface/on-select.service'
 import { pipeLog } from './pipe.log'
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
+import {LoadingService} from "../loading/loadingService";
 
 export type TrieObservable = Observable<TrieWrapper>
 
@@ -34,7 +35,6 @@ export class OpenDocumentsService {
     openDocumentBodies$: Observable<HTMLBodyElement>
     renderedSegments$: Observable<BrowserSegment[]>
     virtualDocumentTabulation$: Observable<SerializedTabulationAggregate>
-    aVirtualTabulationIsLoading$: Observable<boolean>
 
     constructor(
         private config: {
@@ -45,6 +45,7 @@ export class OpenDocumentsService {
             onSelectService: OnSelectService
             tabulationConfigurationService: TabulationConfigurationService
             exampleSegmentsService: ExampleSegmentsService
+            loadingService: LoadingService
         },
     ) {
         this.sourceDocuments$ = config.documentRepository.collection$.pipe(
@@ -69,6 +70,7 @@ export class OpenDocumentsService {
                                 config.languageConfigsService,
                             onSelectService: config.onSelectService,
                             exampleSegmentsService: config.exampleSegmentsService,
+                            loadingService: config.loadingService
                         },
                     )
                     return [id, openDocument]
@@ -129,16 +131,6 @@ export class OpenDocumentsService {
             map(
                 (documentTabulations: SerializedDocumentTabulation[]) =>
                     new SerializedTabulationAggregate(documentTabulations),
-            ),
-            shareReplay(1),
-        )
-
-        this.aVirtualTabulationIsLoading$ = mapDocumentTree(
-            (document) => document.isLoadingVirtualTabulation$,
-            SOURCE_DOCUMENTS_NODE_LABEL,
-        ).pipe(
-            map((loadingTabulationBooleans) =>
-                loadingTabulationBooleans.every((v) => v),
             ),
             shareReplay(1),
         )

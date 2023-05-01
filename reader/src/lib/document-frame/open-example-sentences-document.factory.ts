@@ -10,6 +10,7 @@ import { TabulationConfigurationService } from '../language/language-maps/tabula
 import { OnSelectService } from '../user-interface/on-select.service'
 import {SegmentSubsequences} from "@shared/*";
 import {ExampleSegmentsService} from "../quiz/example-segments.service";
+import {LoadingService} from "../loading/loadingService";
 
 export const OpenExampleSentencesFactory = ({
     documentId,
@@ -18,7 +19,8 @@ export const OpenExampleSentencesFactory = ({
     settingsService,
     languageConfigsService,
     onSelectService,
-    exampleSegmentsService
+    exampleSegmentsService,
+    loadingService
 }: {
     documentId: string
     sentences$: Observable<SegmentSubsequences[]>
@@ -27,6 +29,7 @@ export const OpenExampleSentencesFactory = ({
     languageConfigsService: LanguageConfigsService
     onSelectService: OnSelectService
     exampleSegmentsService: ExampleSegmentsService
+    loadingService: LoadingService
 }) => {
     return new OpenDocument(
         documentId,
@@ -37,14 +40,15 @@ export const OpenExampleSentencesFactory = ({
                 distinctUntilChanged(),
                 shareReplay(1),
             ),
-            documentId: documentId
+            documentId
         }),
         'Example Sentences',
         {
             settingsService,
             languageConfigsService,
             onSelectService,
-            exampleSegmentsService
+            exampleSegmentsService,
+            loadingService
         },
     )
 }

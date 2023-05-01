@@ -22,6 +22,7 @@ import {SpacedScheduleRow} from "../../lib/manager/space-schedule-row.type";
 import {DictionaryService} from "../../lib/dictionary/dictionary.service";
 import {fetchTranslationWithGrammarHints} from "../../services/translate.service";
 import {SegmentSubsequences} from "@shared/*";
+import {LoadingService} from "../../lib/loading/loadingService";
 
 type SegmentMapReturnType = {
     segments: SegmentSubsequences[],
@@ -45,7 +46,8 @@ export class QuizService {
             translationAttemptScheduleService,
             onSelectService,
             wordRecognitionProgressRepository,
-            dictionaryService
+            dictionaryService,
+            loadingService
         }: {
             cardsRepository: CardsRepository
             sortedLimitedQuizScheduleRowsService: SortedLimitScheduleRowsService
@@ -57,7 +59,8 @@ export class QuizService {
             onSelectService: OnSelectService,
             wordRecognitionProgressRepository: WordRecognitionProgressRepository
             exampleSegmentsService: ExampleSegmentsService
-            dictionaryService: DictionaryService
+            dictionaryService: DictionaryService,
+            loadingService: LoadingService
         }) {
         this.manualHiddenFieldConfig$.next('')
         this.currentScheduleRow$ = combineLatest(
@@ -124,6 +127,7 @@ export class QuizService {
             onSelectService,
             exampleSegmentsService,
             documentId: 'example-sentences',
+            loadingService,
             sentences$: combineLatest([
                 exampleSegmentsService.exampleSegmentMap$,
                 currentWord$,

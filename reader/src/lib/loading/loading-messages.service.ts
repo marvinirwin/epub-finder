@@ -16,11 +16,6 @@ export class LoadingMessagesService {
             documentRepository.loadingSignal.isLoading$.pipe(
                 map((isFetching) => (isFetching ? 'Fetching library' : '')),
             ),
-            openDocumentsService.aVirtualTabulationIsLoading$.pipe(
-                map((isTabulating) =>
-                    isTabulating ? 'Counting words in documents' : '',
-                ),
-            ),
         ]).pipe(
             map((messages) => messages.filter((v) => v)),
             shareReplay(1),

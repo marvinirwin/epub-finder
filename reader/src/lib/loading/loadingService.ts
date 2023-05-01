@@ -31,11 +31,13 @@ export class LoadingService {
             tap((i: InputType) => {
                 const message = typeof label === 'function' ? label(i) : label;
                 id = Math.random();
-                this.loadingMessage$.next(this.loadingMessage$.getValue().concat({message, id}));
+                let value1 = this.loadingMessage$.getValue();
+                this.loadingMessage$.next(value1.concat({message, id}));
             }),
             f,
             tap((v: OutputType) => {
-                this.loadingMessage$.next(this.loadingMessage$.getValue().filter(loadingMessage => loadingMessage.id !== id));
+                let value = this.loadingMessage$.getValue();
+                this.loadingMessage$.next(value.filter(loadingMessage => loadingMessage.id !== id));
             })
         )
     }

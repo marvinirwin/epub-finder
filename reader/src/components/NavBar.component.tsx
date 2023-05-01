@@ -25,6 +25,7 @@ export const NavBar = (
     const m = useContext(ManagerContext);
     const progressItems = useObservableState(m.progressItemService.progressItemText$)?.join(', ')
     const loadingThings = useObservableState(m.loadingWrapperService.loadingMessage$)?.map(item => item.message)?.join(', ')
+    console.log(loadingThings)
     return (
         <Disclosure as="nav" className="bg-gray-800 w-full">
             {({open}) => (
