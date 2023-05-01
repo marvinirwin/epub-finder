@@ -29,11 +29,13 @@ export class ProgressItem {
 
     async exec(cb: () => Promise<any> | any) {
         try {
+            debugger;
             this.start()
             await cb()
             debugger;
             this.stop()
         } catch (e) {
+            debugger;
             this.stop()
             throw e
         }

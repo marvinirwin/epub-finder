@@ -39,7 +39,8 @@ const UploadModal: React.FC<Props> = ({onSubmit, uploadingDocument}) => {
     };
 
     const handleSubmit = () => {
-        onSubmit(new File([uploadingDocument], uploadingDocumentName, { type: uploadingDocument.type }));
+        const ext = uploadingDocument.name.split('.').pop();
+        onSubmit(new File([uploadingDocument], `${uploadingDocumentName}.${ext}`, { type: uploadingDocument.type }));
     };
 
     const buttonDisabled = uploadingDocumentName.trim() === '';

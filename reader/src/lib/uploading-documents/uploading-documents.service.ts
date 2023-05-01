@@ -63,11 +63,11 @@ export class UploadingDocumentsService {
       lastDocument = file.name;
       const uploadedDocuments = await this.libraryService.upsertDocument(file, language_code);
       this.settingsService.selectedFrequencyDocuments$.user$.next(
-        (await observableLastValue(this.settingsService.selectedFrequencyDocuments$.user$))
+        (await observableLastValue(this.settingsService.selectedFrequencyDocuments$.obs$))
           .concat(uploadedDocuments.id())
       );
       this.settingsService.selectedExampleSegmentDocuments$.user$.next(
-        (await observableLastValue(this.settingsService.selectedExampleSegmentDocuments$.user$))
+        (await observableLastValue(this.settingsService.selectedExampleSegmentDocuments$.obs$))
           .concat(uploadedDocuments.id())
       );
       this.settingsService.readingDocument$.user$.next(uploadedDocuments.id());

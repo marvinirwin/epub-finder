@@ -137,26 +137,10 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
             element: <LandingPage
                 onTextUpload={(file) => {
                     setUploadingDocument(file)
-                    /*
-                                            m.uploadingDocumentsService.upload(
-                                                {
-                                                    file: ,
-                                                    language_code: readingLanguageCode
-                                                }
-                                            );
-                    */
                 }
                 }
                 onFileSelected={({file}) => {
                     setUploadingDocument(file);
-                    /*
-                                        m.uploadingDocumentsService.upload(
-                                            {
-                                                file,
-                                                language_code: readingLanguageCode
-                                            }
-                                        );
-                    */
                 }
                 }
                 languages={languages}
