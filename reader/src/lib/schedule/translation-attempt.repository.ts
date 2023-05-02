@@ -2,7 +2,7 @@ import {IndexedRowsRepository} from './indexed-rows.repository'
 import {DatabaseService} from '../Storage/database.service'
 import {SuperMemoGrade} from 'supermemo'
 import {emptyGenerator} from './pronunciation-progress.repository'
-import {LoadingWrapperService} from "../loading/loadingService";
+import {LoadingService} from "../loading/loadingService";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
 
 export interface TranslationAttemptRecord {
@@ -23,11 +23,11 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
     constructor(
         {
             databaseService,
-            loadingWrapperService,
+            loadingService,
             loggedInUserService
         }: {
             databaseService: DatabaseService,
-            loadingWrapperService: LoadingWrapperService,
+            loadingService: LoadingService,
             loggedInUserService: LoggedInUserService
         }) {
         super({
@@ -35,7 +35,7 @@ export class TranslationAttemptRepository extends IndexedRowsRepository<Translat
             load: emptyGenerator,
             add: (r) => Promise.resolve(r as TranslationAttemptRecord),
             getIndexValue: (r) => ({indexValue: r.learningLanguage}),
-            loadingWrapperService,
+            loadingService: loadingService,
             loggedInUserService
         })
     }

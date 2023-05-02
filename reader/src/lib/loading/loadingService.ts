@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, merge, Observable, pipe, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, merge, Observable} from "rxjs";
 import {map, tap} from "rxjs/operators";
 import {LoadingSignal} from "./loadingSignal";
 
@@ -26,23 +26,30 @@ export class LoadingService {
         f: ((o$: Observable<InputType>) => Observable<OutputType>),
         label: ((i: InputType) => string) | string
     ): Observable<OutputType> {
-        let id: undefined | number;
+        const ids: number[] = [];
         return o$.pipe(
             tap((i: InputType) => {
+                ids.push(Math.random())
+                const lastId = ids[ids.length - 1];
                 const message = typeof label === 'function' ? label(i) : label;
-                id = Math.random();
-                let value1 = this.loadingMessage$.getValue();
-                this.loadingMessage$.next(value1.concat({message, id}));
+                const newLoadingMessageList = this.loadingMessage$.getValue().concat({message, id: lastId});
+                this.loadingMessage$.next(newLoadingMessageList);
+                console.log(`Switchmap started, Loading messages left for ${label}:  ${newLoadingMessageList.length}`)
             }),
             f,
             tap((v: OutputType) => {
-                let value = this.loadingMessage$.getValue();
-                this.loadingMessage$.next(value.filter(loadingMessage => loadingMessage.id !== id));
+                const lastId = ids.pop();
+                const value = this.loadingMessage$.getValue().filter(loadingMessage => {
+                    return loadingMessage.id !== lastId;
+                });
+                this.loadingMessage$.next(value);
+                console.log(`Switchmap finished, Loading messages left for ${label}:  ${value.length}`)
             })
         )
     }
 }
 
+/*
 export class LoadingWrapperService {
     loadingMessage$ = new BehaviorSubject<{id: number, message: string}[]>([]);
 
@@ -65,3 +72,4 @@ export class LoadingWrapperService {
         )
     }
 }
+*/

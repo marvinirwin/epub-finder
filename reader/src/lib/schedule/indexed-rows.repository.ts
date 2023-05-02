@@ -11,10 +11,9 @@ import {
 import { orderBy, flatten } from 'lodash'
 import { DatabaseService } from '../Storage/database.service'
 import { safePush, UnPersistedEntity } from '@shared/'
-import { SuperMemoGrade } from 'supermemo'
-import {LoadingWrapperService} from "../loading/loadingService";
 import {LoadingSignal} from "../loading/loadingSignal";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
+import { LoadingService } from '../loading/loadingService'
 
 
 export type PotentialExcludedDbColumns<T> = Omit<T, 'creator_id' | 'id'> | T;
@@ -36,7 +35,7 @@ export class IndexedRowsRepository<T extends { id: number | string, created_at: 
         load: () => Promise<AsyncGenerator<UnPersistedEntity<T>[]>> | AsyncGenerator<UnPersistedEntity<T>[]>
         add: (t: PotentialExcludedDbColumns<T>) => Promise<T>
         getIndexValue: (v: PotentialExcludedDbColumns<T>) => { indexValue: string },
-        loadingWrapperService: LoadingWrapperService,
+        loadingService: LoadingService,
         loggedInUserService: LoggedInUserService,
     }) {
         this.indexOfOrderedRecords$.next({})

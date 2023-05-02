@@ -12,6 +12,8 @@ import {NavBarProfileMenuProfileButton} from "./NavBarProfileMenuProfileButton";
 import {NavBarProfileSettingsLink} from "./NavBarProfileSettingsLink";
 import {NavBarProfileSignOutLink} from "./NavBarProfileSignOutLink";
 import {NavBarMobileNavLink} from "./NavBarMobileNavLink";
+import EllipsesLoader from "./EllipsesLoader";
+import {uniq} from "lodash";
 
 
 export const NavBar = (
@@ -23,9 +25,9 @@ export const NavBar = (
         userProfileButton: React.ReactNode
     }) => {
     const m = useContext(ManagerContext);
-    const progressItems = useObservableState(m.progressItemService.progressItemText$)?.join(', ')
-    const loadingThings = useObservableState(m.loadingWrapperService.loadingMessage$)?.map(item => item.message)?.join(', ')
-    console.log(loadingThings)
+    const l1 = useObservableState(m.progressItemService.progressItemText$) || []
+    const l2 = useObservableState(m.loadingService.loadingMessage$)?.map(item => item.message) || []
+    const progressItems = uniq([...l1, ...l2]);
     return (
         <Disclosure as="nav" className="bg-gray-800 w-full">
             {({open}) => (
@@ -33,14 +35,11 @@ export const NavBar = (
                     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                         <div className="relative flex items-center justify-between h-16">
                             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                                {progressItems}
-                                {loadingThings}
                                 {/* Mobile menu button*/}
                                 <NavBarOpenMenuButton open={open}/>
+                                <EllipsesLoader items={progressItems}/>
                             </div>
                             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                                {progressItems}
-                                {loadingThings}
 
                                 <NavBarFullScreenNavItems elements={navItems.map((item) => {
                                     return <NavBarFullScreenNavItem
@@ -51,7 +50,7 @@ export const NavBar = (
                                                 'px-3 py-2 rounded-md text-sm font-medium'
                                             )}/>;
                                 })}/>
-
+                                <EllipsesLoader items={progressItems}/>
                             </div>
                             <div
                                 className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -105,6 +104,7 @@ export const NavBar = (
                             {navItems.map((item) => {
                                 return <NavBarMobileNavLink
                                     item={item}
+                                    key={item.name}
                                     className={({isActive, isPending}) =>
                                         classNames(
                                             isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',

@@ -97,7 +97,7 @@ import {CsvService} from './csv.service'
 import {KnownWordsRepository} from '../schedule/known-words.repository'
 import {LeaderBoardService} from "../../components/leader-board.service";
 import {DictionaryService} from "../dictionary/dictionary.service";
-import {LoadingService, LoadingWrapperService} from "../loading/loadingService";
+import {LoadingService} from "../loading/loadingService";
 import {TakenPictureService} from "./TakenPictureService";
 import {QuickPreviewService} from "./QuickPreviewService";
 
@@ -108,7 +108,6 @@ const addVideoIndex = debounce((obs$: Subject<number | undefined>, index: number
 */
 
 export class Manager {
-    public loadingWrapperService: LoadingWrapperService;
     public hotkeyEvents: HotKeyEvents
     public audioRecordingService: AudioManager
     public cardsRepository: CardsRepository
@@ -205,7 +204,6 @@ export class Manager {
 
 
     constructor(public databaseService: DatabaseService, {audioSource}: AppContext) {
-        this.loadingWrapperService = new LoadingWrapperService()
         this.customWordsRepository = new CustomWordsRepository(this)
         this.timeService = new TimeService()
         this.ignoredWordsRepository = new IgnoredWordsRepository(this)

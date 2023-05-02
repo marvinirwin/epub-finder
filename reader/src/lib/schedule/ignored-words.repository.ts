@@ -3,7 +3,7 @@ import {DatabaseService, CachedEntity} from '../Storage/database.service'
 import {IgnoredWord} from '@shared/'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
-import {LoadingWrapperService} from "../loading/loadingService";
+import {LoadingService} from "../loading/loadingService";
 import {observableLastValue} from "../../services/observableLastValue";
 
 // @ts-ignore
@@ -12,14 +12,14 @@ export class IgnoredWordsRepository extends IndexedRowsRepository<IgnoredWord> {
         {
             databaseService,
             loggedInUserService,
-            loadingWrapperService
+            loadingService
         }: {
             databaseService: DatabaseService,
             loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService,
+            loadingService: LoadingService,
         }) {
         super({
-            loadingWrapperService,
+            loadingService: loadingService,
             databaseService,
             load: async () => {
                 const profile = await observableLastValue(loggedInUserService.profile$);

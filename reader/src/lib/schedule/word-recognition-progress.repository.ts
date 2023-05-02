@@ -3,19 +3,19 @@ import {WordRecognitionRow} from './word-recognition-row'
 import {DatabaseService} from '../Storage/database.service'
 import {putPersistableEntity} from "../Storage/put-persistable-entity";
 import {LoggedInUserService} from "../auth/logged-in-user.service";
-import {LoadingWrapperService} from "../loading/loadingService";
 import {observableLastValue} from "../../services/observableLastValue";
+import {LoadingService} from "../loading/loadingService";
 
 export class WordRecognitionProgressRepository extends IndexedRowsRepository<WordRecognitionRow> {
     constructor(
         {
             databaseService,
             loggedInUserService,
-            loadingWrapperService
+            loadingService
         }: {
             databaseService: DatabaseService,
+            loadingService: LoadingService,
             loggedInUserService: LoggedInUserService,
-            loadingWrapperService: LoadingWrapperService,
         }) {
         super({
             databaseService,
@@ -30,7 +30,7 @@ export class WordRecognitionProgressRepository extends IndexedRowsRepository<Wor
             },
             add: (r) => putPersistableEntity({entity: 'spacedRepitionEntities', record: r}),
             getIndexValue: (r) => ({indexValue: r.word}),
-            loadingWrapperService,
+            loadingService: loadingService,
             loggedInUserService
         })
     }
