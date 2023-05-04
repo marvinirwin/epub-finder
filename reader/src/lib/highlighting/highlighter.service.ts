@@ -57,8 +57,6 @@ export class HighlighterService {
                         ),
                     )
                 })
-                console.log(wordElementMap)
-                console.log(targetElementMap)
                 return targetElementMap
             }),
             shareReplay(1),

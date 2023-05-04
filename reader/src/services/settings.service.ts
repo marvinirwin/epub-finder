@@ -42,7 +42,10 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): SettingObject<T> => {
 function listenToPathnameChanges() {
     return new Observable<string>((observer) => {
         const onPopState = (event: any) => {
-            observer.next(window.location.pathname);
+            let value = window.location.pathname;
+            debugger;
+            console.log(`Pathname change ${value}`)
+            observer.next(value);
         };
 
         window.addEventListener('popstate', onPopState);
@@ -50,10 +53,13 @@ function listenToPathnameChanges() {
 
         // Emit the initial value
         observer.next(window.location.pathname);
+        console.log(`Initial pathname ${window.location.pathname}`);
 
         // Clean up function
         return () => {
+            debugger;
             window.removeEventListener('popstate', onPopState);
+            window.addEventListener('pushstate', onPopState);
         };
     });
 }
@@ -318,7 +324,9 @@ export class SettingsService {
             .pipe(
                 map(v => v.replace('/', '')),
                 shareReplay(1)
-            )
+            );
+        // THIS IS A HACK
+        this.componentPath$.subscribe()
     }
 
     public createSetting$<T>(

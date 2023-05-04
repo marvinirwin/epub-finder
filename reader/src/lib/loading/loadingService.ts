@@ -34,7 +34,6 @@ export class LoadingService {
                 const message = typeof label === 'function' ? label(i) : label;
                 const newLoadingMessageList = this.loadingMessage$.getValue().concat({message, id: lastId});
                 this.loadingMessage$.next(newLoadingMessageList);
-                console.log(`Switchmap started, Loading messages left for ${label}:  ${newLoadingMessageList.length}`)
             }),
             f,
             tap((v: OutputType) => {
@@ -43,7 +42,6 @@ export class LoadingService {
                     return loadingMessage.id !== lastId;
                 });
                 this.loadingMessage$.next(value);
-                console.log(`Switchmap finished, Loading messages left for ${label}:  ${value.length}`)
             })
         )
     }

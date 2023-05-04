@@ -27,11 +27,11 @@ export const RevealedQuizCard = ({quizCard}: { quizCard: QuizCard }) => {
                 <CardImage wordInfo={quizCard}/>
             </div>
 */}
-            <div className="w-full sm:w-1/2">
+            <div className="w-full sm:w-1/2 inline-flex items-center flex-col">
                 <QuizCardSound quizCard={quizCard}/>
                 <CardLearningLanguageText word={word || ''}/>
             </div>
-            <div className="flex flex-column">
+            <div className="w-full sm:w-1/2 inline-flex justify-center">
                 {/*
                                 {answerIsRevealed && <QuizCardScheduleTable />}
 */}
