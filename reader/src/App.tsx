@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import './declaration.d'
 import 'fontsource-noto-sans'
 import './App.scss'
@@ -17,6 +17,7 @@ import {SafariNotSupported} from "./safari-not-supported.component";
 import {Flowbite, DarkThemeToggle, CustomFlowbiteTheme} from 'flowbite-react';
 import {PronunciationVideoContainer} from "./components/pronunciation-video/pronunciation-video-container.component";
 import {useObservableState} from "observable-hooks";
+import { useLocation } from 'react-router-dom'
 
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -34,6 +35,9 @@ export const ManagerContext = React.createContext(manager);
 
 function App() {
     const m = manager;
+    useEffect(() => {
+        m.browserInputsService.applyDocumentListeners(document)
+    }, [m])
     const selectedVideo = useObservableState(m.pronunciationVideoService.videoMetadata$);
     return (
         <Flowbite>

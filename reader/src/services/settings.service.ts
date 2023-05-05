@@ -2,7 +2,7 @@ import {DatabaseService} from '../lib/Storage/database.service'
 import {merge, Observable, ReplaySubject} from 'rxjs'
 import {ds_Dict} from '../lib/delta-scan/delta-scan.module'
 import {Hotkeys} from '../lib/hotkeys/hotkeys.interface'
-import {distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators'
+import {distinctUntilChanged, shareReplay, switchMap} from 'rxjs/operators'
 import {HistoryService} from '../lib/app-context/history.service'
 import {SettingGetSet, SettingType} from './setting-get-set'
 import {MapSubject} from './map-subject'
@@ -39,31 +39,6 @@ const settingSubject = <T>(getSet: SettingGetSet<T>): SettingObject<T> => {
     return settingReplaySubject
 }
 
-function listenToPathnameChanges() {
-    return new Observable<string>((observer) => {
-        const onPopState = (event: any) => {
-            let value = window.location.pathname;
-            debugger;
-            console.log(`Pathname change ${value}`)
-            observer.next(value);
-        };
-
-        window.addEventListener('popstate', onPopState);
-        window.addEventListener('pushstate', onPopState);
-
-        // Emit the initial value
-        observer.next(window.location.pathname);
-        console.log(`Initial pathname ${window.location.pathname}`);
-
-        // Clean up function
-        return () => {
-            debugger;
-            window.removeEventListener('popstate', onPopState);
-            window.addEventListener('pushstate', onPopState);
-        };
-    });
-}
-
 
 export class SettingsService {
     private db: DatabaseService
@@ -83,7 +58,7 @@ export class SettingsService {
     public showRomanization$: SettingObject<boolean>
     public frequencyWeight$: SettingObject<number>
     public readingLanguage$: SettingObject<string>
-    public componentPath$: Observable<string>
+    public componentPath$: ReplaySubject<string>
     public manualIsRecording$: SettingObject<boolean>
     public spokenLanguage$: SettingObject<string>
     public selectedFrequencyDocuments$: SettingObject<string[]>
@@ -320,11 +295,7 @@ export class SettingsService {
             true,
             'indexedDB',
         );
-        this.componentPath$ = listenToPathnameChanges()
-            .pipe(
-                map(v => v.replace('/', '')),
-                shareReplay(1)
-            );
+        this.componentPath$ = new ReplaySubject<string>(window.location.pathname.split('/').filter(x => x).length)
         // THIS IS A HACK
         this.componentPath$.subscribe()
     }

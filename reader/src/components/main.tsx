@@ -9,7 +9,7 @@ import "./mouseover-div/mouseover-div";
 import { useShowIntroModal } from "../lib/intro/use-show-intro-modal";
 import { ShowObservableContext } from "../ShowObservableContext";
 import {PageWrapper} from "./menu-landing-page/PageWrapper.component";
-import {BrowserRouter, Router} from "react-router-dom";
+import {BrowserRouter, Router, useLocation} from "react-router-dom";
 
 export const FocusedElement = React.createContext<
     HTMLElement | Document | null
@@ -25,9 +25,6 @@ export const PronunciationVideoResizedContext = React.createContext<
 >(pronunciationVideoResized$)
 
 export function Main({ m }: { m: Manager }) {
-    useEffect(() => {
-        m.browserInputsService.applyDocumentListeners(document)
-    }, [m])
     useShowIntroModal()
 
     const hotkeyHandler =

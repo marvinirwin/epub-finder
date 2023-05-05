@@ -1,4 +1,4 @@
-import React, {DragEvent, useContext, useRef, useState} from "react";
+import React, {DragEvent, useContext, useEffect, useRef, useState} from "react";
 import {NavBarAndSettingsPopup} from "../settings-popup/NavBarAndSettingsPopup.component";
 import {LandingPage, ParentLanguageOption, VariantLanguageOption} from "./LandingPage";
 import {TreeMenuNode} from "../app-directory/tree-menu-node.interface";
@@ -20,6 +20,10 @@ export type PageWrapperProps = {};
 
 export const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     const m = useContext(ManagerContext);
+    const location = useLocation();
+    useEffect(() => {
+        m.settingsService.componentPath$.next(location.pathname.replace('/', ''));
+    }, [location.pathname])
     const readingLanguageCode =
         useObservableState(m.settingsService.readingLanguage$.obs$) || ''
     const spokenLanguageCode =
