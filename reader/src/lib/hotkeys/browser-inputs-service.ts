@@ -96,6 +96,7 @@ export class BrowserInputsService {
 
     applyDocumentListeners(root: HTMLDocument) {
         root.onkeydown = (ev) => {
+            console.log(`keydown ${ev.key}`)
             const activeElement = document.activeElement
             if (activeElement?.tagName === 'TEXTAREA' ||
                 (activeElement?.tagName === 'INPUT' && (activeElement as HTMLInputElement)?.type === 'text')
