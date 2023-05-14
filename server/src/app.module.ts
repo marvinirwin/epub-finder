@@ -48,7 +48,7 @@ import {TimingMiddleware} from "./timing.middleware";
             serveRoot: "/",
         }),
         ServeStaticModule.forRoot({
-            rootPath: resolve('client'), // path to your client directory
+            rootPath: resolve('public'), // path to your client directory
             renderPath: '/quiz-carousel', // path you want to serve index.html for
             serveRoot: '/quiz-carousel' // base path for the static files
         }),

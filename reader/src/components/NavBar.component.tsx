@@ -37,7 +37,6 @@ export const NavBar = (
                             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                                 {/* Mobile menu button*/}
                                 <NavBarOpenMenuButton open={open}/>
-                                <EllipsesLoader items={progressItems}/>
                             </div>
                             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
 

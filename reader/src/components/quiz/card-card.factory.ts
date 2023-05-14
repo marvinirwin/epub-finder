@@ -86,6 +86,7 @@ export const wordCardFactory = (
             ]),  ([translateConfig, dictionary, currentWord]) => {
                 return dictionary.getDefinition(currentWord || "")
                     .then(result => {
+                        debugger;
                         if (result) {
                             return result;
                         }
